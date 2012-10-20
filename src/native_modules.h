@@ -17,8 +17,8 @@ void free_native_module(NativeModule* module);
 
 // Add a module with the given name to the World. If a module with this name already exists,
 // return the existing one.
-NativeModule* add_native_module(World* world, Name name);
-void delete_native_module(World* world, Name name);
+NativeModule* add_native_module(World* world, const char* name);
+void delete_native_module(World* world, const char* name);
 
 // Add a patch on the given module.
 void module_patch_function(NativeModule* module, const char* name, EvaluateFunc func);

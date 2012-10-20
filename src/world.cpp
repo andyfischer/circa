@@ -15,6 +15,7 @@
 #include "modules.h"
 #include "native_modules.h"
 #include "reflection.h"
+#include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
 #include "term.h"
@@ -147,7 +148,7 @@ void update_branch_after_module_reload(Branch* target, Branch* oldBranch, Branch
     update_all_code_references(target, oldBranch, newBranch);
 }
 
-void update_world_after_module_reload(caWorld* world, Branch* oldBranch, Branch* newBranch)
+void update_world_after_module_reload(World* world, Branch* oldBranch, Branch* newBranch)
 {
     // Update references in every module
     for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
@@ -182,6 +183,24 @@ void refresh_all_modules(caWorld* world)
             }
         }
     }
+}
+
+void reload_branch(World* world, caValue* globalName, const char* filename)
+{
+    Term* namedTerm = find_from_global_name(world, as_cstring(globalName));
+    ca_assert(namedTerm != NULL);
+    Branch* existing = nested_contents(namedTerm);
+
+    Branch* newBranch = alloc_branch_gc();
+    load_script(newBranch, filename);
+
+    update_static_error_list(newBranch);
+
+    // New branch starts off with the old branch's version, plus 1.
+    newBranch->version = existing->version + 1;
+
+    namedTerm->nestedContents = newBranch;
+    update_world_after_module_reload(world, existing, newBranch);
 }
 
 } // namespace circa

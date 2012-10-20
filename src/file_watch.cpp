@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "debug.h"
 #include "list.h"
 #include "tagged_value.h"
 #include "world.h"
@@ -75,7 +76,25 @@ void file_watch_trigger_actions(World* world, const char* filename)
     if (watch == NULL)
         return;
 
-    // TODO - walk through each action and execute it.
+    // Walk through each action and execute it.
+    for (int i = 0; i < list_length(&watch->onChangeActions); i++) {
+        caValue* action = list_get(&watch->onChangeActions, i);
+
+        Name label = leading_name(action);
+        ca_assert(label != name_None);
+
+        switch (label) {
+        case name_NativeModule:
+            break;
+        case name_Branch: {
+            // Reload this code branch.
+            caValue* branchGlobalName = list_get(action, 1);
+            break;
+        }
+        default:
+            internal_error("unrecognized file watch action");
+        }
+    }
 }
 
 void file_watch_check_all(World* world)

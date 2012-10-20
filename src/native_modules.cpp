@@ -19,7 +19,7 @@ namespace circa {
 
 struct NativeModuleWorld
 {
-    std::map<Name, NativeModule*> nativeModules;
+    std::map<std::string, NativeModule*> nativeModules;
 };
 
 struct NativeModule
@@ -48,12 +48,12 @@ void free_native_module(NativeModule* module)
     delete module;
 }
 
-NativeModule* add_native_module(World* world, Name name)
+NativeModule* add_native_module(World* world, const char* name)
 {
     NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
 
     // Return existing module, if it exists.
-    std::map<Name, NativeModule*>::const_iterator it = moduleWorld->nativeModules.find(name);
+    std::map<std::string, NativeModule*>::const_iterator it = moduleWorld->nativeModules.find(name);
     if (it != moduleWorld->nativeModules.end())
         return it->second;
 
@@ -63,7 +63,7 @@ NativeModule* add_native_module(World* world, Name name)
     return module;
 }
 
-void delete_native_module(World* world, Name name)
+void delete_native_module(World* world, const char* name)
 {
     world->nativeModuleWorld->nativeModules.erase(name);
 }

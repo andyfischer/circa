@@ -15,6 +15,7 @@
 #include "importing_macros.h"
 #include "inspection.h"
 #include "list.h"
+#include "names.h"
 #include "native_modules.h"
 #include "parser.h"
 #include "stateful_code.h"
@@ -26,6 +27,7 @@
 #include "term.h"
 #include "type.h"
 #include "update_cascades.h"
+#include "world.h"
 
 namespace circa {
 

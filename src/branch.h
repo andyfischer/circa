@@ -187,6 +187,7 @@ bool check_and_update_file_origin(Branch* branch, const char* filename);
 // version of this branch available. If so, the new version is loaded and returned.
 // If not, the exisiting Branch is returned.
 Branch* load_latest_branch(Branch* branch);
+void reload_branch(World* world, caValue* globalName, const char* filename);
 
 void branch_check_invariants(caValue* result, Branch* branch);
 bool branch_check_invariants_print_result(Branch* branch, std::ostream& out);

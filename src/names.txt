@@ -52,6 +52,10 @@ UniformListType
 AnonStructType
 StructType
 
+# File watch actions
+NativeModule
+Branch
+
 # Tokens
 tok_Identifier
 tok_Name

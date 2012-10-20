@@ -84,7 +84,7 @@ void patch_manually_ns()
 void new_function_patched_by_world()
 {
     // First create the module, as part of the global world.
-    NativeModule* module = add_native_module(global_world(), name_from_string("test_module_34"));
+    NativeModule* module = add_native_module(global_world(), "test_module_34");
     module_patch_function(module, "my_add", my_add);
 
     // Now create our function, it should be patched.
@@ -98,6 +98,8 @@ void new_function_patched_by_world()
     run_interpreter(&stack);
 
     // test_equals(test_spy_get_results(), "[3]");
+
+    delete_native_module(global_world(), "test_module_34");
 }
 
 void register_tests()
