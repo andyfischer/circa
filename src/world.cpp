@@ -185,9 +185,15 @@ void refresh_all_modules(caWorld* world)
     }
 }
 
-void reload_branch(World* world, caValue* globalName, const char* filename)
+void load_branch(World* world, const char* globalName, const char* filename)
 {
-    Term* namedTerm = find_from_global_name(world, as_cstring(globalName));
+    Term* namedTerm = find_from_global_name(world, globalName);
+
+    if (namedTerm == NULL) {
+        namedTerm = apply(world->root, FUNCS.imported_file, TermList(),
+                name_from_string(globalName));
+    }
+
     ca_assert(namedTerm != NULL);
     Branch* existing = nested_contents(namedTerm);
 
@@ -196,11 +202,14 @@ void reload_branch(World* world, caValue* globalName, const char* filename)
 
     update_static_error_list(newBranch);
 
-    // New branch starts off with the old branch's version, plus 1.
-    newBranch->version = existing->version + 1;
-
     namedTerm->nestedContents = newBranch;
-    update_world_after_module_reload(world, existing, newBranch);
+
+    if (existing != NULL) {
+        // New branch starts off with the old branch's version, plus 1.
+        newBranch->version = existing->version + 1;
+
+        update_world_after_module_reload(world, existing, newBranch);
+    }
 }
 
 } // namespace circa

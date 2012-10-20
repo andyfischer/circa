@@ -4,6 +4,7 @@
 
 #include "debug.h"
 #include "list.h"
+#include "names.h"
 #include "tagged_value.h"
 #include "world.h"
 
@@ -89,6 +90,7 @@ void file_watch_trigger_actions(World* world, const char* filename)
         case name_Branch: {
             // Reload this code branch.
             caValue* branchGlobalName = list_get(action, 1);
+            load_branch(world, as_cstring(branchGlobalName), filename);
             break;
         }
         default:
@@ -99,6 +101,15 @@ void file_watch_trigger_actions(World* world, const char* filename)
 
 void file_watch_check_all(World* world)
 {
+}
+
+void add_file_watch_branch_load(World* world, const char* filename, const char* branchGlobalName)
+{
+    circa::Value action;
+    set_list(&action, 2);
+    set_name(list_get(&action, 0), name_Branch);
+    set_string(list_get(&action, 1), branchGlobalName);
+    add_file_watch_action(world, filename, &action);
 }
 
 } // namespace circa

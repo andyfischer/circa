@@ -28,6 +28,6 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message);
 ListData* find_actor(World* world, const char* name);
 
 void refresh_all_modules(caWorld* world);
-void reload_branch(World* world, caValue* globalName, const char* filename);
+void load_branch(World* world, const char* moduleName, const char* filename);
 
 } // namespace circa

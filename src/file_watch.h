@@ -22,5 +22,9 @@ struct FileWatchWorld;
 FileWatchWorld* create_file_watch_world();
 
 void add_file_watch_action(World* world, const char* filename, Value* action);
+void file_watch_trigger_actions(World* world, const char* filename);
+void file_watch_check_all(World* world);
+
+void add_file_watch_branch_load(World* world, const char* filename, const char* branchGlobalName);
 
 } // namespace circa
