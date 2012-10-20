@@ -1,15 +1,31 @@
-// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
-
 /**
  * file_watch.h
  *
- * A FileWatch is an object that is responsible for 'watching' a single file. A watched
- * file is one that is actively being used by the runtime. Each FileWatch also stores
- * a list of actions, of things that should be done when the file is modified.
+ * The FileWatch system is a general purpose way to keep the runtime updated based on
+ * changing files.
  *
- * The FileWatch system is a flexible way for the runtime to instantly react whenever a
- * relevant file is modified. This is used to instantly reload script files, native
- * modules, or other things.
+ * For every file that the runtime actively cares about, there is a FileWatch object
+ * (which is stored on the World). Every FileWatch has N different 'actions' which
+ * are executed when the file is changed. For example, a watched Circa script
+ * file will have a reload-branch action. Whenever the watched file is changed, all
+ * actions are executed.
+ *
+ * Another file type that is supported out of the box, is the native module. When a watched
+ * native module is changed, we'll reload the native functions and apply them to the relevant
+ * code.
+ *
+ * Generally, a given FileWatch will only have 1 action. But if the same file is loaded for
+ * different purposes then it might have more.
+ *
+ * A file watch can be created manually (such as with add_file_watch_action() and variants).
+ * But usually the watch is created implicitly, such as when loading the module.
+ *
+ * The function file_watch_check_all() will look at every watched file, and runs the actions
+ * for every file that has changed since the last call. This function should be called as often
+ * as you want file changes to appear in the runtime.
+ *
+ * In the future we'll support efficient file change watching (such as with inotify), but for
+ * now we simply load the file's modified-time on every check.
  *
  */
 
@@ -21,10 +37,16 @@ struct FileWatchWorld;
 
 FileWatchWorld* create_file_watch_world();
 
+// Add a file watch on the given file.
 void add_file_watch_action(World* world, const char* filename, Value* action);
+
+// Immediately trigger the actions stored for the given file (if any).
 void file_watch_trigger_actions(World* world, const char* filename);
+
+// Run all actions on recently modified files.
 void file_watch_check_all(World* world);
 
-void add_file_watch_branch_load(World* world, const char* filename, const char* branchGlobalName);
+// Add a watch to reload the given module.
+void add_file_watch_module_load(World* world, const char* filename, const char* moduleName);
 
 } // namespace circa

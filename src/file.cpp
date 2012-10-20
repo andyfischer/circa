@@ -11,6 +11,22 @@
 #include "tagged_value.h"
 #include "type.h"
 
+namespace circa {
+
+int file_get_mtime(const char* filename)
+{
+    if (fakefs_enabled())
+        return fakefs_get_mtime(filename);
+
+    struct stat s;
+    s.st_mtime = 0;
+
+    stat(filename, &s);
+    return s.st_mtime;
+}
+
+} // namespace circa
+
 using namespace circa;
 
 extern "C" {
@@ -54,19 +70,7 @@ static CachedFile* create_file_entry(const char* filename)
 
 static void update_version_from_mtime(CachedFile* entry)
 {
-    unsigned mtime = 0;
-
-    if (fakefs_enabled()) {
-        mtime = fakefs_get_mtime(entry->filename);
-    } else {
-        struct stat s;
-        s.st_mtime = 0;
-
-        ca_assert(entry != NULL);
-        ca_assert(entry->filename != NULL);
-
-        stat(entry->filename, &s);
-    }
+    unsigned mtime = file_get_mtime(entry->filename);
 
     if (entry->last_known_mtime != mtime) {
         entry->last_known_mtime = mtime;

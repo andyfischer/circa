@@ -18,6 +18,10 @@ Recent
   This code had an error with no source location:
     letterSize = [painter.currentFont.width('AAAAAAAAAA') / 10, painter.currentFont.height] -> Point
   (where width & height both returned null)
+
+Deprecated code to delete
+  FileOrigin on branch (and the code that reloads based on file origins)
+  Unique names (replaced with global names and uniqueOrdinal)
   
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)
