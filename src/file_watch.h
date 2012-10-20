@@ -6,13 +6,15 @@
  *
  * For every file that the runtime actively cares about, there is a FileWatch object
  * (which is stored on the World). Every FileWatch has N different 'actions' which
- * are executed when the file is changed. For example, a watched Circa script
- * file will have a reload-branch action. Whenever the watched file is changed, all
- * actions are executed.
+ * are executed when the file is changed. Whenever the watched file is changed, all actions
+ * are executed.
+ *
+ * For example, a watched Circa script file will have a reload-branch action, which loads the
+ * script and then updates the codebase to use the newly loaded code.
  *
  * Another file type that is supported out of the box, is the native module. When a watched
- * native module is changed, we'll reload the native functions and apply them to the relevant
- * code.
+ * native module is changed, we'll reload the native functions and inject them into the
+ * relevant code.
  *
  * Generally, a given FileWatch will only have 1 action. But if the same file is loaded for
  * different purposes then it might have more.
