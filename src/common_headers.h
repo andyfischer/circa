@@ -159,7 +159,7 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 
 #ifdef CIRCA_TEST_BUILD
 
-#define CIRCA_ENABLE_HEAP_DEBUGGING 0
+#define CIRCA_ENABLE_HEAP_DEBUGGING 1
 
 #else
 

@@ -38,6 +38,7 @@ solution "Circa"
         targetname "circa"
         targetdir "build"
         location "build"
+        defines { "CIRCA_USE_LINENOISE" }
         files {
             "src/command_line/build_tool.cpp",
             "src/command_line/command_line.cpp",
@@ -46,10 +47,10 @@ solution "Circa"
             "src/command_line/exporting_parser.cpp",
             "src/command_line/file_checker.cpp",
             "src/command_line/generate_cpp.cpp",
-            "src/command_line/repl.cpp"
+            "3rdparty/linenoise/linenoise.c"
         }
         links {"static_lib"}
-        includedirs {"src"}
+        includedirs { "src", "3rdparty/linenoise" }
 
         configuration "Debug"
             targetname "circa_d"

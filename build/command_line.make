@@ -23,8 +23,8 @@ ifeq ($(config),debug)
   OBJDIR     = obj/Debug/command_line
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/circa_d
-  DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I../src
+  DEFINES   += -DDEBUG -DCIRCA_USE_LINENOISE
+  INCLUDES  += -I../include -I../src -I../3rdparty/linenoise
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
@@ -45,8 +45,8 @@ ifeq ($(config),release)
   OBJDIR     = obj/Release/command_line
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/circa
-  DEFINES   += 
-  INCLUDES  += -I../include -I../src
+  DEFINES   += -DCIRCA_USE_LINENOISE
+  INCLUDES  += -I../include -I../src -I../3rdparty/linenoise
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
@@ -71,7 +71,7 @@ OBJECTS := \
 	$(OBJDIR)/exporting_parser.o \
 	$(OBJDIR)/file_checker.o \
 	$(OBJDIR)/generate_cpp.o \
-	$(OBJDIR)/repl.o \
+	$(OBJDIR)/linenoise.o \
 
 RESOURCES := \
 
@@ -153,8 +153,8 @@ $(OBJDIR)/file_checker.o: ../src/command_line/file_checker.cpp
 $(OBJDIR)/generate_cpp.o: ../src/command_line/generate_cpp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/repl.o: ../src/command_line/repl.cpp
+$(OBJDIR)/linenoise.o: ../3rdparty/linenoise/linenoise.c
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

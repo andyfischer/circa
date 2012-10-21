@@ -20,6 +20,7 @@
 #include "term.h"
 #include "token.h"
 #include "update_cascades.h"
+#include "world.h"
 
 #include "circa/file.h"
 #include "build_tool.h"
@@ -28,9 +29,16 @@
 #include "exporting_parser.h"
 #include "generate_cpp.h"
 #include "file_checker.h"
-#include "repl.h"
+
+#ifdef CIRCA_USE_LINENOISE
+    extern "C" {
+        #include "linenoise.h"
+    }
+#endif
 
 namespace circa {
+
+int run_repl(Branch* branch);
 
 void read_stdin_line(caValue* line)
 {
@@ -420,13 +428,11 @@ int run_command_line(caWorld* world, caValue* args)
 
     // No arguments remaining
     if (list_length(args) == 0) {
-#ifdef CIRCA_TEST_BUILD
-        run_all_tests();
-#else
         print_usage();
-#endif
         return 0;
     }
+    
+    Branch* mainBranch = create_branch(world->root, "main");
 
     // Check to handle args[0] as a dash-command.
 
@@ -452,31 +458,29 @@ int run_command_line(caWorld* world, caValue* args)
             firstArg = false;
         }
 
-        Branch workspace;
-        caValue* result = term_value(workspace.eval(as_cstring(&command)));
+        caValue* result = term_value(mainBranch->eval(as_cstring(&command)));
         std::cout << to_string(result) << std::endl;
         return 0;
     }
 
     // Start repl
     if (string_eq(list_get(args, 0), "-repl"))
-        return run_repl();
+        return run_repl(mainBranch);
 
     if (string_eq(list_get(args, 0), "-call")) {
-        Branch* branch = create_branch(global_root_branch(), "");
-        Name loadResult = load_script(branch, as_cstring(list_get(args, 1)));
+        Name loadResult = load_script(mainBranch, as_cstring(list_get(args, 1)));
 
         if (loadResult == name_Failure) {
             std::cout << "Failed to load file: " <<  as_cstring(list_get(args, 1)) << std::endl;
             return -1;
         }
 
-        branch_finish_changes(branch);
+        branch_finish_changes(mainBranch);
 
         caStack* stack = circa_alloc_stack(world);
 
         // Push function
-        caFunction* func = circa_find_function(branch, as_cstring(list_get(args, 2)));
+        caFunction* func = circa_find_function(mainBranch, as_cstring(list_get(args, 2)));
         circa_push_function(stack, func);
 
         // Push inputs
@@ -509,11 +513,8 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Generate cpp headers
     if (string_eq(list_get(args, 0), "-gh")) {
-        Branch branch;
-        load_script(&branch, as_cstring(list_get(args, 1)));
-
-        std::cout << generate_cpp_headers(&branch);
-
+        load_script(mainBranch, as_cstring(list_get(args, 1)));
+        std::cout << generate_cpp_headers(mainBranch);
         return 0;
     }
 
@@ -553,37 +554,33 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Reproduce source text
     if (string_eq(list_get(args, 0), "-source-repro")) {
-        Branch branch;
-        load_script(&branch, as_cstring(list_get(args, 1)));
-        std::cout << get_branch_source_text(&branch);
+        load_script(mainBranch, as_cstring(list_get(args, 1)));
+        std::cout << get_branch_source_text(mainBranch);
         return 0;
     }
 
     // Rewrite source, this is useful for upgrading old source
     if (string_eq(list_get(args, 0), "-rewrite-source")) {
-        Branch branch;
-        load_script(&branch, as_cstring(list_get(args, 1)));
-        std::string contents = get_branch_source_text(&branch);
+        load_script(mainBranch, as_cstring(list_get(args, 1)));
+        std::string contents = get_branch_source_text(mainBranch);
         circa_write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
 
     // Default behavior with no flags: load args[0] as a script and run it.
-    Branch* main_branch = create_branch(global_root_branch(), "");
-    load_script(main_branch, as_cstring(list_get(args, 0)));
-    branch_finish_changes(main_branch);
-    refresh_bytecode(main_branch);
+    load_script(mainBranch, as_cstring(list_get(args, 0)));
+    branch_finish_changes(mainBranch);
+    refresh_bytecode(mainBranch);
 
-    if (printRaw) {
-        print_branch(std::cout, main_branch, &rawOutputPrefs);
-    }
+    if (printRaw)
+        print_branch(std::cout, mainBranch, &rawOutputPrefs);
 
     if (dontRunScript)
         return 0;
 
     Stack* stack = alloc_stack(world);
 
-    push_frame(stack, main_branch);
+    push_frame(stack, mainBranch);
 
     run_interpreter(stack);
 
@@ -610,6 +607,126 @@ int run_command_line(caWorld* world, int argc, const char* args[])
         circa_set_string(circa_append(&args_v), args[i]);
 
     return run_command_line(world, &args_v);
+}
+
+bool circa_get_line(caValue* lineOut)
+{
+#ifdef CIRCA_USE_LINENOISE
+    char* input = linenoise("> ");
+
+    if (input == NULL)
+        return false;
+
+    linenoiseHistoryAdd(input);
+
+    set_string(lineOut, input);
+    free(input);
+    return true;
+
+#else
+    internal_error("This tool was built without line reader support");
+#endif
+
+    return true;
+}
+
+void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& output)
+{
+    Branch* branch = top_branch(context);
+    int previousHead = branch->length();
+    parser::compile(branch, parser::statement_list, input);
+    int newHead = branch->length();
+
+    bool anyErrors = false;
+
+    // Check if this new expression created any errors.
+    for (int i=previousHead; i < newHead; i++) {
+        Term* result = branch->get(i);
+
+        if (has_static_error(result)) {
+            output << "error: ";
+            print_static_error(result, output);
+            output << std::endl;
+            anyErrors = true;
+            break;
+        }
+    }
+
+    // Run the stack to the new end of the branch.
+
+    Frame* frame = top_frame(context);
+    run_interpreter(context);
+
+    if (error_occurred(context)) {
+        output << "error: ";
+        print_error_stack(context, std::cout);
+        anyErrors = true;
+        frame_pc_move_to_end(frame);
+    }
+
+    // Print results of the last expression
+    if (!anyErrors) {
+        Term* result = branch->get(branch->length() - 1);
+        if (result->type != as_type(VOID_TYPE)) {
+            output << to_string(find_stack_value_for_term(context, result, 0)) << std::endl;
+        }
+    }
+
+    clear_error(context);
+}
+
+int run_repl(Branch* branch)
+{
+    Stack context;
+    bool displayRaw = false;
+
+    push_frame(&context, branch);
+
+    while (true) {
+        circa::Value input;
+        if (!circa_get_line(&input))
+            break;
+
+        if (string_eq(&input, "exit") || string_eq(&input, "/exit"))
+            break;
+
+        if (string_eq(&input, ""))
+            continue;
+
+        if (string_eq(&input, "/raw")) {
+            displayRaw = !displayRaw;
+            if (displayRaw) std::cout << "Displaying raw output" << std::endl;
+            else std::cout << "Not displaying raw output" << std::endl;
+            continue;
+        }
+        if (string_eq(&input, "/clear")) {
+            clear_branch(branch);
+            std::cout << "Cleared working area" << std::endl;
+            continue;
+        }
+        if (string_eq(&input, "/dump")) {
+            dump(branch);
+            continue;
+        }
+
+        if (string_eq(&input, "/help")) {
+            std::cout << "Special commands: /raw, /help, /clear, /dump, /exit" << std::endl;
+            continue;
+        }
+
+        int previousHead = branch->length();
+        repl_evaluate_line(&context, as_cstring(&input), std::cout);
+
+        if (displayRaw) {
+            for (int i=previousHead; i < branch->length(); i++) {
+                std::cout << get_term_to_string_extended(branch->get(i)) << std::endl;
+                if (nested_contents(branch->get(i))->length() > 0)
+                    print_branch(std::cout, nested_contents(branch->get(i)));
+            }
+        }
+    }
+
+    return 0;
 }
 
 } // namespace circa
