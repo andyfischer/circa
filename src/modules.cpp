@@ -7,7 +7,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
-#include "file_utils.h"
+#include "file.h"
 #include "inspection.h"
 #include "list.h"
 #include "kernel.h"
@@ -33,6 +33,10 @@ void modules_add_search_path(const char* str)
         internal_error("blank path in modules_add_search_path");
 
     set_string(g_moduleSearchPaths.append(), str);
+}
+
+void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut)
+{
 }
 
 Branch* find_loaded_module(const char* name)
@@ -65,7 +69,7 @@ static bool find_module_file(const char* module_name, caValue* filenameOut)
         // Look under searchPath/moduleName.ca
         Value searchPath;
         copy(g_moduleSearchPaths[i], &searchPath);
-        circa_join_path(&searchPath, &module);
+        join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
         if (circa_file_exists(as_cstring(&searchPath))) {
@@ -76,8 +80,8 @@ static bool find_module_file(const char* module_name, caValue* filenameOut)
         // Look under searchPath/moduleName/moduleName.ca
         copy(g_moduleSearchPaths[i], &searchPath);
 
-        circa_join_path(&searchPath, &module);
-        circa_join_path(&searchPath, &module);
+        join_path(&searchPath, &module);
+        join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
         if (circa_file_exists(as_cstring(&searchPath))) {

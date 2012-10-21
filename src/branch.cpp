@@ -10,7 +10,7 @@
 #include "code_iterators.h"
 #include "dll_loading.h"
 #include "evaluation.h"
-#include "file_utils.h"
+#include "file.h"
 #include "function.h"
 #include "importing_macros.h"
 #include "inspection.h"
@@ -641,7 +641,7 @@ std::string get_source_file_location(Branch* branch)
         return "";
 
     Value directory;
-    circa_get_directory_for_filename(sourceFilename, &directory);
+    get_directory_for_filename(sourceFilename, &directory);
 
     return as_string(&directory);
 }

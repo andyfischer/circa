@@ -10,6 +10,8 @@ List* modules_get_search_paths();
 
 void modules_add_search_path(const char* str);
 
+void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut);
+
 Branch* load_module_from_file(const char* module_name, const char* filename);
 
 Branch* load_module(const char* module_name, Term* loadCall);

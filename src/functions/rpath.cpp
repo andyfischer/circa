@@ -2,7 +2,7 @@
 
 #include "circa/internal/for_hosted_funcs.h"
 
-#include "../file_utils.h"
+#include "file.h"
 
 namespace circa {
 namespace rpath_function {
@@ -10,7 +10,7 @@ namespace rpath_function {
     void rpath(caStack* stack)
     {
         caBranch* branch = circa_caller_branch(stack);
-        circa_get_path_relative_to_source(branch, circa_input(stack, 0), circa_output(stack, 0));
+        get_path_relative_to_source(branch, circa_input(stack, 0), circa_output(stack, 0));
     }
 
     void setup(Branch* kernel)

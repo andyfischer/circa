@@ -6,7 +6,7 @@
 #include "building.h"
 #include "debug.h"
 #include "evaluation.h"
-#include "file_utils.h"
+#include "file.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -423,6 +423,17 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
+        if (string_eq(list_get(args, 0), "-load")) {
+            caValue* filename = list_get(args, 1);
+
+            Value moduleName;
+            module_get_default_name_from_filename(filename, &moduleName);
+
+            list_remove_index(args, 0);
+            list_remove_index(args, 0);
+            continue;
+        }
+
         break;
     }
 
@@ -563,7 +574,7 @@ int run_command_line(caWorld* world, caValue* args)
     if (string_eq(list_get(args, 0), "-rewrite-source")) {
         load_script(mainBranch, as_cstring(list_get(args, 1)));
         std::string contents = get_branch_source_text(mainBranch);
-        circa_write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
+        write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
 

@@ -6,7 +6,7 @@
 #include <map>
 
 #include "branch.h"
-#include "file_utils.h"
+#include "file.h"
 #include "function.h"
 #include "kernel.h"
 #include "names.h"
@@ -118,7 +118,7 @@ void module_on_loaded_branch(Branch* branch)
 
         // Load the native module.
         Value filename;
-        circa_get_path_relative_to_source(branch, term_value(term->input(0)), &filename);
+        get_path_relative_to_source(branch, term_value(term->input(0)), &filename);
 
         Value fileWatchAction;
 

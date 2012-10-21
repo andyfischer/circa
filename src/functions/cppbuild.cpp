@@ -2,7 +2,7 @@
 
 #include "circa/internal/for_hosted_funcs.h"
 
-#include "../file_utils.h"
+#include "file.h"
 
 namespace circa {
 namespace cppbuild_function {
@@ -14,7 +14,7 @@ namespace cppbuild_function {
         copy(moduleDir, &filename);
         Value build_ca;
         set_string(&build_ca, "build.ca");
-        circa_join_path(&filename, &build_ca);
+        join_path(&filename, &build_ca);
 
         Branch buildFile;
         load_script(&buildFile, as_cstring(&filename));
