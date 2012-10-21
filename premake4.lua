@@ -39,13 +39,14 @@ solution "Circa"
         targetdir "build"
         location "build"
         files {
-            "src/tools/build_tool.cpp",
-            "src/tools/command_line.cpp",
-            "src/tools/debugger_repl.cpp",
-            "src/tools/exporting_parser.cpp",
-            "src/tools/file_checker.cpp",
-            "src/tools/generate_cpp.cpp",
-            "src/tools/repl.cpp"
+            "src/command_line/build_tool.cpp",
+            "src/command_line/command_line.cpp",
+            "src/command_line/command_line_main.cpp",
+            "src/command_line/debugger_repl.cpp",
+            "src/command_line/exporting_parser.cpp",
+            "src/command_line/file_checker.cpp",
+            "src/command_line/generate_cpp.cpp",
+            "src/command_line/repl.cpp"
         }
         links {"static_lib"}
         includedirs {"src"}

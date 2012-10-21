@@ -66,6 +66,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/build_tool.o \
 	$(OBJDIR)/command_line.o \
+	$(OBJDIR)/command_line_main.o \
 	$(OBJDIR)/debugger_repl.o \
 	$(OBJDIR)/exporting_parser.o \
 	$(OBJDIR)/file_checker.o \
@@ -131,25 +132,28 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/build_tool.o: ../src/tools/build_tool.cpp
+$(OBJDIR)/build_tool.o: ../src/command_line/build_tool.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/command_line.o: ../src/tools/command_line.cpp
+$(OBJDIR)/command_line.o: ../src/command_line/command_line.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/debugger_repl.o: ../src/tools/debugger_repl.cpp
+$(OBJDIR)/command_line_main.o: ../src/command_line/command_line_main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/exporting_parser.o: ../src/tools/exporting_parser.cpp
+$(OBJDIR)/debugger_repl.o: ../src/command_line/debugger_repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_checker.o: ../src/tools/file_checker.cpp
+$(OBJDIR)/exporting_parser.o: ../src/command_line/exporting_parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/generate_cpp.o: ../src/tools/generate_cpp.cpp
+$(OBJDIR)/file_checker.o: ../src/command_line/file_checker.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/repl.o: ../src/tools/repl.cpp
+$(OBJDIR)/generate_cpp.o: ../src/command_line/generate_cpp.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/repl.o: ../src/command_line/repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

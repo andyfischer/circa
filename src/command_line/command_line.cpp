@@ -602,29 +602,15 @@ int run_command_line(caWorld* world, caValue* args)
     return 0;
 }
 
-EXPORT int circa_run_command_line(caWorld* world, int argc, const char* args[])
+int run_command_line(caWorld* world, int argc, const char* args[])
 {
-    circa::Value args_v;
-    circa_set_list(&args_v, 0);
+    Value args_v;
+    set_list(&args_v, 0);
     for (int i=1; i < argc; i++)
         circa_set_string(circa_append(&args_v), args[i]);
 
-    return circa::run_command_line(world, &args_v);
+    return run_command_line(world, &args_v);
 }
 
 } // namespace circa
 
-int main(int argc, const char * args[])
-{
-    caWorld* world = circa_initialize();
-
-    int result = 0;
-    result = circa_run_command_line(world, argc, args);
-
-    circa_shutdown(world);
-
-    // temp
-    // circa::perf_stats_dump();
-    
-    return result;
-}
