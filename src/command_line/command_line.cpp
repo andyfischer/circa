@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "evaluation.h"
 #include "file.h"
+#include "file_watch.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -693,10 +694,17 @@ int run_repl(Branch* branch)
 
     push_frame(&context, branch);
 
+    printf("Started REPL, type /help for reference.\n");
+
     while (true) {
         circa::Value input;
+
+        // Get next line
         if (!circa_get_line(&input))
             break;
+
+        // Before doing any work, process any pending file changes.
+        file_watch_check_all(global_world());
 
         if (string_eq(&input, "exit") || string_eq(&input, "/exit"))
             break;
@@ -706,13 +714,19 @@ int run_repl(Branch* branch)
 
         if (string_eq(&input, "/raw")) {
             displayRaw = !displayRaw;
-            if (displayRaw) std::cout << "Displaying raw output" << std::endl;
-            else std::cout << "Not displaying raw output" << std::endl;
+            if (displayRaw)
+                printf("Displaying raw format for new expressions.\n");
+            else
+                printf("Not displaying raw format.");
             continue;
         }
         if (string_eq(&input, "/clear")) {
             clear_branch(branch);
-            std::cout << "Cleared working area" << std::endl;
+            printf("Cleared working area.");
+            continue;
+        }
+        if (string_eq(&input, "/show")) {
+            std::cout << get_branch_source_text(branch);
             continue;
         }
         if (string_eq(&input, "/dump")) {
@@ -721,9 +735,26 @@ int run_repl(Branch* branch)
         }
 
         if (string_eq(&input, "/help")) {
-            std::cout << "Special commands: /raw, /help, /clear, /dump, /exit" << std::endl;
+            printf("Enter any Circa expression to evaluate it and print the result.\n");
+            printf("All commands are appended to a 'working area' branch, which can\n");
+            printf("be inspected.\n");
+            printf("\n");
+            printf("This REPL is not yet multi-line smart, so long code fragments must\n");
+            printf("be typed as one line.\n");
+            printf("\n");
+            printf("Special REPL commands:\n");
+            printf(" /raw - Toggle the display of raw format\n");
+            printf(" /show - Print all code in working area\n");
+            printf(" /dump - Print all code in working area, raw format\n");
+            printf(" /help - Print this text\n");
+            printf(" /exit - Exit the REPL. Also, Ctrl-C will work\n");
             continue;
         }
+
+        // Evaluate as an expression.
+
+        // Append a newline for the benefit of source repro.
+        string_append(&input, "\n");
 
         int previousHead = branch->length();
         repl_evaluate_line(&context, as_cstring(&input), std::cout);
