@@ -119,7 +119,6 @@ const char* builtin_name_to_string(int name)
     case tok_False: return "tok_False";
     case tok_Namespace: return "tok_Namespace";
     case tok_Include: return "tok_Include";
-    case tok_Import: return "tok_Import";
     case tok_And: return "tok_And";
     case tok_Or: return "tok_Or";
     case tok_Not: return "tok_Not";

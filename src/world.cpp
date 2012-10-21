@@ -185,7 +185,7 @@ void refresh_all_modules(caWorld* world)
     }
 }
 
-void load_branch_from_file(World* world, const char* globalName, const char* filename)
+Branch* load_branch_from_file(World* world, const char* globalName, const char* filename)
 {
     Term* namedTerm = find_from_global_name(world, globalName);
 
@@ -210,6 +210,8 @@ void load_branch_from_file(World* world, const char* globalName, const char* fil
 
         update_world_after_module_reload(world, existing, newBranch);
     }
+
+    return newBranch;
 }
 
 } // namespace circa
@@ -233,7 +235,7 @@ void circa_actor_new_from_file(caWorld* world, const char* actorName, const char
 
 caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
 {
-    Branch* module = load_module(moduleName, NULL);
+    Branch* module = load_module(world, moduleName, NULL);
 
     if (module == NULL) {
         return NULL;

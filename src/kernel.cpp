@@ -1059,6 +1059,7 @@ void bootstrap_kernel()
     };
 
     install_function_list(kernel, records);
+    modules_install_functions(kernel);
     reflection_install_functions(kernel);
     interpreter_install_functions(kernel);
 

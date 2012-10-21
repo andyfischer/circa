@@ -32,6 +32,6 @@ void refresh_all_modules(caWorld* world);
 // Load a script from the given filename, and install it in the global namespace with the
 // given module name. If the module already exists, then we'll replace the existing
 // contents, and we'll update any existing references that point to the replaced code.
-void load_branch_from_file(World* world, const char* moduleName, const char* filename);
+Branch* load_branch_from_file(World* world, const char* moduleName, const char* filename);
 
 } // namespace circa

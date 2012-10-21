@@ -125,7 +125,6 @@ tok_True
 tok_False
 tok_Namespace
 tok_Include
-tok_Import
 tok_And
 tok_Or
 tok_Not

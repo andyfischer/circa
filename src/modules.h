@@ -14,7 +14,7 @@ void module_get_default_name_from_filename(caValue* filename, caValue* moduleNam
 
 Branch* load_module_from_file(const char* module_name, const char* filename);
 
-Branch* load_module(const char* module_name, Term* loadCall);
+Branch* load_module(World* world, const char* module_name, Term* loadCall);
 
 Branch* find_loaded_module(const char* name);
 
@@ -28,5 +28,7 @@ Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newB
 // relative unique names) inside 'newBranch'. If the equivalent in 'newBranch' isn't found,
 // then the reference will be set to null.
 void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBranch);
+
+void modules_install_functions(Branch* kernel);
 
 } // namespace circa

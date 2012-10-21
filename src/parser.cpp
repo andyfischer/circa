@@ -383,11 +383,6 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
         result = case_statement(branch, tokens, context);
     }
 
-    // Import statement
-    else if (tokens.nextIs(tok_Import)) {
-        result = import_statement(branch, tokens, context);
-    }
-
     // Otherwise, expression statement
     else {
         result = expression_statement(branch, tokens, context);
@@ -1192,28 +1187,6 @@ ParseResult include_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
     hide_from_source(filenameTerm);
 
     Term* result = apply(branch, FUNCS.include_func, TermList(filenameTerm));
-
-    return ParseResult(result);
-}
-
-ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-
-    tokens.consume(tok_Import);
-
-    possible_whitespace(tokens);
-
-    if (!tokens.nextIs(tok_Identifier))
-        return compile_error_for_line(branch, tokens, startPosition,
-                "Expected string after 'import'");
-
-    Name module = tokens.consumeName(tok_Identifier);
-
-    Term* result = apply(branch, FUNCS.import, TermList());
-    result->setStringProp("module", name_to_string(module));
-
-    load_module(name_to_string(module), result);
 
     return ParseResult(result);
 }

@@ -46,8 +46,6 @@ namespace include_function {
             return circa_output_error(stack, msg.c_str());
         }
 
-        // TODO: strip out state that isn't referenced any more.
-
         set_branch(circa_output(stack, 0), contents);
 
         List inputs;
@@ -71,12 +69,6 @@ namespace include_function {
         set_branch(circa_output(stack, 0), caller->nestedContents);
     }
 
-    void import_formatSource(caValue* source, Term* term)
-    {
-        append_phrase(source, "import ", term, name_None);
-        append_phrase(source, term->stringProp("module",""), term, name_None);
-    }
-
     void setup(Branch* kernel)
     {
         FUNCS.include_func = import_function(kernel, evaluate_include,
@@ -86,8 +78,6 @@ namespace include_function {
         FUNCS.load_script = import_function(kernel, load_script,
                 "load_script(String filename) -> Branch");
 
-        FUNCS.import = import_function(kernel, NULL, "import()");
-        as_function(FUNCS.import)->formatSource = import_formatSource;
         FUNCS.imported_file = import_function(kernel, NULL, "imported_file() -> Branch");
     }
 }
