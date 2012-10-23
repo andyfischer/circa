@@ -41,7 +41,15 @@ void modules_add_search_path(const char* str)
 
 void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut)
 {
-    // TODO
+    get_just_filename_for_path(filename, moduleNameOut);
+
+    // Chop off everything after the last dot (if there is one)
+    int dotPos = string_find_char_from_end(moduleNameOut, '.');
+    if (dotPos != -1) {
+        Value temp;
+        copy(moduleNameOut, &temp);
+        string_slice(&temp, 0, dotPos, moduleNameOut);
+    }
 }
 
 Branch* find_loaded_module(const char* name)

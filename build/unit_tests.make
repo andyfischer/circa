@@ -70,6 +70,7 @@ OBJECTS := \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/compound_type.o \
 	$(OBJDIR)/fakefs.o \
+	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/interpreter.o \
 	$(OBJDIR)/main.o \
@@ -153,6 +154,9 @@ $(OBJDIR)/compound_type.o: ../src/unit_tests/compound_type.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/fakefs.o: ../src/unit_tests/fakefs.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/file.o: ../src/unit_tests/file.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_watch.o: ../src/unit_tests/file_watch.cpp

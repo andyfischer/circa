@@ -314,6 +314,9 @@ int string_length(caValue* s)
 
 void string_slice(caValue* s, int start, int end, caValue* out)
 {
+    // TODO: This func could be improved to work correctly when 's' is the same object
+    // as 'out'.
+    
     if (s == out)
         internal_error("Usage error in string_slice, 's' cannot be 'out'");
 
