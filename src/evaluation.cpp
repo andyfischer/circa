@@ -347,6 +347,9 @@ void finish_frame(Stack* stack)
     Frame* top = top_frame(stack);
     Branch* finishedBranch = top->branch;
 
+    // Undo the increment to nextPc, it's one past what it should be.
+    top->nextPc = top->pc;
+
     // Exit if we have finished the topmost branch
     if (top->parent == 0 || top->stop) {
         stack->running = false;
@@ -643,14 +646,14 @@ caValue* get_frame_register(Frame* frame, Term* term)
     return get_frame_register(frame, term->index);
 }
 
-static int get_frame_register_count(Frame* frame)
+int frame_register_count(Frame* frame)
 {
     return list_length(&frame->registers);
 }
 
 caValue* get_frame_register_from_end(Frame* frame, int index)
 {
-    return list_get(&frame->registers, get_frame_register_count(frame) - 1 - index);
+    return list_get(&frame->registers, frame_register_count(frame) - 1 - index);
 }
 
 caValue* get_top_register(Stack* stack, Term* term)
@@ -845,7 +848,11 @@ void print_stack(Stack* stack, std::ostream& out)
 
             // current value
             if (term != NULL && !is_value(term)) {
-                caValue* value = get_frame_register(frame, term);
+                caValue* value = NULL;
+
+                if (term->index < frame_register_count(frame))
+                    value = get_frame_register(frame, term->index);
+
                 if (value == NULL)
                     out << " <register OOB>";
                 else
@@ -920,7 +927,7 @@ void update_context_to_latest_branches(Stack* stack)
 
     while (true) {
         // Resize frame->registers if needed.
-        if (get_frame_register_count(frame) != get_locals_count(frame->branch))
+        if (frame_register_count(frame) != get_locals_count(frame->branch))
             list_resize(&frame->registers, get_locals_count(frame->branch));
 
         if (frame->parent == 0)

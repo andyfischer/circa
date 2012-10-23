@@ -174,6 +174,7 @@ Branch* current_branch(Stack* stack);
 caValue* get_frame_register(Frame* frame, int index);
 caValue* get_frame_register(Frame* frame, Term* term);
 caValue* get_frame_register_from_end(Frame* frame, int index);
+int frame_register_count(Frame* frame);
 
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);
