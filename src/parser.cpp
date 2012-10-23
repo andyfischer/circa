@@ -1728,7 +1728,7 @@ ParseResult function_call(Branch* branch, TokenStream& tokens, ParserCxt* contex
 {
     int startPosition = tokens.getPosition();
 
-    ParseResult functionParseResult = identifier_no_create(branch,tokens,context);
+    ParseResult functionParseResult = identifier_no_create(branch, tokens, context);
     Term* function = functionParseResult.term;
     std::string functionName = functionParseResult.identifierName;
 
@@ -1742,6 +1742,14 @@ ParseResult function_call(Branch* branch, TokenStream& tokens, ParserCxt* contex
     if (!tokens.nextIs(tok_RParen))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(tok_RParen);
+
+    // If the function isn't callable, then bail out with unknown_function
+    if (function != NULL && !is_function(function) && !is_type(function)) {
+        Term* result = apply(branch, FUNCS.unknown_function, inputs);
+        result->setStringProp("syntax:functionName", functionName);
+        check_to_insert_implicit_inputs(result);
+        return ParseResult(result);
+    }
 
     Term* result = apply(branch, function, inputs);
 

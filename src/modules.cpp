@@ -203,9 +203,9 @@ void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBr
 
 void import_func_postCompile(Term* term)
 {
-    caValue* moduleName = term_value(term->input(0));
+    caValue* filename = term_value(term->input(0));
 
-    load_module(global_world(), as_cstring(moduleName), term);
+    load_module(global_world(), as_cstring(filename), term);
 }
 
 void modules_install_functions(Branch* kernel)

@@ -337,7 +337,7 @@ void print_usage()
         "  circa <options> <dash-command> <command args>\n"
         "\n"
         "Available options:\n"
-        "  -libpath <path>     : Add a module search path\n"
+        "  -path <path>     : Add a module search path\n"
         "  -p                  : Print out raw source\n"
         "  -pp                 : Print out raw source with properties\n"
         "  -b                  : Print out raw source with bytecode\n"
@@ -380,7 +380,7 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-libpath")) {
+        if (string_eq(list_get(args, 0), "-path")) {
             // Add a module path
             modules_add_search_path(as_cstring(list_get(args, 1)));
             list_remove_index(args, 0);
