@@ -39,7 +39,7 @@
 
 namespace circa {
 
-int run_repl(Branch* branch);
+int run_repl(World* world);
 
 void read_stdin_line(caValue* line)
 {
@@ -477,7 +477,7 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Start repl
     if (string_eq(list_get(args, 0), "-repl"))
-        return run_repl(mainBranch);
+        return run_repl(world);
 
     if (string_eq(list_get(args, 0), "-call")) {
         Name loadResult = load_script(mainBranch, as_cstring(list_get(args, 1)));
@@ -687,8 +687,10 @@ void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& 
     clear_error(context);
 }
 
-int run_repl(Branch* branch)
+int run_repl(World* world)
 {
+    Branch* branch = nested_contents(find_from_global_name(world, "main"));
+
     Stack context;
     bool displayRaw = false;
 
@@ -704,7 +706,7 @@ int run_repl(Branch* branch)
             break;
 
         // Before doing any work, process any pending file changes.
-        file_watch_check_all(global_world());
+        file_watch_check_all(world);
 
         if (string_eq(&input, "exit") || string_eq(&input, "/exit"))
             break;
@@ -721,8 +723,9 @@ int run_repl(Branch* branch)
             continue;
         }
         if (string_eq(&input, "/clear")) {
+            branch = nested_contents(find_from_global_name(world, "main"));
             clear_branch(branch);
-            printf("Cleared working area.");
+            printf("Cleared working area.\n");
             continue;
         }
         if (string_eq(&input, "/show")) {

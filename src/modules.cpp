@@ -130,7 +130,7 @@ Branch* load_module(World* world, const char* module_name, Term* loadCall)
     }
 
     // Create implicit file watch.
-    add_file_watch_module_load(world, module_name, as_cstring(&filename));
+    add_file_watch_module_load(world, as_cstring(&filename), module_name);
 
     return moduleBranch;
 }
