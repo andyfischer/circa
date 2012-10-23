@@ -105,19 +105,20 @@ static bool find_module_file(const char* module_name, caValue* filenameOut)
     return false;
 }
 
-Branch* load_module(World* world, const char* module_name, Term* loadCall)
+Branch* load_module(World* world, const char* moduleName, Term* loadCall)
 {
-    Branch* existing = find_loaded_module(module_name);
+    Branch* existing = find_loaded_module(moduleName);
     if (existing != NULL)
         return existing;
     
     Value filename;
-    bool found = find_module_file(module_name, &filename);
+    bool found = find_module_file(moduleName, &filename);
 
     if (!found)
         return NULL;
 
-    Branch* moduleBranch = load_branch_from_file(world, module_name, as_cstring(&filename));
+    // Load and parse the script file.
+    Branch* moduleBranch = load_script_to_global_name(world, as_cstring(&filename), moduleName);
 
     // If a loadCall is provided, possibly move the new import to be before the loadCall.
     if (loadCall != NULL) {
@@ -130,7 +131,7 @@ Branch* load_module(World* world, const char* module_name, Term* loadCall)
     }
 
     // Create implicit file watch.
-    add_file_watch_module_load(world, as_cstring(&filename), module_name);
+    add_file_watch_module_load(world, as_cstring(&filename), moduleName);
 
     return moduleBranch;
 }

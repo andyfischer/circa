@@ -185,7 +185,7 @@ void refresh_all_modules(caWorld* world)
     }
 }
 
-Branch* load_branch_from_file(World* world, const char* globalName, const char* filename)
+Branch* load_script_to_global_name(World* world, const char* filename, const char* globalName)
 {
     Term* namedTerm = find_from_global_name(world, globalName);
 

@@ -71,9 +71,6 @@ namespace sys
     def perf_stats_reset()
     def perf_stats_dump() -> List
 
--- Load a module from a file.
-def load_module(String filename) -> Branch
-
 -- Declare that this branch should be patched by a native module.
 def native_patch(String filename)
 

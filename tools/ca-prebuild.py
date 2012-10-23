@@ -183,8 +183,8 @@ def all_source_files():
         if file == 'main.cpp':
             continue
         yield "../" + file
-    for file in get_cpp_files_in_dir('src/tools'):
-        yield "../tools/" + file
+    for file in get_cpp_files_in_dir('src/command_line'):
+        yield "../command_line/" + file
     yield "./all_builtin_functions.cpp"
     yield "./all_builtin_types.cpp"
     yield "./setup_builtin_functions.cpp"

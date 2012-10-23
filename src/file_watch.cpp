@@ -96,7 +96,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         case name_Branch: {
             // Reload this code branch.
             caValue* moduleName = list_get(action, 1);
-            load_branch_from_file(world, as_cstring(moduleName), as_cstring(&watch->filename));
+            load_script_to_global_name(world, as_cstring(&watch->filename), as_cstring(moduleName));
             break;
         }
         default:
