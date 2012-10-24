@@ -105,6 +105,28 @@ static bool find_module_file(const char* module_name, caValue* filenameOut)
     return false;
 }
 
+Branch* load_module_from_file2(World* world, const char* moduleName, const char* filename,
+        Term* loadCall)
+{
+    // Load and parse the script file.
+    Branch* branch = load_script_to_global_name(world, filename, moduleName);
+
+    // If a loadCall is provided, possibly move the new import to be before the loadCall.
+    if (loadCall != NULL) {
+        Term* moduleTerm = branch->owningTerm;
+
+        Term* callersModule = find_parent_term_in_branch(loadCall, moduleTerm->owningBranch);
+
+        if (callersModule != NULL && (moduleTerm->index > callersModule->index))
+            move_before(moduleTerm, callersModule);
+    }
+
+    // Create implicit file watch.
+    add_file_watch_module_load(world, filename, moduleName);
+
+    return branch;
+}
+
 Branch* load_module(World* world, const char* moduleName, Term* loadCall)
 {
     Branch* existing = find_loaded_module(moduleName);
@@ -117,23 +139,7 @@ Branch* load_module(World* world, const char* moduleName, Term* loadCall)
     if (!found)
         return NULL;
 
-    // Load and parse the script file.
-    Branch* moduleBranch = load_script_to_global_name(world, as_cstring(&filename), moduleName);
-
-    // If a loadCall is provided, possibly move the new import to be before the loadCall.
-    if (loadCall != NULL) {
-        Term* moduleTerm = moduleBranch->owningTerm;
-
-        Term* callersModule = find_parent_term_in_branch(loadCall, moduleTerm->owningBranch);
-
-        if (callersModule != NULL && (moduleTerm->index > callersModule->index))
-            move_before(moduleTerm, callersModule);
-    }
-
-    // Create implicit file watch.
-    add_file_watch_module_load(world, as_cstring(&filename), moduleName);
-
-    return moduleBranch;
+    return load_module_from_file2(world, moduleName, as_cstring(&filename), loadCall);
 }
 
 Branch* find_module_from_filename(const char* filename)
@@ -204,15 +210,23 @@ void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBr
 
 void import_func_postCompile(Term* term)
 {
-    caValue* filename = term_value(term->input(0));
+    caValue* moduleName = term_value(term->input(0));
+    load_module(global_world(), as_cstring(moduleName), term);
+}
 
-    load_module(global_world(), as_cstring(filename), term);
+void import_file_func_postCompile(Term* term)
+{
+    caValue* moduleName = term_value(term->input(0));
+    caValue* filename = term_value(term->input(1));
+    load_module_from_file2(global_world(), as_cstring(moduleName), as_cstring(filename), term);
 }
 
 void modules_install_functions(Branch* kernel)
 {
-    FUNCS.import = import_function(kernel, NULL, "import(String moduleName)");
+    FUNCS.import = install_function(kernel, "import", NULL);
     as_function(FUNCS.import)->postCompile = import_func_postCompile;
+    Term* import_file = install_function(kernel, "import_file", NULL);
+    as_function(import_file)->postCompile = import_file_func_postCompile;
 }
 
 EXPORT void circa_run_module(caStack* stack, const char* moduleName)
