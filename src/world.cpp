@@ -198,11 +198,10 @@ Branch* load_script_to_global_name(World* world, const char* filename, const cha
     Branch* existing = nested_contents(namedTerm);
 
     Branch* newBranch = alloc_branch_gc();
+    branch_graft_as_nested_contents(namedTerm, newBranch);
     load_script(newBranch, filename);
 
     update_static_error_list(newBranch);
-
-    branch_graft_as_nested_contents(namedTerm, newBranch);
 
     if (existing != NULL) {
         // New branch starts off with the old branch's version, plus 1.

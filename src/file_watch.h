@@ -40,15 +40,25 @@ struct FileWatchWorld;
 FileWatchWorld* create_file_watch_world();
 
 // Add a file watch on the given file.
-void add_file_watch_action(World* world, const char* filename, Value* action);
+FileWatch* add_file_watch_action(World* world, const char* filename, Value* action);
 
 // Immediately trigger the actions stored for the given file (if any).
 void file_watch_trigger_actions(World* world, const char* filename);
 
+// Check if the watched file has been updated, and run actions if so.
+void file_watch_check_now(World* world, FileWatch* watch);
+
+// Check if the watched file has been updated, and ignore this change if so.
+void file_watch_ignore_latest_change(FileWatch* watch);
+
 // Run all actions on recently modified files.
 void file_watch_check_all(World* world);
 
+
 // Add a watch to reload the given module.
-void add_file_watch_module_load(World* world, const char* filename, const char* moduleName);
+FileWatch* add_file_watch_module_load(World* world, const char* filename, const char* moduleName);
+
+// Add a watch to reload the given module.
+FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* moduleName);
 
 } // namespace circa

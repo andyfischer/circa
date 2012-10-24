@@ -6,6 +6,7 @@
 #include "file.h"
 #include "list.h"
 #include "names.h"
+#include "native_modules.h"
 #include "tagged_value.h"
 #include "world.h"
 
@@ -50,13 +51,13 @@ FileWatch* add_file_watch(World* world, const char* filename)
     FileWatch* newWatch = new FileWatch();
     set_string(&newWatch->filename, filename);
     set_list(&newWatch->onChangeActions, 0);
-    newWatch->lastObservedMtime = file_get_mtime(filename);
+    newWatch->lastObservedMtime = 0;
 
     world->fileWatchWorld->watches[filename] = newWatch;
     return newWatch;
 }
 
-void add_file_watch_action(World* world, const char* filename, Value* action)
+FileWatch* add_file_watch_action(World* world, const char* filename, Value* action)
 {
     // Fetch the FileWatch entry.
     FileWatch* watch = add_file_watch(world, filename);
@@ -64,10 +65,12 @@ void add_file_watch_action(World* world, const char* filename, Value* action)
     // Check if this exact action already exists, if so do nothing.
     for (int i=0; i < list_length(&watch->onChangeActions); i++)
         if (equals(list_get(&watch->onChangeActions, i), action))
-            return;
+            return watch;
 
     // Add action
     copy(action, list_append(&watch->onChangeActions));
+
+    return watch;
 }
 
 static bool file_watch_check_for_update(FileWatch* watch)
@@ -91,8 +94,17 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         ca_assert(label != name_None);
 
         switch (label) {
-        case name_NativeModule:
+        case name_NativeModule: {
+            NativeModule* nativeModule = add_native_module(world, filename);
+            native_module_load_from_file(nativeModule, filename);
+
+            caValue* moduleName = list_get(action, 1);
+            native_module_apply_to_global_branch(nativeModule, as_cstring(moduleName));
+
+            printf("todo: load native module:");
+            std::cout << to_string(action) << std::endl;
             break;
+        }
         case name_Branch: {
             // Reload this code branch.
             caValue* moduleName = list_get(action, 1);
@@ -116,6 +128,17 @@ void file_watch_trigger_actions(World* world, const char* filename)
     file_watch_trigger_actions(world, watch);
 }
 
+void file_watch_check_now(World* world, FileWatch* watch)
+{
+    if (file_watch_check_for_update(watch))
+        file_watch_trigger_actions(world, watch);
+}
+
+void file_watch_ignore_latest_change(FileWatch* watch)
+{
+    file_watch_check_for_update(watch);
+}
+
 void file_watch_check_all(World* world)
 {
     std::map<std::string, FileWatch*>::const_iterator it;
@@ -124,18 +147,26 @@ void file_watch_check_all(World* world)
          it != world->fileWatchWorld->watches.end();
          ++it) {
         FileWatch* watch = it->second;
-        if (file_watch_check_for_update(watch))
-            file_watch_trigger_actions(world, watch);
+        file_watch_check_now(world, watch);
     }
 }
 
-void add_file_watch_module_load(World* world, const char* filename, const char* moduleName)
+FileWatch* add_file_watch_module_load(World* world, const char* filename, const char* moduleName)
 {
     circa::Value action;
     set_list(&action, 2);
     set_name(list_get(&action, 0), name_Branch);
     set_string(list_get(&action, 1), moduleName);
-    add_file_watch_action(world, filename, &action);
+    return add_file_watch_action(world, filename, &action);
+}
+
+FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* moduleName)
+{
+    circa::Value action;
+    set_list(&action, 2);
+    set_name(list_get(&action, 0), name_NativeModule);
+    set_string(list_get(&action, 1), moduleName);
+    return add_file_watch_action(world, filename, &action);
 }
 
 } // namespace circa

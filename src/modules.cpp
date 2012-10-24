@@ -16,6 +16,7 @@
 #include "kernel.h"
 #include "modules.h"
 #include "names.h"
+#include "native_modules.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -122,7 +123,10 @@ Branch* load_module_from_file2(World* world, const char* moduleName, const char*
     }
 
     // Create implicit file watch.
-    add_file_watch_module_load(world, filename, moduleName);
+    FileWatch* watch = add_file_watch_module_load(world, filename, moduleName);
+
+    // Since we just loaded the script, update the file watch.
+    file_watch_ignore_latest_change(watch);
 
     return branch;
 }
@@ -221,12 +225,31 @@ void import_file_func_postCompile(Term* term)
     load_module_from_file2(global_world(), as_cstring(moduleName), as_cstring(filename), term);
 }
 
+void native_patch_this_postCompile(Term* term)
+{
+    Branch* branch = term->owningBranch;
+    Value branchGlobalName;
+    get_global_name(branch->owningTerm, &branchGlobalName);
+
+    Value filename;
+    copy(term_value(term->input(0)), &filename);
+    native_module_add_platform_specific_suffix(&filename);
+
+    FileWatch* watch = add_file_watch_native_patch(global_world(),
+            as_cstring(&filename), as_cstring(&branchGlobalName));
+    file_watch_check_now(global_world(), watch);
+}
+
 void modules_install_functions(Branch* kernel)
 {
     FUNCS.import = install_function(kernel, "import", NULL);
     as_function(FUNCS.import)->postCompile = import_func_postCompile;
+
     Term* import_file = install_function(kernel, "import_file", NULL);
     as_function(import_file)->postCompile = import_file_func_postCompile;
+
+    Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
+    as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
 }
 
 EXPORT void circa_run_module(caStack* stack, const char* moduleName)

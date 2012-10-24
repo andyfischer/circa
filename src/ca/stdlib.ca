@@ -25,6 +25,7 @@ def dynamic_call(Branch branch, List inputs) -> List
 -- Modules
 def import(String moduleName)
 def import_file(String moduleName, String filename)
+def native_patch_this(String filename)
 
 -- Message passing
 def send(String name, any msg)

@@ -32,6 +32,7 @@ const char* STDLIB_CA_TEXT =
     "-- Modules\n"
     "def import(String moduleName)\n"
     "def import_file(String moduleName, String filename)\n"
+    "def native_patch_this(String filename)\n"
     "\n"
     "-- Message passing\n"
     "def send(String name, any msg)\n"

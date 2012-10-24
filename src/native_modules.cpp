@@ -11,6 +11,7 @@
 #include "kernel.h"
 #include "names.h"
 #include "native_modules.h"
+#include "string_type.h"
 #include "term.h"
 #include "update_cascades.h"
 #include "world.h"
@@ -129,10 +130,36 @@ void module_on_loaded_branch(Branch* branch)
     World* world = global_world();
 }
 
-} // namespace circa
-
-// Public functions
-void circa_module_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func)
+void native_module_add_platform_specific_suffix(caValue* filename)
 {
-    circa::module_patch_function(module, name, func);
+    string_append(filename, ".so");
 }
+
+void native_module_load_from_file(NativeModule* module, const char* filename)
+{
+    if (module->dll != NULL)
+        dlclose(module->dll);
+
+    module->dll = dlopen(filename, RTLD_NOW);
+
+    if (module->dll) {
+        std::cout << "failed to open dll: " << filename << std::endl;
+        return;
+    }
+
+    OnModuleLoad onModuleLoad = dlsym(module->dll, "circa_module_load");
+
+    if (onModuleLoad == NULL) {
+        std::cout << "could not find circa_module_load in: " << filename << std::endl;
+        return;
+    }
+
+    onModuleLoad(module);
+}
+
+EXPORT void circa_module_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func)
+{
+    module_patch_function(module, name, func);
+}
+
+} // namespace circa

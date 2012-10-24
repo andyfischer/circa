@@ -4,6 +4,8 @@
 
 namespace circa {
 
+typedef void (*OnModuleLoad)(NativeModule* module);
+
 struct NativeModuleWorld;
 struct NativeModule;
 struct NativePatchFunction;
@@ -31,5 +33,8 @@ void module_manually_patch_branch(NativeModule* module, Branch* branch);
 void module_apply_patches_to_function(World* world, Branch* function);
 
 void module_on_loaded_branch(Branch* branch);
+
+void native_module_add_platform_specific_suffix(caValue* filename);
+void native_module_load_from_file(NativeModule* module, const char* filename);
 
 } // namespace circa
