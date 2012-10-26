@@ -160,8 +160,8 @@ void finish_building_function(Branch* contents)
 
     update_exit_points(contents);
 
-    // Possibly apply a native patch.
-    module_apply_patches_to_function(global_world(), contents);
+    // Possibly apply a native patch
+    module_possibly_patch_new_function(global_world(), contents);
 
     branch_finish_changes(contents);
 }

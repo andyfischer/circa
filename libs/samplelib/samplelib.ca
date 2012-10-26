@@ -1,9 +1,12 @@
 
-sys:dll_patch()
+native_patch_this('samplelib' -> rpath)
 
-def sample_b() -> string
-    return 'a not patched'
+def sample_a() -> string
+    return 'sample_a not patched'
 
 namespace ns
     def sample_b() -> string
         return 'ns:sample_b not patched'
+
+print('sample_a: ' sample_a())
+print('ns:sample_b: ' ns:sample_b())

@@ -4,13 +4,9 @@
 #define CIRCA_H_INCLUDED
 
 #ifdef _MSC_VER
-
-// No stdbool on Windows
-
+    // No stdbool on Windows
 #else
-
-#include <stdbool.h>
-
+    #include <stdbool.h>
 #endif
 
 // Public API
@@ -512,7 +508,7 @@ void circa_setup_pointer_type(caType* type);
 
 // -- Native Module support --
 
-void circa_module_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func);
+void circa_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func);
 
 // -- Debugging Helpers --
 
@@ -523,5 +519,7 @@ void circa_dump_b(caBranch* branch);
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+#define CIRCA_EXPORT extern "C"
 
 #endif

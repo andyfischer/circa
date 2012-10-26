@@ -25,6 +25,7 @@ void string_resize(caValue* s, int length);
 bool string_eq(caValue* s, const char* str);
 bool string_starts_with(caValue* s, const char* beginning);
 bool string_ends_with(caValue* s, const char* str);
+void string_remove_suffix(caValue* s, const char* str);
 char string_get(caValue* s, int index);
 int string_length(caValue* s);
 void string_slice(caValue* s, int start, int end, caValue* out);

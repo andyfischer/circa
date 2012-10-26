@@ -225,6 +225,8 @@ const char* as_cstring(caValue* value)
 
 void string_append(caValue* left, const char* right)
 {
+    ca_assert(is_string(left));
+
     StringData** data = (StringData**) &left->value_data.ptr;
     
     int leftLength = string_length(*data);
@@ -238,6 +240,8 @@ void string_append(caValue* left, const char* right)
 
 void string_append(caValue* left, caValue* right)
 {
+    ca_assert(is_string(left));
+
     if (is_string(right))
         string_append(left, as_cstring(right));
     else {
@@ -252,6 +256,8 @@ void string_append_quoted(caValue* left, caValue* right)
 }
 void string_append(caValue* left, int value)
 {
+    ca_assert(is_string(left));
+
     char buf[64];
     sprintf(buf, "%d", value);
     string_append(left, buf);
@@ -300,6 +306,14 @@ bool string_ends_with(caValue* s, const char* ending)
             return false;
 
     return true;
+}
+
+void string_remove_suffix(caValue* s, const char* str)
+{
+    if (!string_ends_with(s, str))
+        return;
+
+    string_resize(s, string_length(s) - strlen(str));
 }
 
 char string_get(caValue* s, int index)

@@ -43,7 +43,7 @@ void patch_manually()
     // Create a patch for my_add
     NativeModule* module = create_native_module();
     module_patch_function(module, "my_add", my_add);
-    module_manually_patch_branch(module, &branch);
+    native_module_apply_patch(module, &branch);
 
     reset_stack(&stack);
     push_frame(&stack, &branch);
@@ -69,7 +69,7 @@ void patch_manually_ns()
     NativeModule* module = create_native_module();
     module_patch_function(module, "ns_a:f1", my_5);
     module_patch_function(module, "ns_b:ns_a:f1", my_6);
-    module_manually_patch_branch(module, &branch);
+    native_module_apply_patch(module, &branch);
 
     Stack stack;
     push_frame(&stack, &branch);

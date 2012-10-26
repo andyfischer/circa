@@ -4,8 +4,13 @@ LIBNAME = samplelib
 CFLAGS = -I../../include
 LINKFLAGS = 
 
-MAC_FLAGS = -rdynamic -undefined dynamic_lookup
-LINUX_FLAGS = -fPIC -shared
+ifeq ($(shell uname), Darwin)
+	# mac
+	OS_FLAGS = -rdynamic -undefined dynamic_lookup
+else
+	# linux
+	OS_FLAGS = -fPIC -shared
+endif
 
 all:
-	gcc ${CFLAGS} ${LINKFLAGS} ${LINUX_FLAGS} -ggdb ${LIBNAME}.cpp -o ${LIBNAME}.so
+	gcc ${CFLAGS} ${LINKFLAGS} ${OS_FLAGS} -ggdb ${LIBNAME}.cpp -o ${LIBNAME}.so

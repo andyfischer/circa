@@ -213,13 +213,7 @@ Branch* load_script_to_global_name(World* world, const char* filename, const cha
     return newBranch;
 }
 
-} // namespace circa
-
-using namespace circa;
-
-extern "C" {
-
-void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
+CIRCA_EXPORT void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
 {
     load_module_from_file(actorName, filename);
 
@@ -232,7 +226,7 @@ void circa_actor_new_from_file(caWorld* world, const char* actorName, const char
     set_string(list_get(actor, 1), actorName);
 }
 
-caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
+CIRCA_EXPORT caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
 {
     Branch* module = load_module(world, moduleName, NULL);
 
@@ -251,7 +245,7 @@ caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, cons
     return actor;
 }
 
-void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message)
+CIRCA_EXPORT void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message)
 {
     ListData* actor = find_actor(world, actorName);
     if (actor == NULL) {
@@ -262,7 +256,7 @@ void circa_actor_post_message(caWorld* world, const char* actorName, caValue* me
     actor_send_message(actor, message);
 }
 
-void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message)
+CIRCA_EXPORT void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message)
 {
     // Refresh all scripts when starting a top-level call
     refresh_all_modules(world);
@@ -277,7 +271,7 @@ void circa_actor_run_message(caWorld* world, const char* actorName, caValue* mes
     actor_run_message(stack, actor, message);
 }
 
-int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
+CIRCA_EXPORT int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
 {
     // Refresh all scripts when starting a top-level call
     refresh_all_modules(world);
@@ -295,7 +289,7 @@ int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages
     return actor_run_queue(stack, actor, maxMessages);
 }
 
-int circa_actor_run_all_queues(caWorld* world, int maxMessages)
+CIRCA_EXPORT int circa_actor_run_all_queues(caWorld* world, int maxMessages)
 {
     // Refresh all scripts when starting a top-level call
     refresh_all_modules(world);
@@ -312,14 +306,14 @@ int circa_actor_run_all_queues(caWorld* world, int maxMessages)
     return handledCount;
 }
 
-void circa_actor_clear_all(caWorld* world)
+CIRCA_EXPORT void circa_actor_clear_all(caWorld* world)
 {
     set_list(&world->actorList, 0);
 }
 
-void circa_refresh_all_modules(caWorld* world)
+CIRCA_EXPORT void circa_refresh_all_modules(caWorld* world)
 {
     refresh_all_modules(world);
 }
 
-} // extern "C"
+} // namespace circa

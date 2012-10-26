@@ -278,6 +278,15 @@ void get_global_name(Term* term, caValue* nameOut)
     }
 }
 
+void get_global_name(Branch* branch, caValue* nameOut)
+{
+    if (branch->owningTerm == NULL) {
+        set_null(nameOut);
+        return;
+    }
+    get_global_name(branch->owningTerm, nameOut);
+}
+
 Term* find_from_global_name(World* world, const char* globalName)
 {
     Branch* branch = world->root;

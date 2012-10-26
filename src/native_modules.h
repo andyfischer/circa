@@ -4,11 +4,10 @@
 
 namespace circa {
 
-typedef void (*OnModuleLoad)(NativeModule* module);
+typedef void (*OnModuleLoad)(NativeModule* nativeModule);
 
 struct NativeModuleWorld;
 struct NativeModule;
-struct NativePatchFunction;
 
 NativeModuleWorld* create_native_module_world();
 
@@ -27,12 +26,10 @@ void module_patch_function(NativeModule* module, const char* name, EvaluateFunc 
 
 // Manually apply a module's patches to the given branch. This function isn't commonly used
 // (the 'common' way is to allow patches on the World to be automatically applied).
-void module_manually_patch_branch(NativeModule* module, Branch* branch);
-
-// Possibly apply a patch to a new function.
-void module_apply_patches_to_function(World* world, Branch* function);
+void native_module_apply_patch(NativeModule* module, Branch* branch);
 
 void module_on_loaded_branch(Branch* branch);
+void module_possibly_patch_new_function(World* world, Branch* function);
 
 void native_module_add_platform_specific_suffix(caValue* filename);
 void native_module_load_from_file(NativeModule* module, const char* filename);

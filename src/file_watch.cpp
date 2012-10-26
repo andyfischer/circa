@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "branch.h"
 #include "debug.h"
 #include "file.h"
 #include "list.h"
@@ -95,14 +96,19 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
 
         switch (label) {
         case name_NativeModule: {
-            NativeModule* nativeModule = add_native_module(world, filename);
-            native_module_load_from_file(nativeModule, filename);
+            NativeModule* nativeModule = add_native_module(world, as_cstring(&watch->filename));
+            native_module_load_from_file(nativeModule, as_cstring(&watch->filename));
 
             caValue* moduleName = list_get(action, 1);
-            native_module_apply_to_global_branch(nativeModule, as_cstring(moduleName));
+            Branch* branch = nested_contents(find_from_global_name(world, as_cstring(moduleName)));
 
-            printf("todo: load native module:");
-            std::cout << to_string(action) << std::endl;
+            if (branch == NULL) {
+                std::cout << "trying to apply native patch, couldn't find module: "
+                    << as_cstring(moduleName) << std::endl;
+                break;
+            }
+
+            native_module_apply_patch(nativeModule, branch);
             break;
         }
         case name_Branch: {

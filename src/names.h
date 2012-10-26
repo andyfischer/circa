@@ -92,6 +92,7 @@ Term* find_from_global_name(World* world, const char* globalName);
 
 // Construct a global name for this term. May return :None if we couldn't create a global name.
 void get_global_name(Term* term, caValue* nameOut);
+void get_global_name(Branch* term, caValue* nameOut);
 
 Term* find_term_from_global_name(const char* name);
 

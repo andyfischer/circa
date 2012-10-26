@@ -1082,7 +1082,7 @@ void bootstrap_kernel()
     as_function(FUNCS.list_append)->specializeType = List__append_specializeType;
 }
 
-EXPORT caWorld* circa_initialize()
+CIRCA_EXPORT caWorld* circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
@@ -1125,7 +1125,7 @@ EXPORT caWorld* circa_initialize()
     return world;
 }
 
-EXPORT void circa_shutdown(caWorld* world)
+CIRCA_EXPORT void circa_shutdown(caWorld* world)
 {
     SHUTTING_DOWN = true;
 

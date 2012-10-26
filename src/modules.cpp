@@ -4,6 +4,7 @@
 
 #include "circa/file.h"
 
+#include "branch.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
@@ -231,8 +232,28 @@ void native_patch_this_postCompile(Term* term)
     Value branchGlobalName;
     get_global_name(branch->owningTerm, &branchGlobalName);
 
+    if (!is_string(&branchGlobalName)) {
+        std::cout << "term doesn't have global name in native_patch_this_postCompile"
+            << std::endl;
+        return;
+    }
+
+#if 0
     Value filename;
     copy(term_value(term->input(0)), &filename);
+
+    if (!is_string(&filename)) {
+        std::cout << "input is not a string value in native_patch_this_postCompile"
+            << std::endl;
+        return;
+    }
+#endif
+
+    // For the filename, look for a shared object file with the same name as this branch.
+    Value filename;
+    copy(branch_get_source_filename(branch), &filename);
+
+    string_remove_suffix(&filename, ".ca");
     native_module_add_platform_specific_suffix(&filename);
 
     FileWatch* watch = add_file_watch_native_patch(global_world(),
@@ -252,19 +273,19 @@ void modules_install_functions(Branch* kernel)
     as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
 }
 
-EXPORT void circa_run_module(caStack* stack, const char* moduleName)
+CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
 {
     circa::Branch* branch = nested_contents(get_global(moduleName));
 
     evaluate_branch((circa::Stack*) stack, branch);
 }
 
-EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
+CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 {
     modules_add_search_path(path);
 }
 
-EXPORT caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const char* filename)
+CIRCA_EXPORT caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const char* filename)
 {
     return (caBranch*) load_module_from_file(module_name, filename);
 }
