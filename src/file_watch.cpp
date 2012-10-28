@@ -64,9 +64,8 @@ FileWatch* add_file_watch_action(World* world, const char* filename, Value* acti
     FileWatch* watch = add_file_watch(world, filename);
 
     // Check if this exact action already exists, if so do nothing.
-    for (int i=0; i < list_length(&watch->onChangeActions); i++)
-        if (equals(list_get(&watch->onChangeActions, i), action))
-            return watch;
+    if (list_contains(&watch->onChangeActions, action))
+        return watch;
 
     // Add action
     copy(action, list_append(&watch->onChangeActions));

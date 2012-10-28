@@ -367,6 +367,15 @@ void list_reverse(caValue* list)
     }
 }
 
+bool list_contains(caValue* list, caValue* element)
+{
+    for (int i=0; i < list_length(list); i++)
+        if (equals(list_get(list, i), element))
+            return true;
+
+    return false;
+}
+
 caValue* list_get(caValue* value, int index)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);

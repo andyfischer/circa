@@ -13,7 +13,7 @@ NativeModuleWorld* create_native_module_world();
 
 // Create a new NativeModule object. This function isn't commonly used (you might want
 // add_native_module instead).
-NativeModule* create_native_module();
+NativeModule* create_native_module(World* world);
 void free_native_module(NativeModule* module);
 
 // Add a module with the given name to the World. If a module with this name already exists,

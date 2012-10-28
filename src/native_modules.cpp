@@ -22,13 +22,16 @@ namespace circa {
 struct NativeModuleWorld
 {
     std::map<std::string, NativeModule*> nativeModules;
+
+    // Dictionary mapping function's global name -> native module name.
+    Value everyPatchedFunction;
 };
 
 struct NativeModule
 {
-    std::map<std::string, EvaluateFunc> patches;
+    World* world;
 
-    Value namePrefix;
+    std::map<std::string, EvaluateFunc> patches;
 
     OnModuleLoad onModuleLoad;
 
@@ -39,12 +42,15 @@ struct NativeModule
 
 NativeModuleWorld* create_native_module_world()
 {
-    return new NativeModuleWorld();
+    NativeModuleWorld* world = new NativeModuleWorld();
+    set_dict(&world->everyPatchedFunction);
+    return world;
 }
 
-NativeModule* create_native_module()
+NativeModule* create_native_module(World* world)
 {
     NativeModule* module = new NativeModule();
+    module->world = world;
     module->dll = NULL;
     return module;
 }
@@ -54,21 +60,20 @@ void free_native_module(NativeModule* module)
     delete module;
 }
 
-NativeModule* add_native_module(World* world, const char* namePrefix)
+NativeModule* add_native_module(World* world, const char* filename)
 {
     NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
 
     // Return existing module, if it exists.
     std::map<std::string, NativeModule*>::const_iterator it =
-        moduleWorld->nativeModules.find(namePrefix);
+        moduleWorld->nativeModules.find(filename);
 
     if (it != moduleWorld->nativeModules.end())
         return it->second;
 
     // Create module.
     NativeModule* module = create_native_module();
-    moduleWorld->nativeModules[namePrefix] = module;
-    set_string(&module->namePrefix, namePrefix);
+    moduleWorld->nativeModules[filename] = module;
     return module;
 }
 
@@ -80,7 +85,26 @@ void delete_native_module(World* world, const char* name)
 void module_patch_function(NativeModule* module, const char* name, EvaluateFunc func)
 {
     module->patches[name] = func;
-}    
+}
+
+void finish_building_native_module(NativeModule* module)
+{
+    // Rebuild the everyPatchedFunction dict.
+    NativeModuleWorld* world = module->world->nativeModuleWorld;
+
+    set_dict(&world->everyPatchedFunction);
+
+    std::map<std::string, NativeModule*>::const_iterator it;
+    for (it = world->nativeModules.begin(); it != world->nativeModules.end(); ++it) {
+
+        NativeModule* module = it->second;
+        std::map<std::string, EvaluateFunc>::const_iterator patchIt;
+
+        for (patchIt = module->patches.begin(); patchIt != module->patches.end(); patchIt++) {
+            std::string 
+        }
+    }
+}
 
 void native_module_apply_patch(NativeModule* module, Branch* branch)
 {
@@ -107,18 +131,6 @@ void native_module_apply_patch(NativeModule* module, Branch* branch)
 
     if (anyTouched)
         dirty_bytecode(branch);
-}
-
-Branch* native_module_get_target_branch(World* world, NativeModule* module)
-{
-    if (!is_string(&module->namePrefix))
-        return world->root;
-
-    Term* term = find_from_global_name(world, as_cstring(&module->namePrefix));
-    if (term == NULL)
-        return NULL;
-
-    return term->nestedContents;
 }
 
 void module_on_loaded_branch(Branch* branch)
@@ -160,7 +172,7 @@ void module_possibly_patch_new_function(World* world, Branch* function)
 
             NativeModule* module = it->second;
 
-            Branch* target = native_module_get_target_branch(world, module);
+            Branch* target = NULL; // FIXME
 
             if (target == NULL)
                 continue;
@@ -200,7 +212,7 @@ void native_module_load_from_file(NativeModule* module, const char* filename)
 
     module->dll = dlopen(filename, RTLD_NOW);
 
-    if (module->dll) {
+    if (!module->dll) {
         std::cout << "failed to open dll: " << filename << std::endl;
         return;
     }

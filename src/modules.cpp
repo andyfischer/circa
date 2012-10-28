@@ -238,8 +238,9 @@ void native_patch_this_postCompile(Term* term)
         return;
     }
 
+    Term* filenameInput = term->input(0);
     Value filename;
-    evaluate_minimum2(term, &filename);
+    evaluate_minimum2(filenameInput, &filename);
 
     if (!is_string(&filename)) {
         std::cout << "input is not a string value in native_patch_this_postCompile"

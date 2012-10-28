@@ -101,10 +101,12 @@ void list_slice(caValue* original, int start, int end, caValue* result);
 // Reverse the list.
 void list_reverse(caValue* list);
 
+// Return true if any of the elements of the list are equal to this element.
+bool list_contains(caValue* list, caValue* element);
+
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.
-
 Name list_get_parameter_type(caValue* parameter);
 bool list_type_has_specific_size(caValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter);
@@ -138,7 +140,6 @@ Type* list_get_repeated_type_from_type(Type* type);
 // For a List-based type, this returns the index of the field with the given name.
 // Returns NULL if the field is not found.
 int list_find_field_index_by_name(Type* listType, const char* name);
-
 
 bool is_list_based_type(Type*);
 

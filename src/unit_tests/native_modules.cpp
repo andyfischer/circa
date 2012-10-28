@@ -84,10 +84,10 @@ void patch_manually_ns()
 void new_function_patched_by_world()
 {
     // First create the module, as part of the global world.
-    NativeModule* module = add_native_module(global_world(), "test_module_34");
+    NativeModule* module = add_native_module(global_world(), "native_modules_test");
     module_patch_function(module, "my_add", my_add);
 
-    // Now create our function, it should be patched.
+    // Now create our function, it should get patched instantly.
     Branch branch;
     branch.compile("def my_add(int a, int b) -> int { a + a }");
     branch.compile("test_spy(my_add(1 2))");
@@ -99,7 +99,7 @@ void new_function_patched_by_world()
 
     // test_equals(test_spy_get_results(), "[3]");
 
-    delete_native_module(global_world(), "test_module_34");
+    delete_native_module(global_world(), "native_modules_test");
 }
 
 void register_tests()
