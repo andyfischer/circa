@@ -11,6 +11,7 @@
 #include "heap_debugging.h"
 #include "inspection.h"
 #include "names.h"
+#include "string_type.h"
 #include "term.h"
 #include "term_list.h"
 #include "type.h"
@@ -526,12 +527,12 @@ std::string get_source_filename(Term* term)
     Branch* branch = term->owningBranch;
 
     while (branch != NULL) {
-        std::string filename = get_branch_source_filename(branch);
+        caValue* filename = branch_get_source_filename(branch);
 
-        if (filename != "")
-            return filename;
+        if (filename != NULL)
+            return as_string(filename);
 
-        branch = get_outer_scope(branch);
+        branch = get_parent_branch(branch);
     }
 
     return "";

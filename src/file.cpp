@@ -62,12 +62,6 @@ void get_directory_for_filename(caValue* filename, caValue* result)
 
 void get_path_relative_to_source(caBranch* relativeTo, caValue* relPath, caValue* result)
 {
-    // Don't modify a blank path
-    if (string_eq(relPath,"")) {
-        set_string(result, "");
-        return;
-    }
-
     if (relativeTo == NULL) {
         copy(relPath, result);
         return;
@@ -87,8 +81,12 @@ void get_path_relative_to_source(caBranch* relativeTo, caValue* relPath, caValue
     }
 
     set_string(result, scriptLocation.c_str());
-    string_append(result, "/");
-    string_append(result, relPath);
+
+    if (!string_eq(relPath,"")) {
+        string_append(result, "/");
+        string_append(result, relPath);
+    }
+
 }
 
 static bool is_path_seperator(char c)

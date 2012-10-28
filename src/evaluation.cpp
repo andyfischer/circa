@@ -1497,17 +1497,7 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
     move(&bytecode, frame_bytecode(top_frame(stack)));
 
     // Start evaluation.
-    start_interpreter_session(stack);
-
-    for (int i=0; i <= term->index; i++) {
-        if (marked[i]) {
-            stack->running = true;
-            top_frame(stack)->pc = i;
-            step_interpreter(stack);
-        }
-    }
-
-    stack->running = false;
+    run_interpreter(stack);
 
     // Possibly save output
     if (result != NULL)

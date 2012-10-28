@@ -154,7 +154,6 @@ void remove_nested_contents(Term* term);
 void branch_graft_as_nested_contents(Term* term, Branch* branch);
 
 caValue* branch_get_source_filename(Branch* branch);
-std::string get_branch_source_filename(Branch* branch);
 Branch* get_outer_scope(Branch* branch);
 
 // Delete this term and remove it from its owning branch.

@@ -344,6 +344,7 @@ namespace file { void register_tests(); }
 namespace file_watch { void register_tests(); }
 namespace interpreter { void register_tests(); }
 namespace migration { void register_tests(); }
+namespace modules { void register_tests(); }
 namespace names { void register_tests(); }
 namespace native_modules { void register_tests(); }
 namespace tokenizer { void register_tests(); }
@@ -359,6 +360,7 @@ int main(int argc, char** argv)
     file_watch::register_tests();
     interpreter::register_tests();
     migration::register_tests();
+    modules::register_tests();
     names::register_tests();
     native_modules::register_tests();
     tokenizer::register_tests();

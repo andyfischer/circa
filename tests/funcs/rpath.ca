@@ -1,0 +1,4 @@
+
+p = rpath('p')
+
+assert(p == "tests/funcs/p")

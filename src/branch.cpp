@@ -420,16 +420,6 @@ caValue* branch_get_source_filename(Branch* branch)
     return fileOrigin->get(1);
 }
 
-std::string get_branch_source_filename(Branch* branch)
-{
-    caValue* val = branch_get_source_filename(branch);
-    
-    if (val == NULL || !is_string(val))
-        return "";
-    else
-        return as_string(val);
-}
-
 Branch* get_outer_scope(Branch* branch)
 {
     if (branch->owningTerm == NULL)
@@ -625,12 +615,8 @@ Branch* load_script_term(Branch* branch, const char* filename)
 std::string get_source_file_location(Branch* branch)
 {
     // Search upwards until we find a branch that has source-file defined.
-    while (branch != NULL && get_branch_source_filename(branch) == "") {
-        if (branch->owningTerm == NULL)
-            branch = NULL;
-        else
-            branch = branch->owningTerm->owningBranch;
-    }
+    while (branch != NULL && branch_get_source_filename(branch) == NULL)
+        branch = get_parent_branch(branch);
 
     if (branch == NULL)
         return "";

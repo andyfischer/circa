@@ -75,6 +75,7 @@ OBJECTS := \
 	$(OBJDIR)/interpreter.o \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/migration.o \
+	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/native_modules.o \
 	$(OBJDIR)/tokenizer.o \
@@ -169,6 +170,9 @@ $(OBJDIR)/main.o: ../src/unit_tests/main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/migration.o: ../src/unit_tests/migration.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/modules.o: ../src/unit_tests/modules.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/names.o: ../src/unit_tests/names.cpp
