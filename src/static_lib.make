@@ -20,11 +20,11 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/static_lib
-  TARGETDIR  = .
+  OBJDIR     = ../build/Debug/static_lib
+  TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca_d.a
   DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I../src
+  INCLUDES  += -I../include -I.
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
@@ -42,11 +42,11 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/static_lib
-  TARGETDIR  = .
+  OBJDIR     = ../build/Release/static_lib
+  TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca.a
   DEFINES   += 
-  INCLUDES  += -I../include -I../src
+  INCLUDES  += -I../include -I.
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
@@ -179,169 +179,169 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/branch.o: ../src/branch.cpp
+$(OBJDIR)/branch.o: branch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/building.o: ../src/building.cpp
+$(OBJDIR)/building.o: building.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/c_api.o: ../src/c_api.cpp
+$(OBJDIR)/c_api.o: c_api.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/code_iterators.o: ../src/code_iterators.cpp
+$(OBJDIR)/code_iterators.o: code_iterators.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/codegen.o: ../src/codegen.cpp
+$(OBJDIR)/codegen.o: codegen.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/control_flow.o: ../src/control_flow.cpp
+$(OBJDIR)/control_flow.o: control_flow.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/debug.o: ../src/debug.cpp
+$(OBJDIR)/debug.o: debug.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/dict.o: ../src/dict.cpp
+$(OBJDIR)/dict.o: dict.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/dll_loading.o: ../src/dll_loading.cpp
+$(OBJDIR)/dll_loading.o: dll_loading.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/evaluation.o: ../src/evaluation.cpp
+$(OBJDIR)/evaluation.o: evaluation.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/fakefs.o: ../src/fakefs.cpp
+$(OBJDIR)/fakefs.o: fakefs.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/feedback.o: ../src/feedback.cpp
+$(OBJDIR)/feedback.o: feedback.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file.o: ../src/file.cpp
+$(OBJDIR)/file.o: file.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_watch.o: ../src/file_watch.cpp
+$(OBJDIR)/file_watch.o: file_watch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/function.o: ../src/function.cpp
+$(OBJDIR)/function.o: function.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gc.o: ../src/gc.cpp
+$(OBJDIR)/gc.o: gc.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/generic.o: ../src/generic.cpp
+$(OBJDIR)/generic.o: generic.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/handle.o: ../src/handle.cpp
+$(OBJDIR)/handle.o: handle.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/heap_debugging.o: ../src/heap_debugging.cpp
+$(OBJDIR)/heap_debugging.o: heap_debugging.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/if_block.o: ../src/if_block.cpp
+$(OBJDIR)/if_block.o: if_block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/importing.o: ../src/importing.cpp
+$(OBJDIR)/importing.o: importing.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/inspection.o: ../src/inspection.cpp
+$(OBJDIR)/inspection.o: inspection.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/kernel.o: ../src/kernel.cpp
+$(OBJDIR)/kernel.o: kernel.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/list.o: ../src/list.cpp
+$(OBJDIR)/list.o: list.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/loops.o: ../src/loops.cpp
+$(OBJDIR)/loops.o: loops.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/map.o: ../src/map.cpp
+$(OBJDIR)/map.o: map.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/modules.o: ../src/modules.cpp
+$(OBJDIR)/modules.o: modules.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/names.o: ../src/names.cpp
+$(OBJDIR)/names.o: names.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/names_builtin.o: ../src/names_builtin.cpp
+$(OBJDIR)/names_builtin.o: names_builtin.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/native_modules.o: ../src/native_modules.cpp
+$(OBJDIR)/native_modules.o: native_modules.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/object.o: ../src/object.cpp
+$(OBJDIR)/object.o: object.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/parser.o: ../src/parser.cpp
+$(OBJDIR)/parser.o: parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/reflection.o: ../src/reflection.cpp
+$(OBJDIR)/reflection.o: reflection.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/selector.o: ../src/selector.cpp
+$(OBJDIR)/selector.o: selector.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/source_repro.o: ../src/source_repro.cpp
+$(OBJDIR)/source_repro.o: source_repro.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/stateful_code.o: ../src/stateful_code.cpp
+$(OBJDIR)/stateful_code.o: stateful_code.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/static_checking.o: ../src/static_checking.cpp
+$(OBJDIR)/static_checking.o: static_checking.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/str_repr.o: ../src/str_repr.cpp
+$(OBJDIR)/str_repr.o: str_repr.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/string_type.o: ../src/string_type.cpp
+$(OBJDIR)/string_type.o: string_type.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/switch_block.o: ../src/switch_block.cpp
+$(OBJDIR)/switch_block.o: switch_block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/tagged_value.o: ../src/tagged_value.cpp
+$(OBJDIR)/tagged_value.o: tagged_value.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/term.o: ../src/term.cpp
+$(OBJDIR)/term.o: term.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/term_list.o: ../src/term_list.cpp
+$(OBJDIR)/term_list.o: term_list.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/term_namespace.o: ../src/term_namespace.cpp
+$(OBJDIR)/term_namespace.o: term_namespace.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/thread.o: ../src/thread.cpp
+$(OBJDIR)/thread.o: thread.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/token.o: ../src/token.cpp
+$(OBJDIR)/token.o: token.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/type.o: ../src/type.cpp
+$(OBJDIR)/type.o: type.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/type_inference.o: ../src/type_inference.cpp
+$(OBJDIR)/type_inference.o: type_inference.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/update_cascades.o: ../src/update_cascades.cpp
+$(OBJDIR)/update_cascades.o: update_cascades.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/weak_ptrs.o: ../src/weak_ptrs.cpp
+$(OBJDIR)/weak_ptrs.o: weak_ptrs.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/world.o: ../src/world.cpp
+$(OBJDIR)/world.o: world.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/all_builtin_functions.o: ../src/generated/all_builtin_functions.cpp
+$(OBJDIR)/all_builtin_functions.o: generated/all_builtin_functions.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/all_builtin_types.o: ../src/generated/all_builtin_types.cpp
+$(OBJDIR)/all_builtin_types.o: generated/all_builtin_types.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/setup_builtin_functions.o: ../src/generated/setup_builtin_functions.cpp
+$(OBJDIR)/setup_builtin_functions.o: generated/setup_builtin_functions.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/stdlib_script_text.o: ../src/generated/stdlib_script_text.cpp
+$(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

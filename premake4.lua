@@ -9,6 +9,8 @@ solution "Circa"
     language "C++"
     includedirs {"include"}
     flags { "Symbols" }
+    targetdir "build"
+    objdir "build/obj"
 
     configuration "Release"
         flags { "OptimizeSpeed" }
@@ -19,8 +21,7 @@ solution "Circa"
     project "static_lib"
         kind "StaticLib"
         targetname "circa"
-        location "build"
-        targetdir "build"
+        location "src"
         files {
             "src/*.cpp",
             "src/generated/all_builtin_functions.cpp",
@@ -36,8 +37,7 @@ solution "Circa"
     project "command_line"
         kind "ConsoleApp"
         targetname "circa"
-        targetdir "build"
-        location "build"
+        location "src"
         defines { "CIRCA_USE_LINENOISE" }
         files {
             "src/command_line/build_tool.cpp",
@@ -57,9 +57,7 @@ solution "Circa"
 
     project "unit_tests"
         kind "ConsoleApp"
-        targetname "circa_tests"
-        targetdir "build"
-        location "build"
+        location "src"
         files {"src/unit_tests/*.cpp"}
         includedirs {"src"}
         links {"static_lib"}

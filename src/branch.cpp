@@ -637,7 +637,7 @@ bool branch_get_function_attr_bool(Branch* branch, Name attr)
     if (is_null(&branch->functionAttrs))
         return false;
 
-    // todo
+    // TODO
 
     return false;
 }

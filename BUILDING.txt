@@ -29,7 +29,7 @@ Run: make <optional config> <optional target>
        On Windows the suffix is .exe, as in: circa.exe
 
     unit_tests
-     - Unit testing app, tests internal functions. Creates: build/circa_test
+     - App that runs C++-based unit tests. Creates: build/unit_tests
 
 Example commands:
 

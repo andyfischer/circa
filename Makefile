@@ -14,20 +14,20 @@ all: $(PROJECTS)
 
 static_lib: 
 	@echo "==== Building static_lib ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f static_lib.make
+	@${MAKE} --no-print-directory -C src -f static_lib.make
 
 command_line: static_lib
 	@echo "==== Building command_line ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f command_line.make
+	@${MAKE} --no-print-directory -C src -f command_line.make
 
 unit_tests: static_lib
 	@echo "==== Building unit_tests ($(config)) ===="
-	@${MAKE} --no-print-directory -C build -f unit_tests.make
+	@${MAKE} --no-print-directory -C src -f unit_tests.make
 
 clean:
-	@${MAKE} --no-print-directory -C build -f static_lib.make clean
-	@${MAKE} --no-print-directory -C build -f command_line.make clean
-	@${MAKE} --no-print-directory -C build -f unit_tests.make clean
+	@${MAKE} --no-print-directory -C src -f static_lib.make clean
+	@${MAKE} --no-print-directory -C src -f command_line.make clean
+	@${MAKE} --no-print-directory -C src -f unit_tests.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"

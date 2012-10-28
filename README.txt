@@ -39,7 +39,25 @@ projects, or people who don't like bugs, are recommended to wait for a beta rele
 Building
 ========
 
-Refer to the BUILDING file.
+To build everything, just run "make"
+
+For more information, see BUILDING.txt .
+
+Directories
+===========
+
+ /3rdparty - Code imported from other projects.
+ /build    - Holds all build artifacts. Can be deleted for a clean build.
+ /docs     - Documentation.
+ /extras   - Files relevant to specific platforms or tools.
+ /improv   - Root directory for Improv app, a graphical tool.
+ /include  - Public include files, this is the directory to add to your include dirs.
+ /libs     - Optional Circa modules, such as bindings to 3rd-party libraries.
+ /notes    - Unorganized notes and plan files.
+ /old      - Deprecated code that isn't ready to be deleted.
+ /src      - Circa source code.
+ /tests    - Script-based tests. See also src/unit_tests for C++ based tests.
+ /tools    - Scripts for Circa developers.
 
 Documentation
 =============

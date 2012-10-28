@@ -20,18 +20,18 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/Debug/unit_tests
-  TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/circa_tests
-  DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I../src
+  OBJDIR     = ../build/Debug/command_line
+  TARGETDIR  = ../build
+  TARGET     = $(TARGETDIR)/circa_d
+  DEFINES   += -DDEBUG -DCIRCA_USE_LINENOISE
+  INCLUDES  += -I../include -I. -I../3rdparty/linenoise
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L.
+  LDFLAGS   += -L../build
   LIBS      += -lcirca_d
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += libcirca_d.a
+  LDDEPS    += ../build/libcirca_d.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -42,18 +42,18 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/Release/unit_tests
-  TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/circa_tests
-  DEFINES   += 
-  INCLUDES  += -I../include -I../src
+  OBJDIR     = ../build/Release/command_line
+  TARGETDIR  = ../build
+  TARGET     = $(TARGETDIR)/circa
+  DEFINES   += -DCIRCA_USE_LINENOISE
+  INCLUDES  += -I../include -I. -I../3rdparty/linenoise
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L.
+  LDFLAGS   += -L../build
   LIBS      += -lcirca
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += libcirca.a
+  LDDEPS    += ../build/libcirca.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -64,21 +64,14 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/branch.o \
-	$(OBJDIR)/c_objects.o \
-	$(OBJDIR)/cascading.o \
-	$(OBJDIR)/code_iterators.o \
-	$(OBJDIR)/compound_type.o \
-	$(OBJDIR)/fakefs.o \
-	$(OBJDIR)/file.o \
-	$(OBJDIR)/file_watch.o \
-	$(OBJDIR)/interpreter.o \
-	$(OBJDIR)/main.o \
-	$(OBJDIR)/migration.o \
-	$(OBJDIR)/modules.o \
-	$(OBJDIR)/names.o \
-	$(OBJDIR)/native_modules.o \
-	$(OBJDIR)/tokenizer.o \
+	$(OBJDIR)/build_tool.o \
+	$(OBJDIR)/command_line.o \
+	$(OBJDIR)/command_line_main.o \
+	$(OBJDIR)/debugger_repl.o \
+	$(OBJDIR)/exporting_parser.o \
+	$(OBJDIR)/file_checker.o \
+	$(OBJDIR)/generate_cpp.o \
+	$(OBJDIR)/linenoise.o \
 
 RESOURCES := \
 
@@ -96,7 +89,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking unit_tests
+	@echo Linking command_line
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -117,7 +110,7 @@ else
 endif
 
 clean:
-	@echo Cleaning unit_tests
+	@echo Cleaning command_line
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -139,50 +132,29 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/branch.o: ../src/unit_tests/branch.cpp
+$(OBJDIR)/build_tool.o: command_line/build_tool.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/c_objects.o: ../src/unit_tests/c_objects.cpp
+$(OBJDIR)/command_line.o: command_line/command_line.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/cascading.o: ../src/unit_tests/cascading.cpp
+$(OBJDIR)/command_line_main.o: command_line/command_line_main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/code_iterators.o: ../src/unit_tests/code_iterators.cpp
+$(OBJDIR)/debugger_repl.o: command_line/debugger_repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/compound_type.o: ../src/unit_tests/compound_type.cpp
+$(OBJDIR)/exporting_parser.o: command_line/exporting_parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/fakefs.o: ../src/unit_tests/fakefs.cpp
+$(OBJDIR)/file_checker.o: command_line/file_checker.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file.o: ../src/unit_tests/file.cpp
+$(OBJDIR)/generate_cpp.o: command_line/generate_cpp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_watch.o: ../src/unit_tests/file_watch.cpp
+$(OBJDIR)/linenoise.o: ../3rdparty/linenoise/linenoise.c
 	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/interpreter.o: ../src/unit_tests/interpreter.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/main.o: ../src/unit_tests/main.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/migration.o: ../src/unit_tests/migration.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/modules.o: ../src/unit_tests/modules.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/names.o: ../src/unit_tests/names.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/native_modules.o: ../src/unit_tests/native_modules.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/tokenizer.o: ../src/unit_tests/tokenizer.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
