@@ -24,8 +24,14 @@
 
 namespace circa {
 
-void dump_frames_raw(Stack* stack);
+static Frame* frame_by_id(Stack* stack, int id);
+static void dump_frames_raw(Stack* stack);
 static Branch* find_pushed_branch_for_action(caValue* action);
+static void update_stack_for_possibly_changed_branches(Stack* stack);
+static void start_interpreter_session(Stack* stack);
+static void step_interpreter(Stack* stack);
+static void bytecode_write_noop(caValue* op);
+static void bytecode_write_finish_op(caValue* op);
 
 const int BytecodeIndex_Inputs = 1;
 const int BytecodeIndex_Output = 2;
@@ -63,11 +69,10 @@ Stack* alloc_stack(World* world)
     return stack;
 }
 
-void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
+void stack_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
-    // todo
+    // TODO for garbage collection
 }
-
 
 static Frame* frame_by_id(Stack* stack, int id)
 {
@@ -180,50 +185,6 @@ static void release_frame(Stack* stack, Frame* frame)
         stack->firstFreeFrame = frame->id;
     }
 }
-
-#if 0
-static void insert_frame_in_expansion_list(Stack* stack, Frame* newFrame, Frame* parent)
-{
-    ca_assert(newFrame->parent == parent->id);
-
-    // Check if parent's expansion list is empty.
-    if (parent->firstExpansion == 0) {
-        parent->firstExpansion = newFrame->id;
-        newFrame->neighborExpansion = 0;
-        return;
-    }
-
-    // Insert the new frame, sorted by parent PC.
-    Frame* neighbor = frame_by_id(stack, parent->firstExpansion);
-    Frame* previousNeighbor = NULL;
-
-    while (true) {
-        if (newFrame->parentPc <= neighbor->parentPc) {
-            // Insert newFrame before neighbor.
-
-            // Check if this is the new first
-            if (previousNeighbor == NULL)
-                parent->firstExpansion = newFrame->id;
-            else
-                previousNeighbor->neighborExpansion = newFrame->id;
-
-            newFrame->neighborExpansion = neighbor->id;
-            return;
-        }
-
-        // Check if this is the last in the expansion list
-        if (neighbor->neighborExpansion == 0) {
-            neighbor->neighborExpansion = newFrame->id;
-            newFrame->neighborExpansion = 0;
-            return;
-        }
-
-        // Advance down the list and iterate.
-        previousNeighbor = neighbor;
-        neighbor = frame_by_id(stack, neighbor->neighborExpansion);
-    }
-}
-#endif
 
 Frame* push_frame(Stack* stack, Branch* branch)
 {
@@ -498,36 +459,6 @@ void evaluate_single_term(Stack* stack, Term* term)
     run_interpreter(stack);
 }
 
-void copy_locals_back_to_terms(Stack* stack, Frame* frame, Branch* branch)
-{
-    // Copy stack back to the original terms.
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        if (is_value(term)) continue;
-        caValue* val = get_frame_register(frame, term);
-        if (val != NULL)
-            copy(val, term_value(branch->get(i)));
-    }
-}
-
-void insert_top_level_state(Stack* stack, Branch* branch)
-{
-    Term* input = find_state_input(branch);
-    if (input == NULL)
-        return;
-
-    copy(&stack->state, get_top_register(stack, input));
-}
-
-void save_top_level_state(Stack* stack, Branch* branch)
-{
-    Term* output = find_state_output(branch);
-    if (output == NULL || output->numInputs() < 1 || output->input(0) == NULL)
-        return;
-
-    move(get_top_register(stack, output->input(0)), &stack->state);
-}
-
 void evaluate_branch(Stack* stack, Branch* branch)
 {
     branch_finish_changes(branch);
@@ -535,15 +466,10 @@ void evaluate_branch(Stack* stack, Branch* branch)
     // Top-level call
     push_frame(stack, branch);
 
-    // Check to insert top-level state
-    insert_top_level_state(stack, branch);
-
     run_interpreter(stack);
 
-    if (!error_occurred(stack)) {
-        save_top_level_state(stack, branch);
+    if (!error_occurred(stack))
         pop_frame(stack);
-    }
 }
 
 caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
@@ -687,101 +613,6 @@ bool error_occurred(Stack* stack)
     return stack->errorOccurred;
 }
 
-void evaluate_range(Stack* stack, Branch* branch, int start, int end)
-{
-    branch_finish_changes(branch);
-    push_frame(stack, branch);
-
-    for (int i=start; i <= end; i++)
-        evaluate_single_term(stack, branch->get(i));
-
-    if (error_occurred(stack))
-        return;
-
-    copy_locals_back_to_terms(stack, top_frame(stack), branch);
-    pop_frame(stack);
-}
-
-void evaluate_minimum(Stack* stack, Term* term, caValue* result)
-{
-    // Get a list of every term that this term depends on. Also, limit this
-    // search to terms inside the current branch.
-    
-    Branch* branch = term->owningBranch;
-    branch_finish_changes(branch);
-
-    push_frame(stack, branch);
-
-    bool *marked = new bool[branch->length()];
-    memset(marked, false, sizeof(bool)*branch->length());
-
-    marked[term->index] = true;
-
-    for (int i=term->index; i >= 0; i--) {
-        Term* checkTerm = branch->get(i);
-        if (checkTerm == NULL)
-            continue;
-
-        if (marked[i]) {
-            for (int inputIndex=0; inputIndex < checkTerm->numInputs(); inputIndex++) {
-                Term* input = checkTerm->input(inputIndex);
-                if (input == NULL)
-                    continue;
-                if (input->owningBranch != branch)
-                    continue;
-                // don't follow :meta inputs
-                if (function_get_input_meta(as_function(term_value(checkTerm->function)),
-                            inputIndex))
-                    continue;
-                marked[input->index] = true;
-            }
-        }
-    }
-
-    for (int i=0; i <= term->index; i++) {
-        if (marked[i])
-            evaluate_single_term(stack, branch->get(i));
-    }
-
-    // Possibly save output
-    if (result != NULL)
-        copy(get_top_register(stack, term), result);
-
-    delete[] marked;
-
-    pop_frame(stack);
-}
-
-caValue* evaluate(Stack* stack, Branch* branch, std::string const& input)
-{
-    int prevHead = branch->length();
-    Term* result = parser::compile(branch, parser::statement_list, input);
-    evaluate_range(stack, branch, prevHead, branch->length() - 1);
-    return term_value(result);
-}
-
-caValue* evaluate(Branch* branch, Term* function, List* inputs)
-{
-    Stack stack;
-
-    TermList inputTerms;
-    inputTerms.resize(inputs->length());
-
-    for (int i=0; i < inputs->length(); i++)
-        inputTerms.setAt(i, create_value(branch, inputs->get(i)));
-
-    int prevHead = branch->length();
-    Term* result = apply(branch, function, inputTerms);
-    evaluate_range(&stack, branch, prevHead, branch->length() - 1);
-    return term_value(result);
-}
-
-caValue* evaluate(Term* function, List* inputs)
-{
-    Branch scratch;
-    return evaluate(&scratch, function, inputs);
-}
-
 void clear_error(Stack* cxt)
 {
     cxt->errorOccurred = false;
@@ -919,7 +750,7 @@ void print_error_stack(Stack* stack, std::ostream& out)
     }
 }
 
-void update_context_to_latest_branches(Stack* stack)
+static void update_stack_for_possibly_changed_branches(Stack* stack)
 {
     // Starting at the top frame, check each frame in the stack to make sure it still
     // matches the original branch.
@@ -937,7 +768,7 @@ void update_context_to_latest_branches(Stack* stack)
     }
 }
 
-Branch* for_loop_choose_branch(Stack* stack, Term* term)
+static Branch* for_loop_choose_branch(Stack* stack, Term* term)
 {
     // If there are zero inputs, use the #zero branch.
     caValue* input = find_stack_value_for_term(stack, term->input(0), 0);
@@ -948,7 +779,7 @@ Branch* for_loop_choose_branch(Stack* stack, Term* term)
     return term->nestedContents;
 }
 
-Branch* case_block_choose_branch(Stack* stack, Term* term)
+static Branch* case_block_choose_branch(Stack* stack, Term* term)
 {
     // Find the accepted case
     Branch* contents = nested_contents(term);
@@ -997,7 +828,7 @@ EvaluateFunc get_override_for_branch(Branch* branch)
     return func->evaluate;
 }
 
-void start_interpreter_session(Stack* stack)
+static void start_interpreter_session(Stack* stack)
 {
     Branch* topBranch = top_frame(stack)->branch;
 
@@ -1005,7 +836,7 @@ void start_interpreter_session(Stack* stack)
     branch_finish_changes(topBranch);
 
     // Check if our stack needs to be updated following branch modification
-    update_context_to_latest_branches(stack);
+    update_stack_for_possibly_changed_branches(stack);
 
     // Cast all inputs, in case they were passed in uncast.
     for (int i=0;; i++) {
@@ -1098,6 +929,18 @@ void write_term_output_instructions(Term* term, caValue* op, Branch* finishingBr
     set_name(action, name_FlatOutputs);
 }
 
+static void bytecode_write_noop(caValue* op)
+{
+    set_list(op, 1);
+    set_name(list_get(op, 0), op_NoOp);
+}
+
+static void bytecode_write_finish_op(caValue* op)
+{
+    set_list(op, 1);
+    set_name(list_get(op, 0), op_FinishFrame);
+}
+
 void write_term_bytecode(Term* term, caValue* result)
 {
     // Each action has a tag in index 0.
@@ -1132,8 +975,7 @@ void write_term_bytecode(Term* term, caValue* result)
         // Special case: don't use InlineCopy for an accumulatingOutput (this is used
         // in for-loop).
         if (term->boolProp("accumulatingOutput", false)) {
-            set_name(outputTag, op_NoOp);
-            list_resize(result, 1);
+            bytecode_write_noop(result);
             return;
 
         } else if (input == NULL) {
@@ -1251,10 +1093,6 @@ void write_branch_bytecode(Branch* branch, caValue* output)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         caValue* op = list_get(output, i);
-        if (term == NULL) {
-            set_list(op, 1);
-            set_name(list_get(op, 0), op_NoOp);
-        }
 
         write_term_bytecode(term, op);
     }
@@ -1262,6 +1100,8 @@ void write_branch_bytecode(Branch* branch, caValue* output)
     // Write the finish operation
     caValue* finishOp = list_get(output, branch->length());
     if (is_for_loop(branch)) {
+
+        // Finish for-loop.
         set_list(finishOp, 2);
         set_name(list_get(finishOp, 0), op_FinishLoop);
 
@@ -1271,12 +1111,10 @@ void write_branch_bytecode(Branch* branch, caValue* output)
         } else {
             set_null(list_get(finishOp, 1));
         }
-
-        return;
+    } else {
+        // Normal finish op.
+        bytecode_write_finish_op(finishOp);
     }
-
-    set_list(finishOp, 1);
-    set_name(list_get(finishOp, 0), op_FinishFrame);
 }
 
 void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue* outputList,
@@ -1532,9 +1370,8 @@ void run_interpreter(Stack* stack)
     stack->errorOccurred = false;
     stack->running = true;
 
-    while (stack->running) {
+    while (stack->running)
         step_interpreter(stack);
-    }
 }
 
 void run_interpreter_step(Stack* stack)
@@ -1558,6 +1395,110 @@ void run_interpreter_steps(Stack* stack, int steps)
     }
 
     stack->running = false;
+}
+
+void evaluate_range(Stack* stack, Branch* branch, int start, int end)
+{
+    branch_finish_changes(branch);
+    push_frame(stack, branch);
+
+    for (int i=start; i <= end; i++)
+        evaluate_single_term(stack, branch->get(i));
+
+    if (error_occurred(stack))
+        return;
+
+    pop_frame(stack);
+}
+
+void evaluate_minimum(Stack* stack, Term* term, caValue* result)
+{
+    // Get a list of every term that this term depends on. Also, limit this
+    // search to terms inside the current branch.
+    
+    Branch* branch = term->owningBranch;
+    branch_finish_changes(branch);
+
+    push_frame(stack, branch);
+
+    bool *marked = new bool[branch->length()];
+    memset(marked, false, sizeof(bool)*branch->length());
+
+    marked[term->index] = true;
+
+    // Walk up the branch, marking terms.
+    for (int i=term->index; i >= 0; i--) {
+        Term* checkTerm = branch->get(i);
+        if (checkTerm == NULL)
+            continue;
+
+        if (marked[i]) {
+            for (int inputIndex=0; inputIndex < checkTerm->numInputs(); inputIndex++) {
+                Term* input = checkTerm->input(inputIndex);
+                if (input == NULL)
+                    continue;
+
+                // don't compile stuff outside this branch.
+                if (input->owningBranch != branch)
+                    continue;
+
+                // don't follow :meta inputs.
+                if (function_get_input_meta(as_function(term_value(checkTerm->function)),
+                            inputIndex))
+                    continue;
+
+                marked[input->index] = true;
+            }
+        }
+    }
+
+    // Construct a bytecode fragment that only includes marked terms.
+    Value bytecode;
+    set_list(&bytecode, branch->length() + 1);
+
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        caValue* op = list_get(&bytecode, i);
+        if (!marked[i]) {
+            bytecode_write_noop(op);
+            continue;
+        }
+
+        write_term_bytecode(term, op);
+    }
+    
+    bytecode_write_finish_op(list_get(&bytecode, branch->length()));
+
+    // Start evaluation.
+    start_interpreter_session(stack);
+
+    for (int i=0; i <= term->index; i++) {
+        if (marked[i]) {
+            stack->running = true;
+            top_frame(stack)->pc = i;
+            step_interpreter(stack);
+        }
+    }
+
+    stack->running = false;
+
+    // Possibly save output
+    if (result != NULL)
+        copy(get_top_register(stack, term), result);
+
+    delete[] marked;
+
+    pop_frame(stack);
+}
+
+void evaluate_minimum2(Term* term, caValue* output)
+{
+    // Check if 'term' is just a value; don't need to create a Stack if so.
+    if (is_value(term))
+        copy(term_value(term), output);
+
+    Stack stack;
+    evaluate_minimum(&stack, term, output);
 }
 
 Frame* as_frame_ref(caValue* value)
@@ -1797,7 +1738,7 @@ void Interpreter__frames(caStack* callerStack)
 void eval_context_setup_type(Type* type)
 {
     type->name = name_from_string("Stack");
-    type->gcListReferences = eval_context_list_references;
+    type->gcListReferences = stack_list_references;
 }
 
 void interpreter_install_functions(Branch* kernel)
@@ -1834,37 +1775,31 @@ void interpreter_install_functions(Branch* kernel)
     list_t::setup_type(TYPES.frame);
 }
 
-} // namespace circa
-
-using namespace circa;
-
 // Public API
 
-extern "C" {
-
-caStack* circa_alloc_stack(caWorld* world)
+CIRCA_EXPORT caStack* circa_alloc_stack(caWorld* world)
 {
     return alloc_stack(world);
 }
 
-void circa_dealloc_stack(caStack* stack)
+CIRCA_EXPORT void circa_dealloc_stack(caStack* stack)
 {
     delete (Stack*) stack;
 }
 
-bool circa_has_error(caStack* stack)
+CIRCA_EXPORT bool circa_has_error(caStack* stack)
 {
     return error_occurred(stack);
 }
-void circa_clear_error(caStack* stack)
+CIRCA_EXPORT void circa_clear_error(caStack* stack)
 {
     clear_error(stack);
 }
-void circa_clear_stack(caStack* stack)
+CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 {
     reset_stack(stack);
 }
-void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
+CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Branch* branch = function_contents((Function*) func);
     
@@ -1882,16 +1817,7 @@ void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
     }
 }
 
-void circa_push_function(caStack* stack, caFunction* func)
-{
-    Branch* branch = function_contents((Function*) func);
-    
-    branch_finish_changes(branch);
-    
-    push_frame(stack, branch);
-}
-
-bool circa_push_function_by_name(caStack* stack, const char* name)
+CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)
 {
     caFunction* func = circa_find_function(NULL, name);
 
@@ -1905,7 +1831,16 @@ bool circa_push_function_by_name(caStack* stack, const char* name)
     return true;
 }
 
-caValue* circa_frame_input(caStack* stack, int index)
+CIRCA_EXPORT void circa_push_function(caStack* stack, caFunction* func)
+{
+    Branch* branch = function_contents((Function*) func);
+    
+    branch_finish_changes(branch);
+    
+    push_frame(stack, branch);
+}
+
+CIRCA_EXPORT caValue* circa_frame_input(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);
     
@@ -1920,7 +1855,7 @@ caValue* circa_frame_input(caStack* stack, int index)
     return get_top_register(stack, term);
 }
 
-caValue* circa_frame_output(caStack* stack, int index)
+CIRCA_EXPORT caValue* circa_frame_output(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);
 
@@ -1933,66 +1868,66 @@ caValue* circa_frame_output(caStack* stack, int index)
     return get_top_register(stack, term);
 }
 
-void circa_run(caStack* stack)
+CIRCA_EXPORT void circa_run(caStack* stack)
 {
     run_interpreter(stack);
 }
 
-void circa_pop(caStack* stack)
+CIRCA_EXPORT void circa_pop(caStack* stack)
 {
     pop_frame(stack);
 }
 
-caBranch* circa_top_branch(caStack* stack)
+CIRCA_EXPORT caBranch* circa_top_branch(caStack* stack)
 {
     return (caBranch*) top_frame(stack)->branch;
 }
 
-caValue* circa_input(caStack* stack, int index)
+CIRCA_EXPORT caValue* circa_input(caStack* stack, int index)
 {
     return get_input(stack, index);
 }
-int circa_num_inputs(caStack* stack)
+CIRCA_EXPORT int circa_num_inputs(caStack* stack)
 {
     return num_inputs(stack);
 }
-int circa_int_input(caStack* stack, int index)
+CIRCA_EXPORT int circa_int_input(caStack* stack, int index)
 {
     return circa_int(circa_input(stack, index));
 }
 
-float circa_float_input(caStack* stack, int index)
+CIRCA_EXPORT float circa_float_input(caStack* stack, int index)
 {
     return circa_to_float(circa_input(stack, index));
 }
-float circa_bool_input(caStack* stack, int index)
+CIRCA_EXPORT float circa_bool_input(caStack* stack, int index)
 {
     return circa_bool(circa_input(stack, index));
 }
 
-const char* circa_string_input(caStack* stack, int index)
+CIRCA_EXPORT const char* circa_string_input(caStack* stack, int index)
 {
     return circa_string(circa_input(stack, index));
 }
 
-caValue* circa_output(caStack* stack, int index)
+CIRCA_EXPORT caValue* circa_output(caStack* stack, int index)
 {
     return get_output(stack, index);
 }
 
-void circa_output_error(caStack* stack, const char* msg)
+CIRCA_EXPORT void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
     top_frame(stack)->pc = top_frame(stack)->branch->length() - 1;
     raise_error(stack);
 }
 
-caTerm* circa_caller_input_term(caStack* stack, int index)
+CIRCA_EXPORT caTerm* circa_caller_input_term(caStack* stack, int index)
 {
     return circa_term_get_input(circa_caller_term(stack), index);
 }
 
-caBranch* circa_caller_branch(caStack* stack)
+CIRCA_EXPORT caBranch* circa_caller_branch(caStack* stack)
 {
     Frame* frame = top_frame_parent(stack);
     if (frame == NULL)
@@ -2000,15 +1935,15 @@ caBranch* circa_caller_branch(caStack* stack)
     return frame->branch;
 }
 
-caTerm* circa_caller_term(caStack* stack)
+CIRCA_EXPORT caTerm* circa_caller_term(caStack* stack)
 {
     Frame* frame = top_frame_parent(stack);
     return frame->branch->get(frame->pc);
 }
 
-void circa_print_error_to_stdout(caStack* stack)
+CIRCA_EXPORT void circa_print_error_to_stdout(caStack* stack)
 {
     print_error_stack(stack, std::cout);
 }
 
-} // extern "C"
+} // namespace circa

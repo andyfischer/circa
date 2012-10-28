@@ -7,24 +7,19 @@
 #include "types/hashtable.h"
 
 namespace circa {
-}
 
-extern "C" {
-
-using namespace circa;
-
-void circa_set_map(caValue* map)
+CIRCA_EXPORT void circa_set_map(caValue* map)
 {
     make(TYPES.map, map);
 }
 
-caValue* circa_map_insert(caValue* map, caValue* key)
+CIRCA_EXPORT caValue* circa_map_insert(caValue* map, caValue* key)
 {
-    return circa::hashtable_t::table_insert(map, key, false);
+    return hashtable_t::table_insert(map, key, false);
 }
-caValue* circa_map_get(caValue* map, caValue* key)
+CIRCA_EXPORT caValue* circa_map_get(caValue* map, caValue* key)
 {
-    return circa::hashtable_t::get_value(map, key);
+    return hashtable_t::get_value(map, key);
 }
 
-}
+} // namespace circa

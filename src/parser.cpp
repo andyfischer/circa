@@ -655,11 +655,9 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     if (tok_Name == lookahead_next_non_whitespace(tokens, false)) {
         possible_whitespace(tokens);
         std::string symbolText = tokens.consumeStr(tok_Name);
-        #if 0 // there was once stuff here
-        if (symbolText == ":xyz") {
+        if (symbolText == ":parsetime") {
         }
         else
-        #endif
         {
             return compile_error_for_line(result, tokens, startPosition,
                 "Unrecognized symbol: " + symbolText);

@@ -101,11 +101,6 @@ Branch* top_branch(Stack* stack);
 // Retrieve the frame with the given depth, this function is O(n).
 Frame* frame_by_depth(Stack* stack, int depth);
 
-// Parse input and immediately evaluate it, returning the result value.
-caValue* evaluate(Stack* stack, Branch* branch, std::string const& input);
-caValue* evaluate(Branch* branch, Term* function, List* inputs);
-caValue* evaluate(Term* function, List* inputs);
-
 // Run the interpreter.
 void run_interpreter(Stack* stack);
 void run_interpreter_step(Stack* stack);
@@ -120,6 +115,7 @@ void evaluate_range(Stack* stack, Branch* branch, int start, int end);
 
 // Evaluate 'term' and every term that it depends on. 
 void evaluate_minimum(Stack* stack, Term* term, caValue* result);
+void evaluate_minimum2(Term* term, caValue* output);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.

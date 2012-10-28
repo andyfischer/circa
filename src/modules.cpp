@@ -238,20 +238,14 @@ void native_patch_this_postCompile(Term* term)
         return;
     }
 
-#if 0
     Value filename;
-    copy(term_value(term->input(0)), &filename);
+    evaluate_minimum2(term, &filename);
 
     if (!is_string(&filename)) {
         std::cout << "input is not a string value in native_patch_this_postCompile"
             << std::endl;
         return;
     }
-#endif
-
-    // For the filename, look for a shared object file with the same name as this branch.
-    Value filename;
-    copy(branch_get_source_filename(branch), &filename);
 
     string_remove_suffix(&filename, ".ca");
     native_module_add_platform_specific_suffix(&filename);

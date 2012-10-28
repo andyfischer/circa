@@ -51,6 +51,9 @@ struct Branch : caBranch
     //  [2] int inputIndex (only used for errors related to inputs)
     Value staticErrors;
 
+    // If this branch is used as a function, this dict may contain extra metadata.
+    Value functionAttrs;
+
     // Compound type object describing our inlined state. May be NULL.
     Type* stateType;
 
@@ -177,6 +180,8 @@ Branch* load_script_term(Branch* branch, const char* filename);
 Term* find_term_by_id(Branch* branch, int id);
 
 std::string get_source_file_location(Branch* branch);
+
+bool branch_get_function_attr_bool(Branch* branch, Name attr);
 
 // Returns a List pointer if the branch has a file origin, NULL if not.
 List* branch_get_file_origin(Branch* branch);

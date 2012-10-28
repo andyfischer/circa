@@ -646,6 +646,16 @@ std::string get_source_file_location(Branch* branch)
     return as_string(&directory);
 }
 
+bool branch_get_function_attr_bool(Branch* branch, Name attr)
+{
+    if (is_null(&branch->functionAttrs))
+        return false;
+
+    // todo
+
+    return false;
+}
+
 List* branch_get_file_origin(Branch* branch)
 {
     if (!is_list(&branch->origin))

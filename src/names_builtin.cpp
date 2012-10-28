@@ -53,6 +53,7 @@ const char* builtin_name_to_string(int name)
     case name_StructType: return "StructType";
     case name_NativeModule: return "NativeModule";
     case name_Branch: return "Branch";
+    case name_ParseTime: return "ParseTime";
     case tok_Identifier: return "tok_Identifier";
     case tok_Name: return "tok_Name";
     case tok_Integer: return "tok_Integer";

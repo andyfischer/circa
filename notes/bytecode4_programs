@@ -1,0 +1,15 @@
+
+Thinking about having Bytecode be stored separately from Branch
+
+There would be a new data structure, BytecodeSet or Program or BytecodeBlock
+
+This would hold pieces of bytecode for several Branches at once
+
+When a piece of bytecode has a Jump (referencing a branch), it would use
+an internal index within the BytecodeSet to point to another branch. Or,
+the Jump operation could specify that the target bytecode hasn't been
+generated yet, and the bytecode for the target branch could be added on the fly.
+
+Once the caller is able to control their own BytecodeSet, they will be able to
+have their own custom evaluation settings, their own optimizations, etc, which
+would not affect other users of the same Branch.

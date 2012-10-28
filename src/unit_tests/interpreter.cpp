@@ -5,8 +5,10 @@
 #include "branch.h"
 #include "evaluation.h"
 #include "kernel.h"
+#include "fakefs.h"
 #include "function.h"
 #include "type.h"
+#include "world.h"
 
 namespace interpreter {
 
@@ -63,10 +65,28 @@ void run_branch_after_additions()
     test_equals(test_spy_get_results(), "[4, 8]");
 }
 
+void test_evaluate_minimum()
+{
+    // Test that rpath works in evaluate minimum.
+
+    FakeFilesystem fs;
+    fs.set("filename", "x = rpath('/path'); y = concat(x, '/more_path')");
+
+    Branch* branch = load_script_to_global_name(global_world(), "filename", "test_evaluate_minimum");
+    Term* y = find_local_name(branch, "y");
+    test_assert(y != NULL);
+
+    Value value;
+    evaluate_minimum2(y, &value);
+
+    test_equals(&value, "filename/path/more_path");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter::test_cast_first_inputs);
     REGISTER_TEST_CASE(interpreter::run_branch_after_additions);
+    REGISTER_TEST_CASE(interpreter::test_evaluate_minimum);
 }
 
 } // namespace interpreter
