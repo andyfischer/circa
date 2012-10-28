@@ -35,8 +35,14 @@ struct Frame
     // Register values.
     List registers;
 
+    // Bytecode
+    Value bytecode;
+
     // Source branch
     Branch* branch;
+
+    // Which version of the branch we are using.
+    int branchVersion;
 
     // Current program counter
     int pc;
@@ -171,6 +177,7 @@ caValue* get_frame_register(Frame* frame, int index);
 caValue* get_frame_register(Frame* frame, Term* term);
 caValue* get_frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
+caValue* frame_bytecode(Frame* frame);
 
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);

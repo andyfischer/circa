@@ -109,6 +109,8 @@ static void resize_frame_list(Stack* stack, int newCapacity)
         frame->id = i + 1;
         frame->stack = stack;
         initialize_null(&frame->registers);
+        initialize_null(&frame->bytecode);
+        frame->branchVersion = 0;
 
         // Except for the last element, this id is updated on next iteration.
         frame->parent = 0;
@@ -158,6 +160,7 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branc
 
     // Initialize frame
     frame->branch = branch;
+    frame->branchVersion = branch->version;
     frame->pc = 0;
     frame->nextPc = 0;
     frame->exitType = name_None;
@@ -169,6 +172,9 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branc
 
     // Initialize registers
     set_list(&frame->registers, get_locals_count(branch));
+
+    // Copy bytecode.
+    copy(&branch->bytecode, frame_bytecode(frame));
 
     return frame;
 }
@@ -322,7 +328,7 @@ void finish_frame(Stack* stack)
 
     ca_assert(parentFrame->pc < parentFrame->branch->length());
 
-    caValue* callerBytecode = list_get(&parentFrame->branch->bytecode, parentFrame->pc);
+    caValue* callerBytecode = list_get(frame_bytecode(parentFrame), parentFrame->pc);
     caValue* outputAction = list_get(callerBytecode, 2);
 
     // Copy outputs
@@ -577,6 +583,11 @@ int frame_register_count(Frame* frame)
     return list_length(&frame->registers);
 }
 
+caValue* frame_bytecode(Frame* frame)
+{
+    return &frame->bytecode;
+}
+
 caValue* get_frame_register_from_end(Frame* frame, int index)
 {
     return list_get(&frame->registers, frame_register_count(frame) - 1 - index);
@@ -757,10 +768,23 @@ static void update_stack_for_possibly_changed_branches(Stack* stack)
     Frame* frame = top_frame(stack);
 
     while (true) {
-        // Resize frame->registers if needed.
-        if (frame_register_count(frame) != get_locals_count(frame->branch))
+
+        if (frame->branchVersion == frame->branch->version) {
+            // Same version.
+
+            if (frame_register_count(frame) != get_locals_count(frame->branch))
+                internal_error("locals count has changed, but version didn't change");
+
+        } else {
+
+            // Resize frame->registers if needed.
             list_resize(&frame->registers, get_locals_count(frame->branch));
 
+            refresh_bytecode(frame->branch);
+            copy(&frame->branch->bytecode, &frame->bytecode);
+        }
+
+        // Continue to next frame.
         if (frame->parent == 0)
             return;
 
@@ -1207,7 +1231,7 @@ static void step_interpreter(Stack* stack)
     ca_assert(frame->pc <= branch->length());
 
     // Grab action
-    caValue* action = list_get(&branch->bytecode, frame->pc);
+    caValue* action = list_get(frame_bytecode(frame), frame->pc);
     int op = as_int(list_get(action, 0));
 
     // Dispatch op
@@ -1419,7 +1443,6 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
     Branch* branch = term->owningBranch;
     branch_finish_changes(branch);
 
-    push_frame(stack, branch);
 
     bool *marked = new bool[branch->length()];
     memset(marked, false, sizeof(bool)*branch->length());
@@ -1468,6 +1491,10 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
     }
     
     bytecode_write_finish_op(list_get(&bytecode, branch->length()));
+
+    // Push frame, use our custom bytecode.
+    push_frame(stack, branch);
+    move(&bytecode, frame_bytecode(top_frame(stack)));
 
     // Start evaluation.
     start_interpreter_session(stack);

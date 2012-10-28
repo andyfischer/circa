@@ -13,3 +13,8 @@ generated yet, and the bytecode for the target branch could be added on the fly.
 Once the caller is able to control their own BytecodeSet, they will be able to
 have their own custom evaluation settings, their own optimizations, etc, which
 would not affect other users of the same Branch.
+
+--
+
+Stopgap for now: Every Frame grabs a copy of the branch's bytecode on creation.
+A caller may overwrite this bytecode value.
