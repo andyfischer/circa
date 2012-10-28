@@ -70,7 +70,7 @@ void test_evaluate_minimum()
     // Test that rpath works in evaluate minimum.
 
     FakeFilesystem fs;
-    fs.set("dir/branch.ca", "x = rpath('/path'); y = concat(x, '/more_path')");
+    fs.set("dir/branch.ca", "x = rpath('path'); y = concat(x, '/more_path')");
 
     Branch* branch = load_script_to_global_name(global_world(), "dir/branch.ca", "test_evaluate_minimum");
     Term* y = find_local_name(branch, "y");
@@ -79,7 +79,7 @@ void test_evaluate_minimum()
     Value value;
     evaluate_minimum2(y, &value);
 
-    test_equals(&value, "filename/path/more_path");
+    test_equals(&value, "dir/path/more_path");
 }
 
 void register_tests()
