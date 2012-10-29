@@ -41,7 +41,7 @@ void patch_manually()
     test_equals(test_spy_get_results(), "[2]");
 
     // Create a patch for my_add
-    NativeModule* module = create_native_module();
+    NativeModule* module = create_native_module(global_world());
     module_patch_function(module, "my_add", my_add);
     native_module_apply_patch(module, &branch);
 
@@ -66,7 +66,7 @@ void patch_manually_ns()
     branch.compile("test_spy(ns_a:f1())");
     branch.compile("test_spy(ns_b:ns_a:f1())");
 
-    NativeModule* module = create_native_module();
+    NativeModule* module = create_native_module(global_world());
     module_patch_function(module, "ns_a:f1", my_5);
     module_patch_function(module, "ns_b:ns_a:f1", my_6);
     native_module_apply_patch(module, &branch);

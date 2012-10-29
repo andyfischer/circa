@@ -21,9 +21,10 @@ namespace circa {
 
 struct NativeModuleWorld
 {
+    // Map of names to NativeModules.
     std::map<std::string, NativeModule*> nativeModules;
 
-    // Dictionary mapping function's global name -> native module name.
+    // Map of every function's global name -> native module name.
     Value everyPatchedFunction;
 };
 
@@ -31,9 +32,13 @@ struct NativeModule
 {
     World* world;
 
+    // Module name, unique across the world. Usually the filename.
+    Value name;
+
     std::map<std::string, EvaluateFunc> patches;
 
-    OnModuleLoad onModuleLoad;
+    // List of branches (via global name) that are intended to be patched by this module.
+    Value affectsBranches;
 
     // If this module was loaded from a DLL or shared object, that object is here.
     // May be NULL if the module was created a different way.
@@ -52,6 +57,7 @@ NativeModule* create_native_module(World* world)
     NativeModule* module = new NativeModule();
     module->world = world;
     module->dll = NULL;
+    set_list(&module->affectsBranches, 0);
     return module;
 }
 
@@ -72,7 +78,7 @@ NativeModule* add_native_module(World* world, const char* filename)
         return it->second;
 
     // Create module.
-    NativeModule* module = create_native_module();
+    NativeModule* module = create_native_module(world);
     moduleWorld->nativeModules[filename] = module;
     return module;
 }
@@ -94,14 +100,32 @@ void finish_building_native_module(NativeModule* module)
 
     set_dict(&world->everyPatchedFunction);
 
+    // For every native module.
     std::map<std::string, NativeModule*>::const_iterator it;
     for (it = world->nativeModules.begin(); it != world->nativeModules.end(); ++it) {
 
         NativeModule* module = it->second;
-        std::map<std::string, EvaluateFunc>::const_iterator patchIt;
 
-        for (patchIt = module->patches.begin(); patchIt != module->patches.end(); patchIt++) {
-            std::string 
+        // For every branch that this native module affects.
+        for (int affectsBranchIndex=0;
+                affectsBranchIndex < list_length(&module->affectsBranches);
+                affectsBranchIndex++) {
+
+            // For every function patched by this module.
+            std::map<std::string, EvaluateFunc>::const_iterator patchIt;
+
+            for (patchIt = module->patches.begin(); patchIt != module->patches.end(); patchIt++) {
+
+                Value functionName;
+                set_string(&functionName, patchIt->first.c_str());
+
+                Value globalName;
+                copy(list_get(&module->affectsBranches, affectsBranchIndex), &globalName);
+
+                string_append_qualified_name(&globalName, &functionName);
+
+                // TODO
+            }
         }
     }
 }

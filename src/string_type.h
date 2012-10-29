@@ -21,6 +21,8 @@ void string_append(caValue* left, int value);
 
 void string_append_char(caValue* left, char c);
 
+void string_append_qualified_name(caValue* left, caValue* right);
+
 void string_resize(caValue* s, int length);
 bool string_eq(caValue* s, const char* str);
 bool string_starts_with(caValue* s, const char* beginning);

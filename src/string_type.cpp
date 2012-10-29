@@ -269,6 +269,19 @@ void string_append_char(caValue* left, char c)
     buf[1] = 0;
     string_append(left, buf);
 }
+
+void string_append_qualified_name(caValue* left, caValue* right)
+{
+    if (string_eq(left, "")) {
+        copy(right, left);
+        return;
+    }
+    if (string_eq(right, ""))
+        return;
+    string_append(left, ":");
+    string_append(left, right);
+}
+
 void string_resize(caValue* s, int length)
 {
     if (length < 0)
