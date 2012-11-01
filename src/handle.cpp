@@ -27,7 +27,7 @@ HandleContainer* alloc_handle_container()
 
 HandleContainer* get_handle_container(caValue* handle)
 {
-    if (handle->value_type->storageType != STORAGE_TYPE_HANDLE)
+    if (handle->value_type->storageType != name_StorageTypeHandle)
         return NULL;
 
     return (HandleContainer*) handle->value_data.ptr;
@@ -78,7 +78,7 @@ void handle_copy(Type* type, caValue* source, caValue* dest)
 
 void setup_handle_type(Type* type)
 {
-    type->storageType = STORAGE_TYPE_HANDLE;
+    type->storageType = name_StorageTypeHandle;
     type->initialize = handle_initialize;
     type->copy = handle_copy;
     type->release = handle_release;
@@ -115,7 +115,7 @@ void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc)
 
 bool is_handle(caValue* value)
 {
-    return value->value_type->storageType == STORAGE_TYPE_HANDLE;
+    return value->value_type->storageType == name_StorageTypeHandle;
 }
 
 caValue* dereference_handle(caValue* value)

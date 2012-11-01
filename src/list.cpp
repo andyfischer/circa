@@ -295,7 +295,7 @@ void list_copy(caValue* source, caValue* dest)
 {
     INCREMENT_STAT(ListSoftCopy);
 
-    ca_assert(source->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(source->value_type->storageType == name_StorageTypeList);
 
     // prepare 'dest'
     change_type(dest, source->value_type);
@@ -378,13 +378,13 @@ bool list_contains(caValue* list, caValue* element)
 
 caValue* list_get(caValue* value, int index)
 {
-    ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(value->value_type->storageType == name_StorageTypeList);
     return list_get((ListData*) value->value_data.ptr, index);
 }
 
 caValue* list_get_from_end(caValue* value, int reverseIndex)
 {
-    ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(value->value_type->storageType == name_StorageTypeList);
     return list_get_from_end((ListData*) value->value_data.ptr, reverseIndex);
 }
 caValue* list_get_safe(caValue* value, int index)
@@ -408,7 +408,7 @@ ListData* list_remove_index(ListData* original, int index)
 
 void list_remove_index(caValue* list, int index)
 {
-    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(list->value_type->storageType == name_StorageTypeList);
     ListData* data = (ListData*) list->value_data.ptr;
     list_remove_index(data, index);
     list->value_data.ptr = data;
@@ -416,7 +416,7 @@ void list_remove_index(caValue* list, int index)
 
 void list_resize(caValue* list, int size)
 {
-    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(list->value_type->storageType == name_StorageTypeList);
     ListData* data = (ListData*) list->value_data.ptr;
     data = list_resize(data, size);
     list->value_data.ptr = data;
@@ -424,7 +424,7 @@ void list_resize(caValue* list, int size)
 
 caValue* list_append(caValue* list)
 {
-    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(list->value_type->storageType == name_StorageTypeList);
     ListData* data = (ListData*) list->value_data.ptr;
     caValue* result = list_append(&data);
     list->value_data.ptr = data;
@@ -439,7 +439,7 @@ void list_extend(caValue* list, caValue* rhsList)
 
 caValue* list_insert(caValue* list, int index)
 {
-    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ca_assert(list->value_type->storageType == name_StorageTypeList);
     ListData* data = (ListData*) list->value_data.ptr;
     caValue* result = list_insert(&data, index);
     list->value_data.ptr = data;
@@ -670,7 +670,7 @@ int list_find_field_index_by_name(Type* listType, const char* name)
 
 bool is_list_based_type(Type* type)
 {
-    return type->storageType == STORAGE_TYPE_LIST;
+    return type->storageType == name_StorageTypeList;
 }
 
 namespace list_t {
@@ -874,7 +874,7 @@ namespace list_t {
     {
         if (type->name == name_None)
             type->name = name_from_string("List");
-        type->storageType = STORAGE_TYPE_LIST;
+        type->storageType = name_StorageTypeList;
         type->initialize = tv_initialize;
         type->release = tv_release;
         type->copy = tv_copy;

@@ -59,6 +59,20 @@ Branch
 # Branch's function attributes
 ParseTime
 
+# Storage types
+StorageTypeNull
+StorageTypeInt
+StorageTypeFloat
+StorageTypeBool
+StorageTypeString
+StorageTypeList
+StorageTypeOpaquePointer
+StorageTypeType
+StorageTypeRef
+StorageTypeHandle
+StorageTypeHashtable
+StorageTypeObject
+
 # Tokens
 tok_Identifier
 tok_Name

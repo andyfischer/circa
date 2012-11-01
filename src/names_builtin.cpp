@@ -54,6 +54,18 @@ const char* builtin_name_to_string(int name)
     case name_NativeModule: return "NativeModule";
     case name_Branch: return "Branch";
     case name_ParseTime: return "ParseTime";
+    case name_StorageTypeNull: return "StorageTypeNull";
+    case name_StorageTypeInt: return "StorageTypeInt";
+    case name_StorageTypeFloat: return "StorageTypeFloat";
+    case name_StorageTypeBool: return "StorageTypeBool";
+    case name_StorageTypeString: return "StorageTypeString";
+    case name_StorageTypeList: return "StorageTypeList";
+    case name_StorageTypeOpaquePointer: return "StorageTypeOpaquePointer";
+    case name_StorageTypeType: return "StorageTypeType";
+    case name_StorageTypeRef: return "StorageTypeRef";
+    case name_StorageTypeHandle: return "StorageTypeHandle";
+    case name_StorageTypeHashtable: return "StorageTypeHashtable";
+    case name_StorageTypeObject: return "StorageTypeObject";
     case tok_Identifier: return "tok_Identifier";
     case tok_Name: return "tok_Name";
     case tok_Integer: return "tok_Integer";

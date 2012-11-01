@@ -95,7 +95,7 @@ namespace number_t {
     {
         reset_type(type);
         type->name = name_from_string("number");
-        type->storageType = STORAGE_TYPE_FLOAT;
+        type->storageType = name_StorageTypeFloat;
         type->reset = reset;
         type->cast = cast;
         type->equals = equals;

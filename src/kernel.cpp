@@ -703,7 +703,7 @@ int ref_hashFunc(caValue* val)
 void ref_setup_type(Type* type)
 {
     type->name = name_from_string("Term");
-    type->storageType = STORAGE_TYPE_REF;
+    type->storageType = name_StorageTypeRef;
     type->toString = ref_toString;
     type->hashFunc = ref_hashFunc;
 }

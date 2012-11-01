@@ -11,7 +11,7 @@ namespace circa {
 
 bool is_object(caValue* value)
 {
-    if (value->value_type->storageType != STORAGE_TYPE_OBJECT)
+    if (value->value_type->storageType != name_StorageTypeObject)
         return false;
 
     // Sanity check, look at object's magical header.
@@ -101,7 +101,7 @@ int object_hash(caValue* value)
 
 void setup_object_type(Type* type, int objectSize, caObjectReleaseFunc releaseFunc)
 {
-    type->storageType = STORAGE_TYPE_OBJECT;
+    type->storageType = name_StorageTypeObject;
     type->initialize = object_initialize;
     type->copy = object_copy;
     type->release = object_release;

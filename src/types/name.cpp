@@ -19,7 +19,7 @@ namespace name_t {
     {
         reset_type(type);
         type->name = name_from_string("Name");
-        type->storageType = STORAGE_TYPE_INT;
+        type->storageType = name_StorageTypeInt;
         type->toString = to_string;
         type->formatSource = format_source;
     }

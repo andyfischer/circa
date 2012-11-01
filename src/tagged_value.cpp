@@ -458,7 +458,7 @@ Branch* as_branch(caValue* value)
 
 void* as_opaque_pointer(caValue* value)
 {
-    ca_assert(value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER);
+    ca_assert(value->value_type->storageType == name_StorageTypeOpaquePointer);
     return value->value_data.ptr;
 }
 
@@ -492,20 +492,20 @@ void* get_pointer(caValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-bool is_bool(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
+bool is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
 bool is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
 bool is_error(caValue* value) { return value->value_type == &ERROR_T; }
-bool is_float(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
 bool is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
 bool is_function_pointer(caValue* value) { return value->value_type == &FUNCTION_T; }
-bool is_int(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
-bool is_list(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
+bool is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
+bool is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
 bool is_null(caValue* value) { return value->value_type == &NULL_T; }
-bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER; }
-bool is_ref(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_REF; }
-bool is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
+bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == name_StorageTypeOpaquePointer; }
+bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeRef; }
+bool is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
 bool is_name(caValue* value) { return value->value_type == &NAME_T; }
-bool is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
+bool is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
 
 bool is_number(caValue* value)
 {
@@ -549,18 +549,18 @@ using namespace circa;
 
 extern "C" {
 
-bool circa_is_bool(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
+bool circa_is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
 bool circa_is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
 bool circa_is_error(caValue* value) { return value->value_type == &ERROR_T; }
-bool circa_is_float(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool circa_is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
 bool circa_is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
-bool circa_is_int(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
-bool circa_is_list(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
+bool circa_is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
+bool circa_is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
 bool circa_is_name(caValue* value) { return value->value_type == &NAME_T; }
 bool circa_is_null(caValue* value)  { return value->value_type == &NULL_T; }
 bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
-bool circa_is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
-bool circa_is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
+bool circa_is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
+bool circa_is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
 
 bool circa_bool(caValue* value) {
     ca_assert(circa_is_bool(value));

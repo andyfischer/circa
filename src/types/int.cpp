@@ -42,7 +42,7 @@ namespace int_t {
     {
         if (type->name == name_None)
             type->name = name_from_string("int");
-        type->storageType = STORAGE_TYPE_INT;
+        type->storageType = name_StorageTypeInt;
         type->reset = reset;
         type->equals = equals;
         type->hashFunc = hashFunc;

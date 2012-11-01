@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 """
 This script generates the contents of src/names_builtin.h and src/names_builtin.cpp, using

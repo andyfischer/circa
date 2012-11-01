@@ -15,21 +15,6 @@
 
 namespace circa {
 
-typedef int StorageType;
-
-const int STORAGE_TYPE_NULL = 0;
-const int STORAGE_TYPE_INT = 1;
-const int STORAGE_TYPE_FLOAT = 2;
-const int STORAGE_TYPE_BOOL = 3;
-const int STORAGE_TYPE_STRING = 4;
-const int STORAGE_TYPE_LIST = 5;
-const int STORAGE_TYPE_OPAQUE_POINTER = 6;
-const int STORAGE_TYPE_TYPE = 7;
-const int STORAGE_TYPE_REF = 8;
-const int STORAGE_TYPE_HANDLE = 9;
-const int STORAGE_TYPE_HASHTABLE = 10;
-const int STORAGE_TYPE_OBJECT = 11;
-
 extern Term* IMPLICIT_TYPES;
 
 struct CastResult
@@ -78,8 +63,7 @@ struct Type
     CircaObject header;
 
     Name name;
-
-    StorageType storageType;
+    Name storageType;
 
     // C++ type info. This is only used to do runtime type checks, when the data
     // is accessed as a C++ type. Otherwise, this is optional.

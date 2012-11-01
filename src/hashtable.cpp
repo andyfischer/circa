@@ -4,6 +4,7 @@
 #include "circa/internal/for_hosted_funcs.h"
 
 #include "hashtable.h"
+#include "names.h"
 
 namespace circa {
 
@@ -324,7 +325,7 @@ namespace tagged_value_wrappers {
 // Public API
 bool is_hashtable(caValue* value)
 {
-    return value->value_type->storageType == STORAGE_TYPE_HASHTABLE;
+    return value->value_type->storageType == name_StorageTypeHashtable;
 }
 
 void set_hashtable(caValue* value)
@@ -363,7 +364,7 @@ void hashtable_setup_type(Type* type)
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
     type->name = name_from_string("Map");
-    type->storageType = STORAGE_TYPE_HASHTABLE;
+    type->storageType = name_StorageTypeHashtable;
 }
 
 } // namespace circa
