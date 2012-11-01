@@ -20,7 +20,7 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = ../build/Debug/command_line
+  OBJDIR     = ../build/obj/Debug/command_line
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/circa_d
   DEFINES   += -DDEBUG -DCIRCA_USE_LINENOISE
@@ -42,7 +42,7 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = ../build/Release/command_line
+  OBJDIR     = ../build/obj/Release/command_line
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/circa
   DEFINES   += -DCIRCA_USE_LINENOISE

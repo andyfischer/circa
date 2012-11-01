@@ -4,7 +4,6 @@
 #include "../types/color.cpp"
 #include "../types/common.cpp"
 #include "../types/eval_context.cpp"
-#include "../types/hashtable.cpp"
 #include "../types/indexable.cpp"
 #include "../types/int.cpp"
 #include "../types/name.cpp"

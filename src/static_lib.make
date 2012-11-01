@@ -20,7 +20,7 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = ../build/Debug/static_lib
+  OBJDIR     = ../build/obj/Debug/static_lib
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca_d.a
   DEFINES   += -DDEBUG
@@ -42,7 +42,7 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = ../build/Release/static_lib
+  OBJDIR     = ../build/obj/Release/static_lib
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca.a
   DEFINES   += 
@@ -82,6 +82,7 @@ OBJECTS := \
 	$(OBJDIR)/gc.o \
 	$(OBJDIR)/generic.o \
 	$(OBJDIR)/handle.o \
+	$(OBJDIR)/hashtable.o \
 	$(OBJDIR)/heap_debugging.o \
 	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing.o \
@@ -89,7 +90,6 @@ OBJECTS := \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/loops.o \
-	$(OBJDIR)/map.o \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/names_builtin.o \
@@ -233,6 +233,9 @@ $(OBJDIR)/generic.o: generic.cpp
 $(OBJDIR)/handle.o: handle.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/hashtable.o: hashtable.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/heap_debugging.o: heap_debugging.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -252,9 +255,6 @@ $(OBJDIR)/list.o: list.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/loops.o: loops.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/map.o: map.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/modules.o: modules.cpp

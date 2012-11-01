@@ -6,7 +6,6 @@
 #include "hashtable.h"
 
 namespace circa {
-namespace hashtable_t {
 
 struct Slot {
     caValue key;
@@ -19,6 +18,10 @@ struct Hashtable {
     Slot slots[0];
     // slots has size [capacity].
 };
+
+int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey);
+int hashtable_find_slot(Hashtable* data, caValue* key);
+caValue* hashtable_get(Hashtable* data, caValue* key);
 
 // How many slots to create for a brand new table.
 const int INITIAL_SIZE = 10;
@@ -75,7 +78,7 @@ Hashtable* grow(Hashtable* data, int new_capacity)
         if (is_null(&old_slot->key))
             continue;
 
-        int index = table_insert(&new_data, &old_slot->key, true);
+        int index = hashtable_insert(&new_data, &old_slot->key, true);
         swap(&old_slot->value, &new_data->slots[index].value);
     }
     return new_data;
@@ -109,7 +112,7 @@ Hashtable* duplicate(Hashtable* original)
         if (is_null(&slot->key))
             continue;
 
-        int index = table_insert(&dupe, &slot->key, false);
+        int index = hashtable_insert(&dupe, &slot->key, false);
         copy(&slot->value, &dupe->slots[index].value);
     }
     return dupe;
@@ -127,13 +130,13 @@ int find_ideal_slot_index(Hashtable* data, caValue* key)
 // Insert the given key into the dictionary, returns the index.
 // This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int table_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
+int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
 
     // Check if this key is already here
-    int existing = find_key(*dataPtr, key);
+    int existing = hashtable_find_slot(*dataPtr, key);
     if (existing != -1)
         return existing;
 
@@ -170,11 +173,11 @@ int table_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
 
 void insert_value(Hashtable** dataPtr, caValue* key, caValue* value)
 {
-    int index = table_insert(dataPtr, key, false);
+    int index = hashtable_insert(dataPtr, key, false);
     copy(value, &(*dataPtr)->slots[index].value);
 }
 
-int find_key(Hashtable* data, caValue* key)
+int hashtable_find_slot(Hashtable* data, caValue* key)
 {
     if (data == NULL)
         return -1;
@@ -196,9 +199,9 @@ int find_key(Hashtable* data, caValue* key)
     return index;
 }
 
-caValue* get_value(Hashtable* data, caValue* key)
+caValue* hashtable_get(Hashtable* data, caValue* key)
 {
-    int index = find_key(data, key);
+    int index = hashtable_find_slot(data, key);
     if (index == -1) return NULL;
     return &data->slots[index].value;
 }
@@ -211,7 +214,7 @@ caValue* get_index(Hashtable* data, int index)
 
 void remove(Hashtable* data, caValue* key)
 {
-    int index = find_key(data, key);
+    int index = hashtable_find_slot(data, key);
     if (index == -1)
         return;
 
@@ -291,41 +294,6 @@ void debug_print(Hashtable* data)
     }
 }
 
-void iterator_start(Hashtable* data, caValue* iterator)
-{
-    if (data == NULL || data->count == 0)
-        return set_null(iterator);
-
-    set_int(iterator, 0);
-
-    // Advance if this iterator location isn't valid
-    if (is_null(&data->slots[0].key))
-        iterator_next(data, iterator);
-}
-
-void iterator_next(Hashtable* data, caValue* iterator)
-{
-    int i = as_int(iterator);
-
-    // Advance to next valid location
-    int next = i + 1;
-    while ((next < data->capacity) && (is_null(&data->slots[next].key)))
-        next++;
-
-    if (next >= data->capacity)
-        set_null(iterator);
-    else
-        set_int(iterator, next);
-}
-
-void iterator_get(Hashtable* data, caValue* iterator, caValue** key, caValue** value)
-{
-    int i = as_int(iterator);
-
-    *key = &data->slots[i].key;
-    *value = &data->slots[i].value;
-}
-
 namespace tagged_value_wrappers {
 
     void initialize(Type* type, caValue* value)
@@ -349,40 +317,45 @@ namespace tagged_value_wrappers {
     {
         Value fieldStr;
         set_string(&fieldStr, field);
-        return hashtable_t::get_value((Hashtable*) value->value_data.ptr, &fieldStr);
+        return hashtable_get((Hashtable*) value->value_data.ptr, &fieldStr);
     }
 } // namespace tagged_value_wrappers
 
 // Public API
 bool is_hashtable(caValue* value)
 {
-    return value->value_type->initialize == tagged_value_wrappers::initialize;
+    return value->value_type->storageType == STORAGE_TYPE_HASHTABLE;
 }
 
-caValue* get_value(caValue* table, caValue* key)
+void set_hashtable(caValue* value)
+{
+    make(TYPES.map, value);
+}
+
+caValue* hashtable_get(caValue* table, caValue* key)
 {
     ca_assert(is_hashtable(table));
-    return get_value((Hashtable*) table->value_data.ptr, key);
+    return hashtable_get((Hashtable*) table->value_data.ptr, key);
 }
 
-caValue* table_insert(caValue* tableTv, caValue* key, bool consumeKey)
+caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
-    int index = table_insert(&table, key, consumeKey);
+    int index = hashtable_insert(&table, key, consumeKey);
 
     caValue* slot = &table->slots[index].value;
     return slot;
 }
 
-void table_remove(caValue* tableTv, caValue* key)
+void hashtable_remove(caValue* tableTv, caValue* key)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     remove(table, key);
 }
 
-void setup_type(Type* type)
+void hashtable_setup_type(Type* type)
 {
     type->initialize = tagged_value_wrappers::initialize;
     type->release = tagged_value_wrappers::release;
@@ -390,7 +363,7 @@ void setup_type(Type* type)
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
     type->name = name_from_string("Map");
+    type->storageType = STORAGE_TYPE_HASHTABLE;
 }
 
-} // namespace hashtable_t
 } // namespace circa

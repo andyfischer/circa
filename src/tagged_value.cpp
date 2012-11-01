@@ -379,7 +379,6 @@ void set_string(caValue* value, std::string const& s)
 
 caValue* set_list(caValue* value)
 {
-    set_null(value);
     make(&LIST_T, value);
     return value;
 }

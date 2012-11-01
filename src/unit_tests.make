@@ -20,7 +20,7 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = ../build/Debug/unit_tests
+  OBJDIR     = ../build/obj/Debug/unit_tests
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/unit_tests
   DEFINES   += -DDEBUG
@@ -42,7 +42,7 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = ../build/Release/unit_tests
+  OBJDIR     = ../build/obj/Release/unit_tests
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/unit_tests
   DEFINES   += 

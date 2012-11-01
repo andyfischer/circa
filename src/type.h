@@ -27,7 +27,8 @@ const int STORAGE_TYPE_OPAQUE_POINTER = 6;
 const int STORAGE_TYPE_TYPE = 7;
 const int STORAGE_TYPE_REF = 8;
 const int STORAGE_TYPE_HANDLE = 9;
-const int STORAGE_TYPE_OBJECT = 10;
+const int STORAGE_TYPE_HASHTABLE = 10;
+const int STORAGE_TYPE_OBJECT = 11;
 
 extern Term* IMPLICIT_TYPES;
 

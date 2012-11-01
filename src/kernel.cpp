@@ -14,6 +14,7 @@
 #include "function.h"
 #include "gc.h"
 #include "generic.h"
+#include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
 #include "kernel.h"
@@ -38,7 +39,6 @@
 #include "types/color.h"
 #include "types/common.h"
 #include "types/eval_context.h"
-#include "types/hashtable.h"
 #include "types/indexable.h"
 #include "types/int.h"
 #include "types/name.h"
@@ -419,7 +419,7 @@ void List__get(caStack* stack)
 
 void Map__contains(caStack* stack)
 {
-    caValue* value = hashtable_t::get_value(circa_input(stack, 0), circa_input(stack, 1));
+    caValue* value = hashtable_get(circa_input(stack, 0), circa_input(stack, 1));
     set_bool(circa_output(stack, 0), value != NULL);
 }
 
@@ -431,7 +431,7 @@ void Map__set(caStack* stack)
     caValue* key = circa_input(stack, 1);
     caValue* value = circa_input(stack, 2);
 
-    copy(value, hashtable_t::table_insert(out, key, false));
+    copy(value, hashtable_insert(out, key, false));
 }
 
 void Map__remove(caStack* stack)
@@ -439,14 +439,14 @@ void Map__remove(caStack* stack)
     caValue* out = circa_output(stack, 1);
     copy(circa_input(stack, 0), out);
 
-    hashtable_t::table_remove(out, circa_input(stack, 1));
+    hashtable_remove(out, circa_input(stack, 1));
 }
 
 void Map__get(caStack* stack)
 {
     caValue* table = circa_input(stack, 0);
     caValue* key = circa_input(stack, 1);
-    caValue* value = hashtable_t::get_value(table, key);
+    caValue* value = hashtable_get(table, key);
     if (value == NULL) {
         std::string msg = "Key not found: " + to_string(key);
         return circa_output_error(stack, msg.c_str());
@@ -874,7 +874,7 @@ void bootstrap_kernel()
     set_t::setup_type(unbox_type(set_type));
 
     TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
-    hashtable_t::setup_type(TYPES.map);
+    hashtable_setup_type(TYPES.map);
 
     Term* indexableType = create_value(kernel, &TYPE_T, "Indexable");
     indexable_t::setup_type(unbox_type(indexableType));
