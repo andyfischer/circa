@@ -21,12 +21,14 @@ void free_native_module(NativeModule* module);
 NativeModule* add_native_module(World* world, const char* name);
 void delete_native_module(World* world, const char* name);
 
-// Add a patch on the given module.
+// Add a function patch on the given module.
 void module_patch_function(NativeModule* module, const char* name, EvaluateFunc func);
 
-// Manually apply a module's patches to the given branch. This function isn't commonly used
-// (the 'common' way is to allow patches on the World to be automatically applied).
+// Manually apply a module's patches to the given branch. This function isn't commonly used.
+// (the common way is to allow patches on the World to be automatically applied).
 void native_module_apply_patch(NativeModule* module, Branch* branch);
+
+void native_module_add_change_action_patch_branch(NativeModule* module, const char* branchName);
 
 void module_on_loaded_branch(Branch* branch);
 void module_possibly_patch_new_function(World* world, Branch* function);

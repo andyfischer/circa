@@ -110,7 +110,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             native_module_apply_patch(nativeModule, branch);
             break;
         }
-        case name_Branch: {
+        case name_PatchBranch: {
             // Reload this code branch.
             caValue* moduleName = list_get(action, 1);
             load_script_to_global_name(world, as_cstring(&watch->filename), as_cstring(moduleName));
@@ -160,7 +160,7 @@ FileWatch* add_file_watch_module_load(World* world, const char* filename, const 
 {
     circa::Value action;
     set_list(&action, 2);
-    set_name(list_get(&action, 0), name_Branch);
+    set_name(list_get(&action, 0), name_PatchBranch);
     set_string(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }

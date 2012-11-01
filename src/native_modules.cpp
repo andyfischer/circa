@@ -37,8 +37,8 @@ struct NativeModule
 
     std::map<std::string, EvaluateFunc> patches;
 
-    // List of branches (via global name) that are intended to be patched by this module.
-    Value affectsBranches;
+    // List of actions that are triggered when this module is changed.
+    Value onChangeActions;
 
     // If this module was loaded from a DLL or shared object, that object is here.
     // May be NULL if the module was created a different way.
@@ -57,7 +57,7 @@ NativeModule* create_native_module(World* world)
     NativeModule* module = new NativeModule();
     module->world = world;
     module->dll = NULL;
-    set_list(&module->affectsBranches, 0);
+    set_list(&module->onChangeActions, 0);
     return module;
 }
 
@@ -96,6 +96,7 @@ void module_patch_function(NativeModule* module, const char* name, EvaluateFunc 
 void finish_building_native_module(NativeModule* module)
 {
     // Rebuild the everyPatchedFunction dict.
+#if 0
     NativeModuleWorld* world = module->world->nativeModuleWorld;
 
     set_dict(&world->everyPatchedFunction);
@@ -128,6 +129,7 @@ void finish_building_native_module(NativeModule* module)
             }
         }
     }
+#endif
 }
 
 void native_module_apply_patch(NativeModule* module, Branch* branch)
@@ -155,6 +157,17 @@ void native_module_apply_patch(NativeModule* module, Branch* branch)
 
     if (anyTouched)
         dirty_bytecode(branch);
+}
+
+void native_module_add_change_action_patch_branch(NativeModule* module, const char* branchName)
+{
+    Value action;
+    set_list(&action, 2);
+    set_name(list_get(&action, 0), name_PatchBranch);
+    set_string(list_get(&action, 1), branchName);
+
+    if (!list_contains(&module->onChangeActions, &action))
+        move(&action, list_append(&module->onChangeActions));
 }
 
 void module_on_loaded_branch(Branch* branch)

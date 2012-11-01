@@ -54,7 +54,7 @@ StructType
 
 # File watch actions
 NativeModule
-Branch
+PatchBranch
 
 # Branch's function attributes
 ParseTime
