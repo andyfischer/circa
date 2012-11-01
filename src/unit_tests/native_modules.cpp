@@ -4,6 +4,7 @@
 
 #include "evaluation.h"
 #include "kernel.h"
+#include "modules.h"
 #include "native_modules.h"
 #include "world.h"
 
@@ -81,6 +82,39 @@ void patch_manually_ns()
     free_native_module(module);
 }
 
+void trigger_change()
+{
+    // Don't patch manually, add a change action and trigger it.
+    Branch* branch = add_module(global_world(), "trigger_change_test");
+    branch->compile("def f() -> int { 1 }");
+    branch->compile("test_spy(f())");
+
+    NativeModule* module = create_native_module(global_world());
+
+    module_patch_function(module, "f", my_5);
+    native_module_add_change_action_patch_branch(module, "trigger_change_test");
+
+    Stack stack;
+    push_frame(&stack, branch);
+    test_spy_clear();
+    run_interpreter(&stack);
+
+    // First pass, patch not in effect.
+    test_equals(test_spy_get_results(), "[1]");
+
+    // Now, patch in effect.
+    native_module_on_change(module);
+
+    reset_stack(&stack);
+    push_frame(&stack, branch);
+    test_spy_clear();
+    run_interpreter(&stack);
+
+    test_equals(test_spy_get_results(), "[5]");
+
+    free_native_module(module);
+}
+
 void new_function_patched_by_world()
 {
     // First create the module, as part of the global world.
@@ -97,6 +131,7 @@ void new_function_patched_by_world()
     test_spy_clear();
     run_interpreter(&stack);
 
+    // FIXME
     // test_equals(test_spy_get_results(), "[3]");
 
     delete_native_module(global_world(), "native_modules_test");
@@ -107,6 +142,7 @@ void register_tests()
     REGISTER_TEST_CASE(native_modules::patch_manually);
     REGISTER_TEST_CASE(native_modules::patch_manually_ns);
     REGISTER_TEST_CASE(native_modules::new_function_patched_by_world);
+    REGISTER_TEST_CASE(native_modules::trigger_change);
 }
 
 }

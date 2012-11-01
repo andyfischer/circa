@@ -95,19 +95,11 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
 
         switch (label) {
         case name_NativeModule: {
-            NativeModule* nativeModule = add_native_module(world, as_cstring(&watch->filename));
+            caValue* nativeModuleName = list_get(action, 1);
+
+            NativeModule* nativeModule = add_native_module(world, as_cstring(nativeModuleName));
             native_module_load_from_file(nativeModule, as_cstring(&watch->filename));
-
-            caValue* moduleName = list_get(action, 1);
-            Branch* branch = nested_contents(find_from_global_name(world, as_cstring(moduleName)));
-
-            if (branch == NULL) {
-                std::cout << "trying to apply native patch, couldn't find module: "
-                    << as_cstring(moduleName) << std::endl;
-                break;
-            }
-
-            native_module_apply_patch(nativeModule, branch);
+            native_module_on_change(nativeModule);
             break;
         }
         case name_PatchBranch: {
@@ -165,12 +157,12 @@ FileWatch* add_file_watch_module_load(World* world, const char* filename, const 
     return add_file_watch_action(world, filename, &action);
 }
 
-FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* moduleName)
+FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* name)
 {
     circa::Value action;
     set_list(&action, 2);
     set_name(list_get(&action, 0), name_NativeModule);
-    set_string(list_get(&action, 1), moduleName);
+    set_string(list_get(&action, 1), name);
     return add_file_watch_action(world, filename, &action);
 }
 

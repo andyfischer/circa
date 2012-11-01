@@ -14,6 +14,8 @@ void module_get_default_name_from_filename(caValue* filename, caValue* moduleNam
 
 Branch* load_module_from_file(const char* module_name, const char* filename);
 
+Branch* add_module(World* world, const char* name);
+
 Branch* load_module(World* world, const char* module_name, Term* loadCall);
 
 Branch* find_loaded_module(const char* name);

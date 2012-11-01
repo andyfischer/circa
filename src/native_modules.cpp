@@ -66,20 +66,20 @@ void free_native_module(NativeModule* module)
     delete module;
 }
 
-NativeModule* add_native_module(World* world, const char* filename)
+NativeModule* add_native_module(World* world, const char* name)
 {
     NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
 
     // Return existing module, if it exists.
     std::map<std::string, NativeModule*>::const_iterator it =
-        moduleWorld->nativeModules.find(filename);
+        moduleWorld->nativeModules.find(name);
 
     if (it != moduleWorld->nativeModules.end())
         return it->second;
 
     // Create module.
     NativeModule* module = create_native_module(world);
-    moduleWorld->nativeModules[filename] = module;
+    moduleWorld->nativeModules[name] = module;
     return module;
 }
 
@@ -168,6 +168,35 @@ void native_module_add_change_action_patch_branch(NativeModule* module, const ch
 
     if (!list_contains(&module->onChangeActions, &action))
         move(&action, list_append(&module->onChangeActions));
+}
+
+void native_module_on_change(NativeModule* module)
+{
+    World* world = module->world;
+
+    // Run each change action.
+    for (int i=0; i < list_length(&module->onChangeActions); i++) {
+        caValue* action = list_get(&module->onChangeActions, i);
+
+        Name tag = leading_name(action);
+
+        switch (tag) {
+        case name_PatchBranch: {
+            caValue* name = list_get(action, 1);
+            Branch* branch = nested_contents(find_from_global_name(world, as_cstring(name)));
+            if (branch == NULL) {
+                std::cout << "branch " << as_cstring(name)
+                    << " not found in native_module_on_change" << std::endl;
+                break;
+            }
+
+            native_module_apply_patch(module, branch);
+            break;
+        }
+        default:
+            internal_error("unrecognized action in native_module_on_change");
+        }
+    }
 }
 
 void module_on_loaded_branch(Branch* branch)

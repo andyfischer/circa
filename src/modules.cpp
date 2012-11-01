@@ -71,6 +71,16 @@ Branch* load_module_from_file(const char* module_name, const char* filename)
     return nested_contents(import);
 }
 
+Branch* add_module(World* world, const char* name)
+{
+    Term* existing = find_from_global_name(world, name);
+    if (existing != NULL)
+        return nested_contents(existing);
+
+    Term* term = apply(world->root, FUNCS.imported_file, TermList(), name_from_string(name));
+    return nested_contents(term);
+}
+
 static bool find_module_file(const char* module_name, caValue* filenameOut)
 {
     Value module;
@@ -229,15 +239,16 @@ void import_file_func_postCompile(Term* term)
 void native_patch_this_postCompile(Term* term)
 {
     Branch* branch = term->owningBranch;
-    Value branchGlobalName;
-    get_global_name(branch->owningTerm, &branchGlobalName);
+    Value branchName;
+    get_global_name(branch->owningTerm, &branchName);
 
-    if (!is_string(&branchGlobalName)) {
+    if (!is_string(&branchName)) {
         std::cout << "term doesn't have global name in native_patch_this_postCompile"
             << std::endl;
         return;
     }
 
+    // Fetch the native module's filename, this might require parse-time eval.
     Term* filenameInput = term->input(0);
     Value filename;
     evaluate_minimum2(filenameInput, &filename);
@@ -251,8 +262,15 @@ void native_patch_this_postCompile(Term* term)
     string_remove_suffix(&filename, ".ca");
     native_module_add_platform_specific_suffix(&filename);
 
+    // Add a file watch that will update the NativeModule on file change.
     FileWatch* watch = add_file_watch_native_patch(global_world(),
-            as_cstring(&filename), as_cstring(&branchGlobalName));
+            as_cstring(&filename), as_cstring(&branchName));
+
+    NativeModule* module = add_native_module(global_world(), as_cstring(&filename));
+
+    // Hook up the NativeModule to patch this branch when changed.
+    native_module_add_change_action_patch_branch(module, as_cstring(&branchName));
+
     file_watch_check_now(global_world(), watch);
 }
 
