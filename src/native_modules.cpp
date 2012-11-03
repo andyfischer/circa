@@ -10,6 +10,7 @@
 #include "file.h"
 #include "function.h"
 #include "hashtable.h"
+#include "importing.h"
 #include "kernel.h"
 #include "names.h"
 #include "native_modules.h"
@@ -109,8 +110,6 @@ void module_patch_function(NativeModule* module, const char* name, EvaluateFunc 
 
 void native_module_apply_patch(NativeModule* module, Branch* branch)
 {
-    bool anyTouched = false;
-
     // Walk through list of patches, and try to find any functions to apply them to.
     std::map<std::string, EvaluateFunc>::const_iterator it;
     for (it = module->patches.begin(); it != module->patches.end(); ++it) {
@@ -124,14 +123,8 @@ void native_module_apply_patch(NativeModule* module, Branch* branch)
         if (!is_function(term))
             continue;
 
-        Function* function = as_function(term);
-        function->evaluate = evaluateFunc;
-        anyTouched = true;
-        dirty_bytecode(function_contents(term));
+        install_function(term, evaluateFunc);
     }
-
-    if (anyTouched)
-        dirty_bytecode(branch);
 }
 
 void native_module_add_change_action_patch_branch(NativeModule* module, const char* branchName)
@@ -181,7 +174,10 @@ static void update_patch_function_lookup_for_module(NativeModule* module)
             string_append_qualified_name(&globalName, &functionName);
 
             // Save this line.
-            copy(&module->name, hashtable_insert(everyPatchedFunction, &globalName));
+            caValue* entry = hashtable_insert(everyPatchedFunction, &globalName);
+            set_list(entry, 2);
+            copy(&module->name, list_get(entry, 0));
+            copy(&functionName, list_get(entry, 1));
         }
     }
 }
@@ -247,12 +243,15 @@ void module_possibly_patch_new_function(World* world, Branch* function)
         return;
 
     // Lookup in the global table.
-    caValue* nativeModuleName = hashtable_get(&moduleWorld->everyPatchedFunction, &globalName);
+    caValue* patchEntry = hashtable_get(&moduleWorld->everyPatchedFunction, &globalName);
 
-    if (nativeModuleName == NULL) {
+    if (patchEntry == NULL) {
         // No patch for this function.
         return;
     }
+
+    caValue* nativeModuleName = list_get(patchEntry, 0);
+    caValue* functionName = list_get(patchEntry, 1);
 
     // Found a patch; apply it.
     NativeModule* module = get_existing_native_module(world, as_cstring(nativeModuleName));
@@ -263,7 +262,18 @@ void module_possibly_patch_new_function(World* world, Branch* function)
         return;
     }
 
-    // TODO
+    std::map<std::string, EvaluateFunc>::const_iterator it;
+    it = module->patches.find(as_cstring(functionName));
+
+    if (it == module->patches.end()) {
+        std::cout << "in module_possibly_patch_new_function, couldn't find function: "
+            << as_cstring(functionName) << std::endl;
+        return;
+    }
+    
+    EvaluateFunc evaluateFunc = it->second;
+
+    install_function(function->owningTerm, evaluateFunc);
 }
 
 void native_module_add_platform_specific_suffix(caValue* filename)
@@ -283,7 +293,7 @@ void native_module_load_from_file(NativeModule* module, const char* filename)
 {
     native_module_close(module);
 
-    module->dll = dlopen(filename, RTLD_NOW);
+    module->dll = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
 
     if (!module->dll) {
         std::cout << "failed to open dll: " << filename << std::endl;

@@ -264,7 +264,7 @@ void native_patch_this_postCompile(Term* term)
 
     // Add a file watch that will update the NativeModule on file change.
     FileWatch* watch = add_file_watch_native_patch(global_world(),
-            as_cstring(&filename), as_cstring(&branchName));
+            as_cstring(&filename), as_cstring(&filename));
 
     NativeModule* module = add_native_module(global_world(), as_cstring(&filename));
 
