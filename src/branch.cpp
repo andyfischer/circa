@@ -378,6 +378,9 @@ bool has_nested_contents(Term* term)
 
 Branch* nested_contents(Term* term)
 {
+    if (term == NULL)
+        return NULL;
+
     if (term->nestedContents == NULL) {
         term->nestedContents = new Branch();
         term->nestedContents->owningTerm = term;
@@ -590,8 +593,6 @@ Name load_script(Branch* branch, const char* filename)
     }
 
     parser::compile(branch, parser::statement_list, as_cstring(&contents));
-
-    module_on_loaded_branch(branch);
 
     return name_Success;
 }

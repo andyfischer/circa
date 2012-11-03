@@ -827,8 +827,10 @@ void bootstrap_kernel()
     TYPES.list = unbox_type(create_type_value(kernel, &LIST_T, "List"));
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
     create_type_value(kernel, &BRANCH_T, "Branch");
+    TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
+    hashtable_setup_type(TYPES.map);
 
-    // Finish initializing World (this requires List type)
+    // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
 
     // Setup output_placeholder() function, needed to declare functions properly.
@@ -873,8 +875,6 @@ void bootstrap_kernel()
     Term* set_type = create_value(kernel, &TYPE_T, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-    TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
-    hashtable_setup_type(TYPES.map);
 
     Term* indexableType = create_value(kernel, &TYPE_T, "Indexable");
     indexable_t::setup_type(unbox_type(indexableType));

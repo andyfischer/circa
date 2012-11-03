@@ -14,6 +14,7 @@ void module_get_default_name_from_filename(caValue* filename, caValue* moduleNam
 
 Branch* load_module_from_file(const char* module_name, const char* filename);
 
+// Add a top-level with the given name, or return an existing one if it exists.
 Branch* add_module(World* world, const char* name);
 
 Branch* load_module(World* world, const char* module_name, Term* loadCall);
@@ -31,6 +32,7 @@ Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newB
 // then the reference will be set to null.
 void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBranch);
 
+// Install builtin modules functions.
 void modules_install_functions(Branch* kernel);
 
 } // namespace circa

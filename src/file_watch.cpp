@@ -99,7 +99,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
 
             NativeModule* nativeModule = add_native_module(world, as_cstring(nativeModuleName));
             native_module_load_from_file(nativeModule, as_cstring(&watch->filename));
-            native_module_on_change(nativeModule);
+            native_module_finish_change(nativeModule);
             break;
         }
         case name_PatchBranch: {

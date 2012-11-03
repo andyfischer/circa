@@ -9,6 +9,7 @@
 #include "branch.h"
 #include "file.h"
 #include "function.h"
+#include "hashtable.h"
 #include "kernel.h"
 #include "names.h"
 #include "native_modules.h"
@@ -48,7 +49,7 @@ struct NativeModule
 NativeModuleWorld* create_native_module_world()
 {
     NativeModuleWorld* world = new NativeModuleWorld();
-    set_dict(&world->everyPatchedFunction);
+    set_hashtable(&world->everyPatchedFunction);
     return world;
 }
 
@@ -66,20 +67,33 @@ void free_native_module(NativeModule* module)
     delete module;
 }
 
-NativeModule* add_native_module(World* world, const char* name)
+NativeModule* get_existing_native_module(World* world, const char* name)
 {
-    NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
+    NativeModuleWorld* nativeWorld = world->nativeModuleWorld;
 
     // Return existing module, if it exists.
     std::map<std::string, NativeModule*>::const_iterator it =
-        moduleWorld->nativeModules.find(name);
+        nativeWorld->nativeModules.find(name);
 
-    if (it != moduleWorld->nativeModules.end())
+    if (it != nativeWorld->nativeModules.end())
         return it->second;
 
-    // Create module.
-    NativeModule* module = create_native_module(world);
-    moduleWorld->nativeModules[name] = module;
+    return NULL;
+}
+
+NativeModule* add_native_module(World* world, const char* name)
+{
+    NativeModuleWorld* nativeWorld = world->nativeModuleWorld;
+
+    NativeModule* module = get_existing_native_module(world, name);
+
+    if (module != NULL)
+        return module;
+
+    // Create new module with this name.
+    module = create_native_module(world);
+    set_string(&module->name, name);
+    nativeWorld->nativeModules[name] = module;
     return module;
 }
 
@@ -91,45 +105,6 @@ void delete_native_module(World* world, const char* name)
 void module_patch_function(NativeModule* module, const char* name, EvaluateFunc func)
 {
     module->patches[name] = func;
-}
-
-void finish_building_native_module(NativeModule* module)
-{
-    // Rebuild the everyPatchedFunction dict.
-#if 0
-    NativeModuleWorld* world = module->world->nativeModuleWorld;
-
-    set_dict(&world->everyPatchedFunction);
-
-    // For every native module.
-    std::map<std::string, NativeModule*>::const_iterator it;
-    for (it = world->nativeModules.begin(); it != world->nativeModules.end(); ++it) {
-
-        NativeModule* module = it->second;
-
-        // For every branch that this native module affects.
-        for (int affectsBranchIndex=0;
-                affectsBranchIndex < list_length(&module->affectsBranches);
-                affectsBranchIndex++) {
-
-            // For every function patched by this module.
-            std::map<std::string, EvaluateFunc>::const_iterator patchIt;
-
-            for (patchIt = module->patches.begin(); patchIt != module->patches.end(); patchIt++) {
-
-                Value functionName;
-                set_string(&functionName, patchIt->first.c_str());
-
-                Value globalName;
-                copy(list_get(&module->affectsBranches, affectsBranchIndex), &globalName);
-
-                string_append_qualified_name(&globalName, &functionName);
-
-                // TODO
-            }
-        }
-    }
-#endif
 }
 
 void native_module_apply_patch(NativeModule* module, Branch* branch)
@@ -170,9 +145,71 @@ void native_module_add_change_action_patch_branch(NativeModule* module, const ch
         move(&action, list_append(&module->onChangeActions));
 }
 
-void native_module_on_change(NativeModule* module)
+static void update_patch_function_lookup_for_module(NativeModule* module)
 {
     World* world = module->world;
+    caValue* everyPatchedFunction = &world->nativeModuleWorld->everyPatchedFunction;
+
+    std::cout << "looking at module: " << to_string(&module->name) << std::endl;
+
+    // Look across every change action on the NativeModule (looking for PatchBranch entries).
+    for (int i=0; i < list_length(&module->onChangeActions); i++) {
+
+        caValue* action = list_get(&module->onChangeActions, i);
+
+        std::cout << "looking at action: " << to_string(action) << std::endl;
+
+        if (leading_name(action) != name_PatchBranch)
+            continue;
+
+        caValue* branchName = list_get(action, 1);
+
+        // Look at every function that this module patches.
+        std::map<std::string, EvaluateFunc>::const_iterator it;
+
+        for (it = module->patches.begin(); it != module->patches.end(); it++) {
+
+            Value functionName;
+            set_string(&functionName, it->first.c_str());
+
+            std::cout << "looking at function: " << to_string(&functionName) << std::endl;
+
+            // Construct a global name for this function, using the branch's global name.
+
+            Value globalName;
+            copy(branchName, &globalName);
+            string_append_qualified_name(&globalName, &functionName);
+
+            // Save this line.
+            copy(&module->name, hashtable_insert(everyPatchedFunction, &globalName));
+        }
+    }
+}
+
+static void update_patch_function_lookup(World* world)
+{
+    NativeModuleWorld* nativeWorld = world->nativeModuleWorld;
+    set_hashtable(&nativeWorld->everyPatchedFunction);
+
+    // For every native module.
+    std::map<std::string, NativeModule*>::const_iterator it;
+    for (it = nativeWorld->nativeModules.begin(); it != nativeWorld->nativeModules.end(); ++it) {
+
+        NativeModule* module = it->second;
+
+        update_patch_function_lookup_for_module(module);
+    }
+
+    // TEMP
+    std::cout << "updated lookup:" << std::endl;
+    std::cout << to_string(&nativeWorld->everyPatchedFunction) << std::endl;
+}
+
+void native_module_finish_change(NativeModule* module)
+{
+    World* world = module->world;
+
+    update_patch_function_lookup(world);
 
     // Run each change action.
     for (int i=0; i < list_length(&module->onChangeActions); i++) {
@@ -185,8 +222,7 @@ void native_module_on_change(NativeModule* module)
             caValue* name = list_get(action, 1);
             Branch* branch = nested_contents(find_from_global_name(world, as_cstring(name)));
             if (branch == NULL) {
-                std::cout << "branch " << as_cstring(name)
-                    << " not found in native_module_on_change" << std::endl;
+                // It's okay if the branch doesn't exist yet.
                 break;
             }
 
@@ -194,69 +230,40 @@ void native_module_on_change(NativeModule* module)
             break;
         }
         default:
-            internal_error("unrecognized action in native_module_on_change");
+            internal_error("unrecognized action in native_module_finish_change");
         }
     }
-}
-
-void module_on_loaded_branch(Branch* branch)
-{
-#if 0
-    // Search the script for calls to native_patch.
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        if (term->function != FUNCS.native_patch)
-            continue;
-
-        // Load the native module.
-        Value filename;
-        get_path_relative_to_source(branch, term_value(term->input(0)), &filename);
-
-        Value fileWatchAction;
-        // ...
-    }
-#endif
 }
 
 void module_possibly_patch_new_function(World* world, Branch* function)
 {
     NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
 
-    Value functionGlobalName;
-    get_global_name(function, &functionGlobalName);
+    Value globalName;
+    get_global_name(function, &globalName);
 
     // No global name: no patch.
-    if (!is_string(&functionGlobalName))
+    if (!is_string(&globalName))
         return;
 
-    // Check every loaded native module; see if our function's global name starts
-    // with any of the module names.
+    // Lookup in the global table.
+    caValue* nativeModuleName = hashtable_get(&moduleWorld->everyPatchedFunction, &globalName);
 
-    std::map<std::string, NativeModule*>::const_iterator it;
-    for (it = moduleWorld->nativeModules.begin(); it != moduleWorld->nativeModules.end(); ++it) {
-        if (string_starts_with(&functionGlobalName, it->first.c_str())) {
-
-            NativeModule* module = it->second;
-
-            Branch* target = NULL; // FIXME
-
-            if (target == NULL)
-                continue;
-
-            // Check inside this module.
-            std::map<std::string, EvaluateFunc>::const_iterator patchIt;
-            for (patchIt = module->patches.begin(); patchIt != module->patches.end(); ++patchIt) {
-
-                Term* term = find_local_name(target, patchIt->first.c_str());
-                if (term->nestedContents == function) {
-                    // Found a match.
-                    EvaluateFunc evaluateFunc = patchIt->second;
-                    as_function(term)->evaluate = evaluateFunc;
-                    dirty_bytecode(function);
-                }
-            }
-        }
+    if (nativeModuleName == NULL) {
+        // No patch for this function.
+        return;
     }
+
+    // Found a patch; apply it.
+    NativeModule* module = get_existing_native_module(world, as_cstring(nativeModuleName));
+
+    if (module == NULL) {
+        std::cout << "in module_possibly_patch_new_function, couldn't find module: "
+            << as_cstring(nativeModuleName) << std::endl;
+        return;
+    }
+
+    // TODO
 }
 
 void native_module_add_platform_specific_suffix(caValue* filename)

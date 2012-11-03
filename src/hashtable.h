@@ -10,7 +10,8 @@ caValue* hashtable_get(caValue* table, caValue* key);
 caValue* hashtable_get_slot(caValue* table, int slot);
 caValue* hashtable_num_slots(caValue* table);
 caValue* hashtable_insert(caValue* table, caValue* key, bool consumeKey);
-void hashtable_remove(caValue* tableTv, caValue* key);
+caValue* hashtable_insert(caValue* table, caValue* key);
+void hashtable_remove(caValue* table, caValue* key);
 
 void hashtable_setup_type(Type* type);
 

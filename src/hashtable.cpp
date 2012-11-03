@@ -349,6 +349,11 @@ caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
     return slot;
 }
 
+caValue* hashtable_insert(caValue* table, caValue* key)
+{
+    return hashtable_insert(table, key, false);
+}
+
 void hashtable_remove(caValue* tableTv, caValue* key)
 {
     ca_assert(is_hashtable(tableTv));

@@ -16,6 +16,8 @@ NativeModuleWorld* create_native_module_world();
 NativeModule* create_native_module(World* world);
 void free_native_module(NativeModule* module);
 
+NativeModule* get_existing_native_module(World* world, const char* name);
+
 // Add a module with the given unique name to the World. If a module with this name already
 // exists, return the existing one. The name is usually the filename.
 NativeModule* add_native_module(World* world, const char* name);
@@ -30,9 +32,8 @@ void native_module_apply_patch(NativeModule* module, Branch* branch);
 
 void native_module_add_change_action_patch_branch(NativeModule* module, const char* branchName);
 
-void native_module_on_change(NativeModule* module);
+void native_module_finish_change(NativeModule* module);
 
-void module_on_loaded_branch(Branch* branch);
 void module_possibly_patch_new_function(World* world, Branch* function);
 
 void native_module_add_platform_specific_suffix(caValue* filename);

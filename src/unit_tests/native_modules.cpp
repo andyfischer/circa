@@ -91,7 +91,6 @@ void trigger_change()
 
     NativeModule* module = create_native_module(global_world());
 
-    module_patch_function(module, "f", my_5);
     native_module_add_change_action_patch_branch(module, "trigger_change_test");
 
     Stack stack;
@@ -103,7 +102,8 @@ void trigger_change()
     test_equals(test_spy_get_results(), "[1]");
 
     // Now, patch in effect.
-    native_module_on_change(module);
+    module_patch_function(module, "f", my_5);
+    native_module_finish_change(module);
 
     reset_stack(&stack);
     push_frame(&stack, branch);
@@ -118,21 +118,22 @@ void trigger_change()
 void new_function_patched_by_world()
 {
     // First create the module, as part of the global world.
-    NativeModule* module = add_native_module(global_world(), "native_modules_test");
+    NativeModule* module = add_native_module(global_world(), "nativemod_module");
     module_patch_function(module, "my_add", my_add);
+    native_module_add_change_action_patch_branch(module, "nativemod_branch");
+    native_module_finish_change(module);
 
     // Now create our function, it should get patched instantly.
-    Branch branch;
-    branch.compile("def my_add(int a, int b) -> int { a + a }");
-    branch.compile("test_spy(my_add(1 2))");
+    Branch* branch = add_module(global_world(), "nativemod_branch");
+    branch->compile("def my_add(int a, int b) -> int { a + a }");
+    branch->compile("test_spy(my_add(1 2))");
 
     Stack stack;
-    push_frame(&stack, &branch);
+    push_frame(&stack, branch);
     test_spy_clear();
     run_interpreter(&stack);
 
-    // FIXME
-    // test_equals(test_spy_get_results(), "[3]");
+    test_equals(test_spy_get_results(), "[3]");
 
     delete_native_module(global_world(), "native_modules_test");
 }
