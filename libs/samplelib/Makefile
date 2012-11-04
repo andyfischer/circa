@@ -6,7 +6,7 @@ LINKFLAGS =
 
 ifeq ($(shell uname), Darwin)
 	# mac
-	OS_FLAGS = -rdynamic -undefined dynamic_lookup
+	OS_FLAGS = -dynamiclib -undefined dynamic_lookup
 else
 	# linux
 	OS_FLAGS = -fPIC -shared

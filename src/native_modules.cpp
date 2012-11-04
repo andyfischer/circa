@@ -293,7 +293,7 @@ void native_module_load_from_file(NativeModule* module, const char* filename)
 {
     native_module_close(module);
 
-    module->dll = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
+    module->dll = dlopen(filename, RTLD_NOW);
 
     if (!module->dll) {
         std::cout << "failed to open dll: " << filename << std::endl;
