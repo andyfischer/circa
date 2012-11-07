@@ -143,14 +143,14 @@ static void update_patch_function_lookup_for_module(NativeModule* module)
     World* world = module->world;
     caValue* everyPatchedFunction = &world->nativeModuleWorld->everyPatchedFunction;
 
-    std::cout << "looking at module: " << to_string(&module->name) << std::endl;
+    // std::cout << "looking at module: " << to_string(&module->name) << std::endl;
 
     // Look across every change action on the NativeModule (looking for PatchBranch entries).
     for (int i=0; i < list_length(&module->onChangeActions); i++) {
 
         caValue* action = list_get(&module->onChangeActions, i);
 
-        std::cout << "looking at action: " << to_string(action) << std::endl;
+        // std::cout << "looking at action: " << to_string(action) << std::endl;
 
         if (leading_name(action) != name_PatchBranch)
             continue;
@@ -165,7 +165,7 @@ static void update_patch_function_lookup_for_module(NativeModule* module)
             Value functionName;
             set_string(&functionName, it->first.c_str());
 
-            std::cout << "looking at function: " << to_string(&functionName) << std::endl;
+            // std::cout << "looking at function: " << to_string(&functionName) << std::endl;
 
             // Construct a global name for this function, using the branch's global name.
 
@@ -195,10 +195,6 @@ static void update_patch_function_lookup(World* world)
 
         update_patch_function_lookup_for_module(module);
     }
-
-    // TEMP
-    std::cout << "updated lookup:" << std::endl;
-    std::cout << to_string(&nativeWorld->everyPatchedFunction) << std::endl;
 }
 
 void native_module_finish_change(NativeModule* module)

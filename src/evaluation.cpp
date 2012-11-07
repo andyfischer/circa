@@ -62,6 +62,12 @@ Stack::~Stack()
     gc_on_object_deleted((CircaObject*) this);
 }
 
+void
+Stack::dump()
+{
+    print_stack(this, std::cout);
+}
+
 Stack* alloc_stack(World* world)
 {
     Stack* stack = new Stack();

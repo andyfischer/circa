@@ -99,7 +99,7 @@ bool is_major_branch(Branch* branch)
     if (branch->owningTerm == NULL)
         return true;
 
-    return is_subroutine(branch->owningTerm);
+    return is_function(branch->owningTerm);
 }
 
 bool is_minor_branch(Branch* branch)

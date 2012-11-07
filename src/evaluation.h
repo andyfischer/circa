@@ -88,6 +88,8 @@ struct Stack
     Stack();
     ~Stack();
 
+    void dump();
+
 private:
     // Disabled C++ funcs.
     Stack(Stack const&) {}
