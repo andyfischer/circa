@@ -12,12 +12,11 @@
 #include "string_type.h"
 #include "term.h"
 #include "type.h"
+#include "world.h"
 
 #include "term.h"
 
 namespace circa {
-
-static unsigned int g_nextTermID = 1;
 
 Term::Term()
   : weakPtr(0),
@@ -29,7 +28,7 @@ Term::Term()
     index(0),
     nestedContents(NULL)
 {
-    id = g_nextTermID++;
+    id = global_world()->nextTermID;
 
     debug_register_valid_object(this, TERM_OBJECT);
 

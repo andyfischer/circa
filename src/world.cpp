@@ -37,6 +37,10 @@ void world_initialize(World* world)
     set_list(&world->actorList, 0);
 
     world->actorStack = circa_alloc_stack(world);
+
+    world->nextTermID = 1;
+    world->nextBranchID = 1;
+    world->nextStackID = 1;
 }
 
 ListData* find_actor(World* world, const char* name)

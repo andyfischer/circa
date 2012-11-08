@@ -14,6 +14,11 @@ struct World {
     NativeModuleWorld* nativeModuleWorld;
     FileWatchWorld* fileWatchWorld;
 
+    // Next unused global IDs.
+    int nextTermID;
+    int nextBranchID;
+    int nextStackID;
+
 protected:
     // Disallow C++ construction
     World();

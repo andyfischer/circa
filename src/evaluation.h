@@ -61,6 +61,9 @@ struct Stack
     // GCable object header.
     CircaObject header;
 
+    // Globally unique ID.
+    int id;
+
     // Frame list
     int framesCapacity;
     Frame* frames;
@@ -109,6 +112,9 @@ Branch* top_branch(Stack* stack);
 // Retrieve the frame with the given depth, this function is O(n).
 Frame* frame_by_depth(Stack* stack, int depth);
 
+// Compute the current stack depth.
+int stack_depth(Stack* stack);
+
 // Run the interpreter.
 void run_interpreter(Stack* stack);
 void run_interpreter_step(Stack* stack);
@@ -133,8 +139,6 @@ void clear_error(Stack* cxt);
 
 // Reset a Stack to its default value.
 void reset_stack(Stack* stack);
-
-// *** Mid-level Stack manipulation ***
 
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Branch* branch);

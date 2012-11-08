@@ -645,6 +645,10 @@ bool circa_get_line(caValue* lineOut)
 void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& output)
 {
     Branch* branch = top_branch(stack);
+
+    // If there are extra frames on the stack (maybe from an error), then blow them away.
+
+
     int previousHead = branch->length();
     parser::compile(branch, parser::statement_list, input);
     int newHead = branch->length();

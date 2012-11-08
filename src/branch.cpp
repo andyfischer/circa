@@ -31,8 +31,6 @@
 
 namespace circa {
 
-static unsigned int g_nextBranchID = 1;
-
 void on_branch_created(Branch* branch)
 {
     // No-op, used for debugging.
@@ -50,7 +48,7 @@ Branch::Branch()
     stateType(NULL),
     emptyEvaluation(false)
 {
-    id = g_nextBranchID++;
+    id = global_world()->nextBranchID++;
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
 
     on_branch_created(this);

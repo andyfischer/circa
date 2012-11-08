@@ -21,6 +21,7 @@
 #include "term.h"
 #include "type.h"
 #include "update_cascades.h"
+#include "world.h"
 
 namespace circa {
 
@@ -48,6 +49,8 @@ Stack::Stack()
     top = 0;
     firstFreeFrame = 0;
     lastFreeFrame = 0;
+
+    id = global_world()->nextStackID;
 }
 
 Stack::~Stack()
@@ -663,8 +666,8 @@ void print_stack(Stack* stack, std::ostream& out)
 
     int topId = top_frame(stack) == NULL ? 0 : top_frame(stack)->id;
 
-    out << "[Stack " << stack
-        << ", top = #" << topId
+    out << "[Stack #" << stack->id
+        << ", topFrame = #" << topId
         << "]" << std::endl;
     for (int frameIndex = 0; frameIndex < list_length(&stackTrace); frameIndex++) {
         Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, frameIndex)));
@@ -672,7 +675,7 @@ void print_stack(Stack* stack, std::ostream& out)
         Branch* branch = frame->branch;
         out << " [Frame #" << frame->id
              << ", depth = " << depth
-             << ", branch = " << branch
+             << ", branch = " << branch->id
              << ", pc = " << frame->pc
              << ", nextPc = " << frame->nextPc
              << "]" << std::endl;
