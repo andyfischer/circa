@@ -458,7 +458,7 @@ std::string branch_namespace_to_string(Branch* branch)
     return out.str();
 }
 
-void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
+void print_branch(Branch* branch, RawOutputPrefs* prefs, std::ostream& out)
 {
     int prevIndent = prefs->indentLevel;
 
@@ -470,7 +470,7 @@ void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
 
         prefs->indentLevel = indent;
 
-        print_term(out, term, prefs);
+        print_term(term, prefs, out);
         out << std::endl;
 
         // Possibly print the closing bytecode op.
@@ -496,7 +496,7 @@ std::string get_branch_raw(Branch* branch)
 {
     RawOutputPrefs prefs;
     std::stringstream out;
-    print_branch(out, branch, &prefs);
+    print_branch(branch, &prefs, out);
     return out.str();
 }
 
@@ -621,7 +621,7 @@ void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string
     }
 }
 
-void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
+void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
 {
     for (int i=0; i < prefs->indentLevel; i++)
         out << " ";
@@ -695,30 +695,30 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     }
 }
 
-void print_term(std::ostream& out, Term* term)
+void print_term(Term* term, std::ostream& out)
 {
     RawOutputPrefs prefs;
-    print_term(out, term, &prefs);
+    print_term(term, &prefs, out);
 }
 
-void print_branch(std::ostream& out, Branch* branch)
+void print_branch(Branch* branch, std::ostream& out)
 {
     RawOutputPrefs prefs;
-    print_branch(out, branch, &prefs);
+    print_branch(branch, &prefs, out);
 }
 
-void print_branch_with_properties(std::ostream& out, Branch* branch)
+void print_branch_with_properties(Branch* branch, std::ostream& out)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
-    print_branch(out, branch, &prefs);
+    print_branch(branch, &prefs, out);
 }
 
 std::string get_term_to_string_extended(Term* term)
 {
     RawOutputPrefs prefs;
     std::stringstream out;
-    print_term(out, term, &prefs);
+    print_term(term, &prefs, out);
     return out.str();
 }
 
@@ -727,7 +727,7 @@ std::string get_term_to_string_extended_with_props(Term* term)
     RawOutputPrefs prefs;
     prefs.showProperties = true;
     std::stringstream out;
-    print_term(out, term, &prefs);
+    print_term(term, &prefs, out);
     return out.str();
 }
 

@@ -123,13 +123,13 @@ struct RawOutputPrefs
 };
 
 
-void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs);
-void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs);
-void print_term(std::ostream& out, Term* term);
+void print_branch(Branch* branch, RawOutputPrefs* prefs, std::ostream& out);
+void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out);
+void print_term(Term* term, std::ostream& out);
 
 // Convenient overloads for raw format printing
-void print_branch(std::ostream& out, Branch* branch);
-void print_branch_with_properties(std::ostream& out, Branch* branch);
+void print_branch(Branch* branch, std::ostream& out);
+void print_branch_with_properties(Branch* branch, std::ostream& out);
 std::string get_branch_raw(Branch* branch);
 std::string get_term_to_string_extended(Term*);
 std::string get_term_to_string_extended_with_props(Term*);

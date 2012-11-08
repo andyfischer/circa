@@ -10,7 +10,7 @@ namespace internal_debug_function {
         std::cout << "dump_parse " << global_id(term) << ": ";
         for (int i=0; i < term->numInputs(); i++) {
             if (i != 0) std::cout << ", ";
-            print_term(std::cout, term->input(0));
+            print_term(term->input(0), std::cout);
         }
         std::cout << std::endl;
     }

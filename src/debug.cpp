@@ -22,27 +22,27 @@ uint64 PERF_STATS[c_numPerfStats];
 
 void dump(Branch& branch)
 {
-    print_branch(std::cout, &branch);
+    print_branch(&branch, std::cout);
 }
 void dump(Branch* branch)
 {
-    print_branch(std::cout, branch);
+    print_branch(branch, std::cout);
 }
 void dump_bytecode(Branch* branch)
 {
     RawOutputPrefs prefs;
     prefs.showBytecode = true;
-    print_branch(std::cout, branch, &prefs);
+    print_branch(branch, &prefs, std::cout);
 }
 
 void dump_with_props(Branch& branch)
 {
-    print_branch_with_properties(std::cout, &branch);
+    print_branch_with_properties(&branch, std::cout);
 }
 
 void dump(Term* term)
 {
-    print_term(std::cout, term);
+    print_term(term, std::cout);
 }
 
 void dump(caValue& value)

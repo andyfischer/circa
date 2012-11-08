@@ -692,7 +692,7 @@ void print_stack(Stack* stack, std::ostream& out)
             else
                 out << " ";
 
-            print_term(out, term);
+            print_term(term, out);
 
             // current value
             if (term != NULL && !is_value(term)) {

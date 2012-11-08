@@ -585,7 +585,7 @@ int run_command_line(caWorld* world, caValue* args)
     refresh_bytecode(mainBranch);
 
     if (printRaw)
-        print_branch(std::cout, mainBranch, &rawOutputPrefs);
+        print_branch(mainBranch, &rawOutputPrefs, std::cout);
 
     if (dontRunScript)
         return 0;
@@ -642,9 +642,9 @@ bool circa_get_line(caValue* lineOut)
     return true;
 }
 
-void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& output)
+void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& output)
 {
-    Branch* branch = top_branch(context);
+    Branch* branch = top_branch(stack);
     int previousHead = branch->length();
     parser::compile(branch, parser::statement_list, input);
     int newHead = branch->length();
@@ -666,12 +666,12 @@ void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& 
 
     // Run the stack to the new end of the branch.
 
-    Frame* frame = top_frame(context);
-    run_interpreter(context);
+    Frame* frame = top_frame(stack);
+    run_interpreter(stack);
 
-    if (error_occurred(context)) {
+    if (error_occurred(stack)) {
         output << "error: ";
-        print_error_stack(context, std::cout);
+        print_error_stack(stack, std::cout);
         anyErrors = true;
         frame_pc_move_to_end(frame);
     }
@@ -680,21 +680,21 @@ void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& 
     if (!anyErrors) {
         Term* result = branch->get(branch->length() - 1);
         if (result->type != as_type(VOID_TYPE)) {
-            output << to_string(find_stack_value_for_term(context, result, 0)) << std::endl;
+            output << to_string(find_stack_value_for_term(stack, result, 0)) << std::endl;
         }
     }
 
-    clear_error(context);
+    clear_error(stack);
 }
 
 int run_repl(World* world)
 {
     Branch* branch = nested_contents(find_from_global_name(world, "main"));
 
-    Stack context;
+    Stack stack;
     bool displayRaw = false;
 
-    push_frame(&context, branch);
+    push_frame(&stack, branch);
 
     printf("Started REPL, type /help for reference.\n");
 
@@ -733,7 +733,11 @@ int run_repl(World* world)
             continue;
         }
         if (string_eq(&input, "/dump")) {
-            dump(branch);
+            print_branch(branch, std::cout);
+            continue;
+        }
+        if (string_eq(&input, "/stack")) {
+            print_stack(&stack, std::cout);
             continue;
         }
 
@@ -746,11 +750,12 @@ int run_repl(World* world)
             printf("be typed as one line.\n");
             printf("\n");
             printf("Special REPL commands:\n");
-            printf(" /raw - Toggle the display of raw format\n");
-            printf(" /show - Print all code in working area\n");
-            printf(" /dump - Print all code in working area, raw format\n");
-            printf(" /help - Print this text\n");
-            printf(" /exit - Exit the REPL. Also, Ctrl-C will work\n");
+            printf(" /raw   - Toggle the display of raw format\n");
+            printf(" /show  - Print all code in working area\n");
+            printf(" /dump  - Print all code in working area, raw format\n");
+            printf(" /stack - Display the current stack, raw format\n");
+            printf(" /help  - Print this text\n");
+            printf(" /exit  - Exit the REPL. Also, Ctrl-C will work\n");
             continue;
         }
 
@@ -760,13 +765,13 @@ int run_repl(World* world)
         string_append(&input, "\n");
 
         int previousHead = branch->length();
-        repl_evaluate_line(&context, as_cstring(&input), std::cout);
+        repl_evaluate_line(&stack, as_cstring(&input), std::cout);
 
         if (displayRaw) {
             for (int i=previousHead; i < branch->length(); i++) {
                 std::cout << get_term_to_string_extended(branch->get(i)) << std::endl;
                 if (nested_contents(branch->get(i))->length() > 0)
-                    print_branch(std::cout, nested_contents(branch->get(i)));
+                    print_branch(nested_contents(branch->get(i)), std::cout);
             }
         }
     }
