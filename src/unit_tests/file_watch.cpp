@@ -5,6 +5,7 @@
 #include "fakefs.h"
 #include "file_watch.h"
 #include "kernel.h"
+#include "modules.h"
 #include "world.h"
 
 namespace file_watch {

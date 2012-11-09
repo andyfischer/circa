@@ -39,9 +39,6 @@ ListData* find_actor(World* world, const char* name);
 
 void refresh_all_modules(caWorld* world);
 
-// Load a script from the given filename, and install it in the global namespace with the
-// given module name. If the module already exists, then we'll replace the existing
-// contents, and we'll update any existing references that point to the replaced code.
-Branch* load_script_to_global_name(World* world, const char* filename, const char* globalName);
+void update_world_after_module_reload(World* world, Branch* oldBranch, Branch* newBranch);
 
 } // namespace circa

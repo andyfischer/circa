@@ -3,9 +3,10 @@
 #include "unit_test_common.h"
 
 #include "branch.h"
+#include "evaluation.h"
 #include "fakefs.h"
 #include "kernel.h"
-#include "evaluation.h"
+#include "modules.h"
 #include "world.h"
 
 namespace modules {
@@ -15,7 +16,7 @@ void source_file_location()
     FakeFilesystem fs;
 
     fs.set("branch.ca", "a = 1");
-    Branch* branch = load_script_to_global_name(global_world(), "branch.ca", "source_file_location");
+    Branch* branch = load_module_file(global_world(), "source_file_location", "branch.ca");
 
     test_equals(branch_get_source_filename(branch), "branch.ca");
 }
@@ -28,7 +29,7 @@ void test_require()
 
     fs.set("user.ca", "require module; test_spy(module:f())");
 
-    Branch* branch = load_script_to_global_name(global_world(), "user.ca", "test_require");
+    Branch* branch = load_module_file(global_world(), "test_require", "user.ca");
 
     dump(branch);
 

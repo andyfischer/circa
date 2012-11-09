@@ -189,37 +189,9 @@ void refresh_all_modules(caWorld* world)
     }
 }
 
-Branch* load_script_to_global_name(World* world, const char* filename, const char* globalName)
-{
-    Term* namedTerm = find_from_global_name(world, globalName);
-
-    if (namedTerm == NULL) {
-        namedTerm = apply(world->root, FUNCS.imported_file, TermList(),
-                name_from_string(globalName));
-    }
-
-    ca_assert(namedTerm != NULL);
-    Branch* existing = nested_contents(namedTerm);
-
-    Branch* newBranch = alloc_branch_gc();
-    branch_graft_as_nested_contents(namedTerm, newBranch);
-    load_script(newBranch, filename);
-
-    update_static_error_list(newBranch);
-
-    if (existing != NULL) {
-        // New branch starts off with the old branch's version, plus 1.
-        newBranch->version = existing->version + 1;
-
-        update_world_after_module_reload(world, existing, newBranch);
-    }
-
-    return newBranch;
-}
-
 CIRCA_EXPORT void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
 {
-    load_module_from_file(world, actorName, filename);
+    load_module_file_watched(world, actorName, filename);
 
     caValue* actor = list_append(&world->actorList);
     make(TYPES.actor, actor);

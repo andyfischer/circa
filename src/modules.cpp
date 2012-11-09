@@ -108,10 +108,38 @@ static bool find_module_file(World* world, const char* module_name, caValue* fil
     return false;
 }
 
-Branch* load_module_from_file(World* world, const char* moduleName, const char* filename)
+Branch* load_module_file(World* world, const char* moduleName, const char* filename)
+{
+    Term* namedTerm = find_from_global_name(world, moduleName);
+
+    if (namedTerm == NULL) {
+        namedTerm = apply(world->root, FUNCS.imported_file, TermList(),
+                name_from_string(moduleName));
+    }
+
+    ca_assert(namedTerm != NULL);
+    Branch* existing = nested_contents(namedTerm);
+
+    Branch* newBranch = alloc_branch_gc();
+    branch_graft_as_nested_contents(namedTerm, newBranch);
+    load_script(newBranch, filename);
+
+    update_static_error_list(newBranch);
+
+    if (existing != NULL) {
+        // New branch starts off with the old branch's version, plus 1.
+        newBranch->version = existing->version + 1;
+
+        update_world_after_module_reload(world, existing, newBranch);
+    }
+
+    return newBranch;
+}
+
+Branch* load_module_file_watched(World* world, const char* moduleName, const char* filename)
 {
     // Load and parse the script file.
-    Branch* branch = load_script_to_global_name(world, filename, moduleName);
+    Branch* branch = load_module_file(world, moduleName, filename);
 
     // Create implicit file watch.
     FileWatch* watch = add_file_watch_module_load(world, filename, moduleName);
@@ -134,7 +162,7 @@ Branch* load_module_by_name(World* world, const char* moduleName)
     if (!found)
         return NULL;
 
-    return load_module_from_file(world, moduleName, as_cstring(&filename));
+    return load_module_file_watched(world, moduleName, as_cstring(&filename));
 }
 
 void module_on_loaded_by_term(Branch* module, Term* loadCall)
@@ -224,7 +252,7 @@ void import_file_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
     caValue* filename = term_value(term->input(1));
-    Branch* module = load_module_from_file(global_world(), as_cstring(moduleName),
+    Branch* module = load_module_file_watched(global_world(), as_cstring(moduleName),
             as_cstring(filename));
     module_on_loaded_by_term(module, term);
 }
@@ -296,7 +324,7 @@ CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 CIRCA_EXPORT caBranch* circa_load_module_from_file(caWorld* world, const char* module_name,
         const char* filename)
 {
-    return (caBranch*) load_module_from_file(world, module_name, filename);
+    return (caBranch*) load_module_file_watched(world, module_name, filename);
 }
 
 } // namespace circa

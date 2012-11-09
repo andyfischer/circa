@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "file.h"
 #include "list.h"
+#include "modules.h"
 #include "names.h"
 #include "native_modules.h"
 #include "tagged_value.h"
@@ -105,7 +106,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         case name_PatchBranch: {
             // Reload this code branch.
             caValue* moduleName = list_get(action, 1);
-            load_script_to_global_name(world, as_cstring(&watch->filename), as_cstring(moduleName));
+            load_module_file(world, as_cstring(moduleName), as_cstring(&watch->filename));
             break;
         }
         default:

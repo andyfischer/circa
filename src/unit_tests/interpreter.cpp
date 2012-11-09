@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "fakefs.h"
 #include "function.h"
+#include "modules.h"
 #include "type.h"
 #include "world.h"
 
@@ -72,7 +73,7 @@ void test_evaluate_minimum()
     FakeFilesystem fs;
     fs.set("dir/branch.ca", "x = rpath('path'); y = concat(x, '/more_path')");
 
-    Branch* branch = load_script_to_global_name(global_world(), "dir/branch.ca", "test_evaluate_minimum");
+    Branch* branch = load_module_file(global_world(), "test_evaluate_minimum", "dir/branch.ca");
     Term* y = find_local_name(branch, "y");
     test_assert(y != NULL);
 
