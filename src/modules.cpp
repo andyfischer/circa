@@ -115,21 +115,10 @@ static bool find_module_file(World* world, const char* module_name, caValue* fil
     return false;
 }
 
-Branch* load_module_from_file2(World* world, const char* moduleName, const char* filename,
-        Term* loadCall)
+Branch* load_module_from_file2(World* world, const char* moduleName, const char* filename)
 {
     // Load and parse the script file.
     Branch* branch = load_script_to_global_name(world, filename, moduleName);
-
-    // If a loadCall is provided, possibly move the new import to be before the loadCall.
-    if (loadCall != NULL) {
-        Term* moduleTerm = branch->owningTerm;
-
-        Term* callersModule = find_parent_term_in_branch(loadCall, moduleTerm->owningBranch);
-
-        if (callersModule != NULL && (moduleTerm->index > callersModule->index))
-            move_before(moduleTerm, callersModule);
-    }
 
     // Create implicit file watch.
     FileWatch* watch = add_file_watch_module_load(world, filename, moduleName);
@@ -140,7 +129,7 @@ Branch* load_module_from_file2(World* world, const char* moduleName, const char*
     return branch;
 }
 
-Branch* load_module(World* world, const char* moduleName, Term* loadCall)
+Branch* load_module_by_name(World* world, const char* moduleName)
 {
     Branch* existing = find_loaded_module(moduleName);
     if (existing != NULL)
@@ -152,7 +141,17 @@ Branch* load_module(World* world, const char* moduleName, Term* loadCall)
     if (!found)
         return NULL;
 
-    return load_module_from_file2(world, moduleName, as_cstring(&filename), loadCall);
+    return load_module_from_file2(world, moduleName, as_cstring(&filename));
+}
+
+void module_on_loaded_by_term(Branch* module, Term* loadCall)
+{
+    Term* moduleTerm = module->owningTerm;
+
+    Term* callersModule = find_parent_term_in_branch(loadCall, moduleTerm->owningBranch);
+
+    if (callersModule != NULL && (moduleTerm->index > callersModule->index))
+        move_before(moduleTerm, callersModule);
 }
 
 Branch* find_module_from_filename(const char* filename)
@@ -224,14 +223,17 @@ void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBr
 void require_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
-    load_module(global_world(), as_cstring(moduleName), term);
+    Branch* module = load_module_by_name(global_world(), as_cstring(moduleName));
+    module_on_loaded_by_term(module, term);
 }
 
 void import_file_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
     caValue* filename = term_value(term->input(1));
-    load_module_from_file2(global_world(), as_cstring(moduleName), as_cstring(filename), term);
+    Branch* module = load_module_from_file2(global_world(), as_cstring(moduleName),
+            as_cstring(filename));
+    module_on_loaded_by_term(module, term);
 }
 
 void native_patch_this_postCompile(Term* term)

@@ -17,7 +17,12 @@ Branch* load_module_from_file(const char* module_name, const char* filename);
 // Add a top-level with the given name, or return an existing one if it exists.
 Branch* add_module(World* world, const char* name);
 
-Branch* load_module(World* world, const char* module_name, Term* loadCall);
+// Load a module via name. The file will be found via standard module lookup.
+Branch* load_module_by_name(World* world, const char* module_name);
+
+// This should be called whenever a new module is loaded by a certain term. We may
+// rearrange the global module order so that the module is located before the term.
+void module_on_loaded_by_term(Branch* module, Term* loadCall);
 
 Branch* find_loaded_module(const char* name);
 

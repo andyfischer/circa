@@ -232,7 +232,7 @@ CIRCA_EXPORT void circa_actor_new_from_file(caWorld* world, const char* actorNam
 
 CIRCA_EXPORT caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
 {
-    Branch* module = load_module(world, moduleName, NULL);
+    Branch* module = load_module_by_name(world, moduleName);
 
     if (module == NULL) {
         return NULL;
