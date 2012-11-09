@@ -91,7 +91,7 @@ const char* get_token_text(int match)
         case tok_Case: return "case";
         case tok_While: return "while";
         case tok_Require: return "require";
-        case tok_Package: return "require";
+        case tok_Package: return "package";
         case tok_Unrecognized: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -320,6 +320,8 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, tok_Switch)) return;
         if (try_to_consume_keyword(context, tok_Case)) return;
         if (try_to_consume_keyword(context, tok_While)) return;
+        if (try_to_consume_keyword(context, tok_Require)) return;
+        if (try_to_consume_keyword(context, tok_Package)) return;
 
         consume_identifier(context);
         return;

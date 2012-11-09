@@ -26,12 +26,10 @@ void test_require()
     FakeFilesystem fs;
 
     fs.set("module.ca", "def f()->int { 5 }");
-
     fs.set("user.ca", "require module; test_spy(module:f())");
 
+    load_module_file(global_world(), "module", "module.ca");
     Branch* branch = load_module_file(global_world(), "test_require", "user.ca");
-
-    dump(branch);
 
     test_spy_clear();
 
@@ -46,7 +44,7 @@ void test_require()
 void register_tests()
 {
     REGISTER_TEST_CASE(modules::source_file_location);
-    //REGISTER_TEST_CASE(modules::test_require);
+    REGISTER_TEST_CASE(modules::test_require);
 }
 
 } // namespace modules
