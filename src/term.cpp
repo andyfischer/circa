@@ -28,7 +28,7 @@ Term::Term()
     index(0),
     nestedContents(NULL)
 {
-    id = global_world()->nextTermID;
+    id = global_world()->nextTermID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
 

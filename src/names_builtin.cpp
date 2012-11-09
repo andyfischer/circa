@@ -142,6 +142,8 @@ const char* builtin_name_to_string(int name)
     case tok_Switch: return "tok_Switch";
     case tok_Case: return "tok_Case";
     case tok_While: return "tok_While";
+    case tok_Require: return "tok_Require";
+    case tok_Package: return "tok_Package";
     case tok_Whitespace: return "tok_Whitespace";
     case tok_Newline: return "tok_Newline";
     case tok_Comment: return "tok_Comment";

@@ -90,6 +90,8 @@ const char* get_token_text(int match)
         case tok_Switch: return "switch";
         case tok_Case: return "case";
         case tok_While: return "while";
+        case tok_Require: return "require";
+        case tok_Package: return "require";
         case tok_Unrecognized: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }

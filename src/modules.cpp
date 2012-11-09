@@ -223,7 +223,7 @@ void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBr
     }
 }
 
-void import_func_postCompile(Term* term)
+void require_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
     load_module(global_world(), as_cstring(moduleName), term);
@@ -276,8 +276,8 @@ void native_patch_this_postCompile(Term* term)
 
 void modules_install_functions(Branch* kernel)
 {
-    FUNCS.import = install_function(kernel, "import", NULL);
-    as_function(FUNCS.import)->postCompile = import_func_postCompile;
+    FUNCS.require = install_function(kernel, "require", NULL);
+    as_function(FUNCS.require)->postCompile = require_func_postCompile;
 
     Term* import_file = install_function(kernel, "import_file", NULL);
     as_function(import_file)->postCompile = import_file_func_postCompile;

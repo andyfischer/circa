@@ -466,7 +466,13 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
 bool token_is_allowed_as_function_name(int token)
 {
     switch (token) {
-        case tok_For: case tok_If: case tok_Include: case tok_Type: case tok_Not:
+        case tok_For:
+        case tok_If:
+        case tok_Include:
+        case tok_Type:
+        case tok_Not:
+        case tok_Require:
+        case tok_Package:
             return true;
         default:
             return false;
@@ -490,7 +496,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     // Function name
     Value functionName;
-    tokens.consumeStr(&functionName, tok_Identifier);
+    tokens.consumeStr(&functionName);
 
     bool isMethod = false;
     Term* methodType = NULL;

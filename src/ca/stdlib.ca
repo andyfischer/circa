@@ -23,7 +23,8 @@ def dynamic_call(Branch branch, List inputs) -> List
     -- Dynamic function dispatch
 
 -- Modules
-def import(String moduleName)
+def require(String moduleName)
+def package(String moduleName)
 def import_file(String moduleName, String filename)
 def native_patch_this(String filename)
 
