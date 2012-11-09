@@ -96,11 +96,6 @@ void parse_string_as_argument_list(caValue* str, List* output)
     }
 }
 
-void do_add_lib_path(List* args, caValue* reply)
-{
-    modules_add_search_path(as_cstring(list_get(args, 0)));
-}
-
 void do_echo(List* args, caValue* reply)
 {
     set_string(reply, to_string(args));
@@ -382,7 +377,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         if (string_eq(list_get(args, 0), "-path")) {
             // Add a module path
-            modules_add_search_path(as_cstring(list_get(args, 1)));
+            module_add_search_path(world, as_cstring(list_get(args, 1)));
             list_remove_index(args, 0);
             list_remove_index(args, 0);
             continue;

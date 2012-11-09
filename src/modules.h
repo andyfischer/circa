@@ -6,9 +6,9 @@
 
 namespace circa {
 
-List* modules_get_search_paths();
+caValue* module_search_paths(World* world);
 
-void modules_add_search_path(const char* str);
+void module_add_search_path(World* world, const char* str);
 
 void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut);
 

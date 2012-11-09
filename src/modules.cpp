@@ -26,19 +26,14 @@
 
 namespace circa {
 
-List g_moduleSearchPaths;
-
-List* modules_get_search_paths()
+caValue* module_search_paths(World* world)
 {
-    return &g_moduleSearchPaths;
+    return &world->moduleSearchPaths;
 }
 
-void modules_add_search_path(const char* str)
+void module_add_search_path(World* world, const char* str)
 {
-    if (strcmp(str, "") == 0)
-        internal_error("blank path in modules_add_search_path");
-
-    set_string(g_moduleSearchPaths.append(), str);
+    set_string(world->moduleSearchPaths.append(), str);
 }
 
 void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut)
@@ -66,7 +61,8 @@ Branch* find_loaded_module(const char* name)
 
 Branch* load_module_from_file(const char* module_name, const char* filename)
 {
-    Term* import = apply(global_root_branch(), FUNCS.imported_file, TermList(), name_from_string(module_name));
+    Term* import = apply(global_root_branch(), FUNCS.imported_file, TermList(),
+            name_from_string(module_name));
     load_script(nested_contents(import), filename);
     return nested_contents(import);
 }
@@ -81,36 +77,38 @@ Branch* add_module(World* world, const char* name)
     return nested_contents(term);
 }
 
-static bool find_module_file(const char* module_name, caValue* filenameOut)
+static bool find_module_file(World* world, const char* module_name, caValue* filenameOut)
 {
     Value module;
     set_string(&module, module_name);
 
-    int count = list_length(&g_moduleSearchPaths);
+    int count = list_length(&world->moduleSearchPaths);
     for (int i=0; i < count; i++) {
+
+        caValue* searchPath = list_get(&world->moduleSearchPaths, i);
 
         // For each search path we'll check two places.
 
         // Look under searchPath/moduleName.ca
-        Value searchPath;
-        copy(g_moduleSearchPaths[i], &searchPath);
-        join_path(&searchPath, &module);
-        string_append(&searchPath, ".ca");
+        Value computedPath;
+        copy(searchPath, &computedPath);
+        join_path(&computedPath, &module);
+        string_append(&computedPath, ".ca");
 
-        if (circa_file_exists(as_cstring(&searchPath))) {
-            swap(&searchPath, filenameOut);
+        if (circa_file_exists(as_cstring(&computedPath))) {
+            move(&computedPath, filenameOut);
             return true;
         }
 
         // Look under searchPath/moduleName/moduleName.ca
-        copy(g_moduleSearchPaths[i], &searchPath);
+        copy(searchPath, &computedPath);
 
-        join_path(&searchPath, &module);
-        join_path(&searchPath, &module);
-        string_append(&searchPath, ".ca");
+        join_path(&computedPath, &module);
+        join_path(&computedPath, &module);
+        string_append(&computedPath, ".ca");
 
-        if (circa_file_exists(as_cstring(&searchPath))) {
-            swap(&searchPath, filenameOut);
+        if (circa_file_exists(as_cstring(&computedPath))) {
+            move(&computedPath, filenameOut);
             return true;
         }
     }
@@ -149,7 +147,7 @@ Branch* load_module(World* world, const char* moduleName, Term* loadCall)
         return existing;
     
     Value filename;
-    bool found = find_module_file(moduleName, &filename);
+    bool found = find_module_file(world, moduleName, &filename);
 
     if (!found)
         return NULL;
@@ -297,7 +295,7 @@ CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
 
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 {
-    modules_add_search_path(path);
+    module_add_search_path(world, path);
 }
 
 CIRCA_EXPORT caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const char* filename)

@@ -8,9 +8,11 @@ struct World {
 
     Branch* root;
 
+    // Actors.
     circa::Value actorList;
     caStack* actorStack;
 
+    // Private data.
     NativeModuleWorld* nativeModuleWorld;
     FileWatchWorld* fileWatchWorld;
 
@@ -18,6 +20,9 @@ struct World {
     int nextTermID;
     int nextBranchID;
     int nextStackID;
+
+    // Module information.
+    List moduleSearchPaths;
 
 protected:
     // Disallow C++ construction

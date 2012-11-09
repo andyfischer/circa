@@ -247,7 +247,7 @@ void reflect__kernel(caStack* stack)
 
 void sys__module_search_paths(caStack* stack)
 {
-    copy(modules_get_search_paths(), circa_output(stack, 0));
+    copy(module_search_paths(stack->world), circa_output(stack, 0));
 }
 void sys__perf_stats_reset(caStack* stack)
 {
@@ -1116,7 +1116,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
             caValue* path = list_get(&libPaths, i);
             if (string_eq(path, ""))
                 continue;
-            modules_add_search_path(as_cstring(path));
+            module_add_search_path(world, as_cstring(path));
         }
     }
 
