@@ -85,7 +85,7 @@ void patch_manually_ns()
 void trigger_change()
 {
     // Don't patch manually, add a change action and trigger it.
-    Branch* branch = add_module(global_world(), "trigger_change_test");
+    Branch* branch = fetch_module(global_world(), "trigger_change_test");
     branch->compile("def f() -> int { 1 }");
     branch->compile("test_spy(f())");
 
@@ -124,7 +124,7 @@ void new_function_patched_by_world()
     native_module_finish_change(module);
 
     // Now create our function, it should get patched instantly.
-    Branch* branch = add_module(global_world(), "nativemod_branch");
+    Branch* branch = fetch_module(global_world(), "nativemod_branch");
     branch->compile("def my_add(int a, int b) -> int { a + a }");
     branch->compile("test_spy(my_add(1 2))");
 

@@ -60,7 +60,7 @@ Branch* find_loaded_module(const char* name)
 }
 
 
-Branch* add_module(World* world, const char* name)
+Branch* fetch_module(World* world, const char* name)
 {
     Term* existing = find_from_global_name(world, name);
     if (existing != NULL)
