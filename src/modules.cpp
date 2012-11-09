@@ -59,13 +59,6 @@ Branch* find_loaded_module(const char* name)
     return NULL;
 }
 
-Branch* load_module_from_file(const char* module_name, const char* filename)
-{
-    Term* import = apply(global_root_branch(), FUNCS.imported_file, TermList(),
-            name_from_string(module_name));
-    load_script(nested_contents(import), filename);
-    return nested_contents(import);
-}
 
 Branch* add_module(World* world, const char* name)
 {
@@ -115,7 +108,7 @@ static bool find_module_file(World* world, const char* module_name, caValue* fil
     return false;
 }
 
-Branch* load_module_from_file2(World* world, const char* moduleName, const char* filename)
+Branch* load_module_from_file(World* world, const char* moduleName, const char* filename)
 {
     // Load and parse the script file.
     Branch* branch = load_script_to_global_name(world, filename, moduleName);
@@ -141,7 +134,7 @@ Branch* load_module_by_name(World* world, const char* moduleName)
     if (!found)
         return NULL;
 
-    return load_module_from_file2(world, moduleName, as_cstring(&filename));
+    return load_module_from_file(world, moduleName, as_cstring(&filename));
 }
 
 void module_on_loaded_by_term(Branch* module, Term* loadCall)
@@ -231,7 +224,7 @@ void import_file_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
     caValue* filename = term_value(term->input(1));
-    Branch* module = load_module_from_file2(global_world(), as_cstring(moduleName),
+    Branch* module = load_module_from_file(global_world(), as_cstring(moduleName),
             as_cstring(filename));
     module_on_loaded_by_term(module, term);
 }
@@ -300,9 +293,10 @@ CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
     module_add_search_path(world, path);
 }
 
-CIRCA_EXPORT caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const char* filename)
+CIRCA_EXPORT caBranch* circa_load_module_from_file(caWorld* world, const char* module_name,
+        const char* filename)
 {
-    return (caBranch*) load_module_from_file(module_name, filename);
+    return (caBranch*) load_module_from_file(world, module_name, filename);
 }
 
 } // namespace circa

@@ -12,7 +12,7 @@ void module_add_search_path(World* world, const char* str);
 
 void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut);
 
-Branch* load_module_from_file(const char* module_name, const char* filename);
+Branch* load_module_from_file(World* world, const char* moduleName, const char* filename);
 
 // Add a top-level with the given name, or return an existing one if it exists.
 Branch* add_module(World* world, const char* name);

@@ -219,7 +219,7 @@ Branch* load_script_to_global_name(World* world, const char* filename, const cha
 
 CIRCA_EXPORT void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
 {
-    load_module_from_file(actorName, filename);
+    load_module_from_file(world, actorName, filename);
 
     caValue* actor = list_append(&world->actorList);
     make(TYPES.actor, actor);
