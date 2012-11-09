@@ -135,7 +135,12 @@ void evaluate_minimum2(Term* term, caValue* output);
 // 'break' statement, or a runtime error.
 bool error_occurred(Stack* stack);
 
-void clear_error(Stack* cxt);
+// Clear the error flag, but leave the stack as-is. See also stack_clear_error.
+void stack_ignore_error(Stack* stack);
+
+// Clear the error flag and drop any intermediate stack frames. The stack will be
+// cleared up until the 'stop' frame (as if it successfully finished an evaluation).
+void stack_clear_error(Stack* stack);
 
 // Reset a Stack to its default value.
 void reset_stack(Stack* stack);

@@ -56,7 +56,7 @@ Stack::Stack()
 Stack::~Stack()
 {
     // clear error so that pop_frame doesn't complain about losing an errored frame.
-    clear_error(this);
+    stack_ignore_error(this);
 
     reset_stack(this);
 
@@ -87,6 +87,11 @@ static Frame* frame_by_id(Stack* stack, int id)
 {
     ca_assert(id != 0);
     return &stack->frames[id - 1];
+}
+
+static bool is_stop_frame(Frame* frame)
+{
+    return frame->stop || frame->parent == 0;
 }
 
 Frame* frame_by_depth(Stack* stack, int depth)
@@ -327,7 +332,7 @@ void finish_frame(Stack* stack)
     top->nextPc = top->pc;
 
     // Exit if we have finished the topmost branch
-    if (top->parent == 0 || top->stop) {
+    if (is_stop_frame(top)) {
         stack->running = false;
         return;
     }
@@ -633,9 +638,20 @@ bool error_occurred(Stack* stack)
     return stack->errorOccurred;
 }
 
-void clear_error(Stack* cxt)
+void stack_ignore_error(Stack* cxt)
 {
     cxt->errorOccurred = false;
+}
+
+void stack_clear_error(Stack* stack)
+{
+    stack_ignore_error(stack);
+    while (top_frame(stack) != NULL && !is_stop_frame(top_frame(stack)))
+        pop_frame(stack);
+
+    Frame* top = top_frame(stack);
+    top->pc = top->branch->length() - 1;
+    top->nextPc = top->branch->length();
 }
 
 static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
@@ -1423,9 +1439,8 @@ void run_interpreter_steps(Stack* stack, int steps)
     stack->running = true;
     step_interpreter(stack);
 
-    while (stack->running && (steps--) > 0) {
+    while (stack->running && (steps--) > 0)
         step_interpreter(stack);
-    }
 
     stack->running = false;
 }
@@ -1819,7 +1834,7 @@ CIRCA_EXPORT bool circa_has_error(caStack* stack)
 }
 CIRCA_EXPORT void circa_clear_error(caStack* stack)
 {
-    clear_error(stack);
+    stack_ignore_error(stack);
 }
 CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 {

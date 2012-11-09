@@ -644,10 +644,10 @@ bool circa_get_line(caValue* lineOut)
 
 void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& output)
 {
+    // If there is a leftover error stack, then blow it away.
+    stack_clear_error(stack);
+
     Branch* branch = top_branch(stack);
-
-    // If there are extra frames on the stack (maybe from an error), then blow them away.
-
 
     int previousHead = branch->length();
     parser::compile(branch, parser::statement_list, input);
@@ -655,40 +655,21 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
 
     bool anyErrors = false;
 
-    // Check if this new expression created any errors.
-    for (int i=previousHead; i < newHead; i++) {
-        Term* result = branch->get(i);
-
-        if (has_static_error(result)) {
-            output << "error: ";
-            print_static_error(result, output);
-            output << std::endl;
-            anyErrors = true;
-            break;
-        }
-    }
-
     // Run the stack to the new end of the branch.
 
-    Frame* frame = top_frame(stack);
     run_interpreter(stack);
 
     if (error_occurred(stack)) {
         output << "error: ";
         print_error_stack(stack, std::cout);
-        anyErrors = true;
-        frame_pc_move_to_end(frame);
+        return;
     }
 
     // Print results of the last expression
-    if (!anyErrors) {
-        Term* result = branch->get(branch->length() - 1);
-        if (result->type != as_type(VOID_TYPE)) {
-            output << to_string(find_stack_value_for_term(stack, result, 0)) << std::endl;
-        }
+    Term* result = branch->get(branch->length() - 1);
+    if (result->type != as_type(VOID_TYPE)) {
+        output << to_string(find_stack_value_for_term(stack, result, 0)) << std::endl;
     }
-
-    clear_error(stack);
 }
 
 int run_repl(World* world)
