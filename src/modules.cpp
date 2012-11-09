@@ -279,6 +279,8 @@ void modules_install_functions(Branch* kernel)
     FUNCS.require = install_function(kernel, "require", NULL);
     as_function(FUNCS.require)->postCompile = require_func_postCompile;
 
+    FUNCS.package = install_function(kernel, "package", NULL);
+
     Term* import_file = install_function(kernel, "import_file", NULL);
     as_function(import_file)->postCompile = import_file_func_postCompile;
 

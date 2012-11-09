@@ -382,6 +382,16 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_Case)) {
         result = case_statement(branch, tokens, context);
     }
+    
+    // Require statement
+    else if (tokens.nextIs(tok_Require)) {
+        result = require_statement(branch, tokens, context);
+    }
+
+    // Package statement
+    else if (tokens.nextIs(tok_Package)) {
+        result = package_statement(branch, tokens, context);
+    }
 
     // Otherwise, expression statement
     else {
@@ -973,6 +983,52 @@ ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* conte
     set_source_location(result, startPosition, tokens);
     set_is_statement(result, true);
     return ParseResult(result);
+}
+
+ParseResult require_statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(tok_Require);
+    possible_whitespace(tokens);
+
+    Term* moduleName = NULL;
+
+    if (tokens.nextIs(tok_Identifier)) {
+        moduleName = create_string(branch, tokens.consumeStr());
+    } else if (tokens.nextIs(tok_String)) {
+        moduleName = literal_string(branch, tokens, context).term;
+    } else {
+        return compile_error_for_line(branch, tokens, startPosition,
+            "Expected module name (as a string or identifier)");
+    }
+
+    Term* term = apply(branch, FUNCS.require, TermList(moduleName));
+
+    return ParseResult(term);
+}
+
+ParseResult package_statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(tok_Require);
+    possible_whitespace(tokens);
+
+    Term* moduleName = NULL;
+
+    if (tokens.nextIs(tok_Identifier)) {
+        moduleName = create_string(branch, tokens.consumeStr());
+    } else if (tokens.nextIs(tok_String)) {
+        moduleName = literal_string(branch, tokens, context).term;
+    } else {
+        return compile_error_for_line(branch, tokens, startPosition,
+            "Expected module name (as a string or identifier)");
+    }
+
+    Term* term = apply(branch, FUNCS.package, TermList(moduleName));
+
+    return ParseResult(term);
 }
 
 ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)

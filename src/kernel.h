@@ -82,6 +82,7 @@ struct BuiltinFuncs {
     Term* pack_state;
     Term* pack_state_to_list;
     Term* pack_state_list_n;
+    Term* package;
     Term* range;
     Term* return_func;
     Term* selector;
