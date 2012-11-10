@@ -1012,7 +1012,7 @@ ParseResult package_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(tok_Require);
+    tokens.consume(tok_Package);
     possible_whitespace(tokens);
 
     Term* moduleName = NULL;

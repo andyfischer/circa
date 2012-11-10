@@ -292,7 +292,7 @@ void native_module_load_from_file(NativeModule* module, const char* filename)
     module->dll = dlopen(filename, RTLD_NOW);
 
     if (!module->dll) {
-        std::cout << "failed to open dll: " << filename << std::endl;
+        std::cout << "dlopen failure, file = " << filename << ", msg = " << dlerror() << std::endl;
         return;
     }
 

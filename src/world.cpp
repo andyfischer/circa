@@ -38,6 +38,8 @@ void world_initialize(World* world)
 
     world->actorStack = circa_alloc_stack(world);
 
+    set_list(&world->moduleSearchPaths);
+
     world->nextTermID = 1;
     world->nextBranchID = 1;
     world->nextStackID = 1;

@@ -284,6 +284,9 @@ caValue* circa_alloc_list(int size);
 
 caType* circa_type_of(caValue* value);
 
+// Assign a Value using the Type's default create() handler.
+void circa_create_value(caValue* value, caType* type);
+
 // -- Accessors --
 
 // Check the type of a caValue.
@@ -389,15 +392,9 @@ caValue* circa_map_insert(caValue* map, caValue* key);
 // Retrive a value from a Handle
 caValue* circa_handle_get_value(caValue* handle);
 
-// Assign a value to a Handle
-void circa_handle_set(caValue* container, caValue* value, caReleaseFunc releaseFunc);
-
-void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc);
-
+void circa_handle_set_object(caValue* handle, void* object);
 void* circa_handle_get_object(caValue* handle);
 
-// Assign a Value using the Type's default create() handler.
-void circa_create_value(caValue* value, caType* type);
 
 // -- Names --
 

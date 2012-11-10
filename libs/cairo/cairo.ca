@@ -12,7 +12,7 @@ type TextExtents { Point bearing; Point size; Point advance }
 namespace Operator { clear = 0, source = 1, over = 2 }
 
 -- Contexts
-def create_context(Surface s) -> Context
+def Surface.make_context(self) -> Context
 
 def Context.save(self)
 def Context.restore(self)
@@ -26,7 +26,7 @@ def Context.fill_preserve(self)
 def Context.set_operator(self, Name operator)
 
 -- Surfaces
-def create_image_surface(Point size) -> Surface
+def make_image_surface(Point size) -> Surface
 def Surface.write_to_png(self, String filename)
 
 -- Text

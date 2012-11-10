@@ -63,6 +63,8 @@ struct Type
     CircaObject header;
 
     Name name;
+
+    // Enum describing the data structure used to store this type's value.
     Name storageType;
 
     // C++ type info. This is only used to do runtime type checks, when the data
@@ -173,6 +175,7 @@ Type* get_output_type(Term* term, int outputIndex);
 Type* get_output_type(Term* term);
 Type* get_type_of_input(Term* term, int inputIndex);
 caValue* get_type_property(Type* type, const char* name);
+caValue* type_property_insert(Type* type, const char* name);
 void set_type_property(Type* type, const char* name, caValue* value);
 
 Branch* type_declaration_branch(Type* type);

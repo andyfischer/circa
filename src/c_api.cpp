@@ -129,16 +129,11 @@ caValue* circa_handle_get_value(caValue* handle)
     return get_handle_value(handle);
 }
 
-void circa_handle_set(caValue* handle, caValue* value, caReleaseFunc releaseFunc)
-{
-    set_handle_value(handle, value, (ReleaseFunc) releaseFunc);
-}
-
-void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc)
+void circa_handle_set_object(caValue* handle, void* object)
 {
     Value value;
     set_opaque_pointer(&value, object);
-    circa_handle_set(handle, &value, releaseFunc);
+    move(&value, get_handle_value(handle));
 }
 
 void* circa_handle_get_object(caValue* handle)

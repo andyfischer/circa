@@ -184,6 +184,11 @@ caValue* get_type_property(Type* type, const char* name)
     return type->properties[name];
 }
 
+caValue* type_property_insert(Type* type, const char* name)
+{
+    return type->properties.insert(name);
+}
+
 void set_type_property(Type* type, const char* name, caValue* value)
 {
     copy(value, type->properties.insert(name));

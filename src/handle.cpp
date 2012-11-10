@@ -4,66 +4,61 @@
 
 #include "type.h"
 #include "tagged_value.h"
+#include "type.h"
 
 #include "handle.h"
 
 namespace circa {
 
-struct HandleContainer
+struct HandleData
 {
     int refcount;
     caValue value;
-    ReleaseFunc releaseFunc;
 };
 
-HandleContainer* alloc_handle_container()
+bool is_handle(caValue* value)
 {
-    HandleContainer* c = (HandleContainer*) malloc(sizeof(HandleContainer));
-    c->refcount = 1;
-    c->releaseFunc = NULL;
-    initialize_null(&c->value);
-    return c;
+    return value->value_type->storageType == name_StorageTypeHandle;
 }
 
-HandleContainer* get_handle_container(caValue* handle)
+HandleData* as_handle(caValue* handle)
 {
-    if (handle->value_type->storageType != name_StorageTypeHandle)
-        return NULL;
-
-    return (HandleContainer*) handle->value_data.ptr;
+    ca_assert(handle->value_type->storageType == name_StorageTypeHandle);
+    return (HandleData*) handle->value_data.ptr;
 }
 
 caValue* get_handle_value(caValue* handle)
 {
-    HandleContainer* container = get_handle_container(handle);
-    if (container == NULL)
-        return NULL;
+    HandleData* container = as_handle(handle);
     return &container->value;
-}
-
-void* get_handle_value_opaque_pointer(caValue* handle)
-{
-    return as_opaque_pointer(get_handle_value(handle));
 }
 
 void handle_initialize(Type* type, caValue* value)
 {
-    value->value_data.ptr = alloc_handle_container();
+    HandleData* c = (HandleData*) malloc(sizeof(HandleData));
+    c->refcount = 1;
+    initialize_null(&c->value);
+    value->value_data.ptr = c;
 }
 
 void handle_release(caValue* value)
 {
-    if (value->value_data.ptr == NULL)
-        return;
-
-    HandleContainer* container = get_handle_container(value);
+    HandleData* container = as_handle(value);
     ca_assert(container != NULL);
 
     container->refcount--;
 
+    // Release data, if this is the last reference.
     if (container->refcount <= 0) {
-        if (container->releaseFunc != NULL)
-            container->releaseFunc(&container->value);
+
+        // Find the type's custom release func (if defined).
+        caValue* releaseFunc = get_type_property(value->value_type, "handle.release");
+
+        if (releaseFunc != NULL && is_opaque_pointer(releaseFunc)) {
+            ReleaseFunc func = (ReleaseFunc) as_opaque_pointer(releaseFunc);
+            func(&container->value);
+        }
+
         free(container);
     }
 }
@@ -71,9 +66,10 @@ void handle_release(caValue* value)
 void handle_copy(Type* type, caValue* source, caValue* dest)
 {
     set_null(dest);
-    get_handle_container(source)->refcount++;
+
+    as_handle(source)->refcount++;
     dest->value_type = source->value_type;
-    dest->value_data = source->value_data;
+    dest->value_data.ptr = source->value_data.ptr;
 }
 
 void setup_handle_type(Type* type)
@@ -84,45 +80,28 @@ void setup_handle_type(Type* type)
     type->release = handle_release;
 }
 
-void set_handle_value(caValue* handle, Type* type, caValue* value, ReleaseFunc releaseFunc)
+void handle_type_set_release_func(Type* type, ReleaseFunc releaseFunc)
 {
-    set_null(handle);
-    change_type(handle, type);
-    HandleContainer* container = alloc_handle_container();
-    swap(value, &container->value);
-    container->releaseFunc = releaseFunc;
-    handle->value_data.ptr = container;
+    set_opaque_pointer(type_property_insert(type, "handle.release"), (void*) releaseFunc);
 }
 
-void set_handle_value(caValue* handle, caValue* value, ReleaseFunc releaseFunc)
+/*
+void* get_handle_value_opaque_pointer(caValue* handle)
 {
-    HandleContainer* container = get_handle_container(handle);
-    swap(value, &container->value);
-    container->releaseFunc = releaseFunc;
+    return as_opaque_pointer(get_handle_value(handle));
 }
 
 void set_handle_value_opaque_pointer(caValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)
 {
     Value pointerVal;
     set_opaque_pointer(&pointerVal, ptr);
-    set_handle_value(handle, type, &pointerVal, releaseFunc);
+    move(&pointerVal, set_handle_value(handle, type, releaseFunc));
 }
 void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc)
 {
-    HandleContainer* container = get_handle_container(handle);
+    HandleData* container = as_handle(handle);
     container->releaseFunc = releaseFunc;
 }
-
-bool is_handle(caValue* value)
-{
-    return value->value_type->storageType == name_StorageTypeHandle;
-}
-
-caValue* dereference_handle(caValue* value)
-{
-    while (is_handle(value))
-        value = get_handle_value(value);
-    return value;
-}
+*/
 
 } // namespace circa
