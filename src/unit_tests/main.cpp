@@ -342,6 +342,7 @@ namespace compound_type { void register_tests(); }
 namespace fakefs { void register_tests(); }
 namespace file { void register_tests(); }
 namespace file_watch { void register_tests(); }
+namespace handle { void register_tests(); }
 namespace importing { void register_tests(); }
 namespace interpreter { void register_tests(); }
 namespace migration { void register_tests(); }
@@ -359,6 +360,7 @@ int main(int argc, char** argv)
     fakefs::register_tests();
     file::register_tests();
     file_watch::register_tests();
+    handle::register_tests();
     importing::register_tests();
     interpreter::register_tests();
     migration::register_tests();
