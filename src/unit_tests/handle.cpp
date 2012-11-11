@@ -31,17 +31,61 @@ void test_value_is_shared()
     test_equals(get_handle_value(&handle2), "777");
 }
 
-/*
-void my_release(caValue* value)
+int gTimesReleaseCalled = 0;
+
+void my_release_func(caValue* value)
 {
-    test_assert(gSlot[as_int(value)]);
-    gSlot[as_int(value)] = false;
+    gTimesReleaseCalled++;
 }
-*/
+
+void test_release()
+{
+    Type type;
+    setup_handle_type(&type);
+    handle_type_set_release_func(&type, my_release_func);
+
+    gTimesReleaseCalled = 0;
+
+    Value handle1;
+    make(&type, &handle1);
+
+    set_int(get_handle_value(&handle1), 888);
+
+    test_assert(gTimesReleaseCalled == 0);
+
+    set_null(&handle1);
+
+    test_assert(gTimesReleaseCalled == 1);
+
+    gTimesReleaseCalled = 0;
+
+    Value handle2;
+    make(&type, &handle1);
+    copy(&handle1, &handle2);
+
+    test_assert(gTimesReleaseCalled == 0);
+
+    set_null(&handle2);
+    test_assert(gTimesReleaseCalled == 0);
+
+    set_null(&handle1);
+    test_assert(gTimesReleaseCalled == 1);
+
+    gTimesReleaseCalled = 0;
+    make(&type, &handle1);
+    make(&type, &handle2);
+
+    set_null(&handle1);
+    test_assert(gTimesReleaseCalled == 1);
+
+    set_null(&handle2);
+    test_assert(gTimesReleaseCalled == 2);
+}
 
 void register_tests()
 {
     REGISTER_TEST_CASE(handle::test_value_is_shared);
+    REGISTER_TEST_CASE(handle::test_release);
 }
 
 }
