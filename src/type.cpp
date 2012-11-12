@@ -374,9 +374,9 @@ std::string get_base_type_name(std::string const& typeName)
     return "";
 }
 
-Term* find_method_with_search_name(Branch* branch, Type* type, std::string const& searchName)
+Term* find_method_with_search_name(Branch* branch, Type* type, const char* searchName)
 {
-    Term* term = find_name(branch, searchName.c_str());
+    Term* term = find_name(branch, searchName);
     if (term != NULL && is_function(term))
         return term;
 
@@ -387,7 +387,7 @@ Term* find_method_with_search_name(Branch* branch, Type* type, std::string const
         typeDeclarationBranch = type->declaringTerm->owningBranch;
 
     if (typeDeclarationBranch != NULL && typeDeclarationBranch != branch) {
-        term = find_name(typeDeclarationBranch, searchName.c_str());
+        term = find_name(typeDeclarationBranch, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
@@ -395,7 +395,7 @@ Term* find_method_with_search_name(Branch* branch, Type* type, std::string const
     return NULL;
 }
 
-Term* find_method(Branch* branch, Type* type, std::string const& name)
+Term* find_method(Branch* branch, Type* type, const char* name)
 {
     if (type->name == 0)
         return NULL;
@@ -403,7 +403,7 @@ Term* find_method(Branch* branch, Type* type, std::string const& name)
     // First, look inside the type definition.
     Branch* typeDef = type_declaration_branch(type);
     if (typeDef != NULL) {
-        Term* func = find_local_name(typeDef, name_from_string(name.c_str()));
+        Term* func = find_local_name(typeDef, name_from_string(name));
         if (func != NULL && is_function(func))
             return func;
     }
@@ -411,7 +411,7 @@ Term* find_method(Branch* branch, Type* type, std::string const& name)
     // Next, construct the search name, which looks like TypeName.functionName.
     std::string searchName = std::string(name_to_string(type->name)) + "." + name;
 
-    Term* result = find_method_with_search_name(branch, type, searchName);
+    Term* result = find_method_with_search_name(branch, type, searchName.c_str());
 
     if (result != NULL)
         return result;
@@ -420,7 +420,8 @@ Term* find_method(Branch* branch, Type* type, std::string const& name)
     // for the base type name (such as List).
     std::string baseTypeName = get_base_type_name(name_to_string(type->name));
     if (baseTypeName != "") {
-        result = find_method_with_search_name(branch, type, baseTypeName + "." + name);
+        std::string searchName = baseTypeName + "." + name;
+        result = find_method_with_search_name(branch, type, searchName.c_str());
 
         if (result != NULL)
             return result;

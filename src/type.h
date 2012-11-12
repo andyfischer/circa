@@ -192,7 +192,7 @@ void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch* kernel);
 Term* create_tuple_type(caValue* types);
-Term* find_method(Branch* branch, Type* type, std::string const& name);
+Term* find_method(Branch* branch, Type* type, const char* name);
 
 // Change the type value for an existing type. 'term' should be a value of
 // type Type.

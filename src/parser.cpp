@@ -1762,7 +1762,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Type* rootType = root.term->type;
 
     // Find the function
-    Term* function = find_method(branch, rootType, functionName);
+    Term* function = find_method(branch, rootType, functionName.c_str());
 
     if (function == NULL) {
         // Method could not be statically found. Create a dynamic_method call.
