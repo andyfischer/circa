@@ -767,6 +767,8 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
         setup_handle_type(as_type(result));
         result->setBoolProp("syntax:SuperSpecialHandleType", true);
+        result->setBoolProp("syntax:noBrackets", true);
+        return ParseResult(result);
     }
 
     // if there's a semicolon, or we've run out of tokens, then finish here.
