@@ -3,9 +3,14 @@ package cairo
 
 native_patch_this('cairo' -> rpath)
 
-type Context;
-type Surface;
-type FontFace;
+type Context = handle_type()
+def Context.release(self)
+
+type Surface = handle_type()
+def Surface.release(self)
+
+type FontFace = handle_type()
+def FontFace.release(self)
 
 type TextExtents { Point bearing; Point size; Point advance }
 

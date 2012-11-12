@@ -50,10 +50,12 @@ namespace type_t {
         append_phrase(source, "type ", term, name_Keyword);
         append_phrase(source, term->name, term, name_TypeName);
 
-        if (term->boolProp("syntax:semicolon", false)) {
-            //append_phrase(source, ";", term, name_None);
-            return;
+        if (term->boolProp("syntax:SuperSpecialHandleType", false)) {
+            append_phrase(source, " = handle_type()", term, name_None);
         }
+
+        if (term->boolProp("syntax:noBrackets", false))
+            return;
 
         append_phrase(source, term->stringProp("syntax:preLBracketWhitespace", " "),
                 term, tok_Whitespace);
@@ -433,7 +435,7 @@ void install_type(Term* term, Type* type)
     set_type(term_value(term), type);
 }
 
-Type* get_declared_type(Branch* branch, const char* name)
+Type* find_type(Branch* branch, const char* name)
 {
     Term* term = branch->get(name);
     if (term == NULL)

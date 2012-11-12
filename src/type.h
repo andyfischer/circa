@@ -198,7 +198,7 @@ Term* find_method(Branch* branch, Type* type, std::string const& name);
 // type Type.
 void install_type(Term* term, Type* type);
 
-Type* get_declared_type(Branch* branch, const char* name);
+Type* find_type(Branch* branch, const char* name);
 
 void set_type_list(caValue* value, Type* type1);
 void set_type_list(caValue* value, Type* type1, Type* type2);

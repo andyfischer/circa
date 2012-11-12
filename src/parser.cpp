@@ -751,9 +751,27 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         possible_whitespace_or_newline(tokens);
     }
 
-    // if there's a semicolon, then finish it as an empty type.
-    if (tokens.nextIs(tok_Semicolon)) {
-        result->setBoolProp("syntax:semicolon", true);
+    // Possibly consume a very special syntax. This will be improved to be more
+    // general purpose, if it sticks.
+    if (tokens.nextIs(tok_Equals)) {
+        tokens.consume(tok_Equals);
+        possible_whitespace(tokens);
+        std::string funcName = tokens.consumeStr(tok_Identifier);
+        if (funcName != "handle_type") {
+            return compile_error_for_line(result, tokens, startPosition,
+                    "Failed to parse super special handle_type syntax");
+        }
+
+        tokens.consume(tok_LParen);
+        tokens.consume(tok_RParen);
+
+        setup_handle_type(as_type(result));
+        result->setBoolProp("syntax:SuperSpecialHandleType", true);
+    }
+
+    // if there's a semicolon, or we've run out of tokens, then finish here.
+    if (tokens.nextIs(tok_Semicolon) || tokens.finished()) {
+        result->setBoolProp("syntax:noBrackets", true);
         return ParseResult(result);
     }
 

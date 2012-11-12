@@ -82,10 +82,25 @@ void test_release()
     test_assert(gTimesReleaseCalled == 2);
 }
 
+void test_release_defined_in_script()
+{
+    Branch branch;
+    branch.compile("type T = handle_type()");
+    branch.compile("def T.release(self) { test_spy(concat('released: ' self)) }");
+
+    Type* T = find_type(&branch, "T");
+    test_assert(T != NULL);
+
+    Value value1;
+    make(T, &value1);
+    test_assert(is_handle(&value1));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(handle::test_value_is_shared);
     REGISTER_TEST_CASE(handle::test_release);
+    REGISTER_TEST_CASE(handle::test_release_defined_in_script);
 }
 
 }
