@@ -4,6 +4,8 @@ solution "Improv"
     language "C++"
     includedirs {"include"}
     flags { "Symbols" }
+    targetdir "build"
+    objdir "build/obj"
 
     configuration "Release"
         flags { "OptimizeSpeed" }
@@ -14,10 +16,9 @@ solution "Improv"
     project "Improv"
         kind "WindowedApp"
         location "build"
-        targetdir "build"
+        location "src"
         files {
             "src/*.cpp",
-            "build/*.cpp",
             }
         includedirs {".", "../include", "libs"}
 

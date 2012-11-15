@@ -30,7 +30,7 @@ protected:
     ~World();
 };
 
-World* create_world();
+World* alloc_world();
 void world_initialize(World* world);
 
 void actor_send_message(ListData* actor, caValue* message);

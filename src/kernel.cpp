@@ -746,9 +746,6 @@ void test_spy(caStack* stack)
 
 void bootstrap_kernel()
 {
-    // Create global World.
-    g_world = (World*) malloc(sizeof(*g_world));
-
     // Initialize global type objects
     null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
@@ -1090,9 +1087,11 @@ CIRCA_EXPORT caWorld* circa_initialize()
     memset(&FUNCS, 0, sizeof(FUNCS));
     memset(&TYPES, 0, sizeof(TYPES));
 
+    g_world = alloc_world();
+
     bootstrap_kernel();
 
-    caWorld* world = create_world();
+    caWorld* world = global_world();
 
     Branch* kernel = global_root_branch();
 

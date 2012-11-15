@@ -5,8 +5,6 @@
 
 class Window : public QWidget
 {
-    Q_OBJECT
-
 public:
     Window();
 };

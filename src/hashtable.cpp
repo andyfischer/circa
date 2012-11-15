@@ -372,4 +372,15 @@ void hashtable_setup_type(Type* type)
     type->storageType = name_StorageTypeHashtable;
 }
 
+// Publich functions
+CIRCA_EXPORT caValue* circa_map_insert(caValue* table, caValue* key)
+{
+    return hashtable_insert(table, key);
+}
+
+CIRCA_EXPORT void circa_set_map(caValue* value)
+{
+    set_hashtable(value);
+}
+
 } // namespace circa

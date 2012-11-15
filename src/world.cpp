@@ -23,22 +23,25 @@
 
 namespace circa {
 
-World* create_world()
+World* alloc_world()
 {
-    return global_world();
+    World* world = (World*) malloc(sizeof(World));
+    memset(world, 0, sizeof(World));
+
+    initialize_null(&world->actorList);
+    initialize_null(&world->moduleSearchPaths);
+
+    return world;
 }
 
 void world_initialize(World* world)
 {
+    set_list(&world->actorList, 0);
+    set_list(&world->moduleSearchPaths);
+
     world->nativeModuleWorld = create_native_module_world();
     world->fileWatchWorld = create_file_watch_world();
-
-    initialize_null(&world->actorList);
-    set_list(&world->actorList, 0);
-
     world->actorStack = circa_alloc_stack(world);
-
-    set_list(&world->moduleSearchPaths);
 
     world->nextTermID = 1;
     world->nextBranchID = 1;

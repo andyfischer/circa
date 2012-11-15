@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "Common.h"
+#include "RenderTarget.h"
 #include "Texture.h"
 
 Texture*
