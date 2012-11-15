@@ -1,14 +1,29 @@
 
 require cairo
 
-surface = cairo:make_image_surface([200 200])
+xc = 128.0
+yc = 128.0
+radius = 100.0
+angle1 = 45
+angle2 = 180
 
-context = surface.make_context
+surface = cairo:make_image_surface([300 300])
+cxt = surface.make_context
 
-context.set_source_color(#f00)
-context.move_to([10 10])
-context.line_to([190 190])
-context.close_path()
-context.paint
+cxt.set_line_width(10)
+cxt.arc([xc yc] radius angle1 angle2)
+cxt.stroke
 
-surface.write_to_png('test_output.png')
+cxt.set_source_color(#f228)
+cxt.set_line_width(6)
+
+cxt.arc([xc yc] 10, 0, 180)
+cxt.fill
+
+cxt.arc([xc yc] radius, angle1, angle1)
+cxt.line_to([xc yc])
+cxt.arc([xc yc] radius, angle2, angle2)
+cxt.line_to([xc yc])
+cxt.stroke
+
+surface.write_to_png('test.png')

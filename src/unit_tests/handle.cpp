@@ -21,16 +21,16 @@ void test_value_is_shared()
     make(&type, &handle1);
     copy(&handle1, &handle2);
 
-    test_assert(is_null(get_handle_value(&handle1)));
-    test_assert(is_null(get_handle_value(&handle2)));
+    test_assert(is_null(handle_get_value(&handle1)));
+    test_assert(is_null(handle_get_value(&handle2)));
 
-    set_int(get_handle_value(&handle1), 777);
-    test_equals(get_handle_value(&handle1), "777");
-    test_equals(get_handle_value(&handle2), "777");
+    set_int(handle_get_value(&handle1), 777);
+    test_equals(handle_get_value(&handle1), "777");
+    test_equals(handle_get_value(&handle2), "777");
 
     set_null(&handle1);
 
-    test_equals(get_handle_value(&handle2), "777");
+    test_equals(handle_get_value(&handle2), "777");
 }
 
 int gTimesReleaseCalled = 0;
@@ -59,7 +59,7 @@ void test_release()
     test_assert(is_handle(&value));
     test_equals(gTimesReleaseCalled, 0);
 
-    set_int(get_handle_value(&value), 5);
+    set_int(handle_get_value(&value), 5);
     set_null(&value);
 
     test_equals(gTimesReleaseCalled, 1);

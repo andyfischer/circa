@@ -6,7 +6,7 @@ namespace circa {
 
 // Accessors
 bool is_handle(caValue* value);
-caValue* get_handle_value(caValue* handle);
+caValue* handle_get_value(caValue* handle);
 
 void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc);
 void setup_handle_type(Type* type);

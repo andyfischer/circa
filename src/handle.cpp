@@ -29,7 +29,7 @@ HandleData* as_handle(caValue* handle)
     return (HandleData*) handle->value_data.ptr;
 }
 
-caValue* get_handle_value(caValue* handle)
+caValue* handle_get_value(caValue* handle)
 {
     HandleData* container = as_handle(handle);
     return &container->value;
@@ -53,17 +53,7 @@ void handle_release(caValue* value)
     // Release data, if this is the last reference.
     if (container->refcount <= 0) {
 
-        // Find the type's custom release func (if defined).
-#if 0
-        caValue* releaseFunc = get_type_property(value->value_type, "handle.release");
-
-        if (releaseFunc != NULL && is_opaque_pointer(releaseFunc)) {
-            ReleaseFunc func = (ReleaseFunc) as_opaque_pointer(releaseFunc);
-            func(&container->value);
-        }
-#endif
-
-        // New style: Find the hosted release function, and call it.
+        // Find the type's release function (if any), and call it.
         Term* releaseMethod = find_method(NULL, value->value_type, "release");
         if (releaseMethod != NULL) {
             Stack stack;
@@ -99,29 +89,5 @@ void setup_handle_type(Type* type)
     type->copy = handle_copy;
     type->release = handle_release;
 }
-
-void handle_type_set_release_func(Type* type, ReleaseFunc releaseFunc)
-{
-    set_opaque_pointer(type_property_insert(type, "handle.release"), (void*) releaseFunc);
-}
-
-/*
-void* get_handle_value_opaque_pointer(caValue* handle)
-{
-    return as_opaque_pointer(get_handle_value(handle));
-}
-
-void set_handle_value_opaque_pointer(caValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)
-{
-    Value pointerVal;
-    set_opaque_pointer(&pointerVal, ptr);
-    move(&pointerVal, set_handle_value(handle, type, releaseFunc));
-}
-void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc)
-{
-    HandleData* container = as_handle(handle);
-    container->releaseFunc = releaseFunc;
-}
-*/
 
 } // namespace circa

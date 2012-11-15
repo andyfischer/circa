@@ -126,14 +126,14 @@ void circa_set_point(caValue* point, float x, float y)
 }
 caValue* circa_handle_get_value(caValue* handle)
 {
-    return get_handle_value(handle);
+    return handle_get_value(handle);
 }
 
 void circa_handle_set_object(caValue* handle, void* object)
 {
     Value value;
     set_opaque_pointer(&value, object);
-    move(&value, get_handle_value(handle));
+    move(&value, handle_get_value(handle));
 }
 
 void* circa_handle_get_object(caValue* handle)
