@@ -1,6 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include <cmath>
+#include <cstdio>
 #include <cairo/cairo.h>
 
 #include <OpenGL/glu.h>
@@ -23,19 +24,20 @@ cairo_font_face_t* as_cairo_font_face(caValue* value)
     return (cairo_font_face_t*) circa_handle_get_object(value);
 }
 
-void cairoContext_release(caValue* value)
+void Context_release(caStack* stack)
 {
-    cairo_t* context = as_cairo_context(value);
+    cairo_t* context = as_cairo_context(circa_input(stack, 0));
     cairo_destroy(context);
 }
-void cairoSurface_release(caValue* value)
+void Surface_release(caStack* stack)
 {
-    cairo_surface_t* surface = as_cairo_surface(value);
+    cairo_surface_t* surface = as_cairo_surface(circa_input(stack, 0));
+    printf("destroy surface: %p\n", surface);
     cairo_surface_destroy(surface);
 }
-void cairoFontFace_release(caValue* value)
+void FontFace_release(caStack* stack)
 {
-    cairo_font_face_t* font = as_cairo_font_face(value);
+    cairo_font_face_t* font = as_cairo_font_face(circa_input(stack, 0));
     cairo_font_face_destroy(font);
 }
 
@@ -45,9 +47,9 @@ float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
 void make_context(caStack* stack)
 {
     cairo_surface_t* surface = as_cairo_surface(circa_input(stack, 0));
-
+    cairo_t* context = cairo_create(surface);
     caValue* out = circa_create_default_output(stack, 0);
-    circa_handle_set_object(out, surface, cairoSurface_release);
+    circa_handle_set_object(out, context);
 }
 void Context_save(caStack* stack)
 {
@@ -64,7 +66,11 @@ void Context_stroke(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circa_input(stack, 0));
     cairo_stroke(context);
-    circa_set_null(circa_output(stack, 0));
+}
+void Context_fill(caStack* stack)
+{
+    cairo_t* context = as_cairo_context(circa_input(stack, 0));
+    cairo_fill(context);
 }
 void Context_paint(caStack* stack)
 {
@@ -175,7 +181,13 @@ void Context_line_to(caStack* stack)
     float x(0), y(0);
     circa_vec2(circa_input(stack, 1), &x, &y);
     cairo_line_to(context, x, y);
-    circa_set_null(circa_output(stack, 0));
+}
+void Context_rel_line_to(caStack* stack)
+{
+    cairo_t* context = as_cairo_context(circa_input(stack, 0));
+    float x(0), y(0);
+    circa_vec2(circa_input(stack, 1), &x, &y);
+    cairo_rel_line_to(context, x, y);
 }
 void Context_arc(caStack* stack)
 {
@@ -213,7 +225,7 @@ void make_image_surface(caStack* stack)
         int(width), int(height));
 
     caValue* out = circa_create_default_output(stack, 0);
-    circa_handle_set_object(out, surface, cairoSurface_release);
+    circa_handle_set_object(out, surface);
 }
 
 void Surface_write_to_png(caStack* stack)
@@ -269,10 +281,11 @@ void upload_surface_to_opengl(caStack* stack)
 
 CIRCA_EXPORT void circa_module_load(caNativeModule* module)
 {
-    circa_patch_function(module, "Surface.make_context", make_context);
+    circa_patch_function(module, "Context.release", Context_release);
     circa_patch_function(module, "Context.save", Context_save);
     circa_patch_function(module, "Context.restore", Context_restore);
     circa_patch_function(module, "Context.stroke", Context_stroke);
+    circa_patch_function(module, "Context.fill", Context_fill);
     circa_patch_function(module, "Context.paint", Context_paint);
     circa_patch_function(module, "Context.clip", Context_clip);
     circa_patch_function(module, "Context.clip_preserve", Context_clip_preserve);
@@ -289,10 +302,14 @@ CIRCA_EXPORT void circa_module_load(caNativeModule* module)
     circa_patch_function(module, "Context.move_to", Context_move_to);
     circa_patch_function(module, "Context.rectangle", Context_rectangle);
     circa_patch_function(module, "Context.line_to", Context_line_to);
+    circa_patch_function(module, "Context.rel_line_to", Context_rel_line_to);
     circa_patch_function(module, "Context.arc", Context_arc);
     circa_patch_function(module, "Context.new_sub_path", Context_new_sub_path);
     circa_patch_function(module, "Context.close_path", Context_close_path);
     circa_patch_function(module, "Context.set_line_width", Context_set_line_width);
     circa_patch_function(module, "make_image_surface", make_image_surface);
     circa_patch_function(module, "Surface.write_to_png", Surface_write_to_png);
+    circa_patch_function(module, "Surface.release", Surface_release);
+    circa_patch_function(module, "Surface.make_context", make_context);
+    circa_patch_function(module, "FontFace.release", FontFace_release);
 }
