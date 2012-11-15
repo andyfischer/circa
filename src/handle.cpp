@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include "evaluation.h"
+#include "function.h"
 #include "type.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -52,11 +54,29 @@ void handle_release(caValue* value)
     if (container->refcount <= 0) {
 
         // Find the type's custom release func (if defined).
+#if 0
         caValue* releaseFunc = get_type_property(value->value_type, "handle.release");
 
         if (releaseFunc != NULL && is_opaque_pointer(releaseFunc)) {
             ReleaseFunc func = (ReleaseFunc) as_opaque_pointer(releaseFunc);
             func(&container->value);
+        }
+#endif
+
+        // New style: Find the hosted release function, and call it.
+        Term* releaseMethod = find_method(NULL, value->value_type, "release");
+        if (releaseMethod != NULL) {
+            Stack stack;
+            push_frame(&stack, function_contents(releaseMethod));
+            caValue* inputSlot = get_input(&stack, 0);
+
+            // Don't copy this value, otherwise we'll get in trouble when the copy
+            // needs to be released.
+            swap(value, inputSlot);
+
+            run_interpreter(&stack);
+
+            swap(value, inputSlot);
         }
 
         free(container);

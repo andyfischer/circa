@@ -55,7 +55,7 @@ Stack::Stack()
 
 Stack::~Stack()
 {
-    // clear error so that pop_frame doesn't complain about losing an errored frame.
+    // Clear error, so that pop_frame doesn't complain about losing an errored frame.
     stack_ignore_error(this);
 
     reset_stack(this);
@@ -864,9 +864,8 @@ EvaluateFunc get_override_for_branch(Branch* branch)
     if (owner == NULL)
         return NULL;
 
-    if (!is_function(owner)) {
+    if (!is_function(owner))
         return NULL;
-    }
 
     Function* func = as_function(owner);
 

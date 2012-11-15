@@ -170,6 +170,7 @@ void frame_pc_move_to_end(Frame* frame);
 
 // Stack expansions. These are frames which aren't on the current trace.
 Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);
+
 // Functions used by eval functions.
 caValue* get_input(Stack* stack, int index);
 caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta);

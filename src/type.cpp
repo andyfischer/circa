@@ -376,9 +376,12 @@ std::string get_base_type_name(std::string const& typeName)
 
 Term* find_method_with_search_name(Branch* branch, Type* type, const char* searchName)
 {
-    Term* term = find_name(branch, searchName);
-    if (term != NULL && is_function(term))
-        return term;
+    // Local name search.
+    if (branch != NULL) {
+        Term* term = find_name(branch, searchName);
+        if (term != NULL && is_function(term))
+            return term;
+    }
 
     // If not found, look in the branch where the type was declared.
     Branch* typeDeclarationBranch = NULL;
@@ -387,7 +390,7 @@ Term* find_method_with_search_name(Branch* branch, Type* type, const char* searc
         typeDeclarationBranch = type->declaringTerm->owningBranch;
 
     if (typeDeclarationBranch != NULL && typeDeclarationBranch != branch) {
-        term = find_name(typeDeclarationBranch, searchName);
+        Term* term = find_name(typeDeclarationBranch, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
@@ -400,7 +403,8 @@ Term* find_method(Branch* branch, Type* type, const char* name)
     if (type->name == 0)
         return NULL;
 
-    // First, look inside the type definition.
+    // First, look inside the type definition, which contains simulated methods and
+    // possibly other stuff.
     Branch* typeDef = type_declaration_branch(type);
     if (typeDef != NULL) {
         Term* func = find_local_name(typeDef, name_from_string(name));
@@ -408,9 +412,10 @@ Term* find_method(Branch* branch, Type* type, const char* name)
             return func;
     }
 
-    // Next, construct the search name, which looks like TypeName.functionName.
+    // Construct the search name, which looks like TypeName.functionName.
     std::string searchName = std::string(name_to_string(type->name)) + "." + name;
 
+    // Standard search.
     Term* result = find_method_with_search_name(branch, type, searchName.c_str());
 
     if (result != NULL)

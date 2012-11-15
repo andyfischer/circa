@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "fakefs.h"
 #include "function.h"
+#include "importing.h"
 #include "modules.h"
 #include "type.h"
 #include "world.h"
@@ -83,11 +84,33 @@ void test_evaluate_minimum()
     test_equals(&value, "dir/path/more_path");
 }
 
+void my_func_override(caStack* stack)
+{
+    set_int(circa_output(stack, 0), circa_int_input(stack, 0) + 10);
+}
+
+void test_directly_call_native_override()
+{
+    // Test an interpreter session where the top frame is a native override.
+    
+    Branch branch;
+    Term* my_func = branch.compile("def my_func(int i) -> int");
+    install_function(&branch, "my_func", my_func_override);
+
+    Stack stack;
+    push_frame(&stack, function_contents(my_func));
+
+    set_int(circa_input(&stack, 0), 5);
+    run_interpreter(&stack);
+    test_equals(circa_output(&stack, 0), "15");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter::test_cast_first_inputs);
     REGISTER_TEST_CASE(interpreter::run_branch_after_additions);
     REGISTER_TEST_CASE(interpreter::test_evaluate_minimum);
+    REGISTER_TEST_CASE(interpreter::test_directly_call_native_override);
 }
 
 } // namespace interpreter
