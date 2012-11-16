@@ -13,12 +13,11 @@
 
 namespace circa {
 
-struct Term : public caTerm
+struct Term
 {
     Value value;
 
-    // Inherited from caTerm:
-    // int id; // Globally unique ID. This is mainly used for debugging.
+    int id; // Globally unique ID. This is mainly used for debugging.
 
     // A WeakPtr to this object, this is lazily initialized.
     WeakPtr weakPtr;
@@ -122,6 +121,9 @@ struct Term : public caTerm
     void setFloatProp(const char* name, float f);
     void setBoolProp(const char* name, bool b);
     void setStringProp(const char* name, std::string const& s);
+
+    void dump();
+    Branch* parent();
 };
 
 // Allocate a new Term object.

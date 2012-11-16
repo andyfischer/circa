@@ -15,7 +15,7 @@
 
 namespace circa {
 
-struct Branch : caBranch
+struct Branch
 {
     CircaObject header;
 
@@ -131,6 +131,9 @@ struct Branch : caBranch
     Term* eval(std::string const& statement);
 
     std::string toString();
+    void dump();
+    Term* owner();
+    Branch* parent();
 
 private:
     // Disallow copy constructor

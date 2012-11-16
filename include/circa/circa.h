@@ -19,15 +19,21 @@ extern "C" {
 
 #ifdef __cplusplus
 namespace circa {
+    struct Branch;
     struct Stack;
+    struct Term;
     struct Type;
     struct World;
     struct NativeModule;
 }
 
+typedef circa::Branch caBranch;
+
 // a Stack holds the interpreter's current state, including a list of frames (activation
 // records). Each Stack corresponds to one lightweight thread (not OS thread).
 typedef circa::Stack caStack;
+
+typedef circa::Term caTerm;
 
 // a Type holds data for a single Circa type, including a name, handlers for
 // initialization and destruction, and various other handlers and metadata.
@@ -41,7 +47,9 @@ typedef circa::NativeModule caNativeModule;
 
 #else
 
+typedef struct caBranch caBranch;
 typedef struct caStack caStack;
+typedef struct caTerm caTerm;
 typedef struct caType caType;
 typedef struct caWorld caWorld;
 typedef struct caNativeModule caNativeModule;
@@ -97,35 +105,6 @@ struct Value : caValue
 } // namespace circa
 
 #endif // __cplusplus
-
-struct caTerm;
-    
-// a Branch is a section of compiled code. It contains a list of Terms and some other
-// metadata. Each Term may itself contain a nested Branch.
-typedef struct caBranch 
-{
-#ifdef __cplusplus
-    void dump();
-    caTerm* term(int index);
-    caTerm* owner();
-
-    protected: caBranch() {} // Disallow C++ construction of this type.
-#endif
-} caBranch;
-
-// a Term is one unit of compiled code. Each term has a function and a list of inputs, and
-// some other metadata. A term may also have a nested Branch.
-typedef struct caTerm 
-{
-    int id; // Globally unique ID. This is mainly used for debugging.
-
-#ifdef __cplusplus
-    void dump();
-    caBranch* parent();
-
-    protected: caTerm() {} // Disallow C++ construction of this type.
-#endif
-} caTerm;
 
 // a Function holds data for a single Circa function, including a name, the function's
 // definition (stored as a Branch), and various other metadata. Each Function has an
@@ -421,6 +400,8 @@ caBranch* circa_kernel(caWorld* world);
 
 // Find a Term by name, looking in the given branch.
 caTerm* circa_find_term(caBranch* branch, const char* name);
+
+caTerm* circa_find_global(caWorld* world, const char* name);
 
 // Find a Function by name, looking in the given branch.
 caFunction* circa_find_function_local(caBranch* branch, const char* name);

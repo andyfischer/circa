@@ -33,11 +33,6 @@ void caBranch::dump()
     circa_dump_b(this);
 }
 
-caTerm* caBranch::term(int index)
-{
-    return circa_get_term(this, index);
-}
-
 caTerm* caBranch::owner()
 {
     return circa_owning_term(this);
@@ -164,24 +159,36 @@ caTerm* circa_find_term(caBranch* branch, const char* name)
 {
     return (caTerm*) find_name((Branch*) branch, name);
 }
+caTerm* circa_find_global(caWorld* world, const char* name)
+{
+    return (caTerm*) find_name(world->root, name);
+}
 caFunction* circa_find_function_local(caBranch* branch, const char* name)
 {
     caTerm* term = find_name((Branch*) branch, name, -1, name_LookupFunction);
+    if (term == NULL)
+        return NULL;
     return circa_function(circa_term_value(term));
 }
 caType* circa_find_type_local(caBranch* branch, const char* name)
 {
     caTerm* term = find_name((Branch*) branch, name, -1, name_LookupType);
+    if (term == NULL)
+        return NULL;
     return circa_type(circa_term_value(term));
 }
 caFunction* circa_find_function(caWorld* world, const char* name)
 {
     caTerm* term = find_name(world->root, name, -1, name_LookupFunction);
+    if (term == NULL)
+        return NULL;
     return circa_function(circa_term_value(term));
 }
 caType* circa_find_type(caWorld* world, const char* name)
 {
     caTerm* term = find_name(world->root, name, -1, name_LookupType);
+    if (term == NULL)
+        return NULL;
     return circa_type(circa_term_value(term));
 }
 

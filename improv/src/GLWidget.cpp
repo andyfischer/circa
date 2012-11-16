@@ -75,7 +75,8 @@ void GLWidget::paintGL()
     circa_set_list(&msg, 2);
 
     circa_set_string(circa_index(&msg, 0), "paintGL");
-    caType* renderTargetType = circa_find_type(NULL, "EngineBindings:RenderTarget");
+    caType* renderTargetType = circa_find_type(g_world, "EngineBindings:RenderTarget");
+    caTerm* term = circa_find_global(g_world, "EngineBindings:RenderTarget");
     assert(renderTargetType != NULL);
 
     circa_set_typed_pointer(circa_index(&msg, 1), renderTargetType, &renderTarget);
