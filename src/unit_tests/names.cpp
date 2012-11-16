@@ -140,6 +140,18 @@ void search_every_global_name()
     }
 }
 
+void bug_with_lookup_type_and_qualified_name()
+{
+    // Bug repro. There was an issue where, when searching for a qualified name, we would
+    // use the original lookup type on the prefix. (which is wrong).
+
+    Branch branch;
+    Branch* module = create_branch(&branch, "module");
+    Term* T = create_type(module, "T");
+
+    test_assert(T == find_name(&branch, "module:T", -1, name_LookupType));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names::find_name);
@@ -147,6 +159,7 @@ void register_tests()
     REGISTER_TEST_CASE(names::unique_ordinals);
     REGISTER_TEST_CASE(names::test_find_ordinal_suffix);
     REGISTER_TEST_CASE(names::search_every_global_name);
+    REGISTER_TEST_CASE(names::bug_with_lookup_type_and_qualified_name);
 }
 
 } // namespace names

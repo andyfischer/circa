@@ -110,7 +110,7 @@ Term* run_name_search(NameSearch* params)
         nsSearch.name = namespacePrefix;
         nsSearch.position = params->position;
         nsSearch.ordinal = params->ordinal;
-        nsSearch.lookupType = params->lookupType;
+        nsSearch.lookupType = name_LookupAny;
         nsSearch.searchParent = false;
         Term* nsPrefixTerm = run_name_search(&nsSearch);
 

@@ -5,6 +5,8 @@ Top 5 worst issues
    - Still happening 7/18
 
 Recent
+  Delete create_type (use create_type_value instead)
+
   Move output casting to a different spot. Currently it happens twice - once when a value
     is copied by output_placeholder (this is the correct spot), and again in finish_frame.
     It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
