@@ -198,9 +198,8 @@ void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
     Term* term = find_global(as_cstring(branchName));
 
     // Create the branch if needed
-    if (term == NULL) {
+    if (term == NULL)
         term = apply(global_root_branch(), FUNCS.branch, TermList(), name_from_string(branchName));
-    }
 
     // Import the new branch contents
     Branch* branch = nested_contents(term);
@@ -485,7 +484,7 @@ int run_command_line(caWorld* world, caValue* args)
         caStack* stack = circa_alloc_stack(world);
 
         // Push function
-        caFunction* func = circa_find_function(mainBranch, as_cstring(list_get(args, 2)));
+        caFunction* func = circa_find_function_local(mainBranch, as_cstring(list_get(args, 2)));
         circa_push_function(stack, func);
 
         // Push inputs

@@ -1811,7 +1811,7 @@ void interpreter_install_functions(Branch* kernel)
 
     install_function_list(kernel, records);
 
-    TYPES.frame = circa_find_type(kernel, "Frame");
+    TYPES.frame = circa_find_type_local(kernel, "Frame");
     list_t::setup_type(TYPES.frame);
 }
 

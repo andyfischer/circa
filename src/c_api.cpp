@@ -16,6 +16,7 @@
 #include "string_type.h"
 #include "term.h"
 #include "tagged_value.h"
+#include "world.h"
 
 using namespace circa;
 
@@ -163,25 +164,25 @@ caTerm* circa_find_term(caBranch* branch, const char* name)
 {
     return (caTerm*) find_name((Branch*) branch, name);
 }
-caFunction* circa_find_function(caBranch* branch, const char* name)
+caFunction* circa_find_function_local(caBranch* branch, const char* name)
 {
     caTerm* term = find_name((Branch*) branch, name, -1, name_LookupFunction);
-    if (term == NULL)
-        return NULL;
-    caValue* val = circa_term_value(term);
-    if (val == NULL || !circa_is_function(val))
-        return NULL;
-    return circa_function(val);
+    return circa_function(circa_term_value(term));
 }
-caType* circa_find_type(caBranch* branch, const char* name)
+caType* circa_find_type_local(caBranch* branch, const char* name)
 {
     caTerm* term = find_name((Branch*) branch, name, -1, name_LookupType);
-    if (term == NULL)
-        return NULL;
-    caValue* val = circa_term_value(term);
-    if (val == NULL || !circa_is_type(val))
-        return NULL;
-    return circa_type(val);
+    return circa_type(circa_term_value(term));
+}
+caFunction* circa_find_function(caWorld* world, const char* name)
+{
+    caTerm* term = find_name(world->root, name, -1, name_LookupFunction);
+    return circa_function(circa_term_value(term));
+}
+caType* circa_find_type(caWorld* world, const char* name)
+{
+    caTerm* term = find_name(world->root, name, -1, name_LookupType);
+    return circa_type(circa_term_value(term));
 }
 
 int circa_term_num_inputs(caTerm* term)

@@ -68,7 +68,7 @@ void test_custom_object()
     circa_install_function(&branch, "create_object", create_object);
     circa_install_function(&branch, "check_object", check_object);
 
-    circa_setup_object_type(circa_find_type(&branch, "MyType"),
+    circa_setup_object_type(circa_find_type_local(&branch, "MyType"),
             sizeof(CustomObject), CustomObjectRelease);
 
     // Shouldn't allocate any objects before running.
@@ -107,8 +107,8 @@ void test_type_not_prematurely_used()
         "state MyType st2 = make(MyType)\n"
         );
 
-    Type* myType = (Type*) circa_find_type(&branch, "MyType");
-    Type* myCompoundType = (Type*) circa_find_type(&branch, "MyCompoundType");
+    Type* myType = (Type*) circa_find_type_local(&branch, "MyType");
+    Type* myCompoundType = (Type*) circa_find_type_local(&branch, "MyCompoundType");
     test_assert(!myType->inUse);
     test_assert(!myCompoundType->inUse);
 

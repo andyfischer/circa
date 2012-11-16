@@ -423,10 +423,13 @@ caBranch* circa_kernel(caWorld* world);
 caTerm* circa_find_term(caBranch* branch, const char* name);
 
 // Find a Function by name, looking in the given branch.
-caFunction* circa_find_function(caBranch* branch, const char* name);
+caFunction* circa_find_function_local(caBranch* branch, const char* name);
 
 // Find a Type by name, looking in the given branch.
-caType* circa_find_type(caBranch* branch, const char* name);
+caType* circa_find_type_local(caBranch* branch, const char* name);
+
+caFunction* circa_find_function(caWorld* world, const char* name);
+caType* circa_find_type(caWorld* world, const char* name);
 
 // Retreive the nth input Term to the caller Term. May return NULL if the caller term
 // doesn't have that many inputs, or if there is no caller term.
