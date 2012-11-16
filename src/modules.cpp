@@ -245,7 +245,8 @@ void require_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
     Branch* module = load_module_by_name(global_world(), as_cstring(moduleName));
-    module_on_loaded_by_term(module, term);
+    if (module != NULL)
+        module_on_loaded_by_term(module, term);
 }
 
 void import_file_func_postCompile(Term* term)

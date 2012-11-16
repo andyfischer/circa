@@ -251,7 +251,18 @@ Branch* term_get_function_details(Term* call)
         || call->function == FUNCS.include_func)
         return nested_contents(call);
 
-    return function_get_contents(as_function(term_value(call->function)));
+    if (call->function == NULL)
+        return NULL;
+
+    // Check if the function is a type. (deprecated).
+    if (is_type(call->function))
+        return function_contents(FUNCS.cast);
+
+    caValue* value = term_value(call->function);
+    if (!is_function(value))
+        return NULL;
+
+    return function_get_contents(as_function(value));
 }
 
 Term* term_get_input_placeholder(Term* call, int index)

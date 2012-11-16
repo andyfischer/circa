@@ -1,12 +1,12 @@
 
 msg = input() -> List
 
-import UIHelper
-import FPSTracker
+require UIHelper
+require FPSTracker
 
 msg_name = msg[0]
 
-state ButtonBar scriptChoices = button_bar([
+state ButtonBar scriptChoices = UIHelper:button_bar([
         ["Introduction", "demos/intro.ca"]
         ["Asteroids", "demos/asteroids.ca"],
         ["Garden", "demos/garden.ca"]
@@ -17,7 +17,7 @@ state ButtonBar scriptChoices = button_bar([
         ["BoxUI Test", "demos/BoxUITest.ca"]
         ])
 
-state fpsTracker = make(FPSTracker)
+state fpsTracker = make(FPSTracker:FPSTracker)
 state number time
 
 scriptChoices.arrange([30 80 200 370], :vertical)

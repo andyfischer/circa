@@ -671,10 +671,10 @@ int run_repl(World* world)
 {
     Branch* branch = nested_contents(find_from_global_name(world, "main"));
 
-    Stack stack;
+    Stack* stack = alloc_stack(world);
     bool displayRaw = false;
 
-    push_frame(&stack, branch);
+    push_frame(stack, branch);
 
     printf("Started REPL, type /help for reference.\n");
 
@@ -717,7 +717,7 @@ int run_repl(World* world)
             continue;
         }
         if (string_eq(&input, "/stack")) {
-            print_stack(&stack, std::cout);
+            print_stack(stack, std::cout);
             continue;
         }
 
@@ -745,7 +745,7 @@ int run_repl(World* world)
         string_append(&input, "\n");
 
         int previousHead = branch->length();
-        repl_evaluate_line(&stack, as_cstring(&input), std::cout);
+        repl_evaluate_line(stack, as_cstring(&input), std::cout);
 
         if (displayRaw) {
             for (int i=previousHead; i < branch->length(); i++) {

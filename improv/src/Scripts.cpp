@@ -18,8 +18,7 @@ void scripts_initialize()
     circa_add_module_search_path(g_world, "ca");
 
     caBranch* engineBindings = circa_load_module_from_file(g_world,
-            "EngineBindings",
-            "ca/EngineBindings.ca");
+            "EngineBindings", "ca/EngineBindings.ca");
     engine_bindings_install(engineBindings);
 
     circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");

@@ -615,6 +615,9 @@ void update_extra_outputs(Term* term)
     Branch* branch = term->owningBranch;
     Branch* function = term_get_function_details(term);
 
+    if (function == NULL)
+        return;
+
     bool needToUpdatePackState = false;
 
     for (int index=1; ; index++) {

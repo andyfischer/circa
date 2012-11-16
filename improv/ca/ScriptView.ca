@@ -1,6 +1,6 @@
 
-import UIHelper
-import FPSTracker
+require UIHelper
+require FPSTracker
 
 msg = input()
 
@@ -22,7 +22,7 @@ state number timeShift = 0
 state showStatView = false
 state showFps = false
 
-state fpsTracker = make(FPSTracker)
+state fpsTracker = make(FPSTracker:FPSTracker)
 
 buttons = [
     ["Browse" :browse]
@@ -30,7 +30,7 @@ buttons = [
     ["Freeze" :freezeState]
     ["Back" :exit]
     ]
-state ButtonBar topButtons = button_bar(buttons)
+state ButtonBar topButtons = UIHelper:button_bar(buttons)
 topButtons.arrange([10 10 buttons.length*100 40], :horizontal)
 
 -- set the state of the Freeze button
