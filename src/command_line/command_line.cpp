@@ -195,13 +195,11 @@ void rewrite_branch(Branch* branch, caValue* contents, caValue* reply)
 
 void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
 {
-    Name name = name_from_string(branchName);
-
-    Term* term = get_global(name);
+    Term* term = find_global(as_cstring(branchName));
 
     // Create the branch if needed
     if (term == NULL) {
-        term = apply(global_root_branch(), FUNCS.branch, TermList(), name);
+        term = apply(global_root_branch(), FUNCS.branch, TermList(), name_from_string(branchName));
     }
 
     // Import the new branch contents

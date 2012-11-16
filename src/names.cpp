@@ -419,18 +419,13 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
-Term* get_global(Name name)
-{
-    return find_name(global_root_branch(), name);
-}
-
-Term* get_global(const char* nameStr)
+Term* find_global(const char* nameStr)
 {
     Name name = name_from_string(nameStr);
     if (name == name_None)
         return NULL;
 
-    return get_global(name);
+    return find_name(global_root_branch(), name);
 }
 
 Branch* get_parent_branch(Branch* branch)

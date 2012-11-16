@@ -67,8 +67,7 @@ int name_find_qualified_separator(const char* name);
 int name_find_ordinal_suffix(const char* str, int* endPos);
 
 // Get a named term from the global namespace.
-Term* get_global(Name name);
-Term* get_global(const char* name);
+Term* find_global(const char* name);
 
 Branch* get_parent_branch(Branch* branch);
 Term* get_parent_term(Term* term);

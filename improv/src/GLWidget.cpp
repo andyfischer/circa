@@ -76,7 +76,7 @@ void GLWidget::paintGL()
 
     circa_set_string(circa_index(&msg, 0), "paintGL");
     circa_set_typed_pointer(circa_index(&msg, 1),
-        circa_find_type(NULL, "RenderTarget"), &renderTarget);
+        circa_find_type(NULL, "EngineBindings:RenderTarget"), &renderTarget);
 
     circa_actor_run_message(g_world, "Main", &msg);
 

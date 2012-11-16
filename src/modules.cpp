@@ -312,8 +312,7 @@ void modules_install_functions(Branch* kernel)
 
 CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
 {
-    circa::Branch* branch = nested_contents(get_global(moduleName));
-
+    circa::Branch* branch = nested_contents(find_global(moduleName));
     evaluate_branch((circa::Stack*) stack, branch);
 }
 
