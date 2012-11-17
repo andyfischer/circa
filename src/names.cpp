@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "debug.h"
+#include "function.h"
 #include "kernel.h"
 #include "heap_debugging.h"
 #include "if_block.h"
@@ -694,6 +695,35 @@ Term* find_from_unique_name(Branch* branch, const char* name)
         }
     }
     return NULL;
+}
+
+Type* find_type(World* world, const char* name)
+{
+    caTerm* term = find_name(world->root, name, -1, name_LookupType);
+    if (term == NULL)
+        return NULL;
+    return circa_type(circa_term_value(term));
+}
+Type* find_type_local(Branch* branch, const char* name)
+{
+    caTerm* term = find_name(branch, name, -1, name_LookupType);
+    if (term == NULL)
+        return NULL;
+    return circa_type(circa_term_value(term));
+}
+Branch* find_function(World* world, const char* name)
+{
+    caTerm* term = find_name(world->root, name, -1, name_LookupFunction);
+    if (term == NULL)
+        return NULL;
+    return function_contents(term);
+}
+Branch* find_function_local(Branch* branch, const char* name)
+{
+    caTerm* term = find_name(branch, name, -1, name_LookupFunction);
+    if (term == NULL)
+        return NULL;
+    return function_contents(term);
 }
 
 bool name_is_valid(Name name)

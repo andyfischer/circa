@@ -39,7 +39,6 @@ if msg_name == 'onPaintEvent'
     scriptChoices.paint(painter)
 
     fpsTracker.onFrame(time)
-    print('fps: ', fpsTracker.recentFps)
 
 elif msg_name == 'onInputEvent'
     event = msg[1]

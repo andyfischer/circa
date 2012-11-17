@@ -163,33 +163,21 @@ caTerm* circa_find_global(caWorld* world, const char* name)
 {
     return (caTerm*) find_name(world->root, name);
 }
-caFunction* circa_find_function_local(caBranch* branch, const char* name)
+caBranch* circa_find_function_local(caBranch* branch, const char* name)
 {
-    caTerm* term = find_name((Branch*) branch, name, -1, name_LookupFunction);
-    if (term == NULL)
-        return NULL;
-    return circa_function(circa_term_value(term));
+    return find_function_local(branch, name);
 }
 caType* circa_find_type_local(caBranch* branch, const char* name)
 {
-    caTerm* term = find_name((Branch*) branch, name, -1, name_LookupType);
-    if (term == NULL)
-        return NULL;
-    return circa_type(circa_term_value(term));
+    return find_type_local(branch, name);
 }
-caFunction* circa_find_function(caWorld* world, const char* name)
+caBranch* circa_find_function(caWorld* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, name_LookupFunction);
-    if (term == NULL)
-        return NULL;
-    return circa_function(circa_term_value(term));
+    return find_function(world, name);
 }
 caType* circa_find_type(caWorld* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, name_LookupType);
-    if (term == NULL)
-        return NULL;
-    return circa_type(circa_term_value(term));
+    return find_type(world, name);
 }
 
 int circa_term_num_inputs(caTerm* term)

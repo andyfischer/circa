@@ -484,7 +484,7 @@ int run_command_line(caWorld* world, caValue* args)
         caStack* stack = circa_alloc_stack(world);
 
         // Push function
-        caFunction* func = circa_find_function_local(mainBranch, as_cstring(list_get(args, 2)));
+        caBranch* func = circa_find_function_local(mainBranch, as_cstring(list_get(args, 2)));
         circa_push_function(stack, func);
 
         // Push inputs

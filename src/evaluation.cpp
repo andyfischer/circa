@@ -1859,7 +1859,7 @@ CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* 
 
 CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)
 {
-    caFunction* func = circa_find_function(NULL, name);
+    caBranch* func = circa_find_function(NULL, name);
 
     if (func == NULL) {
         // TODO: Save this error on the stack instead of stdout
@@ -1871,13 +1871,11 @@ CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)
     return true;
 }
 
-CIRCA_EXPORT void circa_push_function(caStack* stack, caFunction* func)
+CIRCA_EXPORT void circa_push_function(caStack* stack, caBranch* func)
 {
-    Branch* branch = function_contents((Function*) func);
+    branch_finish_changes(func);
     
-    branch_finish_changes(branch);
-    
-    push_frame(stack, branch);
+    push_frame(stack, func);
 }
 
 CIRCA_EXPORT caValue* circa_frame_input(caStack* stack, int index)

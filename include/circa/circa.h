@@ -161,7 +161,7 @@ void circa_dealloc_stack(caStack* stack);
 void circa_run_module(caStack* stack, const char* moduleName);
 
 // Push a function to the stack.
-void circa_push_function(caStack* stack, caFunction* func);
+void circa_push_function(caStack* stack, caBranch* func);
 
 // Find a function by name and push it to the stack. Returns whether the function
 // name was found.
@@ -404,12 +404,12 @@ caTerm* circa_find_term(caBranch* branch, const char* name);
 caTerm* circa_find_global(caWorld* world, const char* name);
 
 // Find a Function by name, looking in the given branch.
-caFunction* circa_find_function_local(caBranch* branch, const char* name);
+caBranch* circa_find_function_local(caBranch* branch, const char* name);
 
 // Find a Type by name, looking in the given branch.
 caType* circa_find_type_local(caBranch* branch, const char* name);
 
-caFunction* circa_find_function(caWorld* world, const char* name);
+caBranch* circa_find_function(caWorld* world, const char* name);
 caType* circa_find_type(caWorld* world, const char* name);
 
 // Retreive the nth input Term to the caller Term. May return NULL if the caller term

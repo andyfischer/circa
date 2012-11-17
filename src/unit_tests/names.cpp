@@ -4,8 +4,11 @@
 
 #include "building.h"
 #include "code_iterators.h"
+#include "evaluation.h"
+#include "fakefs.h"
 #include "inspection.h"
 #include "kernel.h"
+#include "modules.h"
 #include "names.h"
 #include "string_type.h"
 
@@ -152,6 +155,23 @@ void bug_with_lookup_type_and_qualified_name()
     test_assert(T == find_name(&branch, "module:T", -1, name_LookupType));
 }
 
+void type_name_visible_from_module()
+{
+    FakeFilesystem fs;
+    fs.set("a", "type A { int i }");
+    fs.set("b", "require a\ntest_spy(make(A))");
+
+    load_module_file(global_world(), "a", "a");
+    Branch* b = load_module_file(global_world(), "b", "b");
+
+    Stack stack;
+    push_frame(&stack, b);
+    test_spy_clear();
+    run_interpreter(&stack);
+
+    test_equals(test_spy_get_results(), "[[0]]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names::find_name);
@@ -160,6 +180,7 @@ void register_tests()
     REGISTER_TEST_CASE(names::test_find_ordinal_suffix);
     REGISTER_TEST_CASE(names::search_every_global_name);
     REGISTER_TEST_CASE(names::bug_with_lookup_type_and_qualified_name);
+    REGISTER_TEST_CASE(names::type_name_visible_from_module);
 }
 
 } // namespace names
