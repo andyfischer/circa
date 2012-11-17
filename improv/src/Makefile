@@ -68,6 +68,7 @@ OBJECTS := \
 	$(OBJDIR)/Common.o \
 	$(OBJDIR)/FontBitmap.o \
 	$(OBJDIR)/GLWidget.o \
+	$(OBJDIR)/GLWidget_moc.o \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/RenderTarget.o \
 	$(OBJDIR)/ResourceManager.o \
@@ -77,6 +78,7 @@ OBJECTS := \
 	$(OBJDIR)/Texture.o \
 	$(OBJDIR)/triangulate.o \
 	$(OBJDIR)/Window.o \
+	$(OBJDIR)/Window_moc.o \
 
 RESOURCES := \
 
@@ -152,6 +154,9 @@ $(OBJDIR)/FontBitmap.o: FontBitmap.cpp
 $(OBJDIR)/GLWidget.o: GLWidget.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/GLWidget_moc.o: GLWidget_moc.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/main.o: main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -177,6 +182,9 @@ $(OBJDIR)/triangulate.o: triangulate.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Window.o: Window.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/Window_moc.o: Window_moc.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

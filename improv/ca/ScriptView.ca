@@ -131,7 +131,7 @@ if msg[0] == 'onPaintEvent'
 
 
 elif msg[0] == 'onInputEvent'
-    event = msg[1] -> InputEvent
+    event = msg[1]
 
     -- StatView
     if event.key_pressed(:t)

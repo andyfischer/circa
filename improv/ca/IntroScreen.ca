@@ -3,6 +3,7 @@ msg = input() -> List
 
 require UIHelper
 require FPSTracker
+require InputEvent
 
 msg_name = msg[0]
 
@@ -41,7 +42,7 @@ if msg_name == 'onPaintEvent'
     print('fps: ', fpsTracker.recentFps)
 
 elif msg_name == 'onInputEvent'
-    event = msg[1] -> InputEvent
+    event = msg[1]
     choice = scriptChoices.@input(event)
     if is_string(choice)
         send('ScriptView' ['loadFile' choice])
