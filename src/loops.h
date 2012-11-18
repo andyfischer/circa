@@ -25,7 +25,9 @@ void start_for_loop(Stack* stack, bool enableLoopOutput);
 void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput);
 
 void finish_while_loop(Term* whileTerm);
-CA_FUNCTION(evaluate_unbounded_loop);
-CA_FUNCTION(evaluate_unbounded_loop_finish);
+void evaluate_unbounded_loop(caStack*);
+void evaluate_unbounded_loop_finish(caStack*);
+
+void loop_setup_functions(Branch* kernel);
 
 } // namespace circa

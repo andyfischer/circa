@@ -905,6 +905,7 @@ void bootstrap_kernel()
 
     control_flow_setup_funcs(kernel);
     selector_setup_funcs(kernel);
+    loop_setup_functions(kernel);
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(kernel);

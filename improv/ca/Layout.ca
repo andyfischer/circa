@@ -24,9 +24,7 @@ def start(Point size) -> Layout
     layout
 
 def Element.setStrategy(@self, Name strategy)
-
-def Layout.getRoot(self)
-    return self.elements[0]
+    self.elements[self.cursor].strategy = strategy
 
 def Layout.addNode(@self, cursor, data)
     element = make(Element)
@@ -34,7 +32,14 @@ def Layout.addNode(@self, cursor, data)
     element.parent = cursor
 
     newCursor = self.elements.append(element)
-    self.elements[cursor].children.append(
+    self.elements[cursor].children.append(newCursor)
+    return newCursor
+
+def Layout.setProp(@self, name, value)
+    self.elements[self.cursor].props.set(name, value)
+
+def Layout.applyBoxLayout(@self, cursor, List @positions)
+    
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
@@ -45,3 +50,6 @@ def Layout.getRects(self) -> List
 
     for Element e in self.elements
 
+        -- Dispatch on strategy
+        if e.strategy == :box
+            self.applyBoxLayout(index(), @positions)

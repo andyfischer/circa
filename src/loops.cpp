@@ -6,7 +6,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "kernel.h"
-#include "importing_macros.h"
+#include "importing.h"
 #include "inspection.h"
 #include "list.h"
 #include "source_repro.h"
@@ -199,20 +199,13 @@ void finish_for_loop(Term* forTerm)
     branch_finish_changes(contents);
 }
 
-Term* find_enclosing_for_loop(Term* term)
+Term* find_enclosing_for_loop(Term* location)
 {
-    if (term == NULL)
-        return NULL;
-
-    if (term->function == FUNCS.for_func)
-        return term;
-
-    Branch* branch = term->owningBranch;
-    if (branch == NULL)
-        return NULL;
-
-    return find_enclosing_for_loop(branch->owningTerm);
+    while (location != NULL && location->function != FUNCS.for_func)
+        location = get_parent_term(location);
+    return location;
 }
+
 Branch* find_enclosing_for_loop_contents(Term* term)
 {
     Term* loop = find_enclosing_for_loop(term);
@@ -224,6 +217,8 @@ Branch* find_enclosing_for_loop_contents(Term* term)
 bool is_for_loop(Branch* branch)
 {
     if (branch->owningTerm == NULL)
+        return false;
+    if (FUNCS.for_func == NULL)
         return false;
     return branch->owningTerm->function == FUNCS.for_func;
 }
@@ -436,6 +431,29 @@ void evaluate_unbounded_loop(caStack* stack)
 
 void evaluate_unbounded_loop_finish(caStack* stack)
 {
+}
+
+void index_func_postCompile(Term* term)
+{
+    Term* enclosingLoop = find_enclosing_for_loop(term);
+    if (enclosingLoop == NULL)
+        return;
+    Term* loop_index = for_loop_find_index(nested_contents(enclosingLoop));
+    if (loop_index == NULL)
+        return;
+    set_input(term, 0, loop_index);
+    set_input_hidden(term, 0, true);
+}
+
+void evaluate_index_func(caStack* stack)
+{
+    copy(circa_input(stack, 0), circa_output(stack, 0));
+}
+
+void loop_setup_functions(Branch* kernel)
+{
+    Term* index_func = import_function(kernel, evaluate_index_func, "index(int i :optional) -> int");
+    as_function(index_func)->postCompile = index_func_postCompile;
 }
 
 } // namespace circa
