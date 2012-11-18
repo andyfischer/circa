@@ -50,3 +50,12 @@ a.resize(1)
 assert(a == [1])
 a.resize(0)
 assert(a == [])
+
+-- Append
+a = [1 2]
+a.append(3)
+assert(a == [1 2 3])
+pos = a.append(4)
+assert(a == [1 2 3 4])
+a[pos] = 5
+assert(a == [1 2 3 5])

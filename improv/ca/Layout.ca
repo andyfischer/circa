@@ -1,7 +1,7 @@
 
 type Element {
     int parent
-    List contents
+    List children
     Name strategy
     Map props
     any data
@@ -9,29 +9,39 @@ type Element {
 
 type Layout {
     List elements
+    int cursor
 }
 
-def start() -> Layout
-    make(Layout)
+def start(Point size) -> Layout
+    layout = make(Layout)
+    layout.size = size
+
+    -- set up the initial element
+    root = make(Element)
+    root.parent = -1
+    layout.elements.append(root)
+
+    layout
 
 def Element.setStrategy(@self, Name strategy)
 
-def Map.listMissing(self, List list) -> List
-    output = []
-    for i in list
-        if not self.contains(i)
-            output.append(i)
-    output
+def Layout.getRoot(self)
+    return self.elements[0]
 
--- Returns a list of [Rect, any] pairs.
+def Layout.addNode(@self, cursor, data)
+    element = make(Element)
+    element.data = data
+    element.parent = cursor
+
+    newCursor = self.elements.append(element)
+    self.elements[cursor].children.append(
+
+-- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
     positions = empty_list(self.elements.length)
 
-    -- Position of root should be provided.
-    root = self.elements[0]
-    missingProps = root.props.listMissing(['x' 'y' 'width' 'height'])
-    positions[0] = 
-
+    -- Position the root element
+    positions[0] = rect(0 0 self.size.x self.size.y)
 
     for Element e in self.elements
 

@@ -305,6 +305,7 @@ void List__append(caStack* stack)
     caValue* out = circa_output(stack, 1);
     copy(circa_input(stack, 0), out);
     copy(circa_input(stack, 1), list_append(out));
+    set_int(circa_output(stack, 0), list_length(out) - 1);
 }
 
 Type* List__append_specializeType(Term* term)
@@ -464,6 +465,7 @@ void Map__set(caStack* stack)
 
     copy(value, hashtable_insert(out, key, false));
 }
+
 void Map__insertPairs(caStack* stack)
 {
     caValue* out = circa_output(stack, 1);
@@ -475,7 +477,6 @@ void Map__insertPairs(caStack* stack)
         copy(list_get(pair, 1), hashtable_insert(out, list_get(pair, 0), false));
     }
 }
-
 
 void Mutable__get(caStack* stack)
 {

@@ -199,8 +199,8 @@ def Interpreter.error_message(self) -> String
 def Interpreter.toString(self) -> String
 
 def empty_list(any initialValue, int size) -> List
-def List.append(@self, any element)
-    -- Append an element to the end of this list.
+def List.append(@self, any element) -> int
+    -- Append an element to the end of this list, return the new element's index.
 def List.extend(@self, List right)
     -- Extend this list with the given input. Afterwards, 'self' will be the
     -- concatenation of the old 'self' and 'right'.
