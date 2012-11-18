@@ -99,6 +99,7 @@ Type* find_type(World* world, const char* name);
 Type* find_type_local(Branch* branch, const char* name);
 Branch* find_function(World* world, const char* name);
 Branch* find_function_local(Branch* branch, const char* name);
+Branch* find_module(World* world, const char* name);
 
 bool name_is_valid(Name index);
 const char* name_to_string(Name name);

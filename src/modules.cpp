@@ -110,18 +110,16 @@ static bool find_module_file(World* world, const char* module_name, caValue* fil
 
 Branch* load_module_file(World* world, const char* moduleName, const char* filename)
 {
-    Term* namedTerm = find_from_global_name(world, moduleName);
+    Branch* existing = find_module(world, moduleName);
 
-    if (namedTerm == NULL) {
-        namedTerm = apply(world->root, FUNCS.imported_file, TermList(),
+    if (existing == NULL) {
+        Term* term = apply(world->root, FUNCS.imported_file, TermList(),
                 name_from_string(moduleName));
+        existing = nested_contents(term);
     }
 
-    ca_assert(namedTerm != NULL);
-    Branch* existing = nested_contents(namedTerm);
-
     Branch* newBranch = alloc_branch_gc();
-    branch_graft_as_nested_contents(namedTerm, newBranch);
+    branch_graft_replacement(existing, newBranch);
     load_script(newBranch, filename);
 
     update_static_error_list(newBranch);

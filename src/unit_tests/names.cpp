@@ -159,17 +159,18 @@ void type_name_visible_from_module()
 {
     FakeFilesystem fs;
     fs.set("a", "type A { int i }");
-    fs.set("b", "require a\ntest_spy(make(A))");
-
     load_module_file(global_world(), "a", "a");
+
+    fs.set("b", "require a\ntest_spy(make(A))");
     Branch* b = load_module_file(global_world(), "b", "b");
 
     Stack stack;
     push_frame(&stack, b);
     test_spy_clear();
     run_interpreter(&stack);
+    test_assert(&stack);
 
-    test_equals(test_spy_get_results(), "[[0]]");
+    test_equals(test_spy_get_results(), "[{i: 0}]");
 }
 
 void register_tests()

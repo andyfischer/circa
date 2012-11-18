@@ -725,6 +725,13 @@ Branch* find_function_local(Branch* branch, const char* name)
         return NULL;
     return function_contents(term);
 }
+Branch* find_module(World* world, const char* name)
+{
+    caTerm* term = find_name(world->root, name, -1, name_LookupModule);
+    if (term == NULL)
+        return NULL;
+    return nested_contents(term);
+}
 
 bool name_is_valid(Name name)
 {

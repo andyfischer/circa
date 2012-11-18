@@ -401,14 +401,13 @@ void remove_nested_contents(Term* term)
     term->nestedContents = NULL;
 }
 
-void branch_graft_as_nested_contents(Term* term, Branch* branch)
+void branch_graft_replacement(Branch* target, Branch* replacement)
 {
-    // Remove owningTerm link from existing branch.
-    if (term->nestedContents != NULL)
-        term->nestedContents->owningTerm = NULL;
+    target->owningTerm->nestedContents = replacement;
+    replacement->owningTerm = target->owningTerm;
 
-    term->nestedContents = branch;
-    branch->owningTerm = term;
+    // Remove owningTerm link from existing branch.
+    target->owningTerm = NULL;
 }
 
 caValue* branch_get_source_filename(Branch* branch)
