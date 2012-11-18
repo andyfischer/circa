@@ -59,12 +59,11 @@ Branch* find_loaded_module(const char* name)
     return NULL;
 }
 
-
 Branch* fetch_module(World* world, const char* name)
 {
-    Term* existing = find_from_global_name(world, name);
+    Branch* existing = find_module(world, name);
     if (existing != NULL)
-        return nested_contents(existing);
+        return existing;
 
     Term* term = apply(world->root, FUNCS.imported_file, TermList(), name_from_string(name));
     return nested_contents(term);

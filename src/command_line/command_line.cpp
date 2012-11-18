@@ -436,7 +436,7 @@ int run_command_line(caWorld* world, caValue* args)
         return 0;
     }
     
-    Branch* mainBranch = create_branch(world->root, "main");
+    Branch* mainBranch = fetch_module(world, "main");
 
     // Check to handle args[0] as a dash-command.
 
@@ -666,7 +666,7 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
 
 int run_repl(World* world)
 {
-    Branch* branch = nested_contents(find_from_global_name(world, "main"));
+    Branch* branch = fetch_module(world, "main");
 
     Stack* stack = alloc_stack(world);
     bool displayRaw = false;
@@ -700,7 +700,7 @@ int run_repl(World* world)
             continue;
         }
         if (string_eq(&input, "/clear")) {
-            branch = nested_contents(find_from_global_name(world, "main"));
+            branch = fetch_module(world, "main");
             clear_branch(branch);
             printf("Cleared working area.\n");
             continue;
