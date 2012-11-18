@@ -289,6 +289,17 @@ void Function__branch(caStack* stack)
     set_branch(circa_output(stack, 0), function_get_contents(function));
 }
 
+void empty_list(caStack* stack)
+{
+    caValue* out = circa_output(stack, 0);
+    int size = circa_int_input(stack, 1);
+    caValue* initialValue = circa_input(stack, 0);
+    set_list(out, size);
+    for (int i=0; i < size; i++) {
+        copy(initialValue, list_get(out, i));
+    }
+}
+
 void List__append(caStack* stack)
 {
     caValue* out = circa_output(stack, 1);
@@ -423,17 +434,6 @@ void Map__contains(caStack* stack)
     set_bool(circa_output(stack, 0), value != NULL);
 }
 
-void Map__set(caStack* stack)
-{
-    caValue* out = circa_output(stack, 1);
-    copy(circa_input(stack, 0), out);
-
-    caValue* key = circa_input(stack, 1);
-    caValue* value = circa_input(stack, 2);
-
-    copy(value, hashtable_insert(out, key, false));
-}
-
 void Map__remove(caStack* stack)
 {
     caValue* out = circa_output(stack, 1);
@@ -453,6 +453,29 @@ void Map__get(caStack* stack)
     }
     copy(value, circa_output(stack, 0));
 }
+
+void Map__set(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+
+    caValue* key = circa_input(stack, 1);
+    caValue* value = circa_input(stack, 2);
+
+    copy(value, hashtable_insert(out, key, false));
+}
+void Map__insertPairs(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+
+    caValue* pairs = circa_input(stack, 1);
+    for (int i=0; i < list_length(pairs); i++) {
+        caValue* pair = list_get(pairs, i);
+        copy(list_get(pair, 1), hashtable_insert(out, list_get(pair, 0), false));
+    }
+}
+
 
 void Mutable__get(caStack* stack)
 {
@@ -1007,6 +1030,7 @@ void bootstrap_kernel()
 
         {"Function.branch", Function__branch},
 
+        {"empty_list", empty_list},
         {"List.append", List__append},
         {"List.extend", List__extend},
         {"List.resize", List__resize},
@@ -1021,6 +1045,7 @@ void bootstrap_kernel()
         {"Map.remove", Map__remove},
         {"Map.get", Map__get},
         {"Map.set", Map__set},
+        {"Map.insertPairs", Map__insertPairs},
 
         {"Mutable.get", Mutable__get},
         {"Mutable.set", Mutable__set},

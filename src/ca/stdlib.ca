@@ -198,6 +198,7 @@ def Interpreter.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
 def Interpreter.toString(self) -> String
 
+def empty_list(any initialValue, int size) -> List
 def List.append(@self, any element)
     -- Append an element to the end of this list.
 def List.extend(@self, List right)
@@ -268,6 +269,8 @@ def Map.get(self, any key) -> any
     -- Gets the key associated with this value.
 def Map.set(@self, any key, any value)
     -- Sets the value associated with this key.
+def Map.insertPairs(@self, List pairs)
+    -- Set multiple key-value pairs.
 
 -- Overloaded functions
 def is_overloaded_func(Branch branch) -> bool
@@ -540,6 +543,9 @@ def random_norm_vector() -> Point
     -- Return a random normalized vector.
     angle = rand() * 360
     return [cos(angle) sin(angle)]
+
+def rect(number x1, number y1, number x2, number y2) -> Rect
+    return [x1 y1 x2 y2]
 
 def to_rect(Point topLeft, Point size) -> Rect
     -- Return a Rect with the given top-left coordinate and size.

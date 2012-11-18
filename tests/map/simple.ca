@@ -30,3 +30,10 @@ assert(m.get([0]) == 1)
 assert(m.get([0 0]) == 2)
 assert(m.get([0 0 0]) == 3)
 assert(m.get([0 0 0 0]) == 4)
+
+-- Insert pairs
+m = make(Map)
+m.insertPairs([[0 1] [1 2] [2 3]])
+assert(m.get(0) == 1)
+assert(m.get(1) == 2)
+assert(m.get(2) == 3)
