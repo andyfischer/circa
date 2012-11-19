@@ -58,7 +58,6 @@ struct BuiltinFuncs {
     Term* get_with_selector;
     Term* if_block;
     Term* require;
-    Term* imported_file;
     Term* include_func;
     Term* input;
     Term* input_explicit;
@@ -72,6 +71,7 @@ struct BuiltinFuncs {
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output_index;
+    Term* module;
     Term* mult;
     Term* namespace_func;
     Term* neg;

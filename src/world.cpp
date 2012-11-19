@@ -162,7 +162,7 @@ void update_world_after_module_reload(World* world, Branch* oldBranch, Branch* n
     // Update references in every module
     for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (term->function == FUNCS.imported_file) {
+        if (term->function == FUNCS.module) {
             update_branch_after_module_reload(term->nestedContents, oldBranch, newBranch);
         }
     }
@@ -180,7 +180,7 @@ void refresh_all_modules(caWorld* world)
     // Iterate over top-level modules
     for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (term->function == FUNCS.imported_file) {
+        if (term->function == FUNCS.module) {
             
             Branch* existing = term->nestedContents;
             Branch* latest = load_latest_branch(existing);

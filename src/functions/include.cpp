@@ -12,8 +12,7 @@ namespace include_function {
         bool fileChanged = check_and_update_file_origin(contents, filename.c_str());
 
         // Reload if the filename or modified-time has changed
-        if (fileChanged)
-        {
+        if (fileChanged) {
             clear_branch(contents);
             
             // Add an input placeholder to catch the filename argument. Kind of a hack.
@@ -77,8 +76,6 @@ namespace include_function {
 
         FUNCS.load_script = import_function(kernel, load_script,
                 "load_script(String filename) -> Branch");
-
-        FUNCS.imported_file = import_function(kernel, NULL, "imported_file() -> Branch");
     }
 }
 } // namespace circa

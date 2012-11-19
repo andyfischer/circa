@@ -51,7 +51,7 @@ bool fits_lookup_type(Term* term, Name type)
         case name_LookupFunction:
             return is_function(term);
         case name_LookupModule:
-            return (term->function == FUNCS.imported_file);
+            return (term->function == FUNCS.module);
     }
     internal_error("unknown type in fits_lookup_type");
     return false;
@@ -414,7 +414,7 @@ bool exposes_nested_names(Term* term)
         return false;
     if (term->function == FUNCS.include_func)
         return true;
-    if (term->function == FUNCS.imported_file)
+    if (term->function == FUNCS.module)
         return true;
 
     return false;

@@ -53,7 +53,7 @@ Branch* find_loaded_module(const char* name)
 {
     for (BranchIteratorFlat it(global_root_branch()); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (term->function == FUNCS.imported_file && term->name == name)
+        if (term->function == FUNCS.module && term->name == name)
             return nested_contents(term);
     }
     return NULL;
@@ -65,7 +65,7 @@ Branch* fetch_module(World* world, const char* name)
     if (existing != NULL)
         return existing;
 
-    Term* term = apply(world->root, FUNCS.imported_file, TermList(), name_from_string(name));
+    Term* term = apply(world->root, FUNCS.module, TermList(), name_from_string(name));
     return nested_contents(term);
 }
 
@@ -112,7 +112,7 @@ Branch* load_module_file(World* world, const char* moduleName, const char* filen
     Branch* existing = find_module(world, moduleName);
 
     if (existing == NULL) {
-        Term* term = apply(world->root, FUNCS.imported_file, TermList(),
+        Term* term = apply(world->root, FUNCS.module, TermList(),
                 name_from_string(moduleName));
         existing = nested_contents(term);
     }
@@ -305,6 +305,8 @@ void modules_install_functions(Branch* kernel)
 
     Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
     as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
+
+    FUNCS.module = import_function(kernel, NULL, "module() -> Branch");
 }
 
 CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
