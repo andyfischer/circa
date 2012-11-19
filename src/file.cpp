@@ -134,72 +134,11 @@ void write_text_file(const char* filename, const char* contents)
     file.close();
 }
 
-} // namespace circa
-
-using namespace circa;
-
-extern "C" {
-
-struct CachedFile {
-    char* filename;
-    circa::Value contents;
-    bool needs_fread;
-    int version;
-    int last_known_mtime;
-};
-
-std::map<std::string, CachedFile*> g_fileCache;
-
-static CachedFile* get_file_entry(const char* filename)
-{
-    std::map<std::string, CachedFile*>::const_iterator it;
-    it = g_fileCache.find(filename);
-    if (it == g_fileCache.end())
-        return NULL;
-
-    return it->second;
-}
-
-static CachedFile* create_file_entry(const char* filename)
-{
-    CachedFile* entry = get_file_entry(filename);
-    if (entry != NULL)
-        return entry;
-
-    // Create a new entry
-    entry = (CachedFile*) malloc(sizeof(*entry));
-    entry->filename = circa_strdup(filename);
-    initialize_null(&entry->contents);
-    entry->needs_fread = false;
-    entry->version = 0;
-    entry->last_known_mtime = 0;
-    g_fileCache[filename] = entry;
-    return entry;
-}
-
-static void update_version_from_mtime(CachedFile* entry)
-{
-    unsigned mtime = file_get_mtime(entry->filename);
-
-    if (entry->last_known_mtime != mtime) {
-        entry->last_known_mtime = mtime;
-        entry->version++;
-        entry->needs_fread = true;
-    }
-}
-
-void circa_read_file(const char* filename, caValue* contentsOut)
+void read_text_file(const char* filename, caValue* contentsOut)
 {
     if (fakefs_enabled())
         return fakefs_read_file(filename, contentsOut);
-    
-    CachedFile* entry = create_file_entry(filename);
-    update_version_from_mtime(entry);
 
-    if (!entry->needs_fread)
-        copy(&entry->contents, contentsOut);
-
-    // Read the data
     FILE* fp = fopen(filename, "r");
     if (fp == NULL) {
         set_null(contentsOut);
@@ -211,23 +150,22 @@ void circa_read_file(const char* filename, caValue* contentsOut)
     size_t file_size = ftell(fp);
     rewind(fp);
 
-    char* contentsData = string_initialize(&entry->contents, file_size + 1);
+    // Read raw data.
+    touch(contentsOut);
+    char* contentsData = string_initialize(contentsOut, file_size + 1);
     size_t bytesRead = fread(contentsData, 1, file_size, fp);
 
     contentsData[bytesRead] = 0;
-    entry->needs_fread = false;
 
-    copy(&entry->contents, contentsOut);
-
-    log_start(0, "read_file");
-    log_arg("filename", filename);
-    log_arg("file_size", file_size);
-    log_arg("bytesRead", bytesRead);
-    log_arg("contents", entry->contents);
-    log_finish();
+    fclose(fp);
 }
 
-bool circa_file_exists(const char* filename)
+CIRCA_EXPORT void circa_read_file(const char* filename, caValue* contentsOut)
+{
+    read_text_file(filename, contentsOut);
+}
+
+CIRCA_EXPORT bool circa_file_exists(const char* filename)
 {
     if (fakefs_enabled())
         return fakefs_file_exists(filename);
@@ -240,11 +178,9 @@ bool circa_file_exists(const char* filename)
     return true;
 }
 
-int circa_file_get_version(const char* filename)
+CIRCA_EXPORT int circa_file_get_version(const char* filename)
 {
-    CachedFile* entry = create_file_entry(filename);
-    update_version_from_mtime(entry);
-    return entry->version;
+    return file_get_mtime(filename);
 }
 
-} // extern "C"
+} // namespace "circa"
