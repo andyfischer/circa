@@ -109,7 +109,7 @@ void format_term_source(caValue* source, Term* term)
     // Or, check if this is a value term.
     } else if (is_value(term)) {
         // for certain types, don't write "name =" in front
-        if (term->type != &FUNCTION_T && term->type != &TYPE_T)
+        if (term->type != TYPES.function && term->type != TYPES.type)
             format_name_binding(source, term);
 
         format_value_term(source, term);

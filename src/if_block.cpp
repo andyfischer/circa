@@ -478,7 +478,7 @@ void modify_block_so_that_state_access_is_indexed(Block* block, int index)
     if (stateOutput->input(0) == stateInput) {
         // State output is directly connected to input. In this case, the block should
         // null out the state field.
-        Term* stateResult = create_value(block, &NULL_T);
+        Term* stateResult = create_value(block, TYPES.null);
         Term* packList = apply(block, FUNCS.pack_state_to_list,
             TermList(stateInput, stateResult));
         packList->setIntProp("index", index);

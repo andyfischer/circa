@@ -37,7 +37,7 @@ Function::Function()
     postInputChange(NULL),
     postCompile(NULL)
 {
-    gc_register_new_object((CircaObject*) this, &FUNCTION_T, true);
+    gc_register_new_object((CircaObject*) this, TYPES.function, true);
 }
 
 Function::~Function()
@@ -95,7 +95,7 @@ std::string get_placeholder_name_for_index(int index)
 Term* create_function(Block* block, const char* name)
 {
     ca_assert(name != NULL);
-    Term* term = create_value(block, &FUNCTION_T, name);
+    Term* term = create_value(block, TYPES.function, name);
     initialize_function(term);
     initialize_subroutine(term);
     return term;
@@ -103,7 +103,7 @@ Term* create_function(Block* block, const char* name)
 
 void initialize_function(Term* func)
 {
-    term_value(func)->value_type = &FUNCTION_T;
+    term_value(func)->value_type = TYPES.function;
     as_function(func)->declaringTerm = func;
     as_function(func)->contents = nested_contents(func);
 }
@@ -169,9 +169,9 @@ void finish_building_function(Block* contents)
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
     if (!FINISHED_BOOTSTRAP)
-        return &ANY_T;
+        return TYPES.any;
     if (!is_function(function))
-        return &ANY_T;
+        return TYPES.any;
 
     Function* attrs = as_function(function);
     Type* outputType = function_get_output_type(attrs, 0);
@@ -179,7 +179,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (attrs->specializeType != NULL)
         outputType = attrs->specializeType(call);
     if (outputType == NULL)
-        outputType = &ANY_T;
+        outputType = TYPES.any;
 
     if (function->boolProp("preferSpecialize", false)) {
         Term* specialized = statically_specialize_overload_for_call(call);
@@ -219,13 +219,13 @@ Type* function_get_output_type(Term* function, int index)
 Type* function_get_output_type(Function* func, int index)
 {
     if (func == NULL)
-        return &ANY_T;
+        return TYPES.any;
 
     // If there's no output_placeholder, then we are probably still building this
     // function.
     Term* placeholder = function_get_output_placeholder(func, index);
     if (placeholder == NULL)
-        return &ANY_T;
+        return TYPES.any;
 
     return placeholder->type;
 }
@@ -444,7 +444,7 @@ void function_format_header_source(caValue* source, Block* function)
     append_phrase(source, ")", term, tok_LParen);
 
     Term* primaryOutput = get_output_placeholder(function, 0);
-    if (primaryOutput != NULL && primaryOutput->type != &VOID_T) {
+    if (primaryOutput != NULL && primaryOutput->type != TYPES.void_type) {
         append_phrase(source, term->stringProp("syntax:whitespacePreColon", ""),
                 term, tok_Whitespace);
         append_phrase(source, "->", term, name_None);

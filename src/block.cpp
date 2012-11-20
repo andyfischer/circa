@@ -49,7 +49,7 @@ Block::Block()
     emptyEvaluation(false)
 {
     id = global_world()->nextBlockID++;
-    gc_register_new_object((CircaObject*) this, &BLOCK_T, true);
+    gc_register_new_object((CircaObject*) this, TYPES.block, true);
 
     on_block_created(this);
 }

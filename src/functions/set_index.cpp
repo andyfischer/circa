@@ -18,7 +18,7 @@ namespace set_index_function {
     Type* specializeType(Term* caller)
     {
         //FIXME
-        return &LIST_T;
+        return TYPES.list;
         //return caller->input(0)->type;
     }
 

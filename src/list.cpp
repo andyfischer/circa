@@ -897,7 +897,7 @@ namespace list_t {
 List::List()
   : Value()
 {
-    make(&LIST_T, this);
+    make(TYPES.list, this);
 }
 
 caValue*

@@ -42,7 +42,7 @@ Stack::Stack()
    errorOccurred(false),
    world(NULL)
 {
-    gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
+    gc_register_new_object((CircaObject*) this, TYPES.eval_context, true);
 
     framesCapacity = 0;
     frames = NULL;
@@ -373,7 +373,7 @@ void finish_frame(Stack* stack)
             }
 
 
-            if (placeholder->type == &VOID_T)
+            if (placeholder->type == TYPES.void_type)
                 continue;
 
             caValue* result = get_frame_register(topFrame, placeholder);
@@ -956,7 +956,7 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
         }
         
         // Check if a cast is necessary
-        else if (input->type != placeholder->type && placeholder->type != &ANY_T) {
+        else if (input->type != placeholder->type && placeholder->type != TYPES.any) {
             set_list(action, 3);
             set_name(list_get(action, 0), name_Cast);
             set_term_ref(list_get(action, 1), input);

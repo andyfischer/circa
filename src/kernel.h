@@ -87,46 +87,34 @@ struct BuiltinFuncs {
     Term* value;
 };
 
-extern BuiltinFuncs FUNCS;
-
-extern Type ANY_T;
-extern Type BOOL_T;
-extern Type BLOCK_T;
-extern Type DICT_T;
-extern Type ERROR_T;
-extern Type EVAL_CONTEXT_T;
-extern Type FLOAT_T;
-extern Type FUNCTION_T;
-extern Type FUNCTION_ATTRS_T;
-extern Type HANDLE_T;
-extern Type INT_T;
-extern Type LIST_T;
-extern Type NULL_T;
-extern Type OPAQUE_POINTER_T;
-extern Type POINT_T;
-extern Type REF_T;
-extern Type STRING_T;
-extern Type NAME_T;
-extern Type TYPE_T;
-extern Type VOID_T;
-
 struct BuiltinTypes {
     Type* actor;
     Type* any;
     Type* block;
+    Type* bool_type;
     Type* color;
     Type* dict;
     Type* error;
+    Type* eval_context;
     Type* file_signature;
     Type* frame;
     Type* float_type;
+    Type* function;
+    Type* int_type;
     Type* list;
     Type* map;
+    Type* name;
+    Type* null;
+    Type* opaque_pointer;
     Type* point;
+    Type* ref;
     Type* selector;
+    Type* string;
+    Type* type;
     Type* void_type;
 };
 
+extern BuiltinFuncs FUNCS;
 extern BuiltinTypes TYPES;
 
 extern bool STATIC_INITIALIZATION_FINISHED;

@@ -14,12 +14,12 @@ namespace make_function {
     {
         Term* input = caller->input(0);
         if (input == NULL)
-            return &ANY_T;
+            return TYPES.any;
 
         if (is_value(input) && is_type(input))
             return as_type(input);
 
-        return &ANY_T;
+        return TYPES.any;
     }
 
     void setup(Block* kernel)

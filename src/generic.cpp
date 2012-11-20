@@ -122,7 +122,7 @@ Term* statically_specialize_overload_for_call(Term* call)
 
     // Do not try to specialize if any arguments are untyped.
     for (int i=0; i < call->numInputs(); i++)
-        if (call->input(i) != NULL && declared_type(call->input(i)) == &ANY_T)
+        if (call->input(i) != NULL && declared_type(call->input(i)) == TYPES.any)
             return NULL;
 
     // Find which case will succeed

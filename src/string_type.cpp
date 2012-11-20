@@ -400,7 +400,7 @@ std::string as_string(caValue* value)
 
 char* string_initialize(caValue* value, int length)
 {
-    make(&STRING_T, value);
+    make(TYPES.string, value);
     StringData* data = string_create(length);
     value->value_data.ptr = data;
     return data->str;
@@ -408,7 +408,7 @@ char* string_initialize(caValue* value, int length)
 
 void set_string(caValue* value, const char* s)
 {
-    make(&STRING_T, value);
+    make(TYPES.string, value);
     int length = strlen(s);
     StringData* data = string_create(length);
     memcpy(data->str, s, length + 1);
@@ -417,7 +417,7 @@ void set_string(caValue* value, const char* s)
 
 void set_string(caValue* value, const char* s, int length)
 {
-    make(&STRING_T, value);
+    make(TYPES.string, value);
     StringData* data = string_create(length);
     memcpy(data->str, s, length);
     data->str[length] = 0;

@@ -51,7 +51,7 @@ void controlFlow_postCompile(Term* term)
         rename(term, name_from_string("#return"));
 
     // Create a #control value
-    Term* controlTerm = create_value(term->owningBlock, &NAME_T, "#control");
+    Term* controlTerm = create_value(term->owningBlock, TYPES.name, "#control");
     hide_from_source(controlTerm);
 
     Name controlValue = name_None;

@@ -9,7 +9,7 @@ namespace cast_function {
     {
         caValue* source = INPUT(0);
 
-        if (CALLER->type == &ANY_T)
+        if (CALLER->type == TYPES.any)
             return copy(source, OUTPUT);
 
         Type* type = CALLER->type;

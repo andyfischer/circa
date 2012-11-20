@@ -38,7 +38,7 @@ namespace declared_state_function {
         }
 
         // Otherwise, reset to the type's default value
-        if (declared_type(caller) == &ANY_T)
+        if (declared_type(caller) == TYPES.any)
             set_null(output);
         else
             make(declared_type(caller), output);

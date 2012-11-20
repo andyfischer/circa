@@ -36,17 +36,17 @@ namespace get_field_function {
 
             // Abort if input type is not correct
             if (!is_string(term_value(caller->input(1))))
-                return &ANY_T;
+                return TYPES.any;
 
             if (!is_list_based_type(head))
-                return &ANY_T;
+                return TYPES.any;
 
             std::string const& name = as_string(term_value(caller->input(1)));
 
             int fieldIndex = list_find_field_index_by_name(head, name.c_str());
 
             if (fieldIndex == -1)
-                return &ANY_T;
+                return TYPES.any;
 
             head = as_type(get_index(list_get_type_list_from_type(head),fieldIndex));
         }

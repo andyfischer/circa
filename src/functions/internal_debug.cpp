@@ -17,7 +17,6 @@ namespace internal_debug_function {
 
 
     bool g_initializedHandleType;
-    Type g_testHandleType;
     const int g_testHandleSlots = 100;
     bool g_testHandleAllocated[g_testHandleSlots];
 

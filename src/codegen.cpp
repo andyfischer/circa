@@ -15,10 +15,10 @@ std::string get_cpp_type_name(Type* type)
 
 std::string get_cpp_type_accessor(Type* type)
 {
-    if (type == &INT_T) return "as_int";
-    else if (type == &FLOAT_T) return "as_float";
-    else if (type == &STRING_T) return "as_string";
-    else if (type == &BOOL_T) return "as_bool";
+    if (type == TYPES.int_type) return "as_int";
+    else if (type == TYPES.float_type) return "as_float";
+    else if (type == TYPES.string) return "as_string";
+    else if (type == TYPES.bool_type) return "as_bool";
     else return "(unknown accessor)";
 }
 

@@ -5,12 +5,6 @@
 namespace circa {
 namespace list_function {
 
-/*
-    Type* list_specializeType(Term* term)
-    {
-    }
-    */
-
     void make_list(caStack* stack)
     {
         // Variadic arg handling will already have turned this into a list

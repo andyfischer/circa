@@ -39,7 +39,8 @@ Value::operator=(Value const& rhs)
 
 void initialize_null(caValue* value)
 {
-    value->value_type = &NULL_T;
+    ca_assert(TYPES.null != NULL);
+    value->value_type = TYPES.null;
     value->value_data.ptr = NULL;
 }
 
@@ -71,7 +72,7 @@ void set_null(caValue* value)
     if (value->value_type->release != NULL)
         value->value_type->release(value);
 
-    value->value_type = &NULL_T;
+    value->value_type = TYPES.null;
     value->value_data.ptr = NULL;
 }
 
@@ -82,7 +83,7 @@ void release(caValue* value)
         if (release != NULL)
             release(value);
     }
-    value->value_type = &NULL_T;
+    value->value_type = TYPES.null;
     value->value_data.ptr = 0;
 }
 
@@ -344,31 +345,31 @@ bool equals_int(caValue* value, int i)
 
 void set_bool(caValue* value, bool b)
 {
-    change_type(value, &BOOL_T);
+    change_type(value, TYPES.bool_type);
     value->value_data.asbool = b;
 }
 
 Dict* set_dict(caValue* value)
 {
-    make(&DICT_T, value);
+    make(TYPES.dict, value);
     return (Dict*) value;
 }
 
 void set_error_string(caValue* value, const char* s)
 {
     set_string(value, s);
-    value->value_type = &ERROR_T;
+    value->value_type = TYPES.error;
 }
 
 void set_int(caValue* value, int i)
 {
-    change_type(value, &INT_T);
+    change_type(value, TYPES.int_type);
     value->value_data.asint = i;
 }
 
 void set_float(caValue* value, float f)
 {
-    change_type(value, &FLOAT_T);
+    change_type(value, TYPES.float_type);
     value->value_data.asfloat = f;
 }
 
@@ -379,7 +380,7 @@ void set_string(caValue* value, std::string const& s)
 
 caValue* set_list(caValue* value)
 {
-    make(&LIST_T, value);
+    make(TYPES.list, value);
     return value;
 }
 
@@ -393,25 +394,25 @@ caValue* set_list(caValue* value, int size)
 void set_type(caValue* value, Type* type)
 {
     set_null(value);
-    value->value_type = &TYPE_T;
+    value->value_type = TYPES.type;
     value->value_data.ptr = type;
 }
 
 void set_function(caValue* value, Function* function)
 {
     set_null(value);
-    value->value_type = &FUNCTION_T;
+    value->value_type = TYPES.function;
     value->value_data.ptr = function;
 }
 
 void set_opaque_pointer(caValue* value, void* addr)
 {
-    change_type(value, &OPAQUE_POINTER_T);
+    change_type(value, TYPES.opaque_pointer);
     value->value_data.ptr = addr;
 }
 void set_block(caValue* value, Block* block)
 {
-    change_type(value, &BLOCK_T);
+    change_type(value, TYPES.block);
     value->value_data.ptr = block;
 }
 
@@ -493,18 +494,18 @@ void* get_pointer(caValue* value, Type* expectedType)
 }
 
 bool is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
-bool is_block(caValue* value) { return value->value_type == &BLOCK_T; }
-bool is_error(caValue* value) { return value->value_type == &ERROR_T; }
+bool is_block(caValue* value) { return value->value_type == TYPES.block; }
+bool is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
-bool is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
-bool is_function_pointer(caValue* value) { return value->value_type == &FUNCTION_T; }
+bool is_function(caValue* value) { return value->value_type == TYPES.function; }
+bool is_function_pointer(caValue* value) { return value->value_type == TYPES.function; }
 bool is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
 bool is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
-bool is_null(caValue* value) { return value->value_type == &NULL_T; }
+bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == name_StorageTypeOpaquePointer; }
 bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeRef; }
 bool is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
-bool is_name(caValue* value) { return value->value_type == &NAME_T; }
+bool is_name(caValue* value) { return value->value_type == TYPES.name; }
 bool is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
 
 bool is_number(caValue* value)
@@ -550,14 +551,14 @@ using namespace circa;
 extern "C" {
 
 bool circa_is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
-bool circa_is_block(caValue* value) { return value->value_type == &BLOCK_T; }
-bool circa_is_error(caValue* value) { return value->value_type == &ERROR_T; }
+bool circa_is_block(caValue* value) { return value->value_type == TYPES.block; }
+bool circa_is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool circa_is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
-bool circa_is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
+bool circa_is_function(caValue* value) { return value->value_type == TYPES.function; }
 bool circa_is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
 bool circa_is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
-bool circa_is_name(caValue* value) { return value->value_type == &NAME_T; }
-bool circa_is_null(caValue* value)  { return value->value_type == &NULL_T; }
+bool circa_is_name(caValue* value) { return value->value_type == TYPES.name; }
+bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
 bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
 bool circa_is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
 bool circa_is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
@@ -659,7 +660,7 @@ caType* circa_type_of(caValue* value)
 
 void circa_set_bool(caValue* container, bool b)
 {
-    change_type(container, &BOOL_T);
+    change_type(container, TYPES.bool_type);
     container->value_data.asbool = b;
 }
 void circa_set_error(caValue* container, const char* msg)
@@ -668,12 +669,12 @@ void circa_set_error(caValue* container, const char* msg)
 }
 void circa_set_float(caValue* container, float f)
 {
-    change_type(container, &FLOAT_T);
+    change_type(container, TYPES.float_type);
     container->value_data.asfloat = f;
 }
 void circa_set_int(caValue* container, int i)
 {
-    change_type(container, &INT_T);
+    change_type(container, TYPES.int_type);
     container->value_data.asint = i;
 }
 void circa_set_name(caValue* container, caName value)
@@ -696,7 +697,7 @@ void circa_set_term(caValue* container, caTerm* term)
 void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)
 {
     if (type == NULL)
-        type = &ANY_T;
+        type = TYPES.any;
     change_type(container, (Type*) type);
     container->value_data.ptr = ptr;
 }

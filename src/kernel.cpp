@@ -62,30 +62,7 @@ bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
-// Structure of pointers to builtin functions.
 BuiltinFuncs FUNCS;
-
-// Builtin type objects:
-Type ANY_T;
-Type BOOL_T;
-Type BLOCK_T;
-Type DICT_T;
-Type ERROR_T;
-Type EVAL_CONTEXT_T;
-Type FLOAT_T;
-Type FUNCTION_T;
-Type FUNCTION_ATTRS_T;
-Type HANDLE_T;
-Type INT_T;
-Type LIST_T;
-Type NULL_T;
-Type OPAQUE_POINTER_T;
-Type REF_T;
-Type STRING_T;
-Type NAME_T;
-Type TYPE_T;
-Type VOID_T;
-
 BuiltinTypes TYPES;
 
 caValue* g_oracleValues;
@@ -97,7 +74,7 @@ Type* output_placeholder_specializeType(Term* caller)
 {
     // Special case: if we're an accumulatingOutput then the output type is List.
     if (caller->boolProp("accumulatingOutput", false))
-        return &LIST_T;
+        return TYPES.list;
 
     if (caller->input(0) == NULL)
         return NULL;
@@ -315,7 +292,7 @@ Type* List__append_specializeType(Term* term)
     }
     case name_Invalid:
     default:
-        return &ANY_T;
+        return TYPES.any;
     }
 }
 
@@ -756,22 +733,52 @@ void test_spy(caStack* stack)
 
 void bootstrap_kernel()
 {
-    // Initialize global type objects
-    null_t::setup_type(&NULL_T);
-    bool_t::setup_type(&BOOL_T);
-    block_setup_type(&BLOCK_T);
-    dict_t::setup_type(&DICT_T);
-    eval_context_t::setup_type(&EVAL_CONTEXT_T);
-    number_t::setup_type(&FLOAT_T);
-    int_t::setup_type(&INT_T);
-    list_t::setup_type(&LIST_T);
-    name_t::setup_type(&NAME_T);
-    opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
-    ref_setup_type(&REF_T);
-    string_setup_type(&STRING_T);
-    void_t::setup_type(&VOID_T);
-    eval_context_setup_type(&EVAL_CONTEXT_T);
-    string_setup_type(&ERROR_T); // errors are just stored as strings for now
+    // Initialize the core global types.
+    TYPES.dict = create_type_uninitialized();
+    TYPES.null = create_type_uninitialized();
+    TYPES.type = create_type_uninitialized();
+
+    initialize_type(TYPES.dict);
+    initialize_type(TYPES.null);
+    initialize_type(TYPES.type);
+
+    // Initialize remaining global types.
+    TYPES.any = create_type();
+    TYPES.block = create_type();
+    TYPES.bool_type = create_type();
+    TYPES.error = create_type();
+    TYPES.eval_context = create_type();
+    TYPES.float_type = create_type();
+    TYPES.function = create_type();
+    TYPES.int_type = create_type();
+    TYPES.list = create_type();
+    TYPES.map = create_type();
+    TYPES.name = create_type();
+    TYPES.opaque_pointer = create_type();
+    TYPES.ref = create_type();
+    TYPES.string = create_type();
+    TYPES.void_type = create_type();
+
+    any_t::setup_type(TYPES.any);
+    block_setup_type(TYPES.block);
+    bool_t::setup_type(TYPES.bool_type);
+    dict_t::setup_type(TYPES.dict);
+    eval_context_t::setup_type(TYPES.eval_context);
+    function_t::setup_type(TYPES.function);
+    hashtable_setup_type(TYPES.map);
+    int_t::setup_type(TYPES.int_type);
+    list_t::setup_type(TYPES.list);
+    name_t::setup_type(TYPES.name);
+    null_t::setup_type(TYPES.null);
+    number_t::setup_type(TYPES.float_type);
+    opaque_pointer_t::setup_type(TYPES.opaque_pointer);
+    ref_setup_type(TYPES.ref);
+    string_setup_type(TYPES.string);
+    string_setup_type(TYPES.error); // errors are just stored as strings for now
+    type_t::setup_type(TYPES.type);
+    void_t::setup_type(TYPES.void_type);
+
+    g_world = alloc_world();
 
     // Create root Block.
     g_world->root = new Block();
@@ -785,79 +792,75 @@ void bootstrap_kernel()
     // Create Type type
     Term* typeType = kernel->appendNew();
     typeType->function = FUNCS.value;
-    typeType->type = &TYPE_T;
-    term_value(typeType)->value_type = &TYPE_T;
-    term_value(typeType)->value_data.ptr = &TYPE_T;
-    TYPE_T.declaringTerm = typeType;
-    type_t::setup_type(&TYPE_T);
+    typeType->type = TYPES.type;
+    term_value(typeType)->value_type = TYPES.type;
+    term_value(typeType)->value_data.ptr = TYPES.type;
+    TYPES.type->declaringTerm = typeType;
     rename(typeType, name_from_string("Type"));
 
     // Create Any type
     Term* anyType = kernel->appendNew();
     anyType->function = valueFunc;
-    anyType->type = &TYPE_T;
-    term_value(anyType)->value_type = &TYPE_T;
-    term_value(anyType)->value_data.ptr = &ANY_T;
-    ANY_T.declaringTerm = anyType;
-    any_t::setup_type(&ANY_T);
+    anyType->type = TYPES.type;
+    term_value(anyType)->value_type = TYPES.type;
+    term_value(anyType)->value_data.ptr = TYPES.any;
+    TYPES.any->declaringTerm = anyType;
     rename(anyType, name_from_string("any"));
 
     // Create Function type
-    function_t::setup_type(&FUNCTION_T);
     Term* functionType = kernel->appendNew();
     functionType->function = valueFunc;
-    functionType->type = &TYPE_T;
-    FUNCTION_T.declaringTerm = functionType;
-    term_value(functionType)->value_type = &TYPE_T;
-    term_value(functionType)->value_data.ptr = &FUNCTION_T;
+    functionType->type = TYPES.type;
+    TYPES.function->declaringTerm = functionType;
+    term_value(functionType)->value_type = TYPES.type;
+    term_value(functionType)->value_data.ptr = TYPES.function;
     rename(functionType, name_from_string("Function"));
 
     // Initialize value() func
-    valueFunc->type = &FUNCTION_T;
+    valueFunc->type = TYPES.function;
     valueFunc->function = valueFunc;
-    make(&FUNCTION_T, term_value(valueFunc));
+    make(TYPES.function, term_value(valueFunc));
 
-    function_t::initialize(&FUNCTION_T, term_value(valueFunc));
+    function_t::initialize(TYPES.function, term_value(valueFunc));
     initialize_function(valueFunc);
     as_function(valueFunc)->name = "value";
     function_set_empty_evaluation(as_function(valueFunc));
 
     // Initialize primitive types (this requires value() function)
-    create_type_value(kernel, &BOOL_T, "bool");
-    create_type_value(kernel, &FLOAT_T, "number");
-    create_type_value(kernel, &INT_T, "int");
-    create_type_value(kernel, &NAME_T, "Name");
-    create_type_value(kernel, &STRING_T, "String");
-    create_type_value(kernel, &DICT_T, "Dict");
-    create_type_value(kernel, &REF_T, "Term");
-    create_type_value(kernel, &VOID_T, "void");
-    TYPES.list = unbox_type(create_type_value(kernel, &LIST_T, "List"));
-    create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
-    create_type_value(kernel, &BLOCK_T, "Block");
-    TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
-    hashtable_setup_type(TYPES.map);
+    create_type_value(kernel, TYPES.bool_type, "bool");
+    create_type_value(kernel, TYPES.block, "Block");
+    create_type_value(kernel, TYPES.dict, "Dict");
+    create_type_value(kernel, TYPES.float_type, "number");
+    create_type_value(kernel, TYPES.int_type, "int");
+    create_type_value(kernel, TYPES.list, "List");
+    create_type_value(kernel, TYPES.name, "Name");
+    create_type_value(kernel, TYPES.opaque_pointer, "opaque_pointer");
+    create_type_value(kernel, TYPES.string, "String");
+    create_type_value(kernel, TYPES.ref, "Term");
+    create_type_value(kernel, TYPES.void_type, "void");
+    create_type_value(kernel, TYPES.map, "Map");
 
     // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
 
     // Setup output_placeholder() function, needed to declare functions properly.
-    FUNCS.output = create_value(kernel, &FUNCTION_T, "output_placeholder");
-    function_t::initialize(&FUNCTION_T, term_value(FUNCS.output));
+    FUNCS.output = create_value(kernel, TYPES.function, "output_placeholder");
+    function_t::initialize(TYPES.function, term_value(FUNCS.output));
     initialize_function(FUNCS.output);
     as_function(FUNCS.output)->name = "output_placeholder";
     as_function(FUNCS.output)->evaluate = NULL;
     as_function(FUNCS.output)->specializeType = output_placeholder_specializeType;
-    ca_assert(function_get_output_type(FUNCS.output, 0) == &ANY_T);
+    ca_assert(function_get_output_type(FUNCS.output, 0) == TYPES.any);
 
     // Fix some holes in value() function
     {
         Function* attrs = as_function(valueFunc);
         Term* output = append_output_placeholder(function_contents(attrs), NULL);
-        change_declared_type(output, &ANY_T);
+        change_declared_type(output, TYPES.any);
         finish_building_function(function_contents(attrs));
     }
 
-    ca_assert(function_get_output_type(valueFunc, 0) == &ANY_T);
+    ca_assert(function_get_output_type(valueFunc, 0) == TYPES.any);
 
     // input_placeholder() is needed before we can declare a function with inputs
     FUNCS.input = import_function(kernel, NULL, "input_placeholder() -> any");
@@ -875,14 +878,13 @@ void bootstrap_kernel()
     FINISHED_BOOTSTRAP = true;
 
     // Initialize a few more types
-    Term* set_type = create_value(kernel, &TYPE_T, "Set");
+    Term* set_type = create_value(kernel, TYPES.type, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-
-    Term* indexableType = create_value(kernel, &TYPE_T, "Indexable");
+    Term* indexableType = create_value(kernel, TYPES.type, "Indexable");
     indexable_t::setup_type(unbox_type(indexableType));
 
-    TYPES.selector = unbox_type(create_value(kernel, &TYPE_T, "Selector"));
+    TYPES.selector = unbox_type(create_value(kernel, TYPES.type, "Selector"));
     list_t::setup_type(TYPES.selector);
 
     control_flow_setup_funcs(kernel);
@@ -949,32 +951,32 @@ void bootstrap_kernel()
 
     // Create vectorized functions
     Term* add_v = create_function(kernel, "add_v");
-    create_function_vectorized_vv(function_contents(add_v), FUNCS.add, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(add_v), FUNCS.add, TYPES.list, TYPES.list);
     Term* add_s = create_function(kernel, "add_s");
-    create_function_vectorized_vs(function_contents(add_s), FUNCS.add, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(add_s), FUNCS.add, TYPES.list, TYPES.any);
 
     append_to_overloaded_function(FUNCS.add, add_v);
     append_to_overloaded_function(FUNCS.add, add_s);
 
     Term* sub_v = create_function(kernel, "sub_v");
-    create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, TYPES.list, TYPES.list);
     Term* sub_s = create_function(kernel, "sub_s");
-    create_function_vectorized_vs(function_contents(sub_s), FUNCS.sub, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(sub_s), FUNCS.sub, TYPES.list, TYPES.any);
     
     append_to_overloaded_function(FUNCS.sub, sub_v);
     append_to_overloaded_function(FUNCS.sub, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_function(kernel, "mult_v");
-    create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, TYPES.list, TYPES.list);
     Term* mult_s = create_function(kernel, "mult_s");
-    create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, TYPES.list, TYPES.any);
 
     append_to_overloaded_function(FUNCS.mult, mult_v);
     append_to_overloaded_function(FUNCS.mult, mult_s);
 
     Term* div_s = create_function(kernel, "div_s");
-    create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
 
     // Need dynamic_method before any hosted functions
     FUNCS.dynamic_method = import_function(kernel, dynamic_method_call,
@@ -1096,8 +1098,6 @@ CIRCA_EXPORT caWorld* circa_initialize()
     memset(&FUNCS, 0, sizeof(FUNCS));
     memset(&TYPES, 0, sizeof(TYPES));
 
-    g_world = alloc_world();
-
     bootstrap_kernel();
 
     caWorld* world = global_world();
@@ -1136,19 +1136,6 @@ CIRCA_EXPORT caWorld* circa_initialize()
 CIRCA_EXPORT void circa_shutdown(caWorld* world)
 {
     SHUTTING_DOWN = true;
-
-    clear_type_contents(&BOOL_T);
-    clear_type_contents(&DICT_T);
-    clear_type_contents(&ERROR_T);
-    clear_type_contents(&FLOAT_T);
-    clear_type_contents(&INT_T);
-    clear_type_contents(&LIST_T);
-    clear_type_contents(&NULL_T);
-    clear_type_contents(&OPAQUE_POINTER_T);
-    clear_type_contents(&REF_T);
-    clear_type_contents(&STRING_T);
-    clear_type_contents(&TYPE_T);
-    clear_type_contents(&VOID_T);
 
     delete world->root;
     world->root = NULL;

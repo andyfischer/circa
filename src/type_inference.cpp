@@ -17,7 +17,7 @@ namespace circa {
 Type* find_common_type(caValue* list)
 {
     if (list_length(list) == 0)
-        return &ANY_T;
+        return TYPES.any;
 
     // Check if every type in this list is the same.
     bool all_equal = true;
@@ -34,16 +34,17 @@ Type* find_common_type(caValue* list)
     // Special case, allow ints to go into floats
     bool all_are_ints_or_floats = true;
     for (int i=0; i < list_length(list); i++) {
-        if ((as_type(list_get(list,i)) != &INT_T) && (as_type(list_get(list,i)) != &FLOAT_T)) {
+        if ((as_type(list_get(list,i)) != TYPES.int_type)
+                && (as_type(list_get(list,i)) != TYPES.float_type)) {
             all_are_ints_or_floats = false;
             break;
         }
     }
 
     if (all_are_ints_or_floats)
-        return &FLOAT_T;
+        return TYPES.float_type;
 
-    // Another special case, if all types are lists then use LIST_T
+    // Another special case, if all types are lists then use List
     bool all_are_lists = true;
     for (int i=0; i < list_length(list); i++) {
         if (!is_list_based_type(as_type(list_get(list,i))))
@@ -51,10 +52,10 @@ Type* find_common_type(caValue* list)
     }
 
     if (all_are_lists)
-        return &LIST_T;
+        return TYPES.list;
 
     // Otherwise give up
-    return &ANY_T;
+    return TYPES.any;
 }
 
 Type* find_common_type(Type* type1, Type* type2)
@@ -65,13 +66,13 @@ Type* find_common_type(Type* type1, Type* type2)
     if (type1 == type2)
         return type1;
 
-    if (type1 == &ANY_T || type2 == &ANY_T)
-        return &ANY_T;
+    if (type1 == TYPES.any || type2 == TYPES.any)
+        return TYPES.any;
 
     if (is_list_based_type(type1) && is_list_based_type(type2))
-        return &LIST_T;
+        return TYPES.list;
 
-    return &ANY_T;
+    return TYPES.any;
 }
 
 Type* find_common_type(Type* type1, Type* type2, Type* type3)
@@ -84,11 +85,11 @@ Type* find_common_type(Type* type1, Type* type2, Type* type3)
 Type* infer_type_of_get_index(Term* input)
 {
     if (input == NULL)
-        return &ANY_T;
+        return TYPES.any;
 
     switch (list_get_parameter_type(&input->type->parameter)) {
     case name_Untyped:
-        return &ANY_T;
+        return TYPES.any;
     case name_UniformListType:
         return list_get_repeated_type_from_type(input->type);
     case name_StructType:
@@ -96,7 +97,7 @@ Type* infer_type_of_get_index(Term* input)
         return find_common_type(list_get_type_list_from_type(input->type));
     case name_Invalid:
     default:
-        return &ANY_T;
+        return TYPES.any;
     }
 }
 

@@ -46,7 +46,7 @@ namespace number_t {
     }
     void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {
-        if (query->subjectType == &FLOAT_T || query->subjectType == &INT_T)
+        if (query->subjectType == TYPES.float_type || query->subjectType == TYPES.int_type)
             query->succeed();
         else
             query->fail();

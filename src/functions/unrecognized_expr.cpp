@@ -12,7 +12,8 @@ namespace unrecognized_expr_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.unrecognized_expression = import_function(kernel, NULL, "unrecognized_expr(any :multiple)");
+        FUNCS.unrecognized_expression = import_function(kernel, NULL,
+                "unrecognized_expr(any :multiple)");
         as_function(FUNCS.unrecognized_expression)->formatSource = formatSource;
     }
 }

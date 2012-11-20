@@ -272,8 +272,8 @@ void change_function(Term* term, Term* function)
 void change_declared_type(Term *term, Type *newType)
 {
     // Don't allow 'null' to be used as a declared type (use 'any' instead)
-    if (newType == &NULL_T)
-        newType = &ANY_T;
+    if (newType == TYPES.null)
+        newType = TYPES.any;
 
     ca_assert(term != NULL);
     ca_assert(newType != NULL);
@@ -431,7 +431,7 @@ Term* create_value(Block* block, Type* type, std::string const& name)
     change_declared_type(term, type);
     make(type, term_value(term));
 
-    if (type == &TYPE_T) {
+    if (type == TYPES.type) {
         as_type(term)->name = name_from_string(name.c_str());
         as_type(term)->declaringTerm = term;
     }
@@ -460,40 +460,40 @@ Term* create_value(Block* block, caValue* initialValue, std::string const& name)
 
 Term* create_string(Block* block, std::string const& s, std::string const& name)
 {
-    Term* term = create_value(block, &STRING_T, name);
+    Term* term = create_value(block, TYPES.string, name);
     set_string(term_value(term), s);
     return term;
 }
 
 Term* create_int(Block* block, int i, std::string const& name)
 {
-    Term* term = create_value(block, &INT_T, name);
+    Term* term = create_value(block, TYPES.int_type, name);
     set_int(term_value(term), i);
     return term;
 }
 
 Term* create_float(Block* block, float f, std::string const& name)
 {
-    Term* term = create_value(block, &FLOAT_T, name);
+    Term* term = create_value(block, TYPES.float_type, name);
     set_float(term_value(term), f);
     return term;
 }
 
 Term* create_bool(Block* block, bool b, std::string const& name)
 {
-    Term* term = create_value(block, &BOOL_T, name);
+    Term* term = create_value(block, TYPES.bool_type, name);
     set_bool(term_value(term), b);
     return term;
 }
 
 Term* create_void(Block* block, std::string const& name)
 {
-    return create_value(block, &VOID_T, name);
+    return create_value(block, TYPES.void_type, name);
 }
 
 Term* create_list(Block* block, std::string const& name)
 {
-    Term* term = create_value(block, &LIST_T, name);
+    Term* term = create_value(block, TYPES.list, name);
     return term;
 }
 
@@ -521,7 +521,7 @@ Block* create_block_unevaluated(Block* owner, const char* name)
 
 Term* create_type(Block* block, std::string nameStr)
 {
-    Term* term = create_value(block, &TYPE_T);
+    Term* term = create_value(block, TYPES.type);
 
     if (nameStr != "") {
         Name name = name_from_string(nameStr);
@@ -534,7 +534,7 @@ Term* create_type(Block* block, std::string nameStr)
 
 Term* create_type_value(Block* block, Type* value, std::string const& name)
 {
-    Term* term = create_value(block, &TYPE_T, name);
+    Term* term = create_value(block, TYPES.type, name);
     set_type(term_value(term), value);
 
     if (value->declaringTerm == NULL)
@@ -545,7 +545,7 @@ Term* create_type_value(Block* block, Type* value, std::string const& name)
 
 Term* create_symbol_value(Block* block, int value, std::string const& name)
 {
-    Term* term = create_value(block, &NAME_T, name);
+    Term* term = create_value(block, TYPES.type, name);
     set_name(term_value(term), value);
     return term;
 }

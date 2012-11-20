@@ -258,7 +258,7 @@ caValue* circa_declare_value(caBlock* block, const char* name)
     std::string nameStr;
     if (name != NULL)
         nameStr = name;
-    Term* term = create_value((Block*) block, &ANY_T, nameStr);
+    Term* term = create_value((Block*) block, TYPES.any, nameStr);
     return term_value(term);
 }
 

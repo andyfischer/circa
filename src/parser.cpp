@@ -467,7 +467,7 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
-        typeTerm = ANY_T.declaringTerm;
+        typeTerm = TYPES.any->declaringTerm;
     }
 
     return ParseResult(typeTerm, typeName);
@@ -681,7 +681,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     // Output type
-    Term* outputType = VOID_T.declaringTerm;
+    Term* outputType = TYPES.void_type->declaringTerm;
 
     if (tok_RightArrow == lookahead_next_non_whitespace(tokens, false)) {
         result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));
@@ -733,7 +733,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     std::string name = tokens.consumeStr(tok_Identifier);
 
-    Term* result = create_value(block, &TYPE_T, name);
+    Term* result = create_value(block, TYPES.type, name);
 
     // Attributes
     result->setStringProp("syntax:preLBracketWhitespace",
@@ -1162,7 +1162,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     }
 
     // Lookup the explicit type
-    Type* type = &ANY_T;
+    Type* type = TYPES.any;
     bool unknownType = false;
     if (typeName != "") {
         Term* typeTerm = find_name(block, typeName.c_str(), -1, name_LookupType);
@@ -1187,7 +1187,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         Term* initialValue = infix_expression(nested_contents(initializer), tokens, context, 0).term;
 
         // Possibly add a cast()
-        if (type != declared_type(initialValue) && type != &ANY_T) {
+        if (type != declared_type(initialValue) && type != TYPES.any) {
             initialValue = apply(nested_contents(initializer), FUNCS.cast, TermList(initialValue));
             initialValue->setBoolProp("hidden", true);
             change_declared_type(initialValue, type);
@@ -1197,7 +1197,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
-        if (typeName == "" && initialValue->type != &NULL_T) {
+        if (typeName == "" && initialValue->type != TYPES.null) {
             type = initialValue->type;
         }
     }
@@ -2174,7 +2174,7 @@ ParseResult literal_null(Block* block, TokenStream& tokens, ParserCxt* context)
 
     tokens.consume(tok_Null);
 
-    Term* term = create_value(block, &NULL_T);
+    Term* term = create_value(block, TYPES.null);
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
@@ -2280,7 +2280,7 @@ ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context)
     std::string s = tokens.nextStr();
     tokens.consume(tok_Name);
 
-    Term* term = create_value(block, &NAME_T);
+    Term* term = create_value(block, TYPES.null);
 
     // Skip the leading ':' in the name string
     set_name(term_value(term), name_from_string(s.c_str() + 1));

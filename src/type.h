@@ -115,8 +115,8 @@ struct Type
 
     const char* nameStr();
 
-    // Disallow copy constructor
 private:
+    // Disallow copy constructor.
     Type(Type const&) { internal_error(""); }
     Type& operator=(Type const&) { internal_error(""); return *this; }
 };
@@ -164,6 +164,9 @@ namespace type_t {
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);
 } // namespace type_t
+
+Type* create_type_uninitialized();
+void initialize_type(Type* t);
 
 // Create a collectable type instance.
 Type* create_type();

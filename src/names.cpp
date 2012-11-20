@@ -793,7 +793,7 @@ void set_name(caValue* tv, Name val)
 {
     ca_assert(name_is_valid(val));
     set_null(tv);
-    tv->value_type = &NAME_T;
+    tv->value_type = TYPES.name;
     tv->value_data.asint = val;
 }
 

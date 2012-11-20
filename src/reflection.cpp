@@ -25,7 +25,7 @@ namespace circa {
     
 void set_term_ref(caValue* val, Term* term)
 {
-    change_type(val, &REF_T);
+    change_type(val, TYPES.ref);
     val->value_data.ptr = term;
 }
 
@@ -37,7 +37,7 @@ Term* as_term_ref(caValue* val)
 
 bool is_term_ref(caValue* val)
 {
-    return val->value_type == &REF_T;
+    return val->value_type == TYPES.ref;
 }
 
 void block_ref(caStack* stack)

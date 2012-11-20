@@ -110,39 +110,9 @@ namespace type_t {
 
 } // namespace type_t
 
-Type::Type() :
-    name(0),
-    storageType(name_StorageTypeNull),
-    cppTypeInfo(NULL),
-    declaringTerm(NULL),
-    initialize(NULL),
-    release(NULL),
-    copy(NULL),
-    reset(NULL),
-    equals(NULL),
-    cast(NULL),
-    staticTypeQuery(NULL),
-    toString(NULL),
-    formatSource(NULL),
-    touch(NULL),
-    getIndex(NULL),
-    setIndex(NULL),
-    getField(NULL),
-    setField(NULL),
-    numElements(NULL),
-    checkInvariants(NULL),
-    remapPointers(NULL),
-    hashFunc(NULL),
-    visitHeap(NULL),
-    checksum(NULL),
-    gcListReferences(NULL),
-    gcRelease(NULL),
-    parent(NULL),
-    objectSize(0),
-    inUse(false)
+Type::Type()
 {
-    // Register ourselves. Start out as 'root'.
-    gc_register_new_object((CircaObject*) this, &TYPE_T, true);
+    initialize_type(this);
 }
 
 Type::~Type()
@@ -162,7 +132,7 @@ Type* get_output_type(Term* term, int outputIndex)
         return term->type;
 
     if (term->function == NULL)
-        return &ANY_T;
+        return TYPES.any;
 
     return function_get_output_type(term->function, outputIndex);
 }
@@ -203,9 +173,29 @@ Block* type_declaration_block(Type* type)
     return type->declaringTerm->nestedContents;
 }
 
+Type* create_type_uninitialized()
+{
+    Type* t = (Type*) malloc(sizeof(Type));
+    memset(t, 0, sizeof(Type));
+    return t;
+}
+
+void initialize_type(Type* t)
+{
+    t->storageType = name_StorageTypeNull;
+
+    initialize_null(&t->properties);
+    set_dict(&t->properties);
+
+    initialize_null(&t->parameter);
+
+    gc_register_new_object((CircaObject*) t, TYPES.type, true);
+}
+
 Type* create_type()
 {
-    Type* t = new Type();
+    Type* t = create_type_uninitialized();
+    initialize_type(t);
     gc_set_object_is_root((CircaObject*) t, false);
     return t;
 }
@@ -243,7 +233,7 @@ static void run_static_type_query(StaticTypeQuery* query)
         query->subjectType = declared_type(query->subject);
 
     // If output term is ANY type then we cannot statically determine.
-    if (query->subjectType == &ANY_T)
+    if (query->subjectType == TYPES.any)
         return query->unableToDetermine();
 
     // Always succeed if types are the same.
@@ -354,7 +344,7 @@ Term* create_tuple_type(caValue* types)
     Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str());
     list_t::setup_type(unbox_type(result));
 
-    unbox_type(result)->parent = &LIST_T;
+    unbox_type(result)->parent = TYPES.list;
 
     caValue* parameter = set_list(&unbox_type(result)->parameter, list_length(types));
 
