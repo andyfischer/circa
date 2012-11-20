@@ -503,7 +503,7 @@ bool is_int(caValue* value) { return value->value_type->storageType == name_Stor
 bool is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
 bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == name_StorageTypeOpaquePointer; }
-bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeRef; }
+bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeTerm; }
 bool is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
 bool is_name(caValue* value) { return value->value_type == TYPES.name; }
 bool is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }

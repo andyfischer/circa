@@ -160,9 +160,6 @@ namespace type_t {
     void formatSource(caValue* source, Term* term);
     void remap_pointers(Term *term, TermMap const& map);
     void setup_type(Type* type);
-
-    // Accessors
-    Type::RemapPointers& get_remap_pointers_func(Term* type);
 } // namespace type_t
 
 Type* create_type_uninitialized();

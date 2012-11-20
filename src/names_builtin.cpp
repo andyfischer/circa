@@ -61,8 +61,8 @@ const char* builtin_name_to_string(int name)
     case name_StorageTypeString: return "StorageTypeString";
     case name_StorageTypeList: return "StorageTypeList";
     case name_StorageTypeOpaquePointer: return "StorageTypeOpaquePointer";
+    case name_StorageTypeTerm: return "StorageTypeTerm";
     case name_StorageTypeType: return "StorageTypeType";
-    case name_StorageTypeRef: return "StorageTypeRef";
     case name_StorageTypeHandle: return "StorageTypeHandle";
     case name_StorageTypeHashtable: return "StorageTypeHashtable";
     case name_StorageTypeObject: return "StorageTypeObject";

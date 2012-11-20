@@ -67,8 +67,8 @@ StorageTypeBool
 StorageTypeString
 StorageTypeList
 StorageTypeOpaquePointer
+StorageTypeTerm
 StorageTypeType
-StorageTypeRef
 StorageTypeHandle
 StorageTypeHashtable
 StorageTypeObject

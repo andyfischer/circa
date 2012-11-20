@@ -103,15 +103,11 @@ namespace type_t {
         type->toString = toString;
     }
 
-    Type::RemapPointers& get_remap_pointers_func(Term* type)
-    {
-        return as_type(type)->remapPointers;
-    }
-
 } // namespace type_t
 
 Type::Type()
 {
+    memset(this, 0, sizeof(*this));
     initialize_type(this);
 }
 

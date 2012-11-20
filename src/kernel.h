@@ -107,7 +107,7 @@ struct BuiltinTypes {
     Type* null;
     Type* opaque_pointer;
     Type* point;
-    Type* ref;
+    Type* term;
     Type* selector;
     Type* string;
     Type* type;

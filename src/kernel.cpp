@@ -662,7 +662,7 @@ Block* global_root_block()
     return global_world()->root;
 }
 
-std::string ref_toString(caValue* val)
+std::string term_toString(caValue* val)
 {
     Term* t = as_term_ref(val);
     if (t == NULL)
@@ -675,7 +675,7 @@ std::string ref_toString(caValue* val)
     }
 }
 
-int ref_hashFunc(caValue* val)
+int term_hashFunc(caValue* val)
 {
     Term* term = as_term_ref(val);
     if (term == NULL)
@@ -683,12 +683,12 @@ int ref_hashFunc(caValue* val)
     return term->id;
 }
 
-void ref_setup_type(Type* type)
+void term_setup_type(Type* type)
 {
     type->name = name_from_string("Term");
-    type->storageType = name_StorageTypeRef;
-    type->toString = ref_toString;
-    type->hashFunc = ref_hashFunc;
+    type->storageType = name_StorageTypeTerm;
+    type->toString = term_toString;
+    type->hashFunc = term_hashFunc;
 }
 
 // Spy & oracle
@@ -755,7 +755,7 @@ void bootstrap_kernel()
     TYPES.map = create_type();
     TYPES.name = create_type();
     TYPES.opaque_pointer = create_type();
-    TYPES.ref = create_type();
+    TYPES.term = create_type();
     TYPES.string = create_type();
     TYPES.void_type = create_type();
 
@@ -772,7 +772,7 @@ void bootstrap_kernel()
     null_t::setup_type(TYPES.null);
     number_t::setup_type(TYPES.float_type);
     opaque_pointer_t::setup_type(TYPES.opaque_pointer);
-    ref_setup_type(TYPES.ref);
+    term_setup_type(TYPES.term);
     string_setup_type(TYPES.string);
     string_setup_type(TYPES.error); // errors are just stored as strings for now
     type_t::setup_type(TYPES.type);
@@ -836,7 +836,7 @@ void bootstrap_kernel()
     create_type_value(kernel, TYPES.name, "Name");
     create_type_value(kernel, TYPES.opaque_pointer, "opaque_pointer");
     create_type_value(kernel, TYPES.string, "String");
-    create_type_value(kernel, TYPES.ref, "Term");
+    create_type_value(kernel, TYPES.term, "Term");
     create_type_value(kernel, TYPES.void_type, "void");
     create_type_value(kernel, TYPES.map, "Map");
 
