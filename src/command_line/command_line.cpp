@@ -659,7 +659,7 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
 
     // Print results of the last expression
     Term* result = block->get(block->length() - 1);
-    if (result->type != as_type(VOID_TYPE)) {
+    if (result->type != &VOID_T) {
         output << to_string(find_stack_value_for_term(stack, result, 0)) << std::endl;
     }
 }

@@ -467,7 +467,7 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
-        typeTerm = ANY_TYPE;
+        typeTerm = ANY_T.declaringTerm;
     }
 
     return ParseResult(typeTerm, typeName);
@@ -681,7 +681,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     // Output type
-    Term* outputType = VOID_TYPE;
+    Term* outputType = VOID_T.declaringTerm;
 
     if (tok_RightArrow == lookahead_next_non_whitespace(tokens, false)) {
         result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));

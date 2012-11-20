@@ -62,21 +62,6 @@ bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
-Term* ANY_TYPE = NULL;
-Term* BOOL_TYPE = NULL;
-Term* DICT_TYPE = NULL;
-Term* FLOAT_TYPE = NULL;
-Term* INT_TYPE = NULL;
-Term* REF_TYPE = NULL;
-Term* STRING_TYPE = NULL;
-Term* FEEDBACK_TYPE = NULL;
-Term* FUNCTION_TYPE = NULL;
-Term* MAP_TYPE = NULL;
-Term* NAME_TYPE = NULL;
-Term* TYPE_TYPE = NULL;
-Term* VOID_TYPE = NULL;
-Term* OPAQUE_POINTER_TYPE = NULL;
-
 // Structure of pointers to builtin functions.
 BuiltinFuncs FUNCS;
 
@@ -797,34 +782,34 @@ void bootstrap_kernel()
     FUNCS.value = valueFunc;
 
     // Create Type type
-    TYPE_TYPE = kernel->appendNew();
-    TYPE_TYPE->function = FUNCS.value;
-    TYPE_TYPE->type = &TYPE_T;
-    term_value(TYPE_TYPE)->value_type = &TYPE_T;
-    term_value(TYPE_TYPE)->value_data.ptr = &TYPE_T;
-    TYPE_T.declaringTerm = TYPE_TYPE;
+    Term* typeType = kernel->appendNew();
+    typeType->function = FUNCS.value;
+    typeType->type = &TYPE_T;
+    term_value(typeType)->value_type = &TYPE_T;
+    term_value(typeType)->value_data.ptr = &TYPE_T;
+    TYPE_T.declaringTerm = typeType;
     type_t::setup_type(&TYPE_T);
-    rename(TYPE_TYPE, name_from_string("Type"));
+    rename(typeType, name_from_string("Type"));
 
     // Create Any type
-    ANY_TYPE = kernel->appendNew();
-    ANY_TYPE->function = valueFunc;
-    ANY_TYPE->type = &TYPE_T;
-    term_value(ANY_TYPE)->value_type = &TYPE_T;
-    term_value(ANY_TYPE)->value_data.ptr = &ANY_T;
-    ANY_T.declaringTerm = ANY_TYPE;
+    Term* anyType = kernel->appendNew();
+    anyType->function = valueFunc;
+    anyType->type = &TYPE_T;
+    term_value(anyType)->value_type = &TYPE_T;
+    term_value(anyType)->value_data.ptr = &ANY_T;
+    ANY_T.declaringTerm = anyType;
     any_t::setup_type(&ANY_T);
-    rename(ANY_TYPE, name_from_string("any"));
+    rename(anyType, name_from_string("any"));
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
-    FUNCTION_TYPE = kernel->appendNew();
-    FUNCTION_TYPE->function = valueFunc;
-    FUNCTION_TYPE->type = &TYPE_T;
-    FUNCTION_T.declaringTerm = FUNCTION_TYPE;
-    term_value(FUNCTION_TYPE)->value_type = &TYPE_T;
-    term_value(FUNCTION_TYPE)->value_data.ptr = &FUNCTION_T;
-    rename(FUNCTION_TYPE, name_from_string("Function"));
+    Term* functionType = kernel->appendNew();
+    functionType->function = valueFunc;
+    functionType->type = &TYPE_T;
+    FUNCTION_T.declaringTerm = functionType;
+    term_value(functionType)->value_type = &TYPE_T;
+    term_value(functionType)->value_data.ptr = &FUNCTION_T;
+    rename(functionType, name_from_string("Function"));
 
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;
@@ -837,16 +822,16 @@ void bootstrap_kernel()
     function_set_empty_evaluation(as_function(valueFunc));
 
     // Initialize primitive types (this requires value() function)
-    BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
-    FLOAT_TYPE = create_type_value(kernel, &FLOAT_T, "number");
-    INT_TYPE = create_type_value(kernel, &INT_T, "int");
-    NAME_TYPE = create_type_value(kernel, &NAME_T, "Name");
-    STRING_TYPE = create_type_value(kernel, &STRING_T, "String");
-    DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
-    REF_TYPE = create_type_value(kernel, &REF_T, "Term");
-    VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
+    create_type_value(kernel, &BOOL_T, "bool");
+    create_type_value(kernel, &FLOAT_T, "number");
+    create_type_value(kernel, &INT_T, "int");
+    create_type_value(kernel, &NAME_T, "Name");
+    create_type_value(kernel, &STRING_T, "String");
+    create_type_value(kernel, &DICT_T, "Dict");
+    create_type_value(kernel, &REF_T, "Term");
+    create_type_value(kernel, &VOID_T, "void");
     TYPES.list = unbox_type(create_type_value(kernel, &LIST_T, "List"));
-    OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
+    create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
     create_type_value(kernel, &BLOCK_T, "Block");
     TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
     hashtable_setup_type(TYPES.map);

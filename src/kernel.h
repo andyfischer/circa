@@ -7,23 +7,6 @@
 
 namespace circa {
 
-extern Block* KERNEL;
-
-extern Term* ANY_TYPE;
-extern Term* BOOL_TYPE;
-extern Term* DICT_TYPE;
-extern Term* FLOAT_TYPE;
-extern Term* INT_TYPE;
-extern Term* REF_TYPE;
-extern Term* STRING_TYPE;
-extern Term* COLOR_TYPE;
-extern Term* FEEDBACK_TYPE;
-extern Term* FUNCTION_TYPE;
-extern Term* NAME_TYPE;
-extern Term* TYPE_TYPE;
-extern Term* VOID_TYPE;
-extern Term* OPAQUE_POINTER_TYPE;
-
 struct BuiltinFuncs {
     Term* add;
     Term* add_i;

@@ -7,8 +7,8 @@ namespace callable_t {
 
     void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {
-        if (declared_type(query->subject) == unbox_type(FUNCTION_TYPE)
-                || declared_type(query->subject) == unbox_type(TYPE_TYPE))
+        if (declared_type(query->subject) == &FUNCTION_T
+                || declared_type(query->subject) == &TYPE_T)
             query->succeed();
         else
             query->fail();
