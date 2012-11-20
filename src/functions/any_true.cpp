@@ -21,7 +21,7 @@ namespace any_true_function {
         set_bool(circa_output(stack, 0), result);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, any_true, "any_true(List l) -> bool;"
                 "'Return whether any of the items in l are true'");

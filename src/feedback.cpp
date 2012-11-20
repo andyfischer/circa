@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "kernel.h"
 #include "building.h"
 #include "code_iterators.h"
@@ -45,7 +45,7 @@ void handle_feedback_event(Stack* context, Term* target, caValue* desired)
             Term* stackTerm = context->callStack[stackPos];
             if (!is_subroutine(stackTerm->function))
                 continue;
-            if (target->owningBranch == stackTerm->function->nestedContents)
+            if (target->owningBlock == stackTerm->function->nestedContents)
                 break;
         }
 
@@ -53,7 +53,7 @@ void handle_feedback_event(Stack* context, Term* target, caValue* desired)
 
         Term* caller = context->callStack[stackPos];
 
-        ca_assert(caller->function->nestedContents == target->owningBranch);
+        ca_assert(caller->function->nestedContents == target->owningBlock);
 
         int input = get_input_index_of_placeholder(target);
 
@@ -78,7 +78,7 @@ void handle_feedback_event(Stack* context, Term* target, caValue* desired)
 
 OLD_FEEDBACK_IMPL_DISABLED
 
-const std::string TRAINING_BRANCH_NAME = "#training";
+const std::string TRAINING_BLOCK_NAME = "#training";
 
 TermList FeedbackOperation::getFeedback(Term* target, Term* type)
 {
@@ -129,9 +129,9 @@ void set_trainable(Term* term, bool value)
     term->setBoolProp("trainable", value);
 }
 
-void update_derived_trainable_properties(Branch& branch)
+void update_derived_trainable_properties(Block& block)
 {
-    for (BranchIterator it(&branch); !it.finished(); it.advance()) {
+    for (BlockIterator it(&block); !it.finished(); it.advance()) {
         // if any of our inputs are trainable then mark us as derived-trainable
         bool found = false;
         for (int i=0; i < it->numInputs(); i++) {
@@ -145,7 +145,7 @@ void update_derived_trainable_properties(Branch& branch)
     }
 }
 
-void normalize_feedback_branch(Branch& branch)
+void normalize_feedback_block(Block& block)
 {
     // Look for any terms that have multiple assign() functions, and combine them with
     // a feedback-accumulator to one assign()
@@ -154,8 +154,8 @@ void normalize_feedback_branch(Branch& branch)
     // assign() term
     std::map<Term*, std::vector<int> > termToAssignTerms;
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < block.length(); i++) {
+        Term* term = block[i];
         if (term->function == UNSAFE_FUNCS.assign) {
             Term* target = term->input(0);
             termToAssignTerms[target].push_back(i);
@@ -177,33 +177,33 @@ void normalize_feedback_branch(Branch& branch)
 
             for (index_it = it->second.begin(); index_it != it->second.end(); ++index_it) {
                 int index = *index_it;
-                ca_assert(branch[index] != NULL);
-                accumulatorInputs.append(branch[index]->input(0));
-                branch.set(index, NULL);
+                ca_assert(block[index] != NULL);
+                accumulatorInputs.append(block[index]->input(0));
+                block.set(index, NULL);
             }
 
             // Create a call to their feedback-accumulator
             // Should probably choose the accumulator func based on type or function
-            Term* accumulator = apply(branch, AVERAGE_FUNC, accumulatorInputs);
+            Term* accumulator = apply(block, AVERAGE_FUNC, accumulatorInputs);
 
             // assign() this
-            apply(branch, UNSAFE_FUNCS.assign, TermList(accumulator, target));
+            apply(block, UNSAFE_FUNCS.assign, TermList(accumulator, target));
         }
     }
 
-    branch.removeNulls();
+    block.removeNulls();
 }
 
-void refresh_training_branch(Branch& branch, Branch& trainingBranch)
+void refresh_training_block(Block& block, Block& trainingBlock)
 {
     //#if 0
-    update_derived_trainable_properties(branch);
-    trainingBranch.clear();
+    update_derived_trainable_properties(block);
+    trainingBlock.clear();
 
     FeedbackOperation operation;
 
     // Iterate backwards through the code
-    for (BranchIterator it(&branch, true); !it.finished(); ++it) {
+    for (BlockIterator it(&block, true); !it.finished(); ++it) {
         Term* term = *it;
 
         // Check for feedback(), which does nothing but create a feedback signal
@@ -250,11 +250,11 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 
         if (term->numInputs() == 0) {
             // Just create a feedback term. This is probably an assign() for a value()
-            apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
+            apply(trainingBlock, feedbackFunc, TermList(term, desiredValue));
 
         } else if (term->numInputs() == 1) {
             // Create a feedback term with only 1 output
-            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
+            Term* feedback = apply(trainingBlock, feedbackFunc, TermList(term, desiredValue));
             operation.sendFeedback(term->input(0), feedback, DESIRED_VALUE_FEEDBACK);
 
         } else if (term->numInputs() > 1) {
@@ -263,7 +263,7 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 
             // Inputs to feedback func are [originalTerm, desiredValue]
 
-            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
+            Term* feedback = apply(trainingBlock, feedbackFunc, TermList(term, desiredValue));
             // Resize the output of 'feedback' so that there is one output term per input
             resize_list(feedback_output(feedback), term->numInputs(), ANY_TYPE);
 
@@ -290,18 +290,18 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
     //#endif
 }
 
-void refresh_training_branch(Branch& branch)
+void refresh_training_block(Block& block)
 {
-    refresh_training_branch(branch, default_training_branch(branch));
+    refresh_training_block(block, default_training_block(block));
 }
 
-Branch& default_training_branch(Branch& branch)
+Block& default_training_block(Block& block)
 {
-    // Check if '#training' branch exists. Create if it doesn't exist
-    if (!branch.contains(TRAINING_BRANCH_NAME))
-        create_branch(branch, TRAINING_BRANCH_NAME);
+    // Check if '#training' block exists. Create if it doesn't exist
+    if (!block.contains(TRAINING_BLOCK_NAME))
+        create_block(block, TRAINING_BLOCK_NAME);
 
-    return nested_contents(branch[TRAINING_BRANCH_NAME]);
+    return nested_contents(block[TRAINING_BLOCK_NAME]);
 }
 
 float get_feedback_weight(Term* term)
@@ -314,7 +314,7 @@ void set_feedback_weight(Term* term, float weight)
     term->setFloatProp("feedback-weight", weight);
 }
 
-void feedback_register_constants(Branch& kernel)
+void feedback_register_constants(Block& kernel)
 {
 #if 0
     FEEDBACK_TYPE = create_empty_type(kernel, "FeedbackType");
@@ -322,7 +322,7 @@ void feedback_register_constants(Branch& kernel)
 #endif
 }
 
-Branch& feedback_output(Term* term)
+Block& feedback_output(Term* term)
 {
     // might refactor this:
     return nested_contents(term);

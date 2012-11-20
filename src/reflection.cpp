@@ -40,14 +40,14 @@ bool is_term_ref(caValue* val)
     return val->value_type == &REF_T;
 }
 
-void branch_ref(caStack* stack)
+void block_ref(caStack* stack)
 {
     Term* input0 = (Term*) circa_caller_input_term(stack, 0);
-    Branch* branch = input0->nestedContents;
-    if (branch != NULL) {
-        gc_mark_object_referenced(&branch->header);
+    Block* block = input0->nestedContents;
+    if (block != NULL) {
+        gc_mark_object_referenced(&block->header);
     }
-    set_branch(circa_output(stack, 0), branch);
+    set_block(circa_output(stack, 0), block);
 }
 
 void term_ref(caStack* stack)
@@ -56,126 +56,126 @@ void term_ref(caStack* stack)
     set_term_ref(circa_output(stack, 0), (Term*) term);
 }
 
-void update_all_code_references_in_value(caValue* value, Branch* oldBranch, Branch* newBranch)
+void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block* newBlock)
 {
     for (ValueIterator it(value); it.unfinished(); it.advance()) {
         caValue* val = *it;
         if (is_ref(val)) {
-            set_term_ref(val, translate_term_across_branches(as_term_ref(val),
-                oldBranch, newBranch));
+            set_term_ref(val, translate_term_across_blockes(as_term_ref(val),
+                oldBlock, newBlock));
             
-        } else if (is_branch(val)) {
+        } else if (is_block(val)) {
 
-            // If this is just a reference to 'oldBranch' then simply update it to 'newBranch'.
-            if (as_branch(val) == oldBranch) {
-                set_branch(val, newBranch);
+            // If this is just a reference to 'oldBlock' then simply update it to 'newBlock'.
+            if (as_block(val) == oldBlock) {
+                set_block(val, newBlock);
                 continue;
             }
 
-            // Noop on null branch.
-            if (as_branch(val) == NULL)
+            // Noop on null block.
+            if (as_block(val) == NULL)
                 continue;
 
-            // Noop if branch has no owner.
-            Term* oldTerm = as_branch(val)->owningTerm;
+            // Noop if block has no owner.
+            Term* oldTerm = as_block(val)->owningTerm;
             if (oldTerm == NULL)
                 continue;
 
-            Term* newTerm = translate_term_across_branches(oldTerm, oldBranch, newBranch);
+            Term* newTerm = translate_term_across_blockes(oldTerm, oldBlock, newBlock);
             if (newTerm == NULL) {
-                set_branch(val, NULL);
+                set_block(val, NULL);
                 continue;
             }
 
-            set_branch(val, newTerm->nestedContents);
+            set_block(val, newTerm->nestedContents);
         }
     }
 }
 
-void Branch__dump(caStack* stack)
+void Block__dump(caStack* stack)
 {
-    dump(as_branch(circa_input(stack, 0)));
+    dump(as_block(circa_input(stack, 0)));
 }
 
-void Branch__input(caStack* stack)
+void Block__input(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
     set_term_ref(circa_output(stack, 0),
-        get_input_placeholder(branch, circa_int_input(stack, 1)));
+        get_input_placeholder(block, circa_int_input(stack, 1)));
 }
-void Branch__inputs(caStack* stack)
+void Block__inputs(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
     set_list(output, 0);
     for (int i=0;; i++) {
-        Term* term = get_input_placeholder(branch, i);
+        Term* term = get_input_placeholder(block, i);
         if (term == NULL)
             break;
         set_term_ref(list_append(output), term);
     }
 }
-void Branch__is_null(caStack* stack)
+void Block__is_null(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), branch == NULL);
+    Block* block = as_block(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), block == NULL);
 }
-void Branch__output(caStack* stack)
+void Block__output(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
     set_term_ref(circa_output(stack, 0),
-        get_output_placeholder(branch, circa_int_input(stack, 1)));
+        get_output_placeholder(block, circa_int_input(stack, 1)));
 }
-void Branch__outputs(caStack* stack)
+void Block__outputs(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
     set_list(output, 0);
     for (int i=0;; i++) {
-        Term* term = get_output_placeholder(branch, i);
+        Term* term = get_output_placeholder(block, i);
         if (term == NULL)
             break;
         set_term_ref(list_append(output), term);
     }
 }
-void Branch__owner(caStack* stack)
+void Block__owner(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL) {
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL) {
         set_term_ref(circa_output(stack, 0), NULL);
         return;
     }
 
-    set_term_ref(circa_output(stack, 0), branch->owningTerm);
+    set_term_ref(circa_output(stack, 0), block->owningTerm);
 }
 
-void Branch__format_source(caStack* stack)
+void Block__format_source(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
 
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);
-    format_branch_source((caValue*) output, branch);
+    format_block_source((caValue*) output, block);
 }
 
-void Branch__format_function_heading(caStack* stack)
+void Block__format_function_heading(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);
-    function_format_header_source(output, branch);
+    function_format_header_source(output, block);
 }
 
 #if 0
-void Branch__get_documentation(caStack* stack)
+void Block__get_documentation(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
 
     caValue* out = circa_output(stack, 0);
     set_list(out, 0);
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (is_input_placeholder(term))
             continue;
 
@@ -185,92 +185,92 @@ void Branch__get_documentation(caStack* stack)
 }
 #endif
 
-void Branch__has_static_error(caStack* stack)
+void Block__has_static_error(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), has_static_errors_cached(branch));
+    Block* block = as_block(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), has_static_errors_cached(block));
 }
 
-void Branch__get_static_errors(caStack* stack)
+void Block__get_static_errors(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
 
-    if (is_null(&branch->staticErrors))
+    if (is_null(&block->staticErrors))
         set_list(circa_output(stack, 0), 0);
     else
-        copy(&branch->staticErrors, circa_output(stack, 0));
+        copy(&block->staticErrors, circa_output(stack, 0));
 }
 
-void Branch__get_static_errors_formatted(caStack* stack)
+void Block__get_static_errors_formatted(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
-    if (is_null(&branch->staticErrors))
+    if (is_null(&block->staticErrors))
         set_list(circa_output(stack, 0), 0);
 
-    caValue* errors = &branch->staticErrors;
+    caValue* errors = &block->staticErrors;
     caValue* out = circa_output(stack, 0);
     set_list(out, circa_count(errors));
     for (int i=0; i < circa_count(out); i++)
         format_static_error(circa_index(errors, i), circa_index(out, i));
 }
 
-void Branch__call(caStack* stack)
+void Block__call(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     caValue* inputs = circa_input(stack, 1);
     ca_assert(is_list(inputs));
-    push_frame_with_inputs(stack, branch, inputs);
+    push_frame_with_inputs(stack, block, inputs);
 }
 
 // Reflection
 
-void Branch__terms(caStack* stack)
+void Block__terms(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     caValue* out = circa_output(stack, 0);
-    set_list(out, branch->length());
+    set_list(out, block->length());
 
-    for (int i=0; i < branch->length(); i++)
-        set_term_ref(circa_index(out, i), branch->get(i));
+    for (int i=0; i < block->length(); i++)
+        set_term_ref(circa_index(out, i), block->get(i));
 }
 
-void Branch__version(caStack* stack)
+void Block__version(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
-    set_int(circa_output(stack, 0), branch->version);
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
+    set_int(circa_output(stack, 0), block->version);
 }
 
-void Branch__walk_terms(caStack* stack)
+void Block__walk_terms(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     caValue* out = circa_output(stack, 0);
     set_list(out, 0);
-    for (BranchIterator it(branch); it.unfinished(); it.advance())
+    for (BlockIterator it(block); it.unfinished(); it.advance())
         set_term_ref(list_append(out), *it);
 }
 
-void Branch__get_term(caStack* stack)
+void Block__get_term(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     int index = circa_int_input(stack, 1);
-    set_term_ref(circa_output(stack, 0), branch->get(index));
+    set_term_ref(circa_output(stack, 0), block->get(index));
 }
 
 bool is_considered_config(Term* term)
@@ -286,45 +286,45 @@ bool is_considered_config(Term* term)
     return true;
 }
 
-void Branch__list_configs(caStack* stack)
+void Block__list_configs(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     caValue* output = circa_output(stack, 0);
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (is_considered_config(term))
             set_term_ref(circa_append(output), term);
     }
 }
 
-void Branch__functions(caStack* stack)
+void Block__functions(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     caValue* output = circa_output(stack, 0);
     set_list(output, 0);
 
-    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (is_function(term)) {
-            set_branch(list_append(output), function_contents(as_function(term)));
+            set_block(list_append(output), function_contents(as_function(term)));
         }
     }
 }
 
-void Branch__file_signature(caStack* stack)
+void Block__file_signature(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
-    List* fileOrigin = branch_get_file_origin(branch);
+    List* fileOrigin = block_get_file_origin(block);
     if (fileOrigin == NULL)
         set_null(circa_output(stack, 0));
     else
@@ -335,38 +335,38 @@ void Branch__file_signature(caStack* stack)
     }
 }
 
-void Branch__find_term(caStack* stack)
+void Block__find_term(caStack* stack)
 {
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
-    Term* term = branch->get(circa_string_input(stack, 1));
+    Term* term = block->get(circa_string_input(stack, 1));
 
     set_term_ref(circa_output(stack, 0), term);
 }
 
-void Branch__statements(caStack* stack)
+void Block__statements(caStack* stack)
 {
-    Branch* branch = (Branch*) circa_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
+    Block* block = (Block*) circa_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
 
     caValue* out = circa_output(stack, 0);
 
     circa_set_list(out, 0);
 
-    for (int i=0; i < branch->length(); i++)
-        if (is_statement(branch->get(i)))
-            circa_set_term(circa_append(out), (caTerm*) branch->get(i));
+    for (int i=0; i < block->length(); i++)
+        if (is_statement(block->get(i)))
+            circa_set_term(circa_append(out), (caTerm*) block->get(i));
 }
 
-void Branch__link(caStack* stack)
+void Block__link(caStack* stack)
 {
-    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
-    Branch* source = (Branch*) circa_branch(circa_input(stack, 1));
+    Block* self = (Block*) circa_block(circa_input(stack, 0));
+    Block* source = (Block*) circa_block(circa_input(stack, 1));
 
-    branch_link_missing_functions(self, source);
+    block_link_missing_functions(self, source);
 }
 
 void Term__name(caStack* stack)
@@ -413,7 +413,7 @@ void Term__function(caStack* stack)
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
-    set_branch(circa_output(stack, 0), function_contents(as_function(t->function)));
+    set_block(circa_output(stack, 0), function_contents(as_function(t->function)));
 }
 void Term__type(caStack* stack)
 {
@@ -542,7 +542,7 @@ void Term__parent(caStack* stack)
         circa_output_error(stack, "NULL reference");
         return;
     }
-    set_branch(circa_output(stack, 0), t->owningBranch);
+    set_block(circa_output(stack, 0), t->owningBlock);
 }
 void Term__contents(caStack* stack)
 {
@@ -551,7 +551,7 @@ void Term__contents(caStack* stack)
         circa_output_error(stack, "NULL reference");
         return;
     }
-    set_branch(circa_output(stack, 0), t->nestedContents);
+    set_block(circa_output(stack, 0), t->nestedContents);
 }
 void Term__is_null(caStack* stack)
 {
@@ -610,47 +610,47 @@ void Term__property(caStack* stack)
 
 void is_overloaded_func(caStack* stack)
 {
-    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
+    Block* self = (Block*) circa_block(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), is_overloaded_function(self));
 }
 
 void overload__get_contents(caStack* stack)
 {
-    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
+    Block* self = (Block*) circa_block(circa_input(stack, 0));
     caValue* out = circa_output(stack, 0);
     set_list(out, 0);
 
     list_overload_contents(self, out);
 }
 
-void reflection_install_functions(Branch* kernel)
+void reflection_install_functions(Block* kernel)
 {
     static const ImportRecord records[] = {
         {"term_ref", term_ref},
-        {"branch_ref", branch_ref},
-        {"Branch.input", Branch__input},
-        {"Branch.inputs", Branch__inputs},
-        {"Branch.is_null", Branch__is_null},
-        {"Branch.output", Branch__output},
-        {"Branch.outputs", Branch__outputs},
-        {"Branch.owner", Branch__owner},
-        {"Branch.dump", Branch__dump},
-        {"Branch.call", Branch__call},
-        {"Branch.file_signature", Branch__file_signature},
-        {"Branch.statements", Branch__statements},
-        {"Branch.format_source", Branch__format_source},
-        {"Branch.format_function_heading", Branch__format_function_heading},
-        {"Branch.get_term", Branch__get_term},
-        {"Branch.get_static_errors", Branch__get_static_errors},
-        {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
-        {"Branch.has_static_error", Branch__has_static_error},
-        {"Branch.list_configs", Branch__list_configs},
-        {"Branch.find_term", Branch__find_term},
-        {"Branch.functions", Branch__functions},
-        {"Branch.terms", Branch__terms},
-        {"Branch.version", Branch__version},
-        {"Branch.walk_terms", Branch__walk_terms},
-        {"Branch.link", Branch__link},
+        {"block_ref", block_ref},
+        {"Block.input", Block__input},
+        {"Block.inputs", Block__inputs},
+        {"Block.is_null", Block__is_null},
+        {"Block.output", Block__output},
+        {"Block.outputs", Block__outputs},
+        {"Block.owner", Block__owner},
+        {"Block.dump", Block__dump},
+        {"Block.call", Block__call},
+        {"Block.file_signature", Block__file_signature},
+        {"Block.statements", Block__statements},
+        {"Block.format_source", Block__format_source},
+        {"Block.format_function_heading", Block__format_function_heading},
+        {"Block.get_term", Block__get_term},
+        {"Block.get_static_errors", Block__get_static_errors},
+        {"Block.get_static_errors_formatted", Block__get_static_errors_formatted},
+        {"Block.has_static_error", Block__has_static_error},
+        {"Block.list_configs", Block__list_configs},
+        {"Block.find_term", Block__find_term},
+        {"Block.functions", Block__functions},
+        {"Block.terms", Block__terms},
+        {"Block.version", Block__version},
+        {"Block.walk_terms", Block__walk_terms},
+        {"Block.link", Block__link},
         {"Term.assign", Term__assign},
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},

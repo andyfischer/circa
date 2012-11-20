@@ -453,18 +453,18 @@ namespace zmq_file_source {
 #endif
 
 // For static linking:
-void zmq_install_functions(caBranch* branch)
+void zmq_install_functions(caBlock* block)
 {
-    circa_install_function(branch, "zmq:create_responder", zmq__create_responder);
-    circa_install_function(branch, "zmq:Responder.read", zmq__Responder_read);
-    circa_install_function(branch, "zmq:Responder.reply", zmq__Responder_reply);
-    circa_install_function(branch, "zmq:create_requester", zmq__create_requester);
-    circa_install_function(branch, "zmq:Requester.send", zmq__Requester_send);
-    circa_install_function(branch, "zmq:Requester.receive", zmq__Requester_receive);
-    circa_install_function(branch, "zmq:create_publisher", zmq__create_publisher);
-    circa_install_function(branch, "zmq:Publisher.send", zmq__Publisher_send);
-    circa_install_function(branch, "zmq:create_subscriber", zmq__create_subscriber);
-    circa_install_function(branch, "zmq:Subscriber.poll", zmq__Subscriber_poll);
+    circa_install_function(block, "zmq:create_responder", zmq__create_responder);
+    circa_install_function(block, "zmq:Responder.read", zmq__Responder_read);
+    circa_install_function(block, "zmq:Responder.reply", zmq__Responder_reply);
+    circa_install_function(block, "zmq:create_requester", zmq__create_requester);
+    circa_install_function(block, "zmq:Requester.send", zmq__Requester_send);
+    circa_install_function(block, "zmq:Requester.receive", zmq__Requester_receive);
+    circa_install_function(block, "zmq:create_publisher", zmq__create_publisher);
+    circa_install_function(block, "zmq:Publisher.send", zmq__Publisher_send);
+    circa_install_function(block, "zmq:create_subscriber", zmq__create_subscriber);
+    circa_install_function(block, "zmq:Subscriber.poll", zmq__Subscriber_poll);
 }
 
 } // extern "C"

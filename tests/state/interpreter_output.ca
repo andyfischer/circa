@@ -10,6 +10,6 @@ b = {
 }
 
 int = make_interpreter()
-int.push_frame(branch_ref(b), [1])
+int.push_frame(block_ref(b), [1])
 int.run
 print(int.get_state_output)

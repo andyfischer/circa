@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "debug.h"
 #include "function.h"
 #include "kernel.h"
@@ -62,22 +62,22 @@ Term* run_name_search(NameSearch* params)
     if (params->name == 0)
         return NULL;
 
-    Branch* branch = params->branch;
+    Block* block = params->block;
 
-    if (branch == NULL)
+    if (block == NULL)
         return NULL;
 
     // position can be -1, meaning 'last term'
     int position = params->position;
     if (position == -1)
-        position = branch->length();
+        position = block->length();
 
-    if (position > branch->length())
-        position = branch->length();
+    if (position > block->length())
+        position = block->length();
 
     // Look for an exact match.
     for (int i = position - 1; i >= 0; i--) {
-        Term* term = branch->get(i);
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
 
@@ -86,10 +86,10 @@ Term* run_name_search(NameSearch* params)
                 && (params->ordinal == -1 || term->uniqueOrdinal == params->ordinal))
             return term;
 
-        // If this term exposes its names, then search inside the nested branch.
+        // If this term exposes its names, then search inside the nested block.
         if (term->nestedContents != NULL && exposes_nested_names(term)) {
             NameSearch nestedSearch;
-            nestedSearch.branch = term->nestedContents;
+            nestedSearch.block = term->nestedContents;
             nestedSearch.name = params->name;
             nestedSearch.position = -1;
             nestedSearch.ordinal = -1;
@@ -107,7 +107,7 @@ Term* run_name_search(NameSearch* params)
     // If it's a qualified name, search for the first prefix.
     if (namespacePrefix != name_None) {
         NameSearch nsSearch;
-        nsSearch.branch = params->branch;
+        nsSearch.block = params->block;
         nsSearch.name = namespacePrefix;
         nsSearch.position = params->position;
         nsSearch.ordinal = params->ordinal;
@@ -118,7 +118,7 @@ Term* run_name_search(NameSearch* params)
         if (nsPrefixTerm != NULL) {
             // Recursively search inside the prefix for the remainder of the name.
             NameSearch nestedSearch;
-            nestedSearch.branch = nested_contents(nsPrefixTerm);
+            nestedSearch.block = nested_contents(nsPrefixTerm);
             nestedSearch.name = qualified_name_get_remainder_after_first_section(params->name);
             nestedSearch.position = -1;
             nestedSearch.ordinal = params->ordinal;
@@ -128,24 +128,24 @@ Term* run_name_search(NameSearch* params)
         }
     }
 
-    // Possibly continue search to parent branch.
+    // Possibly continue search to parent block.
     if (params->searchParent) {
 
         // Don't continue the search if we just searched the root.
-        if (branch == global_root_branch())
+        if (block == global_root_block())
             return NULL;
 
         // Search parent
 
         // the position is our parent's position plus one, so that we do look
-        // at the parent's branch (in case our name has a namespace prefix
-        // that refers back to the inside of this branch).
+        // at the parent's block (in case our name has a namespace prefix
+        // that refers back to the inside of this block).
         //
         // TODO: This has an issue where, if we do have a qualified name that
-        // refers back to this branch as a namespace, the search location will
+        // refers back to this block as a namespace, the search location will
         // be wrong later.
         //
-        // Say we have branch:
+        // Say we have block:
         // namespace ns {
         //   a = 1
         //   b = 2  <-- search location
@@ -153,17 +153,17 @@ Term* run_name_search(NameSearch* params)
         // }
         //
         // We start at location 'b' and search for ns:c. This will fail at first, then
-        // go to the parent branch which finds 'ns', which searches inside 'ns' to find 'c'.
+        // go to the parent block which finds 'ns', which searches inside 'ns' to find 'c'.
         // However, ns:c is not visible at location 'b'.
         
         NameSearch parentSearch;
 
-        Term* parentTerm = branch->owningTerm;
+        Term* parentTerm = block->owningTerm;
         if (parentTerm != NULL) {
-            parentSearch.branch = parentTerm->owningBranch;
+            parentSearch.block = parentTerm->owningBlock;
             parentSearch.position = parentTerm->index + 1;
         } else {
-            parentSearch.branch = global_root_branch();
+            parentSearch.block = global_root_block();
             parentSearch.position = -1;
         }
         parentSearch.name = params->name;
@@ -176,10 +176,10 @@ Term* run_name_search(NameSearch* params)
     return NULL;
 }
 
-Term* find_name(Branch* branch, Name name, int position, Name lookupType)
+Term* find_name(Block* block, Name name, int position, Name lookupType)
 {
     NameSearch nameSearch;
-    nameSearch.branch = branch;
+    nameSearch.block = block;
     nameSearch.name = name;
     nameSearch.position = position;
     nameSearch.ordinal = -1;
@@ -188,10 +188,10 @@ Term* find_name(Branch* branch, Name name, int position, Name lookupType)
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Branch* branch, Name name, int position, Name lookupType)
+Term* find_local_name(Block* block, Name name, int position, Name lookupType)
 {
     NameSearch nameSearch;
-    nameSearch.branch = branch;
+    nameSearch.block = block;
     nameSearch.name = name;
     nameSearch.position = position;
     nameSearch.ordinal = -1;
@@ -200,14 +200,14 @@ Term* find_local_name(Branch* branch, Name name, int position, Name lookupType)
     return run_name_search(&nameSearch);
 }
 
-Term* find_name(Branch* branch, const char* nameStr, int position, Name lookupType)
+Term* find_name(Block* block, const char* nameStr, int position, Name lookupType)
 {
     Name name = name_from_string(nameStr);
     if (name == name_None)
         return NULL;
 
     NameSearch nameSearch;
-    nameSearch.branch = branch;
+    nameSearch.block = block;
     nameSearch.name = name;
     nameSearch.position = position;
     nameSearch.ordinal = -1;
@@ -216,14 +216,14 @@ Term* find_name(Branch* branch, const char* nameStr, int position, Name lookupTy
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Branch* branch, const char* nameStr, int position, Name lookupType)
+Term* find_local_name(Block* block, const char* nameStr, int position, Name lookupType)
 {
     Name name = name_from_string(nameStr);
     if (name == name_None)
         return NULL;
 
     NameSearch nameSearch;
-    nameSearch.branch = branch;
+    nameSearch.block = block;
     nameSearch.name = name;
     nameSearch.position = position;
     nameSearch.ordinal = -1;
@@ -242,14 +242,14 @@ void get_global_name(Term* term, caValue* nameOut)
     while (true) {
         stack.push_back(searchTerm);
 
-        if (searchTerm->owningBranch == global_root_branch())
+        if (searchTerm->owningBlock == global_root_block())
             break;
 
         searchTerm = get_parent_term(searchTerm);
 
         if (searchTerm == NULL) {
             // Parent is NULL but we haven't yet reached the global root. This is
-            // a deprecated style of branch that isn't connected to root. No global
+            // a deprecated style of block that isn't connected to root. No global
             // name is possible.
             set_name(nameOut, name_None);
             return;
@@ -279,23 +279,23 @@ void get_global_name(Term* term, caValue* nameOut)
     }
 }
 
-void get_global_name(Branch* branch, caValue* nameOut)
+void get_global_name(Block* block, caValue* nameOut)
 {
-    if (branch->owningTerm == NULL) {
+    if (block->owningTerm == NULL) {
         set_null(nameOut);
         return;
     }
-    get_global_name(branch->owningTerm, nameOut);
+    get_global_name(block->owningTerm, nameOut);
 }
 
 Term* find_from_global_name(World* world, const char* globalName)
 {
-    Branch* branch = world->root;
+    Block* block = world->root;
 
     // Loop, walking down the (possibly) qualified name.
     for (int step=0;; step++) {
 
-        ca_assert(branch != NULL);
+        ca_assert(block != NULL);
 
         int separatorPos = name_find_qualified_separator(globalName);
         int nameEnd = separatorPos;
@@ -303,7 +303,7 @@ Term* find_from_global_name(World* world, const char* globalName)
 
         NameSearch nameSearch;
         nameSearch.name = existing_name_from_string(globalName, nameEnd);
-        nameSearch.branch = branch;
+        nameSearch.block = block;
         nameSearch.position = -1;
         nameSearch.ordinal = ordinal;
         nameSearch.lookupType = name_LookupAny;
@@ -321,7 +321,7 @@ Term* find_from_global_name(World* world, const char* globalName)
 
         // Otherwise, continue the search.
         globalName = globalName + separatorPos + 1;
-        branch = nested_contents(foundTerm);
+        block = nested_contents(foundTerm);
     }
 }
 
@@ -332,7 +332,7 @@ Term* find_name_at(Term* term, const char* nameStr)
         return NULL;
 
     NameSearch nameSearch;
-    nameSearch.branch = term->owningBranch;
+    nameSearch.block = term->owningBlock;
     nameSearch.name = name;
     nameSearch.position = term->index;
     nameSearch.ordinal = -1;
@@ -344,7 +344,7 @@ Term* find_name_at(Term* term, const char* nameStr)
 Term* find_name_at(Term* term, Name name)
 {
     NameSearch nameSearch;
-    nameSearch.branch = term->owningBranch;
+    nameSearch.block = term->owningBlock;
     nameSearch.name = name;
     nameSearch.position = term->index;
     nameSearch.ordinal = -1;
@@ -426,31 +426,31 @@ Term* find_global(const char* nameStr)
     if (name == name_None)
         return NULL;
 
-    return find_name(global_root_branch(), name);
+    return find_name(global_root_block(), name);
 }
 
-Branch* get_parent_branch(Branch* branch)
+Block* get_parent_block(Block* block)
 {
-    if (branch == global_root_branch())
+    if (block == global_root_block())
         return NULL;
 
-    if (branch->owningTerm == NULL)
-        return global_root_branch();
+    if (block->owningTerm == NULL)
+        return global_root_block();
 
-    if (branch->owningTerm->owningBranch == NULL)
-        return global_root_branch();
+    if (block->owningTerm->owningBlock == NULL)
+        return global_root_block();
 
-    return branch->owningTerm->owningBranch;
+    return block->owningTerm->owningBlock;
 }
 
 Term* get_parent_term(Term* term)
 {
-    if (term->owningBranch == NULL)
+    if (term->owningBlock == NULL)
         return NULL;
-    if (term->owningBranch->owningTerm == NULL)
+    if (term->owningBlock->owningTerm == NULL)
         return NULL;
 
-    return term->owningBranch->owningTerm;
+    return term->owningBlock->owningTerm;
 }
 
 Term* get_parent_term(Term* term, int levels)
@@ -463,12 +463,12 @@ Term* get_parent_term(Term* term, int levels)
     return term;
 }
 
-bool name_is_reachable_from(Term* term, Branch* branch)
+bool name_is_reachable_from(Term* term, Block* block)
 {
-    if (term->owningBranch == branch)
+    if (term->owningBlock == block)
         return true;
 
-    Branch* parent = get_parent_branch(branch);
+    Block* parent = get_parent_block(block);
 
     if (parent == NULL)
         return false;
@@ -476,36 +476,36 @@ bool name_is_reachable_from(Term* term, Branch* branch)
     return name_is_reachable_from(term, parent);
 }
 
-Branch* find_first_common_branch(Term* left, Term* right)
+Block* find_first_common_block(Term* left, Term* right)
 {
-    Branch* leftParent = left->owningBranch;
-    Branch* rightParent = right->owningBranch;
+    Block* leftParent = left->owningBlock;
+    Block* rightParent = right->owningBlock;
 
     if (leftParent == NULL) return NULL;
     if (rightParent == NULL) return NULL;
 
     // Walk upwards from left term.
-    while (leftParent != NULL && leftParent != global_root_branch()) {
+    while (leftParent != NULL && leftParent != global_root_block()) {
 
         // Walk upwards from right term.
-        while (rightParent != NULL && leftParent != global_root_branch()) {
+        while (rightParent != NULL && leftParent != global_root_block()) {
             if (leftParent == rightParent)
                 return leftParent;
 
-            rightParent = get_parent_branch(rightParent);
+            rightParent = get_parent_block(rightParent);
         }
 
-        leftParent = get_parent_branch(leftParent);
-        rightParent = right->owningBranch;
+        leftParent = get_parent_block(leftParent);
+        rightParent = right->owningBlock;
     }
 
     return NULL;
 }
 
-bool term_is_child_of_branch(Term* term, Branch* branch)
+bool term_is_child_of_block(Term* term, Block* block)
 {
     while (term != NULL) {
-        if (term->owningBranch == branch)
+        if (term->owningBlock == block)
             return true;
 
         term = get_parent_term(term);
@@ -515,9 +515,9 @@ bool term_is_child_of_branch(Term* term, Branch* branch)
 }
 
 // Returns whether or not we succeeded
-bool get_relative_name_recursive(Branch* branch, Term* term, std::stringstream& output)
+bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& output)
 {
-    if (name_is_reachable_from(term, branch)) {
+    if (name_is_reachable_from(term, block)) {
         output << term->name;
         return true;
     }
@@ -527,13 +527,13 @@ bool get_relative_name_recursive(Branch* branch, Term* term, std::stringstream& 
     if (parentTerm == NULL)
         return false;
 
-    // Don't include the names of hidden branches
+    // Don't include the names of hidden blockes
     if (is_hidden(parentTerm)) {
         output << term->name;
         return true;
     }
 
-    bool success = get_relative_name_recursive(branch, parentTerm, output);
+    bool success = get_relative_name_recursive(block, parentTerm, output);
 
     if (success) {
         output << ":" << term->name;
@@ -543,17 +543,17 @@ bool get_relative_name_recursive(Branch* branch, Term* term, std::stringstream& 
     }
 }
 
-std::string get_relative_name(Branch* branch, Term* term)
+std::string get_relative_name(Block* block, Term* term)
 {
     ca_assert(term != NULL);
 
-    if (name_is_reachable_from(term, branch))
+    if (name_is_reachable_from(term, block))
         return term->name;
 
     // Build a dot-separated name
     std::stringstream result;
 
-    get_relative_name_recursive(branch, term, result);
+    get_relative_name_recursive(block, term, result);
 
     return result.str();
 }
@@ -561,15 +561,15 @@ std::string get_relative_name(Branch* branch, Term* term)
 std::string get_relative_name_at(Term* location, Term* term)
 {
     if (location == NULL)
-        return get_relative_name(global_root_branch(), term);
+        return get_relative_name(global_root_block(), term);
 
-    if (location->owningBranch == NULL)
+    if (location->owningBlock == NULL)
         return term->name;
     else
-        return get_relative_name(location->owningBranch, term);
+        return get_relative_name(location->owningBlock, term);
 }
 
-void get_relative_name_as_list(Term* term, Branch* relativeTo, caValue* nameOutput)
+void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutput)
 {
     set_list(nameOutput, 0);
 
@@ -579,7 +579,7 @@ void get_relative_name_as_list(Term* term, Branch* relativeTo, caValue* nameOutp
     while (true) {
         set_string(list_append(nameOutput), get_unique_name(term));
 
-        if (term->owningBranch == relativeTo) {
+        if (term->owningBlock == relativeTo) {
             break;
         }
 
@@ -596,7 +596,7 @@ void get_relative_name_as_list(Term* term, Branch* relativeTo, caValue* nameOutp
     list_reverse(nameOutput);
 }
 
-Term* find_from_relative_name_list(caValue* name, Branch* relativeTo)
+Term* find_from_relative_name_list(caValue* name, Block* relativeTo)
 {
     if (is_null(name))
         return NULL;
@@ -622,7 +622,7 @@ void update_unique_name(Term* term)
 {
     Term::UniqueName& name = term->uniqueName;
 
-    if (term->owningBranch == NULL) {
+    if (term->owningBlock == NULL) {
         name.name = term->name;
         return;
     }
@@ -642,14 +642,14 @@ void update_unique_name(Term* term)
     // Look for a name collision. We might need to keep looping, if our generated name
     // collides with an existing name.
 
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
 
     bool updatedName = true;
     while (updatedName) {
         updatedName = false;
 
         for (int i = term->index-1; i >= 0; i--) {
-            Term* other = branch->get(i);
+            Term* other = block->get(i);
             if (other == NULL) continue;
 
             // If another term shares the same base, then make sure our ordinal is
@@ -682,16 +682,16 @@ const char* get_unique_name(Term* term)
     return term->uniqueName.name.c_str();
 }
 
-Term* find_from_unique_name(Branch* branch, const char* name)
+Term* find_from_unique_name(Block* block, const char* name)
 {
     // O(n) search; this should be made more efficient.
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
         if (strcmp(get_unique_name(term), name) == 0) {
-            return branch->get(i);
+            return block->get(i);
         }
     }
     return NULL;
@@ -704,28 +704,28 @@ Type* find_type(World* world, const char* name)
         return NULL;
     return circa_type(circa_term_value(term));
 }
-Type* find_type_local(Branch* branch, const char* name)
+Type* find_type_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(branch, name, -1, name_LookupType);
+    caTerm* term = find_name(block, name, -1, name_LookupType);
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
 }
-Branch* find_function(World* world, const char* name)
+Block* find_function(World* world, const char* name)
 {
     caTerm* term = find_name(world->root, name, -1, name_LookupFunction);
     if (term == NULL)
         return NULL;
     return function_contents(term);
 }
-Branch* find_function_local(Branch* branch, const char* name)
+Block* find_function_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(branch, name, -1, name_LookupFunction);
+    caTerm* term = find_name(block, name, -1, name_LookupFunction);
     if (term == NULL)
         return NULL;
     return function_contents(term);
 }
-Branch* find_module(World* world, const char* name)
+Block* find_module(World* world, const char* name)
 {
     caTerm* term = find_name(world->root, name, -1, name_LookupModule);
     if (term == NULL)

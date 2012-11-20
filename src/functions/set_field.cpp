@@ -43,7 +43,7 @@ namespace set_field_function {
         format_source_for_input(source, term, 1);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.set_field = import_function(kernel, evaluate,
                 "set_field(any, String, any) -> any");

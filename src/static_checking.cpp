@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "kernel.h"
@@ -98,20 +98,20 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, to_string(term_value(term->input(0))).c_str());
 }
 
-void check_for_static_errors(List* errors, Branch* branch)
+void check_for_static_errors(List* errors, Block* block)
 {
-    for (BranchIterator it(branch); it.unfinished(); ++it)
+    for (BlockIterator it(block); it.unfinished(); ++it)
         check_term_for_static_error(errors, *it);
 }
 
-void update_static_error_list(Branch* branch)
+void update_static_error_list(Block* block)
 {
     List errors;
-    check_for_static_errors(&errors, branch);
+    check_for_static_errors(&errors, block);
     if (errors.empty())
-        set_null(&branch->staticErrors);
+        set_null(&block->staticErrors);
     else
-        swap(&errors, &branch->staticErrors);
+        swap(&errors, &block->staticErrors);
 }
 
 bool has_static_error(Term* term)
@@ -121,23 +121,23 @@ bool has_static_error(Term* term)
     return !errors.empty();
 }
 
-bool has_static_errors(Branch* branch)
+bool has_static_errors(Block* block)
 {
-    update_static_error_list(branch);
-    return has_static_errors_cached(branch);
+    update_static_error_list(block);
+    return has_static_errors_cached(block);
 }
 
-bool has_static_errors_cached(Branch* branch)
+bool has_static_errors_cached(Block* block)
 {
-    return !is_null(&branch->staticErrors);
+    return !is_null(&block->staticErrors);
 }
 
-int count_static_errors(Branch* branch)
+int count_static_errors(Block* block)
 {
-    update_static_error_list(branch);
-    if (is_null(&branch->staticErrors))
+    update_static_error_list(block);
+    if (is_null(&block->staticErrors))
         return 0;
-    return list_length(&branch->staticErrors);
+    return list_length(&block->staticErrors);
 }
 
 void format_static_error(caValue* error, caValue* stringOutput)
@@ -218,26 +218,26 @@ bool print_static_errors_formatted(caValue* result, std::ostream& out)
     return true;
 }
 
-bool print_static_errors_formatted(Branch* branch, caValue* out)
+bool print_static_errors_formatted(Block* block, caValue* out)
 {
     std::stringstream strm;
-    if (!print_static_errors_formatted(branch, strm))
+    if (!print_static_errors_formatted(block, strm))
         return false;
     set_string(out, strm.str());
     return true;
 }
 
-bool print_static_errors_formatted(Branch* branch, std::ostream& out)
+bool print_static_errors_formatted(Block* block, std::ostream& out)
 {
-    update_static_error_list(branch);
-    if (!is_list(&branch->staticErrors))
+    update_static_error_list(block);
+    if (!is_list(&block->staticErrors))
         return false;
-    return print_static_errors_formatted(&branch->staticErrors, out);
+    return print_static_errors_formatted(&block->staticErrors, out);
 }
 
-bool print_static_errors_formatted(Branch* branch)
+bool print_static_errors_formatted(Block* block)
 {
-    return print_static_errors_formatted(branch, std::cout);
+    return print_static_errors_formatted(block, std::cout);
 }
 
 void print_static_error(Term* term, std::ostream& out)
@@ -249,10 +249,10 @@ void print_static_error(Term* term, std::ostream& out)
         print_static_error(result[0], out);
 }
 
-std::string get_static_errors_formatted(Branch* branch)
+std::string get_static_errors_formatted(Block* block)
 {
     std::stringstream out;
-    print_static_errors_formatted(branch, out);
+    print_static_errors_formatted(block, out);
     return out.str();
 }
 

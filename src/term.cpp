@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "kernel.h"
 #include "debug.h"
@@ -24,7 +24,7 @@ Term::Term()
     function(NULL),
     nameSymbol(name_None),
     uniqueOrdinal(0),
-    owningBranch(NULL),
+    owningBlock(NULL),
     index(0),
     nestedContents(NULL)
 {
@@ -102,7 +102,7 @@ Term::setDependency(int index, Term* term)
         set_input(this, index - 1, term);
 }
 
-Branch*
+Block*
 Term::contents()
 {
     return nested_contents(this);

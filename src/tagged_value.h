@@ -87,7 +87,7 @@ void* get_pointer(caValue* value, Type* expectedType);
 
 // Type checking against builtin types.
 bool is_bool(caValue* value);
-bool is_branch(caValue* value);
+bool is_block(caValue* value);
 bool is_error(caValue* value);
 bool is_float(caValue* value);
 bool is_function(caValue* value);
@@ -104,7 +104,7 @@ bool is_type(caValue* value);
 
 // Unboxing using builtin types.
 bool        as_bool(caValue* value);
-Branch*     as_branch(caValue* value);
+Block*     as_block(caValue* value);
 const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
 Function*   as_function(caValue* value);
@@ -114,7 +114,7 @@ Type*       as_type(caValue* value);
 
 // Boxing using builtin types.
 void set_bool(caValue* value, bool b);
-void set_branch(caValue* value, Branch* branch);
+void set_block(caValue* value, Block* block);
 Dict* set_dict(caValue* value);
 void set_error_string(caValue* value, const char* s);
 void set_float(caValue* value, float f);

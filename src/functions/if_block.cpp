@@ -9,7 +9,7 @@ namespace if_block_function {
     {
         format_name_binding(source, term);
 
-        Branch* contents = nested_contents(term);
+        Block* contents = nested_contents(term);
 
         int index = 0;
         while (contents->get(index)->function == FUNCS.input)
@@ -46,11 +46,11 @@ namespace if_block_function {
                     caseTerm->stringProp("syntax:lineEnding", ""),
                     caseTerm, tok_Whitespace);
 
-            format_branch_source(source, nested_contents(caseTerm), caseTerm);
+            format_block_source(source, nested_contents(caseTerm), caseTerm);
         }
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.if_block = import_function(kernel, NULL, "if_block() -> any");
         as_function(FUNCS.if_block)->formatSource = formatSource;

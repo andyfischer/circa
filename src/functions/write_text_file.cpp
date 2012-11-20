@@ -12,7 +12,7 @@ namespace write_text_file_function {
         write_text_file(STRING_INPUT(0), STRING_INPUT(1));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate,
             "write_text_file(String filename, String contents);"

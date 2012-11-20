@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "function.h"
 #include "importing_macros.h"
@@ -63,7 +63,7 @@ namespace type_t {
         append_phrase(source, term->stringProp("syntax:postLBracketWhitespace", " "),
                 term, tok_Whitespace);
 
-        Branch* contents = nested_contents(term);
+        Block* contents = nested_contents(term);
 
         for (int i=0; i < contents->length(); i++) {
             Term* field = contents->get(i);
@@ -196,7 +196,7 @@ void set_type_property(Type* type, const char* name, caValue* value)
     copy(value, type->properties.insert(name));
 }
 
-Branch* type_declaration_branch(Type* type)
+Block* type_declaration_block(Type* type)
 {
     if (type->declaringTerm == NULL)
         return NULL;
@@ -336,9 +336,9 @@ void initialize_simple_pointer_type(Type* type)
     reset_type(type);
 }
 
-void type_initialize_kernel(Branch* kernel)
+void type_initialize_kernel(Block* kernel)
 {
-    IMPLICIT_TYPES = create_branch(kernel, "#implicit_types")->owningTerm;
+    IMPLICIT_TYPES = create_block(kernel, "#implicit_types")->owningTerm;
 }
 
 Term* create_tuple_type(caValue* types)
@@ -374,23 +374,23 @@ std::string get_base_type_name(std::string const& typeName)
     return "";
 }
 
-Term* find_method_with_search_name(Branch* branch, Type* type, const char* searchName)
+Term* find_method_with_search_name(Block* block, Type* type, const char* searchName)
 {
     // Local name search.
-    if (branch != NULL) {
-        Term* term = find_name(branch, searchName);
+    if (block != NULL) {
+        Term* term = find_name(block, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
 
-    // If not found, look in the branch where the type was declared.
-    Branch* typeDeclarationBranch = NULL;
+    // If not found, look in the block where the type was declared.
+    Block* typeDeclarationBlock = NULL;
 
     if (type->declaringTerm != NULL)
-        typeDeclarationBranch = type->declaringTerm->owningBranch;
+        typeDeclarationBlock = type->declaringTerm->owningBlock;
 
-    if (typeDeclarationBranch != NULL && typeDeclarationBranch != branch) {
-        Term* term = find_name(typeDeclarationBranch, searchName);
+    if (typeDeclarationBlock != NULL && typeDeclarationBlock != block) {
+        Term* term = find_name(typeDeclarationBlock, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
@@ -398,14 +398,14 @@ Term* find_method_with_search_name(Branch* branch, Type* type, const char* searc
     return NULL;
 }
 
-Term* find_method(Branch* branch, Type* type, const char* name)
+Term* find_method(Block* block, Type* type, const char* name)
 {
     if (type->name == 0)
         return NULL;
 
     // First, look inside the type definition, which contains simulated methods and
     // possibly other stuff.
-    Branch* typeDef = type_declaration_branch(type);
+    Block* typeDef = type_declaration_block(type);
     if (typeDef != NULL) {
         Term* func = find_local_name(typeDef, name_from_string(name));
         if (func != NULL && is_function(func))
@@ -416,7 +416,7 @@ Term* find_method(Branch* branch, Type* type, const char* name)
     std::string searchName = std::string(name_to_string(type->name)) + "." + name;
 
     // Standard search.
-    Term* result = find_method_with_search_name(branch, type, searchName.c_str());
+    Term* result = find_method_with_search_name(block, type, searchName.c_str());
 
     if (result != NULL)
         return result;
@@ -426,7 +426,7 @@ Term* find_method(Branch* branch, Type* type, const char* name)
     std::string baseTypeName = get_base_type_name(name_to_string(type->name));
     if (baseTypeName != "") {
         std::string searchName = baseTypeName + "." + name;
-        result = find_method_with_search_name(branch, type, searchName.c_str());
+        result = find_method_with_search_name(block, type, searchName.c_str());
 
         if (result != NULL)
             return result;
@@ -441,9 +441,9 @@ void install_type(Term* term, Type* type)
     set_type(term_value(term), type);
 }
 
-Type* find_type(Branch* branch, const char* name)
+Type* find_type(Block* block, const char* name)
 {
-    Term* term = branch->get(name);
+    Term* term = block->get(name);
     if (term == NULL)
         return NULL;
     if (!is_type(term))

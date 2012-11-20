@@ -19,7 +19,7 @@ namespace concat_function {
         set_string(circa_output(stack, 0), out.str());
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, concat, "concat(any :multiple) -> String;"
             "'Concatenate each input (converting to a string if necessary).'");

@@ -638,9 +638,9 @@ CA_FUNCTION(opengl__bind_main_frame_buffer)
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
-void on_load(Branch* branch)
+void on_load(Block* block)
 {
-    g_frameBuffer_t = setup_type_as_handle<FrameBuffer>(branch, "opengl:FrameBuffer");
+    g_frameBuffer_t = setup_type_as_handle<FrameBuffer>(block, "opengl:FrameBuffer");
 }
 
 } // extern "C"

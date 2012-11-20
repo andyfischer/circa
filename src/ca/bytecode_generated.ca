@@ -29,7 +29,7 @@ OpNames = [
     'Pause'
     'SetNull'
     'InlineCopy'
-    'PushBranch'
+    'PushBlock'
     'FireNative'
     'CaseBlock'
     'ForLoop'

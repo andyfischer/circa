@@ -5,7 +5,7 @@
 namespace circa {
 namespace static_error_function {
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.static_error = 
             import_function(kernel, NULL, "static_error(any msg)");

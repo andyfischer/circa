@@ -11,7 +11,7 @@ enum ExitRank {
 };
 
 // Evaluation helpers
-void control_flow_setup_funcs(Branch* kernel);
-void update_exit_points(Branch* branch);
+void control_flow_setup_funcs(Block* kernel);
+void update_exit_points(Block* block);
 
 } // namespace circa

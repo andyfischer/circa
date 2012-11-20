@@ -1,6 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
@@ -13,9 +13,9 @@
 
 namespace circa {
 
-void mark_static_errors_invalid(Branch* branch)
+void mark_static_errors_invalid(Block* block)
 {
-    set_null(&branch->staticErrors);
+    set_null(&block->staticErrors);
 }
 
 void on_create_call(Term* term)
@@ -29,19 +29,19 @@ void on_create_call(Term* term)
         func(term);
 }
 
-void on_branch_inputs_changed(Branch* branch)
+void on_block_inputs_changed(Block* block)
 {
 }
 
-void fix_forward_function_references(Branch* branch)
+void fix_forward_function_references(Block* block)
 {
-    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             // See if we can now find this function
             std::string functionName = term->stringProp("syntax:functionName", "");
 
-            Term* func = find_name(branch, functionName.c_str());
+            Term* func = find_name(block, functionName.c_str());
             if (func != NULL) {
                 change_function(term, func);
             }
@@ -49,15 +49,15 @@ void fix_forward_function_references(Branch* branch)
     }
 }
 
-void dirty_bytecode(Branch* branch)
+void dirty_bytecode(Block* block)
 {
-    set_null(&branch->bytecode);
+    set_null(&block->bytecode);
 }
 
-void refresh_bytecode(Branch* branch)
+void refresh_bytecode(Block* block)
 {
-    if (is_null(&branch->bytecode))
-        write_branch_bytecode(branch, &branch->bytecode);
+    if (is_null(&block->bytecode))
+        write_block_bytecode(block, &block->bytecode);
 }
 
 } // namespace circa

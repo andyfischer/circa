@@ -100,48 +100,48 @@ Type* infer_type_of_get_index(Term* input)
     }
 }
 
-Term* statically_infer_length_func(Branch* branch, Term* term)
+Term* statically_infer_length_func(Block* block, Term* term)
 {
     Term* input = term->input(0);
     if (input->function == FUNCS.copy)
-        return statically_infer_length_func(branch, input->input(0));
+        return statically_infer_length_func(block, input->input(0));
 
     if (input->function == FUNCS.list)
-        return create_int(branch, input->numInputs());
+        return create_int(block, input->numInputs());
 
     if (input->function == FUNCS.list_append) {
-        Term* leftLength = apply(branch, FUNCS.length, TermList(input->input(0)));
-        return apply(branch, FUNCS.add, TermList(
-                    statically_infer_length_func(branch, leftLength),
-                    create_int(branch, 1)));
+        Term* leftLength = apply(block, FUNCS.length, TermList(input->input(0)));
+        return apply(block, FUNCS.add, TermList(
+                    statically_infer_length_func(block, leftLength),
+                    create_int(block, 1)));
     }
 
     // Give up
     std::cout << "statically_infer_length_func didn't understand: "
         << input->function->name << std::endl;
-    return create_symbol_value(branch, name_Unknown);
+    return create_symbol_value(block, name_Unknown);
 }
 
-Term* statically_infer_result(Branch* branch, Term* term)
+Term* statically_infer_result(Block* block, Term* term)
 {
     if (term->function == FUNCS.length)
-        return statically_infer_length_func(branch, term);
+        return statically_infer_length_func(block, term);
 
 #if 0
     Disabled, this approach might be flawed
     if (term->function == TYPE_FUNC)
-        return statically_infer_type(branch, term->input(0));
+        return statically_infer_type(block, term->input(0));
 #endif
 
     // Function not recognized
     std::cout << "statically_infer_result didn't recognize: "
         << term->function->name << std::endl;
-    return create_symbol_value(branch, name_Unknown);
+    return create_symbol_value(block, name_Unknown);
 }
 
 void statically_infer_result(Term* term, caValue* result)
 {
-    Branch scratch;
+    Block scratch;
 
     Term* resultTerm = statically_infer_result(&scratch, term);
 

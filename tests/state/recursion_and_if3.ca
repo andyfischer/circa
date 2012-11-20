@@ -1,7 +1,7 @@
 
 -- Variation of bug_with_recursion_and_if
 --
--- In this variation, the subroutine already has a branch with a state var.
+-- In this variation, the subroutine already has a block with a state var.
 
 def recr(int depth)
 

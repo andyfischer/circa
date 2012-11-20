@@ -29,7 +29,7 @@ struct Dll
     std::set<void*> loadedFunctions;
 };
 
-typedef void (*OnLoadFunc)(Branch* branch);
+typedef void (*OnLoadFunc)(Block* block);
 
 typedef std::map<std::string, Dll*> LoadedDllMap;
 LoadedDllMap g_loadedDlls;
@@ -121,14 +121,14 @@ Dll* load_dll(const char* filename, caValue* errorOut)
     return dll;
 }
 
-void patch_branch_recr(Dll* dll, Branch* branch, std::string namespacePrefix)
+void patch_block_recr(Dll* dll, Block* block, std::string namespacePrefix)
 {
-    for (int i=0; i < branch->length(); i++)
+    for (int i=0; i < block->length(); i++)
     {
-        Term* term = branch->get(i);
+        Term* term = block->get(i);
 
         if (is_namespace(term)) {
-            patch_branch_recr(dll, nested_contents(term), namespacePrefix + term->name + "__");
+            patch_block_recr(dll, nested_contents(term), namespacePrefix + term->name + "__");
         }
         else if (is_function(term)) {
             std::string name = term->name;
@@ -152,7 +152,7 @@ void patch_branch_recr(Dll* dll, Branch* branch, std::string namespacePrefix)
     }
 }
 
-void patch_with_dll(const char* dll_filename, Branch* branch, caValue* errorOut)
+void patch_with_dll(const char* dll_filename, Block* block, caValue* errorOut)
 {
     // Check to unload this file, if it's already loaded
     unload_dll(dll_filename);
@@ -171,16 +171,16 @@ void patch_with_dll(const char* dll_filename, Branch* branch, caValue* errorOut)
     // Call on_load (if it exists)
     OnLoadFunc onLoad = (OnLoadFunc) find_func_in_dll(dll, "on_load");
     if (onLoad != NULL)
-        onLoad(branch);
+        onLoad(block);
 
-    // Iterate through every function inside 'branch', and possibly replace
+    // Iterate through every function inside 'block', and possibly replace
     // its evaluate function with one from the dll.
-    patch_branch_recr(dll, branch, "");
+    patch_block_recr(dll, block, "");
 }
 
-void find_dll_for_script(Branch* branch, caValue* resultOut)
+void find_dll_for_script(Block* block, caValue* resultOut)
 {
-    String* filename = (String*) branch_get_source_filename(branch);
+    String* filename = (String*) block_get_source_filename(block);
 
     if (!is_string(filename)) {
         set_name(resultOut, name_Failure);
@@ -197,15 +197,15 @@ void find_dll_for_script(Branch* branch, caValue* resultOut)
     swap(&dllFilename, resultOut);
 }
 
-void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
+void dll_loading_check_for_patches_on_loaded_block(Block* block)
 {
-    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
         if (it.current()->function == FUNCS.dll_patch) {
             Term* caller = it.current();
 
             // Find the DLL.
             String filename;
-            find_dll_for_script(branch, &filename);
+            find_dll_for_script(block, &filename);
 
             if (!is_string(&filename)) {
                 mark_static_error(caller, "Couldn't find DLL");
@@ -213,7 +213,7 @@ void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
             }
 
             Value error;
-            patch_with_dll(as_cstring(&filename), branch, &error);
+            patch_with_dll(as_cstring(&filename), block, &error);
 
             if (!is_null(&error)) {
                 std::cout << as_string(&error) << std::endl;
@@ -231,7 +231,7 @@ void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
 
 namespace circa {
 
-void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
+void dll_loading_check_for_patches_on_loaded_block(Block* block)
 {
     // No-op
 }

@@ -3,7 +3,7 @@
 #include "circa/circa.h"
 
 #include "common_headers.h"
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "evaluation.h"
 #include "handle.h"
@@ -28,12 +28,12 @@ caValue::dump()
     std::cout << to_string(this) << std::endl;
 }
 
-void caBranch::dump()
+void caBlock::dump()
 {
     circa_dump_b(this);
 }
 
-caTerm* caBranch::owner()
+caTerm* caBlock::owner()
 {
     return circa_owning_term(this);
 }
@@ -43,15 +43,15 @@ void caTerm::dump()
     circa::dump((Term*) this);
 }
 
-caBranch* caTerm::parent()
+caBlock* caTerm::parent()
 {
-    return circa_parent_branch(this);
+    return circa_parent_block(this);
 }
 
 caValue* circa_create_default_output(caStack* stack, int index)
 {
     caValue* val = circa_output(stack, index);
-    caBranch* top = circa_top_branch(stack);
+    caBlock* top = circa_top_block(stack);
     caTerm* placeholder = circa_output_placeholder(top, index);
     circa_create_value(val, circa_term_declared_type(placeholder));
     return val;
@@ -143,35 +143,35 @@ void circa_create_value(caValue* value, caType* type)
 }
 
 // Code setup
-caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate)
+caTerm* circa_install_function(caBlock* block, const char* name, caEvaluateFunc evaluate)
 {
-    return (caTerm*) install_function((Branch*) branch, name, (EvaluateFunc) evaluate);
+    return (caTerm*) install_function((Block*) block, name, (EvaluateFunc) evaluate);
 }
-void circa_install_function_list(caBranch* branch, const caFunctionBinding* list)
+void circa_install_function_list(caBlock* block, const caFunctionBinding* list)
 {
     while (list->name != NULL) {
-        circa_install_function(branch, list->name, list->func);
+        circa_install_function(block, list->name, list->func);
         list++;
     }
 }
 
-caTerm* circa_find_term(caBranch* branch, const char* name)
+caTerm* circa_find_term(caBlock* block, const char* name)
 {
-    return (caTerm*) find_name((Branch*) branch, name);
+    return (caTerm*) find_name((Block*) block, name);
 }
 caTerm* circa_find_global(caWorld* world, const char* name)
 {
     return (caTerm*) find_name(world->root, name);
 }
-caBranch* circa_find_function_local(caBranch* branch, const char* name)
+caBlock* circa_find_function_local(caBlock* block, const char* name)
 {
-    return find_function_local(branch, name);
+    return find_function_local(block, name);
 }
-caType* circa_find_type_local(caBranch* branch, const char* name)
+caType* circa_find_type_local(caBlock* block, const char* name)
 {
-    return find_type_local(branch, name);
+    return find_type_local(block, name);
 }
-caBranch* circa_find_function(caWorld* world, const char* name)
+caBlock* circa_find_function(caWorld* world, const char* name)
 {
     return find_function(world, name);
 }
@@ -195,45 +195,45 @@ caType* circa_term_declared_type(caTerm* term)
 }
 
 
-caTerm* circa_get_term(caBranch* branch, int index)
+caTerm* circa_get_term(caBlock* block, int index)
 {
-    return (caTerm*) ((Branch*) branch)->get(index);
+    return (caTerm*) ((Block*) block)->get(index);
 }
 
-caTerm* circa_input_placeholder(caBranch* branch, int index)
+caTerm* circa_input_placeholder(caBlock* block, int index)
 {
-    return (caTerm*) get_input_placeholder((Branch*)branch, index);
+    return (caTerm*) get_input_placeholder((Block*)block, index);
 }
-caTerm* circa_output_placeholder(caBranch* branch, int index)
+caTerm* circa_output_placeholder(caBlock* block, int index)
 {
-    return (caTerm*) get_output_placeholder((Branch*)branch, index);
+    return (caTerm*) get_output_placeholder((Block*)block, index);
 }
-caBranch* circa_nested_branch(caTerm* term)
+caBlock* circa_nested_block(caTerm* term)
 {
-    return (caBranch*) ((Term*)term)->nestedContents;
+    return (caBlock*) ((Term*)term)->nestedContents;
 }
-caBranch* circa_get_nested_branch(caBranch* branch, const char* name)
+caBlock* circa_get_nested_block(caBlock* block, const char* name)
 {
-    Term* term = (Term*) find_name((Branch*)branch, name);
+    Term* term = (Term*) find_name((Block*)block, name);
     if (term == NULL)
         return NULL;
-    return (caBranch*) term->nestedContents;
+    return (caBlock*) term->nestedContents;
 }
-caBranch* circa_parent_branch(caTerm* term)
+caBlock* circa_parent_block(caTerm* term)
 {
-    return (caBranch*) ((Term*) term)->owningBranch;
+    return (caBlock*) ((Term*) term)->owningBlock;
 }
-caTerm* circa_owning_term(caBranch* branch)
+caTerm* circa_owning_term(caBlock* block)
 {
-    return (caTerm*) ((Branch*) branch)->owningTerm;
+    return (caTerm*) ((Block*) block)->owningTerm;
 }
 
-// Get the owning Term for a given Branch
-caTerm* circa_owning_term(caBranch*);
+// Get the owning Term for a given Block
+caTerm* circa_owning_term(caBlock*);
 
-caBranch* circa_function_contents(caFunction* func)
+caBlock* circa_function_contents(caFunction* func)
 {
-    return (caBranch*) function_contents((Function*) func);
+    return (caBlock*) function_contents((Function*) func);
 }
 
 // Access the fixed value of the given Term.
@@ -248,17 +248,17 @@ int circa_term_get_index(caTerm* term)
     return ((Term*)term)->index;
 }
 
-caFunction* circa_declare_function(caBranch* branch, const char* name)
+caFunction* circa_declare_function(caBlock* block, const char* name)
 {
-    return (caFunction*) as_function(term_value(create_function((Branch*) branch, name)));
+    return (caFunction*) as_function(term_value(create_function((Block*) block, name)));
 }
 
-caValue* circa_declare_value(caBranch* branch, const char* name)
+caValue* circa_declare_value(caBlock* block, const char* name)
 {
     std::string nameStr;
     if (name != NULL)
         nameStr = name;
-    Term* term = create_value((Branch*) branch, &ANY_T, nameStr);
+    Term* term = create_value((Block*) block, &ANY_T, nameStr);
     return term_value(term);
 }
 
@@ -272,9 +272,9 @@ void circa_dump_s(caStack* stack)
     dump((Stack*) stack);
 }
 
-void circa_dump_b(caBranch* branch)
+void circa_dump_b(caBlock* block)
 {
-    dump((Branch*) branch);
+    dump((Block*) block);
 }
 
 } // extern "C"

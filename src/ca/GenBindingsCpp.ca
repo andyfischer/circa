@@ -107,7 +107,7 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
     writer.unindent()
     writer.writeln('}')
 
-def write_bindings(Branch branch) -> String
+def write_bindings(Block block) -> String
 
     writer = make(CodeWriter)
 
@@ -116,7 +116,7 @@ def write_bindings(Branch branch) -> String
 
     bindings = []
 
-    for Function func in branch.functions
+    for Function func in block.functions
         cname = ""
         write_function(&writer, func, &cname)
 
@@ -135,10 +135,10 @@ def write_bindings(Branch branch) -> String
     writer.writeln('};')
 
     -- Installation function
-    writer.writeln("void Install_xxx(caBranch* branch)")
+    writer.writeln("void Install_xxx(caBlock* block)")
     writer.writeln("{")
     writer.indent()
-    writer.writeln("circa_install_function_list(branch, IMPORTS);")
+    writer.writeln("circa_install_function_list(block, IMPORTS);")
     writer.unindent()
     writer.writeln("}")
 

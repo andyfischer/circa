@@ -13,7 +13,7 @@ void handle_feedback_event(Stack* context, Term* target, caValue* desired);
 #if 0
 OLD_FEEDBACK_IMPL_DISABLED
 
-extern const std::string TRAINING_BRANCH_NAME;
+extern const std::string TRAINING_BLOCK_NAME;
 
 struct FeedbackOperation
 {
@@ -42,16 +42,16 @@ struct FeedbackOperation
 
 bool is_trainable(Term* term);
 void set_trainable(Term* term, bool value);
-void refresh_training_branch(Branch& branch, Branch& trainingBranch);
-void refresh_training_branch(Branch& branch);
-Branch& default_training_branch(Branch& branch);
+void refresh_training_block(Block& block, Block& trainingBlock);
+void refresh_training_block(Block& block);
+Block& default_training_block(Block& block);
 
-void feedback_register_constants(Branch& kernel);
+void feedback_register_constants(Block& kernel);
 
 float get_feedback_weight(Term* term);
 void set_feedback_weight(Term* term, float weight);
 
-Branch& feedback_output(Term* term);
+Block& feedback_output(Term* term);
 
 #endif
 

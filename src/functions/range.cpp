@@ -28,7 +28,7 @@ namespace range_function {
         return create_typed_unsized_list_type(&INT_T);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.range = import_function(kernel, evaluate,
                 "range(int start, int max) -> List;"

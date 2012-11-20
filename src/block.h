@@ -15,35 +15,35 @@
 
 namespace circa {
 
-struct Branch
+struct Block
 {
     CircaObject header;
 
     // Globally unique ID. Used for debugging.
     int id;
 
-    // List of content terms. This branch owns all the Term objects in this list.
+    // List of content terms. This block owns all the Term objects in this list.
     TermList _terms;
 
     // Name bindings.
     TermNamespace names;
 
-    // Points to the Term which owns this branch as a value.
+    // Points to the Term which owns this block as a value.
     Term* owningTerm;
 
     // Monotonically increasing version number.
     int version;
 
-    // Whether this branch is "in progress". Certain cleanup actions are suspended
+    // Whether this block is "in progress". Certain cleanup actions are suspended
     // while in this state.
     bool inProgress;
 
-    // Variant value describing where this branch came from. 
-    //   If the branch came from a file, then the value will be of format:
+    // Variant value describing where this block came from. 
+    //   If the block came from a file, then the value will be of format:
     //     [:file, String filename, int nullable_timestamp]
     Value origin;
 
-    // If this branch has any static errors, then they are listed here. If there
+    // If this block has any static errors, then they are listed here. If there
     // are no errors then this value is null.
     // If this has a list, each element has structure:
     //  [0] int index
@@ -51,7 +51,7 @@ struct Branch
     //  [2] int inputIndex (only used for errors related to inputs)
     Value staticErrors;
 
-    // If this branch is used as a function, this dict may contain extra metadata.
+    // If this block is used as a function, this dict may contain extra metadata.
     Value functionAttrs;
 
     // Compound type object describing our inlined state. May be NULL.
@@ -60,14 +60,14 @@ struct Branch
     // Evaluation advice
     bool emptyEvaluation;
 
-    // Whether this branch is effectual or contains any effectual calls.
+    // Whether this block is effectual or contains any effectual calls.
     bool effectual;
 
     // Compiled interpreter instructions.
     Value bytecode;
 
-    Branch();
-    ~Branch();
+    Block();
+    ~Block();
 
     int length();
 
@@ -133,78 +133,78 @@ struct Branch
     std::string toString();
     void dump();
     Term* owner();
-    Branch* parent();
+    Block* parent();
 
 private:
     // Disallow copy constructor
-    Branch(Branch const&) { internal_error(""); }
-    Branch& operator=(Branch const&) { internal_error(""); return *this; }
+    Block(Block const&) { internal_error(""); }
+    Block& operator=(Block const&) { internal_error(""); return *this; }
 };
 
-void branch_setup_type(Type* type);
-void assert_valid_branch(Branch const* obj);
+void block_setup_type(Type* type);
+void assert_valid_block(Block const* obj);
 
-Branch* alloc_branch_gc();
+Block* alloc_block_gc();
 
 bool is_namespace(Term* term);
-bool is_namespace(Branch* branch);
+bool is_namespace(Block* block);
 
 bool has_nested_contents(Term* term);
-Branch* nested_contents(Term* term);
+Block* nested_contents(Term* term);
 void remove_nested_contents(Term* term);
 
-// Insert this existing branch as the nested contents for this term.
-void branch_graft_replacement(Branch* target, Branch* replacement);
+// Insert this existing block as the nested contents for this term.
+void block_graft_replacement(Block* target, Block* replacement);
 
-caValue* branch_get_source_filename(Branch* branch);
-Branch* get_outer_scope(Branch* branch);
+caValue* block_get_source_filename(Block* block);
+Block* get_outer_scope(Block* block);
 
-// Delete this term and remove it from its owning branch.
+// Delete this term and remove it from its owning block.
 void erase_term(Term* term);
 
-// Delete the contents of 'branch'.
-void clear_branch(Branch* branch);
+// Delete the contents of 'block'.
+void clear_block(Block* block);
 
-void duplicate_branch(Branch* source, Branch* dest);
+void duplicate_block(Block* source, Block* dest);
 
-Name load_script(Branch* branch, const char* filename);
-void post_module_load(Branch* branch);
+Name load_script(Block* block, const char* filename);
+void post_module_load(Block* block);
 
 // Create an include() call that loads the given file. Returns the included
-// branch.
-Branch* include_script(Branch* branch, const char* filename);
+// block.
+Block* include_script(Block* block, const char* filename);
 
 // Create a load_script() call that loads the given file. The load_script
 // function doesn't evaluate the contents when called. Returns the included
-// branch.
-Branch* load_script_term(Branch* branch, const char* filename);
+// block.
+Block* load_script_term(Block* block, const char* filename);
 
-Term* find_term_by_id(Branch* branch, int id);
+Term* find_term_by_id(Block* block, int id);
 
-std::string get_source_file_location(Branch* branch);
+std::string get_source_file_location(Block* block);
 
-bool branch_get_function_attr_bool(Branch* branch, Name attr);
+bool block_get_function_attr_bool(Block* block, Name attr);
 
-// Returns a List pointer if the branch has a file origin, NULL if not.
-List* branch_get_file_origin(Branch* branch);
+// Returns a List pointer if the block has a file origin, NULL if not.
+List* block_get_file_origin(Block* block);
 
-// Checks Branch.origin, and checks the modified time of 'filename'. If the origin
+// Checks Block.origin, and checks the modified time of 'filename'. If the origin
 // does not match the file's modified time, then we return true and update the
-// branch's origin. So, if this function true then the branch should be reloaded.
-bool check_and_update_file_origin(Branch* branch, const char* filename);
+// block's origin. So, if this function true then the block should be reloaded.
+bool check_and_update_file_origin(Block* block, const char* filename);
 
-// Using the branch origin, this checks the filesystem to see if there is a new
-// version of this branch available. If so, the new version is loaded and returned.
-// If not, the exisiting Branch is returned.
-Branch* load_latest_branch(Branch* branch);
+// Using the block origin, this checks the filesystem to see if there is a new
+// version of this block available. If so, the new version is loaded and returned.
+// If not, the exisiting Block is returned.
+Block* load_latest_block(Block* block);
 
-void branch_check_invariants(caValue* result, Branch* branch);
-bool branch_check_invariants_print_result(Branch* branch, std::ostream& out);
+void block_check_invariants(caValue* result, Block* block);
+bool block_check_invariants_print_result(Block* block, std::ostream& out);
 
-// Update the branch's stateType. Should be called after the code is changed in a way
+// Update the block's stateType. Should be called after the code is changed in a way
 // that could add/remove declared state.
-void branch_update_state_type(Branch* branch);
+void block_update_state_type(Block* block);
 
-void branch_link_missing_functions(Branch* branch, Branch* source);
+void block_link_missing_functions(Block* block, Block* source);
 
 } // namespace circa

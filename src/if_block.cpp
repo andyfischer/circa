@@ -4,7 +4,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "building.h"
@@ -25,21 +25,21 @@ static Term* if_block_add_input(Term* ifCall, Term* input);
 
 struct CaseIterator
 {
-    BranchIteratorFlat branchIterator;
+    BlockIteratorFlat blockIterator;
 
-    CaseIterator(Branch* branch)
-      : branchIterator(branch)
+    CaseIterator(Block* block)
+      : blockIterator(block)
     {
         advanceWhileInvalid();
     }
      
     bool finished()
     {
-        return branchIterator.finished();
+        return blockIterator.finished();
     }
     void advance()
     {
-        branchIterator.index++;
+        blockIterator.index++;
         advanceWhileInvalid();
     }
     void advanceWhileInvalid()
@@ -48,27 +48,27 @@ struct CaseIterator
         if (finished())
             return;
 
-        if (branchIterator.current()->function != FUNCS.case_func) {
-            branchIterator.advance();
+        if (blockIterator.current()->function != FUNCS.case_func) {
+            blockIterator.advance();
             goto possibly_invalid;
         }
     }
 
     Term* current()
     {
-        ca_assert(branchIterator.current()->function == FUNCS.case_func);
-        return branchIterator.current();
+        ca_assert(blockIterator.current()->function == FUNCS.case_func);
+        return blockIterator.current();
     }
     int index()
     {
-        return branchIterator.index;
+        return blockIterator.index;
     }
 
     bool unfinished() { return !finished(); }
     void operator++() { advance(); }
 };
 
-int if_block_count_cases(Branch* block)
+int if_block_count_cases(Block* block)
 {
     int result = 0;
     for (int i=0; i < block->length(); i++)
@@ -79,7 +79,7 @@ int if_block_count_cases(Branch* block)
 
 Term* if_block_add_input(Term* ifBlock, Term* input)
 {
-    Branch* contents = nested_contents(ifBlock);
+    Block* contents = nested_contents(ifBlock);
 
     int existingInputCount = ifBlock->numInputs();
 
@@ -92,7 +92,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     // Add a corresponding input placeholder to each case
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        Branch* caseContents = nested_contents(term);
+        Block* caseContents = nested_contents(term);
         Term* casePlaceholder = append_input_placeholder(caseContents);
         change_declared_type(casePlaceholder, placeholder->type);
         rename(casePlaceholder, input->nameSymbol);
@@ -103,13 +103,13 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
 
 Term* if_block_prepend_primary_output(Term* ifBlock)
 {
-    Branch* contents = nested_contents(ifBlock);
+    Block* contents = nested_contents(ifBlock);
 
     Term* placeholder = prepend_output_placeholder(contents, NULL);
 
     // Insert a corresponding output in each case.
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
-        Branch* caseContents = nested_contents(it.current());
+        Block* caseContents = nested_contents(it.current());
 
         Term* result = find_last_non_comment_expression(caseContents);
 
@@ -122,7 +122,7 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     return placeholder;
 }
 
-Term* if_block_append_output(Branch* block, const char* nameString)
+Term* if_block_append_output(Block* block, const char* nameString)
 {
     Name name = name_from_string(nameString);
 
@@ -133,7 +133,7 @@ Term* if_block_append_output(Branch* block, const char* nameString)
     // Add a corresponding output placeholder to each case
     for (CaseIterator it(block); it.unfinished(); it.advance()) {
 
-        Branch* caseContents = nested_contents(it.current());
+        Block* caseContents = nested_contents(it.current());
 
         // Use the local name binding as the placeholder's result
         Term* result = find_name(caseContents, name);
@@ -146,7 +146,7 @@ Term* if_block_append_output(Branch* block, const char* nameString)
     return placeholder;
 }
 
-Term* if_block_get_case(Branch* block, int index)
+Term* if_block_get_case(Block* block, int index)
 {
     for (int i=0; i < block->length(); i++) {
         if (block->get(i) == NULL || block->get(i)->function != FUNCS.case_func)
@@ -160,13 +160,13 @@ Term* if_block_get_case(Branch* block, int index)
     return NULL;
 }
 
-void if_block_start(Branch* block)
+void if_block_start(Block* block)
 {
     // Create a placeholder for primary output
     append_output_placeholder(block, NULL);
 }
 
-Term* if_block_append_case(Branch* block, Term* input)
+Term* if_block_append_case(Block* block, Term* input)
 {
     int insertPos = 0;
     for (int i=0; i < block->length(); i++) {
@@ -203,19 +203,19 @@ Term* if_block_append_case(Branch* block, Term* input)
 
     return newCase;
 }
-bool is_case_branch(Branch* branch)
+bool is_case_block(Block* block)
 {
-    return branch->owningTerm != NULL && branch->owningTerm->function == FUNCS.case_func;
+    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.case_func;
 }
-bool is_if_block(Branch* branch)
+bool is_if_block(Block* block)
 {
-    return branch->owningTerm != NULL && branch->owningTerm->function == FUNCS.if_block;
+    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.if_block;
 }
-Branch* get_block_for_case_branch(Branch* branch)
+Block* get_block_for_case_block(Block* block)
 {
-    return get_parent_branch(branch);
+    return get_parent_block(block);
 }
-Term* if_block_get_output_by_name(Branch* block, const char* name)
+Term* if_block_get_output_by_name(Block* block, const char* name)
 {
     for (int i=0;; i++) {
         Term* term = get_output_placeholder(block, i);
@@ -227,26 +227,26 @@ Term* if_block_get_output_by_name(Branch* block, const char* name)
     return NULL;
 }
 
-void if_block_finish_appended_case(Branch* block, Term* caseTerm)
+void if_block_finish_appended_case(Block* block, Term* caseTerm)
 {
     // Add an output placeholder
     apply(nested_contents(caseTerm), FUNCS.output,
         TermList(find_last_non_comment_expression(nested_contents(caseTerm))));
 }
 
-void append_state_placeholders_if_needed(Branch* branch)
+void append_state_placeholders_if_needed(Block* block)
 {
-    if (!has_state_input(branch))
-        append_state_input(branch);
-    if (!has_state_output(branch))
-        append_state_output(branch);
+    if (!has_state_input(block))
+        append_state_input(block);
+    if (!has_state_output(block))
+        append_state_output(block);
 }
 
 void if_block_normalize_state_inputs(Term* ifBlock)
 {
-    Branch* contents = nested_contents(ifBlock);
+    Block* contents = nested_contents(ifBlock);
 
-    // Check if any branches have a state input
+    // Check if any blockes have a state input
     bool anyState = false;
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         if (has_state_input(nested_contents(it.current())))
@@ -261,7 +261,7 @@ void if_block_normalize_state_inputs(Term* ifBlock)
         append_state_placeholders_if_needed(nested_contents(it.current()));
 }
 
-bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
+bool if_block_is_name_bound_in_every_case(Block* contents, const char* name)
 {
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         if (!nested_contents(it.current())->contains(name))
@@ -272,7 +272,7 @@ bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
 
 void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 {
-    Branch* contents = nested_contents(ifCall);
+    Block* contents = nested_contents(ifCall);
     TermList outerTerms;
 
     // Find outer pointers across each case
@@ -298,9 +298,9 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 }
 
 #if 0
-void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
+void if_block_fix_outer_pointers(Term* ifCall, Block* caseContents)
 {
-    Branch* contents = nested_contents(ifCall);
+    Block* contents = nested_contents(ifCall);
 
     for (OuterInputIterator it(caseContents); it.unfinished(); ++it) {
 
@@ -317,7 +317,7 @@ void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
 
         // Check if this pointer goes outside the if-block. If so, we'll have to
         // find the corresponding placeholder (or create a new one).
-        if (input->owningBranch != contents) {
+        if (input->owningBlock != contents) {
 
             Term* placeholder = NULL;
 
@@ -344,28 +344,28 @@ void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
 }
 #endif
 
-void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBranch)
+void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBlock)
 {
-    Branch* mainBranch = nested_contents(ifCall);
-    Branch* outerBranch = ifCall->owningBranch;
+    Block* mainBlock = nested_contents(ifCall);
+    Block* outerBlock = ifCall->owningBlock;
 
-    for (int i=0; i < caseBranch->length(); i++) {
-        Term* term = caseBranch->get(i);
+    for (int i=0; i < caseBlock->length(); i++) {
+        Term* term = caseBlock->get(i);
         if (term->name == "")
             continue;
 
         Name name = term->nameSymbol;
 
-        Term* outer = find_name(outerBranch, name);
+        Term* outer = find_name(outerBlock, name);
         if (outer == NULL)
             continue;
 
         // This term rebinds an outer name.
 
-        // First, bring in the outer name as an input to the branch.
+        // First, bring in the outer name as an input to the block.
 
         // Check if we already have an output for this name.
-        Term* inputPlaceholder = find_input_placeholder_with_name(mainBranch, name_to_string(name));
+        Term* inputPlaceholder = find_input_placeholder_with_name(mainBlock, name_to_string(name));
 
         // Create it if necessary
         if (inputPlaceholder == NULL) {
@@ -373,8 +373,8 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBra
             rename(inputPlaceholder, name);
 
             // Fix the new input placeholders to have the correct name and input.
-            for (CaseIterator it(mainBranch); it.unfinished(); it.advance()) {
-                Branch* caseContents = nested_contents(it.current());
+            for (CaseIterator it(mainBlock); it.unfinished(); it.advance()) {
+                Block* caseContents = nested_contents(it.current());
                 Term* casePlaceholder = get_input_placeholder(caseContents,
                     inputPlaceholder->index);
                 ca_assert(casePlaceholder != NULL);
@@ -383,17 +383,17 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBra
         }
 
         // Now make sure there is an output placeholder for this name.
-        Term* outputPlaceholder = find_output_placeholder_with_name(mainBranch, name_to_string(name));
+        Term* outputPlaceholder = find_output_placeholder_with_name(mainBlock, name_to_string(name));
 
         if (outputPlaceholder == NULL)
-            outputPlaceholder = if_block_append_output(mainBranch, name_to_string(name));
+            outputPlaceholder = if_block_append_output(mainBlock, name_to_string(name));
     }
 }
 
-void write_all_names_to_list(Branch* branch, List* names)
+void write_all_names_to_list(Block* block, List* names)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (term->name != "")
             set_string(names->append(), term->name);
     }
@@ -401,26 +401,26 @@ void write_all_names_to_list(Branch* branch, List* names)
 
 void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
 {
-    // Find names which are bound in every branch (and not already outputs)
-    Branch* contents = nested_contents(ifCall);
+    // Find names which are bound in every block (and not already outputs)
+    Block* contents = nested_contents(ifCall);
 
-    bool firstBranch = true;
+    bool firstBlock = true;
     List names;
 
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
-        Branch* caseBranch = nested_contents(it.current());
+        Block* caseBlock = nested_contents(it.current());
 
-        if (firstBranch) {
-            firstBranch = false;
-            write_all_names_to_list(caseBranch, &names);
+        if (firstBlock) {
+            firstBlock = false;
+            write_all_names_to_list(caseBlock, &names);
             continue;
         }
 
-        // search through 'names' and remove any not in this branch.
+        // search through 'names' and remove any not in this block.
         for (int i=0; i < names.length(); i++) {
             if (is_null(names[i]))
                 continue;
-            if (caseBranch->get(as_cstring(names[i])) == NULL)
+            if (caseBlock->get(as_cstring(names[i])) == NULL)
                 set_null(names[i]);
         }
     }
@@ -440,7 +440,7 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
 
 void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
 {
-    Branch* masterContents = nested_contents(ifBlock);
+    Block* masterContents = nested_contents(ifBlock);
 
     for (int outputIndex=0;; outputIndex++) {
         Term* masterPlaceholder = get_output_placeholder(masterContents, outputIndex);
@@ -463,23 +463,23 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
     }
 }
 
-void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
+void modify_block_so_that_state_access_is_indexed(Block* block, int index)
 {
-    Term* stateInput = find_state_input(branch);
+    Term* stateInput = find_state_input(block);
     if (stateInput == NULL)
         return;
 
     // Create terms for unpack_state_from_list and pack_state_to_list, if needed.
 
-    Term* stateOutput = find_state_output(branch);
+    Term* stateOutput = find_state_output(block);
 
     // If state output is directly connected to input, then we don't need to create
     // an unpack_state_from_list call.
     if (stateOutput->input(0) == stateInput) {
-        // State output is directly connected to input. In this case, the branch should
+        // State output is directly connected to input. In this case, the block should
         // null out the state field.
-        Term* stateResult = create_value(branch, &NULL_T);
-        Term* packList = apply(branch, FUNCS.pack_state_to_list,
+        Term* stateResult = create_value(block, &NULL_T);
+        Term* packList = apply(block, FUNCS.pack_state_to_list,
             TermList(stateInput, stateResult));
         packList->setIntProp("index", index);
         set_input(stateOutput, 0, packList);
@@ -488,7 +488,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
 
     // There are terms between state input & output, bracket them with calls to
     // unpack_state_from_list and pack_state_to_list.
-    Term* unpackList = apply(branch, FUNCS.unpack_state_from_list, TermList(stateInput));
+    Term* unpackList = apply(block, FUNCS.unpack_state_from_list, TermList(stateInput));
     unpackList->setIntProp("index", index);
     move_after_inputs(unpackList);
 
@@ -504,7 +504,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     Term* stateResult = stateOutput->input(0);
     ca_assert(stateResult != NULL);
 
-    Term* packList = apply(branch, FUNCS.pack_state_to_list,
+    Term* packList = apply(block, FUNCS.pack_state_to_list,
         TermList(stateInput, stateResult));
     packList->setIntProp("index", index);
     packList->setBoolProp("final", true);
@@ -514,7 +514,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
 
 void finish_if_block(Term* ifBlock)
 {
-    Branch* contents = nested_contents(ifBlock);
+    Block* contents = nested_contents(ifBlock);
 
     // Make sure there is a primary output
     if (get_output_placeholder(contents, 0) == NULL)
@@ -532,7 +532,7 @@ void finish_if_block(Term* ifBlock)
     int caseIndex = 0;
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        modify_branch_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
+        modify_block_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
         caseIndex++;
     }
 

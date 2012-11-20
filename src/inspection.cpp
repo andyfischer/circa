@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "kernel.h"
@@ -94,61 +94,61 @@ bool is_an_unknown_identifier(Term* term)
     return term->function == FUNCS.unknown_identifier;
 }
 
-bool is_major_branch(Branch* branch)
+bool is_major_block(Block* block)
 {
-    if (branch->owningTerm == NULL)
+    if (block->owningTerm == NULL)
         return true;
 
-    return is_function(branch->owningTerm);
+    return is_function(block->owningTerm);
 }
 
-bool is_minor_branch(Branch* branch)
+bool is_minor_block(Block* block)
 {
-    if (branch->owningTerm == NULL)
+    if (block->owningTerm == NULL)
         return false;
     
-    Term* owner = branch->owningTerm;
+    Term* owner = block->owningTerm;
     return owner->function == FUNCS.if_block
         || owner->function == FUNCS.case_func
         || owner->function == FUNCS.for_func;
 }
 
-int get_locals_count(Branch* branch)
+int get_locals_count(Block* block)
 {
-    return branch->length();
+    return block->length();
 }
 
-Term* get_input_placeholder(Branch* branch, int index)
+Term* get_input_placeholder(Block* block, int index)
 {
-    if (index >= branch->length())
+    if (index >= block->length())
         return NULL;
-    Term* term = branch->get(index);
+    Term* term = block->get(index);
     if (term == NULL || term->function != FUNCS.input)
         return NULL;
     return term;
 }
 
-Term* get_output_placeholder(Branch* branch, int index)
+Term* get_output_placeholder(Block* block, int index)
 {
-    if (index >= branch->length())
+    if (index >= block->length())
         return NULL;
-    Term* term = branch->getFromEnd(index);
+    Term* term = block->getFromEnd(index);
     if (term == NULL || term->function != FUNCS.output)
         return NULL;
     return term;
 }
 
-int count_input_placeholders(Branch* branch)
+int count_input_placeholders(Block* block)
 {
     int result = 0;
-    while (get_input_placeholder(branch, result) != NULL)
+    while (get_input_placeholder(block, result) != NULL)
         result++;
     return result;
 }
-int count_output_placeholders(Branch* branch)
+int count_output_placeholders(Block* block)
 {
     int result = 0;
-    while (get_output_placeholder(branch, result) != NULL)
+    while (get_output_placeholder(block, result) != NULL)
         result++;
     return result;
 }
@@ -175,7 +175,7 @@ Term* get_output_term(Term* term, int index)
 
 Term* get_extra_output(Term* term, int index)
 {
-    Term* position = term->owningBranch->getSafe(term->index + index + 1);
+    Term* position = term->owningBlock->getSafe(term->index + index + 1);
     if (position != NULL && position->function == FUNCS.extra_output)
         return position;
     return NULL;
@@ -204,10 +204,10 @@ bool term_is_state_input(Term* term, int index)
     return as_bool(prop);
 }
 
-Term* find_state_input(Branch* branch)
+Term* find_state_input(Block* block)
 {
     for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
+        Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
         if (is_state_input(placeholder))
@@ -215,24 +215,24 @@ Term* find_state_input(Branch* branch)
     }
 }
 
-bool has_state_input(Branch* branch)
+bool has_state_input(Block* block)
 {
-    return find_state_input(branch) != NULL;
+    return find_state_input(block) != NULL;
 }
 
-Term* find_state_output(Branch* branch)
+Term* find_state_output(Block* block)
 {
     for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(branch, i);
+        Term* placeholder = get_output_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
         if (is_state_output(placeholder))
             return placeholder;
     }
 }
-bool has_state_output(Branch* branch)
+bool has_state_output(Block* block)
 {
-    return find_state_output(branch) != NULL;
+    return find_state_output(block) != NULL;
 }
 bool is_state_input(Term* placeholder)
 {
@@ -243,7 +243,7 @@ bool is_state_output(Term* placeholder)
     return placeholder->boolProp("state", false);
 }
 
-Branch* term_get_function_details(Term* call)
+Block* term_get_function_details(Term* call)
 {
     // TODO: Shouldn't need to special case these functions.
     if (call->function == FUNCS.if_block
@@ -270,7 +270,7 @@ Term* term_get_input_placeholder(Term* call, int index)
     if (!is_function(call->function))
         return NULL;
 
-    Branch* contents = term_get_function_details(call);
+    Block* contents = term_get_function_details(call);
     if (contents == NULL)
         return NULL;
     if (index >= contents->length())
@@ -294,7 +294,7 @@ Term* term_get_output_placeholder(Term* call, int index)
     if (!is_function(call->function))
         return NULL;
 
-    Branch* contents = term_get_function_details(call);
+    Block* contents = term_get_function_details(call);
     if (contents == NULL)
         return NULL;
     if (index >= contents->length())
@@ -319,27 +319,27 @@ int count_actual_output_terms(Term* term)
 
 Term* preceding_term(Term* term)
 {
-    return term->owningBranch->getSafe(term->index - 1);
+    return term->owningBlock->getSafe(term->index - 1);
 }
 Term* following_term(Term* term)
 {
-    return term->owningBranch->getSafe(term->index + 1);
+    return term->owningBlock->getSafe(term->index + 1);
 }
 
-bool has_variable_args(Branch* branch)
+bool has_variable_args(Block* block)
 {
     for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
+        Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return false;
         if (placeholder->boolProp("multiple", false))
             return true;
     }
 }
-Term* find_output_placeholder_with_name(Branch* branch, const char* name)
+Term* find_output_placeholder_with_name(Block* block, const char* name)
 {
     for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(branch, i);
+        Term* placeholder = get_output_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
         if (placeholder->name == name)
@@ -347,32 +347,32 @@ Term* find_output_placeholder_with_name(Branch* branch, const char* name)
     }
 }
 
-Term* find_last_non_comment_expression(Branch* branch)
+Term* find_last_non_comment_expression(Block* block)
 {
-    for (int i = branch->length() - 1; i >= 0; i--) {
-        if (branch->get(i) == NULL)
+    for (int i = block->length() - 1; i >= 0; i--) {
+        if (block->get(i) == NULL)
             continue;
 
         // Skip certain special functions
-        Term* func = branch->get(i)->function;
+        Term* func = block->get(i)->function;
         if (func == FUNCS.output
                 || func == FUNCS.input 
                 || func == FUNCS.pack_state
                 || func == FUNCS.pack_state_list_n)
             continue;
 
-        if (branch->get(i)->name == "#outer_rebinds")
+        if (block->get(i)->name == "#outer_rebinds")
             continue;
-        if (branch->get(i)->function != FUNCS.comment)
-            return branch->get(i);
+        if (block->get(i)->function != FUNCS.comment)
+            return block->get(i);
     }
     return NULL;
 }
 
-Term* find_term_with_function(Branch* branch, Term* func)
+Term* find_term_with_function(Block* block, Term* func)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->getFromEnd(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->getFromEnd(i);
         if (term == NULL)
             continue;
         if (term->function == func)
@@ -381,10 +381,10 @@ Term* find_term_with_function(Branch* branch, Term* func)
     return NULL;
 }
 
-Term* find_input_placeholder_with_name(Branch* branch, const char* name)
+Term* find_input_placeholder_with_name(Block* block, const char* name)
 {
     for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
+        Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
         if (placeholder->name == name)
@@ -411,13 +411,13 @@ Term* find_user_with_function(Term* target, Term* func)
     return NULL;
 }
 
-Term* find_parent_term_in_branch(Term* term, Branch* branch)
+Term* find_parent_term_in_block(Term* term, Block* block)
 {
     while (true) {
         if (term == NULL)
             return NULL;
 
-        if (term->owningBranch == branch)
+        if (term->owningBlock == block)
             return term;
 
         term = get_parent_term(term);
@@ -458,23 +458,23 @@ std::string get_short_local_name(Term* term)
     return global_id(term);
 }
 
-std::string branch_namespace_to_string(Branch* branch)
+std::string block_namespace_to_string(Block* block)
 {
     std::stringstream out;
 
     TermNamespace::iterator it;
-    for (it = branch->names.begin(); it != branch->names.end(); ++it)
+    for (it = block->names.begin(); it != block->names.end(); ++it)
         out << it->first << ": " << global_id(it->second) << "\n";
 
     return out.str();
 }
 
-void print_branch(Branch* branch, RawOutputPrefs* prefs, std::ostream& out)
+void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out)
 {
     int prevIndent = prefs->indentLevel;
 
-    out << "[Branch#" << branch->id << "]" << std::endl;
-    for (BranchIterator it(branch); !it.finished(); it.advance()) {
+    out << "[Block#" << block->id << "]" << std::endl;
+    for (BlockIterator it(block); !it.finished(); it.advance()) {
         Term* term = it.current();
 
         int indent = it.depth();
@@ -486,12 +486,12 @@ void print_branch(Branch* branch, RawOutputPrefs* prefs, std::ostream& out)
 
         // Possibly print the closing bytecode op.
         if (prefs->showBytecode
-                && term->index == (term->owningBranch->length() - 1)
-                && term->owningBranch != NULL
-                && !is_null(&term->owningBranch->bytecode)
+                && term->index == (term->owningBlock->length() - 1)
+                && term->owningBlock != NULL
+                && !is_null(&term->owningBlock->bytecode)
                 ) {
 
-            Branch* nested = term->owningBranch;
+            Block* nested = term->owningBlock;
 
             for (int i=0; i < prefs->indentLevel; i++)
                 out << " ";
@@ -503,11 +503,11 @@ void print_branch(Branch* branch, RawOutputPrefs* prefs, std::ostream& out)
     prefs->indentLevel = prevIndent;
 }
 
-std::string get_branch_raw(Branch* branch)
+std::string get_block_raw(Block* block)
 {
     RawOutputPrefs prefs;
     std::stringstream out;
-    print_branch(branch, &prefs, out);
+    print_block(block, &prefs, out);
     return out.str();
 }
 
@@ -532,18 +532,18 @@ std::string get_short_location(Term* term)
 
 std::string get_source_filename(Term* term)
 {
-    if (term->owningBranch == NULL)
+    if (term->owningBlock == NULL)
         return "";
 
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
 
-    while (branch != NULL) {
-        caValue* filename = branch_get_source_filename(branch);
+    while (block != NULL) {
+        caValue* filename = block_get_source_filename(block);
 
         if (filename != NULL)
             return as_string(filename);
 
-        branch = get_parent_branch(branch);
+        block = get_parent_block(block);
     }
 
     return "";
@@ -603,28 +603,28 @@ TermList get_involved_terms(TermList inputs, TermList outputs)
     return result;
 }
 
-void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string> &names)
+void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &names)
 {
     TermNamespace::iterator it;
-    for (it = branch->names.begin(); it != branch->names.end(); ++it) {
+    for (it = block->names.begin(); it != block->names.end(); ++it) {
         std::string name = it->first;
 
         // Ignore compiler-generated terms
         if (name[0] == '#')
             continue;
 
-        // Ignore names that aren't bound in the outer branch
-        Term* outer = find_name(get_outer_scope(branch), name.c_str());
+        // Ignore names that aren't bound in the outer block
+        Term* outer = find_name(get_outer_scope(block), name.c_str());
 
         if (outer == NULL)
             continue;
 
         // Ignore global terms
-        if (outer->owningBranch == global_root_branch())
+        if (outer->owningBlock == global_root_block())
             continue;
 
         // Ignore terms that are just a simple copy
-        Term* result = branch->get(name);
+        Term* result = block->get(name);
         if (result->function == FUNCS.copy && result->input(0) == outer)
             continue;
 
@@ -697,8 +697,8 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
         for (int i=0; i < prefs->indentLevel + 2; i++)
             out << " ";
 
-        Branch* branch = term->owningBranch;
-        caValue* op = list_get_safe(&branch->bytecode, term->index);
+        Block* block = term->owningBlock;
+        caValue* op = list_get_safe(&block->bytecode, term->index);
         if (op == NULL)
             out << "(missing bytecode)";
         else
@@ -712,17 +712,17 @@ void print_term(Term* term, std::ostream& out)
     print_term(term, &prefs, out);
 }
 
-void print_branch(Branch* branch, std::ostream& out)
+void print_block(Block* block, std::ostream& out)
 {
     RawOutputPrefs prefs;
-    print_branch(branch, &prefs, out);
+    print_block(block, &prefs, out);
 }
 
-void print_branch_with_properties(Branch* branch, std::ostream& out)
+void print_block_with_properties(Block* block, std::ostream& out)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
-    print_branch(branch, &prefs, out);
+    print_block(block, &prefs, out);
 }
 
 std::string get_term_to_string_extended(Term* term)
@@ -744,14 +744,14 @@ std::string get_term_to_string_extended_with_props(Term* term)
 
 void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context)
 {
-    if (location->owningBranch == NULL)
+    if (location->owningBlock == NULL)
         return;
 
-    Branch* branch = location->owningBranch;
+    Block* block = location->owningBlock;
 
-    // Iterate upwards through all the terms that are above 'location' in this branch
+    // Iterate upwards through all the terms that are above 'location' in this block
     for (int index=location->index - 1; index >= 0; index--) {
-        Term* t = branch->get(index);
+        Term* t = block->get(index);
         if (t == NULL) continue;
         if (t->name == "") continue;
         bool stop = visitor(t, t->name.c_str(), context);
@@ -760,8 +760,8 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caVal
         // TODO: Iterate inside namespaces, providing the correct name
     }
 
-    if (branch->owningTerm != NULL)
-        visit_name_accessible_terms(branch->owningTerm, visitor, context);
+    if (block->owningTerm != NULL)
+        visit_name_accessible_terms(block->owningTerm, visitor, context);
 }
 
 }

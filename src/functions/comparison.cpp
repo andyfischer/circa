@@ -53,7 +53,7 @@ namespace comparison_function {
                 circa_float_input(stack, 0) >= circa_float_input(stack, 1));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, less_than_i, "less_than_i(int,int) -> bool");
         import_function(kernel, less_than_f, "less_than_f(number,number) -> bool");

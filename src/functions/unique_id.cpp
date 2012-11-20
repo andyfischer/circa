@@ -11,7 +11,7 @@ namespace unique_id_function {
         set_int(OUTPUT, nextId++);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate, "unique_id() -> int");
     }

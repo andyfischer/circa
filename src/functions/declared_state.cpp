@@ -24,7 +24,7 @@ namespace declared_state_function {
 
         // We couldn't use the input value. If there is an initializer, then push that
         // to the stack.
-        Branch* initializer = NULL;
+        Block* initializer = NULL;
         if (caller->input(1) != NULL)
             initializer = caller->input(1)->nestedContents;
 
@@ -57,7 +57,7 @@ namespace declared_state_function {
         append_phrase(source, term->name.c_str(), term, name_TermName);
 
         Term* defaultValue = NULL;
-        Branch* initializer = NULL;
+        Block* initializer = NULL;
 
         if (term->input(1) != NULL)
             initializer = term->input(1)->nestedContents;
@@ -78,7 +78,7 @@ namespace declared_state_function {
         }
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.declared_state = import_function(kernel, get_declared_state,
             "declared_state(state any value, any initializer :optional) -> any");

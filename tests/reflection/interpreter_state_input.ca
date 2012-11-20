@@ -5,7 +5,7 @@ def myfunc()
 
 int = make_interpreter()
 
-int.push_frame(branch_ref(myfunc), [])
+int.push_frame(block_ref(myfunc), [])
 int.run
 
 print('post run 1: ' int.get_state_output)
@@ -13,7 +13,7 @@ print('post run 1: ' int.get_state_output)
 s = int.get_state_output
 
 int.reset
-int.push_frame(branch_ref(myfunc), [])
+int.push_frame(block_ref(myfunc), [])
 int.set_state_input(s)
 int.run
 

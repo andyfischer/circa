@@ -1,9 +1,9 @@
 
 This document talks about how code is internally stored.
 
-A piece of code is stored as a Branch. Each branch stores a list of Terms. Each Term has
-a list of inputs, a function, possibly a name, and other metadata. A Term may also have
-a nested Branch which can contain more Terms.
+A piece of code is stored as a Block. Each block stores a list of Terms. Each Term has
+a list of inputs, a function, possibly a name, and other metadata. A Term may also contain
+its own nested Block, which can contain more Terms.
 
 ### Term ###
 
@@ -22,9 +22,9 @@ We try to follow the following rules for input references. Note that some of the
 are known to be ignored in some cases. It hasn't been decided yet whether these exceptions
 will be allowed or fixed.
 
- - Each input term must occur earlier in the branch than the using term.
+ - Each input term must occur earlier in the block than the using term.
  - A term must not have itself as an input.
- - A term can only use inputs in the current branch, or in a parent branch. (Exceptions:
+ - A term can only use inputs in the current block, or in a parent block. (Exceptions:
    This rule is currently broken for the namespace() and include() functions. These
    functions expose their contents, so outside terms can refer directly to their inner
    terms).

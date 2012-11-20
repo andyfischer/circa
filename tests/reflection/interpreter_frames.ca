@@ -13,7 +13,7 @@ def frame1()
     call_frame2 = frame2()
 
 int = make_interpreter()
-int.push_frame(branch_ref(frame1), [])
+int.push_frame(block_ref(frame1), [])
 int.run
 
 -- interpreter should now have 'frame1' and 'frame2'

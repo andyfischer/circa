@@ -7,4 +7,4 @@ def hi()
     def hi2()
     x = hi2
 
-branch_ref(hi).statements
+block_ref(hi).statements

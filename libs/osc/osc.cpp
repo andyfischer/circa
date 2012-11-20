@@ -167,10 +167,10 @@ EXPORT CA_FUNCTION(osc__send)
     lo_message_free(message);
 }
 
-EXPORT void on_load(Branch* branch)
+EXPORT void on_load(Block* block)
 {
-    Type* server = get_declared_type(branch, "osc:Server");
-    Type* address = get_declared_type(branch, "osc:Address");
+    Type* server = get_declared_type(block, "osc:Server");
+    Type* address = get_declared_type(block, "osc:Address");
     setup_handle_type(server);
     setup_handle_type(address);
 }

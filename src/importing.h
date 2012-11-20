@@ -14,13 +14,13 @@ namespace circa {
 // a header in Circa-syntax.
 //
 // Example function header: "function do-something(int, string) -> int"
-Term* import_function(Branch* branch, EvaluateFunc func, std::string const& header);
+Term* import_function(Block* block, EvaluateFunc func, std::string const& header);
 
 // Install an evaluate function into an existing function object.
 void install_function(Term* function, EvaluateFunc evaluate);
-Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate);
+Term* install_function(Block* block, const char* name, EvaluateFunc evaluate);
 
-Term* import_type(Branch* branch, Type* type);
+Term* import_type(Block* block, Type* type);
 
 struct ImportRecord
 {
@@ -28,6 +28,6 @@ struct ImportRecord
     EvaluateFunc evaluate;
 };
 
-void install_function_list(Branch* branch, const ImportRecord* list);
+void install_function_list(Block* block, const ImportRecord* list);
 
 } // namespace circa

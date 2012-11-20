@@ -52,7 +52,7 @@ const char* builtin_name_to_string(int name)
     case name_AnonStructType: return "AnonStructType";
     case name_StructType: return "StructType";
     case name_NativeModule: return "NativeModule";
-    case name_PatchBranch: return "PatchBranch";
+    case name_PatchBlock: return "PatchBlock";
     case name_ParseTime: return "ParseTime";
     case name_StorageTypeNull: return "StorageTypeNull";
     case name_StorageTypeInt: return "StorageTypeInt";
@@ -153,7 +153,7 @@ const char* builtin_name_to_string(int name)
     case op_Pause: return "op_Pause";
     case op_SetNull: return "op_SetNull";
     case op_InlineCopy: return "op_InlineCopy";
-    case op_CallBranch: return "op_CallBranch";
+    case op_CallBlock: return "op_CallBlock";
     case op_DynamicCall: return "op_DynamicCall";
     case op_FireNative: return "op_FireNative";
     case op_CaseBlock: return "op_CaseBlock";
@@ -202,7 +202,7 @@ const char* builtin_name_to_string(int name)
     case stat_StringToStd: return "stat_StringToStd";
     case stat_StepInterpreter: return "stat_StepInterpreter";
     case stat_InterpreterCastOutputFromFinishedFrame: return "stat_InterpreterCastOutputFromFinishedFrame";
-    case stat_BranchNameLookups: return "stat_BranchNameLookups";
+    case stat_BlockNameLookups: return "stat_BlockNameLookups";
     case stat_PushFrame: return "stat_PushFrame";
     case stat_LoopFinishIteration: return "stat_LoopFinishIteration";
     case stat_LoopWriteOutput: return "stat_LoopWriteOutput";

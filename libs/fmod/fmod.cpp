@@ -64,7 +64,7 @@ CA_FUNCTION(play_sound)
         std::cout << "Error in FMOD_System_PlaySound: " << FMOD_ErrorString(result) << std::endl;
 }
 
-void setup(circa::Branch& kernel)
+void setup(circa::Block& kernel)
 {
     g_soundType = unbox_type(kernel["Sound"]);
     circa::install_function(kernel["load_sound_int"], load_sound);

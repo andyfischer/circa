@@ -45,17 +45,17 @@ void test_assert_function(Term* term, int line, const char* file)
     }
 }
 
-void test_assert_function(Branch* branch, int line, const char* file)
+void test_assert_function(Block* block, int line, const char* file)
 {
-    if (!branch_check_invariants_print_result(branch, std::cout)) {
-        std::cout << "Branch failed invariant check in " << file << ", line " << line << std::endl;
+    if (!block_check_invariants_print_result(block, std::cout)) {
+        std::cout << "Block failed invariant check in " << file << ", line " << line << std::endl;
         declare_current_test_failed();
     }
 
     List errors;
-    check_for_static_errors(&errors, branch);
+    check_for_static_errors(&errors, block);
     if (!errors.empty()) {
-        std::cout << "Branch has static errors at " << file << ", line " << line << std::endl;
+        std::cout << "Block has static errors at " << file << ", line " << line << std::endl;
         print_static_errors_formatted(&errors, std::cout);
         declare_current_test_failed();
     }
@@ -139,11 +139,11 @@ void test_equals_function(caValue* a, float b,
     return test_equals_function(to_float(a), b, aText, bText, line, file);
 }
 
-bool test_fail_on_static_error(Branch* branch)
+bool test_fail_on_static_error(Block* block)
 {
-    if (has_static_errors(branch)) {
+    if (has_static_errors(block)) {
         std::cout << "Static error in " << get_current_test_name() << std::endl;
-        print_static_errors_formatted(branch, std::cout);
+        print_static_errors_formatted(block, std::cout);
         std::cout << std::endl;
         declare_current_test_failed();
         return true;
@@ -282,17 +282,17 @@ bool current_test_has_failed()
     return gCurrentTestCase.failed;
 }
 
-void test_branch_as_assertions_list(Branch* branch, std::string const& contextStr)
+void test_block_as_assertions_list(Block* block, std::string const& contextStr)
 {
-    if (has_static_errors(branch)) {
+    if (has_static_errors(block)) {
         std::cout << "Static error " << contextStr << ":" << std::endl;
-        print_static_errors_formatted(branch, std::cout);
+        print_static_errors_formatted(block, std::cout);
         declare_current_test_failed();
         return;
     }
 
     std::stringstream checkInvariantsOutput;
-    if (!branch_check_invariants_print_result(branch, checkInvariantsOutput)) {
+    if (!block_check_invariants_print_result(block, checkInvariantsOutput)) {
         std::cout << "Failed invariant " << contextStr << std::endl;
         std::cout << checkInvariantsOutput.str() << std::endl;
         declare_current_test_failed();
@@ -300,7 +300,7 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
     }
 
     Stack context;
-    evaluate_branch(&context, branch);
+    evaluate_block(&context, block);
 
     if (context.errorOccurred) {
         std::cout << "Runtime error " << contextStr << std::endl;
@@ -310,8 +310,8 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
     }
 
     int boolean_statements_found = 0;
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (!is_statement(term))
             continue;
 
@@ -335,7 +335,7 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
     }
 }
 
-namespace branch { void register_tests(); }
+namespace block { void register_tests(); }
 namespace c_objects { void register_tests(); }
 namespace code_iterators { void register_tests(); }
 namespace compound_type { void register_tests(); }
@@ -353,7 +353,7 @@ namespace tokenizer { void register_tests(); }
 
 int main(int argc, char** argv)
 {
-    branch::register_tests();
+    block::register_tests();
     c_objects::register_tests();
     code_iterators::register_tests();
     compound_type::register_tests();

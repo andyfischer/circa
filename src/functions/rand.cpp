@@ -47,7 +47,7 @@ namespace rand_function {
         set_int(OUTPUT, rand() % range);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate_f, "rand() -> number\n -- Return a random number between 0.0 and 1.0, with a linear distribution.");
         import_function(kernel, evaluate_f_range,

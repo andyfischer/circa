@@ -5,10 +5,10 @@
 namespace circa {
 namespace meta_function {
 
-    void lift_closure(Branch* branch)
+    void lift_closure(Block* block)
     {
-        for (int i=0; i < branch->length(); i++) {
-            Term* term = branch->get(i);
+        for (int i=0; i < block->length(); i++) {
+            Term* term = block->get(i);
             if (term == NULL) continue;
             if (term->function == FUNCS.freeze) {
                 Term* input = term->input(0);
@@ -30,17 +30,17 @@ namespace meta_function {
     {
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
-        //FIXME lift_closure(as_branch(OUTPUT));
+        //FIXME lift_closure(as_block(OUTPUT));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         #if 0
         FIXME
         FUNCS.freeze = import_function(kernel, copy_function::evaluate, "freeze(any) -> any");
         function_t::get_specialize_type(FUNCS.freeze) = freeze_specializeType;
 
-        import_function(kernel, lift_closure_evaluate, "lift_closure(Branch) -> Branch");
+        import_function(kernel, lift_closure_evaluate, "lift_closure(Block) -> Block");
         #endif
     }
 

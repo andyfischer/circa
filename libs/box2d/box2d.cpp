@@ -399,17 +399,17 @@ void run_global_refcount_check()
     std::cout << "run_global_refcount_check" << std::endl;
 
     caValue evalContext;
-    caValue usersBranch;
-    caValue runtimeBranch;
+    caValue usersBlock;
+    caValue runtimeBlock;
         
     app::App* app = &app::get_global_app();
     set_transient_value(&evalContext, &app->_evalContext, &EVAL_CONTEXT_T);
-    set_transient_value(&usersBranch, app->_usersBranch, &BRANCH_T);
-    set_transient_value(&runtimeBranch, app->_runtimeBranch, &BRANCH_T);
+    set_transient_value(&usersBlock, app->_usersBlock, &BLOCK_T);
+    set_transient_value(&runtimeBlock, app->_runtimeBlock, &BLOCK_T);
 
     //recursive_dump_heap(&evalContext, "evalContext");
-    //recursive_dump_heap(&usersBranch, "usersBranch");
-    //recursive_dump_heap(&runtimeBranch, "runtimeBranch");
+    //recursive_dump_heap(&usersBlock, "usersBlock");
+    //recursive_dump_heap(&runtimeBlock, "runtimeBlock");
 
     ObjectListElement* element = g_bodyHandles.first;
 
@@ -418,8 +418,8 @@ void run_global_refcount_check()
 
         List references;
         list_references_to_pointer(&evalContext, body, &references);
-        list_references_to_pointer(&usersBranch, body, &references);
-        list_references_to_pointer(&runtimeBranch, body, &references);
+        list_references_to_pointer(&usersBlock, body, &references);
+        list_references_to_pointer(&runtimeBlock, body, &references);
 
         for (int i=0; i < references.length(); i++)
             std::cout << references[i]->asString() << std::endl;
@@ -428,15 +428,15 @@ void run_global_refcount_check()
     }
 
     cleanup_transient_value(&evalContext);
-    cleanup_transient_value(&usersBranch);
-    cleanup_transient_value(&runtimeBranch);
+    cleanup_transient_value(&usersBlock);
+    cleanup_transient_value(&runtimeBlock);
 }
 #endif
 
-void on_load(Branch* branch)
+void on_load(Block* block)
 {
-    g_body_t = get_declared_type(branch, "box2d:Body");
-    g_mouseJoint_t = get_declared_type(branch, "box2d:MouseJoint");
+    g_body_t = get_declared_type(block, "box2d:Body");
+    g_mouseJoint_t = get_declared_type(block, "box2d:MouseJoint");
 
     handle_t::setup_type<Body>(g_body_t);
     handle_t::setup_type<MouseJoint>(g_mouseJoint_t);

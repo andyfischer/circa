@@ -7,13 +7,13 @@ namespace include_function {
 
     bool load_script(Stack* cxt, Term* caller, const std::string& filename)
     {
-        Branch* contents = nested_contents(caller);
+        Block* contents = nested_contents(caller);
 
         bool fileChanged = check_and_update_file_origin(contents, filename.c_str());
 
         // Reload if the filename or modified-time has changed
         if (fileChanged) {
-            clear_branch(contents);
+            clear_block(contents);
             
             // Add an input placeholder to catch the filename argument. Kind of a hack.
             append_input_placeholder(contents);
@@ -33,7 +33,7 @@ namespace include_function {
     void evaluate_include(caStack* stack)
     {
         Term* caller = (Term*) circa_caller_term(stack);
-        Branch* contents = nested_contents((Term*) caller);
+        Block* contents = nested_contents((Term*) caller);
 
         bool fileChanged = load_script(stack, caller, circa_string_input(stack, 0));
 
@@ -45,7 +45,7 @@ namespace include_function {
             return circa_output_error(stack, msg.c_str());
         }
 
-        set_branch(circa_output(stack, 0), contents);
+        set_block(circa_output(stack, 0), contents);
 
         List inputs;
         consume_inputs_to_list(stack, &inputs);
@@ -65,17 +65,17 @@ namespace include_function {
         Term* caller = (Term*) circa_caller_term(stack);
         load_script(stack, caller, circa_string_input(stack, 0));
 
-        set_branch(circa_output(stack, 0), caller->nestedContents);
+        set_block(circa_output(stack, 0), caller->nestedContents);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.include_func = import_function(kernel, evaluate_include,
-                "include(String filename) -> Branch");
+                "include(String filename) -> Block");
         as_function(FUNCS.include_func)->postCompile = include_post_compile;
 
         FUNCS.load_script = import_function(kernel, load_script,
-                "load_script(String filename) -> Branch");
+                "load_script(String filename) -> Block");
     }
 }
 } // namespace circa

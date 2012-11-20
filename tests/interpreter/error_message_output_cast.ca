@@ -1,7 +1,7 @@
 
 int = make_interpreter()
 
-testBranch = {
+testBlock = {
 
     def f() -> int
         return "hi"
@@ -9,7 +9,7 @@ testBranch = {
     f()
 }
 
-int.push_frame(branch_ref(testBranch), [])
+int.push_frame(block_ref(testBlock), [])
 int.run
 
 print(int.error_message)

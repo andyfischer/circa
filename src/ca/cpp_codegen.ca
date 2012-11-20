@@ -44,7 +44,7 @@ def write_literal_function(CodeWriter w :out, Term term)
     w.writeln(')')
     w.writeln('{')
     w.indent()
-    write_branch(&w, func.contents)
+    write_block(&w, func.contents)
     w.unindent()
     w.writeln('}')
 
@@ -63,9 +63,9 @@ def write_value_term(CodeWriter w :out, Term term)
         w.write(term.value -> to_string)
         w.writeln(';')
 
-def write_branch(CodeWriter w :out, Branch branch)
+def write_block(CodeWriter w :out, Block block)
 
-    for term in branch.terms
+    for term in block.terms
         @term -> Term
 
         if term.property('statement') != true
@@ -100,14 +100,14 @@ def write_branch(CodeWriter w :out, Branch branch)
             w.writeln(';')
         
 
-def branch_to_cpp_string(Branch b) -> String
+def block_to_cpp_string(Block b) -> String
     writer = make(CodeWriter)
 
-    write_branch(&writer, b)
+    write_block(&writer, b)
 
     return writer.toString()
 
-test_branch = {
+test_block = {
 
     def my_function(int a, int b) -> int
         return a - b
@@ -119,4 +119,4 @@ test_branch = {
     print(b)
 }
 
-branch_to_cpp_string(branch_ref(test_branch)) -> print
+block_to_cpp_string(block_ref(test_block)) -> print

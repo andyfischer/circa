@@ -86,9 +86,9 @@ static const caFunctionBinding g_imports[] = {
     {NULL, NULL}
 };
 
-void engine_bindings_install(caBranch* branch)
+void engine_bindings_install(caBlock* block)
 {
-    circa_setup_pointer_type(circa_find_type_local(branch, "RenderTarget"));
-    circa_setup_pointer_type(circa_find_type_local(branch, "Font"));
-    circa_install_function_list(branch, g_imports);
+    circa_setup_pointer_type(circa_find_type_local(block, "RenderTarget"));
+    circa_setup_pointer_type(circa_find_type_local(block, "Font"));
+    circa_install_function_list(block, g_imports);
 }

@@ -29,8 +29,8 @@ extern "C" CA_FUNCTION(create_thing)
     set_handle_value_opaque_pointer(OUTPUT, CALLER->type, new Thing(), ReleaseThing);
 }
 
-extern "C" void on_load(Branch* branch)
+extern "C" void on_load(Block* block)
 {
-    Type* thing = get_declared_type(branch, "Thing");
+    Type* thing = get_declared_type(block, "Thing");
     setup_handle_type(thing);
 }

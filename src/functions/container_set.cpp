@@ -18,7 +18,7 @@ namespace container_set_function {
             set_t::add(result, circa_index(args, index));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate, "set(any :multiple) -> Set");
     }

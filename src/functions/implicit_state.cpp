@@ -67,7 +67,7 @@ namespace implicit_state_function {
         copy(value, list_get(container, index));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.unpack_state = import_function(kernel, (EvaluateFunc) unpack_state,
             "unpack_state(any container, any identifier :meta) -> any");

@@ -39,7 +39,7 @@ namespace list_function {
         circa_set_list(out, count);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.list = import_function(kernel, make_list, "list(any :multiple) -> List");
         // as_function(FUNCS.list)->specializeType = list_specializeType;

@@ -38,17 +38,17 @@ struct Frame
     // Bytecode
     Value bytecode;
 
-    // Source branch
-    Branch* branch;
+    // Source block
+    Block* block;
 
-    // Which version of the branch we are using.
-    int branchVersion;
+    // Which version of the block we are using.
+    int blockVersion;
 
     // Current program counter
     int pc;
     int nextPc;
 
-    // When a branch is exited early, this stores the exit type.
+    // When a block is exited early, this stores the exit type.
     caName exitType;
     
     // If true, the interpreter should stop after completing this frame. The frame
@@ -76,7 +76,7 @@ struct Stack
     FrameId lastFreeFrame;
 
     // Whether the interpreter is currently running. Set to false when an error occurs
-    // or when the branch is completed.
+    // or when the block is completed.
     bool running;
 
     // Flag that indicates the most recent run was interrupted by an error
@@ -107,7 +107,7 @@ Stack* alloc_stack(World* world);
 // Access the stack.
 Frame* top_frame(Stack* stack);
 Frame* top_frame_parent(Stack* stack);
-Branch* top_branch(Stack* stack);
+Block* top_block(Stack* stack);
 
 // Retrieve the frame with the given depth, this function is O(n).
 Frame* frame_by_depth(Stack* stack, int depth);
@@ -122,10 +122,10 @@ void run_interpreter_steps(Stack* stack, int steps);
 
 // Evaluate a single term. Deprecated.
 void evaluate_single_term(Stack* stack, Term* term);
-void evaluate_branch(Stack* stack, Branch* branch);
+void evaluate_block(Stack* stack, Block* block);
 
 // Evaluate only the terms between 'start' and 'end'.
-void evaluate_range(Stack* stack, Branch* branch, int start, int end);
+void evaluate_range(Stack* stack, Block* block, int start, int end);
 
 // Evaluate 'term' and every term that it depends on. 
 void evaluate_minimum(Stack* stack, Term* term, caValue* result);
@@ -146,8 +146,8 @@ void stack_clear_error(Stack* stack);
 void reset_stack(Stack* stack);
 
 // Push a frame onto the stack.
-Frame* push_frame(Stack* stack, Branch* branch);
-Frame* push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
+Frame* push_frame(Stack* stack, Block* block);
+Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* inputs);
 
 // Pop the topmost frame and throw it away. This call doesn't preserve the frame's
 // outputs or update PC. You might want to call finish_frame() instead of this.
@@ -157,7 +157,7 @@ void pop_frame(Stack* stack);
 void frame_set_stop_when_finished(Frame* frame);
 
 // Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
-// - you call it when the branch is finished evaluating. But instead of passing outputs
+// - you call it when the block is finished evaluating. But instead of passing outputs
 // to the parent frame (like finish_frame does), this copies them to your list.
 void fetch_stack_outputs(Stack* stack, caValue* outputs);
 
@@ -182,7 +182,7 @@ caValue* get_output(Stack* stack, int index);
 caValue* get_caller_output(Stack* stack, int index);
 
 Term* current_term(Stack* stack);
-Branch* current_branch(Stack* stack);
+Block* current_block(Stack* stack);
 
 // Registers
 caValue* get_frame_register(Frame* frame, int index);
@@ -194,7 +194,7 @@ caValue* frame_bytecode(Frame* frame);
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);
 
-EvaluateFunc get_override_for_branch(Branch* branch);
+EvaluateFunc get_override_for_block(Block* block);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.
@@ -209,11 +209,11 @@ void print_error_stack(Stack* stack, std::ostream& out);
 
 // Update bytecode
 void write_term_bytecode(Term* term, caValue* output);
-void write_branch_bytecode(Branch* branch, caValue* output);
+void write_block_bytecode(Block* block, caValue* output);
 
 // Setup the builtin Stack type.
 void eval_context_setup_type(Type* type);
 
-void interpreter_install_functions(Branch* branch);
+void interpreter_install_functions(Block* block);
 
 } // namespace circa

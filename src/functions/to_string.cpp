@@ -15,7 +15,7 @@ namespace to_string_function {
             set_string(out, to_string(in));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate, "to_string(any) -> String");
     }

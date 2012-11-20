@@ -36,20 +36,20 @@ bool is_copying_call(Term* term);
 
 bool is_an_unknown_identifier(Term* term);
 
-// Checks if term->nestedContents is a major branch. A 'major' branch has its own stack
+// Checks if term->nestedContents is a major block. A 'major' block has its own stack
 // frame when executed.
-bool is_major_branch(Term* term);
-bool is_major_branch(Branch* branch);
-bool is_minor_branch(Branch* branch);
+bool is_major_block(Term* term);
+bool is_major_block(Block* block);
+bool is_minor_block(Block* block);
 
-bool has_variable_args(Branch* branch);
-int get_locals_count(Branch* branch);
+bool has_variable_args(Block* block);
+int get_locals_count(Block* block);
 
 // Input & output placeholders
-Term* get_input_placeholder(Branch* branch, int index);
-Term* get_output_placeholder(Branch* branch, int index);
-int count_input_placeholders(Branch* branch);
-int count_output_placeholders(Branch* branch);
+Term* get_input_placeholder(Block* block, int index);
+Term* get_output_placeholder(Block* block, int index);
+int count_input_placeholders(Block* block);
+int count_output_placeholders(Block* block);
 int input_placeholder_index(Term* inputPlaceholder);
 bool is_input_placeholder(Term* term);
 bool is_output_placeholder(Term* term);
@@ -61,16 +61,16 @@ Term* find_extra_output_for_state(Term* term);
 
 // Stateful inputs & outputs
 bool term_is_state_input(Term* term, int index);
-Term* find_state_input(Branch* branch);
-bool has_state_input(Branch* branch);
-Term* find_state_output(Branch* branch);
-bool has_state_output(Branch* branch);
+Term* find_state_input(Block* block);
+bool has_state_input(Block* block);
+Term* find_state_output(Block* block);
+bool has_state_output(Block* block);
 bool is_state_input(Term* placeholder);
 bool is_state_output(Term* placeholder);
 
-// Accessors that use a term's 'details' branch, which may be the nested branch,
-// or it might be the function's branch, depending on the function.
-Branch* term_get_function_details(Term* call);
+// Accessors that use a term's 'details' block, which may be the nested block,
+// or it might be the function's block, depending on the function.
+Block* term_get_function_details(Term* call);
 Term* term_get_input_placeholder(Term* call, int index);
 int term_count_input_placeholders(Term* term);
 Term* term_get_output_placeholder(Term* call, int index);
@@ -80,36 +80,36 @@ bool term_has_variable_args(Term* term);
 // extra_output terms).
 int count_actual_output_terms(Term* term);
 
-// Preceding term in the same branch (may be NULL).
+// Preceding term in the same block (may be NULL).
 Term* preceding_term(Term* term);
 
-// Following term in the same branch (may be NULL).
+// Following term in the same block (may be NULL).
 Term* following_term(Term* term);
 
-Term* find_input_placeholder_with_name(Branch* branch, const char* name);
-Term* find_output_placeholder_with_name(Branch* branch, const char* name);
+Term* find_input_placeholder_with_name(Block* block, const char* name);
+Term* find_output_placeholder_with_name(Block* block, const char* name);
 
-Term* find_last_non_comment_expression(Branch* branch);
-Term* find_term_with_function(Branch* branch, Term* func);
-Term* find_input_placeholder_with_name(Branch* branch, const char* name);
+Term* find_last_non_comment_expression(Block* block);
+Term* find_term_with_function(Block* block, Term* func);
+Term* find_input_placeholder_with_name(Block* block, const char* name);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);
 
 // Search upwards starting at 'term', and returns the parent (or the term itself) found
-// in 'branch'. Returns NULL if not found.
-Term* find_parent_term_in_branch(Term* term, Branch* branch);
+// in 'block'. Returns NULL if not found.
+Term* find_parent_term_in_block(Term* term, Block* block);
 
 bool has_an_error_listener(Term* term);
 
 // Format the term's global id as a string that looks like: $ab3
 std::string global_id(Term* term);
 
-// Returns the UniqueName, a name that's unique within the term's branch.
+// Returns the UniqueName, a name that's unique within the term's block.
 const char* unique_name(Term* term);
 
 std::string get_short_local_name(Term* term);
 
-std::string branch_namespace_to_string(Branch* branch);
+std::string block_namespace_to_string(Block* block);
 
 // Print compiled code in a raw format
 struct RawOutputPrefs
@@ -123,14 +123,14 @@ struct RawOutputPrefs
 };
 
 
-void print_branch(Branch* branch, RawOutputPrefs* prefs, std::ostream& out);
+void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out);
 void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out);
 void print_term(Term* term, std::ostream& out);
 
 // Convenient overloads for raw format printing
-void print_branch(Branch* branch, std::ostream& out);
-void print_branch_with_properties(Branch* branch, std::ostream& out);
-std::string get_branch_raw(Branch* branch);
+void print_block(Block* block, std::ostream& out);
+void print_block_with_properties(Block* block, std::ostream& out);
+std::string get_block_raw(Block* block);
 std::string get_term_to_string_extended(Term*);
 std::string get_term_to_string_extended_with_props(Term*);
 
@@ -140,7 +140,7 @@ std::string get_short_location(Term* term);
 // Print the source file that this term came from, if any.
 std::string get_source_filename(Term* term);
 
-void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string> &names);
+void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &names);
 
 // Get a list of the set of terms which descend from 'inputs', and which have 'outputs'
 // as descendants.

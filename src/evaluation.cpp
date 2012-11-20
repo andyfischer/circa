@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "building.h"
-#include "branch.h"
+#include "block.h"
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
@@ -27,8 +27,8 @@ namespace circa {
 
 static Frame* frame_by_id(Stack* stack, int id);
 static void dump_frames_raw(Stack* stack);
-static Branch* find_pushed_branch_for_action(caValue* action);
-static void update_stack_for_possibly_changed_branches(Stack* stack);
+static Block* find_pushed_block_for_action(caValue* action);
+static void update_stack_for_possibly_changed_blockes(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 static void step_interpreter(Stack* stack);
 static void bytecode_write_noop(caValue* op);
@@ -124,7 +124,7 @@ static void resize_frame_list(Stack* stack, int newCapacity)
         frame->stack = stack;
         initialize_null(&frame->registers);
         initialize_null(&frame->bytecode);
-        frame->branchVersion = 0;
+        frame->blockVersion = 0;
 
         // Except for the last element, this id is updated on next iteration.
         frame->parent = 0;
@@ -139,7 +139,7 @@ static void resize_frame_list(Stack* stack, int newCapacity)
     }
 }
 
-static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branch* branch)
+static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block* block)
 {
     // Check to grow the frames list.
     if (stack->firstFreeFrame == 0) {
@@ -173,8 +173,8 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branc
     }
 
     // Initialize frame
-    frame->branch = branch;
-    frame->branchVersion = branch->version;
+    frame->block = block;
+    frame->blockVersion = block->version;
     frame->pc = 0;
     frame->nextPc = 0;
     frame->exitType = name_None;
@@ -185,10 +185,10 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branc
     frame->parentPc = parentPc;
 
     // Initialize registers
-    set_list(&frame->registers, get_locals_count(branch));
+    set_list(&frame->registers, get_locals_count(block));
 
     // Copy bytecode.
-    copy(&branch->bytecode, frame_bytecode(frame));
+    copy(&block->bytecode, frame_bytecode(frame));
 
     return frame;
 }
@@ -206,18 +206,18 @@ static void release_frame(Stack* stack, Frame* frame)
     }
 }
 
-Frame* push_frame(Stack* stack, Branch* branch)
+Frame* push_frame(Stack* stack, Block* block)
 {
     INCREMENT_STAT(PushFrame);
 
-    // Make sure the branch's bytecode is up-to-date.
-    refresh_bytecode(branch);
+    // Make sure the block's bytecode is up-to-date.
+    refresh_bytecode(block);
 
     int parentPc = 0;
     if (stack->top != 0)
         parentPc = top_frame(stack)->pc;
 
-    Frame* frame = initialize_frame(stack, stack->top, parentPc, branch);
+    Frame* frame = initialize_frame(stack, stack->top, parentPc, block);
 
     // Update 'top'
     stack->top = frame->id;
@@ -245,7 +245,7 @@ void pop_frame(Stack* stack)
     // TODO: add a 'retention' flag?
 }
 
-Frame* push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
+Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* _inputs)
 {
     // Make a local copy of 'inputs', since we're going to touch the stack before
     // accessing it, and the value might live on the stack.
@@ -256,12 +256,12 @@ Frame* push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
     int inputsLength = list_length(inputs);
 
     // Push new frame
-    Frame* frame = push_frame(stack, branch);
+    Frame* frame = push_frame(stack, block);
     
     // Cast inputs into placeholders
     int placeholderIndex = 0;
     for (placeholderIndex=0;; placeholderIndex++) {
-        Term* placeholder = get_input_placeholder(branch, placeholderIndex);
+        Term* placeholder = get_input_placeholder(block, placeholderIndex);
         if (placeholder == NULL)
             break;
 
@@ -298,8 +298,8 @@ Frame* stack_create_expansion(Stack* stack, Frame* parent, Term* term)
 {
     circa::Value action;
     write_term_bytecode(term, &action);
-    Branch* branch = find_pushed_branch_for_action(&action);
-    Frame* frame = initialize_frame(stack, parent->id, term->index, branch);
+    Block* block = find_pushed_block_for_action(&action);
+    Frame* frame = initialize_frame(stack, parent->id, term->index, block);
     return frame;
 }
 
@@ -315,7 +315,7 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
     set_list(outputs, 0);
 
     for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(top->branch, i);
+        Term* placeholder = get_output_placeholder(top->block, i);
         if (placeholder == NULL)
             break;
 
@@ -326,12 +326,12 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
 void finish_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
-    Branch* finishedBranch = top->branch;
+    Block* finishedBlock = top->block;
 
     // Undo the increment to nextPc, it's one past what it should be.
     top->nextPc = top->pc;
 
-    // Exit if we have finished the topmost branch
+    // Exit if we have finished the topmost block
     if (is_stop_frame(top)) {
         stack->running = false;
         return;
@@ -340,7 +340,7 @@ void finish_frame(Stack* stack)
     Frame* topFrame = top_frame(stack);
     Frame* parentFrame = top_frame_parent(stack);
 
-    ca_assert(parentFrame->pc < parentFrame->branch->length());
+    ca_assert(parentFrame->pc < parentFrame->block->length());
 
     caValue* callerBytecode = list_get(frame_bytecode(parentFrame), parentFrame->pc);
     caValue* outputAction = list_get(callerBytecode, 2);
@@ -349,7 +349,7 @@ void finish_frame(Stack* stack)
 
     if (as_name(outputAction) == name_FlatOutputs) {
 
-        Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+        Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
         int outputSlotCount = count_actual_output_terms(finishedTerm);
 
         // Copy outputs to the parent frame, and advance PC.
@@ -357,7 +357,7 @@ void finish_frame(Stack* stack)
 
             caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
 
-            Term* placeholder = get_output_placeholder(finishedBranch, i);
+            Term* placeholder = get_output_placeholder(finishedBlock, i);
             if (placeholder == NULL) {
 
                 // Placeholder not found for this extra_output. If this output is supposed
@@ -396,10 +396,10 @@ void finish_frame(Stack* stack)
             }
         }
     } else if (as_name(outputAction) == name_OutputsToList) {
-        Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+        Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
         caValue* dest = get_frame_register(parentFrame, finishedTerm->index);
 
-        int count = count_output_placeholders(finishedBranch);
+        int count = count_output_placeholders(finishedBlock);
         set_list(dest, count);
 
         for (int i=0; i < count; i++) {
@@ -425,8 +425,8 @@ void finish_frame(Stack* stack)
 
 void frame_pc_move_to_end(Frame* frame)
 {
-    frame->pc = frame->branch->length() - 1;
-    frame->nextPc = frame->branch->length();
+    frame->pc = frame->block->length() - 1;
+    frame->nextPc = frame->block->length();
 }
 
 Frame* top_frame(Stack* stack)
@@ -442,12 +442,12 @@ Frame* top_frame_parent(Stack* stack)
         return NULL;
     return frame_by_id(stack, top->parent);
 }
-Branch* top_branch(Stack* stack)
+Block* top_block(Stack* stack)
 {
     Frame* frame = top_frame(stack);
     if (frame == NULL)
         return NULL;
-    return frame->branch;
+    return frame->block;
 }
 
 void reset_stack(Stack* stack)
@@ -472,19 +472,19 @@ void reset_stack(Stack* stack)
 
 void evaluate_single_term(Stack* stack, Term* term)
 {
-    Frame* frame = push_frame(stack, term->owningBranch);
+    Frame* frame = push_frame(stack, term->owningBlock);
     frame->pc = term->index;
     frame->nextPc = term->index;
 
     run_interpreter(stack);
 }
 
-void evaluate_branch(Stack* stack, Branch* branch)
+void evaluate_block(Stack* stack, Block* block)
 {
-    branch_finish_changes(branch);
+    block_finish_changes(block);
 
     // Top-level call
-    push_frame(stack, branch);
+    push_frame(stack, block);
 
     run_interpreter(stack);
 
@@ -504,7 +504,7 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
     int distance = 0;
 
     while (true) {
-        if (distance >= stackDelta && frame->branch == term->owningBranch)
+        if (distance >= stackDelta && frame->block == term->owningBlock)
             return get_frame_register(frame, term);
 
         if (frame->parent == 0)
@@ -517,7 +517,7 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
 
 int num_inputs(Stack* stack)
 {
-    return count_input_placeholders(top_frame(stack)->branch);
+    return count_input_placeholders(top_frame(stack)->block);
 }
 
 void consume_inputs_to_list(Stack* stack, List* list)
@@ -553,7 +553,7 @@ void consume_input(Stack* stack, int index, caValue* dest)
 caValue* get_output(Stack* stack, int index)
 {
     Frame* frame = top_frame(stack);
-    Term* placeholder = get_output_placeholder(frame->branch, index);
+    Term* placeholder = get_output_placeholder(frame->block, index);
     if (placeholder == NULL)
         return NULL;
     return get_frame_register(frame, placeholder);
@@ -562,20 +562,20 @@ caValue* get_output(Stack* stack, int index)
 caValue* get_caller_output(Stack* stack, int index)
 {
     Frame* frame = top_frame_parent(stack);
-    Term* currentTerm = frame->branch->get(frame->pc);
+    Term* currentTerm = frame->block->get(frame->pc);
     return get_frame_register(frame, get_output_term(currentTerm, index));
 }
 
 Term* current_term(Stack* stack)
 {
     Frame* top = top_frame(stack);
-    return top->branch->get(top->pc);
+    return top->block->get(top->pc);
 }
 
-Branch* current_branch(Stack* stack)
+Block* current_block(Stack* stack)
 {
     Frame* top = top_frame(stack);
-    return top->branch;
+    return top->block;
 }
 
 caValue* get_frame_register(Frame* frame, int index)
@@ -610,7 +610,7 @@ caValue* get_frame_register_from_end(Frame* frame, int index)
 caValue* get_top_register(Stack* stack, Term* term)
 {
     Frame* frame = top_frame(stack);
-    ca_assert(term->owningBranch == frame->branch);
+    ca_assert(term->owningBlock == frame->block);
     return get_frame_register(frame, term);
 }
 
@@ -650,8 +650,8 @@ void stack_clear_error(Stack* stack)
         pop_frame(stack);
 
     Frame* top = top_frame(stack);
-    top->pc = top->branch->length() - 1;
-    top->nextPc = top->branch->length();
+    top->pc = top->block->length() - 1;
+    top->nextPc = top->block->length();
 }
 
 static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
@@ -688,19 +688,19 @@ void print_stack(Stack* stack, std::ostream& out)
     for (int frameIndex = 0; frameIndex < list_length(&stackTrace); frameIndex++) {
         Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, frameIndex)));
         int depth = list_length(&stackTrace) - frameIndex - 1;
-        Branch* branch = frame->branch;
+        Block* block = frame->block;
         out << " [Frame #" << frame->id
              << ", depth = " << depth
-             << ", branch = " << branch->id
+             << ", block = " << block->id
              << ", pc = " << frame->pc
              << ", nextPc = " << frame->nextPc
              << "]" << std::endl;
 
-        if (branch == NULL)
+        if (block == NULL)
             continue;
 
-        for (int i=0; i < frame->branch->length(); i++) {
-            Term* term = branch->get(i);
+        for (int i=0; i < frame->block->length(); i++) {
+            Term* term = block->get(i);
 
             // indent
             for (int x = 0; x < frameIndex+1; x++)
@@ -755,12 +755,12 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
         bool lastFrame = i == list_length(&stackTrace) - 1;
 
-        if (frame->pc >= frame->branch->length()) {
+        if (frame->pc >= frame->block->length()) {
             std::cout << "(end of frame)" << std::endl;
             continue;
         }
 
-        Term* term = frame->branch->get(frame->pc);
+        Term* term = frame->block->get(frame->pc);
 
         // Print a short location label
         if (term->function == FUNCS.input) {
@@ -786,27 +786,27 @@ void print_error_stack(Stack* stack, std::ostream& out)
     }
 }
 
-static void update_stack_for_possibly_changed_branches(Stack* stack)
+static void update_stack_for_possibly_changed_blockes(Stack* stack)
 {
     // Starting at the top frame, check each frame in the stack to make sure it still
-    // matches the original branch.
+    // matches the original block.
     Frame* frame = top_frame(stack);
 
     while (true) {
 
-        if (frame->branchVersion == frame->branch->version) {
+        if (frame->blockVersion == frame->block->version) {
             // Same version.
 
-            if (frame_register_count(frame) != get_locals_count(frame->branch))
+            if (frame_register_count(frame) != get_locals_count(frame->block))
                 internal_error("locals count has changed, but version didn't change");
 
         } else {
 
             // Resize frame->registers if needed.
-            list_resize(&frame->registers, get_locals_count(frame->branch));
+            list_resize(&frame->registers, get_locals_count(frame->block));
 
-            refresh_bytecode(frame->branch);
-            copy(&frame->branch->bytecode, &frame->bytecode);
+            refresh_bytecode(frame->block);
+            copy(&frame->block->bytecode, &frame->bytecode);
         }
 
         // Continue to next frame.
@@ -817,21 +817,21 @@ static void update_stack_for_possibly_changed_branches(Stack* stack)
     }
 }
 
-static Branch* for_loop_choose_branch(Stack* stack, Term* term)
+static Block* for_loop_choose_block(Stack* stack, Term* term)
 {
-    // If there are zero inputs, use the #zero branch.
+    // If there are zero inputs, use the #zero block.
     caValue* input = find_stack_value_for_term(stack, term->input(0), 0);
 
     if (is_list(input) && list_length(input) == 0)
-        return for_loop_get_zero_branch(term->nestedContents);
+        return for_loop_get_zero_block(term->nestedContents);
 
     return term->nestedContents;
 }
 
-static Branch* case_block_choose_branch(Stack* stack, Term* term)
+static Block* case_block_choose_block(Stack* stack, Term* term)
 {
     // Find the accepted case
-    Branch* contents = nested_contents(term);
+    Block* contents = nested_contents(term);
 
     int termIndex = 0;
     while (contents->get(termIndex)->function == FUNCS.input)
@@ -857,10 +857,10 @@ static Branch* case_block_choose_branch(Stack* stack, Term* term)
     return NULL;
 }
 
-EvaluateFunc get_override_for_branch(Branch* branch)
+EvaluateFunc get_override_for_block(Block* block)
 {
     // This relationship should be simplified.
-    Term* owner = branch->owningTerm;
+    Term* owner = block->owningTerm;
     if (owner == NULL)
         return NULL;
 
@@ -878,17 +878,17 @@ EvaluateFunc get_override_for_branch(Branch* branch)
 
 static void start_interpreter_session(Stack* stack)
 {
-    Branch* topBranch = top_frame(stack)->branch;
+    Block* topBlock = top_frame(stack)->block;
 
     // Make sure there are no pending code updates.
-    branch_finish_changes(topBranch);
+    block_finish_changes(topBlock);
 
-    // Check if our stack needs to be updated following branch modification
-    update_stack_for_possibly_changed_branches(stack);
+    // Check if our stack needs to be updated following block modification
+    update_stack_for_possibly_changed_blockes(stack);
 
     // Cast all inputs, in case they were passed in uncast.
     for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(topBranch, i);
+        Term* placeholder = get_input_placeholder(topBlock, i);
         if (placeholder == NULL)
             break;
         caValue* slot = get_top_register(stack, placeholder);
@@ -896,16 +896,16 @@ static void start_interpreter_session(Stack* stack)
     }
 }
 
-void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
+void write_term_input_instructions(Term* term, caValue* op, Block* block)
 {
     caValue* outputTag = list_get(op, 0);
     caValue* inputs = list_get(op, 1);
 
     // Check the input count
     int inputCount = term->numInputs();
-    int expectedCount = count_input_placeholders(branch);
+    int expectedCount = count_input_placeholders(block);
     int requiredCount = expectedCount;
-    bool varargs = has_variable_args(branch);
+    bool varargs = has_variable_args(block);
     if (varargs)
         requiredCount = expectedCount - 1;
 
@@ -925,7 +925,7 @@ void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
     list_resize(inputs, expectedCount);
     int inputIndex = 0;
     for (int placeholderIndex=0;; placeholderIndex++, inputIndex++) {
-        Term* placeholder = get_input_placeholder(branch, placeholderIndex);
+        Term* placeholder = get_input_placeholder(block, placeholderIndex);
         if (placeholder == NULL)
             break;
 
@@ -970,7 +970,7 @@ void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
     }
 }
 
-void write_term_output_instructions(Term* term, caValue* op, Branch* finishingBranch)
+void write_term_output_instructions(Term* term, caValue* op, Block* finishingBlock)
 {
     caValue* action = list_get(op, 2);
 
@@ -993,7 +993,7 @@ void write_term_bytecode(Term* term, caValue* result)
 {
     // Each action has a tag in index 0.
     // Actions which take inputs have a list of input instructions in index 1.
-    // Actions which push a branch have a list of output instructions in index 2.
+    // Actions which push a block have a list of output instructions in index 2.
     
     INCREMENT_STAT(WriteTermBytecode);
 
@@ -1002,9 +1002,9 @@ void write_term_bytecode(Term* term, caValue* result)
     caValue* inputs = list_get(result, 1);
     set_list(inputs, 0);
 
-    // Check to trigger a C override, if this is the first term in an override branch.
-    Branch* parent = term->owningBranch;
-    if (term->index == 0 && get_override_for_branch(parent) != NULL) {
+    // Check to trigger a C override, if this is the first term in an override block.
+    Block* parent = term->owningBlock;
+    if (term->index == 0 && get_override_for_block(parent) != NULL) {
         list_resize(result, 1);
         set_name(list_get(result, 0), op_FireNative);
 
@@ -1062,7 +1062,7 @@ void write_term_bytecode(Term* term, caValue* result)
     }
 
     if (term->function == FUNCS.dynamic_call
-            || term->function == FUNCS.branch_dynamic_call) {
+            || term->function == FUNCS.block_dynamic_call) {
         list_resize(result, 3);
         set_name(list_get(result, 0), op_DynamicCall);
         write_term_input_instructions(term, result, function_contents(term->function));
@@ -1070,51 +1070,51 @@ void write_term_bytecode(Term* term, caValue* result)
         return;
     }
     
-    // Choose the next branch
-    Branch* branch = NULL;
+    // Choose the next block
+    Block* block = NULL;
     Name tag = 0;
 
     if (is_value(term)) {
         // Value terms are no-ops.
-        branch = NULL;
+        block = NULL;
         tag = op_NoOp;
     } else if (term->function == FUNCS.lambda
-            || term->function == FUNCS.branch_unevaluated) {
+            || term->function == FUNCS.block_unevaluated) {
         // These funcs have a nestedContents, but it shouldn't be evaluated.
-        branch = NULL;
+        block = NULL;
         tag = op_NoOp;
     } else if (term->function == FUNCS.if_block) {
-        branch = term->nestedContents;
+        block = term->nestedContents;
         tag = op_CaseBlock;
 
     } else if (term->nestedContents != NULL) {
         // Otherwise if the term has nested contents, then use it.
-        branch = term->nestedContents;
-        tag = op_CallBranch;
+        block = term->nestedContents;
+        tag = op_CallBlock;
     } else if (term->function != NULL) {
         // No nested contents, use function.
-        branch = function_contents(term->function);
-        tag = op_CallBranch;
+        block = function_contents(term->function);
+        tag = op_CallBlock;
     }
 
-    if (tag == op_NoOp || branch == NULL || branch->emptyEvaluation) {
+    if (tag == op_NoOp || block == NULL || block->emptyEvaluation) {
         // No-op
         set_name(outputTag, op_NoOp);
         list_resize(result, 1);
         return;
     }
     
-    // For CallBranch we need to save the branch pointer
-    if (tag == op_CallBranch) {
-        set_branch(list_get(result, 3), branch);
+    // For CallBlock we need to save the block pointer
+    if (tag == op_CallBlock) {
+        set_block(list_get(result, 3), block);
     }
 
     // If we made it this far, then it's a normal call. Save the tag.
     set_name(outputTag, tag);
 
     // Write input & output instructions
-    write_term_input_instructions(term, result, branch);
-    write_term_output_instructions(term, result, branch);
+    write_term_input_instructions(term, result, block);
+    write_term_output_instructions(term, result, block);
 
     // Finally, do some lightweight optimization.
 
@@ -1122,39 +1122,39 @@ void write_term_bytecode(Term* term, caValue* result)
     if (term->function != NULL && term->function->boolProp("preferSpecialize", false)) {
         Term* specialized = statically_specialize_overload_for_call(term);
         if (specialized != NULL) {
-            ca_assert(tag == op_CallBranch);
-            set_branch(list_get(result, 3), function_contents(specialized));
+            ca_assert(tag == op_CallBlock);
+            set_block(list_get(result, 3), function_contents(specialized));
         }
     }
 }
 
-void write_branch_bytecode(Branch* branch, caValue* output)
+void write_block_bytecode(Block* block, caValue* output)
 {
-    // Branch bytecode is a list with length + 1 elements.
+    // Block bytecode is a list with length + 1 elements.
     // The first 'length' elements are operations that correspond with
     // Terms with matching index.
     // The final element is a 'finish' instruction that usually pops the
-    // branch or something.
+    // block or something.
     
-    set_list(output, branch->length() + 1);
+    set_list(output, block->length() + 1);
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         caValue* op = list_get(output, i);
 
         write_term_bytecode(term, op);
     }
 
     // Write the finish operation
-    caValue* finishOp = list_get(output, branch->length());
-    if (is_for_loop(branch)) {
+    caValue* finishOp = list_get(output, block->length());
+    if (is_for_loop(block)) {
 
         // Finish for-loop.
         set_list(finishOp, 2);
         set_name(list_get(finishOp, 0), op_FinishLoop);
 
         // Possibly produce output, depending on if this term is used.
-        if ((branch->owningTerm != NULL) && user_count(branch->owningTerm) > 0) {
+        if ((block->owningTerm != NULL) && user_count(block->owningTerm) > 0) {
             set_name(list_get(finishOp, 1), name_LoopProduceOutput);
         } else {
             set_null(list_get(finishOp, 1));
@@ -1231,11 +1231,11 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
     }
 }
 
-static Branch* find_pushed_branch_for_action(caValue* action)
+static Block* find_pushed_block_for_action(caValue* action)
 {
     switch (leading_name(action)) {
-    case op_CallBranch:
-        return as_branch(list_get(action, 2));
+    case op_CallBlock:
+        return as_block(list_get(action, 2));
     default:
         return NULL;
     }
@@ -1246,13 +1246,13 @@ static void step_interpreter(Stack* stack)
     INCREMENT_STAT(StepInterpreter);
 
     Frame* frame = top_frame(stack);
-    Branch* branch = frame->branch;
+    Block* block = frame->block;
 
     // Advance pc to nextPc
     frame->pc = frame->nextPc;
     frame->nextPc = frame->pc + 1;
 
-    ca_assert(frame->pc <= branch->length());
+    ca_assert(frame->pc <= block->length());
 
     // Grab action
     caValue* action = list_get(frame_bytecode(frame), frame->pc);
@@ -1262,10 +1262,10 @@ static void step_interpreter(Stack* stack)
     switch (op) {
     case op_NoOp:
         break;
-    case op_CallBranch: {
-        Branch* branch = as_branch(list_get(action, 3));
+    case op_CallBlock: {
+        Block* block = as_block(list_get(action, 3));
         caValue* inputActions = list_get(action, 1);
-        Frame* frame = push_frame(stack, branch);
+        Frame* frame = push_frame(stack, block);
         populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
         break;
     }
@@ -1277,26 +1277,26 @@ static void step_interpreter(Stack* stack)
         // May have a runtime type error.
         if (error_occurred(stack))
             return;
-        Branch* branch = as_branch(list_get(&incomingInputs, 0));
+        Block* block = as_block(list_get(&incomingInputs, 0));
         caValue* unpackedInputs = list_get(&incomingInputs, 1);
-        push_frame_with_inputs(stack, branch, unpackedInputs);
+        push_frame_with_inputs(stack, block, unpackedInputs);
         break;
     }
 
     case op_CaseBlock: {
-        Term* currentTerm = branch->get(frame->pc);
-        Branch* branch = case_block_choose_branch(stack, currentTerm);
-        if (branch == NULL)
+        Term* currentTerm = block->get(frame->pc);
+        Block* block = case_block_choose_block(stack, currentTerm);
+        if (block == NULL)
             return;
-        Frame* frame = push_frame(stack, branch);
+        Frame* frame = push_frame(stack, block);
         caValue* inputActions = list_get(action, 1);
         populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
         break;
     }
     case op_ForLoop: {
-        Term* currentTerm = branch->get(frame->pc);
-        Branch* branch = for_loop_choose_branch(stack, currentTerm);
-        Frame* frame = push_frame(stack, branch);
+        Term* currentTerm = block->get(frame->pc);
+        Block* block = for_loop_choose_block(stack, currentTerm);
+        Frame* frame = push_frame(stack, block);
         caValue* inputActions = list_get(action, 1);
         populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
         bool enableLoopOutput = as_name(list_get(action, 3)) == name_LoopProduceOutput;
@@ -1316,12 +1316,12 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_FireNative: {
-        EvaluateFunc override = get_override_for_branch(branch);
+        EvaluateFunc override = get_override_for_block(block);
         ca_assert(override != NULL);
 
         // By default, we'll set nextPc to finish this frame on the next iteration.
         // The override func may change nextPc.
-        frame->nextPc = frame->branch->length();
+        frame->nextPc = frame->block->length();
 
         // Call override
         override(stack);
@@ -1330,7 +1330,7 @@ static void step_interpreter(Stack* stack)
     }
     case op_ExitPoint: {
         Frame* frame = top_frame(stack);
-        Term* currentTerm = branch->get(frame->pc);
+        Term* currentTerm = block->get(frame->pc);
 
         caValue* control = find_stack_value_for_term(stack, currentTerm->input(0), 0);
 
@@ -1345,7 +1345,7 @@ static void step_interpreter(Stack* stack)
 
             // Don't touch this output if it is an accumulatingOutput; it already has
             // its output value.
-            Term* outputPlaceholder = get_output_placeholder(branch, i);
+            Term* outputPlaceholder = get_output_placeholder(block, i);
             if (outputPlaceholder->boolProp("accumulatingOutput", false))
                 continue;
 
@@ -1361,7 +1361,7 @@ static void step_interpreter(Stack* stack)
 
         // Set PC to end
         frame->exitType = as_name(control);
-        frame->nextPc = branch->length();
+        frame->nextPc = block->length();
         break;
     }
     case op_FinishFrame: {
@@ -1375,9 +1375,9 @@ static void step_interpreter(Stack* stack)
     }
 
     case op_ErrorNotEnoughInputs: {
-        Term* currentTerm = branch->get(frame->pc);
+        Term* currentTerm = block->get(frame->pc);
         circa::Value msg;
-        Branch* func = function_contents(currentTerm->function);
+        Block* func = function_contents(currentTerm->function);
         int expectedCount = count_input_placeholders(func);
         if (has_variable_args(func))
             expectedCount--;
@@ -1392,9 +1392,9 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_ErrorTooManyInputs: {
-        Term* currentTerm = branch->get(frame->pc);
+        Term* currentTerm = block->get(frame->pc);
         circa::Value msg;
-        Branch* func = function_contents(currentTerm->function);
+        Block* func = function_contents(currentTerm->function);
         int expectedCount = count_input_placeholders(func);
         int foundCount = currentTerm->numInputs();
         set_string(&msg, "Too many inputs, expected ");
@@ -1444,13 +1444,13 @@ void run_interpreter_steps(Stack* stack, int steps)
     stack->running = false;
 }
 
-void evaluate_range(Stack* stack, Branch* branch, int start, int end)
+void evaluate_range(Stack* stack, Block* block, int start, int end)
 {
-    branch_finish_changes(branch);
-    push_frame(stack, branch);
+    block_finish_changes(block);
+    push_frame(stack, block);
 
     for (int i=start; i <= end; i++)
-        evaluate_single_term(stack, branch->get(i));
+        evaluate_single_term(stack, block->get(i));
 
     if (error_occurred(stack))
         return;
@@ -1461,20 +1461,20 @@ void evaluate_range(Stack* stack, Branch* branch, int start, int end)
 void evaluate_minimum(Stack* stack, Term* term, caValue* result)
 {
     // Get a list of every term that this term depends on. Also, limit this
-    // search to terms inside the current branch.
+    // search to terms inside the current block.
     
-    Branch* branch = term->owningBranch;
-    branch_finish_changes(branch);
+    Block* block = term->owningBlock;
+    block_finish_changes(block);
 
 
-    bool *marked = new bool[branch->length()];
-    memset(marked, false, sizeof(bool)*branch->length());
+    bool *marked = new bool[block->length()];
+    memset(marked, false, sizeof(bool)*block->length());
 
     marked[term->index] = true;
 
-    // Walk up the branch, marking terms.
+    // Walk up the block, marking terms.
     for (int i=term->index; i >= 0; i--) {
-        Term* checkTerm = branch->get(i);
+        Term* checkTerm = block->get(i);
         if (checkTerm == NULL)
             continue;
 
@@ -1484,8 +1484,8 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
                 if (input == NULL)
                     continue;
 
-                // don't compile stuff outside this branch.
-                if (input->owningBranch != branch)
+                // don't compile stuff outside this block.
+                if (input->owningBlock != block)
                     continue;
 
                 // don't follow :meta inputs.
@@ -1500,10 +1500,10 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
 
     // Construct a bytecode fragment that only includes marked terms.
     Value bytecode;
-    set_list(&bytecode, branch->length() + 1);
+    set_list(&bytecode, block->length() + 1);
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         caValue* op = list_get(&bytecode, i);
         if (!marked[i]) {
             bytecode_write_noop(op);
@@ -1513,10 +1513,10 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
         write_term_bytecode(term, op);
     }
     
-    bytecode_write_finish_op(list_get(&bytecode, branch->length()));
+    bytecode_write_finish_op(list_get(&bytecode, block->length()));
 
     // Push frame, use our custom bytecode.
-    push_frame(stack, branch);
+    push_frame(stack, block);
     move(&bytecode, frame_bytecode(top_frame(stack)));
 
     // Start evaluation.
@@ -1570,11 +1570,11 @@ void Frame__registers(caStack* callerStack)
     touch(out);
 }
 
-void Frame__branch(caStack* callerStack)
+void Frame__block(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     ca_assert(frame != NULL);
-    set_branch(circa_output(callerStack, 0), frame->branch);
+    set_block(circa_output(callerStack, 0), frame->block);
 }
 
 void Frame__register(caStack* callerStack)
@@ -1601,7 +1601,7 @@ void Frame__pc_term(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     ca_assert(frame != NULL);
-    set_term_ref(circa_output(callerStack, 0), frame->branch->get(frame->pc));
+    set_term_ref(circa_output(callerStack, 0), frame->block->get(frame->pc));
 }
 
 void make_interpreter(caStack* callerStack)
@@ -1618,11 +1618,11 @@ void Interpreter__push_frame(caStack* callerStack)
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
-    Branch* branch = as_branch(circa_input(callerStack, 1));
-    ca_assert(branch != NULL);
+    Block* block = as_block(circa_input(callerStack, 1));
+    ca_assert(block != NULL);
     caValue* inputs = circa_input(callerStack, 2);
 
-    push_frame_with_inputs(self, branch, inputs);
+    push_frame_with_inputs(self, block, inputs);
 }
 void Interpreter__pop_frame(caStack* callerStack)
 {
@@ -1639,10 +1639,10 @@ void Interpreter__set_state_input(caStack* callerStack)
         return circa_output_error(callerStack, "No stack frame");
 
     // find state input
-    Branch* branch = top_frame(self)->branch;
+    Block* block = top_frame(self)->block;
     caValue* stateSlot = NULL;
     for (int i=0;; i++) {
-        Term* input = get_input_placeholder(branch, i);
+        Term* input = get_input_placeholder(block, i);
         if (input == NULL)
             break;
         if (is_state_input(input)) {
@@ -1652,7 +1652,7 @@ void Interpreter__set_state_input(caStack* callerStack)
     }
 
     if (stateSlot == NULL)
-        // No-op if branch doesn't expect state
+        // No-op if block doesn't expect state
         return;
 
     copy(circa_input(callerStack, 1), stateSlot);
@@ -1667,10 +1667,10 @@ void Interpreter__get_state_output(caStack* callerStack)
         return circa_output_error(callerStack, "No stack frame");
 
     // find state output
-    Branch* branch = top_frame(self)->branch;
+    Block* block = top_frame(self)->block;
     caValue* stateSlot = NULL;
     for (int i=0;; i++) {
-        Term* output = get_output_placeholder(branch, i);
+        Term* output = get_output_placeholder(block, i);
         if (output == NULL)
             break;
         if (is_state_output(output)) {
@@ -1723,7 +1723,7 @@ void Interpreter__output(caStack* callerStack)
     int index = circa_int_input(callerStack, 1);
 
     Frame* frame = top_frame(self);
-    Term* output = get_output_placeholder(frame->branch, index);
+    Term* output = get_output_placeholder(frame->block, index);
     if (output == NULL)
         set_null(circa_output(callerStack, 0));
     else
@@ -1781,10 +1781,10 @@ void eval_context_setup_type(Type* type)
     type->gcListReferences = stack_list_references;
 }
 
-void interpreter_install_functions(Branch* kernel)
+void interpreter_install_functions(Block* kernel)
 {
     static const ImportRecord records[] = {
-        {"Frame.branch", Frame__branch},
+        {"Frame.block", Frame__block},
         {"Frame.register", Frame__register},
         {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},
@@ -1841,11 +1841,11 @@ CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 }
 CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
-    Branch* branch = function_contents((Function*) func);
+    Block* block = function_contents((Function*) func);
     
-    branch_finish_changes(branch);
+    block_finish_changes(block);
     
-    push_frame_with_inputs(stack, branch, inputs);
+    push_frame_with_inputs(stack, block, inputs);
     
     run_interpreter(stack);
     
@@ -1859,7 +1859,7 @@ CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* 
 
 CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)
 {
-    caBranch* func = circa_find_function(NULL, name);
+    caBlock* func = circa_find_function(NULL, name);
 
     if (func == NULL) {
         // TODO: Save this error on the stack instead of stdout
@@ -1871,9 +1871,9 @@ CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)
     return true;
 }
 
-CIRCA_EXPORT void circa_push_function(caStack* stack, caBranch* func)
+CIRCA_EXPORT void circa_push_function(caStack* stack, caBlock* func)
 {
-    branch_finish_changes(func);
+    block_finish_changes(func);
     
     push_frame(stack, func);
 }
@@ -1885,7 +1885,7 @@ CIRCA_EXPORT caValue* circa_frame_input(caStack* stack, int index)
     if (top == NULL)
         return NULL;
 
-    Term* term = top->branch->get(index);
+    Term* term = top->block->get(index);
 
     if (term->function != FUNCS.input)
         return NULL;
@@ -1897,9 +1897,9 @@ CIRCA_EXPORT caValue* circa_frame_output(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);
 
-    int realIndex = top->branch->length() - index - 1;
+    int realIndex = top->block->length() - index - 1;
 
-    Term* term = top->branch->get(realIndex);
+    Term* term = top->block->get(realIndex);
     if (term->function != FUNCS.output)
         return NULL;
 
@@ -1916,9 +1916,9 @@ CIRCA_EXPORT void circa_pop(caStack* stack)
     pop_frame(stack);
 }
 
-CIRCA_EXPORT caBranch* circa_top_branch(caStack* stack)
+CIRCA_EXPORT caBlock* circa_top_block(caStack* stack)
 {
-    return (caBranch*) top_frame(stack)->branch;
+    return (caBlock*) top_frame(stack)->block;
 }
 
 CIRCA_EXPORT caValue* circa_input(caStack* stack, int index)
@@ -1956,7 +1956,7 @@ CIRCA_EXPORT caValue* circa_output(caStack* stack, int index)
 CIRCA_EXPORT void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
-    top_frame(stack)->pc = top_frame(stack)->branch->length() - 1;
+    top_frame(stack)->pc = top_frame(stack)->block->length() - 1;
     raise_error(stack);
 }
 
@@ -1965,18 +1965,18 @@ CIRCA_EXPORT caTerm* circa_caller_input_term(caStack* stack, int index)
     return circa_term_get_input(circa_caller_term(stack), index);
 }
 
-CIRCA_EXPORT caBranch* circa_caller_branch(caStack* stack)
+CIRCA_EXPORT caBlock* circa_caller_block(caStack* stack)
 {
     Frame* frame = top_frame_parent(stack);
     if (frame == NULL)
         return NULL;
-    return frame->branch;
+    return frame->block;
 }
 
 CIRCA_EXPORT caTerm* circa_caller_term(caStack* stack)
 {
     Frame* frame = top_frame_parent(stack);
-    return frame->branch->get(frame->pc);
+    return frame->block->get(frame->pc);
 }
 
 CIRCA_EXPORT void circa_print_error_to_stdout(caStack* stack)

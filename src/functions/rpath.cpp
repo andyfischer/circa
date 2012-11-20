@@ -9,11 +9,11 @@ namespace rpath_function {
 
     void rpath(caStack* stack)
     {
-        caBranch* branch = circa_caller_branch(stack);
-        get_path_relative_to_source(branch, circa_input(stack, 0), circa_output(stack, 0));
+        caBlock* block = circa_caller_block(stack);
+        get_path_relative_to_source(block, circa_input(stack, 0), circa_output(stack, 0));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, rpath, "def rpath(String) -> String");
     }

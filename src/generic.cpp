@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "loops.h"
 #include "function.h"
@@ -17,9 +17,9 @@
 
 namespace circa {
 
-void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type* rhsType)
+void create_function_vectorized_vs(Block* out, Term* func, Type* lhsType, Type* rhsType)
 {
-    clear_branch(out);
+    clear_block(out);
 
     Term* input0 = apply(out, FUNCS.input, TermList(), name_from_string("in0"));
     change_declared_type(input0, lhsType);
@@ -28,7 +28,7 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
     start_building_for_loop(loop, "it", NULL);
-    Branch* loopContents = nested_contents(loop);
+    Block* loopContents = nested_contents(loop);
 
     Term* iterator = loopContents->get("it");
     apply(loopContents, func, TermList(iterator, input1));
@@ -38,9 +38,9 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
     apply(out, FUNCS.output, TermList(loop));
 }
 
-void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type* rhsType)
+void create_function_vectorized_vv(Block* out, Term* func, Type* lhsType, Type* rhsType)
 {
-    clear_branch(out);
+    clear_block(out);
 
     Term* input0 = apply(out, FUNCS.input, TermList(), name_from_string("in0"));
     change_declared_type(input0, lhsType);
@@ -49,7 +49,7 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
     start_building_for_loop(loop, "it", NULL);
-    Branch* loopContents = nested_contents(loop);
+    Block* loopContents = nested_contents(loop);
 
     Term* iterator = loopContents->get("it");
 
@@ -62,10 +62,10 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     apply(out, FUNCS.output, TermList(loop));
 }
 
-Term* create_overloaded_function(Branch* branch, const char* header)
+Term* create_overloaded_function(Block* block, const char* header)
 {
-    Term* function = parser::compile(branch, parser::function_decl, header);
-    Branch* contents = nested_contents(function);
+    Term* function = parser::compile(block, parser::function_decl, header);
+    Block* contents = nested_contents(function);
 
     // Box the inputs in a list (used in calls to inputs_fit_function)
     TermList inputPlaceholders;
@@ -73,24 +73,24 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     Term* inputsAsList = apply(contents, FUNCS.list, inputPlaceholders);
 
     // Add the switch block
-    Term* block = apply(contents, FUNCS.if_block, TermList());
+    Term* ifBlock = apply(contents, FUNCS.if_block, TermList());
 
     // Cases are added with append_to_overloaded_function()
 
     // Setup the fallback case
-    Term* elseTerm = if_block_append_case(nested_contents(block), NULL);
-    Branch* elseBranch = nested_contents(elseTerm);
-    apply(elseBranch, FUNCS.overload_error_no_match, TermList(inputsAsList));
-    if_block_finish_appended_case(elseBranch, elseTerm);
+    Term* elseTerm = if_block_append_case(nested_contents(ifBlock), NULL);
+    Block* elseBlock = nested_contents(elseTerm);
+    apply(elseBlock, FUNCS.overload_error_no_match, TermList(inputsAsList));
+    if_block_finish_appended_case(elseBlock, elseTerm);
 
-    set_input(get_output_placeholder(contents, 0), 0, block);
+    set_input(get_output_placeholder(contents, 0), 0, ifBlock);
 
     function->setBoolProp("overloadedFunc", true);
     function->setBoolProp("preferSpecialize", true);
     return function;
 }
 
-void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc)
+void append_to_overloaded_function(Block* overloadedFunc, Term* specializedFunc)
 {
     TermList inputPlaceholders;
     input_placeholders_to_list(overloadedFunc, &inputPlaceholders);
@@ -103,9 +103,9 @@ void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc
     move_before(condition, ifBlock);
 
     Term* caseTerm = if_block_append_case(nested_contents(ifBlock), condition);
-    Branch* caseBranch = nested_contents(caseTerm);
-    apply(caseBranch, specializedFunc, inputPlaceholders);
-    if_block_finish_appended_case(caseBranch, caseTerm);
+    Block* caseBlock = nested_contents(caseTerm);
+    apply(caseBlock, specializedFunc, inputPlaceholders);
+    if_block_finish_appended_case(caseBlock, caseTerm);
 }
 
 void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
@@ -115,10 +115,10 @@ void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
 
 Term* statically_specialize_overload_for_call(Term* call)
 {
-    Branch* original = function_contents(call->function);
+    Block* original = function_contents(call->function);
     Term* switchTerm = find_term_with_function(original, FUNCS.if_block);
     ca_assert(switchTerm != NULL);
-    Branch* switchBranch = nested_contents(switchTerm);
+    Block* switchBlock = nested_contents(switchTerm);
 
     // Do not try to specialize if any arguments are untyped.
     for (int i=0; i < call->numInputs(); i++)
@@ -126,8 +126,8 @@ Term* statically_specialize_overload_for_call(Term* call)
             return NULL;
 
     // Find which case will succeed
-    for (int i=0; i < switchBranch->length(); i++) {
-        Term* caseTerm = switchBranch->get(i);
+    for (int i=0; i < switchBlock->length(); i++) {
+        Term* caseTerm = switchBlock->get(i);
         if (caseTerm->function != FUNCS.case_func)
             continue;
 
@@ -165,21 +165,21 @@ Term* statically_specialize_overload_for_call(Term* call)
     return NULL;
 }
 
-bool is_overloaded_function(Branch* branch)
+bool is_overloaded_function(Block* block)
 {
-    if (branch->owningTerm == NULL)
+    if (block->owningTerm == NULL)
         return false;
 
-    return branch->owningTerm->boolProp("overloadedFunc", false);
+    return block->owningTerm->boolProp("overloadedFunc", false);
 }
 
-void list_overload_contents(Branch* branch, caValue* output)
+void list_overload_contents(Block* block, caValue* output)
 {
-    if (!is_overloaded_function(branch))
+    if (!is_overloaded_function(block))
         return;
 
-    Term* ifBlock = find_term_with_function(branch, FUNCS.if_block);
-    Branch* ifContents = nested_contents(ifBlock);
+    Term* ifBlock = find_term_with_function(block, FUNCS.if_block);
+    Block* ifContents = nested_contents(ifBlock);
 
     // iterate across cases
     for (int caseIndex=0;; caseIndex++) {
@@ -187,7 +187,7 @@ void list_overload_contents(Branch* branch, caValue* output)
         if (caseTerm == NULL)
             break;
 
-        Branch* caseContents = nested_contents(caseTerm);
+        Block* caseContents = nested_contents(caseTerm);
 
         Term* call = find_last_non_comment_expression(caseContents);
         Term* func = call->function;

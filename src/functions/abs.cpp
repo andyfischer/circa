@@ -10,7 +10,7 @@ namespace abs_function {
         set_float(circa_output(stack, 0), std::abs(circa_float_input(stack, 0)));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, abs, "abs(number n) -> number 'Absolute value'");
     }

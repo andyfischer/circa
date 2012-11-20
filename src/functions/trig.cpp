@@ -74,7 +74,7 @@ namespace trig_function {
         set_float(OUTPUT, radians_to_degrees(result));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         Term* sin_func = import_function(kernel, evaluate_sin, "sin(number degrees) -> number;"
             "'Trigonometric sin() function");

@@ -22,7 +22,7 @@ namespace make_function {
         return &ANY_T;
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         Term* func = import_function(kernel, make_func, "make(Type) -> any");
         as_function(func)->specializeType = specializeType;

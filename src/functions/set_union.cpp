@@ -21,7 +21,7 @@ namespace set_union_function {
         }
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate, "set_union(Set :multiple) -> Set");
     }

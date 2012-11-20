@@ -6,7 +6,7 @@
 
 #include "circa/circa.h"
 
-#include "branch.h"
+#include "block.h"
 #include "heap_debugging.h"
 #include "gc.h"
 #include "term_map.h"
@@ -178,7 +178,7 @@ caValue* get_type_property(Type* type, const char* name);
 caValue* type_property_insert(Type* type, const char* name);
 void set_type_property(Type* type, const char* name, caValue* value);
 
-Branch* type_declaration_branch(Type* type);
+Block* type_declaration_block(Type* type);
 
 StaticTypeQuery::Result run_static_type_query(Type* type, Type* subjectType);
 StaticTypeQuery::Result run_static_type_query(Type* type, Term* term);
@@ -190,15 +190,15 @@ void clear_type_contents(Type* type);
 
 void initialize_simple_pointer_type(Type* type);
 
-void type_initialize_kernel(Branch* kernel);
+void type_initialize_kernel(Block* kernel);
 Term* create_tuple_type(caValue* types);
-Term* find_method(Branch* branch, Type* type, const char* name);
+Term* find_method(Block* block, Type* type, const char* name);
 
 // Change the type value for an existing type. 'term' should be a value of
 // type Type.
 void install_type(Term* term, Type* type);
 
-Type* find_type(Branch* branch, const char* name);
+Type* find_type(Block* block, const char* name);
 
 void set_type_list(caValue* value, Type* type1);
 void set_type_list(caValue* value, Type* type1, Type* type2);

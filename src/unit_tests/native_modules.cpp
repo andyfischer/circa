@@ -29,13 +29,13 @@ void my_6(caStack* stack)
 void patch_manually()
 {
     // Run with an unpatched 'my_add'
-    Branch branch;
-    branch.compile("def my_add(int a, int b) -> int { a + a }");
-    branch.compile("namespace ns { def my_add(int a, int b) -> int { a + a } }");
-    branch.compile("test_spy(my_add(1 2))");
+    Block block;
+    block.compile("def my_add(int a, int b) -> int { a + a }");
+    block.compile("namespace ns { def my_add(int a, int b) -> int { a + a } }");
+    block.compile("test_spy(my_add(1 2))");
 
     Stack stack;
-    push_frame(&stack, &branch);
+    push_frame(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -44,10 +44,10 @@ void patch_manually()
     // Create a patch for my_add
     NativeModule* module = create_native_module(global_world());
     module_patch_function(module, "my_add", my_add);
-    native_module_apply_patch(module, &branch);
+    native_module_apply_patch(module, &block);
 
     reset_stack(&stack);
-    push_frame(&stack, &branch);
+    push_frame(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -59,21 +59,21 @@ void patch_manually()
 void patch_manually_ns()
 {
     // Similar to 'patch_manually' test, but with a namespaced name.
-    Branch branch;
-    branch.compile("def f1() -> int { 1 }");
-    branch.compile("namespace ns_a { def f1() -> int { 1 } }");
-    branch.compile("namespace ns_b { namespace ns_a { def f1() -> int { 1 } } }");
-    branch.compile("test_spy(f1())");
-    branch.compile("test_spy(ns_a:f1())");
-    branch.compile("test_spy(ns_b:ns_a:f1())");
+    Block block;
+    block.compile("def f1() -> int { 1 }");
+    block.compile("namespace ns_a { def f1() -> int { 1 } }");
+    block.compile("namespace ns_b { namespace ns_a { def f1() -> int { 1 } } }");
+    block.compile("test_spy(f1())");
+    block.compile("test_spy(ns_a:f1())");
+    block.compile("test_spy(ns_b:ns_a:f1())");
 
     NativeModule* module = create_native_module(global_world());
     module_patch_function(module, "ns_a:f1", my_5);
     module_patch_function(module, "ns_b:ns_a:f1", my_6);
-    native_module_apply_patch(module, &branch);
+    native_module_apply_patch(module, &block);
 
     Stack stack;
-    push_frame(&stack, &branch);
+    push_frame(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -85,16 +85,16 @@ void patch_manually_ns()
 void trigger_change()
 {
     // Don't patch manually, add a change action and trigger it.
-    Branch* branch = fetch_module(global_world(), "trigger_change_test");
-    branch->compile("def f() -> int { 1 }");
-    branch->compile("test_spy(f())");
+    Block* block = fetch_module(global_world(), "trigger_change_test");
+    block->compile("def f() -> int { 1 }");
+    block->compile("test_spy(f())");
 
     NativeModule* module = create_native_module(global_world());
 
-    native_module_add_change_action_patch_branch(module, "trigger_change_test");
+    native_module_add_change_action_patch_block(module, "trigger_change_test");
 
     Stack stack;
-    push_frame(&stack, branch);
+    push_frame(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -106,7 +106,7 @@ void trigger_change()
     native_module_finish_change(module);
 
     reset_stack(&stack);
-    push_frame(&stack, branch);
+    push_frame(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -120,16 +120,16 @@ void new_function_patched_by_world()
     // First create the module, as part of the global world.
     NativeModule* module = add_native_module(global_world(), "nativemod_module");
     module_patch_function(module, "my_add", my_add);
-    native_module_add_change_action_patch_branch(module, "nativemod_branch");
+    native_module_add_change_action_patch_block(module, "nativemod_block");
     native_module_finish_change(module);
 
     // Now create our function, it should get patched instantly.
-    Branch* branch = fetch_module(global_world(), "nativemod_branch");
-    branch->compile("def my_add(int a, int b) -> int { a + a }");
-    branch->compile("test_spy(my_add(1 2))");
+    Block* block = fetch_module(global_world(), "nativemod_block");
+    block->compile("def my_add(int a, int b) -> int { a + a }");
+    block->compile("test_spy(my_add(1 2))");
 
     Stack stack;
-    push_frame(&stack, branch);
+    push_frame(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);
 

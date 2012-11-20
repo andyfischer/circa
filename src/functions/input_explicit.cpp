@@ -16,14 +16,14 @@ namespace input_explicit_function {
 
     void postCompile(Term* term)
     {
-        Branch* branch = term->owningBranch;
+        Block* block = term->owningBlock;
 
-        Term* in = append_input_placeholder(branch);
+        Term* in = append_input_placeholder(block);
         set_input(term, 0, in);
         term->inputInfo(0)->properties.setBool("hidden", true);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.input_explicit = import_function(kernel, input_explicit, "input(any) -> any");
         as_function(FUNCS.input_explicit)->postCompile = postCompile;

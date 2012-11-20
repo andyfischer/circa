@@ -4,18 +4,18 @@
 
 #include "term.h"
 #include "building.h"
-#include "branch.h"
+#include "block.h"
 
 namespace cascading {
 
 void test_rename()
 {
-    Branch branch;
-    branch.compile("a = 1; b = 2; c = 3; d = add(b b)");
+    Block block;
+    block.compile("a = 1; b = 2; c = 3; d = add(b b)");
 
-    Term* b = branch["b"];
-    Term* c = branch["c"];
-    Term* d = branch["d"];
+    Term* b = block["b"];
+    Term* c = block["c"];
+    Term* d = block["d"];
 
     // sanity check: d starts with b as input.
     test_assert(d->input(0) == b);

@@ -5,12 +5,12 @@ def func(String s) -> String
   print('called func with: ' s)
   return "result"
 
-i.push_frame(branch_ref(func), ['hi'])
+i.push_frame(block_ref(func), ['hi'])
 i.run()
 print('output = ' i.output(0))
 i.pop_frame()
 
-i.push_frame(branch_ref(func), ['bye'])
+i.push_frame(block_ref(func), ['bye'])
 i.run()
 print('output = ' i.output(0))
 i.pop_frame()

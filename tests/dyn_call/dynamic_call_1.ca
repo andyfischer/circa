@@ -4,6 +4,6 @@ def func(int i) -> int
     return i + 1
 
 
-outputs = dynamic_call(func.branch, [1])
+outputs = dynamic_call(func.block, [1])
 
 print('outputs = ' outputs)

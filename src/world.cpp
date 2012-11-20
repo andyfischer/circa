@@ -4,7 +4,7 @@
 
 #include "circa/circa.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
@@ -44,7 +44,7 @@ void world_initialize(World* world)
     world->actorStack = circa_alloc_stack(world);
 
     world->nextTermID = 1;
-    world->nextBranchID = 1;
+    world->nextBlockID = 1;
     world->nextStackID = 1;
 }
 
@@ -75,8 +75,8 @@ void actor_send_message(ListData* actor, caValue* message)
 
 void actor_run_message(caStack* stack, ListData* actor, caValue* message)
 {
-    Branch* branch = find_loaded_module(as_cstring(list_get(actor, 1)));
-    Frame* frame = push_frame(stack, branch);
+    Block* block = find_loaded_module(as_cstring(list_get(actor, 1)));
+    Frame* frame = push_frame(stack, block);
 
     frame_set_stop_when_finished(frame);
 
@@ -87,20 +87,20 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message)
             << "' could not receive message (no input slot): "
             << to_string(message) << std::endl;
 
-        std::cout << "branch = " << branch << std::endl;
+        std::cout << "block = " << block << std::endl;
         return;
     }
     copy(message, inputSlot);
 
     // Copy state (if any)
-    Term* state_in = find_state_input(branch);
+    Term* state_in = find_state_input(block);
     if (state_in != NULL)
         copy(list_get(actor, 3), get_top_register(stack, state_in));
 
     run_interpreter(stack);
 
     // Preserve state, if found, and if there was no error.
-    Term* state_out = find_state_output(branch);
+    Term* state_out = find_state_output(block);
     if (!error_occurred(stack) && state_out != NULL) {
         copy(get_top_register(stack, state_out), list_get(actor, 3));
     }
@@ -146,24 +146,24 @@ int actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
     return count;
 }
 
-void update_branch_after_module_reload(Branch* target, Branch* oldBranch, Branch* newBranch)
+void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
 {
-    // Noop if the target is our new branch
-    if (target == newBranch)
+    // Noop if the target is our new block
+    if (target == newBlock)
         return;
 
-    ca_assert(target != oldBranch);
+    ca_assert(target != oldBlock);
 
-    update_all_code_references(target, oldBranch, newBranch);
+    update_all_code_references(target, oldBlock, newBlock);
 }
 
-void update_world_after_module_reload(World* world, Branch* oldBranch, Branch* newBranch)
+void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock)
 {
     // Update references in every module
-    for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.module) {
-            update_branch_after_module_reload(term->nestedContents, oldBranch, newBranch);
+            update_block_after_module_reload(term->nestedContents, oldBlock, newBlock);
         }
     }
 
@@ -171,19 +171,19 @@ void update_world_after_module_reload(World* world, Branch* oldBranch, Branch* n
     for (int i=0; i < list_length(&world->actorList); i++) {
         caValue* actor = list_get(&world->actorList, i);
         caValue* state = list_get(actor, 3);
-        update_all_code_references_in_value(state, oldBranch, newBranch);
+        update_all_code_references_in_value(state, oldBlock, newBlock);
     }
 }
 
 void refresh_all_modules(caWorld* world)
 {
     // Iterate over top-level modules
-    for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.module) {
             
-            Branch* existing = term->nestedContents;
-            Branch* latest = load_latest_branch(existing);
+            Block* existing = term->nestedContents;
+            Block* latest = load_latest_block(existing);
 
             if (existing != latest) {
                 term->nestedContents = latest;
@@ -209,7 +209,7 @@ CIRCA_EXPORT void circa_actor_new_from_file(caWorld* world, const char* actorNam
 
 CIRCA_EXPORT caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
 {
-    Branch* module = load_module_by_name(world, moduleName);
+    Block* module = load_module_by_name(world, moduleName);
 
     if (module == NULL) {
         return NULL;

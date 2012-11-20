@@ -16,7 +16,7 @@ namespace cppbuild_function {
         set_string(&build_ca, "build.ca");
         join_path(&filename, &build_ca);
 
-        Branch buildFile;
+        Block buildFile;
         load_script(&buildFile, as_cstring(&filename));
 
         caValue* moduleName = term_value(buildFile["name"]);
@@ -57,7 +57,7 @@ namespace cppbuild_function {
             return RAISE_ERROR("g++ returned error");
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         // installed in builtins.cpp
     }

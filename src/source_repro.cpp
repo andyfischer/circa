@@ -1,6 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "kernel.h"
 #include "function.h"
@@ -17,20 +17,20 @@
 
 namespace circa {
 
-void format_branch_source(caValue* source, Branch* branch, Term* format)
+void format_block_source(caValue* source, Block* block, Term* format)
 {
     if (format != NULL)
         append_phrase(source, format->stringProp("syntax:postHeadingWs", ""),
                 format, name_Whitespace);
 
-    bool styleBraces = format && format->stringProp("syntax:branchStyle","") == "braces";
+    bool styleBraces = format && format->stringProp("syntax:blockStyle","") == "braces";
 
     if (styleBraces)
         append_phrase(source, "{", format, name_None);
 
     bool newlineNeeded = false;
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
 
         if (!should_print_term_source_line(term))
             continue;
@@ -270,7 +270,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     // for a forward reference. The caller did a bad thing by asking us
     // to format this source, because forward references shouldn't be made
     // by regular calls, only by certain implicit calls that should be hidden.
-    if (input->owningBranch == term->owningBranch
+    if (input->owningBlock == term->owningBlock
             && input->index > term->index) {
         append_phrase(source, "<!forward_reference>", term, name_None);
     }
@@ -384,11 +384,11 @@ void append_phrase(caValue* source, std::string const& str, Term* term, Name typ
     return append_phrase(source, str.c_str(), term, type);
 }
 
-std::string get_branch_source_text(Branch* branch)
+std::string get_block_source_text(Block* block)
 {
     Value source;
     set_list(&source, 0);
-    format_branch_source(&source, branch);
+    format_block_source(&source, block);
     return unformat_rich_source(&source);
 }
 

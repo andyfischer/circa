@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-#include "branch.h"
+#include "block.h"
 #include "evaluation.h"
 #include "inspection.h"
 #include "names_builtin.h"
@@ -20,24 +20,24 @@ int DEBUG_BREAK_ON_TERM = -1;
 
 uint64 PERF_STATS[c_numPerfStats];
 
-void dump(Branch& branch)
+void dump(Block& block)
 {
-    print_branch(&branch, std::cout);
+    print_block(&block, std::cout);
 }
-void dump(Branch* branch)
+void dump(Block* block)
 {
-    print_branch(branch, std::cout);
+    print_block(block, std::cout);
 }
-void dump_bytecode(Branch* branch)
+void dump_bytecode(Block* block)
 {
     RawOutputPrefs prefs;
     prefs.showBytecode = true;
-    print_branch(branch, &prefs, std::cout);
+    print_block(block, &prefs, std::cout);
 }
 
-void dump_with_props(Branch& branch)
+void dump_with_props(Block& block)
 {
-    print_branch_with_properties(&branch, std::cout);
+    print_block_with_properties(&block, std::cout);
 }
 
 void dump(Term* term)

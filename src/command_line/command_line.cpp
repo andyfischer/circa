@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "debug.h"
 #include "evaluation.h"
@@ -156,17 +156,17 @@ void do_file_command(List* args, caValue* reply)
         break;
     }
 
-    Branch branch;
-    load_script(&branch, as_cstring(args->get(argIndex)));
+    Block block;
+    load_script(&block, as_cstring(args->get(argIndex)));
 
     if (printSource)
-        std::cout << get_branch_source_text(&branch);
+        std::cout << get_block_source_text(&block);
 
     if (dontRunScript)
         return;
     
     Stack stack;
-    evaluate_branch(&stack, &branch);
+    evaluate_block(&stack, &block);
 
     if (printState)
         std::cout << to_string(&stack.state) << std::endl;
@@ -179,43 +179,43 @@ void do_file_command(List* args, caValue* reply)
     }
 }
 
-void rewrite_branch(Branch* branch, caValue* contents, caValue* reply)
+void rewrite_block(Block* block, caValue* contents, caValue* reply)
 {
-    clear_branch(branch);
-    parser::compile(branch, parser::statement_list, as_cstring(contents));
+    clear_block(block);
+    parser::compile(block, parser::statement_list, as_cstring(contents));
 
-    if (has_static_errors(branch)) {
+    if (has_static_errors(block)) {
         std::stringstream errors;
-        print_static_errors_formatted(branch);
+        print_static_errors_formatted(block);
         set_string(reply, errors.str());
     } else {
         set_name(reply, name_Success);
     }
 }
 
-void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
+void do_write_block(caValue* blockName, caValue* contents, caValue* reply)
 {
-    Term* term = find_global(as_cstring(branchName));
+    Term* term = find_global(as_cstring(blockName));
 
-    // Create the branch if needed
+    // Create the block if needed
     if (term == NULL)
-        term = apply(global_root_branch(), FUNCS.branch, TermList(), name_from_string(branchName));
+        term = apply(global_root_block(), FUNCS.block, TermList(), name_from_string(blockName));
 
-    // Import the new branch contents
-    Branch* branch = nested_contents(term);
-    rewrite_branch(branch, contents, reply);
+    // Import the new block contents
+    Block* block = nested_contents(term);
+    rewrite_block(block, contents, reply);
 }
 
 void do_update_file(caValue* filename, caValue* contents, caValue* reply)
 {
-    Branch* branch = find_module_from_filename(as_cstring(filename));
+    Block* block = find_module_from_filename(as_cstring(filename));
 
-    if (branch == NULL) {
+    if (block == NULL) {
         set_string(reply, "Module not found");
         return;
     }
 
-    rewrite_branch(branch, contents, reply);
+    rewrite_block(block, contents, reply);
 }
 
 void do_admin_command(caValue* input, caValue* reply)
@@ -246,7 +246,7 @@ void do_admin_command(caValue* input, caValue* reply)
         parse_string_as_argument_list(input, &args);
         do_echo(&args, reply);
 
-    } else if (equals_string(&command, "write_branch")) {
+    } else if (equals_string(&command, "write_block")) {
 
         int nextSpace = string_find_char(input, first_space+1, ' ');
         if (nextSpace == -1) {
@@ -254,13 +254,13 @@ void do_admin_command(caValue* input, caValue* reply)
             return;
         }
         
-        Value branchName;
-        string_slice(input, first_space+1, nextSpace, &branchName);
+        Value blockName;
+        string_slice(input, first_space+1, nextSpace, &blockName);
 
         Value contents;
         string_slice(input, nextSpace+1, -1, &contents);
 
-        do_write_branch(&branchName, &contents, reply);
+        do_write_block(&blockName, &contents, reply);
 
     } else if (equals_string(&command, "update_file")) {
 
@@ -281,9 +281,9 @@ void do_admin_command(caValue* input, caValue* reply)
     } else if (equals_string(&command, "source_repro")) {
         List args;
         parse_string_as_argument_list(input, &args);
-        Branch branch;
-        load_script(&branch, as_cstring(args[1]));
-        std::cout << get_branch_source_text(&branch);
+        Block block;
+        load_script(&block, as_cstring(args[1]));
+        std::cout << get_block_source_text(&block);
     } else if (equals_string(&command, "dump_stats")) {
 
         perf_stats_dump();
@@ -436,7 +436,7 @@ int run_command_line(caWorld* world, caValue* args)
         return 0;
     }
     
-    Branch* mainBranch = fetch_module(world, "main");
+    Block* mainBlock = fetch_module(world, "main");
 
     // Check to handle args[0] as a dash-command.
 
@@ -462,7 +462,7 @@ int run_command_line(caWorld* world, caValue* args)
             firstArg = false;
         }
 
-        caValue* result = term_value(mainBranch->eval(as_cstring(&command)));
+        caValue* result = term_value(mainBlock->eval(as_cstring(&command)));
         std::cout << to_string(result) << std::endl;
         return 0;
     }
@@ -472,19 +472,19 @@ int run_command_line(caWorld* world, caValue* args)
         return run_repl(world);
 
     if (string_eq(list_get(args, 0), "-call")) {
-        Name loadResult = load_script(mainBranch, as_cstring(list_get(args, 1)));
+        Name loadResult = load_script(mainBlock, as_cstring(list_get(args, 1)));
 
         if (loadResult == name_Failure) {
             std::cout << "Failed to load file: " <<  as_cstring(list_get(args, 1)) << std::endl;
             return -1;
         }
 
-        branch_finish_changes(mainBranch);
+        block_finish_changes(mainBlock);
 
         caStack* stack = circa_alloc_stack(world);
 
         // Push function
-        caBranch* func = circa_find_function_local(mainBranch, as_cstring(list_get(args, 2)));
+        caBlock* func = circa_find_function_local(mainBlock, as_cstring(list_get(args, 2)));
         circa_push_function(stack, func);
 
         // Push inputs
@@ -517,8 +517,8 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Generate cpp headers
     if (string_eq(list_get(args, 0), "-gh")) {
-        load_script(mainBranch, as_cstring(list_get(args, 1)));
-        std::cout << generate_cpp_headers(mainBranch);
+        load_script(mainBlock, as_cstring(list_get(args, 1)));
+        std::cout << generate_cpp_headers(mainBlock);
         return 0;
     }
 
@@ -558,33 +558,33 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Reproduce source text
     if (string_eq(list_get(args, 0), "-source-repro")) {
-        load_script(mainBranch, as_cstring(list_get(args, 1)));
-        std::cout << get_branch_source_text(mainBranch);
+        load_script(mainBlock, as_cstring(list_get(args, 1)));
+        std::cout << get_block_source_text(mainBlock);
         return 0;
     }
 
     // Rewrite source, this is useful for upgrading old source
     if (string_eq(list_get(args, 0), "-rewrite-source")) {
-        load_script(mainBranch, as_cstring(list_get(args, 1)));
-        std::string contents = get_branch_source_text(mainBranch);
+        load_script(mainBlock, as_cstring(list_get(args, 1)));
+        std::string contents = get_block_source_text(mainBlock);
         write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
 
     // Default behavior with no flags: load args[0] as a script and run it.
-    load_script(mainBranch, as_cstring(list_get(args, 0)));
-    branch_finish_changes(mainBranch);
-    refresh_bytecode(mainBranch);
+    load_script(mainBlock, as_cstring(list_get(args, 0)));
+    block_finish_changes(mainBlock);
+    refresh_bytecode(mainBlock);
 
     if (printRaw)
-        print_branch(mainBranch, &rawOutputPrefs, std::cout);
+        print_block(mainBlock, &rawOutputPrefs, std::cout);
 
     if (dontRunScript)
         return 0;
 
     Stack* stack = alloc_stack(world);
 
-    push_frame(stack, mainBranch);
+    push_frame(stack, mainBlock);
 
     run_interpreter(stack);
 
@@ -639,15 +639,15 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
     // If there is a leftover error stack, then blow it away.
     stack_clear_error(stack);
 
-    Branch* branch = top_branch(stack);
+    Block* block = top_block(stack);
 
-    int previousHead = branch->length();
-    parser::compile(branch, parser::statement_list, input);
-    int newHead = branch->length();
+    int previousHead = block->length();
+    parser::compile(block, parser::statement_list, input);
+    int newHead = block->length();
 
     bool anyErrors = false;
 
-    // Run the stack to the new end of the branch.
+    // Run the stack to the new end of the block.
 
     run_interpreter(stack);
 
@@ -658,7 +658,7 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
     }
 
     // Print results of the last expression
-    Term* result = branch->get(branch->length() - 1);
+    Term* result = block->get(block->length() - 1);
     if (result->type != as_type(VOID_TYPE)) {
         output << to_string(find_stack_value_for_term(stack, result, 0)) << std::endl;
     }
@@ -666,12 +666,12 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
 
 int run_repl(World* world)
 {
-    Branch* branch = fetch_module(world, "main");
+    Block* block = fetch_module(world, "main");
 
     Stack* stack = alloc_stack(world);
     bool displayRaw = false;
 
-    push_frame(stack, branch);
+    push_frame(stack, block);
 
     printf("Started REPL, type /help for reference.\n");
 
@@ -700,17 +700,17 @@ int run_repl(World* world)
             continue;
         }
         if (string_eq(&input, "/clear")) {
-            branch = fetch_module(world, "main");
-            clear_branch(branch);
+            block = fetch_module(world, "main");
+            clear_block(block);
             printf("Cleared working area.\n");
             continue;
         }
         if (string_eq(&input, "/show")) {
-            std::cout << get_branch_source_text(branch);
+            std::cout << get_block_source_text(block);
             continue;
         }
         if (string_eq(&input, "/dump")) {
-            print_branch(branch, std::cout);
+            print_block(block, std::cout);
             continue;
         }
         if (string_eq(&input, "/stack")) {
@@ -720,7 +720,7 @@ int run_repl(World* world)
 
         if (string_eq(&input, "/help")) {
             printf("Enter any Circa expression to evaluate it and print the result.\n");
-            printf("All commands are appended to a 'working area' branch, which can\n");
+            printf("All commands are appended to a 'working area' block, which can\n");
             printf("be inspected.\n");
             printf("\n");
             printf("This REPL is not yet multi-line smart, so long code fragments must\n");
@@ -741,14 +741,14 @@ int run_repl(World* world)
         // Append a newline for the benefit of source repro.
         string_append(&input, "\n");
 
-        int previousHead = branch->length();
+        int previousHead = block->length();
         repl_evaluate_line(stack, as_cstring(&input), std::cout);
 
         if (displayRaw) {
-            for (int i=previousHead; i < branch->length(); i++) {
-                std::cout << get_term_to_string_extended(branch->get(i)) << std::endl;
-                if (nested_contents(branch->get(i))->length() > 0)
-                    print_branch(nested_contents(branch->get(i)), std::cout);
+            for (int i=previousHead; i < block->length(); i++) {
+                std::cout << get_term_to_string_extended(block->get(i)) << std::endl;
+                if (nested_contents(block->get(i))->length() > 0)
+                    print_block(nested_contents(block->get(i)), std::cout);
             }
         }
     }

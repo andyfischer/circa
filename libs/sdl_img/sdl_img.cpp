@@ -212,10 +212,10 @@ CA_FUNCTION(ImageTexture_draw_clip)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void on_load(Branch* branch)
+void on_load(Block* block)
 {
-    g_image_t = get_declared_type(branch, "Image");
-    g_imageTexture_t = get_declared_type(branch, "ImageTexture");
+    g_image_t = get_declared_type(block, "Image");
+    g_imageTexture_t = get_declared_type(block, "ImageTexture");
 
     handle_t::setup_type<Image>(g_image_t);
     handle_t::setup_type<ImageTexture>(g_imageTexture_t);

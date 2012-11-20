@@ -42,7 +42,7 @@ namespace add_function {
 
         float delta = desired - to_float(target);
 
-        Branch* outputList = feedback_output(CALLER);
+        Block* outputList = feedback_output(CALLER);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
@@ -52,7 +52,7 @@ namespace add_function {
         #endif
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int, int) -> int");
         FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number, number) -> number");

@@ -15,7 +15,7 @@ namespace sub_function {
         set_float(OUTPUT, FLOAT_INPUT(0) - FLOAT_INPUT(1));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate_i, "sub_i(int,int) -> int");
         import_function(kernel, evaluate_f, "sub_f(number,number) -> number");

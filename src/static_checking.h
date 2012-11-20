@@ -6,8 +6,8 @@
 
 namespace circa {
 
-void check_for_static_errors(List* result, Branch* branch);
-void update_static_error_list(Branch* branch);
+void check_for_static_errors(List* result, Block* block);
+void update_static_error_list(Block* block);
 
 void format_static_error(caValue* error, caValue* stringOutput);
 
@@ -16,16 +16,16 @@ bool print_static_errors_formatted(caValue* result, std::ostream& out);
 
 
 bool has_static_error(Term* term);
-bool has_static_errors(Branch* branch);
-bool has_static_errors_cached(Branch* branch);
-int count_static_errors(Branch* branch);
+bool has_static_errors(Block* block);
+bool has_static_errors_cached(Block* block);
+int count_static_errors(Block* block);
 
-bool print_static_errors_formatted(Branch* branch, std::ostream& out);
-bool print_static_errors_formatted(Branch* branch);
-bool print_static_errors_formatted(Branch* branch, caValue* out);
+bool print_static_errors_formatted(Block* block, std::ostream& out);
+bool print_static_errors_formatted(Block* block);
+bool print_static_errors_formatted(Block* block, caValue* out);
 
 void print_static_error(Term* term, std::ostream& out);
-std::string get_static_errors_formatted(Branch* branch);
+std::string get_static_errors_formatted(Block* block);
 std::string get_static_error_message(Term* term);
 
 void mark_static_error(Term* term, const char* msg);

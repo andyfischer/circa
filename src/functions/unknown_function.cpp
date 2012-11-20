@@ -14,7 +14,7 @@ namespace unknown_function_function {
         circa_output_error(stack, out.c_str());
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.unknown_function = import_function(kernel, evaluate_unknown_function,
             "unknown_function(any :multiple) -> any");

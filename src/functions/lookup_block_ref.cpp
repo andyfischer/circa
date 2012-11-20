@@ -3,7 +3,7 @@
 #include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
-namespace lookup_branch_ref_function {
+namespace lookup_block_ref_function {
 
     CA_FUNCTION(evaluate)
     {
@@ -12,17 +12,17 @@ namespace lookup_branch_ref_function {
         Term* term = get_global(name);
 
         if (term == NULL)
-            return branch_ref_t::set_from_ref(OUTPUT, NULL);
+            return block_ref_t::set_from_ref(OUTPUT, NULL);
 
-        // FIXME: Don't give references to a non-branch
+        // FIXME: Don't give references to a non-block
 
-        return branch_ref_t::set_from_ref(OUTPUT, term);
+        return block_ref_t::set_from_ref(OUTPUT, term);
         #endif
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "lookup_branch_ref(String) -> Branch");
+        import_function(kernel, evaluate, "lookup_block_ref(String) -> Block");
     }
 }
 }

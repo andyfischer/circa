@@ -9,7 +9,7 @@
 
 #include "circa/file.h"
 
-#include "../branch.h"
+#include "../block.h"
 #include "../list.h"
 #include "../source_repro.h"
 #include "../static_checking.h"
@@ -23,13 +23,13 @@ int run_file_checker_for_directory(const char* dir);
 
 void run_file_checker(const char* filename, List* errors)
 {
-    Branch branch;
-    load_script(&branch, filename);
+    Block block;
+    load_script(&block, filename);
 
     // Catch static errors
     {
         List staticErrors;
-        check_for_static_errors(&staticErrors, &branch);
+        check_for_static_errors(&staticErrors, &block);
         for (int i=0; i < staticErrors.length(); i++)
             format_static_error(staticErrors[i], errors->append());
     }
@@ -51,7 +51,7 @@ void run_file_checker(const char* filename, List* errors)
     }
 
     // Run a source-repro test
-    std::string reproducedSource = get_branch_source_text(&branch);
+    std::string reproducedSource = get_block_source_text(&block);
 
     if (actualSource != reproducedSource) {
         // TODO: Provide more details about the source repro problem.

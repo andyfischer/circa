@@ -1,5 +1,5 @@
 
--- Rebind a name because it's bound in every branch
+-- Rebind a name because it's bound in every block
 if true
     a = 1
 else

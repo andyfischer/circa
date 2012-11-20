@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "building.h"
@@ -31,9 +31,9 @@ void on_term_created(Term* term)
     // debugging hook
 }
 
-Term* apply(Branch* branch, Term* function, TermList const& inputs, Name name)
+Term* apply(Block* block, Term* function, TermList const& inputs, Name name)
 {
-    branch_start_changes(branch);
+    block_start_changes(block);
 
     // If function is NULL, use 'unknown_function' instead.
     if (function == NULL)
@@ -41,17 +41,17 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, Name name)
 
     // If 'function' is actually a type, create a call to cast().
     if (function != NULL && is_type(function)) {
-        Term* term = apply(branch, FUNCS.cast, inputs);
+        Term* term = apply(block, FUNCS.cast, inputs);
         change_declared_type(term, as_type(term_value(function)));
         return term;
     }
 
     // Figure out the term position; it should be placed before any output() terms.
     // (unless it's an output term itself).
-    int position = branch->length();
+    int position = block->length();
     if (function != FUNCS.output) {
         while (position > 0) {
-            Term* preceding = branch->get(position - 1);
+            Term* preceding = block->get(position - 1);
             if (preceding == NULL)
                 break;
 
@@ -73,13 +73,13 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, Name name)
     }
 
     // Create the term
-    Term* term = branch->appendNew();
+    Term* term = block->appendNew();
     INCREMENT_STAT(TermsCreated);
 
     on_term_created(term);
 
     // Position the term before any output_placeholder terms.
-    branch->move(term, position);
+    block->move(term, position);
 
     if (name != name_None)
         rename(term, name);
@@ -108,7 +108,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, Name name)
 
 void set_input(Term* term, int index, Term* input)
 {
-    branch_start_changes(term->owningBranch);
+    block_start_changes(term->owningBlock);
 
     assert_valid_term(term);
     assert_valid_term(input);
@@ -264,9 +264,9 @@ void change_function(Term* term, Term* function)
 
     // Possibly insert a state input for the enclosing subroutine.
     if (is_function_stateful(function))
-        find_or_create_state_container(term->owningBranch);
+        find_or_create_state_container(term->owningBlock);
 
-    dirty_bytecode(term->owningBranch);
+    dirty_bytecode(term->owningBlock);
 }
 
 void change_declared_type(Term *term, Type *newType)
@@ -304,16 +304,16 @@ void rename(Term* termToRename, Name name)
     if (termToRename->nameSymbol == name)
         return;
 
-    Branch* branch = termToRename->owningBranch;
+    Block* block = termToRename->owningBlock;
 
-    // Update binding in the owning branch.
-    if (branch != NULL) {
+    // Update binding in the owning block.
+    if (block != NULL) {
         if (!has_empty_name(termToRename)) {
-            termToRename->owningBranch->names.remove(termToRename->name);
+            termToRename->owningBlock->names.remove(termToRename->name);
             termToRename->name = "";
             termToRename->nameSymbol = name_None;
         }
-        termToRename->owningBranch->bindName(termToRename, name);
+        termToRename->owningBlock->bindName(termToRename, name);
     }
 
     // Update name symbol.
@@ -325,9 +325,9 @@ void rename(Term* termToRename, Name name)
     // term a greater ordinal value.
     termToRename->uniqueOrdinal = 0;
 
-    if (branch != NULL) {
-        for (int i=0; i < branch->length(); i++) {
-            Term* neighbor = branch->get(i);
+    if (block != NULL) {
+        for (int i=0; i < block->length(); i++) {
+            Term* neighbor = block->get(i);
             if (neighbor == termToRename)
                 continue;
             if (neighbor == NULL)
@@ -386,14 +386,14 @@ void rename(Term* termToRename, Name name)
     }
 }
 
-Term* create_duplicate(Branch* branch, Term* original, std::string const& name)
+Term* create_duplicate(Block* block, Term* original, std::string const& name)
 {
     ca_assert(original != NULL);
 
     TermList inputs;
     original->inputsToList(inputs);
 
-    Term* term = apply(branch, original->function, inputs, name_from_string(name));
+    Term* term = apply(block, original->function, inputs, name_from_string(name));
     change_declared_type(term, original->type);
 
     copy(term_value(original), term_value(term));
@@ -410,23 +410,23 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name)
     return term;
 }
 
-Term* apply(Branch* branch, std::string const& functionName, TermList const& inputs, std::string const& name)
+Term* apply(Block* block, std::string const& functionName, TermList const& inputs, std::string const& name)
 {
-    Term* function = find_name(branch, functionName.c_str());
+    Term* function = find_name(block, functionName.c_str());
     if (function == NULL)
         internal_error("function not found: "+functionName);
 
-    Term* result = apply(branch, function, inputs, name_from_string(name));
+    Term* result = apply(block, function, inputs, name_from_string(name));
     result->setStringProp("syntax:functionName", functionName.c_str());
     return result;
 }
 
-Term* create_value(Branch* branch, Type* type, std::string const& name)
+Term* create_value(Block* block, Type* type, std::string const& name)
 {
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
 
-    Term *term = apply(branch, FUNCS.value, TermList(), name_from_string(name));
+    Term *term = apply(block, FUNCS.value, TermList(), name_from_string(name));
 
     change_declared_type(term, type);
     make(type, term_value(term));
@@ -439,89 +439,89 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     return term;
 }
 
-Term* create_value(Branch* branch, std::string const& typeName, std::string const& name)
+Term* create_value(Block* block, std::string const& typeName, std::string const& name)
 {
     Term* type = NULL;
 
-    type = find_name(branch, typeName.c_str());
+    type = find_name(block, typeName.c_str());
 
     if (type == NULL)
         internal_error("Couldn't find type: "+typeName);
 
-    return create_value(branch, as_type(term_value(type)), name);
+    return create_value(block, as_type(term_value(type)), name);
 }
 
-Term* create_value(Branch* branch, caValue* initialValue, std::string const& name)
+Term* create_value(Block* block, caValue* initialValue, std::string const& name)
 {
-    Term* term = create_value(branch, initialValue->value_type, name);
+    Term* term = create_value(block, initialValue->value_type, name);
     copy(initialValue, term_value(term));
     return term;
 }
 
-Term* create_string(Branch* branch, std::string const& s, std::string const& name)
+Term* create_string(Block* block, std::string const& s, std::string const& name)
 {
-    Term* term = create_value(branch, &STRING_T, name);
+    Term* term = create_value(block, &STRING_T, name);
     set_string(term_value(term), s);
     return term;
 }
 
-Term* create_int(Branch* branch, int i, std::string const& name)
+Term* create_int(Block* block, int i, std::string const& name)
 {
-    Term* term = create_value(branch, &INT_T, name);
+    Term* term = create_value(block, &INT_T, name);
     set_int(term_value(term), i);
     return term;
 }
 
-Term* create_float(Branch* branch, float f, std::string const& name)
+Term* create_float(Block* block, float f, std::string const& name)
 {
-    Term* term = create_value(branch, &FLOAT_T, name);
+    Term* term = create_value(block, &FLOAT_T, name);
     set_float(term_value(term), f);
     return term;
 }
 
-Term* create_bool(Branch* branch, bool b, std::string const& name)
+Term* create_bool(Block* block, bool b, std::string const& name)
 {
-    Term* term = create_value(branch, &BOOL_T, name);
+    Term* term = create_value(block, &BOOL_T, name);
     set_bool(term_value(term), b);
     return term;
 }
 
-Term* create_void(Branch* branch, std::string const& name)
+Term* create_void(Block* block, std::string const& name)
 {
-    return create_value(branch, &VOID_T, name);
+    return create_value(block, &VOID_T, name);
 }
 
-Term* create_list(Branch* branch, std::string const& name)
+Term* create_list(Block* block, std::string const& name)
 {
-    Term* term = create_value(branch, &LIST_T, name);
+    Term* term = create_value(block, &LIST_T, name);
     return term;
 }
 
-Branch* create_branch(Branch* owner, const char* name)
+Block* create_block(Block* owner, const char* name)
 {
-    return nested_contents(apply(owner, FUNCS.branch, TermList(), name_from_string(name)));
+    return nested_contents(apply(owner, FUNCS.block, TermList(), name_from_string(name)));
 }
 
-Branch* find_or_create_branch(Branch* owner, const char* name)
+Block* find_or_create_block(Block* owner, const char* name)
 {
     Term* existing = find_local_name(owner, name);
     if (existing != NULL)
         return nested_contents(existing);
-    return create_branch(owner, name);
+    return create_block(owner, name);
 }
 
-Branch* create_namespace(Branch* branch, std::string const& name)
+Block* create_namespace(Block* block, std::string const& name)
 {
-    return apply(branch, FUNCS.namespace_func, TermList(), name_from_string(name))->contents();
+    return apply(block, FUNCS.namespace_func, TermList(), name_from_string(name))->contents();
 }
-Branch* create_branch_unevaluated(Branch* owner, const char* name)
+Block* create_block_unevaluated(Block* owner, const char* name)
 {
-    return nested_contents(apply(owner, FUNCS.branch_unevaluated, TermList(), name_from_string(name)));
+    return nested_contents(apply(owner, FUNCS.block_unevaluated, TermList(), name_from_string(name)));
 }
 
-Term* create_type(Branch* branch, std::string nameStr)
+Term* create_type(Block* block, std::string nameStr)
 {
-    Term* term = create_value(branch, &TYPE_T);
+    Term* term = create_value(block, &TYPE_T);
 
     if (nameStr != "") {
         Name name = name_from_string(nameStr);
@@ -532,9 +532,9 @@ Term* create_type(Branch* branch, std::string nameStr)
     return term;
 }
 
-Term* create_type_value(Branch* branch, Type* value, std::string const& name)
+Term* create_type_value(Block* block, Type* value, std::string const& name)
 {
-    Term* term = create_value(branch, &TYPE_T, name);
+    Term* term = create_value(block, &TYPE_T, name);
     set_type(term_value(term), value);
 
     if (value->declaringTerm == NULL)
@@ -543,68 +543,68 @@ Term* create_type_value(Branch* branch, Type* value, std::string const& name)
     return term;
 }
 
-Term* create_symbol_value(Branch* branch, int value, std::string const& name)
+Term* create_symbol_value(Block* block, int value, std::string const& name)
 {
-    Term* term = create_value(branch, &NAME_T, name);
+    Term* term = create_value(block, &NAME_T, name);
     set_name(term_value(term), value);
     return term;
 }
 
-Term* duplicate_value(Branch* branch, Term* term)
+Term* duplicate_value(Block* block, Term* term)
 {
-    Term* dup = create_value(branch, term->type);
+    Term* dup = create_value(block, term->type);
     copy(term_value(term), term_value(dup));
     return dup;
 }
 
-Term* append_input_placeholder(Branch* branch)
+Term* append_input_placeholder(Block* block)
 {
-    int count = count_input_placeholders(branch);
-    Term* term = apply(branch, FUNCS.input, TermList());
-    branch->move(term, count);
+    int count = count_input_placeholders(block);
+    Term* term = apply(block, FUNCS.input, TermList());
+    block->move(term, count);
     return term;
 }
-Term* append_output_placeholder(Branch* branch, Term* result)
+Term* append_output_placeholder(Block* block, Term* result)
 {
-    int count = count_output_placeholders(branch);
-    Term* term = apply(branch, FUNCS.output, TermList(result));
-    branch->move(term, branch->length() - count - 1);
+    int count = count_output_placeholders(block);
+    Term* term = apply(block, FUNCS.output, TermList(result));
+    block->move(term, block->length() - count - 1);
     return term;
 }
-Term* prepend_output_placeholder(Branch* branch, Term* result)
+Term* prepend_output_placeholder(Block* block, Term* result)
 {
-    return apply(branch, FUNCS.output, TermList(result));
+    return apply(block, FUNCS.output, TermList(result));
 }
 
-Term* append_state_input(Branch* branch)
+Term* append_state_input(Block* block)
 {
     // Make sure that a state input doesn't already exist
-    Term* existing = find_state_input(branch);
+    Term* existing = find_state_input(block);
     if (existing != NULL)
         return existing;
 
-    int inputCount = count_input_placeholders(branch);
+    int inputCount = count_input_placeholders(block);
 
-    Term* term = apply(branch, FUNCS.input, TermList());
-    branch->move(term, inputCount);
+    Term* term = apply(block, FUNCS.input, TermList());
+    block->move(term, inputCount);
     term->setBoolProp("state", true);
     term->setBoolProp("hiddenInput", true);
     term->setBoolProp("output", true);
 
-    on_branch_inputs_changed(branch);
+    on_block_inputs_changed(block);
 
     return term;
 }
 
-Term* append_state_output(Branch* branch)
+Term* append_state_output(Block* block)
 {
     // Make sure that a state input doesn't already exist
-    Term* existing = find_state_output(branch);
+    Term* existing = find_state_output(block);
     if (existing != NULL)
         return existing;
 
-    Term* term = append_output_placeholder(branch, 
-        find_open_state_result(branch, branch->length()));
+    Term* term = append_output_placeholder(block, 
+        find_open_state_result(block, block->length()));
     term->setBoolProp("state", true);
     hide_from_source(term);
     return term;
@@ -612,8 +612,8 @@ Term* append_state_output(Branch* branch)
 
 void update_extra_outputs(Term* term)
 {
-    Branch* branch = term->owningBranch;
-    Branch* function = term_get_function_details(term);
+    Block* block = term->owningBlock;
+    Block* function = term_get_function_details(term);
 
     if (function == NULL)
         return;
@@ -653,12 +653,12 @@ void update_extra_outputs(Term* term)
         Term* extra_output = NULL;
 
         // Check if this extra_output() already exists
-        Term* existingSlot = branch->getSafe(term->index + index);
+        Term* existingSlot = block->getSafe(term->index + index);
         if (existingSlot != NULL && existingSlot->function == FUNCS.extra_output)
             extra_output = existingSlot;
         
         if (extra_output == NULL) {
-            extra_output = apply(branch, FUNCS.extra_output, TermList(term), name);
+            extra_output = apply(block, FUNCS.extra_output, TermList(term), name);
             move_to_index(extra_output, term->index + index);
 
             if (rebindsInput >= 0)
@@ -675,13 +675,13 @@ void update_extra_outputs(Term* term)
     }
 
     if (needToUpdatePackState)
-        branch_update_existing_pack_state_calls(branch);
+        block_update_existing_pack_state_calls(block);
 }
 
-Term* find_open_state_result(Branch* branch, int position)
+Term* find_open_state_result(Block* block, int position)
 {
     for (int i = position - 1; i >= 0; i--) {
-        Term* term = branch->get(i);
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
         if (term->function == FUNCS.input && is_state_input(term))
@@ -695,7 +695,7 @@ Term* find_open_state_result(Branch* branch, int position)
 
 Term* find_open_state_result(Term* location)
 {
-    return find_open_state_result(location->owningBranch, location->index);
+    return find_open_state_result(location->owningBlock, location->index);
 }
 
 void check_to_insert_implicit_inputs(Term* term)
@@ -709,13 +709,13 @@ void check_to_insert_implicit_inputs(Term* term)
 
         int inputIndex = stateInput->index;
 
-        Term* container = find_or_create_state_container(term->owningBranch);
+        Term* container = find_or_create_state_container(term->owningBlock);
 
         // Add a unpack_state() call
-        Term* unpack = apply(term->owningBranch, FUNCS.unpack_state,
+        Term* unpack = apply(term->owningBlock, FUNCS.unpack_state,
             TermList(container, term));
         hide_from_source(unpack);
-        term->owningBranch->move(unpack, term->index);
+        term->owningBlock->move(unpack, term->index);
 
         insert_input(term, inputIndex, unpack);
         set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
@@ -733,73 +733,73 @@ float get_step(Term* term)
     return term->floatProp("step", 1.0);
 }
 
-void branch_start_changes(Branch* branch)
+void block_start_changes(Block* block)
 {
-    if (branch->inProgress)
+    if (block->inProgress)
         return;
 
-    branch->inProgress = true;
+    block->inProgress = true;
 
-    // For any minor branch that is inProgress, make sure the parent branch is also
+    // For any minor block that is inProgress, make sure the parent block is also
     // marked inProgress.
     
-    if (is_minor_branch(branch))
-        branch_start_changes(get_parent_branch(branch));
+    if (is_minor_block(block))
+        block_start_changes(get_parent_block(block));
 }
 
-void branch_finish_changes(Branch* branch)
+void block_finish_changes(Block* block)
 {
-    if (!branch->inProgress) {
+    if (!block->inProgress) {
         // If nothing else, make sure bytecode is up to date.
-        refresh_bytecode(branch);
+        refresh_bytecode(block);
         return;
     }
 
     // Perform cleanup
 
     // Remove NULLs
-    branch->removeNulls();
+    block->removeNulls();
 
-    // Make sure nested minor branches are finished.
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    // Make sure nested minor blockes are finished.
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
 
-        if (term->nestedContents != NULL && is_minor_branch(term->nestedContents))
-            branch_finish_changes(term->nestedContents);
+        if (term->nestedContents != NULL && is_minor_block(term->nestedContents))
+            block_finish_changes(term->nestedContents);
     }
 
-    fix_forward_function_references(branch);
+    fix_forward_function_references(block);
 
     // Create an output_placeholder for state, if necessary.
-    Term* openState = find_open_state_result(branch, branch->length());
+    Term* openState = find_open_state_result(block, block->length());
     if (openState != NULL)
-        append_state_output(branch);
+        append_state_output(block);
 
-    update_exit_points(branch);
+    update_exit_points(block);
 
     // Make sure the primary output is connected.
-    if (is_minor_branch(branch)) {
-        Term* output = get_output_placeholder(branch, 0);
+    if (is_minor_block(block)) {
+        Term* output = get_output_placeholder(block, 0);
 
         // Don't mess with the primary if-block output.
-        if (output != NULL && output->input(0) == NULL && !is_if_block(output->owningBranch)) {
-            set_input(output, 0, find_last_non_comment_expression(branch));
+        if (output != NULL && output->input(0) == NULL && !is_if_block(output->owningBlock)) {
+            set_input(output, 0, find_last_non_comment_expression(block));
             respecialize_type(output);
         }
     }
 
-    // Refresh for-loop zero branch
-    if (is_for_loop(branch))
-        for_loop_remake_zero_branch(branch);
+    // Refresh for-loop zero block
+    if (is_for_loop(block))
+        for_loop_remake_zero_block(block);
 
-    // Update branch's state type
-    branch_update_state_type(branch);
+    // Update block's state type
+    block_update_state_type(block);
 
-    dirty_bytecode(branch);
-    refresh_bytecode(branch);
+    dirty_bytecode(block);
+    refresh_bytecode(block);
 
-    branch->inProgress = false;
-    branch->version++;
+    block->inProgress = false;
+    block->version++;
 }
 
 Term* find_user_with_function(Term* term, const char* funcName)
@@ -813,21 +813,21 @@ Term* find_user_with_function(Term* term, const char* funcName)
 }
 Term* apply_before(Term* existing, Term* function, int input)
 {
-    Branch* branch = existing->owningBranch;
-    Term* newTerm = apply(branch, function, TermList(existing->input(input)));
-    branch->move(newTerm, existing->index);
+    Block* block = existing->owningBlock;
+    Term* newTerm = apply(block, function, TermList(existing->input(input)));
+    block->move(newTerm, existing->index);
     set_input(existing, input, newTerm);
     return newTerm;
 }
 Term* apply_after(Term* existing, Term* function)
 {
-    Branch* branch = existing->owningBranch;
+    Block* block = existing->owningBlock;
 
     // Grab a copy of users before we start messing with it
     TermList users = existing->users;
 
-    Term* newTerm = apply(branch, function, TermList(existing));
-    branch->move(newTerm, existing->index + 1);
+    Term* newTerm = apply(block, function, TermList(existing));
+    block->move(newTerm, existing->index + 1);
 
     // Rewrite users to use the new term
     for (int i=0; i < users.length(); i++) {
@@ -839,36 +839,36 @@ Term* apply_after(Term* existing, Term* function)
 }
 void move_before(Term* movee, Term* position)
 {
-    ca_assert(movee->owningBranch == position->owningBranch);
-    movee->owningBranch->move(movee, position->index);
+    ca_assert(movee->owningBlock == position->owningBlock);
+    movee->owningBlock->move(movee, position->index);
 }
 
 void move_after(Term* movee, Term* position)
 {
-    Branch* branch = movee->owningBranch;
+    Block* block = movee->owningBlock;
     int pos = position->index + 1;
 
     // Make sure the position is after any extra_output() terms
-    while (pos < branch->length()
-            && branch->get(pos) != NULL
-            && branch->get(pos)->function == FUNCS.extra_output)
+    while (pos < block->length()
+            && block->get(pos) != NULL
+            && block->get(pos)->function == FUNCS.extra_output)
         pos++;
 
     // If 'movee' is currently before 'position', then the desired index is one less
     if (movee->index < position->index)
         pos--;
 
-    branch->move(movee, pos);
+    block->move(movee, pos);
 }
 
 void move_after_inputs(Term* term)
 {
-    Branch* branch = term->owningBranch;
-    int inputCount = count_input_placeholders(branch);
-    branch->move(term, inputCount);
+    Block* block = term->owningBlock;
+    int inputCount = count_input_placeholders(block);
+    block->move(term, inputCount);
 }
 
-bool term_belongs_at_branch_end(Term* term)
+bool term_belongs_at_block_end(Term* term)
 {
     if (term == NULL)
         return false;
@@ -884,12 +884,12 @@ bool term_belongs_at_branch_end(Term* term)
 
 void move_before_outputs(Term* term)
 {
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
 
     // Walk backwards to find the target position
-    int position = branch->length();
+    int position = block->length();
     for (; position > 0; position--) {
-        Term* preceding = branch->get(position - 1);
+        Term* preceding = block->get(position - 1);
 
         if (is_output_placeholder(preceding))
             continue;
@@ -902,19 +902,19 @@ void move_before_outputs(Term* term)
     if (!is_output_placeholder(term))
         position--;
 
-    branch->move(term, position);
+    block->move(term, position);
 }
 
 void move_before_final_terms(Term* term)
 {
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
 
     // Walk backwards to find the target position
-    int position = branch->length();
+    int position = block->length();
     for (; position > 0; position--) {
-        Term* preceding = branch->get(position - 1);
+        Term* preceding = block->get(position - 1);
 
-        if (term_belongs_at_branch_end(preceding))
+        if (term_belongs_at_block_end(preceding))
             continue;
 
         break;
@@ -922,15 +922,15 @@ void move_before_final_terms(Term* term)
 
     // We now have the position of the 1st final term. If this term isn't
     // a final term itself, then move the position back one more.
-    if (!term_belongs_at_branch_end(term))
+    if (!term_belongs_at_block_end(term))
         position--;
 
-    branch->move(term, position);
+    block->move(term, position);
 }
 
 void move_to_index(Term* term, int index)
 {
-    term->owningBranch->move(term, index);
+    term->owningBlock->move(term, index);
 }
 
 void transfer_users(Term* from, Term* to)
@@ -943,20 +943,20 @@ void transfer_users(Term* from, Term* to)
     }
 }
 
-void input_placeholders_to_list(Branch* branch, TermList* list)
+void input_placeholders_to_list(Block* block, TermList* list)
 {
     for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
+        Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             break;
         list->append(placeholder);
     }
 }
 
-void list_outer_pointers(Branch* branch, TermList* list)
+void list_outer_pointers(Block* block, TermList* list)
 {
-    for (BranchInputIterator it(branch); it.unfinished(); it.advance()) {
-        if (it.currentInput()->owningBranch != branch)
+    for (BlockInputIterator it(block); it.unfinished(); it.advance()) {
+        if (it.currentInput()->owningBlock != block)
             list->appendUnique(it.currentInput());
     }
 }
@@ -970,27 +970,27 @@ int find_input_index_for_pointer(Term* call, Term* input)
     return -1;
 }
 
-void check_to_add_primary_output_placeholder(Branch* branch)
+void check_to_add_primary_output_placeholder(Block* block)
 {
-    Term* output = get_output_placeholder(branch, 0);
+    Term* output = get_output_placeholder(block, 0);
 
     if (output == NULL || is_state_input(output))
-        prepend_output_placeholder(branch, find_last_non_comment_expression(branch));
+        prepend_output_placeholder(block, find_last_non_comment_expression(block));
 }
 
-void check_to_add_state_output_placeholder(Branch* branch)
+void check_to_add_state_output_placeholder(Block* block)
 {
     // No-op if a state output placeholder already exists
-    if (find_state_output(branch) != NULL)
+    if (find_state_output(block) != NULL)
         return;
 
-    Term* result = find_open_state_result(branch, branch->length());
+    Term* result = find_open_state_result(block, block->length());
 
     // No-op if no state is being used
     if (result == NULL)
         return;
 
-    Term* output = apply(branch, FUNCS.output, TermList(result));
+    Term* output = apply(block, FUNCS.output, TermList(result));
     output->setBoolProp("state", true);
 }
 
@@ -999,7 +999,7 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     // Check whether the output's connection is valid at this location
     Term* result = output->input(0);
     if (result != NULL
-            && result->owningBranch == output->owningBranch
+            && result->owningBlock == output->owningBlock
             && result->index < location->index)
         return result;
 
@@ -1033,15 +1033,15 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     change_declared_type(term, outputType);
 }
 
-void rewrite_as_value(Branch* branch, int index, Type* type)
+void rewrite_as_value(Block* block, int index, Type* type)
 {
-    while (index > branch->length())
-        branch->append(NULL);
+    while (index > block->length())
+        block->append(NULL);
 
-    if (index >= branch->length()) {
-        create_value(branch, type);
+    if (index >= block->length()) {
+        create_value(block, type);
     } else {
-        Term* term = branch->get(index);
+        Term* term = block->get(index);
 
         change_function(term, FUNCS.value);
         change_declared_type(term, type);
@@ -1054,16 +1054,16 @@ void remove_term(Term* term)
     assert_valid_term(term);
 
     int index = term->index;
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
 
     erase_term(term);
 
-    for (int i=index; i < branch->_terms.length()-1; i++) {
-        branch->_terms.setAt(i, branch->_terms[i+1]);
-        if (branch->_terms[i] != NULL)
-            branch->_terms[i]->index = i;
+    for (int i=index; i < block->_terms.length()-1; i++) {
+        block->_terms.setAt(i, block->_terms[i+1]);
+        if (block->_terms[i] != NULL)
+            block->_terms[i]->index = i;
     }
-    branch->_terms.resize(branch->_terms.length()-1);
+    block->_terms.resize(block->_terms.length()-1);
 }
 
 void remap_pointers_quick(Term* term, Term* old, Term* newTerm)
@@ -1073,10 +1073,10 @@ void remap_pointers_quick(Term* term, Term* old, Term* newTerm)
             set_input(term, i, newTerm);
 }
 
-void remap_pointers_quick(Branch* branch, Term* old, Term* newTerm)
+void remap_pointers_quick(Block* block, Term* old, Term* newTerm)
 {
-    for (int i=0; i < branch->length(); i++)
-        remap_pointers_quick(branch->get(i), old, newTerm);
+    for (int i=0; i < block->length(); i++)
+        remap_pointers_quick(block->get(i), old, newTerm);
 }
 
 void remap_pointers(Term* term, TermMap const& map)
@@ -1122,21 +1122,21 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
-void remap_pointers(Branch* branch, Term* original, Term* replacement)
+void remap_pointers(Block* block, Term* original, Term* replacement)
 {
     TermMap map;
     map[original] = replacement;
 
-    for (int i=0; i < branch->length(); i++) {
-        if (branch->get(i) == NULL) continue;
-        remap_pointers(branch->get(i), map);
+    for (int i=0; i < block->length(); i++) {
+        if (block->get(i) == NULL) continue;
+        remap_pointers(block->get(i), map);
     }
 }
 
-bool term_is_nested_in_branch(Term* term, Branch* branch)
+bool term_is_nested_in_block(Term* term, Block* block)
 {
     while (term != NULL) {
-        if (term->owningBranch == branch)
+        if (term->owningBlock == block)
             return true;
 
         term = get_parent_term(term);
@@ -1147,17 +1147,17 @@ bool term_is_nested_in_branch(Term* term, Branch* branch)
 
 void create_inputs_for_outer_references(Term* term)
 {
-    Branch* branch = nested_contents(term);
+    Block* block = nested_contents(term);
     TermMap outerToInnerMap;
 
-    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* innerTerm = *it;
         for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
             Term* input = innerTerm->input(inputIndex);
             if (input == NULL)
                 continue;
 
-            if (!term_is_nested_in_branch(input, branch)) {
+            if (!term_is_nested_in_block(input, block)) {
                 // This is an outer reference
 
                 // Check if we've already created a placeholder for this one
@@ -1169,9 +1169,9 @@ void create_inputs_for_outer_references(Term* term)
                 } else {
                     // Need to create a new placeholder
                     int placeholderIndex = term->numInputs();
-                    Term* placeholder = apply(branch, FUNCS.input, TermList(), input->nameSymbol);
+                    Term* placeholder = apply(block, FUNCS.input, TermList(), input->nameSymbol);
                     change_declared_type(placeholder, input->type);
-                    branch->move(placeholder, placeholderIndex);
+                    block->move(placeholder, placeholderIndex);
                     set_input(term, placeholderIndex, placeholder);
                     remap_pointers_quick(innerTerm, input, placeholder);
                 }

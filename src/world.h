@@ -6,7 +6,7 @@ namespace circa {
 
 struct World {
 
-    Branch* root;
+    Block* root;
 
     // Actors.
     circa::Value actorList;
@@ -18,7 +18,7 @@ struct World {
 
     // Next unused global IDs.
     int nextTermID;
-    int nextBranchID;
+    int nextBlockID;
     int nextStackID;
 
     // Module information.
@@ -39,6 +39,6 @@ ListData* find_actor(World* world, const char* name);
 
 void refresh_all_modules(caWorld* world);
 
-void update_world_after_module_reload(World* world, Branch* oldBranch, Branch* newBranch);
+void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock);
 
 } // namespace circa

@@ -70,19 +70,19 @@ namespace function_t {
 
 } // namespace function_t
 
-Branch* function_contents(Term* func)
+Block* function_contents(Term* func)
 {
     return nested_contents(func);
 }
 
-Branch* function_contents(Function* func)
+Block* function_contents(Function* func)
 {
     return nested_contents(func->declaringTerm);
 }
 
-Function* get_function_from_branch(Branch* branch)
+Function* get_function_from_block(Block* block)
 {
-    return as_function(branch->owningTerm);
+    return as_function(block->owningTerm);
 }
 
 std::string get_placeholder_name_for_index(int index)
@@ -92,10 +92,10 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
-Term* create_function(Branch* branch, const char* name)
+Term* create_function(Block* block, const char* name)
 {
     ca_assert(name != NULL);
-    Term* term = create_value(branch, &FUNCTION_T, name);
+    Term* term = create_value(block, &FUNCTION_T, name);
     initialize_function(term);
     initialize_subroutine(term);
     return term;
@@ -108,7 +108,7 @@ void initialize_function(Term* func)
     as_function(func)->contents = nested_contents(func);
 }
 
-void finish_building_function(Branch* contents)
+void finish_building_function(Block* contents)
 {
     // Connect the primary output placeholder with the last expression.
     Term* primaryOutput = get_output_placeholder(contents, 0);
@@ -143,7 +143,7 @@ void finish_building_function(Branch* contents)
     // After the output_placeholder terms are created, we might need to update any
     // recursive calls.
 
-    for (BranchIterator it(contents); it.unfinished(); it.advance()) {
+    for (BlockIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (function_contents(term->function) != contents)
             continue;
@@ -155,7 +155,7 @@ void finish_building_function(Branch* contents)
         update_extra_outputs(term);
 
         // Update cascade, might need to fix pack_state() calls.
-        branch_update_existing_pack_state_calls(term->owningBranch);
+        block_update_existing_pack_state_calls(term->owningBlock);
     }
 
     update_exit_points(contents);
@@ -163,7 +163,7 @@ void finish_building_function(Branch* contents)
     // Possibly apply a native patch
     module_possibly_patch_new_function(global_world(), contents);
 
-    branch_finish_changes(contents);
+    block_finish_changes(contents);
 }
 
 Type* derive_specialized_output_type(Term* function, Term* call)
@@ -233,7 +233,7 @@ Type* function_get_output_type(Function* func, int index)
 // TODO: Replace with count_input_placeholders
 int function_num_inputs(Function* func)
 {
-    Branch* contents = function_get_contents(func);
+    Block* contents = function_get_contents(func);
 
     int count = 0;
     for (int i=0; i < contents->length(); i++) {
@@ -249,7 +249,7 @@ int function_num_inputs(Function* func)
 // TODO: Replace with count_output_placeholders
 int function_num_outputs(Function* func)
 {
-    Branch* contents = function_get_contents(func);
+    Block* contents = function_get_contents(func);
 
     int count = 0;
     for (int i=contents->length() - 1; i >= 0; i--) {
@@ -280,7 +280,7 @@ bool function_has_variable_args(Term* func)
 
 Term* function_get_input_placeholder(Function* func, int index)
 {
-    Branch* contents = function_get_contents(func);
+    Block* contents = function_get_contents(func);
     if (contents == NULL)
         return NULL;
     return get_input_placeholder(contents, index);
@@ -288,12 +288,12 @@ Term* function_get_input_placeholder(Function* func, int index)
 
 Term* function_get_output_placeholder(Function* func, int index)
 {
-    Branch* contents = function_get_contents(func);
+    Block* contents = function_get_contents(func);
     if (contents == NULL)
         return NULL;
     return get_output_placeholder(contents, index);
 }
-Branch* function_get_contents(Function* func)
+Block* function_get_contents(Function* func)
 {
     return func->contents;
 }
@@ -317,7 +317,7 @@ std::string function_get_documentation_string(Function* func)
     // it will be the first thing defined in the function, and it'll be
     // anonymous and be a statement.
     int expected_index = function_num_inputs(func);
-    Branch* contents = function_get_contents(func);
+    Block* contents = function_get_contents(func);
 
     if (expected_index >= contents->length()) return "";
     Term* possibleDocString = contents->get(expected_index);
@@ -367,7 +367,7 @@ void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialize
     as_function(func)->specializeType = specializeFunc;
 }
 
-void function_format_header_source(caValue* source, Branch* function)
+void function_format_header_source(caValue* source, Block* function)
 {
     Term* term = function->owningTerm;
 
@@ -461,10 +461,10 @@ void function_format_source(caValue* source, Term* term)
 {
     append_phrase(source, "def ", term, tok_Def);
 
-    Branch* contents = function_contents(term);
+    Block* contents = function_contents(term);
 
     function_format_header_source(source, contents);
-    format_branch_source(source, contents, term);
+    format_block_source(source, contents, term);
 }
 
 void function_set_empty_evaluation(Function* function)
@@ -485,9 +485,9 @@ bool is_subroutine(Term* term)
     return as_function(term)->evaluate == evaluate_subroutine;
 }
 
-bool is_subroutine(Branch* branch)
+bool is_subroutine(Block* block)
 {
-    return branch->owningTerm != NULL && is_subroutine(branch->owningTerm);
+    return block->owningTerm != NULL && is_subroutine(block->owningTerm);
 }
 
 void initialize_subroutine(Term* sub)

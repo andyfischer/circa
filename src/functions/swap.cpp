@@ -11,7 +11,7 @@ namespace swap_function {
         copy(circa_input(stack, 1), circa_output(stack, 1));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, swap, "swap(any :out, any :out)");
     }

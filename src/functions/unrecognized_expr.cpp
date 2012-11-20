@@ -10,7 +10,7 @@ namespace unrecognized_expr_function {
         append_phrase(source, term->stringProp("originalText",""), term, name_None);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.unrecognized_expression = import_function(kernel, NULL, "unrecognized_expr(any :multiple)");
         as_function(FUNCS.unrecognized_expression)->formatSource = formatSource;

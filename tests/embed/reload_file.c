@@ -6,7 +6,7 @@
 #include "circa/circa.h"
 
 // This script will constantly write a script to a file, and will constantly
-// refresh and run that module, to make sure that branch reloading works correctly.
+// refresh and run that module, to make sure that block reloading works correctly.
 
 void write_script_to_file(int key)
 {
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     // Write initial version
     write_script_to_file(0);
 
-    caBranch* module = circa_load_module_from_file(world, "file_to_reload", "file_to_reload.ca");
+    caBlock* module = circa_load_module_from_file(world, "file_to_reload", "file_to_reload.ca");
 
     int currentKey = 0;
 

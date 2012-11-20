@@ -62,7 +62,7 @@ def advance_request(Request request) -> any
     -- First dispatch on function
 
     -- value() function
-    if term.function == branch_ref(value)
+    if term.function == block_ref(value)
 
         -- Accept an :assign request
         if request.desire.name == :assign
@@ -74,14 +74,14 @@ def advance_request(Request request) -> any
             return Failure([:FuncCantHandleRequest request])
 
     -- copy() function, forward to input
-    elif term.function == branch_ref(copy) or term.function == branch_ref(output_placeholder)
+    elif term.function == block_ref(copy) or term.function == block_ref(output_placeholder)
         
         -- TODO, need to correct request.knowledge
         request.target.term = term.input(0)
         return request
 
     -- get_index
-    elif term.function == branch_ref(get_index)
+    elif term.function == block_ref(get_index)
         -- TODO, handle requests that target the index value.
         indexTerm = term.input(1)
 

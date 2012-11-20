@@ -21,7 +21,7 @@ namespace neg_function  {
         format_source_for_input(source, term, 0);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int) -> int");
         Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number) -> number");

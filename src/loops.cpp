@@ -1,6 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
@@ -20,9 +20,9 @@
 
 namespace circa {
 
-void for_loop_fix_state_input(Branch* contents);
+void for_loop_fix_state_input(Block* contents);
 
-Term* for_loop_get_iterator(Branch* contents)
+Term* for_loop_get_iterator(Block* contents)
 {
     for (int i=0; i < contents->length(); i++)
         if (contents->get(i)->function == FUNCS.get_index)
@@ -30,11 +30,11 @@ Term* for_loop_get_iterator(Branch* contents)
     return NULL;
 }
 
-Term* for_loop_find_index(Branch* contents)
+Term* for_loop_find_index(Block* contents)
 {
     return find_term_with_function(contents, FUNCS.loop_index);
 }
-Term* for_loop_find_output_index(Branch* contents)
+Term* for_loop_find_output_index(Block* contents)
 {
     return find_term_with_function(contents, FUNCS.loop_output_index);
 }
@@ -48,15 +48,15 @@ const char* for_loop_get_iterator_name(Term* forTerm)
     return iterator->name.c_str();
 }
 
-Branch* get_for_loop_outer_rebinds(Term* forTerm)
+Block* get_for_loop_outer_rebinds(Term* forTerm)
 {
-    Branch* contents = nested_contents(forTerm);
+    Block* contents = nested_contents(forTerm);
     return contents->getFromEnd(0)->contents();
 }
 
 Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType)
 {
-    Branch* contents = nested_contents(forTerm);
+    Block* contents = nested_contents(forTerm);
 
     // Add input placeholder for the list input
     Term* listInput = apply(contents, FUNCS.input, TermList());
@@ -75,8 +75,8 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
     change_declared_type(iterator, iteratorType);
     hide_from_source(iterator);
 
-    // Add the zero branch
-    create_branch_unevaluated(contents, "#zero");
+    // Add the zero block
+    create_block_unevaluated(contents, "#zero");
 
     // Add an loop output index
     Term* loopOutputIndex = apply(contents, FUNCS.loop_output_index, TermList());
@@ -86,13 +86,13 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
 
 void add_implicit_placeholders(Term* forTerm)
 {
-    Branch* contents = nested_contents(forTerm);
+    Block* contents = nested_contents(forTerm);
     std::string listName = forTerm->input(0)->name;
     Term* iterator = for_loop_get_iterator(contents);
     std::string iteratorName = iterator->name;
 
     std::vector<std::string> reboundNames;
-    list_names_that_this_branch_rebinds(contents, reboundNames);
+    list_names_that_this_block_rebinds(contents, reboundNames);
 
     int inputIndex = 1;
 
@@ -120,7 +120,7 @@ void add_implicit_placeholders(Term* forTerm)
         set_input(forTerm, inputIndex, original);
 
         // Repoint terms to use our new input_placeholder
-        for (BranchIterator it(contents); it.unfinished(); it.advance())
+        for (BlockIterator it(contents); it.unfinished(); it.advance())
             remap_pointers_quick(*it, original, input);
 
         // Create output_placeholder
@@ -133,7 +133,7 @@ void add_implicit_placeholders(Term* forTerm)
     }
 }
 
-void repoint_terms_to_use_input_placeholders(Branch* contents)
+void repoint_terms_to_use_input_placeholders(Block* contents)
 {
     // Visit every term
     for (int i=0; i < contents->length(); i++) {
@@ -145,9 +145,9 @@ void repoint_terms_to_use_input_placeholders(Branch* contents)
             if (input == NULL)
                 continue;
             
-            // If the input is outside this branch, then see if we have a named
+            // If the input is outside this block, then see if we have a named
             // input that could be used instead.
-            if (input->owningBranch == contents || input->name == "")
+            if (input->owningBlock == contents || input->name == "")
                 continue;
 
             Term* replacement = find_input_placeholder_with_name(contents, input->name.c_str());
@@ -160,25 +160,25 @@ void repoint_terms_to_use_input_placeholders(Branch* contents)
 }
 
 // Find the term that should be the 'primary' result for this loop.
-Term* loop_get_primary_result(Branch* branch)
+Term* loop_get_primary_result(Block* block)
 {
-    Term* iterator = for_loop_get_iterator(branch);
+    Term* iterator = for_loop_get_iterator(block);
 
     // For a rebound list, use the last term that has the iterator's
     // name, even if it's the iterator itself.
-    if (branch->owningTerm->boolProp("modifyList", false))
-        return branch->get(iterator->name);
+    if (block->owningTerm->boolProp("modifyList", false))
+        return block->get(iterator->name);
 
     // Otherwise, use the last expression as the output.
-    return find_last_non_comment_expression(branch);
+    return find_last_non_comment_expression(block);
 }
 
 void finish_for_loop(Term* forTerm)
 {
-    Branch* contents = nested_contents(forTerm);
+    Block* contents = nested_contents(forTerm);
 
     // Need to finish here to prevent error
-    branch_finish_changes(contents);
+    block_finish_changes(contents);
 
     // Add a a primary output
     Term* primaryOutput = apply(contents, FUNCS.output,
@@ -196,7 +196,7 @@ void finish_for_loop(Term* forTerm)
     check_to_insert_implicit_inputs(forTerm);
     update_extra_outputs(forTerm);
 
-    branch_finish_changes(contents);
+    block_finish_changes(contents);
 }
 
 Term* find_enclosing_for_loop(Term* location)
@@ -206,7 +206,7 @@ Term* find_enclosing_for_loop(Term* location)
     return location;
 }
 
-Branch* find_enclosing_for_loop_contents(Term* term)
+Block* find_enclosing_for_loop_contents(Term* term)
 {
     Term* loop = find_enclosing_for_loop(term);
     if (loop == NULL)
@@ -214,24 +214,24 @@ Branch* find_enclosing_for_loop_contents(Term* term)
     return nested_contents(loop);
 }
 
-bool is_for_loop(Branch* branch)
+bool is_for_loop(Block* block)
 {
-    if (branch->owningTerm == NULL)
+    if (block->owningTerm == NULL)
         return false;
     if (FUNCS.for_func == NULL)
         return false;
-    return branch->owningTerm->function == FUNCS.for_func;
+    return block->owningTerm->function == FUNCS.for_func;
 }
 
-Branch* for_loop_get_zero_branch(Branch* contents)
+Block* for_loop_get_zero_block(Block* contents)
 {
     return contents->get("#zero")->contents();
 }
 
-void for_loop_remake_zero_branch(Branch* forContents)
+void for_loop_remake_zero_block(Block* forContents)
 {
-    Branch* zero = for_loop_get_zero_branch(forContents);
-    clear_branch(zero);
+    Block* zero = for_loop_get_zero_block(forContents);
+    clear_block(zero);
 
     // Clone inputs
     for (int i=0;; i++) {
@@ -260,10 +260,10 @@ void for_loop_remake_zero_branch(Branch* forContents)
         rename(clone, placeholder->nameSymbol);
     }
 
-    branch_finish_changes(zero);
+    block_finish_changes(zero);
 }
 
-void for_loop_fix_state_input(Branch* contents)
+void for_loop_fix_state_input(Block* contents)
 {
     // This function will look at the state access inside for-loop contents.
     // If there's state, the default building functions will have created
@@ -316,9 +316,9 @@ void for_loop_fix_state_input(Branch* contents)
 void start_for_loop(caStack* stack, bool enableLoopOutput)
 {
     Frame* frame = top_frame(stack);
-    Branch* contents = frame->branch;
+    Block* contents = frame->block;
 
-    // Check if top frame actually contains a for-loop (it might be using the #zero branch)
+    // Check if top frame actually contains a for-loop (it might be using the #zero block)
     if (!is_for_loop(contents))
         return;
 
@@ -332,7 +332,7 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
         set_list(get_frame_register_from_end(frame, 0), list_length(listInput));
     }
 
-    // Interpreter will run the contents of the branch
+    // Interpreter will run the contents of the block
 }
 
 void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
@@ -340,7 +340,7 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
     INCREMENT_STAT(LoopFinishIteration);
 
     Frame* frame = top_frame(stack);
-    Branch* contents = frame->branch;
+    Block* contents = frame->block;
 
     // Find list length
     caValue* listInput = get_frame_register(frame, 0);
@@ -409,17 +409,17 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
 
 void finish_while_loop(Term* whileTerm)
 {
-    Branch* branch = nested_contents(whileTerm);
+    Block* block = nested_contents(whileTerm);
 
     // Append a call to unbounded_loop_finish()
-    Term* term = apply(branch, FUNCS.unbounded_loop_finish,
+    Term* term = apply(block, FUNCS.unbounded_loop_finish,
         TermList());
     move_before_outputs(term);
 }
 
 void evaluate_unbounded_loop(caStack* stack)
 {
-    Branch* contents = (Branch*) circa_caller_branch(stack);
+    Block* contents = (Block*) circa_caller_block(stack);
 
     // Check for zero evaluations
     if (!as_bool(circa_input(stack, 0))) {
@@ -450,7 +450,7 @@ void evaluate_index_func(caStack* stack)
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void loop_setup_functions(Branch* kernel)
+void loop_setup_functions(Block* kernel)
 {
     Term* index_func = import_function(kernel, evaluate_index_func, "index(int i :optional) -> int");
     as_function(index_func)->postCompile = index_func_postCompile;

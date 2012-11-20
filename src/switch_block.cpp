@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "kernel.h"
 #include "if_block.h"
@@ -23,7 +23,7 @@ CA_FUNCTION(evaluate_switch)
 {
 #if 0
     Stack* context = CONTEXT;
-    Branch* contents = nested_contents(CALLER);
+    Block* contents = nested_contents(CALLER);
     caValue* input = INPUT(0);
 
     // Iterate through each 'case' and find one that succeeds.
@@ -41,7 +41,7 @@ CA_FUNCTION(evaluate_switch)
         }
 
         if (succeeds) {
-            Branch* caseContents = nested_contents(caseTerm);
+            Block* caseContents = nested_contents(caseTerm);
             push_frame(context, caseContents);
 
             for (int i=0; i < caseContents->length(); i++) {
@@ -52,7 +52,7 @@ CA_FUNCTION(evaluate_switch)
             }
 
             // Copy joined values to output slots
-            Branch* joining = nested_contents(contents->getFromEnd(0));
+            Block* joining = nested_contents(contents->getFromEnd(0));
 
             for (int i=0; i < joining->length(); i++) {
                 Term* joinTerm = joining->get(i);

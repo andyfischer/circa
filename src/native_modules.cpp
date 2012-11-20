@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-#include "branch.h"
+#include "block.h"
 #include "file.h"
 #include "function.h"
 #include "hashtable.h"
@@ -108,7 +108,7 @@ void module_patch_function(NativeModule* module, const char* name, EvaluateFunc 
     module->patches[name] = func;
 }
 
-void native_module_apply_patch(NativeModule* module, Branch* branch)
+void native_module_apply_patch(NativeModule* module, Block* block)
 {
     // Walk through list of patches, and try to find any functions to apply them to.
     std::map<std::string, EvaluateFunc>::const_iterator it;
@@ -116,7 +116,7 @@ void native_module_apply_patch(NativeModule* module, Branch* branch)
         std::string const& name = it->first;
         EvaluateFunc evaluateFunc = it->second;
 
-        Term* term = find_local_name(branch, name.c_str());
+        Term* term = find_local_name(block, name.c_str());
 
         if (term == NULL)
             continue;
@@ -127,12 +127,12 @@ void native_module_apply_patch(NativeModule* module, Branch* branch)
     }
 }
 
-void native_module_add_change_action_patch_branch(NativeModule* module, const char* branchName)
+void native_module_add_change_action_patch_block(NativeModule* module, const char* blockName)
 {
     Value action;
     set_list(&action, 2);
-    set_name(list_get(&action, 0), name_PatchBranch);
-    set_string(list_get(&action, 1), branchName);
+    set_name(list_get(&action, 0), name_PatchBlock);
+    set_string(list_get(&action, 1), blockName);
 
     if (!list_contains(&module->onChangeActions, &action))
         move(&action, list_append(&module->onChangeActions));
@@ -145,17 +145,17 @@ static void update_patch_function_lookup_for_module(NativeModule* module)
 
     // std::cout << "looking at module: " << to_string(&module->name) << std::endl;
 
-    // Look across every change action on the NativeModule (looking for PatchBranch entries).
+    // Look across every change action on the NativeModule (looking for PatchBlock entries).
     for (int i=0; i < list_length(&module->onChangeActions); i++) {
 
         caValue* action = list_get(&module->onChangeActions, i);
 
         // std::cout << "looking at action: " << to_string(action) << std::endl;
 
-        if (leading_name(action) != name_PatchBranch)
+        if (leading_name(action) != name_PatchBlock)
             continue;
 
-        caValue* branchName = list_get(action, 1);
+        caValue* blockName = list_get(action, 1);
 
         // Look at every function that this module patches.
         std::map<std::string, EvaluateFunc>::const_iterator it;
@@ -167,10 +167,10 @@ static void update_patch_function_lookup_for_module(NativeModule* module)
 
             // std::cout << "looking at function: " << to_string(&functionName) << std::endl;
 
-            // Construct a global name for this function, using the branch's global name.
+            // Construct a global name for this function, using the block's global name.
 
             Value globalName;
-            copy(branchName, &globalName);
+            copy(blockName, &globalName);
             string_append_qualified_name(&globalName, &functionName);
 
             // Save this line.
@@ -210,15 +210,15 @@ void native_module_finish_change(NativeModule* module)
         Name tag = leading_name(action);
 
         switch (tag) {
-        case name_PatchBranch: {
+        case name_PatchBlock: {
             caValue* name = list_get(action, 1);
-            Branch* branch = nested_contents(find_from_global_name(world, as_cstring(name)));
-            if (branch == NULL) {
-                // It's okay if the branch doesn't exist yet.
+            Block* block = nested_contents(find_from_global_name(world, as_cstring(name)));
+            if (block == NULL) {
+                // It's okay if the block doesn't exist yet.
                 break;
             }
 
-            native_module_apply_patch(module, branch);
+            native_module_apply_patch(module, block);
             break;
         }
         default:
@@ -227,7 +227,7 @@ void native_module_finish_change(NativeModule* module)
     }
 }
 
-void module_possibly_patch_new_function(World* world, Branch* function)
+void module_possibly_patch_new_function(World* world, Block* function)
 {
     NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
 

@@ -38,7 +38,7 @@ namespace circa {
 typedef long long int int64;
 typedef long long unsigned int uint64;
 
-struct Branch;
+struct Block;
 struct CastResult;
 struct CircaObject;
 struct Dict;

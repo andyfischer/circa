@@ -138,7 +138,7 @@ namespace math_function {
         set_float(circa_output(stack, 0), std::log(circa_float_input(stack, 0)));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, max_f, "max_f(number,number) -> number; 'Maximum of two numbers'");
         import_function(kernel, max_i, "max_i(int,int) -> int; 'Maximum of two integers'");

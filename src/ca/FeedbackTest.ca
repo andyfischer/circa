@@ -11,7 +11,7 @@ def mySample()
     b = mylist[0]
 
 
-br = branch_ref(mySample)
+br = block_ref(mySample)
 br.dump
 --print('a is ' br.find_term("a"))
 --print('b is ' br.find_term("b"))

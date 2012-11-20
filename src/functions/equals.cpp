@@ -17,7 +17,7 @@ namespace equals_function {
                 !equals(circa_input(stack, 0), circa_input(stack, 1)));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, equals_func, "equals(any,any) -> bool");
         import_function(kernel, not_equals, "not_equals(any,any) -> bool");

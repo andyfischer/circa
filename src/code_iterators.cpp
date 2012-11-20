@@ -1,6 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "branch.h"
+#include "block.h"
 #include "term.h"
 
 #include "code_iterators.h"
@@ -8,67 +8,67 @@
 
 namespace circa {
 
-BranchIterator::BranchIterator(Branch* branch, bool backwards)
+BlockIterator::BlockIterator(Block* block, bool backwards)
   : _backwards(backwards),
-    _skipNextBranch(false)
+    _skipNextBlock(false)
 {
-    reset(branch);
+    reset(block);
 }
 
-void BranchIterator::reset(Branch* branch)
+void BlockIterator::reset(Block* block)
 {
     _stack.clear();
-    if (branch->length() != 0) {
-        int firstIndex = _backwards ? branch->length() - 1 : 0;
-        _stack.push_back(IteratorFrame(branch, firstIndex));
+    if (block->length() != 0) {
+        int firstIndex = _backwards ? block->length() - 1 : 0;
+        _stack.push_back(IteratorFrame(block, firstIndex));
     }
 }
 
-bool BranchIterator::finished()
+bool BlockIterator::finished()
 {
     return _stack.empty();
 }
 
-Term* BranchIterator::current()
+Term* BlockIterator::current()
 {
     ca_assert(!finished());
     IteratorFrame& frame = _stack.back();
-    return frame.branch->get(frame.index);
+    return frame.block->get(frame.index);
 }
 
-void BranchIterator::advance()
+void BlockIterator::advance()
 {
     ca_assert(!finished());
-    if (_skipNextBranch) {
-        _skipNextBranch = false;
-        advanceSkippingBranch();
+    if (_skipNextBlock) {
+        _skipNextBlock = false;
+        advanceSkippingBlock();
         return;
     }
 
     Term* term = current();
 
-    // Check to start an inner branch.
+    // Check to start an inner block.
     if (term && term->nestedContents && term->contents()->length() > 0) {
-        Branch* contents = nested_contents(term);
+        Block* contents = nested_contents(term);
         int firstIndex = _backwards ? contents->length() - 1 : 0;
         _stack.push_back(IteratorFrame(contents, firstIndex));
         return;
     }
 
     // Otherwise, just advance. PS, it's not really accurate to say that we are "skipping"
-    // any branches, because we just checked if there was one.
-    advanceSkippingBranch();
+    // any blockes, because we just checked if there was one.
+    advanceSkippingBlock();
 }
 
-void BranchIterator::advanceSkippingBranch()
+void BlockIterator::advanceSkippingBlock()
 {
     while (true) {
-        Branch* branch = _stack.back().branch;
+        Block* block = _stack.back().block;
         int& index = _stack.back().index;
 
         index += _backwards ? -1 : 1;
 
-        if (index < 0 || index >= branch->length())
+        if (index < 0 || index >= block->length())
             _stack.pop_back();
         else
             break;
@@ -78,7 +78,7 @@ void BranchIterator::advanceSkippingBranch()
     }
 }
 
-int BranchIterator::depth()
+int BlockIterator::depth()
 {
     return (int) _stack.size() - 1;
 }
@@ -88,7 +88,7 @@ int BranchIterator::depth()
 UpwardIterator::UpwardIterator(Term* startingTerm)
   : _stopAt(NULL)
 {
-    _branch = startingTerm->owningBranch;
+    _block = startingTerm->owningBlock;
     _index = startingTerm->index;
 
     // advance once, we don't yield the starting term
@@ -96,20 +96,20 @@ UpwardIterator::UpwardIterator(Term* startingTerm)
 }
 
 void
-UpwardIterator::stopAt(Branch* branch)
+UpwardIterator::stopAt(Block* block)
 {
-    _stopAt = branch;
+    _stopAt = block;
 }
 
 bool UpwardIterator::finished()
 {
-    return _branch == NULL;
+    return _block == NULL;
 }
 
 Term* UpwardIterator::current()
 {
-    ca_assert(_branch != NULL);
-    return _branch->get(_index);
+    ca_assert(_block != NULL);
+    return _block->get(_index);
 }
 
 void UpwardIterator::advance()
@@ -118,18 +118,18 @@ void UpwardIterator::advance()
         _index--;
 
         if (_index < 0) {
-            Term* parentTerm = _branch->owningTerm;
+            Term* parentTerm = _block->owningTerm;
             if (parentTerm == NULL) {
-                _branch = NULL;
+                _block = NULL;
                 return;
             }
 
-            _branch = parentTerm->owningBranch;
+            _block = parentTerm->owningBlock;
             _index = parentTerm->index;
 
-            if (_branch == _stopAt)
-                _branch = NULL;
-            if (_branch == NULL)
+            if (_block == _stopAt)
+                _block = NULL;
+            if (_block == NULL)
                 return;
         }
         
@@ -137,40 +137,40 @@ void UpwardIterator::advance()
     } while (unfinished() && current() == NULL);
 }
 
-BranchIteratorFlat::BranchIteratorFlat(Branch* branchIn)
- : branch(branchIn), index(0)
+BlockIteratorFlat::BlockIteratorFlat(Block* blockIn)
+ : block(blockIn), index(0)
 {
     advanceWhileInvalid();
 }
 
-bool BranchIteratorFlat::finished()
+bool BlockIteratorFlat::finished()
 {
-    return index >= branch->length();
+    return index >= block->length();
 }
-void BranchIteratorFlat::advance()
+void BlockIteratorFlat::advance()
 {
     index++;
     advanceWhileInvalid();
 }
-void BranchIteratorFlat::advanceWhileInvalid()
+void BlockIteratorFlat::advanceWhileInvalid()
 {
 possibly_invalid:
 
     if (finished())
         return;
 
-    if (branch->get(index) == NULL) {
+    if (block->get(index) == NULL) {
         index++;
         goto possibly_invalid;
     }
 }
-Term* BranchIteratorFlat::current()
+Term* BlockIteratorFlat::current()
 {
-    return branch->get(index);
+    return block->get(index);
 }
 
-BranchInputIterator::BranchInputIterator(Branch* branchIn)
- : branch(branchIn)
+BlockInputIterator::BlockInputIterator(Block* blockIn)
+ : block(blockIn)
 {
     index = 0;
     inputIndex = 0;
@@ -178,25 +178,25 @@ BranchInputIterator::BranchInputIterator(Branch* branchIn)
 }
 
 bool
-BranchInputIterator::finished()
+BlockInputIterator::finished()
 {
-    return index >= branch->length();
+    return index >= block->length();
 }
 
-void BranchInputIterator::advance()
+void BlockInputIterator::advance()
 {
     inputIndex++;
     advanceWhileInvalid();
 }
 
-void BranchInputIterator::advanceWhileInvalid()
+void BlockInputIterator::advanceWhileInvalid()
 {
 possibly_invalid:
 
     if (finished())
         return;
 
-    Term* current = branch->get(index);
+    Term* current = block->get(index);
 
     if (current == NULL) {
         index++;
@@ -216,23 +216,23 @@ possibly_invalid:
     }
 }
 
-Term* BranchInputIterator::currentTerm()
+Term* BlockInputIterator::currentTerm()
 {
-    return branch->get(index);
+    return block->get(index);
 }
 
-Term* BranchInputIterator::currentInput()
+Term* BlockInputIterator::currentInput()
 {
-    return branch->get(index)->input(inputIndex);
+    return block->get(index)->input(inputIndex);
 }
 
-int BranchInputIterator::currentInputIndex()
+int BlockInputIterator::currentInputIndex()
 {
     return inputIndex;
 }
 
-OuterInputIterator::OuterInputIterator(Branch* branch)
- : branchInputIterator(branch)
+OuterInputIterator::OuterInputIterator(Block* block)
+ : blockInputIterator(block)
 {
     advanceWhileInvalid();
 }
@@ -240,116 +240,116 @@ OuterInputIterator::OuterInputIterator(Branch* branch)
 bool
 OuterInputIterator::finished()
 {
-    return branchInputIterator.finished();
+    return blockInputIterator.finished();
 }
 
 void OuterInputIterator::advance()
 {
-    branchInputIterator.inputIndex++;
+    blockInputIterator.inputIndex++;
     advanceWhileInvalid();
 }
 
 void OuterInputIterator::advanceWhileInvalid()
 {
 possibly_invalid:
-    branchInputIterator.advanceWhileInvalid();
+    blockInputIterator.advanceWhileInvalid();
 
     if (finished())
         return;
 
     // Only stop on outer inputs
-    if (branchInputIterator.currentInput()->owningBranch == branchInputIterator.branch) {
-        branchInputIterator.inputIndex++;
+    if (blockInputIterator.currentInput()->owningBlock == blockInputIterator.block) {
+        blockInputIterator.inputIndex++;
         goto possibly_invalid;
     }
 }
 
 Term* OuterInputIterator::currentTerm()
 {
-    return branchInputIterator.currentTerm();
+    return blockInputIterator.currentTerm();
 }
 
 Term* OuterInputIterator::currentInput()
 {
-    return branchInputIterator.currentInput();
+    return blockInputIterator.currentInput();
 }
 
 int OuterInputIterator::currentInputIndex()
 {
-    return branchInputIterator.currentInputIndex();
+    return blockInputIterator.currentInputIndex();
 }
 
-BranchIterator2::BranchIterator2()
+BlockIterator2::BlockIterator2()
 {
     _current = NULL;
-    _topBranch = NULL;
+    _topBlock = NULL;
 }
-BranchIterator2::BranchIterator2(Branch* branch)
+BlockIterator2::BlockIterator2(Block* block)
 {
-    _current = branch->get(0);
-    _topBranch = branch;
+    _current = block->get(0);
+    _topBlock = block;
 }
 
-void BranchIterator2::startAt(Term* term)
+void BlockIterator2::startAt(Term* term)
 {
     if (term == NULL) {
         _current = NULL;
-        _topBranch = NULL;
+        _topBlock = NULL;
         return;
     }
 
     _current = term;
-    _topBranch = term->owningBranch;
+    _topBlock = term->owningBlock;
 }
 
-void BranchIterator2::advance()
+void BlockIterator2::advance()
 {
-    // Possibly iterate through the contents of this branch.
+    // Possibly iterate through the contents of this block.
     if (has_nested_contents(_current) && nested_contents(_current)->length() > 0) {
         _current = nested_contents(_current)->get(0);
         return;
     }
 
     // Advance to next index.
-    Branch* branch = _current->owningBranch;
+    Block* block = _current->owningBlock;
     int index = _current->index + 1;
 
-    // Possibly loop as we pop out of finished branches.
+    // Possibly loop as we pop out of finished blockes.
     possibly_invalid:
 
-    if (index >= branch->length() || branch == NULL) {
-        // Finished this branch.
+    if (index >= block->length() || block == NULL) {
+        // Finished this block.
 
-        if (branch == _topBranch || branch == NULL) {
+        if (block == _topBlock || block == NULL) {
             // Finished the iteration.
             _current = NULL;
-            _topBranch = NULL;
+            _topBlock = NULL;
             return;
         }
 
-        // Advance to the next term in the parent branch.
-        Term* parentTerm = branch->owningTerm;
+        // Advance to the next term in the parent block.
+        Term* parentTerm = block->owningTerm;
         if (parentTerm == NULL) {
-            // No branch parent. It's weird that we hit this case before we reached
-            // the topBranch, but anyway, finish the iteration.
+            // No block parent. It's weird that we hit this case before we reached
+            // the topBlock, but anyway, finish the iteration.
             _current = NULL;
-            _topBranch = NULL;
+            _topBlock = NULL;
             return;
         }
 
-        branch = parentTerm->owningBranch;
+        block = parentTerm->owningBlock;
         index = parentTerm->index + 1;
         goto possibly_invalid;
     }
 
     // Skip over NULL terms.
-    if (branch->get(index) == NULL) {
+    if (block->get(index) == NULL) {
         index++;
         goto possibly_invalid;
     }
 
     // Index is valid. Save the position as a Term*.
-    _current = branch->get(index);
+    _current = block->get(index);
 }
 
 NameVisibleIterator::NameVisibleIterator(Term* term)

@@ -32,7 +32,7 @@ def Writer.write(@self, any args :multiple)
     
     self.output.append(args.join(''))
 
-def Writer.dump_function(@self, Branch func)
+def Writer.dump_function(@self, Block func)
     self.write('{')
     self.write('"type": "Function",')
     self.write('"name": "' func.name '",')
@@ -64,7 +64,7 @@ def Writer.dump_type(@self, Type t)
     self.write('}')
     self.needsComma = true
 
-def Writer.dump_module(@self, Branch b)
+def Writer.dump_module(@self, Block b)
     for Term t in b.terms
         if t.is_function
             self.dump_function(t.contents)

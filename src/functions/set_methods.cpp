@@ -40,7 +40,7 @@ namespace set_methods_function {
         }
     }
     
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, hosted_add, "Set.add(self :out, any)");
         import_function(kernel, remove, "Set.remove(self :out, any)");

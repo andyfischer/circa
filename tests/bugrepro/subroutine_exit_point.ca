@@ -1,7 +1,7 @@
 
 -- This bug was a two-parter. The for loop was leaking a #control value, and
 -- the subroutine definition was creating an unnecessary exit_point. The end
--- result is that the branch would exit after the subroutine def.
+-- result is that the block would exit after the subroutine def.
 
 print('check 1')
 

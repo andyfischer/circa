@@ -16,32 +16,32 @@ namespace names {
 
 void find_name()
 {
-    Branch branch;
-    branch.compile("a = 1");
-    branch.compile("namespace ns { a = 2; b = 3; } ");
+    Block block;
+    block.compile("a = 1");
+    block.compile("namespace ns { a = 2; b = 3; } ");
 
-    test_equals(term_value(find_name(&branch, "a")), "1");
-    test_equals(term_value(find_name(&branch, "ns:a")), "2");
-    test_equals(term_value(find_name(&branch, "ns:b")), "3");
+    test_equals(term_value(find_name(&block, "a")), "1");
+    test_equals(term_value(find_name(&block, "ns:a")), "2");
+    test_equals(term_value(find_name(&block, "ns:b")), "3");
 }
 
 void unique_ordinals()
 {
-    Branch branch;
-    Term* a = branch.compile("a = 1");
-    Term* b = branch.compile("b = 1");
+    Block block;
+    Term* a = block.compile("a = 1");
+    Term* b = block.compile("b = 1");
 
     test_equals(a->uniqueOrdinal, 0);
     test_equals(b->uniqueOrdinal, 0);
 
-    Term* a2 = branch.compile("a = 3");
+    Term* a2 = block.compile("a = 3");
     test_equals(a->uniqueOrdinal, 1);
     test_equals(a2->uniqueOrdinal, 2);
 
-    Term* a3 = branch.compile("a = 3");
+    Term* a3 = block.compile("a = 3");
     test_equals(a3->uniqueOrdinal, 3);
 
-    Term* x = branch.compile("x = 4");
+    Term* x = block.compile("x = 4");
     test_equals(x->uniqueOrdinal, 0);
     rename(x, name_from_string("a"));
     test_equals(x->uniqueOrdinal, 4);
@@ -49,37 +49,37 @@ void unique_ordinals()
 
 void global_names()
 {
-    Branch* branch = find_or_create_branch(global_root_branch(), "names_test");
+    Block* block = find_or_create_block(global_root_block(), "names_test");
 
-    Term* a = branch->compile("a = 1");
+    Term* a = block->compile("a = 1");
 
     circa::Value globalName;
     get_global_name(a, &globalName);
     test_equals(&globalName, "names_test:a");
 
-    Term* a_2 = branch->compile("a = 2");
+    Term* a_2 = block->compile("a = 2");
     get_global_name(a, &globalName);
     test_equals(&globalName, "names_test:a#1");
 
     get_global_name(a_2, &globalName);
     test_equals(&globalName, "names_test:a#2");
 
-    Branch* branch2 = create_branch(branch, "branch2");
-    Term* b = branch2->compile("b = 3");
-    Term* b_2 = branch2->compile("b = 4");
+    Block* block2 = create_block(block, "block2");
+    Term* b = block2->compile("b = 3");
+    Term* b_2 = block2->compile("b = 4");
 
     get_global_name(b, &globalName);
-    test_equals(&globalName, "names_test:branch2:b#1");
+    test_equals(&globalName, "names_test:block2:b#1");
     get_global_name(b_2, &globalName);
-    test_equals(&globalName, "names_test:branch2:b#2");
+    test_equals(&globalName, "names_test:block2:b#2");
 
     // Now try finding terms via their global name.
     test_assert(find_from_global_name(global_world(), "names_test:a") == a_2);
     test_assert(find_from_global_name(global_world(), "names_test:a#1") == a);
     test_assert(find_from_global_name(global_world(), "names_test:a#2") == a_2);
-    test_assert(find_from_global_name(global_world(), "names_test:branch2:b") == b_2);
-    test_assert(find_from_global_name(global_world(), "names_test:branch2:b#1") == b);
-    test_assert(find_from_global_name(global_world(), "names_test:branch2:b#2") == b_2);
+    test_assert(find_from_global_name(global_world(), "names_test:block2:b") == b_2);
+    test_assert(find_from_global_name(global_world(), "names_test:block2:b#1") == b);
+    test_assert(find_from_global_name(global_world(), "names_test:block2:b#2") == b_2);
 }
 
 void test_find_ordinal_suffix()
@@ -127,7 +127,7 @@ void search_every_global_name()
     // the global name.
 
     circa::Value globalName;
-    for (BranchIterator it(global_root_branch()); it.unfinished(); it.advance()) {
+    for (BlockIterator it(global_root_block()); it.unfinished(); it.advance()) {
         get_global_name(*it, &globalName);
 
         if (!is_string(&globalName))
@@ -148,11 +148,11 @@ void bug_with_lookup_type_and_qualified_name()
     // Bug repro. There was an issue where, when searching for a qualified name, we would
     // use the original lookup type on the prefix. (which is wrong).
 
-    Branch branch;
-    Branch* module = create_branch(&branch, "module");
+    Block block;
+    Block* module = create_block(&block, "module");
     Term* T = create_type(module, "T");
 
-    test_assert(T == find_name(&branch, "module:T", -1, name_LookupType));
+    test_assert(T == find_name(&block, "module:T", -1, name_LookupType));
 }
 
 void type_name_visible_from_module()
@@ -162,7 +162,7 @@ void type_name_visible_from_module()
     load_module_file(global_world(), "a", "a");
 
     fs.set("b", "require a\ntest_spy(make(A))");
-    Branch* b = load_module_file(global_world(), "b", "b");
+    Block* b = load_module_file(global_world(), "b", "b");
 
     Stack stack;
     push_frame(&stack, b);

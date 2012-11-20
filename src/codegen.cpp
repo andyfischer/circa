@@ -1,6 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "branch.h"
+#include "block.h"
 #include "kernel.h"
 #include "names.h"
 #include "term.h"
@@ -35,7 +35,7 @@ std::string cpp_accessor_for_type(Type* type)
     out << indent << get_cpp_type_name(type) << "(Term* term) : _term(term) {}\n";
     out << "\n";
 
-    Branch* prototype = type->prototype;
+    Block* prototype = type->prototype;
     for (int i=0; i < prototype.length(); i++) {
         Term* field = prototype[i];
         out << indent << get_cpp_type_name(field->type) << "& " << field->name << "() ";
@@ -49,14 +49,14 @@ std::string cpp_accessor_for_type(Type* type)
     return "";
 }
 
-std::string generate_cpp_headers(Branch* branch)
+std::string generate_cpp_headers(Block* block)
 {
     std::stringstream out;
 
-    for (int i=0; i < branch->length(); i++) {
-        if (branch->get(i) == NULL) continue;
+    for (int i=0; i < block->length(); i++) {
+        if (block->get(i) == NULL) continue;
 
-        Term* term = branch->get(i);
+        Term* term = block->get(i);
 
         if (is_type(term))
             out << cpp_accessor_for_type(as_type(term_value(term)));

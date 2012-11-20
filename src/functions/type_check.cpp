@@ -83,7 +83,7 @@ namespace type_check_function {
         circa_output_error(stack, out.str().c_str());
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, hosted_is_list, "is_list(any) -> bool");
         import_function(kernel, hosted_is_int, "is_int(any) -> bool");

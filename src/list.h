@@ -109,7 +109,7 @@ bool list_contains(caValue* list, caValue* element);
 // a specific size.
 Name list_get_parameter_type(caValue* parameter);
 bool list_type_has_specific_size(caValue* parameter);
-void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter);
+void list_initialize_parameter_from_type_decl(Block* typeDecl, caValue* parameter);
 
 // Create a new compound type (sized and named)
 Type* create_compound_type();

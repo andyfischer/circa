@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "kernel.h"
 #include "function.h"
@@ -16,8 +16,8 @@
 
 namespace circa {
 
-static void get_list_of_state_outputs(Branch* branch, int position, TermList* output);
-static Term* append_final_pack_state(Branch* branch);
+static void get_list_of_state_outputs(Block* block, int position, TermList* output);
+static Term* append_final_pack_state(Block* block);
 
 bool is_declared_state(Term* term)
 {
@@ -32,40 +32,40 @@ bool is_function_stateful(Term* func)
     if (attrs == NULL)
         return false;
 
-    Branch* branch = function_contents(func);
-    return has_state_input(branch);
+    Block* block = function_contents(func);
+    return has_state_input(block);
 }
 
-void pack_any_open_state_vars(Branch* branch)
+void pack_any_open_state_vars(Block* block)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
         if (term->function == FUNCS.declared_state) {
-            Term* result = branch->get(term->name);
+            Term* result = block->get(term->name);
 
             // If this result already has a pack_state() term then leave it alone.
             if (find_user_with_function(result, FUNCS.pack_state) != NULL)
                 continue;
 
-            Term* pack = apply(branch, FUNCS.pack_state, TermList(
-                find_open_state_result(branch, branch->length()), result, term));
+            Term* pack = apply(block, FUNCS.pack_state, TermList(
+                find_open_state_result(block, block->length()), result, term));
             pack->setStringProp("field", unique_name(term));
-            branch->move(pack, result->index + 1);
+            block->move(pack, result->index + 1);
         }
     }
 }
 
-bool branch_state_type_is_out_of_date(Branch* branch)
+bool block_state_type_is_out_of_date(Block* block)
 {
     // Alloc an array that tracks, for each field in the existing stateType,
     // whether we have found a corresponding term for that field.
     bool* typeFieldFound = NULL;
     int existingFieldCount = 0;
 
-    if (branch->stateType != NULL) {
-        existingFieldCount = compound_type_get_field_count(branch->stateType);
+    if (block->stateType != NULL) {
+        existingFieldCount = compound_type_get_field_count(block->stateType);
         size_t size = sizeof(bool) * existingFieldCount;
         typeFieldFound = (bool*) malloc(size);
         memset(typeFieldFound, 0, size);
@@ -73,8 +73,8 @@ bool branch_state_type_is_out_of_date(Branch* branch)
     
     // Walk through every term and check whether every unpack_state call is already
     // mentioned in the state type.
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
 
@@ -84,12 +84,12 @@ bool branch_state_type_is_out_of_date(Branch* branch)
         // Found an unpack_state call
         Term* identifyingTerm = term->input(1);
 
-        // If the branch doesn't yet have a stateType then that's an update.
-        if (branch->stateType == NULL)
+        // If the block doesn't yet have a stateType then that's an update.
+        if (block->stateType == NULL)
             goto return_true;
 
         // Look for the field name
-        int fieldIndex = list_find_field_index_by_name(branch->stateType,
+        int fieldIndex = list_find_field_index_by_name(block->stateType,
             unique_name(identifyingTerm));
 
         // If the name isn't found then that's an update
@@ -97,7 +97,7 @@ bool branch_state_type_is_out_of_date(Branch* branch)
             goto return_true;
 
         // If the type doesn't match then that's an update
-        if (compound_type_get_field_type(branch->stateType, fieldIndex)
+        if (compound_type_get_field_type(block->stateType, fieldIndex)
                 != declared_type(term))
             goto return_true;
 
@@ -105,7 +105,7 @@ bool branch_state_type_is_out_of_date(Branch* branch)
         typeFieldFound[fieldIndex] = true;
     }
 
-    // If there were any fields in the type that weren't found in the branch, then
+    // If there were any fields in the type that weren't found in the block, then
     // that's an update.
     if (typeFieldFound != NULL) {
         for (int i=0; i < existingFieldCount; i++) {
@@ -123,9 +123,9 @@ return_true:
     return true;
 }
 
-void branch_update_state_type(Branch* branch)
+void block_update_state_type(Block* block)
 {
-    if (branch_state_type_is_out_of_date(branch)) {
+    if (block_state_type_is_out_of_date(block)) {
 
         // TODO: Handle the case where the stateType should go from non-NULL to NULL
 
@@ -134,8 +134,8 @@ void branch_update_state_type(Branch* branch)
 
         // TODO: give this new type a nice name
 
-        for (int i=0; i < branch->length(); i++) {
-            Term* term = branch->get(i);
+        for (int i=0; i < block->length(); i++) {
+            Term* term = block->get(i);
             if (term == NULL)
                 continue;
 
@@ -147,30 +147,30 @@ void branch_update_state_type(Branch* branch)
             compound_type_append_field(type, declared_type(term), unique_name(identifyingTerm));
         }
 
-        branch->stateType = type;
+        block->stateType = type;
 
         // Might need to update any existing pack_state calls.
-        branch_update_existing_pack_state_calls(branch);
+        block_update_existing_pack_state_calls(block);
     }
 }
 
-static Term* append_final_pack_state(Branch* branch)
+static Term* append_final_pack_state(Block* block)
 {
     TermList inputs;
-    get_list_of_state_outputs(branch, branch->length(), &inputs);
-    Term* term = apply(branch, FUNCS.pack_state, inputs);
+    get_list_of_state_outputs(block, block->length(), &inputs);
+    Term* term = apply(block, FUNCS.pack_state, inputs);
     term->setBoolProp("final", true);
     return term;
 }
 
 // For the given field name
-static Term* find_output_term_for_state_field(Branch* branch, const char* fieldName, int position)
+static Term* find_output_term_for_state_field(Block* block, const char* fieldName, int position)
 {
-    Term* result = find_from_unique_name(branch, fieldName);
+    Term* result = find_from_unique_name(block, fieldName);
 
     // For declared state, the result is the last term with the given name
     if (result->function == FUNCS.declared_state) {
-        return find_local_name(branch, result->name.c_str(), position);
+        return find_local_name(block, result->name.c_str(), position);
     }
 
     ca_assert(result != NULL);
@@ -191,41 +191,41 @@ static Term* find_output_term_for_state_field(Branch* branch, const char* fieldN
 }
 
 // Write a list of terms to 'output' corresponding to the list of state outputs at this
-// position in the branch. Useful for populating a list of inputs for pack_state.
-static void get_list_of_state_outputs(Branch* branch, int position, TermList* output)
+// position in the block. Useful for populating a list of inputs for pack_state.
+static void get_list_of_state_outputs(Block* block, int position, TermList* output)
 {
     output->clear();
 
-    if (branch->stateType == NULL)
+    if (block->stateType == NULL)
         return;
 
-    for (int i=0; i < compound_type_get_field_count(branch->stateType); i++) {
+    for (int i=0; i < compound_type_get_field_count(block->stateType); i++) {
 
-        const char* fieldName = compound_type_get_field_name(branch->stateType, i);
-        Term* result = find_output_term_for_state_field(branch, fieldName, position);
+        const char* fieldName = compound_type_get_field_name(block->stateType, i);
+        Term* result = find_output_term_for_state_field(block, fieldName, position);
         output->append(result);
     }
 }
 
-void branch_update_existing_pack_state_calls(Branch* branch)
+void block_update_existing_pack_state_calls(Block* block)
 {
-    if (branch->stateType == NULL) {
+    if (block->stateType == NULL) {
         // No state type, make sure there's no pack_state call.
         // TODO: Handle this case properly (should search and destroy an existing pack_state call)
         return;
     }
 
-    int stateOutputIndex = branch->length() - 1 - find_state_output(branch)->index;
+    int stateOutputIndex = block->length() - 1 - find_state_output(block)->index;
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
 
         if (term->function == FUNCS.pack_state) {
             // Update the inputs for this pack_state call
             TermList inputs;
-            get_list_of_state_outputs(branch, i, &inputs);
+            get_list_of_state_outputs(block, i, &inputs);
 
             set_inputs(term, inputs);
         }
@@ -236,9 +236,9 @@ void branch_update_existing_pack_state_calls(Branch* branch)
 
             if (existing == NULL || existing->function != FUNCS.pack_state) {
                 TermList inputs;
-                get_list_of_state_outputs(branch, i, &inputs);
+                get_list_of_state_outputs(block, i, &inputs);
                 if (inputs.length() != 0) {
-                    Term* pack_state = apply(branch, FUNCS.pack_state, inputs);
+                    Term* pack_state = apply(block, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
                     set_input(term, stateOutputIndex + 1, pack_state);
 
@@ -250,54 +250,54 @@ void branch_update_existing_pack_state_calls(Branch* branch)
     }
 }
 
-Term* find_active_state_container(Branch* branch)
+Term* find_active_state_container(Block* block)
 {
     // Check if there is already a stateful input
 
     // Special case for if-block: Look for a unpack_state_from_list call
-    if (is_case_branch(branch)) {
-        Term* existing = find_term_with_function(branch, FUNCS.unpack_state_from_list);
+    if (is_case_block(block)) {
+        Term* existing = find_term_with_function(block, FUNCS.unpack_state_from_list);
         if (existing != NULL)
             return existing;
     }
 
     // Special case for for-block: Look for a unpack_state_from_list call
 
-    Term* existing = find_state_input(branch);
+    Term* existing = find_state_input(block);
     if (existing != NULL)
         return existing;
 
     return NULL;
 }
 
-Term* find_or_create_state_container(Branch* branch)
+Term* find_or_create_state_container(Block* block)
 {
-    Term* existing = find_active_state_container(branch);
+    Term* existing = find_active_state_container(block);
     if (existing != NULL)
         return existing;
 
     // None yet, insert one
-    Term* input = append_state_input(branch);
+    Term* input = append_state_input(block);
 
     // Add a final pack_state call too
-    Term* packState = append_final_pack_state(branch);
+    Term* packState = append_final_pack_state(block);
 
     // And the state output
-    append_state_output(branch);
+    append_state_output(block);
 
     return input;
 }
 
-Term* branch_add_pack_state(Branch* branch)
+Term* block_add_pack_state(Block* block)
 {
     TermList inputs;
-    get_list_of_state_outputs(branch, branch->length(), &inputs);
+    get_list_of_state_outputs(block, block->length(), &inputs);
 
     // Don't create anything if there are no state outputs
     if (inputs.length() == 0)
         return NULL;
 
-    return apply(branch, FUNCS.pack_state, inputs);
+    return apply(block, FUNCS.pack_state, inputs);
 }
 
 // Unpack a state value. Input 1 is the "identifying term" which is used as a key.
@@ -318,18 +318,18 @@ void unpack_state(caStack* stack)
     }
 }
 
-// Pack a state value. Each input will correspond with a slot in the branch's state type.
+// Pack a state value. Each input will correspond with a slot in the block's state type.
 void pack_state(caStack* stack)
 {
     Term* caller = (Term*) circa_caller_term(stack);
-    Branch* branch = caller->owningBranch;
+    Block* block = caller->owningBlock;
 
-    if (branch->stateType == NULL)
+    if (block->stateType == NULL)
         return;
 
     caValue* args = circa_input(stack, 0);
     caValue* output = circa_output(stack, 0);
-    make(branch->stateType, output);
+    make(block->stateType, output);
 
     for (int i=0; i < circa_count(args); i++) {
         caValue* input = circa_index(args, i);

@@ -15,7 +15,7 @@ namespace increment_function {
         set_int(circa_output(stack, 0), circa_int_input(stack, 0) - 1);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, increment, "increment(int i) -> int");
         import_function(kernel, decrement, "decrement(int i) -> int");

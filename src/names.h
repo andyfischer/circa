@@ -6,14 +6,14 @@ namespace circa {
 
 struct NameSearch
 {
-    Branch* branch;
+    Block* block;
 
     // Search name.
     Name name;
 
-    // Search position; the name search will look for bindings at this branch index and
+    // Search position; the name search will look for bindings at this block index and
     // above.
-    // If this is -1, it means the search position should be the end of the branch.
+    // If this is -1, it means the search position should be the end of the block.
     int position;
 
     // Unique ordinal value. The name search will only match terms with this ordinal
@@ -25,30 +25,30 @@ struct NameSearch
     // values. This might also be LookupAny, to ignore the term's type.
     Name lookupType;
 
-    // Whether to search parent branches (if not found in target branch).
+    // Whether to search parent blockes (if not found in target block).
     bool searchParent;
 };
 
-// Finds a name in this branch or a visible parent branch.
-Term* find_name(Branch* branch,
+// Finds a name in this block or a visible parent block.
+Term* find_name(Block* block,
                 Name name,
                 int position = -1,
                 Name lookupType = name_LookupAny);
 
-// Finds a name in this branch.
-Term* find_local_name(Branch* branch,
+// Finds a name in this block.
+Term* find_local_name(Block* block,
                       Name name,
                       int position = -1,
                       Name lookupType = name_LookupAny);
 
 // Convenient overloads for using a string as a name
-Term* find_name(Branch* branch,
+Term* find_name(Block* block,
                 const char* name,
                 int position = -1,
                 Name lookupType = name_LookupAny);
 
-// Finds a name in this branch.
-Term* find_local_name(Branch* branch,
+// Finds a name in this block.
+Term* find_local_name(Block* block,
                       const char* name,
                       int position = -1,
                       Name lookupType = name_LookupAny);
@@ -69,37 +69,37 @@ int name_find_ordinal_suffix(const char* str, int* endPos);
 // Get a named term from the global namespace.
 Term* find_global(const char* name);
 
-Branch* get_parent_branch(Branch* branch);
+Block* get_parent_block(Block* block);
 Term* get_parent_term(Term* term);
 Term* get_parent_term(Term* term, int levels);
-bool name_is_reachable_from(Term* term, Branch* branch);
-Branch* find_first_common_branch(Term* left, Term* right);
-bool term_is_child_of_branch(Term* term, Branch* branch);
+bool name_is_reachable_from(Term* term, Block* block);
+Block* find_first_common_block(Term* left, Term* right);
+bool term_is_child_of_block(Term* term, Block* block);
 
-// Get a name of 'term' which is valid in 'branch'. This might simply return term's name,
+// Get a name of 'term' which is valid in 'block'. This might simply return term's name,
 // or if term is inside a namespace or object, this would return a colon-separated name.
-std::string get_relative_name(Branch* branch, Term* term);
+std::string get_relative_name(Block* block, Term* term);
 std::string get_relative_name_at(Term* location, Term* term);
-void get_relative_name_as_list(Term* term, Branch* relativeTo, caValue* nameOutput);
-Term* find_from_relative_name_list(caValue* name, Branch* relativeTo);
+void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutput);
+Term* find_from_relative_name_list(caValue* name, Block* relativeTo);
 
 void update_unique_name(Term* term);
 const char* get_unique_name(Term* term);
 
-Term* find_from_unique_name(Branch* branch, const char* name);
+Term* find_from_unique_name(Block* block, const char* name);
 Term* find_from_global_name(World* world, const char* globalName);
 
 // Construct a global name for this term. May return :None if we couldn't create a global name.
 void get_global_name(Term* term, caValue* nameOut);
-void get_global_name(Branch* term, caValue* nameOut);
+void get_global_name(Block* term, caValue* nameOut);
 
 Term* find_term_from_global_name(const char* name);
 
 Type* find_type(World* world, const char* name);
-Type* find_type_local(Branch* branch, const char* name);
-Branch* find_function(World* world, const char* name);
-Branch* find_function_local(Branch* branch, const char* name);
-Branch* find_module(World* world, const char* name);
+Type* find_type_local(Block* block, const char* name);
+Block* find_function(World* world, const char* name);
+Block* find_function_local(Block* block, const char* name);
+Block* find_module(World* world, const char* name);
 
 bool name_is_valid(Name index);
 const char* name_to_string(Name name);

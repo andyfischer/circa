@@ -4,7 +4,7 @@
 
 #include "circa/file.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
@@ -49,9 +49,9 @@ void module_get_default_name_from_filename(caValue* filename, caValue* moduleNam
     }
 }
 
-Branch* find_loaded_module(const char* name)
+Block* find_loaded_module(const char* name)
 {
-    for (BranchIteratorFlat it(global_root_branch()); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(global_root_block()); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.module && term->name == name)
             return nested_contents(term);
@@ -59,9 +59,9 @@ Branch* find_loaded_module(const char* name)
     return NULL;
 }
 
-Branch* fetch_module(World* world, const char* name)
+Block* fetch_module(World* world, const char* name)
 {
-    Branch* existing = find_module(world, name);
+    Block* existing = find_module(world, name);
     if (existing != NULL)
         return existing;
 
@@ -107,9 +107,9 @@ static bool find_module_file(World* world, const char* module_name, caValue* fil
     return false;
 }
 
-Branch* load_module_file(World* world, const char* moduleName, const char* filename)
+Block* load_module_file(World* world, const char* moduleName, const char* filename)
 {
-    Branch* existing = find_module(world, moduleName);
+    Block* existing = find_module(world, moduleName);
 
     if (existing == NULL) {
         Term* term = apply(world->root, FUNCS.module, TermList(),
@@ -117,26 +117,26 @@ Branch* load_module_file(World* world, const char* moduleName, const char* filen
         existing = nested_contents(term);
     }
 
-    Branch* newBranch = alloc_branch_gc();
-    branch_graft_replacement(existing, newBranch);
-    load_script(newBranch, filename);
+    Block* newBlock = alloc_block_gc();
+    block_graft_replacement(existing, newBlock);
+    load_script(newBlock, filename);
 
-    update_static_error_list(newBranch);
+    update_static_error_list(newBlock);
 
     if (existing != NULL) {
-        // New branch starts off with the old branch's version, plus 1.
-        newBranch->version = existing->version + 1;
+        // New block starts off with the old block's version, plus 1.
+        newBlock->version = existing->version + 1;
 
-        update_world_after_module_reload(world, existing, newBranch);
+        update_world_after_module_reload(world, existing, newBlock);
     }
 
-    return newBranch;
+    return newBlock;
 }
 
-Branch* load_module_file_watched(World* world, const char* moduleName, const char* filename)
+Block* load_module_file_watched(World* world, const char* moduleName, const char* filename)
 {
     // Load and parse the script file.
-    Branch* branch = load_module_file(world, moduleName, filename);
+    Block* block = load_module_file(world, moduleName, filename);
 
     // Create implicit file watch.
     FileWatch* watch = add_file_watch_module_load(world, filename, moduleName);
@@ -144,12 +144,12 @@ Branch* load_module_file_watched(World* world, const char* moduleName, const cha
     // Since we just loaded the script, update the file watch.
     file_watch_ignore_latest_change(watch);
 
-    return branch;
+    return block;
 }
 
-Branch* load_module_by_name(World* world, const char* moduleName)
+Block* load_module_by_name(World* world, const char* moduleName)
 {
-    Branch* existing = find_loaded_module(moduleName);
+    Block* existing = find_loaded_module(moduleName);
     if (existing != NULL)
         return existing;
     
@@ -162,58 +162,58 @@ Branch* load_module_by_name(World* world, const char* moduleName)
     return load_module_file_watched(world, moduleName, as_cstring(&filename));
 }
 
-void module_on_loaded_by_term(Branch* module, Term* loadCall)
+void module_on_loaded_by_term(Block* module, Term* loadCall)
 {
     Term* moduleTerm = module->owningTerm;
 
-    Term* callersModule = find_parent_term_in_branch(loadCall, moduleTerm->owningBranch);
+    Term* callersModule = find_parent_term_in_block(loadCall, moduleTerm->owningBlock);
 
     if (callersModule != NULL && (moduleTerm->index > callersModule->index))
         move_before(moduleTerm, callersModule);
 }
 
-Branch* find_module_from_filename(const char* filename)
+Block* find_module_from_filename(const char* filename)
 {
     // O(n) search for a module with this filename. Could stand to be more efficient.
-    for (int i=0; i < global_root_branch()->length(); i++) {
-        Term* term = global_root_branch()->get(i);
+    for (int i=0; i < global_root_block()->length(); i++) {
+        Term* term = global_root_block()->get(i);
         if (term->nestedContents == NULL)
             continue;
 
-        caValue* branchFilename = branch_get_source_filename(nested_contents(term));
-        if (branchFilename == NULL)
+        caValue* blockFilename = block_get_source_filename(nested_contents(term));
+        if (blockFilename == NULL)
             continue;
 
-        if (string_eq(branchFilename, filename))
+        if (string_eq(blockFilename, filename))
             return nested_contents(term);
     }
 
     return NULL;
 }
 
-// Returns the corresponding term inside newBranch, if found.
+// Returns the corresponding term inside newBlock, if found.
 // Returns 'term' if the translation does not apply (term is not found inside
-// oldBranch).
+// oldBlock).
 // Returns NULL if the translation does apply, but a corresponding term cannot be found.
-Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newBranch)
+Term* translate_term_across_blockes(Term* term, Block* oldBlock, Block* newBlock)
 {
-    if (!term_is_child_of_branch(term, oldBranch))
+    if (!term_is_child_of_block(term, oldBlock))
         return term;
 
     Value relativeName;
-    get_relative_name_as_list(term, oldBranch, &relativeName);
-    return find_from_relative_name_list(&relativeName, newBranch);
+    get_relative_name_as_list(term, oldBlock, &relativeName);
+    return find_from_relative_name_list(&relativeName, newBlock);
 }
 
-void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBranch)
+void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)
 {
-    ca_assert(target != oldBranch);
-    ca_assert(target != newBranch);
+    ca_assert(target != oldBlock);
+    ca_assert(target != newBlock);
 
     // Store a cache of lookups that we've made in this call.
     TermMap cache;
 
-    for (BranchIterator it(target); it.unfinished(); it.advance()) {
+    for (BlockIterator it(target); it.unfinished(); it.advance()) {
 
         Term* term = *it;
 
@@ -227,7 +227,7 @@ void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBr
             } else {
 
                 // Lookup and save result in cache
-                newRef = translate_term_across_branches(ref, oldBranch, newBranch);
+                newRef = translate_term_across_blockes(ref, oldBlock, newBlock);
                 cache[ref] = newRef;
             }
 
@@ -241,7 +241,7 @@ void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBr
 void require_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
-    Branch* module = load_module_by_name(global_world(), as_cstring(moduleName));
+    Block* module = load_module_by_name(global_world(), as_cstring(moduleName));
     if (module != NULL)
         module_on_loaded_by_term(module, term);
 }
@@ -250,18 +250,18 @@ void import_file_func_postCompile(Term* term)
 {
     caValue* moduleName = term_value(term->input(0));
     caValue* filename = term_value(term->input(1));
-    Branch* module = load_module_file_watched(global_world(), as_cstring(moduleName),
+    Block* module = load_module_file_watched(global_world(), as_cstring(moduleName),
             as_cstring(filename));
     module_on_loaded_by_term(module, term);
 }
 
 void native_patch_this_postCompile(Term* term)
 {
-    Branch* branch = term->owningBranch;
-    Value branchName;
-    get_global_name(branch->owningTerm, &branchName);
+    Block* block = term->owningBlock;
+    Value blockName;
+    get_global_name(block->owningTerm, &blockName);
 
-    if (!is_string(&branchName)) {
+    if (!is_string(&blockName)) {
         std::cout << "term doesn't have global name in native_patch_this_postCompile"
             << std::endl;
         return;
@@ -287,13 +287,13 @@ void native_patch_this_postCompile(Term* term)
 
     NativeModule* module = add_native_module(global_world(), as_cstring(&filename));
 
-    // Hook up the NativeModule to patch this branch when changed.
-    native_module_add_change_action_patch_branch(module, as_cstring(&branchName));
+    // Hook up the NativeModule to patch this block when changed.
+    native_module_add_change_action_patch_block(module, as_cstring(&blockName));
 
     file_watch_check_now(global_world(), watch);
 }
 
-void modules_install_functions(Branch* kernel)
+void modules_install_functions(Block* kernel)
 {
     FUNCS.require = install_function(kernel, "require", NULL);
     as_function(FUNCS.require)->postCompile = require_func_postCompile;
@@ -306,13 +306,13 @@ void modules_install_functions(Branch* kernel)
     Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
     as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
 
-    FUNCS.module = import_function(kernel, NULL, "module() -> Branch");
+    FUNCS.module = import_function(kernel, NULL, "module() -> Block");
 }
 
 CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
 {
-    circa::Branch* branch = nested_contents(find_global(moduleName));
-    evaluate_branch((circa::Stack*) stack, branch);
+    circa::Block* block = nested_contents(find_global(moduleName));
+    evaluate_block((circa::Stack*) stack, block);
 }
 
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
@@ -320,10 +320,10 @@ CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
     module_add_search_path(world, path);
 }
 
-CIRCA_EXPORT caBranch* circa_load_module_from_file(caWorld* world, const char* module_name,
+CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* module_name,
         const char* filename)
 {
-    return (caBranch*) load_module_file_watched(world, module_name, filename);
+    return (caBlock*) load_module_file_watched(world, module_name, filename);
 }
 
 } // namespace circa

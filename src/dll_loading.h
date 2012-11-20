@@ -2,6 +2,6 @@
 
 namespace circa {
 
-void dll_loading_check_for_patches_on_loaded_branch(Branch* branch);
+void dll_loading_check_for_patches_on_loaded_block(Block* block);
 
 } // namespace circa

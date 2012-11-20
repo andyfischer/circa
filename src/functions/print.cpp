@@ -21,7 +21,7 @@ namespace print_function {
         set_null(circa_output(_stack, 0));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, evaluate, "print(any :multiple) "
                 "'Prints a line of text output to the console'");

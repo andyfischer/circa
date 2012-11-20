@@ -10,9 +10,9 @@ def my_calling_func(String str)
     s = f(str)
     print(s)
 
-br = branch_ref(my_calling_func)
+br = block_ref(my_calling_func)
 
 -- Link my_calling_func, so that f will be found.
-br.link(branch_ref(ns))
+br.link(block_ref(ns))
 
 br.call("link")

@@ -13,11 +13,11 @@ void selector_prepend(caValue* selector, caValue* element);
 // Check if 'possibleAccessor' is an accessor expresion that we understand. If so, then create
 // a set_with_selector expression which rebinds the root name to use 'result' instead.
 // If 'possibleAccessor' isn't an accessor, then just create a named copy from 'result'.
-Term* rebind_possible_accessor(Branch* branch, Term* possibleAccessor, Term* result);
+Term* rebind_possible_accessor(Block* block, Term* possibleAccessor, Term* result);
 
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error);
 void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caValue* error);
 
-void selector_setup_funcs(Branch* kernel);
+void selector_setup_funcs(Block* kernel);
 
 } // namespace circa

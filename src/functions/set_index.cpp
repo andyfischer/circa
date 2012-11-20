@@ -22,7 +22,7 @@ namespace set_index_function {
         //return caller->input(0)->type;
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.set_index = import_function(kernel, evaluate,
                 "set_index(any, int, any) -> List");

@@ -19,7 +19,7 @@ def changed(any current) -> bool
     prev = current
     return result
 
-def dynamic_call(Branch branch, List inputs) -> List
+def dynamic_call(Block block, List inputs) -> List
     -- Dynamic function dispatch
 
 -- Modules
@@ -34,7 +34,7 @@ def send(String name, any msg)
 def call_actor(String name, any msg)
     -- Invoke an actor immediately
 def actor_run_message(Actor actor, any msg)
-    b = actor.branch
+    b = actor.block
     dynamic_call(b, msg)
 
 def test_oracle() -> any
@@ -66,8 +66,8 @@ namespace refactor
     def change_function(Term r, Callable func)
 
 namespace reflect
-    def this_branch() -> Branch
-    def kernel() -> Branch
+    def this_block() -> Block
+    def kernel() -> Block
 
 namespace sys
     def arg(int index) -> String
@@ -76,61 +76,61 @@ namespace sys
     def perf_stats_reset()
     def perf_stats_dump() -> List
 
--- Declare that this branch should be patched by a native module.
+-- Declare that this block should be patched by a native module.
 def native_patch(String filename)
 
--- Metaprogramming on Branch
-def branch_ref(any branch :ignore_error) -> Branch
-    -- Obtain a Branch ref from an expression.
-def Branch.call(self, any inputs :multiple) -> List
-    -- Invoke this Branch with the given inputs.
-def Branch.dump(self)
-    -- Dump this branch's raw contents to stdout.
-def Branch.file_signature(self) -> any
+-- Metaprogramming on Block
+def block_ref(any block :ignore_error) -> Block
+    -- Obtain a Block ref from an expression.
+def Block.call(self, any inputs :multiple) -> List
+    -- Invoke this Block with the given inputs.
+def Block.dump(self)
+    -- Dump this block's raw contents to stdout.
+def Block.file_signature(self) -> any
     -- Return a 'file signature', which contains the filename and last-modified time.
-def Branch.find_term(self, String name) -> Term
-    -- Find a term inside this Branch with the given name.
-def Branch.format_source(self) -> List
-    -- Return the branch's contents as formatted source.
-def Branch.format_function_heading(self) -> List
-    -- Return a formatted function header for this branch.
-def Branch.functions(self) -> List
-    -- Return a list of functions that occur inside this branch.
-def Branch.get_term(self, int index) -> Term
+def Block.find_term(self, String name) -> Term
+    -- Find a term inside this Block with the given name.
+def Block.format_source(self) -> List
+    -- Return the block's contents as formatted source.
+def Block.format_function_heading(self) -> List
+    -- Return a formatted function header for this block.
+def Block.functions(self) -> List
+    -- Return a list of functions that occur inside this block.
+def Block.get_term(self, int index) -> Term
     -- Fetch a term by index.
-def Branch.get_static_errors(self) -> List
-    -- Return a raw list of static errors inside this branch.
-def Branch.get_static_errors_formatted(self) -> List
-    -- Return a formatted list of static errors inside this branch.
-def Branch.has_static_error(self) -> bool
-    -- Return whether this branch has any static errors.
-def Branch.input(self, int index) -> Term
+def Block.get_static_errors(self) -> List
+    -- Return a raw list of static errors inside this block.
+def Block.get_static_errors_formatted(self) -> List
+    -- Return a formatted list of static errors inside this block.
+def Block.has_static_error(self) -> bool
+    -- Return whether this block has any static errors.
+def Block.input(self, int index) -> Term
     -- Fetch an input placeholder term by index.
-def Branch.is_null(self) -> bool
-    -- Return whether this is a null Branch reference.
-def Branch.inputs(self) -> List
+def Block.is_null(self) -> bool
+    -- Return whether this is a null Block reference.
+def Block.inputs(self) -> List
     -- Return a list of input placeholder terms.
-def Branch.link(self, Branch lib)
-    -- Iterate through this branch, looking for terms that have missing references.
+def Block.link(self, Block lib)
+    -- Iterate through this block, looking for terms that have missing references.
     -- For each missing reference, if a term with the expected name is found in 'lib',
     -- then modify the term to use the named term in 'lib'.
-def Branch.list_configs(self) -> List
+def Block.list_configs(self) -> List
     -- Return a list of Terms that look like configs (named literal values).
-def Branch.output(self, int index) -> Term
+def Block.output(self, int index) -> Term
     -- Return an output placeholder term by index.
-def Branch.outputs(self) -> List
+def Block.outputs(self) -> List
     -- Return a list of all output placeholders.
-def Branch.owner(self) -> Term
-    -- Return the Term that owns this Branch (may be null).
-def Branch.statements(self) -> List
+def Block.owner(self) -> Term
+    -- Return the Term that owns this Block (may be null).
+def Block.statements(self) -> List
     -- Return a list of Terms that are statements.
-def Branch.terms(self) -> List
-    -- Return a list of this branch's terms.
-def Branch.version(self) -> int
+def Block.terms(self) -> List
+    -- Return a list of this block's terms.
+def Block.version(self) -> int
     -- Return the 'version', which is a monotonically increasing number that is
-    -- incremented whenever the branch is modified. Useful for change tracking.
-def Branch.walk_terms(self) -> List
-    -- Return a list of this branch's terms, and all nested terms.
+    -- incremented whenever the block is modified. Useful for change tracking.
+def Block.walk_terms(self) -> List
+    -- Return a list of this block's terms, and all nested terms.
 
 def Dict.count(self) -> int
     -- Return the number of elements
@@ -140,8 +140,8 @@ def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
 
 type Frame;
-def Frame.branch(self) -> Branch
-    -- Return the Branch associated with this Frame.
+def Frame.block(self) -> Block
+    -- Return the Block associated with this Frame.
 def Frame.register(self, int index) -> any
     -- Fetch the value in the given register index.
 def Frame.registers(self) -> List
@@ -153,7 +153,7 @@ def Frame.pc_term(self) -> Term
     -- Fetch the term associated with the current program counter.
 def Frame.create_expansion(self, Term) -> Frame
     -- Create an expansion frame using the given Term.
-    -- Errors if the Term is not part of this frame's branch.
+    -- Errors if the Term is not part of this frame's block.
 def Frame.inputs(self) -> List
     -- Returns a list of input register values
 def Frame.input(self, int nth) -> any
@@ -163,13 +163,13 @@ def Frame.outputs(self) -> List
 def Frame.output(self, int nth) -> any
     -- Returns the nth output register value
 
-def Function.branch(self) -> Branch
+def Function.block(self) -> Block
 
 type Interpreter;
 def make_interpreter() -> Interpreter
     -- Create a new interpreter
-def Interpreter.push_frame(self, Branch, List inputs)
-    -- Push a new frame, using the given branch and input list.
+def Interpreter.push_frame(self, Block, List inputs)
+    -- Push a new frame, using the given block and input list.
 def Interpreter.pop_frame(self)
     -- Pop the topmost frame.
 def Interpreter.set_state_input(self, any)
@@ -273,10 +273,10 @@ def Map.insertPairs(@self, List pairs)
     -- Set multiple key-value pairs.
 
 -- Overloaded functions
-def is_overloaded_func(Branch branch) -> bool
-    -- Return true if this branch is an overloaded function
+def is_overloaded_func(Block block) -> bool
+    -- Return true if this block is an overloaded function
 
-def overload_get_contents(Branch branch) -> List
+def overload_get_contents(Block block) -> List
     -- Get a list of all the functions that this overloaded function uses.
 
 def String.append(@self, String right)
@@ -319,9 +319,9 @@ def term_ref(any :ignore_error) -> Term
 def Term.assign(self, any)
 def Term.asint(self) -> int
 def Term.asfloat(self) -> number
-def Term.parent(self) -> Branch
-def Term.contents(self) -> Branch
-    -- Fetch the nested Branch contents of this Term. The format and the meaning
+def Term.parent(self) -> Block
+def Term.contents(self) -> Block
+    -- Fetch the nested Block contents of this Term. The format and the meaning
     -- of these contents is dictated by the term's function.
 def Term.is_null(self) -> bool
     -- Returns whether this is a null Term reference.
@@ -335,7 +335,7 @@ def Term.format_source_normal(self) -> List
     -- Return a list of formatted source phrases for this Term. This formatting is 'normal',
     -- meaning that it doesn't include the source for inputs (inputs are referred to by name
     -- or by id), and special syntax is not used.
-def Term.function(self) -> Branch
+def Term.function(self) -> Block
     -- Fetch this term's function.
 def Term.get_type(self) -> Type
     -- Fetch the declared type of this term.
@@ -357,24 +357,24 @@ def Term.properties(self) -> Map
 def Term.property(self, String) -> any
     -- Fetch a term property by name.
 def Term.is_value(self) -> bool
-    self.function == branch_ref(value)
+    self.function == block_ref(value)
 def Term.is_function(self) -> bool
     self.is_value and is_function(self.value)
 def Term.is_type(self) -> bool
     self.is_value and is_type(self.value)
 def Term.is_input_placeholder(self) -> bool
-    self.function == branch_ref(input_placeholder)
+    self.function == block_ref(input_placeholder)
 def Term.is_comment(self) -> bool
-    self.function == branch_ref(comment)
+    self.function == block_ref(comment)
 
 -- workaround, these functions currently need to be declared after Term:
-def Branch.name(self) -> String
+def Block.name(self) -> String
     self.owner.name
 
-def Branch.is_method(self) -> bool
+def Block.is_method(self) -> bool
     self.owner.property("syntax:methodDecl") == true
 
-def Branch.get_top_comments(self) -> List
+def Block.get_top_comments(self) -> List
     out = []
     for Term t in self.terms
         if t.is_input_placeholder

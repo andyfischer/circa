@@ -4,7 +4,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "dict.h"
 #include "term_list.h"
 #include "tagged_value.h"
@@ -50,7 +50,7 @@ struct Term
     // (Deprecated) Name binding as string.
     std::string name;
 
-    // A name which is unique across this branch.
+    // A name which is unique across this block.
     struct UniqueName
     {
         std::string name;
@@ -61,14 +61,14 @@ struct Term
 
     UniqueName uniqueName;
 
-    // The branch that owns this term. May be NULL.
-    Branch* owningBranch;
+    // The block that owns this term. May be NULL.
+    Block* owningBlock;
 
-    // The index that this term currently holds inside owningBranch.
+    // The index that this term currently holds inside owningBlock.
     int index;
 
     // Code which is nested inside this term. This object is created on-demand.
-    Branch* nestedContents;
+    Block* nestedContents;
 
     // Dynamic properties
     Dict properties;
@@ -98,7 +98,7 @@ struct Term
     void setDependency(int index, Term* term);
 
     // Shorthand for nested_contents()
-    Branch* contents();
+    Block* contents();
 
     // Shorthand for nested_contents()[index]
     Term* contents(int index);
@@ -123,7 +123,7 @@ struct Term
     void setStringProp(const char* name, std::string const& s);
 
     void dump();
-    Branch* parent();
+    Block* parent();
 };
 
 // Allocate a new Term object.

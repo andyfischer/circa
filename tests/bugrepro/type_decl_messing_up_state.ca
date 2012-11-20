@@ -1,5 +1,5 @@
 
--- The cause of this bug was that type_decl was unnecessarily calling branch->moveToEnd
+-- The cause of this bug was that type_decl was unnecessarily calling block->moveToEnd
 -- to reposition the result. This was messing up the generation of pack_state terms.
 
 def f()

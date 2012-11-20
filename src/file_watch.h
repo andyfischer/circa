@@ -9,7 +9,7 @@
  * are executed when the file is changed. Whenever the watched file is changed, all actions
  * are executed.
  *
- * For example, a watched Circa script file will have a reload-branch action, which loads the
+ * For example, a watched Circa script file will have a reload-block action, which loads the
  * script and then updates the codebase to use the newly loaded code.
  *
  * Another file type that is supported out of the box, is the native module. When a watched

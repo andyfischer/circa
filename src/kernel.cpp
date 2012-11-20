@@ -5,7 +5,7 @@
 #include "circa/circa.h"
 #include "circa/file.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "control_flow.h"
 #include "code_iterators.h"
@@ -56,7 +56,7 @@ extern "C" {
 }
 
 // setup_functions is defined in generated/setup_builtin_functions.cpp
-void setup_builtin_functions(Branch*);
+void setup_builtin_functions(Block*);
 
 bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
@@ -83,7 +83,7 @@ BuiltinFuncs FUNCS;
 // Builtin type objects:
 Type ANY_T;
 Type BOOL_T;
-Type BRANCH_T;
+Type BLOCK_T;
 Type DICT_T;
 Type ERROR_T;
 Type EVAL_CONTEXT_T;
@@ -177,7 +177,7 @@ void dynamic_method_call(caStack* stack)
     std::string functionName = term->stringProp("syntax:functionName", "");
 
     // Find and dispatch method
-    Term* method = find_method((Branch*) circa_caller_branch(stack),
+    Term* method = find_method((Block*) circa_caller_block(stack),
         (Type*) circa_type_of(object), functionName.c_str());
 
     // copy(object, circa_output(stack, 1));
@@ -235,14 +235,14 @@ void refactor__change_function(caStack* stack)
         (Term*) circa_caller_input_term(stack, 1));
 }
 
-void reflect__this_branch(caStack* stack)
+void reflect__this_block(caStack* stack)
 {
-    set_branch(circa_output(stack, 0), (Branch*) circa_caller_branch(stack));
+    set_block(circa_output(stack, 0), (Block*) circa_caller_block(stack));
 }
 
 void reflect__kernel(caStack* stack)
 {
-    set_branch(circa_output(stack, 0), global_root_branch());
+    set_block(circa_output(stack, 0), global_root_block());
 }
 
 void sys__module_search_paths(caStack* stack)
@@ -283,10 +283,10 @@ void Dict__get(caStack* stack)
     copy(dict_get(dict, key), circa_output(stack, 0));
 }
 
-void Function__branch(caStack* stack)
+void Function__block(caStack* stack)
 {
     Function* function = as_function(circa_input(stack, 0));
-    set_branch(circa_output(stack, 0), function_get_contents(function));
+    set_block(circa_output(stack, 0), function_get_contents(function));
 }
 
 void empty_list(caStack* stack)
@@ -698,7 +698,7 @@ World* global_world()
     return g_world;
 }
 
-Branch* global_root_branch()
+Block* global_root_block()
 {
     return global_world()->root;
 }
@@ -773,7 +773,7 @@ void bootstrap_kernel()
     // Initialize global type objects
     null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
-    branch_setup_type(&BRANCH_T);
+    block_setup_type(&BLOCK_T);
     dict_t::setup_type(&DICT_T);
     eval_context_t::setup_type(&EVAL_CONTEXT_T);
     number_t::setup_type(&FLOAT_T);
@@ -787,9 +787,9 @@ void bootstrap_kernel()
     eval_context_setup_type(&EVAL_CONTEXT_T);
     string_setup_type(&ERROR_T); // errors are just stored as strings for now
 
-    // Create root Branch.
-    g_world->root = new Branch();
-    Branch* kernel = g_world->root;
+    // Create root Block.
+    g_world->root = new Block();
+    Block* kernel = g_world->root;
 
     // Create value function
     Term* valueFunc = kernel->appendNew();
@@ -847,7 +847,7 @@ void bootstrap_kernel()
     VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
     TYPES.list = unbox_type(create_type_value(kernel, &LIST_T, "List"));
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
-    create_type_value(kernel, &BRANCH_T, "Branch");
+    create_type_value(kernel, &BLOCK_T, "Block");
     TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
     hashtable_setup_type(TYPES.map);
 
@@ -1018,19 +1018,19 @@ void bootstrap_kernel()
         {"test_oracle", test_oracle},
         {"refactor:rename", refactor__rename},
         {"refactor:change_function", refactor__change_function},
-        {"reflect:this_branch", reflect__this_branch},
+        {"reflect:this_block", reflect__this_block},
         {"reflect:kernel", reflect__kernel},
         {"sys:module_search_paths", sys__module_search_paths},
         {"sys:perf_stats_reset", sys__perf_stats_reset},
         {"sys:perf_stats_dump", sys__perf_stats_dump},
 
-        // {"Branch.call", dynamic_call},
+        // {"Block.call", dynamic_call},
 
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},
         {"Dict.set", Dict__set},
 
-        {"Function.branch", Function__branch},
+        {"Function.block", Function__block},
 
         {"empty_list", empty_list},
         {"List.append", List__append},
@@ -1081,7 +1081,7 @@ void bootstrap_kernel()
     // Fetch refereneces to certain builtin funcs.
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
-    FUNCS.branch_dynamic_call = kernel->get("Branch.call");
+    FUNCS.block_dynamic_call = kernel->get("Block.call");
     FUNCS.length = kernel->get("length");
     FUNCS.native_patch = kernel->get("native_patch");
     FUNCS.not_func = kernel->get("not");
@@ -1120,7 +1120,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
     caWorld* world = global_world();
 
-    Branch* kernel = global_root_branch();
+    Block* kernel = global_root_block();
 
     // Make sure there are no static errors in the kernel. This shouldn't happen.
     if (has_static_errors(kernel)) {
@@ -1186,7 +1186,7 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
 
 using namespace circa;
 
-caBranch* circa_kernel(caWorld* world)
+caBlock* circa_kernel(caWorld* world)
 {
     return world->root;
 }

@@ -10,7 +10,7 @@ namespace comment_function {
         append_phrase(source, term->stringProp("comment",""), term, tok_Comment);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.comment = import_function(kernel, NULL, "comment()");
         as_function(FUNCS.comment)->formatSource = formatSource;

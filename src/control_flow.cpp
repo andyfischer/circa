@@ -19,7 +19,7 @@ namespace circa {
 static Term* find_exit_point_for_term(Term* term);
 static ExitRank get_exit_level_rank(Name level);
 static Name max_exit_level(Name left, Name right);
-static Name get_highest_exit_level(Branch* branch);
+static Name get_highest_exit_level(Block* block);
 
 void evaluate_return(caStack* stack)
 {
@@ -51,7 +51,7 @@ void controlFlow_postCompile(Term* term)
         rename(term, name_from_string("#return"));
 
     // Create a #control value
-    Term* controlTerm = create_value(term->owningBranch, &NAME_T, "#control");
+    Term* controlTerm = create_value(term->owningBlock, &NAME_T, "#control");
     hide_from_source(controlTerm);
 
     Name controlValue = name_None;
@@ -67,8 +67,8 @@ void controlFlow_postCompile(Term* term)
     set_name(term_value(controlTerm), controlValue);
 
     // Add an exit_point after each control-flow term
-    Branch* branch = term->owningBranch;
-    Term* exitPoint = apply(branch, FUNCS.exit_point, TermList(controlTerm));
+    Block* block = term->owningBlock;
+    Term* exitPoint = apply(block, FUNCS.exit_point, TermList(controlTerm));
     hide_from_source(exitPoint);
 }
 
@@ -100,7 +100,7 @@ void return_formatSource(caValue* source, Term* term)
     }
 }
 
-void control_flow_setup_funcs(Branch* kernel)
+void control_flow_setup_funcs(Block* kernel)
 {
     ca_assert(kernel->get("return") == NULL);
 
@@ -135,10 +135,10 @@ static Term* find_exit_point_for_term(Term* term)
     //     Then, for any term X, find_intermediate_result_for_output(A, X) must equal
     //     find_intermediate_result_for_output(B, X)
 
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
 
-    for (int index = term->index + 1; index < branch->length(); index++) {
-        Term* neighbor = branch->get(index);
+    for (int index = term->index + 1; index < block->length(); index++) {
+        Term* neighbor = block->get(index);
         if (neighbor == NULL)
             continue;
 
@@ -156,12 +156,12 @@ static Term* find_exit_point_for_term(Term* term)
     return NULL;
 }
 
-static Name get_highest_exit_level(Branch* branch)
+static Name get_highest_exit_level(Block* block)
 {
     Name highest = name_None;
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
 
         if (term->function != FUNCS.exit_point)
             continue;
@@ -186,30 +186,30 @@ Name find_highest_escaping_exit_level(Term* term)
     else if (term->function == FUNCS.discard)
         return name_Discard;
 
-    // Check the nested branch for this term, and figure out the highest possible
+    // Check the nested block for this term, and figure out the highest possible
     // exit level.
-    Branch* branch = term->nestedContents;
+    Block* block = term->nestedContents;
 
-    if (branch == NULL)
+    if (block == NULL)
         return name_None;
 
     // Don't look at subroutine declaration contents.
-    if (is_major_branch(branch))
+    if (is_major_block(block))
         return name_None;
 
     Name highestLevel = name_None;
 
     if (term->function == FUNCS.if_block) {
-        // For an if-block, we need to iterate over each case branch.
-        for (int i=0; i < branch->length(); i++) {
-            Branch* caseBranch = branch->get(i)->nestedContents;
-            if (caseBranch == NULL)
+        // For an if-block, we need to iterate over each case block.
+        for (int i=0; i < block->length(); i++) {
+            Block* caseBlock = block->get(i)->nestedContents;
+            if (caseBlock == NULL)
                 continue;
 
-            highestLevel = max_exit_level(highestLevel, get_highest_exit_level(caseBranch));
+            highestLevel = max_exit_level(highestLevel, get_highest_exit_level(caseBlock));
         }
     } else {
-        highestLevel = get_highest_exit_level(branch);
+        highestLevel = get_highest_exit_level(block);
     }
 
     // Check if this exit level will actually escape.
@@ -225,37 +225,37 @@ Name find_highest_escaping_exit_level(Term* term)
 
 void force_term_to_output_to_parent(Term* term)
 {
-    Branch* branch = term->owningBranch;
+    Block* block = term->owningBlock;
     ca_assert(term->name != "");
 
     // If this term is inside an if-block, then add it as a block output.
-    if (is_case_branch(branch)) {
-        Branch* ifBlock = get_block_for_case_branch(branch);
+    if (is_case_block(block)) {
+        Block* ifBlock = get_block_for_case_block(block);
         Term* existing = if_block_get_output_by_name(ifBlock, term->name.c_str());
         if (existing == NULL) {
             if_block_append_output(ifBlock, term->name.c_str());
         } else {
             // Connect to existing output
-            set_input(find_output_placeholder_with_name(branch, term->name.c_str()),
+            set_input(find_output_placeholder_with_name(block, term->name.c_str()),
                 0, term);
         }
-    } else if (is_minor_branch(branch)) {
+    } else if (is_minor_block(block)) {
 
-        Term* existing = find_output_placeholder_with_name(branch, term->name.c_str());
+        Term* existing = find_output_placeholder_with_name(block, term->name.c_str());
         if (existing == NULL) {
-            Term* placeholder = append_output_placeholder(branch, term);
+            Term* placeholder = append_output_placeholder(block, term);
             rename(placeholder, term->nameSymbol);
         }
     }
 }
 
-void update_exit_points(Branch* branch)
+void update_exit_points(Block* block)
 {
-    // Don't insert exit_points in if_block's branch (insert in cases instead).
-    if (branch->owningTerm != NULL && branch->owningTerm->function == FUNCS.if_block)
+    // Don't insert exit_points in if_block's block (insert in cases instead).
+    if (block->owningTerm != NULL && block->owningTerm->function == FUNCS.if_block)
         return;
 
-    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
         Term* term = it.current();
 
         if (term->name == "#return" && !is_output_placeholder(term)) {
@@ -263,8 +263,8 @@ void update_exit_points(Branch* branch)
 
             // If this is a subroutine, make sure that the primary output is properly
             // connected.
-            if (is_major_branch(branch)) {
-                Term* output = get_output_placeholder(branch, 0);
+            if (is_major_block(block)) {
+                Term* output = get_output_placeholder(block, 0);
                 if (output != NULL) {
                     set_input(output, 0, term);
                 }
@@ -274,7 +274,7 @@ void update_exit_points(Branch* branch)
         Name escapingExitLevel = find_highest_escaping_exit_level(term);
         if (get_exit_level_rank(escapingExitLevel) > EXIT_RANK_NONE) {
 
-            // This term can cause this branch to exit.
+            // This term can cause this block to exit.
 
             // Make sure that there is an exit_point call that follows this term.
             Term* exitPoint = find_exit_point_for_term(term);
@@ -283,7 +283,7 @@ void update_exit_points(Branch* branch)
 
             if (exitPoint == NULL) {
                 // Create a new exit_point()
-                exitPoint = apply(branch, FUNCS.exit_point, TermList(NULL));
+                exitPoint = apply(block, FUNCS.exit_point, TermList(NULL));
                 move_after(exitPoint, term);
 
                 // Make sure we find a #control term that is in term's extra outputs.
@@ -304,19 +304,19 @@ void update_exit_points(Branch* branch)
 
     // 2nd pass, now that we have finished creating derived terms, go back
     // and ensure that the inputs to each exit_point are corrent.
-    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
 
         Term* exitPoint = it.current();
 
         if (exitPoint->function != FUNCS.exit_point)
             continue;
 
-        // For each output in this branch, assign an input to the exit_point that
+        // For each output in this block, assign an input to the exit_point that
         // has the 'intermediate' result at this term's location. (such as, if the output
         // has a name, use the term at this location with the given name.
 
         for (int i=0;; i++) {
-            Term* output = get_output_placeholder(branch, i);
+            Term* output = get_output_placeholder(block, i);
             if (output == NULL)
                 break;
 

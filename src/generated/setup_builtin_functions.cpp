@@ -6,75 +6,75 @@
 
 #include "../common_headers.h"
 
-#include "../branch.h"
+#include "../block.h"
 
 namespace circa {
 
-namespace abs_function { void setup(Branch* kernel); }
-namespace add_function { void setup(Branch* kernel); }
-namespace any_true_function { void setup(Branch* kernel); }
-namespace branch_function { void setup(Branch* kernel); }
-namespace cast_function { void setup(Branch* kernel); }
-namespace comment_function { void setup(Branch* kernel); }
-namespace comparison_function { void setup(Branch* kernel); }
-namespace concat_function { void setup(Branch* kernel); }
-namespace cond_function { void setup(Branch* kernel); }
-namespace container_set_function { void setup(Branch* kernel); }
-namespace copy_function { void setup(Branch* kernel); }
-namespace cppbuild_function { void setup(Branch* kernel); }
-namespace declared_state_function { void setup(Branch* kernel); }
-namespace div_function { void setup(Branch* kernel); }
-namespace equals_function { void setup(Branch* kernel); }
-namespace error_function { void setup(Branch* kernel); }
-namespace extra_output_function { void setup(Branch* kernel); }
-namespace feedback_function { void setup(Branch* kernel); }
-namespace filter_function { void setup(Branch* kernel); }
-namespace for_function { void setup(Branch* kernel); }
-namespace get_field_function { void setup(Branch* kernel); }
-namespace get_index_function { void setup(Branch* kernel); }
-namespace if_block_function { void setup(Branch* kernel); }
-namespace implicit_state_function { void setup(Branch* kernel); }
-namespace include_function { void setup(Branch* kernel); }
-namespace increment_function { void setup(Branch* kernel); }
-namespace input_explicit_function { void setup(Branch* kernel); }
-namespace internal_debug_function { void setup(Branch* kernel); }
-namespace list_function { void setup(Branch* kernel); }
-namespace logical_function { void setup(Branch* kernel); }
-namespace lookup_branch_ref_function { void setup(Branch* kernel); }
-namespace make_function { void setup(Branch* kernel); }
-namespace math_function { void setup(Branch* kernel); }
-namespace meta_function { void setup(Branch* kernel); }
-namespace mult_function { void setup(Branch* kernel); }
-namespace namespace_function { void setup(Branch* kernel); }
-namespace neg_function { void setup(Branch* kernel); }
-namespace print_function { void setup(Branch* kernel); }
-namespace rand_function { void setup(Branch* kernel); }
-namespace range_function { void setup(Branch* kernel); }
-namespace rpath_function { void setup(Branch* kernel); }
-namespace set_field_function { void setup(Branch* kernel); }
-namespace set_index_function { void setup(Branch* kernel); }
-namespace set_methods_function { void setup(Branch* kernel); }
-namespace set_union_function { void setup(Branch* kernel); }
-namespace static_error_function { void setup(Branch* kernel); }
-namespace sub_function { void setup(Branch* kernel); }
-namespace swap_function { void setup(Branch* kernel); }
-namespace switch_function { void setup(Branch* kernel); }
-namespace term_to_source_function { void setup(Branch* kernel); }
-namespace to_string_function { void setup(Branch* kernel); }
-namespace trig_function { void setup(Branch* kernel); }
-namespace type_check_function { void setup(Branch* kernel); }
-namespace unique_id_function { void setup(Branch* kernel); }
-namespace unknown_function_function { void setup(Branch* kernel); }
-namespace unknown_identifier_function { void setup(Branch* kernel); }
-namespace unrecognized_expr_function { void setup(Branch* kernel); }
-namespace write_text_file_function { void setup(Branch* kernel); }
+namespace abs_function { void setup(Block* kernel); }
+namespace add_function { void setup(Block* kernel); }
+namespace any_true_function { void setup(Block* kernel); }
+namespace block_function { void setup(Block* kernel); }
+namespace cast_function { void setup(Block* kernel); }
+namespace comment_function { void setup(Block* kernel); }
+namespace comparison_function { void setup(Block* kernel); }
+namespace concat_function { void setup(Block* kernel); }
+namespace cond_function { void setup(Block* kernel); }
+namespace container_set_function { void setup(Block* kernel); }
+namespace copy_function { void setup(Block* kernel); }
+namespace cppbuild_function { void setup(Block* kernel); }
+namespace declared_state_function { void setup(Block* kernel); }
+namespace div_function { void setup(Block* kernel); }
+namespace equals_function { void setup(Block* kernel); }
+namespace error_function { void setup(Block* kernel); }
+namespace extra_output_function { void setup(Block* kernel); }
+namespace feedback_function { void setup(Block* kernel); }
+namespace filter_function { void setup(Block* kernel); }
+namespace for_function { void setup(Block* kernel); }
+namespace get_field_function { void setup(Block* kernel); }
+namespace get_index_function { void setup(Block* kernel); }
+namespace if_block_function { void setup(Block* kernel); }
+namespace implicit_state_function { void setup(Block* kernel); }
+namespace include_function { void setup(Block* kernel); }
+namespace increment_function { void setup(Block* kernel); }
+namespace input_explicit_function { void setup(Block* kernel); }
+namespace internal_debug_function { void setup(Block* kernel); }
+namespace list_function { void setup(Block* kernel); }
+namespace logical_function { void setup(Block* kernel); }
+namespace lookup_block_ref_function { void setup(Block* kernel); }
+namespace make_function { void setup(Block* kernel); }
+namespace math_function { void setup(Block* kernel); }
+namespace meta_function { void setup(Block* kernel); }
+namespace mult_function { void setup(Block* kernel); }
+namespace namespace_function { void setup(Block* kernel); }
+namespace neg_function { void setup(Block* kernel); }
+namespace print_function { void setup(Block* kernel); }
+namespace rand_function { void setup(Block* kernel); }
+namespace range_function { void setup(Block* kernel); }
+namespace rpath_function { void setup(Block* kernel); }
+namespace set_field_function { void setup(Block* kernel); }
+namespace set_index_function { void setup(Block* kernel); }
+namespace set_methods_function { void setup(Block* kernel); }
+namespace set_union_function { void setup(Block* kernel); }
+namespace static_error_function { void setup(Block* kernel); }
+namespace sub_function { void setup(Block* kernel); }
+namespace swap_function { void setup(Block* kernel); }
+namespace switch_function { void setup(Block* kernel); }
+namespace term_to_source_function { void setup(Block* kernel); }
+namespace to_string_function { void setup(Block* kernel); }
+namespace trig_function { void setup(Block* kernel); }
+namespace type_check_function { void setup(Block* kernel); }
+namespace unique_id_function { void setup(Block* kernel); }
+namespace unknown_function_function { void setup(Block* kernel); }
+namespace unknown_identifier_function { void setup(Block* kernel); }
+namespace unrecognized_expr_function { void setup(Block* kernel); }
+namespace write_text_file_function { void setup(Block* kernel); }
 
-void setup_builtin_functions(Branch* kernel)
+void setup_builtin_functions(Block* kernel)
 {
     abs_function::setup(kernel);
     add_function::setup(kernel);
     any_true_function::setup(kernel);
-    branch_function::setup(kernel);
+    block_function::setup(kernel);
     cast_function::setup(kernel);
     comment_function::setup(kernel);
     comparison_function::setup(kernel);
@@ -101,7 +101,7 @@ void setup_builtin_functions(Branch* kernel)
     internal_debug_function::setup(kernel);
     list_function::setup(kernel);
     logical_function::setup(kernel);
-    lookup_branch_ref_function::setup(kernel);
+    lookup_block_ref_function::setup(kernel);
     make_function::setup(kernel);
     math_function::setup(kernel);
     meta_function::setup(kernel);

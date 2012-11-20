@@ -16,7 +16,7 @@ def fadein(Color c) -> Color
 
 type View {
     Point mouse
-    Branch mainScript
+    Block mainScript
 }
 
 state Point mouse

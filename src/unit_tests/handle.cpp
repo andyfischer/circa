@@ -42,13 +42,13 @@ void my_release_func(caStack* stack)
 
 void test_release()
 {
-    Branch branch;
-    branch.compile("type T = handle_type()");
-    branch.compile("def T.release(self)");
+    Block block;
+    block.compile("type T = handle_type()");
+    block.compile("def T.release(self)");
 
-    install_function(&branch, "T.release", my_release_func);
+    install_function(&block, "T.release", my_release_func);
 
-    Type* T = find_type(&branch, "T");
+    Type* T = find_type(&block, "T");
     test_assert(T != NULL);
     test_assert(find_method(NULL, T, "release") != NULL);
 

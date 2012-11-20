@@ -4,10 +4,10 @@
 Each interpreter is stored as a first-class object called a Stack. The program can have
 several Stacks at once.
 
-A Stack has a list of Frames, each one acts as an activation record for a certain Branch.
+A Stack has a list of Frames, each one acts as an activation record for a certain Block.
 
 The Frame contains:
-  A reference to a Branch
+  A reference to a Block
   A list of 'register' values
   A current PC and a next PC
 
@@ -20,7 +20,7 @@ The topmost Frame is the one currently being evaluated.
 
 There is some code that invokes the interpreter (calling the run_interpreter function),
 we refer to this as the "caller". When starting an interpreter session, the caller will
-manually push a branch onto the stack (creating a frame). Then, the caller may copy input
+manually push a block onto the stack (creating a frame). Then, the caller may copy input
 values to the frame's registers. The caller should copy an input for each
 input_placeholder() term.
 
@@ -31,10 +31,10 @@ ended.
 During evaluation, the interpreter will evaluate each term in sequence, and save results
 to the frame registers. The stack may grow and shrink with control flow operations.
 
-The interpreter session terminates either when the end of the topmost branch is reached,
+The interpreter session terminates either when the end of the topmost block is reached,
 or the interpreter encounters an error.
 
-If the interpreter finishes the topmost branch, it will exit the session and leave the
+If the interpreter finishes the topmost block, it will exit the session and leave the
 topmost frame as is. The caller should read the output values (if any) from this frame
 and then clear the stack.
 
@@ -48,8 +48,8 @@ may have more frames than expected.
 The interpreter loop goes as follows:
  
  1: Advance PC to nextPC, and set nextPC to (PC + 1)
- 2: Check if we have started a Branch that has an override func. If so:
-       Set nextPC to the last index in this branch
+ 2: Check if we have started a Block that has an override func. If so:
+       Set nextPC to the last index in this block
           Execute the C override
           If the C override raised an error:
              Terminate
@@ -62,17 +62,17 @@ The interpreter loop goes as follows:
           Pop the topmost frame
           Repeat loop
  4: Look at the Term at the current PC.
- 5: If the Term has no evaluation func, or the Branch is emptyEvaluation:
+ 5: If the Term has no evaluation func, or the Block is emptyEvaluation:
        Repeat loop
- 6: Choose the Branch to push. The selection of the Branch depends on the term's function
-       For an if-block or switch, the Branch will be selected based on the condition or
+ 6: Choose the Block to push. The selection of the Block depends on the term's function
+       For an if-block or switch, the Block will be selected based on the condition or
          input value
-       Otherwise, if the term has a nested branch, use that.
-       Otherwise, use the branch corresponding to the term's function
+       Otherwise, if the term has a nested block, use that.
+       Otherwise, use the block corresponding to the term's function
  7: Start a new frame
-       Push a frame using the chosen branch
+       Push a frame using the chosen block
        Copy input values to the new frame. Check that values match expected types.
-       If an input doesn't fit the Branch's expected type:
+       If an input doesn't fit the Block's expected type:
            Raise error and terminate
        Repeat loop
 
@@ -89,7 +89,7 @@ These functions are intended to be used by evaluation override functions.
 
     circa_num_inputs(stack)
 
-        Counts the number of input placeholders in the top frame's branch
+        Counts the number of input placeholders in the top frame's block
 
     circa_output(stack, index)
 
@@ -100,32 +100,32 @@ These functions are intended to be used by evaluation override functions.
 
     circa_caller_term(stack)
         
-        Returns the term that was used for this call. May return NULL if the branch
+        Returns the term that was used for this call. May return NULL if the block
         was pushed manually.
 
         Impl: Returns the current term (according to PC) in the second-to-top frame.
 
     circa_caller_input_term(stack, index)
 
-        Fetches the nth input Term that was used for this call. If the branch
+        Fetches the nth input Term that was used for this call. If the block
         was pushed manually, there might be no such term, in which case this
         will return NULL.
 
         Impl: Looking at the 'current' term in the second-to-top frame, this will return
                 the nth input term of this.
 
-    circa_caller_branch(stack)
+    circa_caller_block(stack)
 
-        Promise: Returns the branch where the current call was made.
-        Impl: Returns the branch of the second-to-top frame.
+        Promise: Returns the block where the current call was made.
+        Impl: Returns the block of the second-to-top frame.
 
 
 
 # EXAMPLE #
 
-We'll use two branches:
+We'll use two blocks:
 
-BranchA: {
+BlockA: {
     input0
     x = input0 + 1
     y = b(x)
@@ -133,13 +133,13 @@ BranchA: {
     output0 = z
 }
 
-BranchB: {
+BlockB: {
     b_input0
     b_result = b_input0 * 2
     b_output0 = b_result
 }
 
-Caller starts by manually pushing BranchA to the stack. Our stack looks like:
+Caller starts by manually pushing BlockA to the stack. Our stack looks like:
 
 Frame 0:
 > 'input0' unevaluated
@@ -193,4 +193,4 @@ At this point, here is what the accessors will return:
     circa_num_inputs(stack)    - returns 1
     circa_caller_term(stack)   - returns the 'y' term
     circa_caller_input_term(stack, 0) - returns the 'x' term
-    circa_caller_branch(stack) - returns BranchA
+    circa_caller_branch(stack) - returns BlockA

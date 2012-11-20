@@ -22,7 +22,7 @@ namespace copy_function {
                 term, tok_Identifier);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.copy = import_function(kernel, evaluate, "copy(any) -> any");
         as_function(FUNCS.copy)->specializeType = specializeType;

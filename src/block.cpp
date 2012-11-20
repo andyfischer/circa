@@ -4,7 +4,7 @@
 
 #include "circa/file.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "kernel.h"
 #include "code_iterators.h"
@@ -31,145 +31,145 @@
 
 namespace circa {
 
-void on_branch_created(Branch* branch)
+void on_block_created(Block* block)
 {
     // No-op, used for debugging.
 }
 
-void assert_valid_branch(Branch const* obj)
+void assert_valid_block(Block const* obj)
 {
     // this once did something
 }
 
-Branch::Branch()
+Block::Block()
   : owningTerm(NULL),
     version(0),
     inProgress(false),
     stateType(NULL),
     emptyEvaluation(false)
 {
-    id = global_world()->nextBranchID++;
-    gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
+    id = global_world()->nextBlockID++;
+    gc_register_new_object((CircaObject*) this, &BLOCK_T, true);
 
-    on_branch_created(this);
+    on_block_created(this);
 }
 
-Branch::~Branch()
+Block::~Block()
 {
-    clear_branch(this);
+    clear_block(this);
     gc_on_object_deleted((CircaObject*) this);
 }
 
-Branch* alloc_branch_gc()
+Block* alloc_block_gc()
 {
-    Branch* branch = new Branch();
-    gc_mark_object_referenced(&branch->header);
-    gc_set_object_is_root(&branch->header, false);
-    return branch;
+    Block* block = new Block();
+    gc_mark_object_referenced(&block->header);
+    gc_set_object_is_root(&block->header, false);
+    return block;
 }
 
-void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
+void block_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
-    Branch* branch = (Branch*) object;
+    Block* block = (Block*) object;
 
     // Follow each term
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         gc_mark(list, (CircaObject*) term->type, color);
         gc_mark(list, (CircaObject*) term->nestedContents, color);
     }
 }
 
-std::string branch_to_string(caValue* val)
+std::string block_to_string(caValue* val)
 {
-    Branch* branch = as_branch(val);
-    if (branch == NULL) {
-        return "Branch#null";
+    Block* block = as_block(val);
+    if (block == NULL) {
+        return "Block#null";
     } else {
         std::stringstream s;
-        s << "Branch#";
-        s << branch->id;
+        s << "Block#";
+        s << block->id;
         return s.str();
     }
 }
 
-void branch_setup_type(Type* type)
+void block_setup_type(Type* type)
 {
-    type->name = name_from_string("Branch");
-    type->toString = branch_to_string;
-    type->gcListReferences = branch_list_references;
+    type->name = name_from_string("Block");
+    type->toString = block_to_string;
+    type->gcListReferences = block_list_references;
 }
 
-int Branch::length()
+int Block::length()
 {
-    assert_valid_branch(this);
+    assert_valid_block(this);
     return _terms.length();
 }
 
-bool Branch::contains(std::string const& name)
+bool Block::contains(std::string const& name)
 {
     return get(name) != NULL;
 }
 
-Term* Branch::get(int index)
+Term* Block::get(int index)
 {
-    assert_valid_branch(this);
+    assert_valid_block(this);
     ca_test_assert(index < length());
     return _terms[index];
 }
-Term* Branch::getSafe(int index)
+Term* Block::getSafe(int index)
 {
     if (index >= length())
         return NULL;
     return _terms[index];
 }
 
-Term* Branch::getFromEnd(int index)
+Term* Block::getFromEnd(int index)
 {
     return get(length() - index - 1);
 }
 
-Term* Branch::last()
+Term* Block::last()
 {
     if (length() == 0) return NULL;
     else return _terms[length()-1];
 }
 
-int Branch::getIndex(Term* term)
+int Block::getIndex(Term* term)
 {
     ca_assert(term != NULL);
-    ca_assert(term->owningBranch == this);
+    ca_assert(term->owningBlock == this);
     assert_valid_term(term);
 
     return term->index;
 }
 
-void Branch::append(Term* term)
+void Block::append(Term* term)
 {
-    assert_valid_branch(this);
+    assert_valid_block(this);
     _terms.append(term);
     if (term != NULL) {
         assert_valid_term(term);
-        ca_assert(term->owningBranch == NULL);
-        term->owningBranch = this;
+        ca_assert(term->owningBlock == NULL);
+        term->owningBlock = this;
         term->index = _terms.length()-1;
     }
 }
 
-Term* Branch::appendNew()
+Term* Block::appendNew()
 {
-    assert_valid_branch(this);
+    assert_valid_block(this);
     Term* term = alloc_term();
     ca_assert(term != NULL);
     _terms.append(term);
-    term->owningBranch = this;
+    term->owningBlock = this;
     term->index = _terms.length()-1;
     return term;
 }
 
-void Branch::set(int index, Term* term)
+void Block::set(int index, Term* term)
 {
-    assert_valid_branch(this);
+    assert_valid_block(this);
     ca_assert(index <= length());
 
     // No-op if this is the same term.
@@ -180,25 +180,25 @@ void Branch::set(int index, Term* term)
     _terms.setAt(index, term);
     if (term != NULL) {
         assert_valid_term(term);
-        ca_assert(term->owningBranch == NULL || term->owningBranch == this);
-        term->owningBranch = this;
+        ca_assert(term->owningBlock == NULL || term->owningBlock == this);
+        term->owningBlock = this;
         term->index = index;
     }
 }
 
-void Branch::setNull(int index)
+void Block::setNull(int index)
 {
-    assert_valid_branch(this);
+    assert_valid_block(this);
     ca_assert(index <= length());
     Term* term = _terms[index];
     if (term != NULL)
         erase_term(term);
 }
 
-void Branch::insert(int index, Term* term)
+void Block::insert(int index, Term* term)
 {
     assert_valid_term(term);
-    assert_valid_branch(this);
+    assert_valid_block(this);
     ca_assert(index >= 0);
     ca_assert(index <= _terms.length());
 
@@ -210,15 +210,15 @@ void Branch::insert(int index, Term* term)
     _terms.setAt(index, term);
 
     if (term != NULL) {
-        ca_assert(term->owningBranch == NULL);
-        term->owningBranch = this;
+        ca_assert(term->owningBlock == NULL);
+        term->owningBlock = this;
         term->index = index;
     }
 }
 
-void Branch::move(Term* term, int index)
+void Block::move(Term* term, int index)
 {
-    ca_assert(term->owningBranch == this);
+    ca_assert(term->owningBlock == this);
 
     if (term->index == index)
         return;
@@ -234,11 +234,11 @@ void Branch::move(Term* term, int index)
     term->index = index;
 }
 
-void Branch::moveToEnd(Term* term)
+void Block::moveToEnd(Term* term)
 {
     assert_valid_term(term);
     ca_assert(term != NULL);
-    ca_assert(term->owningBranch == this);
+    ca_assert(term->owningBlock == this);
     ca_assert(term->index >= 0);
     int index = getIndex(term);
     _terms.append(term);
@@ -246,12 +246,12 @@ void Branch::moveToEnd(Term* term)
     term->index = _terms.length()-1;
 }
 
-void Branch::remove(int index)
+void Block::remove(int index)
 {
     remove_term(get(index));
 }
 
-void Branch::remove(std::string const& name)
+void Block::remove(std::string const& name)
 {
     if (!names.contains(name))
         return;
@@ -260,7 +260,7 @@ void Branch::remove(std::string const& name)
     remove_term(term);
 }
 
-void Branch::removeNulls()
+void Block::removeNulls()
 {
     int numDeleted = 0;
     for (int i=0; i < _terms.length(); i++) {
@@ -276,13 +276,13 @@ void Branch::removeNulls()
         _terms.resize(_terms.length() - numDeleted);
 }
 
-void Branch::removeNameBinding(Term* term)
+void Block::removeNameBinding(Term* term)
 {
     if (!has_empty_name(term) && names[term->name] == term)
         names.remove(term->name);
 }
 
-void Branch::shorten(int newLength)
+void Block::shorten(int newLength)
 {
     for (int i=newLength; i < length(); i++)
         set(i, NULL);
@@ -291,12 +291,12 @@ void Branch::shorten(int newLength)
 }
 
 void
-Branch::clear()
+Block::clear()
 {
-    clear_branch(this);
+    clear_block(this);
 }
 
-Term* Branch::findFirstBinding(Name name)
+Term* Block::findFirstBinding(Name name)
 {
     for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
@@ -308,7 +308,7 @@ Term* Branch::findFirstBinding(Name name)
     return NULL;
 }
 
-void Branch::bindName(Term* term, Name name)
+void Block::bindName(Term* term, Name name)
 {
     assert_valid_term(term);
     if (!has_empty_name(term) && term->nameSymbol != name) {
@@ -321,7 +321,7 @@ void Branch::bindName(Term* term, Name name)
     update_unique_name(term);
 }
 
-void Branch::remapPointers(TermMap const& map)
+void Block::remapPointers(TermMap const& map)
 {
     names.remapPointers(map);
 
@@ -332,7 +332,7 @@ void Branch::remapPointers(TermMap const& map)
     }
 }
 
-std::string Branch::toString()
+std::string Block::toString()
 {
     std::stringstream out;
     out << "[";
@@ -348,13 +348,13 @@ std::string Branch::toString()
 }
 
 Term*
-Branch::compile(std::string const& code)
+Block::compile(std::string const& code)
 {
     return parser::compile(this, parser::statement_list, code);
 }
 
 Term*
-Branch::eval(std::string const& code)
+Block::eval(std::string const& code)
 {
     return parser::evaluate(this, parser::statement_list, code);
 }
@@ -364,9 +364,9 @@ bool is_namespace(Term* term)
     return term->function == FUNCS.namespace_func;
 }
 
-bool is_namespace(Branch* branch)
+bool is_namespace(Block* block)
 {
-    return branch->owningTerm != NULL && is_namespace(branch->owningTerm);
+    return block->owningTerm != NULL && is_namespace(block->owningTerm);
 }
 
 bool has_nested_contents(Term* term)
@@ -374,13 +374,13 @@ bool has_nested_contents(Term* term)
     return term->nestedContents != NULL;
 }
 
-Branch* nested_contents(Term* term)
+Block* nested_contents(Term* term)
 {
     if (term == NULL)
         return NULL;
 
     if (term->nestedContents == NULL) {
-        term->nestedContents = new Branch();
+        term->nestedContents = new Block();
         term->nestedContents->owningTerm = term;
     }
     return term->nestedContents;
@@ -391,28 +391,28 @@ void remove_nested_contents(Term* term)
     if (term->nestedContents == NULL)
         return;
 
-    Branch* branch = term->nestedContents;
-    clear_branch(term->nestedContents);
+    Block* block = term->nestedContents;
+    clear_block(term->nestedContents);
 
-    // Delete this Branch immediately, if it's not referenced.
-    if (!branch->header.referenced)
+    // Delete this Block immediately, if it's not referenced.
+    if (!block->header.referenced)
         delete term->nestedContents;
 
     term->nestedContents = NULL;
 }
 
-void branch_graft_replacement(Branch* target, Branch* replacement)
+void block_graft_replacement(Block* target, Block* replacement)
 {
     target->owningTerm->nestedContents = replacement;
     replacement->owningTerm = target->owningTerm;
 
-    // Remove owningTerm link from existing branch.
+    // Remove owningTerm link from existing block.
     target->owningTerm = NULL;
 }
 
-caValue* branch_get_source_filename(Branch* branch)
+caValue* block_get_source_filename(Block* block)
 {
-    List* fileOrigin = branch_get_file_origin(branch);
+    List* fileOrigin = block_get_file_origin(block);
 
     if (fileOrigin == NULL)
         return NULL;
@@ -420,11 +420,11 @@ caValue* branch_get_source_filename(Branch* branch)
     return fileOrigin->get(1);
 }
 
-Branch* get_outer_scope(Branch* branch)
+Block* get_outer_scope(Block* block)
 {
-    if (branch->owningTerm == NULL)
+    if (block->owningTerm == NULL)
         return NULL;
-    return branch->owningTerm->owningBranch;
+    return block->owningTerm->owningBlock;
 }
 
 void pre_erase_term(Term* term)
@@ -455,33 +455,33 @@ void erase_term(Term* term)
     remove_from_any_user_lists(term);
     clear_from_dependencies_of_users(term);
 
-    if (term->owningBranch != NULL) {
+    if (term->owningBlock != NULL) {
         // remove name binding if necessary
-        term->owningBranch->removeNameBinding(term);
+        term->owningBlock->removeNameBinding(term);
 
         // index may be invalid if something bad has happened
-        ca_assert(term->index < term->owningBranch->length());
-        term->owningBranch->_terms.setAt(term->index, NULL);
+        ca_assert(term->index < term->owningBlock->length());
+        term->owningBlock->_terms.setAt(term->index, NULL);
 
-        term->owningBranch = NULL;
+        term->owningBlock = NULL;
         term->index = -1;
     }
 
     dealloc_term(term);
 }
 
-void clear_branch(Branch* branch)
+void clear_block(Block* block)
 {
-    assert_valid_branch(branch);
-    set_null(&branch->staticErrors);
-    branch->stateType = NULL;
+    assert_valid_block(block);
+    set_null(&block->staticErrors);
+    block->stateType = NULL;
 
-    branch->names.clear();
-    branch->inProgress = false;
+    block->names.clear();
+    block->inProgress = false;
 
-    // Iterate through the branch and tear down any term references, so that we
+    // Iterate through the block and tear down any term references, so that we
     // don't have to worry about stale pointers later.
-    for (BranchIterator it(branch); it.unfinished(); ++it) {
+    for (BlockIterator it(block); it.unfinished(); ++it) {
         if (*it == NULL)
             continue;
 
@@ -491,17 +491,17 @@ void clear_branch(Branch* branch)
         change_function(*it, NULL);
     }
 
-    for (int i= branch->_terms.length() - 1; i >= 0; i--) {
-        Term* term = branch->get(i);
+    for (int i= block->_terms.length() - 1; i >= 0; i--) {
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
 
         if (term->nestedContents)
-            clear_branch(term->nestedContents);
+            clear_block(term->nestedContents);
     }
 
-    for (int i = branch->_terms.length() - 1; i >= 0; i--) {
-        Term* term = branch->get(i);
+    for (int i = block->_terms.length() - 1; i >= 0; i--) {
+        Term* term = block->get(i);
         if (term == NULL)
             continue;
 
@@ -519,12 +519,12 @@ void clear_branch(Branch* branch)
         erase_term(term);
     }
 
-    branch->_terms.clear();
+    block->_terms.clear();
 }
 
-Term* find_term_by_id(Branch* branch, int id)
+Term* find_term_by_id(Block* block, int id)
 {
-    for (BranchIterator it(branch); !it.finished(); it.advance()) {
+    for (BlockIterator it(block); !it.finished(); it.advance()) {
         if (*it == NULL)
             continue;
 
@@ -535,7 +535,7 @@ Term* find_term_by_id(Branch* branch, int id)
     return NULL;
 }
 
-void duplicate_branch_nested(TermMap& newTermMap, Branch* source, Branch* dest)
+void duplicate_block_nested(TermMap& newTermMap, Block* source, Block* dest)
 {
     // Duplicate every term
     for (int index=0; index < source->length(); index++) {
@@ -546,20 +546,20 @@ void duplicate_branch_nested(TermMap& newTermMap, Branch* source, Branch* dest)
         newTermMap[source_term] = dest_term;
 
         // duplicate nested contents
-        clear_branch(nested_contents(dest_term));
-        duplicate_branch_nested(newTermMap,
+        clear_block(nested_contents(dest_term));
+        duplicate_block_nested(newTermMap,
                 nested_contents(source_term), nested_contents(dest_term));
     }
 }
 
-void duplicate_branch(Branch* source, Branch* dest)
+void duplicate_block(Block* source, Block* dest)
 {
-    assert_valid_branch(source);
-    assert_valid_branch(dest);
+    assert_valid_block(source);
+    assert_valid_block(dest);
 
     TermMap newTermMap;
 
-    duplicate_branch_nested(newTermMap, source, dest);
+    duplicate_block_nested(newTermMap, source, dest);
 
     // Remap pointers
     for (int i=0; i < dest->length(); i++)
@@ -570,10 +570,10 @@ void duplicate_branch(Branch* source, Branch* dest)
     dest->names.remapPointers(newTermMap);
 }
 
-Name load_script(Branch* branch, const char* filename)
+Name load_script(Block* block, const char* filename)
 {
     // Store the file origin
-    caValue* origin = &branch->origin;
+    caValue* origin = &block->origin;
     set_list(origin, 3);
     set_name(list_get(origin, 0), name_File);
     set_string(list_get(origin, 1), filename);
@@ -584,42 +584,42 @@ Name load_script(Branch* branch, const char* filename)
     circa_read_file(filename, &contents);
 
     if (is_null(&contents)) {
-        Term* msg = create_string(branch, "file not found");
-        apply(branch, FUNCS.static_error, TermList(msg));
+        Term* msg = create_string(block, "file not found");
+        apply(block, FUNCS.static_error, TermList(msg));
         return name_Failure;
     }
 
-    parser::compile(branch, parser::statement_list, as_cstring(&contents));
+    parser::compile(block, parser::statement_list, as_cstring(&contents));
 
     return name_Success;
 }
 
-Branch* include_script(Branch* branch, const char* filename)
+Block* include_script(Block* block, const char* filename)
 {
-    ca_assert(branch != NULL);
-    Term* filenameTerm = create_string(branch, filename);
-    Term* includeFunc = apply(branch, FUNCS.include_func, TermList(filenameTerm));
+    ca_assert(block != NULL);
+    Term* filenameTerm = create_string(block, filename);
+    Term* includeFunc = apply(block, FUNCS.include_func, TermList(filenameTerm));
     return nested_contents(includeFunc);
 }
 
-Branch* load_script_term(Branch* branch, const char* filename)
+Block* load_script_term(Block* block, const char* filename)
 {
-    ca_assert(branch != NULL);
-    Term* filenameTerm = create_string(branch, filename);
-    Term* includeFunc = apply(branch, FUNCS.load_script, TermList(filenameTerm));
+    ca_assert(block != NULL);
+    Term* filenameTerm = create_string(block, filename);
+    Term* includeFunc = apply(block, FUNCS.load_script, TermList(filenameTerm));
     return nested_contents(includeFunc);
 }
 
-std::string get_source_file_location(Branch* branch)
+std::string get_source_file_location(Block* block)
 {
-    // Search upwards until we find a branch that has source-file defined.
-    while (branch != NULL && branch_get_source_filename(branch) == NULL)
-        branch = get_parent_branch(branch);
+    // Search upwards until we find a block that has source-file defined.
+    while (block != NULL && block_get_source_filename(block) == NULL)
+        block = get_parent_block(block);
 
-    if (branch == NULL)
+    if (block == NULL)
         return "";
 
-    caValue* sourceFilename = branch_get_source_filename(branch);
+    caValue* sourceFilename = block_get_source_filename(block);
 
     if (sourceFilename == NULL)
         return "";
@@ -630,9 +630,9 @@ std::string get_source_file_location(Branch* branch)
     return as_string(&directory);
 }
 
-bool branch_get_function_attr_bool(Branch* branch, Name attr)
+bool block_get_function_attr_bool(Block* block, Name attr)
 {
-    if (is_null(&branch->functionAttrs))
+    if (is_null(&block->functionAttrs))
         return false;
 
     // TODO
@@ -640,12 +640,12 @@ bool branch_get_function_attr_bool(Branch* branch, Name attr)
     return false;
 }
 
-List* branch_get_file_origin(Branch* branch)
+List* block_get_file_origin(Block* block)
 {
-    if (!is_list(&branch->origin))
+    if (!is_list(&block->origin))
         return NULL;
 
-    List* list = (List*) &branch->origin;
+    List* list = (List*) &block->origin;
 
     if (list->length() != 3)
         return NULL;
@@ -656,14 +656,14 @@ List* branch_get_file_origin(Branch* branch)
     return list;
 }
 
-bool check_and_update_file_origin(Branch* branch, const char* filename)
+bool check_and_update_file_origin(Block* block, const char* filename)
 {
     int version = circa_file_get_version(filename);
 
-    caValue* origin = branch_get_file_origin(branch);
+    caValue* origin = block_get_file_origin(block);
 
     if (origin == NULL) {
-        origin = &branch->origin;
+        origin = &block->origin;
         set_list(origin, 3);
         set_name(list_get(origin, 0), name_File);
         set_string(list_get(origin, 1), filename);
@@ -687,28 +687,28 @@ bool check_and_update_file_origin(Branch* branch, const char* filename)
     return false;
 }
 
-Branch* load_latest_branch(Branch* branch)
+Block* load_latest_block(Block* block)
 {
-    caValue* fileOrigin = branch_get_file_origin(branch);
+    caValue* fileOrigin = block_get_file_origin(block);
     if (fileOrigin == NULL)
-        return branch;
+        return block;
 
     std::string filename = as_string(list_get(fileOrigin, 1));
 
-    bool fileChanged = check_and_update_file_origin(branch, filename.c_str());
+    bool fileChanged = check_and_update_file_origin(block, filename.c_str());
 
     if (!fileChanged)
-        return branch;
+        return block;
 
-    Branch* newBranch = alloc_branch_gc();
-    load_script(newBranch, filename.c_str());
+    Block* newBlock = alloc_block_gc();
+    load_script(newBlock, filename.c_str());
 
-    update_static_error_list(newBranch);
+    update_static_error_list(newBlock);
 
-    // New branch starts off with the old branch's version, plus 1.
-    newBranch->version = branch->version + 1;
+    // New block starts off with the old block's version, plus 1.
+    newBlock->version = block->version + 1;
 
-    return newBranch;
+    return newBlock;
 }
 
 void append_internal_error(caValue* result, int index, std::string const& message)
@@ -722,12 +722,12 @@ void append_internal_error(caValue* result, int index, std::string const& messag
     set_string(list_get(error, 2), message);
 }
 
-void branch_check_invariants(caValue* result, Branch* branch)
+void block_check_invariants(caValue* result, Block* block)
 {
     set_list(result, 0);
 
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
 
         if (term == NULL) {
             append_internal_error(result, i, "NULL pointer");
@@ -741,21 +741,21 @@ void branch_check_invariants(caValue* result, Branch* branch)
             append_internal_error(result, i, msg.str());
         }
 
-        // Check that owningBranch is correct
-        if (term->owningBranch != branch)
-            append_internal_error(result, i, "Wrong owningBranch");
+        // Check that owningBlock is correct
+        if (term->owningBlock != block)
+            append_internal_error(result, i, "Wrong owningBlock");
     }
 } 
 
-bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
+bool block_check_invariants_print_result(Block* block, std::ostream& out)
 {
     circa::Value result;
-    branch_check_invariants(&result, branch);
+    block_check_invariants(&result, block);
 
     if (list_length(&result) == 0)
         return true;
 
-    out << list_length(&result) << " errors found in branch " << &branch
+    out << list_length(&result) << " errors found in block " << &block
         << std::endl;
 
     for (int i=0; i < list_length(&result); i++) {
@@ -766,14 +766,14 @@ bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
     }
 
     out << "contents:" << std::endl;
-    print_branch(branch, out);
+    print_block(block, out);
 
     return false;
 }
 
-void branch_link_missing_functions(Branch* branch, Branch* source)
+void block_link_missing_functions(Block* block, Block* source)
 {
-    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             std::string funcName = term->stringProp("syntax:functionName", "");

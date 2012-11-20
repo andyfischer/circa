@@ -2,7 +2,7 @@
 
 #include "unit_test_common.h"
 
-#include "branch.h"
+#include "block.h"
 #include "importing.h"
 #include "inspection.h"
 
@@ -10,24 +10,24 @@ namespace importing {
 
 void my_native_patch(caStack*) {}
 
-void bug_with_is_major_branch()
+void bug_with_is_major_block()
 {
-    Branch branch;
-    Term* f = branch.compile("def f() {}");
+    Block block;
+    Term* f = block.compile("def f() {}");
 
-    test_assert(is_major_branch(nested_contents(f)));
+    test_assert(is_major_block(nested_contents(f)));
     
     // There was a bug where, if the function was patched with a native handler, it
-    // would no longer be considered a major branch.
+    // would no longer be considered a major block.
 
     install_function(f, my_native_patch);
 
-    test_assert(is_major_branch(nested_contents(f)));
+    test_assert(is_major_block(nested_contents(f)));
 }
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(importing::bug_with_is_major_branch);
+    REGISTER_TEST_CASE(importing::bug_with_is_major_block);
 }
 
 } // namespace importing

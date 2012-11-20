@@ -7,7 +7,7 @@
 namespace circa {
 
 const char* for_loop_get_iterator_name(Term* forTerm);
-Term* for_loop_find_index(Branch* contents);
+Term* for_loop_find_index(Block* contents);
 
 // Initialize the contents of a for-loop for a new term. 'iteratorType' is the type to use
 // for the iterator. If it's NULL then we'll infer a type from the term's input.
@@ -15,11 +15,11 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
 void finish_for_loop(Term* forTerm);
 
 Term* find_enclosing_for_loop(Term* term);
-Branch* find_enclosing_for_loop_contents(Term* term);
+Block* find_enclosing_for_loop_contents(Term* term);
 
-bool is_for_loop(Branch* branch);
-Branch* for_loop_get_zero_branch(Branch* forContents);
-void for_loop_remake_zero_branch(Branch* forContents);
+bool is_for_loop(Block* block);
+Block* for_loop_get_zero_block(Block* forContents);
+void for_loop_remake_zero_block(Block* forContents);
 
 void start_for_loop(Stack* stack, bool enableLoopOutput);
 void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput);
@@ -28,6 +28,6 @@ void finish_while_loop(Term* whileTerm);
 void evaluate_unbounded_loop(caStack*);
 void evaluate_unbounded_loop_finish(caStack*);
 
-void loop_setup_functions(Branch* kernel);
+void loop_setup_functions(Block* kernel);
 
 } // namespace circa

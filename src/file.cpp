@@ -60,7 +60,7 @@ void get_directory_for_filename(caValue* filename, caValue* result)
     circa_set_string_size(result, as_cstring(filename), last_slash);
 }
 
-void get_path_relative_to_source(caBranch* relativeTo, caValue* relPath, caValue* result)
+void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue* result)
 {
     if (relativeTo == NULL) {
         copy(relPath, result);
@@ -73,7 +73,7 @@ void get_path_relative_to_source(caBranch* relativeTo, caValue* relPath, caValue
         return;
     }
 
-    std::string scriptLocation = get_source_file_location((Branch*) relativeTo);
+    std::string scriptLocation = get_source_file_location((Block*) relativeTo);
 
     if (scriptLocation == "" || scriptLocation == ".") {
         copy(relPath, result);

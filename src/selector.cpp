@@ -146,7 +146,7 @@ Term* find_accessor_head_term(Term* accessor)
     return chain[0];
 }
 
-Term* write_selector_for_accessor_chain(Branch* branch, TermList* chain)
+Term* write_selector_for_accessor_chain(Block* block, TermList* chain)
 {
     TermList selectorInputs;
 
@@ -161,20 +161,20 @@ Term* write_selector_for_accessor_chain(Branch* branch, TermList* chain)
             selectorInputs.append(term->input(1));
 
         } else if (is_accessor_function(term)) {
-            Term* element = create_string(branch, term->stringProp("syntax:functionName", ""));
+            Term* element = create_string(block, term->stringProp("syntax:functionName", ""));
             selectorInputs.append(element);
         }
     }
 
-    return apply(branch, FUNCS.selector, selectorInputs);
+    return apply(block, FUNCS.selector, selectorInputs);
 }
 
-Term* rebind_possible_accessor(Branch* branch, Term* accessor, Term* result)
+Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
 {
     // Check if this isn't a recognized accessor.
     if (!has_empty_name(accessor)) {
         // Just create a named copy of 'result'.
-        return apply(branch, FUNCS.copy, TermList(result), accessor->nameSymbol);
+        return apply(block, FUNCS.copy, TermList(result), accessor->nameSymbol);
     }
 
     TermList accessorChain;
@@ -183,9 +183,9 @@ Term* rebind_possible_accessor(Branch* branch, Term* accessor, Term* result)
     Term* head = accessorChain[0];
 
     // Create the selector
-    Term* selector = write_selector_for_accessor_chain(branch, &accessorChain);
+    Term* selector = write_selector_for_accessor_chain(block, &accessorChain);
 
-    Term* set = apply(branch, FUNCS.set_with_selector,
+    Term* set = apply(block, FUNCS.set_with_selector,
             TermList(head, selector, result), head->nameSymbol);
 
     change_declared_type(set, declared_type(head));
@@ -288,7 +288,7 @@ void set_with_selector__formatSource(caValue* source, Term* term)
     }
 }
 
-void selector_setup_funcs(Branch* kernel)
+void selector_setup_funcs(Block* kernel)
 {
     FUNCS.selector = 
         import_function(kernel, evaluate_selector, "selector(any elements :multiple) -> Selector");

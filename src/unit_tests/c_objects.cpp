@@ -56,8 +56,8 @@ void test_custom_object()
     g_currentlyAllocated = 0;
     g_totalAllocated = 0;
 
-    Branch branch;
-    branch.compile(
+    Block block;
+    block.compile(
         "type MyType; \n"
         "def create_object() -> MyType\n"
         "def check_object(MyType t)\n"
@@ -65,10 +65,10 @@ void test_custom_object()
         "check_object(s)\n"
             );
 
-    circa_install_function(&branch, "create_object", create_object);
-    circa_install_function(&branch, "check_object", check_object);
+    circa_install_function(&block, "create_object", create_object);
+    circa_install_function(&block, "check_object", check_object);
 
-    circa_setup_object_type(circa_find_type_local(&branch, "MyType"),
+    circa_setup_object_type(circa_find_type_local(&block, "MyType"),
             sizeof(CustomObject), CustomObjectRelease);
 
     // Shouldn't allocate any objects before running.
@@ -76,7 +76,7 @@ void test_custom_object()
     test_equals(g_totalAllocated, 0);
 
     Stack stack;
-    push_frame(&stack, &branch);
+    push_frame(&stack, &block);
     run_interpreter(&stack);
     test_assert(&stack);
     circa_clear_stack(&stack);
@@ -92,8 +92,8 @@ void test_type_not_prematurely_used()
     // Verify that a circa-defined type is not used until interpreter time. Modifying
     // a type's release() handler after there are already instances of it, is not good.
     
-    Branch branch;
-    branch.compile(
+    Block block;
+    block.compile(
         "type MyType; \n"
         "def f() -> MyType\n"
         "def g(MyType t)\n"
@@ -107,8 +107,8 @@ void test_type_not_prematurely_used()
         "state MyType st2 = make(MyType)\n"
         );
 
-    Type* myType = (Type*) circa_find_type_local(&branch, "MyType");
-    Type* myCompoundType = (Type*) circa_find_type_local(&branch, "MyCompoundType");
+    Type* myType = (Type*) circa_find_type_local(&block, "MyType");
+    Type* myCompoundType = (Type*) circa_find_type_local(&block, "MyCompoundType");
     test_assert(!myType->inUse);
     test_assert(!myCompoundType->inUse);
 

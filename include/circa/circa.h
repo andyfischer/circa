@@ -19,7 +19,7 @@ extern "C" {
 
 #ifdef __cplusplus
 namespace circa {
-    struct Branch;
+    struct Block;
     struct Stack;
     struct Term;
     struct Type;
@@ -27,7 +27,7 @@ namespace circa {
     struct NativeModule;
 }
 
-typedef circa::Branch caBranch;
+typedef circa::Block caBlock;
 
 // a Stack holds the interpreter's current state, including a list of frames (activation
 // records). Each Stack corresponds to one lightweight thread (not OS thread).
@@ -47,7 +47,7 @@ typedef circa::NativeModule caNativeModule;
 
 #else
 
-typedef struct caBranch caBranch;
+typedef struct caBlock caBlock;
 typedef struct caStack caStack;
 typedef struct caTerm caTerm;
 typedef struct caType caType;
@@ -107,7 +107,7 @@ struct Value : caValue
 #endif // __cplusplus
 
 // a Function holds data for a single Circa function, including a name, the function's
-// definition (stored as a Branch), and various other metadata. Each Function has an
+// definition (stored as a Block), and various other metadata. Each Function has an
 // EvaluateFunc which is triggered when the function is called.
 typedef struct caFunction caFunction;
 
@@ -136,7 +136,7 @@ void circa_shutdown(caWorld*);
 void circa_add_module_search_path(caWorld* world, const char* path);
 
 // Load a module by opening the given filename as a source file.
-caBranch* circa_load_module_from_file(caWorld* world,
+caBlock* circa_load_module_from_file(caWorld* world,
                                       const char* module_name,
                                       const char* filename);
 
@@ -161,7 +161,7 @@ void circa_dealloc_stack(caStack* stack);
 void circa_run_module(caStack* stack, const char* moduleName);
 
 // Push a function to the stack.
-void circa_push_function(caStack* stack, caBranch* func);
+void circa_push_function(caStack* stack, caBlock* func);
 
 // Find a function by name and push it to the stack. Returns whether the function
 // name was found.
@@ -223,10 +223,10 @@ caValue* circa_create_default_output(caStack* stack, int index);
 // Fetch the caller Term, this is the term whose function is currently being evaluated.
 caTerm* circa_caller_term(caStack* stack);
 
-// Fetch the Branch that holds the caller Term.
-caBranch* circa_caller_branch(caStack* stack);
+// Fetch the Block that holds the caller Term.
+caBlock* circa_caller_block(caStack* stack);
 
-caBranch* circa_top_branch(caStack* stack);
+caBlock* circa_top_block(caStack* stack);
 
 // -- Tagged Values --
 
@@ -270,7 +270,7 @@ void circa_create_value(caValue* value, caType* type);
 
 // Check the type of a caValue.
 bool circa_is_bool(caValue* value);
-bool circa_is_branch(caValue* value);
+bool circa_is_block(caValue* value);
 bool circa_is_error(caValue* value);
 bool circa_is_function(caValue* value);
 bool circa_is_float(caValue* value);
@@ -284,7 +284,7 @@ bool circa_is_type(caValue* value);
 
 // Read the value from a caValue.
 bool        circa_bool(caValue* value);
-caBranch*   circa_branch(caValue* value);
+caBlock*   circa_block(caValue* value);
 float       circa_float(caValue* value);
 caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
@@ -395,55 +395,55 @@ void circa_to_string_repr(caValue* value, caValue* out);
 
 // -- Code Reflection --
 
-// Access the root branch for a caWorld.
-caBranch* circa_kernel(caWorld* world);
+// Access the root block for a caWorld.
+caBlock* circa_kernel(caWorld* world);
 
-// Find a Term by name, looking in the given branch.
-caTerm* circa_find_term(caBranch* branch, const char* name);
+// Find a Term by name, looking in the given block.
+caTerm* circa_find_term(caBlock* block, const char* name);
 
 caTerm* circa_find_global(caWorld* world, const char* name);
 
-// Find a Function by name, looking in the given branch.
-caBranch* circa_find_function_local(caBranch* branch, const char* name);
+// Find a Function by name, looking in the given block.
+caBlock* circa_find_function_local(caBlock* block, const char* name);
 
-// Find a Type by name, looking in the given branch.
-caType* circa_find_type_local(caBranch* branch, const char* name);
+// Find a Type by name, looking in the given block.
+caType* circa_find_type_local(caBlock* block, const char* name);
 
-caBranch* circa_find_function(caWorld* world, const char* name);
+caBlock* circa_find_function(caWorld* world, const char* name);
 caType* circa_find_type(caWorld* world, const char* name);
 
 // Retreive the nth input Term to the caller Term. May return NULL if the caller term
 // doesn't have that many inputs, or if there is no caller term.
 caTerm* circa_caller_input_term(caStack* stack, int index);
 
-// Get a Term from a Branch by index.
-caTerm* circa_get_term(caBranch* branch, int index);
+// Get a Term from a Block by index.
+caTerm* circa_get_term(caBlock* block, int index);
 
-// Get the nth input placeholder from this branch. Returns NULL if there is no such input.
-caTerm* circa_input_placeholder(caBranch* branch, int index);
+// Get the nth input placeholder from this block. Returns NULL if there is no such input.
+caTerm* circa_input_placeholder(caBlock* block, int index);
 
-// Get the nth output placeholder from this branch. Returns NULL if there is no such output.
-caTerm* circa_output_placeholder(caBranch* branch, int index);
+// Get the nth output placeholder from this block. Returns NULL if there is no such output.
+caTerm* circa_output_placeholder(caBlock* block, int index);
 
-// Get the Branch contents for a given Term. This may return NULL.
-caBranch* circa_nested_branch(caTerm* term);
+// Get the Block contents for a given Term. This may return NULL.
+caBlock* circa_nested_block(caTerm* term);
 
-// Get the Branch contents for a term with the given name.
-caBranch* circa_get_nested_branch(caBranch* branch, const char* name);
+// Get the Block contents for a term with the given name.
+caBlock* circa_get_nested_block(caBlock* block, const char* name);
 
-// Get the parent Branch for a given Term
-caBranch* circa_parent_branch(caTerm* term);
+// Get the parent Block for a given Term
+caBlock* circa_parent_block(caTerm* term);
 
-// Get the owning Term for a given Branch
-caTerm* circa_owning_term(caBranch* branch);
+// Get the owning Term for a given Block
+caTerm* circa_owning_term(caBlock* block);
 
-// Get the Branch contents for a function
-caBranch* circa_function_contents(caFunction* func);
+// Get the Block contents for a function
+caBlock* circa_function_contents(caFunction* func);
 
 // Access the fixed value of a value() Term. Returns NULL if Term is not a value.
 caValue* circa_term_value(caTerm* term);
 
-// Fetch the term's index (its position inside the parent branch)
+// Fetch the term's index (its position inside the parent block)
 int circa_term_get_index(caTerm* term);
 
 // Fetch the number of inputs for the given term.
@@ -459,7 +459,7 @@ caType* circa_term_declared_type(caTerm* term);
 
 // Install an evaluation function to the given named function. Returns the container Term.
 // Returns NULL if the name was not found.
-caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc func);
+caTerm* circa_install_function(caBlock* block, const char* name, caEvaluateFunc func);
 
 typedef struct caFunctionBinding
 {
@@ -469,17 +469,17 @@ typedef struct caFunctionBinding
 
 // Install a series of C function bindings. This will treat 'bindingList' as an array
 // that is terminanted with a NULL caFunctionBinding.
-void circa_install_function_list(caBranch* branch, const caFunctionBinding* bindingList);
+void circa_install_function_list(caBlock* block, const caFunctionBinding* bindingList);
 
 // Install an evaluation function to the given Function.
 void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate);
 
 // Create a new Function value with the given name. Returns the created Function.
-caFunction* circa_declare_function(caBranch* branch, const char* name);
+caFunction* circa_declare_function(caBlock* block, const char* name);
 
 // Create a new value() term with the given name. Returns the term's value, which is safe
 // to modify.
-caValue* circa_declare_value(caBranch* branch, const char* name);
+caValue* circa_declare_value(caBlock* block, const char* name);
 
 // Configure a Circa type so that each value holds an integer.
 void circa_setup_int_type(caType* type);
@@ -495,7 +495,7 @@ void circa_patch_function(caNativeModule* module, const char* name, caEvaluateFu
 
 // 'dump' commands will print a representation to stdout
 void circa_dump_s(caStack* stack);
-void circa_dump_b(caBranch* branch);
+void circa_dump_b(caBlock* block);
 
 #ifdef __cplusplus
 } // extern "C"

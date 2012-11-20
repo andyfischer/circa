@@ -409,10 +409,10 @@ void set_opaque_pointer(caValue* value, void* addr)
     change_type(value, &OPAQUE_POINTER_T);
     value->value_data.ptr = addr;
 }
-void set_branch(caValue* value, Branch* branch)
+void set_block(caValue* value, Block* block)
 {
-    change_type(value, &BRANCH_T);
-    value->value_data.ptr = branch;
+    change_type(value, &BLOCK_T);
+    value->value_data.ptr = block;
 }
 
 void set_pointer(caValue* value, Type* type, void* p)
@@ -450,10 +450,10 @@ bool as_bool(caValue* value)
     return value->value_data.asbool;
 }
 
-Branch* as_branch(caValue* value)
+Block* as_block(caValue* value)
 {
-    ca_assert(is_branch(value));
-    return (Branch*) value->value_data.ptr;
+    ca_assert(is_block(value));
+    return (Block*) value->value_data.ptr;
 }
 
 void* as_opaque_pointer(caValue* value)
@@ -493,7 +493,7 @@ void* get_pointer(caValue* value, Type* expectedType)
 }
 
 bool is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
-bool is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
+bool is_block(caValue* value) { return value->value_type == &BLOCK_T; }
 bool is_error(caValue* value) { return value->value_type == &ERROR_T; }
 bool is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
 bool is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
@@ -550,7 +550,7 @@ using namespace circa;
 extern "C" {
 
 bool circa_is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
-bool circa_is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
+bool circa_is_block(caValue* value) { return value->value_type == &BLOCK_T; }
 bool circa_is_error(caValue* value) { return value->value_type == &ERROR_T; }
 bool circa_is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
 bool circa_is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
@@ -566,9 +566,9 @@ bool circa_bool(caValue* value) {
     ca_assert(circa_is_bool(value));
     return value->value_data.asbool;
 }
-caBranch* circa_branch(caValue* value) {
-    ca_assert(circa_is_branch(value));
-    return (caBranch*) value->value_data.ptr;
+caBlock* circa_block(caValue* value) {
+    ca_assert(circa_is_block(value));
+    return (caBlock*) value->value_data.ptr;
 }
 float circa_float(caValue* value) {
     ca_assert(circa_is_float(value));

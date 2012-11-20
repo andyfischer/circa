@@ -24,12 +24,12 @@ namespace for_function {
     void formatSource(caValue* source, Term* term)
     {
         format_heading(source, term);
-        format_branch_source(source, nested_contents(term), term);
+        format_block_source(source, nested_contents(term), term);
         append_phrase(source, term->stringProp("syntax:whitespaceBeforeEnd", ""),
             term, tok_Whitespace);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.for_func = import_function(kernel, NULL, "for(Indexable) -> List");
         as_function(FUNCS.for_func)->formatSource = formatSource;

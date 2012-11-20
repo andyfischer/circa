@@ -11,7 +11,7 @@ namespace feedback_function {
                 circa_input(stack, 1));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.feedback = import_function(kernel, evaluate, "feedback(any :meta, any)");
     }

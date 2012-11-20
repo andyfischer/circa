@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "debug.h"
 #include "file.h"
 #include "list.h"
@@ -103,8 +103,8 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             native_module_finish_change(nativeModule);
             break;
         }
-        case name_PatchBranch: {
-            // Reload this code branch.
+        case name_PatchBlock: {
+            // Reload this code block.
             caValue* moduleName = list_get(action, 1);
             load_module_file(world, as_cstring(moduleName), as_cstring(&watch->filename));
             break;
@@ -153,7 +153,7 @@ FileWatch* add_file_watch_module_load(World* world, const char* filename, const 
 {
     circa::Value action;
     set_list(&action, 2);
-    set_name(list_get(&action, 0), name_PatchBranch);
+    set_name(list_get(&action, 0), name_PatchBlock);
     set_string(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }

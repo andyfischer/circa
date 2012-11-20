@@ -7,5 +7,5 @@ def f(int i) -> int
     return 3
 
 
-out = dynamic_call(branch_ref(f) [5 null])
+out = dynamic_call(block_ref(f) [5 null])
 print('out = ' out)

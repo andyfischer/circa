@@ -8,30 +8,30 @@
 
 namespace circa {
 
-struct BranchIterator
+struct BlockIterator
 {
     struct IteratorFrame {
-        Branch* branch;
+        Block* block;
         int index;
 
-        IteratorFrame(Branch* b, int i) : branch(b), index(i) {}
+        IteratorFrame(Block* b, int i) : block(b), index(i) {}
     };
 
     std::vector<IteratorFrame> _stack;
     bool _backwards;
-    bool _skipNextBranch;
+    bool _skipNextBlock;
 
-    BranchIterator(Branch* branch, bool backwards=false);
-    void reset(Branch* branch);
+    BlockIterator(Block* block, bool backwards=false);
+    void reset(Block* block);
     bool finished();
     bool unfinished() { return !finished(); }
     Term* current();
     void advance();
-    void advanceSkippingBranch();
+    void advanceSkippingBlock();
     int depth();
 
-    // Next call to advance() will not explore a branch, if there is one.
-    void skipNextBranch() { _skipNextBranch = true; }
+    // Next call to advance() will not explore a block, if there is one.
+    void skipNextBlock() { _skipNextBlock = true; }
 
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }
@@ -40,15 +40,15 @@ struct BranchIterator
 
 struct UpwardIterator
 {
-    Branch* _branch;
+    Block* _block;
     int _index;
 
-    Branch* _stopAt;
+    Block* _stopAt;
 
     UpwardIterator(Term* startingTerm);
 
-    // stopAt is optional, if set then we will not continue past the given branch.
-    void stopAt(Branch* branch);
+    // stopAt is optional, if set then we will not continue past the given block.
+    void stopAt(Block* block);
 
     bool finished();
     Term* current();
@@ -60,12 +60,12 @@ struct UpwardIterator
     void operator++() { advance(); }
 };
 
-struct BranchIteratorFlat
+struct BlockIteratorFlat
 {
-    Branch* branch;
+    Block* block;
     int index;
 
-    BranchIteratorFlat(Branch* branch);
+    BlockIteratorFlat(Block* block);
 
     bool finished();
     void advance();
@@ -78,15 +78,15 @@ struct BranchIteratorFlat
     void operator++() { advance(); }
 };
 
-// This iterator steps over each input of each term in the branch. It will skip
+// This iterator steps over each input of each term in the block. It will skip
 // over any NULL terms, and it will skip over NULL inputs.
-struct BranchInputIterator
+struct BlockInputIterator
 {
-    Branch* branch;
+    Block* block;
     int index;
     int inputIndex;
 
-    BranchInputIterator(Branch* branch);
+    BlockInputIterator(Block* block);
 
     bool finished();
     void advance();
@@ -100,13 +100,13 @@ struct BranchInputIterator
     void operator++() { advance(); }
 };
 
-// This iterator is a filtered version of BranchInputIterator. It will only return
-// "outer inputs"- inputs to terms that are outside of the provided branch.
+// This iterator is a filtered version of BlockInputIterator. It will only return
+// "outer inputs"- inputs to terms that are outside of the provided block.
 struct OuterInputIterator
 {
-    BranchInputIterator branchInputIterator;
+    BlockInputIterator blockInputIterator;
 
-    OuterInputIterator(Branch* branch);
+    OuterInputIterator(Block* block);
 
     bool finished();
     void advance();
@@ -120,20 +120,20 @@ struct OuterInputIterator
     void operator++() { advance(); }
 };
 
-struct BranchIterator2
+struct BlockIterator2
 {
     Term* _current;
-    Branch* _topBranch;
+    Block* _topBlock;
 
-    BranchIterator2();
-    BranchIterator2(Branch* branch);
+    BlockIterator2();
+    BlockIterator2(Block* block);
     void startAt(Term* term);
 
     Term* current() { return _current; }
     void advance();
     bool finished() { return _current == NULL; }
     bool unfinished() { return !finished(); }
-    void stop() { _current = NULL; _topBranch = NULL; }
+    void stop() { _current = NULL; _topBlock = NULL; }
 
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }
@@ -144,7 +144,7 @@ struct NameVisibleIterator
 {
     // For a term T, iterates across all the terms where T is name-visible.
 
-    BranchIterator2 _iterator;
+    BlockIterator2 _iterator;
     Term* _target;
 
     NameVisibleIterator(Term* term);

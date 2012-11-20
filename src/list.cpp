@@ -590,7 +590,7 @@ std::string compound_type_to_string(caValue* value)
     return out.str();
 }
 
-void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter)
+void list_initialize_parameter_from_type_decl(Block* typeDecl, caValue* parameter)
 {
     set_list(parameter, 2);
     caValue* types = set_list(list_get(parameter, 0), 0);

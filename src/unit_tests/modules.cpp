@@ -2,7 +2,7 @@
 
 #include "unit_test_common.h"
 
-#include "branch.h"
+#include "block.h"
 #include "evaluation.h"
 #include "fakefs.h"
 #include "kernel.h"
@@ -15,10 +15,10 @@ void source_file_location()
 {
     FakeFilesystem fs;
 
-    fs.set("branch.ca", "a = 1");
-    Branch* branch = load_module_file(global_world(), "source_file_location", "branch.ca");
+    fs.set("block.ca", "a = 1");
+    Block* block = load_module_file(global_world(), "source_file_location", "block.ca");
 
-    test_equals(branch_get_source_filename(branch), "branch.ca");
+    test_equals(block_get_source_filename(block), "block.ca");
 }
 
 void test_require()
@@ -29,12 +29,12 @@ void test_require()
     fs.set("user.ca", "require module; test_spy(module:f())");
 
     load_module_file(global_world(), "module", "module.ca");
-    Branch* branch = load_module_file(global_world(), "test_require", "user.ca");
+    Block* block = load_module_file(global_world(), "test_require", "user.ca");
 
     test_spy_clear();
 
     Stack stack;
-    push_frame(&stack, branch);
+    push_frame(&stack, block);
     run_interpreter(&stack);
 
     test_assert(&stack);

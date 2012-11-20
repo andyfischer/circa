@@ -91,7 +91,7 @@ struct SourceWriter
     }
 };
 
-void write_branch_contents(SourceWriter* writer, Branch* branch);
+void write_block_contents(SourceWriter* writer, Block* block);
 
 void write_term_value(SourceWriter* writer, Term* term)
 {
@@ -182,27 +182,27 @@ void write_term(SourceWriter* writer, Term* term)
     writer->newline();
 }
 
-void write_branch_contents(SourceWriter* writer, Branch* branch)
+void write_block_contents(SourceWriter* writer, Block* block)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
         if (is_input_placeholder(term) || is_output_placeholder(term))
             continue;
         write_term(writer, term);
     }
 }
 
-void write_program(Branch* branch, caValue* out)
+void write_program(Block* block, caValue* out)
 {
     SourceWriter sourceWriter;
-    write_branch_contents(&sourceWriter, branch);
+    write_block_contents(&sourceWriter, block);
     swap(&sourceWriter.output, out);
 }
 
-void write_program_to_file(Branch* branch, const char* filename)
+void write_program_to_file(Block* block, const char* filename)
 {
     Value strs;
-    write_program(branch, &strs);
+    write_program(block, &strs);
 
     FILE* file = fopen(filename, "w");
 
@@ -228,9 +228,9 @@ void run_generate_cpp(caValue* args)
     std::cout << "Loading source from: " << source_file << std::endl;
     std::cout << "Will write to: " << output_file << std::endl;
     
-    Branch branch;
-    load_script(&branch, source_file);
-    write_program_to_file(&branch, output_file);
+    Block block;
+    load_script(&block, source_file);
+    write_program_to_file(&block, output_file);
 }
 
 } // namespace circa

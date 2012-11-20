@@ -7,7 +7,7 @@
 
 namespace circa {
 
-extern Branch* KERNEL;
+extern Block* KERNEL;
 
 extern Term* ANY_TYPE;
 extern Term* BOOL_TYPE;
@@ -28,9 +28,9 @@ struct BuiltinFuncs {
     Term* add;
     Term* add_i;
     Term* add_f;
-    Term* branch;
-    Term* branch_dynamic_call;
-    Term* branch_unevaluated;
+    Term* block;
+    Term* block_dynamic_call;
+    Term* block_unevaluated;
     Term* break_func;
     Term* case_func;
     Term* cast;
@@ -108,7 +108,7 @@ extern BuiltinFuncs FUNCS;
 
 extern Type ANY_T;
 extern Type BOOL_T;
-extern Type BRANCH_T;
+extern Type BLOCK_T;
 extern Type DICT_T;
 extern Type ERROR_T;
 extern Type EVAL_CONTEXT_T;
@@ -130,7 +130,7 @@ extern Type VOID_T;
 struct BuiltinTypes {
     Type* actor;
     Type* any;
-    Type* branch;
+    Type* block;
     Type* color;
     Type* dict;
     Type* error;
@@ -154,7 +154,7 @@ extern bool FINISHED_BOOTSTRAP;
 extern bool SHUTTING_DOWN;
 
 World* global_world();
-Branch* global_root_branch();
+Block* global_root_block();
 
 void empty_evaluate_function(Term* caller);
 
@@ -176,7 +176,7 @@ namespace for_function {
 }
 
 namespace namespace_function {
-    void early_setup(Branch* kernel);
+    void early_setup(Block* kernel);
 }
 
 namespace neg_function {
@@ -184,7 +184,7 @@ namespace neg_function {
 }
 
 namespace return_function {
-    void setup(Branch* kernel);
+    void setup(Block* kernel);
 }
 
 namespace value_function {
@@ -198,6 +198,6 @@ void test_oracle_clear();
 void test_oracle_send(caValue* value);
 void test_oracle_send(int i);
 
-void install_standard_library(Branch* kernel);
+void install_standard_library(Block* kernel);
 
 } // namespace circa

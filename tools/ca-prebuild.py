@@ -40,7 +40,7 @@ def setup_builtin_functions():
 
     namespaces = list(map(lambda s: s+'_function', get_cpp_file_names(dir)))
     function_decls = '\n'.join(
-            sorted(map(lambda n: 'namespace '+n+' { void setup(Branch* kernel); }', namespaces)))
+            sorted(map(lambda n: 'namespace '+n+' { void setup(Block* kernel); }', namespaces)))
     function_calls = '\n    '.join(
             sorted(map(lambda n: n+'::setup(kernel);', namespaces)))
 
@@ -52,13 +52,13 @@ def setup_builtin_functions():
 
 #include "../common_headers.h"
 
-#include "../branch.h"
+#include "../block.h"
 
 namespace circa {
 
 %s
 
-void setup_builtin_functions(Branch* kernel)
+void setup_builtin_functions(Block* kernel)
 {
     %s
 }

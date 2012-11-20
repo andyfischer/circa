@@ -13,17 +13,17 @@ namespace switch_function {
         format_name_binding(source, term);
         append_phrase(source, "switch ", term, name_Keyword);
         format_source_for_input(source, term, 0);
-        format_branch_source(source, nested_contents(term), term);
+        format_block_source(source, nested_contents(term), term);
     }
 
     void case_formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "case ", term, name_Keyword);
         format_source_for_input(source, term, 0);
-        format_branch_source(source, nested_contents(term), term);
+        format_block_source(source, nested_contents(term), term);
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         FUNCS.switch_func = import_function(kernel, evaluate_switch, "switch(any input) -> any");
         as_function(FUNCS.switch_func)->formatSource = switch_formatSource;

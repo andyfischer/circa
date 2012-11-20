@@ -54,9 +54,9 @@ StructType
 
 # File watch actions
 NativeModule
-PatchBranch
+PatchBlock
 
-# Branch's function attributes
+# Block's function attributes
 ParseTime
 
 # Storage types
@@ -166,7 +166,7 @@ op_NoOp
 op_Pause
 op_SetNull
 op_InlineCopy
-op_CallBranch
+op_CallBlock
 op_DynamicCall
 op_FireNative
 op_CaseBlock
@@ -237,7 +237,7 @@ stat_StringToStd
 # Interpreter
 stat_StepInterpreter
 stat_InterpreterCastOutputFromFinishedFrame
-stat_BranchNameLookups
+stat_BlockNameLookups
 stat_PushFrame
 stat_LoopFinishIteration
 stat_LoopWriteOutput

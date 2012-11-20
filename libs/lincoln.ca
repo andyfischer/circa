@@ -259,7 +259,7 @@ namespace post_frame
     opengl:draw_texture_as_quad(texture to_rect([0 0] window_size))
 
 namespace lincoln
-    def default_control(Branch branch)
+    def default_control(Block block)
         if key_pressed('5')
             trace('redrawing')
             send('lincoln.should_redraw', true)
@@ -267,7 +267,7 @@ namespace lincoln
         if key_pressed('1')
             trace('listing configs..')
             send('lincoln.current_mode', 1)
-            send('lincoln.config_list', branch.list_configs())
+            send('lincoln.config_list', block.list_configs())
 
         if key_pressed('3')
             send('lincoln.current_mode', 0)

@@ -1,5 +1,5 @@
 
-testBranch = {
+testBlock = {
     a = 1
     b = 2
     c = {
@@ -8,7 +8,7 @@ testBranch = {
     }
 }
 
-br = branch_ref(testBranch)
+br = block_ref(testBlock)
 
 a = br.find_term('a')
 b = br.find_term('b')

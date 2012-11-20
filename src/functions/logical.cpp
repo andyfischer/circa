@@ -22,7 +22,7 @@ namespace logical_function {
         set_bool(circa_output(stack, 0), !circa_bool_input(stack, 0));
     }
 
-    void setup(Branch* kernel)
+    void setup(Block* kernel)
     {
         import_function(kernel, and_func, "and(bool a, bool b) -> bool;"
                 "'Return whether a and b are both true'");

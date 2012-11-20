@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
+#include "block.h"
 #include "building.h"
 #include "kernel.h"
 #include "evaluation.h"
@@ -17,9 +17,9 @@
 
 namespace circa {
 
-Term* import_function(Branch* branch, EvaluateFunc evaluate, std::string const& header)
+Term* import_function(Block* block, EvaluateFunc evaluate, std::string const& header)
 {
-    Term* result = parser::compile(branch, parser::function_decl, header);
+    Term* result = parser::compile(block, parser::function_decl, header);
 
     as_function(result)->evaluate = evaluate;
     dirty_bytecode(function_contents(as_function(result)));
@@ -33,9 +33,9 @@ void install_function(Term* function, EvaluateFunc evaluate)
     dirty_bytecode(function_contents(function));
 }
 
-Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
+Term* install_function(Block* block, const char* name, EvaluateFunc evaluate)
 {
-    Term* term = find_name(branch, name_from_string(name));
+    Term* term = find_name(block, name_from_string(name));
     if (term == NULL) {
         std::string msg = "Name not found in install_function: ";
         msg += name;
@@ -46,17 +46,17 @@ Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
     return term;
 }
 
-Term* import_type(Branch* branch, Type* type)
+Term* import_type(Block* block, Type* type)
 {
-    Term* term = create_value(branch, &TYPE_T, name_to_string(type->name));
+    Term* term = create_value(block, &TYPE_T, name_to_string(type->name));
     set_type(term_value(term), type);
     return term;
 }
 
-void install_function_list(Branch* branch, const ImportRecord* list)
+void install_function_list(Block* block, const ImportRecord* list)
 {
     while (list->functionName != NULL) {
-        install_function(branch, list->functionName, list->evaluate);
+        install_function(block, list->functionName, list->evaluate);
         list++;
     }
 }
