@@ -173,7 +173,7 @@ namespace value_function {
 
 // Interact with special debugging functions test_spy() and test_oracle()
 void test_spy_clear();
-List* test_spy_get_results();
+caValue* test_spy_get_results();
 void test_oracle_clear();
 void test_oracle_send(caValue* value);
 void test_oracle_send(int i);
