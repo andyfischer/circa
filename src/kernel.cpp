@@ -88,9 +88,6 @@ Type VOID_T;
 
 BuiltinTypes TYPES;
 
-Value TrueValue;
-Value FalseValue;
-
 List g_oracleValues;
 List g_spyValues;
 
@@ -872,10 +869,6 @@ void bootstrap_kernel()
     FUNCS.declare_field = import_function(kernel, NULL, "declare_field() -> any");
 
     FINISHED_BOOTSTRAP = true;
-
-    // Set up some global constants
-    set_bool(&TrueValue, true);
-    set_bool(&FalseValue, false);
 
     // Initialize a few more types
     Term* set_type = create_value(kernel, &TYPE_T, "Set");

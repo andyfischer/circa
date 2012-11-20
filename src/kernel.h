@@ -129,9 +129,6 @@ struct BuiltinTypes {
 
 extern BuiltinTypes TYPES;
 
-extern Value TrueValue;
-extern Value FalseValue;
-
 extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;
 extern bool SHUTTING_DOWN;

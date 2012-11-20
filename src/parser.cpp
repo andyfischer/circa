@@ -1684,7 +1684,9 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
 
             tokens.consume(tok_Equals);
             possible_whitespace(tokens);
-            inputHints.set(index, "state", &TrueValue);
+            Value trueValue;
+            set_bool(&trueValue, true);
+            inputHints.set(index, "state", &trueValue);
             inputHints.set(index, "rebindInput", "t");
         }
 
