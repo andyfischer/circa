@@ -16,8 +16,8 @@ namespace opaque_pointer_t {
 
     void setup_type(Type* type)
     {
-        if (type->name == name_None)
-            type->name = name_from_string("opaque_pointer");
+        if (string_eq(&type->name, ""))
+            set_string(&type->name, "opaque_pointer");
         type->storageType = name_StorageTypeOpaquePointer;
         type->toString = toString;
         type->hashFunc = common_type_callbacks::shallow_hash_func;

@@ -94,7 +94,7 @@ namespace number_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = name_from_string("number");
+        set_string(&type->name, "number");
         type->storageType = name_StorageTypeFloat;
         type->reset = reset;
         type->cast = cast;

@@ -872,8 +872,8 @@ namespace list_t {
 
     void setup_type(Type* type)
     {
-        if (type->name == name_None)
-            type->name = name_from_string("List");
+        if (string_eq(&type->name, ""))
+            set_string(&type->name, "List");
         type->storageType = name_StorageTypeList;
         type->initialize = tv_initialize;
         type->release = tv_release;

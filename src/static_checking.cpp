@@ -180,9 +180,9 @@ void format_static_error(caValue* error, caValue* stringOutput)
             out << "'" << input->name << "'";
         else
             out << "The input expression";
-        out << " has type " << name_to_string(input->type->name) << ", but function "
+        out << " has type " << as_cstring(&input->type->name) << ", but function "
             << term->function->name << " expects type "
-            << name_to_string(function_get_input_type(term->function, inputIndex)->name);
+            << as_cstring(&function_get_input_type(term->function, inputIndex)->name);
     }
     else if (term->function == FUNCS.static_error)
         out << to_string(term_value(term->input(0)));

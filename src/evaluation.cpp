@@ -285,7 +285,7 @@ Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* _inputs)
             string_append(&error, " (at index ");
             string_append(&error, placeholderIndex);
             string_append(&error, ") to type ");
-            string_append(&error, name_to_string(placeholder->type->name));
+            string_append(&error, &placeholder->type->name);
             raise_error_msg(stack, as_cstring(&error));
             return frame;
         }
@@ -387,7 +387,7 @@ void finish_frame(Stack* stack)
                 set_string(&msg, "Couldn't cast output value ");
                 string_append(&msg, to_string(result).c_str());
                 string_append(&msg, " to type ");
-                string_append(&msg, name_to_string(placeholder->type->name));
+                string_append(&msg, &placeholder->type->name);
                 set_error_string(result, as_cstring(&msg));
                 topFrame->pc = placeholder->index;
                 parentFrame->pc = finishedTerm->index + i;
@@ -1209,7 +1209,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
                     set_string(&msg, "Couldn't cast value ");
                     string_append_quoted(&msg, inputValue);
                     string_append(&msg, " to type ");
-                    string_append(&msg, name_to_string(type->name));
+                    string_append(&msg, &type->name);
                     raise_error_msg(stack, as_cstring(&msg));
                 }
                 break;
@@ -1777,7 +1777,7 @@ void Interpreter__frames(caStack* callerStack)
 
 void eval_context_setup_type(Type* type)
 {
-    type->name = name_from_string("Stack");
+    set_string(&type->name, "Stack");
     type->gcListReferences = stack_list_references;
 }
 

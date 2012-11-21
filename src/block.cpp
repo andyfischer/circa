@@ -95,7 +95,7 @@ std::string block_to_string(caValue* val)
 
 void block_setup_type(Type* type)
 {
-    type->name = name_from_string("Block");
+    set_string(&type->name, "Block");
     type->toString = block_to_string;
     type->gcListReferences = block_list_references;
 }

@@ -109,7 +109,7 @@ void write_term_value(SourceWriter* writer, Term* term)
 
 void write_type_name(SourceWriter* writer, Type* type)
 {
-    writer->write(name_to_string(type->name));
+    writer->write(as_cstring(&type->name));
 }
 
 void write_function(SourceWriter* writer, Term* term)

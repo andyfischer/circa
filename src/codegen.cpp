@@ -10,7 +10,7 @@ namespace circa {
 
 std::string get_cpp_type_name(Type* type)
 {
-    return name_to_string(type->name);
+    return as_cstring(&type->name);
 }
 
 std::string get_cpp_type_accessor(Type* type)

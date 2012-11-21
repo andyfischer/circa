@@ -48,7 +48,7 @@ Term* install_function(Block* block, const char* name, EvaluateFunc evaluate)
 
 Term* import_type(Block* block, Type* type)
 {
-    Term* term = create_value(block, TYPES.type, name_to_string(type->name));
+    Term* term = create_value(block, TYPES.type, as_cstring(&type->name));
     set_type(term_value(term), type);
     return term;
 }

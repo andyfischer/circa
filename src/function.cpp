@@ -62,7 +62,7 @@ namespace function_t {
 
     void setup_type(Type* type)
     {
-        type->name = name_from_string("Function");
+        set_string(&type->name, "Function");
         type->initialize = initialize;
         type->copy = copy;
         type->formatSource = function_format_source;
@@ -406,7 +406,7 @@ void function_format_header_source(caValue* source, Block* function)
 
         // Type
         if (showType)
-            append_phrase(source, name_to_string(input->type->name),
+            append_phrase(source, as_cstring(&input->type->name),
                 input->type->declaringTerm, name_TypeName);
 
         // Name
@@ -451,7 +451,7 @@ void function_format_header_source(caValue* source, Block* function)
         append_phrase(source, term->stringProp("syntax:whitespacePostColon", ""),
                 term, tok_Whitespace);
         append_phrase(source,
-            name_to_string(primaryOutput->type->name),
+            as_cstring(&primaryOutput->type->name),
             primaryOutput->type->declaringTerm,
             name_TypeName);
     }

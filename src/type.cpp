@@ -11,6 +11,7 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "string_type.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "term.h"
@@ -78,7 +79,7 @@ namespace type_t {
                     term, tok_Whitespace);
 
             Type* fieldType = function_get_output_type(field, 0);
-            append_phrase(source, name_to_string(fieldType->name), term, name_TypeName);
+            append_phrase(source, as_cstring(&fieldType->name), term, name_TypeName);
             append_phrase(source, field->stringProp("syntax:postNameWs"," "),
                     term, tok_Whitespace);
             append_phrase(source, field->name, term, tok_Identifier);
@@ -90,11 +91,11 @@ namespace type_t {
 
     std::string toString(caValue* value)
     {
-        return std::string("<Type ")+ name_to_string(as_type(value)->name)+">";
+        return std::string("<Type ")+ as_cstring(&as_type(value)->name)+">";
     }
     void setup_type(Type* type)
     {
-        type->name = name_from_string("Type");
+        set_string(&type->name, "Type");
         type->storageType = name_StorageTypeType;
         type->initialize = type_t::initialize;
         type->copy = copy;
@@ -119,7 +120,7 @@ Type::~Type()
 const char*
 Type::nameStr()
 {
-    return name_to_string(this->name);
+    return as_cstring(&name);
 }
 
 Type* get_output_type(Term* term, int outputIndex)
@@ -184,6 +185,8 @@ void initialize_type(Type* t)
     set_dict(&t->properties);
 
     initialize_null(&t->parameter);
+    initialize_null(&t->name);
+    set_string(&t->name, "");
 
     gc_register_new_object((CircaObject*) t, TYPES.type, true);
 }
@@ -333,7 +336,7 @@ Term* create_tuple_type(caValue* types)
     typeName << "Tuple<";
     for (int i=0; i < list_length(types); i++) {
         if (i != 0) typeName << ",";
-        typeName << name_to_string(as_type(list_get(types,i))->name);
+        typeName << as_cstring(&as_type(list_get(types,i))->name);
     }
     typeName << ">";
 
@@ -386,7 +389,7 @@ Term* find_method_with_search_name(Block* block, Type* type, const char* searchN
 
 Term* find_method(Block* block, Type* type, const char* name)
 {
-    if (type->name == 0)
+    if (string_eq(&type->name, ""))
         return NULL;
 
     // First, look inside the type definition, which contains simulated methods and
@@ -399,7 +402,7 @@ Term* find_method(Block* block, Type* type, const char* name)
     }
 
     // Construct the search name, which looks like TypeName.functionName.
-    std::string searchName = std::string(name_to_string(type->name)) + "." + name;
+    std::string searchName = std::string(as_cstring(&type->name)) + "." + name;
 
     // Standard search.
     Term* result = find_method_with_search_name(block, type, searchName.c_str());
@@ -409,7 +412,7 @@ Term* find_method(Block* block, Type* type, const char* name)
 
     // If the type name is complex (such as List<int>), then try searching
     // for the base type name (such as List).
-    std::string baseTypeName = get_base_type_name(name_to_string(type->name));
+    std::string baseTypeName = get_base_type_name(as_cstring(&type->name));
     if (baseTypeName != "") {
         std::string searchName = baseTypeName + "." + name;
         result = find_method_with_search_name(block, type, searchName.c_str());

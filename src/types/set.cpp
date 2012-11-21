@@ -36,7 +36,7 @@ namespace set_t {
     void setup_type(Type* type) {
         list_t::setup_type(type);
         type->toString = set_t::to_string;
-        type->name = name_from_string("Set");
+        set_string(&type->name, "Set");
     }
 
 } // namespace set_t

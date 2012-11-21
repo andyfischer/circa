@@ -119,7 +119,7 @@ extern "C" void circa_to_string_repr(caValue* value, caValue* out)
         parser::quote_and_escape_string(as_cstring(value), out);
     } else {
         set_string(out, "error: no string repr for type ");
-        string_append(out, name_to_string(value->value_type->name));
+        string_append(out, as_cstring(&value->value_type->name));
     }
 }
 

@@ -21,7 +21,7 @@ namespace null_t {
 
     void setup_type(Type* type)
     {
-        type->name = name_from_string("null");
+        set_string(&type->name, "null");
         type->toString = toString;
         type->formatSource = formatSource;
         type->getField = getField;

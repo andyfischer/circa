@@ -443,7 +443,7 @@ void setup_type(Type* type)
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
     type->visitHeap = tagged_value_wrappers::visit_heap;
-    type->name = name_from_string("Dict");
+    set_string(&type->name, "Dict");
 }
 
 } // namespace dict_t

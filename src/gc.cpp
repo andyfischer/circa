@@ -114,7 +114,7 @@ int gc_count_live_objects()
 void gc_dump_live_objects()
 {
     for (CircaObject* current = g_first; current != NULL; current = current->next) {
-        std::cout << name_to_string(current->type->name)
+        std::cout << as_cstring(&current->type->name)
             << "@" << current << std::endl;
     }
 }

@@ -156,7 +156,7 @@ void dynamic_method_call(caStack* stack)
     msg += "Method ";
     msg += functionName;
     msg += " not found on type ";
-    msg += name_to_string(circa_type_of(object)->name);
+    msg += as_cstring(&circa_type_of(object)->name);
     circa_output_error(stack, msg.c_str());
 }
 
@@ -605,7 +605,8 @@ void String__split(caStack* stack)
 
 void Type__name(caStack* stack)
 {
-    set_string(circa_output(stack, 0), name_to_string(as_type(circa_input(stack, 0))->name));
+    Type* type = as_type(circa_input(stack, 0));
+    copy(&type->name, circa_output(stack, 0));
 }
 
 void Type__property(caStack* stack)
@@ -685,7 +686,7 @@ int term_hashFunc(caValue* val)
 
 void term_setup_type(Type* type)
 {
-    type->name = name_from_string("Term");
+    set_string(&type->name, "Term");
     type->storageType = name_StorageTypeTerm;
     type->toString = term_toString;
     type->hashFunc = term_hashFunc;
@@ -733,14 +734,17 @@ void test_spy(caStack* stack)
 
 void bootstrap_kernel()
 {
-    // Initialize the core global types.
+    // First, instanciate the types that are used by Type.
     TYPES.dict = create_type_uninitialized();
     TYPES.null = create_type_uninitialized();
+    TYPES.string = create_type_uninitialized();
     TYPES.type = create_type_uninitialized();
 
     initialize_type(TYPES.dict);
     initialize_type(TYPES.null);
+    initialize_type(TYPES.string);
     initialize_type(TYPES.type);
+    string_setup_type(TYPES.string);
 
     // Initialize remaining global types.
     TYPES.any = create_type();
@@ -756,7 +760,6 @@ void bootstrap_kernel()
     TYPES.name = create_type();
     TYPES.opaque_pointer = create_type();
     TYPES.term = create_type();
-    TYPES.string = create_type();
     TYPES.void_type = create_type();
 
     any_t::setup_type(TYPES.any);
@@ -773,7 +776,6 @@ void bootstrap_kernel()
     number_t::setup_type(TYPES.float_type);
     opaque_pointer_t::setup_type(TYPES.opaque_pointer);
     term_setup_type(TYPES.term);
-    string_setup_type(TYPES.string);
     string_setup_type(TYPES.error); // errors are just stored as strings for now
     type_t::setup_type(TYPES.type);
     void_t::setup_type(TYPES.void_type);

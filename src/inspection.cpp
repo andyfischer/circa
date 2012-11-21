@@ -684,7 +684,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
     if (term->type == NULL)
         out << "<NULL type>";
     else
-        out << name_to_string(term->type->name);
+        out << as_cstring(&term->type->name);
 
     if (is_value(term))
         out << " val:" << to_string(term_value(term));

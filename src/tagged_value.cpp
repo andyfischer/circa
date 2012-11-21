@@ -207,7 +207,7 @@ std::string to_string(caValue* value)
         return toString(value);
 
     std::stringstream out;
-    out << "<" << name_to_string(value->value_type->name)
+    out << "<" << as_cstring(&value->value_type->name)
         << " " << value->value_data.ptr << ">";
     return out.str();
 }
@@ -219,7 +219,7 @@ std::string to_string_annotated(caValue* value)
 
     std::stringstream out;
 
-    out << name_to_string(value->value_type->name) << "#";
+    out << as_cstring(&value->value_type->name) << "#";
 
     if (is_list(value)) {
         out << "[";
@@ -252,7 +252,7 @@ void set_index(caValue* value, int index, caValue* element)
 
     if (setIndex == NULL) {
         std::string msg = std::string("No setIndex function available on type ")
-            + name_to_string(value->value_type->name);
+            + as_cstring(&value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -275,7 +275,7 @@ void set_field(caValue* value, const char* field, caValue* element)
 
     if (setField == NULL) {
         std::string msg = std::string("No setField function available on type ")
-            + name_to_string(value->value_type->name);
+            + as_cstring(&value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -298,7 +298,7 @@ int get_hash_value(caValue* value)
     Type::HashFunc f = value->value_type->hashFunc;
     if (f == NULL) {
         std::string msg;
-        msg += std::string("No hash function for type ") + name_to_string(value->value_type->name);
+        msg += std::string("No hash function for type ") + as_cstring(&value->value_type->name);
         internal_error(msg);
     }
     return f(value);
@@ -478,7 +478,7 @@ const char* get_name_for_type(Type* type)
 {
     if (type == NULL)
         return "<NULL>";
-    else return name_to_string(type->name);
+    else return as_cstring(&type->name);
 }
 
 void* get_pointer(caValue* value, Type* expectedType)

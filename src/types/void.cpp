@@ -17,7 +17,7 @@ namespace void_t {
     }
     void setup_type(Type* type)
     {
-        type->name = name_from_string("void");
+        set_string(&type->name, "void");
         type->cast = cast;
         type->toString = to_string;
     }

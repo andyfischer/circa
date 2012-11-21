@@ -30,8 +30,8 @@ void handle_feedback_event(Stack* context, Term* target, caValue* desired)
         bool success = cast(term_value(target), declared_type(target));
         if (!success) {
             std::cout << "in handle_feedback, failed to cast "
-                << name_to_string(desired->value_type->name) << " to "
-                << name_to_string(declared_type(target)->name) << std::endl;
+                << as_cstring(&desired->value_type->name) << " to "
+                << as_cstring(&declared_type(target)->name) << std::endl;
         }
     } else if (target->function == FUNCS.input) {
 

@@ -21,7 +21,7 @@ namespace eval_context_t {
 
     void setup_type(Type* type)
     {
-        type->name = name_from_string("Stack");
+        set_string(&type->name, "Stack");
         type->visitHeap = visitHeap;
     }
 }

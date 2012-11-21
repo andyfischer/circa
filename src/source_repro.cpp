@@ -80,7 +80,7 @@ static void format_value_term(caValue* source, Term* valueTerm)
 {
     // Special constructor syntax
     if (valueTerm->boolProp("constructor", false)) {
-        append_phrase(source, name_to_string(valueTerm->type->name), valueTerm, name_None);
+        append_phrase(source, as_cstring(&valueTerm->type->name), valueTerm, name_None);
         append_phrase(source, "()", valueTerm, name_None);
 
     // Otherwise use formatSource on type type.
@@ -88,7 +88,7 @@ static void format_value_term(caValue* source, Term* valueTerm)
         Type* type = term_value(valueTerm)->value_type;
         if (type->formatSource == NULL) {
             std::stringstream out;
-            out << "Type " << name_to_string(type->name) <<
+            out << "Type " << as_cstring(&type->name) <<
                 " doesn't have a formatSource function";
             internal_error(out.str());
         }

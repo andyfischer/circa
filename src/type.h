@@ -62,14 +62,10 @@ struct Type
     // CircaObject header, must be the first field.
     CircaObject header;
 
-    Name name;
+    Value name;
 
     // Enum describing the data structure used to store this type's value.
     Name storageType;
-
-    // C++ type info. This is only used to do runtime type checks, when the data
-    // is accessed as a C++ type. Otherwise, this is optional.
-    const std::type_info *cppTypeInfo;
 
     Term* declaringTerm;
 

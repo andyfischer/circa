@@ -18,7 +18,7 @@ namespace name_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = name_from_string("Name");
+        set_string(&type->name, "Name");
         type->storageType = name_StorageTypeInt;
         type->toString = to_string;
         type->formatSource = format_source;

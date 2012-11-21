@@ -203,7 +203,7 @@ void string_format_source(caValue* source, Term* term)
 void string_setup_type(Type* type)
 {
     reset_type(type);
-    type->name = name_from_string("String");
+    set_string(&type->name, "String");
     type->storageType = name_StorageTypeString;
     type->initialize = string_initialize;
     type->release = string_release;

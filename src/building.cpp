@@ -432,7 +432,7 @@ Term* create_value(Block* block, Type* type, std::string const& name)
     make(type, term_value(term));
 
     if (type == TYPES.type) {
-        as_type(term)->name = name_from_string(name.c_str());
+        set_string(&as_type(term)->name, name.c_str());
         as_type(term)->declaringTerm = term;
     }
 
@@ -524,9 +524,8 @@ Term* create_type(Block* block, std::string nameStr)
     Term* term = create_value(block, TYPES.type);
 
     if (nameStr != "") {
-        Name name = name_from_string(nameStr);
-        as_type(term_value(term))->name = name;
-        rename(term, name);
+        set_string(&as_type(term_value(term))->name, nameStr.c_str());
+        rename(term, name_from_string(nameStr));
     }
 
     return term;

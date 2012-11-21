@@ -363,12 +363,12 @@ void hashtable_remove(caValue* tableTv, caValue* key)
 
 void hashtable_setup_type(Type* type)
 {
+    set_string(&type->name, "Map");
     type->initialize = tagged_value_wrappers::initialize;
     type->release = tagged_value_wrappers::release;
     type->copy = tagged_value_wrappers::copy;
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
-    type->name = name_from_string("Map");
     type->storageType = name_StorageTypeHashtable;
 }
 
