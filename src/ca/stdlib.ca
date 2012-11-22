@@ -132,6 +132,12 @@ def Block.version(self) -> int
 def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 
+type Closure {
+    Block block
+    List bindings
+}
+def Closure.call(self, any inputs :multiple)
+
 def Dict.count(self) -> int
     -- Return the number of elements
 def Dict.set(@self, String key, any value)

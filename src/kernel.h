@@ -92,6 +92,7 @@ struct BuiltinTypes {
     Type* any;
     Type* block;
     Type* bool_type;
+    Type* closure;
     Type* color;
     Type* dict;
     Type* error;

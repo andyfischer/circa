@@ -32,6 +32,7 @@ const char* builtin_name_to_string(int name)
     case name_InProgress: return "InProgress";
     case name_Lazy: return "Lazy";
     case name_Consumed: return "Consumed";
+    case name_Uncaptured: return "Uncaptured";
     case name_Return: return "Return";
     case name_Continue: return "Continue";
     case name_Break: return "Break";

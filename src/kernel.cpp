@@ -991,7 +991,6 @@ void bootstrap_kernel()
     static const ImportRecord records[] = {
         {"assert", hosted_assert},
         {"cppbuild:build_module", cppbuild_function::build_module},
-        // {"dynamic_call", dynamic_call},
         {"file:version", file__version},
         {"file:exists", file__exists},
         {"file:read_text", file__read_text},
@@ -1009,8 +1008,6 @@ void bootstrap_kernel()
         {"sys:module_search_paths", sys__module_search_paths},
         {"sys:perf_stats_reset", sys__perf_stats_reset},
         {"sys:perf_stats_dump", sys__perf_stats_dump},
-
-        // {"Block.call", dynamic_call},
 
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},
@@ -1078,6 +1075,7 @@ void bootstrap_kernel()
     // Finish setting up some hosted types
     TYPES.actor = as_type(kernel->get("Actor"));
     TYPES.color = as_type(kernel->get("Color"));
+    TYPES.closure = as_type(kernel->get("Closure"));
     callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));

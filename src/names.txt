@@ -24,6 +24,7 @@ Unevaluated
 InProgress
 Lazy
 Consumed
+Uncaptured
 
 # Control flow
 Return
