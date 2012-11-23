@@ -17,6 +17,7 @@ struct BuiltinFuncs {
     Term* break_func;
     Term* case_func;
     Term* cast;
+    Term* closure_block;
     Term* comment;
     Term* cond;
     Term* continue_func;

@@ -1011,7 +1011,6 @@ void write_term_bytecode(Term* term, caValue* result)
         if (get_parent_term(term) == FUNCS.dynamic_call) {
             list_resize(result, 3);
             set_name(list_get(result, 2), name_OutputsToList);
-            
         }
         return;
     }
@@ -1086,7 +1085,10 @@ void write_term_bytecode(Term* term, caValue* result)
     } else if (term->function == FUNCS.if_block) {
         block = term->nestedContents;
         tag = op_CaseBlock;
-
+    } else if (term->function == FUNCS.closure_block) {
+        // Call the function, not nested contents.
+        block = function_contents(term->function);
+        tag = op_CallBlock;
     } else if (term->nestedContents != NULL) {
         // Otherwise if the term has nested contents, then use it.
         block = term->nestedContents;

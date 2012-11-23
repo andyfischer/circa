@@ -7,6 +7,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "closures.h"
 #include "control_flow.h"
 #include "code_iterators.h"
 #include "dict.h"
@@ -1057,6 +1058,7 @@ void bootstrap_kernel()
 
     install_function_list(kernel, records);
 
+    closures_install_functions(kernel);
     modules_install_functions(kernel);
     reflection_install_functions(kernel);
     interpreter_install_functions(kernel);

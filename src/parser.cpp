@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "closures.h"
 #include "evaluation.h"
 #include "loops.h"
 #include "function.h"
@@ -2050,7 +2051,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // plain block?
     else if (tokens.nextIs(tok_LBrace))
-        result = plain_block(block, tokens, context);
+        result = closure_block(block, tokens, context);
 
     // parenthesized expression?
     else if (tokens.nextIs(tok_LParen)) {
@@ -2289,14 +2290,14 @@ ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(term);
 }
 
-ParseResult plain_block(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    Term* term = apply(block, FUNCS.lambda, TermList());
+    Term* term = apply(block, FUNCS.closure_block, TermList());
     Block* resultBlock = nested_contents(term);
     set_source_location(term, startPosition, tokens);
     consume_block_with_braces(resultBlock, tokens, context, term);
-    create_inputs_for_outer_references(term);
+    closure_redirect_outside_references(resultBlock);
     block_finish_changes(resultBlock);
     return ParseResult(term);
 }

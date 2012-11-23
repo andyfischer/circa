@@ -1,9 +1,0 @@
-
-a = 1
-
-code = {
-    b = add(a a)
-    print(b)
-}
-
-dynamic_call(block_ref(code) [4])

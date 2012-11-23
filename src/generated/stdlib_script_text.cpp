@@ -145,6 +145,8 @@ const char* STDLIB_CA_TEXT =
     "}\n"
     "def Closure.call(self, any inputs :multiple)\n"
     "\n"
+    "def closure_block() -> Closure\n"
+    "\n"
     "def Dict.count(self) -> int\n"
     "    -- Return the number of elements\n"
     "def Dict.set(@self, String key, any value)\n"

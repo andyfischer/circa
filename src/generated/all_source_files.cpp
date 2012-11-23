@@ -1,6 +1,7 @@
 #include "../block.cpp"
 #include "../building.cpp"
 #include "../c_api.cpp"
+#include "../closures.cpp"
 #include "../code_iterators.cpp"
 #include "../codegen.cpp"
 #include "../control_flow.cpp"

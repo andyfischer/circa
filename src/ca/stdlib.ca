@@ -138,6 +138,8 @@ type Closure {
 }
 def Closure.call(self, any inputs :multiple)
 
+def closure_block() -> Closure
+
 def Dict.count(self) -> int
     -- Return the number of elements
 def Dict.set(@self, String key, any value)

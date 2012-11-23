@@ -67,6 +67,7 @@ OBJECTS := \
 	$(OBJDIR)/block.o \
 	$(OBJDIR)/building.o \
 	$(OBJDIR)/c_api.o \
+	$(OBJDIR)/closures.o \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/codegen.o \
 	$(OBJDIR)/control_flow.o \
@@ -186,6 +187,9 @@ $(OBJDIR)/building.o: building.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_api.o: c_api.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/closures.o: closures.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/code_iterators.o: code_iterators.cpp
