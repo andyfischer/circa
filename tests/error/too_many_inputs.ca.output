@@ -1,5 +1,5 @@
 a = 1
 b = 2
 Error occurred:
-[tests/error/too_many_inputs.ca:7,0] f() | Too many inputs, expected 2, found 3
+[tests/error/too_many_inputs.ca:7,0] f() | Too many inputs, expected 2, received 3
 

@@ -131,6 +131,8 @@ void remap_pointers(Term* term, TermMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void remap_pointers(Block* block, Term* original, Term* replacement);
 
+bool term_is_nested_in_block(Term* term, Block* block);
+
 // Look through the nexted contents of 'term', and find any term references to outer
 // terms (terms outside this block). For every outer reference, add an input to
 // 'term' and repoint the referencing terms to use an input placeholder.

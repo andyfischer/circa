@@ -156,6 +156,7 @@ const char* builtin_name_to_string(int name)
     case op_InlineCopy: return "op_InlineCopy";
     case op_CallBlock: return "op_CallBlock";
     case op_DynamicCall: return "op_DynamicCall";
+    case op_ClosureCall: return "op_ClosureCall";
     case op_FireNative: return "op_FireNative";
     case op_CaseBlock: return "op_CaseBlock";
     case op_ForLoop: return "op_ForLoop";

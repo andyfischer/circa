@@ -14,6 +14,8 @@ void make(Type* type, caValue* value);
 
 void change_type(caValue* v, Type* t);
 
+Type* get_value_type(caValue* v);
+
 // Set this value to null. This will call the type's destructor if necessary.
 void set_null(caValue* value);
 

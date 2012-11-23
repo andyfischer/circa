@@ -146,6 +146,7 @@ const char* STDLIB_CA_TEXT =
     "def Closure.call(self, any inputs :multiple)\n"
     "\n"
     "def closure_block() -> Closure\n"
+    "def unbound_input(any) -> any\n"
     "\n"
     "def Dict.count(self) -> int\n"
     "    -- Return the number of elements\n"

@@ -64,6 +64,11 @@ void change_type(caValue* v, Type* t)
     v->value_type = t;
 }
 
+Type* get_value_type(caValue* v)
+{
+    return v->value_type;
+}
+
 void set_null(caValue* value)
 {
     if (value->value_type == NULL)

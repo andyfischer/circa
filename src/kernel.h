@@ -18,6 +18,7 @@ struct BuiltinFuncs {
     Term* case_func;
     Term* cast;
     Term* closure_block;
+    Term* closure_call;
     Term* comment;
     Term* cond;
     Term* continue_func;
@@ -77,6 +78,7 @@ struct BuiltinFuncs {
     Term* sub;
     Term* switch_func;
     Term* type;
+    Term* unbound_input;
     Term* unbounded_loop;
     Term* unbounded_loop_finish;
     Term* unknown_function;

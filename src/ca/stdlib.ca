@@ -139,6 +139,7 @@ type Closure {
 def Closure.call(self, any inputs :multiple)
 
 def closure_block() -> Closure
+def unbound_input(any) -> any
 
 def Dict.count(self) -> int
     -- Return the number of elements

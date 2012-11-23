@@ -597,6 +597,11 @@ int frame_register_count(Frame* frame)
     return list_length(&frame->registers);
 }
 
+caValue* frame_registers(Frame* frame)
+{
+    return &frame->registers;
+}
+
 caValue* frame_bytecode(Frame* frame)
 {
     return &frame->bytecode;
@@ -1068,6 +1073,14 @@ void write_term_bytecode(Term* term, caValue* result)
         set_name(list_get(result, 2), name_OutputsToList);
         return;
     }
+
+    if (term->function == FUNCS.closure_call) {
+        list_resize(result, 3);
+        set_name(list_get(result, 0), op_ClosureCall);
+        write_term_input_instructions(term, result, function_contents(term->function));
+        set_name(list_get(result, 2), name_OutputsToList);
+        return;
+    }
     
     // Choose the next block
     Block* block = NULL;
@@ -1273,15 +1286,49 @@ static void step_interpreter(Stack* stack)
     }
     case op_DynamicCall: {
         circa::Value incomingInputs;
+        set_list(&incomingInputs, 2);
+
         caValue* inputActions = list_get(action, 1);
-        set_list(&incomingInputs, list_length(inputActions));
         populate_inputs_from_bytecode(stack, inputActions, &incomingInputs, 0);
         // May have a runtime type error.
         if (error_occurred(stack))
             return;
+
         Block* block = as_block(list_get(&incomingInputs, 0));
+
         caValue* unpackedInputs = list_get(&incomingInputs, 1);
         push_frame_with_inputs(stack, block, unpackedInputs);
+        break;
+    }
+
+    case op_ClosureCall: {
+        circa::Value incomingInputs;
+        set_list(&incomingInputs, 2);
+
+        caValue* inputActions = list_get(action, 1);
+        populate_inputs_from_bytecode(stack, inputActions, &incomingInputs, 0);
+        // May have a runtime type error.
+        if (error_occurred(stack))
+            return;
+
+        caValue* closure = list_get(&incomingInputs, 0);
+        Block* block = as_block(list_get(closure, 0));
+        caValue* bindings = list_get(closure, 1);
+
+        Frame* frame = push_frame(stack, block);
+        caValue* actualInputs = list_get(&incomingInputs, 1);
+
+        caValue* registers = frame_registers(frame);
+
+        // Copy incoming inputs.
+        int registerWrite = 0;
+        for (registerWrite=0; registerWrite < list_length(actualInputs); registerWrite++)
+            copy(list_get(actualInputs, registerWrite), list_get(registers, registerWrite));
+
+        // Copy closure bindings.
+        for (int i=0; i < list_length(bindings); i++)
+            copy(list_get(bindings, i), list_get(registers, registerWrite++));
+
         break;
     }
 
@@ -1388,7 +1435,7 @@ static void step_interpreter(Stack* stack)
         string_append(&msg, expectedCount);
         if (has_variable_args(func))
             string_append(&msg, " (or more)");
-        string_append(&msg, ", found ");
+        string_append(&msg, ", received ");
         string_append(&msg, foundCount);
         raise_error_msg(stack, as_cstring(&msg));
         break;
@@ -1401,7 +1448,7 @@ static void step_interpreter(Stack* stack)
         int foundCount = currentTerm->numInputs();
         set_string(&msg, "Too many inputs, expected ");
         string_append(&msg, expectedCount);
-        string_append(&msg, ", found ");
+        string_append(&msg, ", received ");
         string_append(&msg, foundCount);
 
         raise_error_msg(stack, as_cstring(&msg));
