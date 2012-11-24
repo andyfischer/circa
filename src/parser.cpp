@@ -2299,6 +2299,10 @@ ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
     consume_block_with_braces(resultBlock, tokens, context, term);
     closure_redirect_outside_references(resultBlock);
     block_finish_changes(resultBlock);
+    
+    // Primary output
+    append_output_placeholder(resultBlock, find_last_non_comment_expression(resultBlock));
+
     return ParseResult(term);
 }
 

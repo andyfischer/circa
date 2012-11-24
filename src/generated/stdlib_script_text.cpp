@@ -143,7 +143,7 @@ const char* STDLIB_CA_TEXT =
     "    Block block\n"
     "    List bindings\n"
     "}\n"
-    "def Closure.call(self, any inputs :multiple)\n"
+    "def Closure.call(self, any inputs :multiple) -> any\n"
     "\n"
     "def closure_block() -> Closure\n"
     "def unbound_input(any) -> any\n"

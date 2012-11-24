@@ -44,6 +44,7 @@ void closure_redirect_outside_references(Block* block)
                     change_declared_type(unbound, input->type);
                     block->move(unbound, nextInsertPosition++);
                     remap_pointers_quick(innerTerm, input, unbound);
+                    it.advance();
                 }
             }
         }

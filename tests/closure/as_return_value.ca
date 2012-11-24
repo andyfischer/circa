@@ -1,0 +1,23 @@
+
+def func1(int a) -> Closure
+    b = a + 1
+    return { a + b + input() + 1 }
+
+c = func1(1)
+assert(c.call(3) == 7)
+
+def appender(String suffix) -> Closure
+    return { concat(input() suffix) }
+
+append_in_bed = appender(' in bed')
+
+assert(append_in_bed.call("marshmellows") == "marshmellows in bed")
+assert(append_in_bed.call("sushi") == "sushi in bed")
+assert(append_in_bed.call("politics") == "politics in bed")
+
+-- function combinator
+def concat_functions(Closure a, Closure b) -> Closure
+    return { b.call(a.call(input())) }
+
+concatted = concat_functions(append_in_bed, { i = input() -> String; i.split(' ') })
+assert(concatted.call('spiders') == ['spiders', 'in', 'bed'])

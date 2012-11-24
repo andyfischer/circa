@@ -136,7 +136,7 @@ type Closure {
     Block block
     List bindings
 }
-def Closure.call(self, any inputs :multiple)
+def Closure.call(self, any inputs :multiple) -> any
 
 def closure_block() -> Closure
 def unbound_input(any) -> any

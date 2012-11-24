@@ -1078,7 +1078,7 @@ void write_term_bytecode(Term* term, caValue* result)
         list_resize(result, 3);
         set_name(list_get(result, 0), op_ClosureCall);
         write_term_input_instructions(term, result, function_contents(term->function));
-        set_name(list_get(result, 2), name_OutputsToList);
+        set_name(list_get(result, 2), name_FlatOutputs);
         return;
     }
     
