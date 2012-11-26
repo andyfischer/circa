@@ -59,10 +59,6 @@ extern "C" {
 // setup_functions is defined in generated/setup_builtin_functions.cpp
 void setup_builtin_functions(Block*);
 
-bool STATIC_INITIALIZATION_FINISHED = false;
-bool FINISHED_BOOTSTRAP = false;
-bool SHUTTING_DOWN = false;
-
 BuiltinFuncs FUNCS;
 BuiltinTypes TYPES;
 
@@ -782,6 +778,7 @@ void bootstrap_kernel()
     void_t::setup_type(TYPES.void_type);
 
     g_world = alloc_world();
+    g_world->bootstrapStatus = name_Bootstrapping;
 
     // Create root Block.
     g_world->root = new Block();
@@ -877,8 +874,6 @@ void bootstrap_kernel()
 
     // Setup declare_field() function, needed to represent compound types.
     FUNCS.declare_field = import_function(kernel, NULL, "declare_field() -> any");
-
-    FINISHED_BOOTSTRAP = true;
 
     // Initialize a few more types
     Term* set_type = create_value(kernel, TYPES.type, "Set");
@@ -1094,9 +1089,6 @@ void bootstrap_kernel()
 
 CIRCA_EXPORT caWorld* circa_initialize()
 {
-    FINISHED_BOOTSTRAP = false;
-    STATIC_INITIALIZATION_FINISHED = true;
-
     memset(&FUNCS, 0, sizeof(FUNCS));
     memset(&TYPES, 0, sizeof(TYPES));
 
@@ -1132,13 +1124,13 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
     log_msg(0, "finished circa_initialize");
 
+    world->bootstrapStatus = name_Done;
+
     return world;
 }
 
 CIRCA_EXPORT void circa_shutdown(caWorld* world)
 {
-    SHUTTING_DOWN = true;
-
     delete world->root;
     world->root = NULL;
 

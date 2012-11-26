@@ -168,8 +168,6 @@ void finish_building_function(Block* contents)
 
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
-    if (!FINISHED_BOOTSTRAP)
-        return TYPES.any;
     if (!is_function(function))
         return TYPES.any;
 

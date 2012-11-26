@@ -55,6 +55,8 @@ const char* builtin_name_to_string(int name)
     case name_NativeModule: return "NativeModule";
     case name_PatchBlock: return "PatchBlock";
     case name_ParseTime: return "ParseTime";
+    case name_Bootstrapping: return "Bootstrapping";
+    case name_Done: return "Done";
     case name_StorageTypeNull: return "StorageTypeNull";
     case name_StorageTypeInt: return "StorageTypeInt";
     case name_StorageTypeFloat: return "StorageTypeFloat";

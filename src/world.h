@@ -24,6 +24,9 @@ struct World {
     // Module information.
     List moduleSearchPaths;
 
+    // Whether the world is currently bootstrapping. Either Bootstrapping or Done.
+    Name bootstrapStatus;
+
 protected:
     // Disallow C++ construction
     World();

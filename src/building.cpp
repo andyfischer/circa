@@ -290,9 +290,6 @@ void change_declared_type(Term *term, Type *newType)
 
 void respecialize_type(Term* term)
 {
-    if (SHUTTING_DOWN)
-        return;
-
     Type* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
         change_declared_type(term, outputType);

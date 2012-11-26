@@ -121,10 +121,6 @@ struct BuiltinTypes {
 extern BuiltinFuncs FUNCS;
 extern BuiltinTypes TYPES;
 
-extern bool STATIC_INITIALIZATION_FINISHED;
-extern bool FINISHED_BOOTSTRAP;
-extern bool SHUTTING_DOWN;
-
 World* global_world();
 Block* global_root_block();
 

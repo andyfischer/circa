@@ -219,6 +219,7 @@ def List.resize(@self, int length)
     -- existing values on the right are dropped.
 def List.count(self) -> int
     -- Return the number of elements in this list.
+
 def List.insert(@self, int, any)
     -- Insert an element at the given index. If necessary, existing elements will
     -- be shifted to the right to make room.
@@ -230,6 +231,7 @@ def List.insert(@self, int, any)
     
 def List.length(self) -> int
     -- Return the number of elements in this list.
+
 def List.join(self, String joiner) -> String
     -- Return a string constructed by converting every element to a string, and
     -- concatenating those strings, each separated by 'joiner'.
@@ -269,6 +271,17 @@ def List.pop(@self) -> any
     result = self.last
     self = self.slice(0, -1)
     result
+
+def List.filter(self, Closure func) -> List
+    result = []
+    for i in self
+        if func.call(i)
+            result.append(i)
+    result
+
+def List.map(self, Closure func) -> List
+    for i in self
+        func.call(i)
 
 def Map.contains(self, any key) -> bool
     -- Returns true if the map contains the given key.

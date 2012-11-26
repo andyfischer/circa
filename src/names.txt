@@ -60,6 +60,10 @@ PatchBlock
 # Block's function attributes
 ParseTime
 
+# Bootstrap status
+Bootstrapping
+Done
+
 # Storage types
 StorageTypeNull
 StorageTypeInt

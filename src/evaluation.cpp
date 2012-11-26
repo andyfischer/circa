@@ -696,7 +696,7 @@ void print_stack(Stack* stack, std::ostream& out)
         Block* block = frame->block;
         out << " [Frame #" << frame->id
              << ", depth = " << depth
-             << ", block = " << block->id
+             << ", block = #" << block->id
              << ", pc = " << frame->pc
              << ", nextPc = " << frame->nextPc
              << "]" << std::endl;

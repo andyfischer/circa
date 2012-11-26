@@ -10,6 +10,7 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "update_cascades.h"
+#include "world.h"
 
 namespace circa {
 
@@ -56,6 +57,10 @@ void dirty_bytecode(Block* block)
 
 void refresh_bytecode(Block* block)
 {
+    // Don't bother touching bytecode if we're still bootstrapping.
+    if (global_world()->bootstrapStatus == name_Bootstrapping)
+        return;
+
     if (is_null(&block->bytecode))
         write_block_bytecode(block, &block->bytecode);
 }
