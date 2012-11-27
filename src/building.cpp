@@ -496,7 +496,7 @@ Term* create_list(Block* block, std::string const& name)
 
 Block* create_block(Block* owner, const char* name)
 {
-    return nested_contents(apply(owner, FUNCS.block, TermList(), name_from_string(name)));
+    return nested_contents(apply(owner, FUNCS.section_block, TermList(), name_from_string(name)));
 }
 
 Block* find_or_create_block(Block* owner, const char* name)

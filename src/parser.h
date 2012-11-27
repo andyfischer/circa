@@ -91,6 +91,7 @@ ParseResult literal_color(Block* block, TokenStream& tokens, ParserCxt* context)
 ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult namespace_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult unknown_identifier(Block* block, std::string const& name);
 ParseResult identifier(Block* block, TokenStream& tokens, ParserCxt* context);

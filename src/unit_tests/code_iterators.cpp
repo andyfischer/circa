@@ -11,7 +11,7 @@ namespace code_iterators {
 void block_iterator_2()
 {
     Block block;
-    block.compile("a = 1; b = 2; c = { d = 3; e = 4; } f = 5");
+    block.compile("a = 1; b = 2; c = section { d = 3; e = 4; } f = 5");
 
     BlockIterator2 it(&block);
     test_assert(it.current()->name == "a"); ++it; test_assert(!it.finished());
@@ -25,7 +25,7 @@ void block_iterator_2()
 void block_iterator_2_2()
 {
     Block block;
-    block.compile("a = { b = { c = { d = 3; e = 4; }}}");
+    block.compile("a = section { b = section { c = section { d = 3; e = 4; }}}");
 
     BlockIterator2 it(&block);
     test_assert(it.current()->name == "a"); test_assert(!it.finished()); ++it;

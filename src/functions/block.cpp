@@ -13,12 +13,11 @@ namespace block_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.block = import_function(kernel, NULL, "block()");
-        as_function(FUNCS.block)->formatSource = format_source;
-
+        // deprecated
         FUNCS.block_unevaluated = import_function(kernel, NULL, "block_unevaluated()");
         function_set_empty_evaluation(as_function(FUNCS.block_unevaluated));
 
+        // deprecated
         FUNCS.lambda = import_function(kernel, NULL, "lambda(any :multiple) -> Block");
         as_function(FUNCS.lambda)->formatSource = format_source;
     }

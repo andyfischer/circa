@@ -2049,9 +2049,13 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_Name))
         result = literal_name(block, tokens, context);
 
-    // plain block?
+    // closure block?
     else if (tokens.nextIs(tok_LBrace))
         result = closure_block(block, tokens, context);
+
+    // section block?
+    else if (tokens.nextIs(tok_Section))
+        result = section_block(block, tokens, context);
 
     // parenthesized expression?
     else if (tokens.nextIs(tok_LParen)) {
@@ -2302,6 +2306,30 @@ ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
     
     // Primary output
     append_output_placeholder(resultBlock, find_last_non_comment_expression(resultBlock));
+
+    return ParseResult(term);
+}
+
+ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    tokens.consume(tok_Section);
+    possible_whitespace(tokens);
+
+    Value name;
+    set_string(&name, "");
+    if (tokens.nextIs(tok_Identifier)) {
+        tokens.getNextStr(&name, 0);
+        tokens.consume();
+        possible_whitespace(tokens);
+    }
+
+    int startPosition = tokens.getPosition();
+    Term* term = apply(block, FUNCS.section_block, TermList(),
+            name_from_string(as_cstring(&name)));
+    Block* resultBlock = nested_contents(term);
+    set_source_location(term, startPosition, tokens);
+    consume_block_with_braces(resultBlock, tokens, context, term);
+    block_finish_changes(resultBlock);
 
     return ParseResult(term);
 }

@@ -159,6 +159,7 @@ tok_Case
 tok_While
 tok_Require
 tok_Package
+tok_Section
 
 tok_Whitespace
 tok_Newline

@@ -198,6 +198,17 @@ void test_keywords2()
     test_assert(tokens.finished());
 }
 
+void test_keywords3()
+{
+    TokenStream tokens("package require section");
+
+    tokens.consume(tok_Package);
+    tokens.consume(tok_Whitespace);
+    tokens.consume(tok_Require);
+    tokens.consume(tok_Whitespace);
+    tokens.consume(tok_Section);
+}
+
 void test_identifiers_that_look_like_keywords()
 {
     TokenStream tokens("endup,iffy,else_,stateful");
@@ -357,6 +368,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer::test_misc3);
     REGISTER_TEST_CASE(tokenizer::test_keywords);
     REGISTER_TEST_CASE(tokenizer::test_keywords2);
+    REGISTER_TEST_CASE(tokenizer::test_keywords3);
     REGISTER_TEST_CASE(tokenizer::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer::test_string_literal);
     REGISTER_TEST_CASE(tokenizer::test_triple_quote_string_literal);

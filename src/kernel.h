@@ -11,7 +11,6 @@ struct BuiltinFuncs {
     Term* add;
     Term* add_i;
     Term* add_f;
-    Term* block;
     Term* block_dynamic_call;
     Term* block_unevaluated;
     Term* break_func;
@@ -70,6 +69,7 @@ struct BuiltinFuncs {
     Term* package;
     Term* range;
     Term* return_func;
+    Term* section_block;
     Term* selector;
     Term* set_index;
     Term* set_field;

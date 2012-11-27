@@ -199,7 +199,8 @@ void do_write_block(caValue* blockName, caValue* contents, caValue* reply)
 
     // Create the block if needed
     if (term == NULL)
-        term = apply(global_root_block(), FUNCS.block, TermList(), name_from_string(blockName));
+        term = apply(global_root_block(), FUNCS.section_block, TermList(),
+                name_from_string(blockName));
 
     // Import the new block contents
     Block* block = nested_contents(term);

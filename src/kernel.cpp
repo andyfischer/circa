@@ -729,6 +729,14 @@ void test_spy(caStack* stack)
     copy(circa_input(stack, 0), list_append(g_spyValues));
 }
 
+void section_block_formatSource(caValue* source, Term* term)
+{
+    format_name_binding(source, term);
+    append_phrase(source, "section", term, name_None);
+    append_phrase(source, " ", term, name_Whitespace);
+    format_block_source(source, nested_contents(term), term);
+}
+
 void bootstrap_kernel()
 {
     // First, instanciate the types that are used by Type.
@@ -891,6 +899,9 @@ void bootstrap_kernel()
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(kernel);
+
+    FUNCS.section_block = import_function(kernel, NULL, "def section_block() -> any");
+    as_function(FUNCS.section_block)->formatSource = section_block_formatSource;
 
     // Create IMPLICIT_TYPES (deprecated)
     type_initialize_kernel(kernel);

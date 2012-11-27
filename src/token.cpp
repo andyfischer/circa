@@ -92,6 +92,7 @@ const char* get_token_text(int match)
         case tok_While: return "while";
         case tok_Require: return "require";
         case tok_Package: return "package";
+        case tok_Section: return "section";
         case tok_Unrecognized: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -294,34 +295,40 @@ void top_level_consume_token(TokenizeContext &context)
 {
     if (is_identifier_first_letter(context.next())) {
 
-        if (try_to_consume_keyword(context, tok_Def)) return;
-        if (try_to_consume_keyword(context, tok_Type)) return;
-        if (try_to_consume_keyword(context, tok_Begin)) return;
-        if (try_to_consume_keyword(context, tok_End)) return;
-        if (try_to_consume_keyword(context, tok_If)) return;
-        if (try_to_consume_keyword(context, tok_Else)) return;
-        if (try_to_consume_keyword(context, tok_Elif)) return;
-        if (try_to_consume_keyword(context, tok_For)) return;
-        if (try_to_consume_keyword(context, tok_State)) return;
-        if (try_to_consume_keyword(context, tok_In)) return;
-        if (try_to_consume_keyword(context, tok_True)) return;
-        if (try_to_consume_keyword(context, tok_False)) return;
-        if (try_to_consume_keyword(context, tok_Do)) return;
-        if (try_to_consume_keyword(context, tok_Namespace)) return;
-        if (try_to_consume_keyword(context, tok_Include)) return;
-        if (try_to_consume_keyword(context, tok_And)) return;
-        if (try_to_consume_keyword(context, tok_Or)) return;
-        if (try_to_consume_keyword(context, tok_Not)) return;
-        if (try_to_consume_keyword(context, tok_Discard)) return;
-        if (try_to_consume_keyword(context, tok_Null)) return;
-        if (try_to_consume_keyword(context, tok_Return)) return;
-        if (try_to_consume_keyword(context, tok_Break)) return;
-        if (try_to_consume_keyword(context, tok_Continue)) return;
-        if (try_to_consume_keyword(context, tok_Switch)) return;
-        if (try_to_consume_keyword(context, tok_Case)) return;
-        if (try_to_consume_keyword(context, tok_While)) return;
-        if (try_to_consume_keyword(context, tok_Require)) return;
-        if (try_to_consume_keyword(context, tok_Package)) return;
+        if (context.next() <= 'm') {
+            // a through m
+            if (try_to_consume_keyword(context, tok_And)) return;
+            if (try_to_consume_keyword(context, tok_Begin)) return;
+            if (try_to_consume_keyword(context, tok_Break)) return;
+            if (try_to_consume_keyword(context, tok_Case)) return;
+            if (try_to_consume_keyword(context, tok_Continue)) return;
+            if (try_to_consume_keyword(context, tok_Def)) return;
+            if (try_to_consume_keyword(context, tok_Discard)) return;
+            if (try_to_consume_keyword(context, tok_Do)) return;
+            if (try_to_consume_keyword(context, tok_End)) return;
+            if (try_to_consume_keyword(context, tok_Else)) return;
+            if (try_to_consume_keyword(context, tok_Elif)) return;
+            if (try_to_consume_keyword(context, tok_False)) return;
+            if (try_to_consume_keyword(context, tok_For)) return;
+            if (try_to_consume_keyword(context, tok_If)) return;
+            if (try_to_consume_keyword(context, tok_In)) return;
+            if (try_to_consume_keyword(context, tok_Include)) return;
+        } else {
+            // n through z
+            if (try_to_consume_keyword(context, tok_Namespace)) return;
+            if (try_to_consume_keyword(context, tok_Not)) return;
+            if (try_to_consume_keyword(context, tok_Null)) return;
+            if (try_to_consume_keyword(context, tok_Or)) return;
+            if (try_to_consume_keyword(context, tok_Return)) return;
+            if (try_to_consume_keyword(context, tok_State)) return;
+            if (try_to_consume_keyword(context, tok_Switch)) return;
+            if (try_to_consume_keyword(context, tok_True)) return;
+            if (try_to_consume_keyword(context, tok_Type)) return;
+            if (try_to_consume_keyword(context, tok_Require)) return;
+            if (try_to_consume_keyword(context, tok_Package)) return;
+            if (try_to_consume_keyword(context, tok_Section)) return;
+            if (try_to_consume_keyword(context, tok_While)) return;
+        }
 
         consume_identifier(context);
         return;
