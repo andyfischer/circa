@@ -30,7 +30,7 @@ namespace cast_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.cast = import_function(kernel, cast_evaluate, "cast :throws (any) -> any");
+        FUNCS.cast = import_function(kernel, cast_evaluate, "cast :throws (any val) -> any");
     }
 }
 }

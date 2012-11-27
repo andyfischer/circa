@@ -18,7 +18,7 @@ namespace block_function {
         function_set_empty_evaluation(as_function(FUNCS.block_unevaluated));
 
         // deprecated
-        FUNCS.lambda = import_function(kernel, NULL, "lambda(any :multiple) -> Block");
+        FUNCS.lambda = import_function(kernel, NULL, "lambda(any inputs :multiple) -> Block");
         as_function(FUNCS.lambda)->formatSource = format_source;
     }
 }

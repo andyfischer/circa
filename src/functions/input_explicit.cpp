@@ -24,10 +24,10 @@ namespace input_explicit_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.input_explicit = import_function(kernel, input_explicit, "input(any) -> any");
+        FUNCS.input_explicit = import_function(kernel, input_explicit, "input(any _) -> any");
         as_function(FUNCS.input_explicit)->postCompile = postCompile;
         
-        FUNCS.output_explicit = import_function(kernel, NULL, "output(any)");
+        FUNCS.output_explicit = import_function(kernel, NULL, "output(any _)");
     }
 }
 }

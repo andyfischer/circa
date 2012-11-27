@@ -21,7 +21,7 @@ namespace concat_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, concat, "concat(any :multiple) -> String;"
+        import_function(kernel, concat, "concat(any vals :multiple) -> String;"
             "'Concatenate each input (converting to a string if necessary).'");
     }
 }

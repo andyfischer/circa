@@ -20,7 +20,7 @@ namespace container_set_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "set(any :multiple) -> Set");
+        import_function(kernel, evaluate, "set(any items :multiple) -> Set");
     }
 }
 }

@@ -55,14 +55,14 @@ namespace comparison_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, less_than_i, "less_than_i(int,int) -> bool");
-        import_function(kernel, less_than_f, "less_than_f(number,number) -> bool");
-        import_function(kernel, less_than_eq_i, "less_than_eq_i(int,int) -> bool");
-        import_function(kernel, less_than_eq_f, "less_than_eq_f(number,number) -> bool");
-        import_function(kernel, greater_than_i, "greater_than_i(int,int) -> bool");
-        import_function(kernel, greater_than_f, "greater_than_f(number,number) -> bool");
-        import_function(kernel, greater_than_eq_i, "greater_than_eq_i(int,int) -> bool");
-        import_function(kernel, greater_than_eq_f, "greater_than_eq_f(number,number) -> bool");
+        import_function(kernel, less_than_i, "less_than_i(int a,int b) -> bool");
+        import_function(kernel, less_than_f, "less_than_f(number a,number b) -> bool");
+        import_function(kernel, less_than_eq_i, "less_than_eq_i(int a,int b) -> bool");
+        import_function(kernel, less_than_eq_f, "less_than_eq_f(number a,number b) -> bool");
+        import_function(kernel, greater_than_i, "greater_than_i(int a,int b) -> bool");
+        import_function(kernel, greater_than_f, "greater_than_f(number a,number b) -> bool");
+        import_function(kernel, greater_than_eq_i, "greater_than_eq_i(int a,int b) -> bool");
+        import_function(kernel, greater_than_eq_f, "greater_than_eq_f(number a,number b) -> bool");
     }
 }
 }

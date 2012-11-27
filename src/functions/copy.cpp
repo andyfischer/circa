@@ -24,7 +24,7 @@ namespace copy_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.copy = import_function(kernel, evaluate, "copy(any) -> any");
+        FUNCS.copy = import_function(kernel, evaluate, "copy(any val) -> any");
         as_function(FUNCS.copy)->specializeType = specializeType;
         as_function(FUNCS.copy)->formatSource = formatSource;
     }

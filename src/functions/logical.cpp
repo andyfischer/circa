@@ -28,7 +28,7 @@ namespace logical_function {
                 "'Return whether a and b are both true'");
         import_function(kernel, or_func, "or(bool a, bool b) -> bool;"
                 "'Return whether a or b are both true'");
-        import_function(kernel, not_func, "not(bool) -> bool");
+        import_function(kernel, not_func, "not(bool b) -> bool");
     }
 }
 }

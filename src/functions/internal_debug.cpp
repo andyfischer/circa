@@ -44,7 +44,7 @@ namespace internal_debug_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, NULL, "dump_parse(any :multiple)"
+        import_function(kernel, NULL, "dump_parse(any t :multiple)"
             "'For internal debugging. The parser will dump information about all input terms"
             "immediately after this function is parsed");
         as_function(kernel->get("dump_parse"))->postCompile = dump_parse_post_compile;

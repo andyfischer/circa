@@ -70,7 +70,7 @@ namespace get_field_function {
     void setup(Block* kernel)
     {
         FUNCS.get_field = import_function(kernel, evaluate,
-                "get_field(any, String) -> any");
+                "get_field(any obj, String key) -> any");
         as_function(FUNCS.get_field)->specializeType = specializeType;
         as_function(FUNCS.get_field)->formatSource = formatSource;
     }

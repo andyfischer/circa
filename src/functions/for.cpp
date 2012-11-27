@@ -31,11 +31,11 @@ namespace for_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.for_func = import_function(kernel, NULL, "for(Indexable) -> List");
+        FUNCS.for_func = import_function(kernel, NULL, "for(Indexable list) -> List");
         as_function(FUNCS.for_func)->formatSource = formatSource;
 
         FUNCS.loop_iterator = import_function(kernel, NULL,
-            "loop_iterator(any, any) -> int");
+            "loop_iterator(any _, any _) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(int index) -> int");
         function_set_empty_evaluation(as_function(FUNCS.loop_index));
 

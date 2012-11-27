@@ -34,7 +34,7 @@ namespace filter_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "filter(Indexable,Indexable) -> List");
+        import_function(kernel, evaluate, "filter(Indexable i,Indexable j) -> List");
     }
 }
 } // namespace circa

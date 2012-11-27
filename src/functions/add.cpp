@@ -54,8 +54,8 @@ namespace add_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int, int) -> int");
-        FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number, number) -> number");
+        FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int a, int b) -> int");
+        FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number a, number b) -> number");
     }
 } // namespace add_function
 } // namespace circa

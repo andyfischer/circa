@@ -35,11 +35,11 @@ namespace list_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.list = import_function(kernel, make_list, "list(any :multiple) -> List");
+        FUNCS.list = import_function(kernel, make_list, "list(any vals :multiple) -> List");
         // as_function(FUNCS.list)->specializeType = list_specializeType;
 
-        import_function(kernel, repeat,  "repeat(any, int) -> List");
-        import_function(kernel, blank_list, "blank_list(int) -> List");
+        import_function(kernel, repeat,  "repeat(any val, int count) -> List");
+        import_function(kernel, blank_list, "blank_list(int count) -> List");
     }
 }
 }

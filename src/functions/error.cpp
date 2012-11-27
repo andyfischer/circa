@@ -16,8 +16,8 @@ namespace error_function {
     }
     void setup(Block* kernel)
     {
-        FUNCS.error = import_function(kernel, error, "error(String)");
-        FUNCS.errored = import_function(kernel, errored, "errored(any) -> bool");
+        FUNCS.error = import_function(kernel, error, "error(String msg)");
+        FUNCS.errored = import_function(kernel, errored, "errored(any val) -> bool");
     }
 }
 }

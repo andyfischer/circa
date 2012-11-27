@@ -22,7 +22,7 @@ namespace lookup_block_ref_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "lookup_block_ref(String) -> Block");
+        import_function(kernel, evaluate, "lookup_block_ref(String name) -> Block");
     }
 }
 }

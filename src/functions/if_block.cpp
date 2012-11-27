@@ -55,7 +55,7 @@ namespace if_block_function {
         FUNCS.if_block = import_function(kernel, NULL, "if_block() -> any");
         as_function(FUNCS.if_block)->formatSource = formatSource;
 
-        FUNCS.case_func = import_function(kernel, NULL, "case(bool :optional)");
+        FUNCS.case_func = import_function(kernel, NULL, "case(bool b :optional)");
     }
 }
 }
