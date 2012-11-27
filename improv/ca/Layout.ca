@@ -1,4 +1,10 @@
 
+def sum(List numbers) -> number
+    result = 0
+    for i in numbers
+        result += i
+    result
+    
 type Element {
     int parent
     List children
@@ -9,6 +15,7 @@ type Element {
 
 type Layout {
     List elements
+    Point size
     int cursor
 }
 
@@ -20,6 +27,7 @@ def start(Point size) -> Layout
     root = make(Element)
     root.parent = -1
     layout.elements.append(root)
+    layout.cursor = 0
 
     layout
 
@@ -37,9 +45,10 @@ def Layout.addNode(@self, cursor, data)
 
 def Layout.setProp(@self, name, value)
     self.elements[self.cursor].props.set(name, value)
+def Layout.setStrategy(@self, strategy)
+    self.elements[self.cursor].strategy = strategy
 
 def Layout.applyBoxLayout(@self, cursor, List @positions)
-    
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
@@ -51,5 +60,11 @@ def Layout.getRects(self) -> List
     for Element e in self.elements
 
         -- Dispatch on strategy
-        if e.strategy == :box
+        if e.strategy == :percent
+            percentTags = for child in e.children
+                self.elements[child].props.get('height', :none)
+
+            print('tags: ' percentTags)
+            -- totalPercent = sum(for child in e.children { self.elements[child]
+
             self.applyBoxLayout(index(), @positions)

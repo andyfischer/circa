@@ -3,7 +3,7 @@ require Layout
 
 layout = Layout:start([100 100])
 
-layout.setStrategy(:box)
+layout.setStrategy(:percent)
 
 root = layout.cursor
 
