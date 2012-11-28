@@ -579,37 +579,58 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             isStateArgument = true;
         }
 
-        Term* typeTerm = NULL;
-        if (inputIndex == 0 && isMethod) {
-            // For input0 of a method, don't expect an explicit type name.
-            typeTerm = methodType;
-        } else {
-            typeTerm = type_expr(block, tokens, context).term;
+        // Lookahead to see if an explicit type name was used.
+        bool explicitType = false;
+        {
+            int lookahead = 0;
+            int identifierCount = 0;
+            if (tokens.nextIs(tok_Identifier, lookahead)) {
+                lookahead++;
+                identifierCount++;
+            }
+            if (tokens.nextIs(tok_Whitespace, lookahead))
+                lookahead++;
+            if (tokens.nextIs(tok_At, lookahead))
+                lookahead++;
+            if (tokens.nextIs(tok_Identifier, lookahead)) {
+                lookahead++;
+                identifierCount++;
+            }
+
+            if (identifierCount == 2)
+                explicitType = true;
         }
 
-        possible_whitespace(tokens);
+        Type* type = NULL;
+        
+        if (explicitType) {
+            Term* typeTerm = type_expr(block, tokens, context).term;
+            type = unbox_type(typeTerm);
+            possible_whitespace(tokens);
+        } else if (inputIndex == 0 && isMethod) {
+            // For input0 of a method, use the assumed type.
+            type = unbox_type(methodType);
+        } else {
+            type = TYPES.any;
+        }
 
-        // Optional @, indicating an output.
+        // Optional @ in front of name, indicating an output.
         bool rebindSymbol = false;
         if (tokens.nextIs(tok_At)) {
             tokens.consume(tok_At);
             rebindSymbol = true;
         }
 
-        std::string name;
-        if (tokens.nextIs(tok_Identifier)) {
-            name = tokens.consumeStr();
-            possible_whitespace(tokens);
-        } else {
-            // anonymous input; use a default name
-            name = get_placeholder_name_for_index(function_num_inputs(attrs));
-        }
+        // Input name.
+        if (!tokens.nextIs(tok_Identifier))
+            return compile_error_for_line(block, tokens, startPosition, "Expected input name");
+
+        std::string name = tokens.consumeStr(tok_Identifier);
+        possible_whitespace(tokens);
 
         // Create an input placeholder term
         Term* input = apply(contents, FUNCS.input, TermList(), name_from_string(name));
-
-        if (is_type(typeTerm))
-            change_declared_type(input, as_type(typeTerm));
+        change_declared_type(input, type);
 
         if (isStateArgument)
             input->setBoolProp("state", true);

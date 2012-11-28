@@ -85,13 +85,6 @@ Function* get_function_from_block(Block* block)
     return as_function(block->owningTerm);
 }
 
-std::string get_placeholder_name_for_index(int index)
-{
-    std::stringstream sstream;
-    sstream << "#input_" << index;
-    return sstream.str();
-}
-
 Term* create_function(Block* block, const char* name)
 {
     ca_assert(name != NULL);

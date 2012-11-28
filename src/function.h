@@ -62,10 +62,6 @@ Block* function_contents(Term* func);
 Block* function_contents(Function* func);
 Function* get_function_from_block(Block* block);
 
-// Return the placeholder name for the given input index; this is the name that
-// is used if no name is given.
-std::string get_placeholder_name_for_index(int index);
-
 // Create a declared function
 Term* create_function(Block* block, const char* name);
 
