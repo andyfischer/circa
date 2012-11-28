@@ -28,7 +28,6 @@ namespace equals_function { void setup(Block* kernel); }
 namespace error_function { void setup(Block* kernel); }
 namespace extra_output_function { void setup(Block* kernel); }
 namespace feedback_function { void setup(Block* kernel); }
-namespace filter_function { void setup(Block* kernel); }
 namespace for_function { void setup(Block* kernel); }
 namespace get_field_function { void setup(Block* kernel); }
 namespace get_index_function { void setup(Block* kernel); }
@@ -40,7 +39,6 @@ namespace input_explicit_function { void setup(Block* kernel); }
 namespace internal_debug_function { void setup(Block* kernel); }
 namespace list_function { void setup(Block* kernel); }
 namespace logical_function { void setup(Block* kernel); }
-namespace lookup_block_ref_function { void setup(Block* kernel); }
 namespace make_function { void setup(Block* kernel); }
 namespace math_function { void setup(Block* kernel); }
 namespace meta_function { void setup(Block* kernel); }
@@ -89,7 +87,6 @@ void setup_builtin_functions(Block* kernel)
     error_function::setup(kernel);
     extra_output_function::setup(kernel);
     feedback_function::setup(kernel);
-    filter_function::setup(kernel);
     for_function::setup(kernel);
     get_field_function::setup(kernel);
     get_index_function::setup(kernel);
@@ -101,7 +98,6 @@ void setup_builtin_functions(Block* kernel)
     internal_debug_function::setup(kernel);
     list_function::setup(kernel);
     logical_function::setup(kernel);
-    lookup_block_ref_function::setup(kernel);
     make_function::setup(kernel);
     math_function::setup(kernel);
     meta_function::setup(kernel);
