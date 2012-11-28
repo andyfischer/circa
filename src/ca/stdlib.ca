@@ -584,16 +584,11 @@ def grow_rect(Rect r, number amount) -> Rect
     -- Return a Rect based on r, where each side is moved away from the center by 'amount'.
     return Rect([r.x1 - amount, r.y1 - amount, r.x2 + amount, r.y2 + amount])
 
-def rect(Point topleft, Point bottomright) -> Rect
-    -- Return a Rect with the given top-left and bottom-right coordinates.
-    return [topleft.x topleft.y bottomright.x bottomright.y]
-
 def approach_rect(Rect target, number maxChange) -> Rect
     -- Stateful function, returns a Rect that gradually approaches the target Rect.
     -- Each coordinate will change by at most 'maxChange' per call.
     return Rect([approach(target.x1,maxChange), approach(target.y1,maxChange),
         approach(target.x2,maxChange),approach(target.y2,maxChange)])
-
 
 def interp_rect(Rect a, Rect b, number ratio) -> Rect
     -- Linearly interpolate between two rectangles.

@@ -52,7 +52,7 @@ def Layout.applyBoxLayout(@self, cursor, List @positions)
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
-    positions = empty_list(self.elements.length)
+    positions = empty_list(null, self.elements.length)
 
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)
@@ -67,4 +67,3 @@ def Layout.getRects(self) -> List
             print('tags: ' percentTags)
             -- totalPercent = sum(for child in e.children { self.elements[child]
 
-            self.applyBoxLayout(index(), @positions)

@@ -572,8 +572,15 @@ int run_command_line(caWorld* world, caValue* args)
         return 0;
     }
 
-    // Default behavior with no flags: load args[0] as a script and run it.
-    load_script(mainBlock, as_cstring(list_get(args, 0)));
+    // Default behavior with no flags: run args[0] as a script filename.
+
+    // Add the script's folder to module search paths.
+    caValue* filename = list_get(args, 0);
+    Value directory;
+    get_directory_for_filename(filename, &directory);
+    module_add_search_path(world, as_cstring(&directory));
+
+    load_script(mainBlock, as_cstring(filename));
     block_finish_changes(mainBlock);
     refresh_bytecode(mainBlock);
 
