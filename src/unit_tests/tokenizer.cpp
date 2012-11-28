@@ -162,10 +162,8 @@ void test_misc3()
 
 void test_keywords()
 {
-    TokenStream tokens("end,if,else,for,state,elif");
+    TokenStream tokens("if,else,for,state,elif");
 
-    tokens.consume(tok_End);
-    tokens.consume(tok_Comma);
     tokens.consume(tok_If);
     tokens.consume(tok_Comma);
     tokens.consume(tok_Else);

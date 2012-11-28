@@ -64,9 +64,6 @@ const char* get_token_text(int match)
         case tok_Pound: return "#";
         case tok_Whitespace: return "WHITESPACE";
         case tok_Newline: return "NEWLINE";
-        case tok_Begin: return "begin";
-        case tok_Do: return "do";
-        case tok_End: return "end";
         case tok_If: return "if";
         case tok_Else: return "else";
         case tok_Elif: return "elif";
@@ -298,14 +295,11 @@ void top_level_consume_token(TokenizeContext &context)
         if (context.next() <= 'm') {
             // a through m
             if (try_to_consume_keyword(context, tok_And)) return;
-            if (try_to_consume_keyword(context, tok_Begin)) return;
             if (try_to_consume_keyword(context, tok_Break)) return;
             if (try_to_consume_keyword(context, tok_Case)) return;
             if (try_to_consume_keyword(context, tok_Continue)) return;
             if (try_to_consume_keyword(context, tok_Def)) return;
             if (try_to_consume_keyword(context, tok_Discard)) return;
-            if (try_to_consume_keyword(context, tok_Do)) return;
-            if (try_to_consume_keyword(context, tok_End)) return;
             if (try_to_consume_keyword(context, tok_Else)) return;
             if (try_to_consume_keyword(context, tok_Elif)) return;
             if (try_to_consume_keyword(context, tok_False)) return;

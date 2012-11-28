@@ -121,9 +121,9 @@ const char* builtin_name_to_string(int name)
     case tok_Pound: return "tok_Pound";
     case tok_Def: return "tok_Def";
     case tok_Type: return "tok_Type";
-    case tok_Begin: return "tok_Begin";
-    case tok_Do: return "tok_Do";
-    case tok_End: return "tok_End";
+    case tok_UnusedName1: return "tok_UnusedName1";
+    case tok_UnusedName2: return "tok_UnusedName2";
+    case tok_UnusedName3: return "tok_UnusedName3";
     case tok_If: return "tok_If";
     case tok_Else: return "tok_Else";
     case tok_Elif: return "tok_Elif";

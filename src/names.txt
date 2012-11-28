@@ -133,9 +133,9 @@ tok_Pound
 
 tok_Def
 tok_Type
-tok_Begin
-tok_Do
-tok_End
+tok_UnusedName1
+tok_UnusedName2
+tok_UnusedName3
 tok_If
 tok_Else
 tok_Elif

@@ -338,7 +338,7 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     // Comment (blank lines count as comments). This should do the same thing
     // as matches_comment_statement.
     if (tokens.nextIs(tok_Comment) || tokens.nextIs(tok_Newline) || tokens.nextIs(tok_Semicolon)
-        || (foundWhitespace && (tokens.nextIs(tok_RBrace) || tokens.nextIs(tok_End) || tokens.finished()))) {
+        || (foundWhitespace && (tokens.nextIs(tok_RBrace) || tokens.finished()))) {
         result = comment(block, tokens, context);
     }
 
@@ -433,8 +433,7 @@ bool matches_comment_statement(Block* block, TokenStream& tokens)
 
     int next = tokens.next(lookahead).match;
     return (next == tok_Comment || next == tok_Newline || next == tok_Semicolon ||
-        (foundWhitespace &&
-             (tokens.nextIs(tok_RBrace) || tokens.nextIs(tok_End) || tokens.finished())));
+        (foundWhitespace && (tokens.nextIs(tok_RBrace) || tokens.finished())));
 }
 
 ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context)
