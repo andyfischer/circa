@@ -17,8 +17,8 @@ namespace sub_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate_i, "sub_i(int,int) -> int");
-        import_function(kernel, evaluate_f, "sub_f(number,number) -> number");
+        import_function(kernel, evaluate_i, "sub_i(int a,int b) -> int");
+        import_function(kernel, evaluate_f, "sub_f(number a,number b) -> number");
     }
 }
 } // namespace circa

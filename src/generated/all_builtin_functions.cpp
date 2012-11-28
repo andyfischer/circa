@@ -29,7 +29,6 @@
 #include "../functions/logical.cpp"
 #include "../functions/make.cpp"
 #include "../functions/math.cpp"
-#include "../functions/meta.cpp"
 #include "../functions/mult.cpp"
 #include "../functions/namespace.cpp"
 #include "../functions/neg.cpp"

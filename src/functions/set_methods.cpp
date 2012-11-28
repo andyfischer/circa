@@ -42,9 +42,9 @@ namespace set_methods_function {
     
     void setup(Block* kernel)
     {
-        import_function(kernel, hosted_add, "Set.add(self :out, any)");
-        import_function(kernel, remove, "Set.remove(self :out, any)");
-        import_function(kernel, contains, "Set.contains(self, any) -> bool");
+        import_function(kernel, hosted_add, "Set.add(@self, any items)");
+        import_function(kernel, remove, "Set.remove(@self, any items)");
+        import_function(kernel, contains, "Set.contains(self, any item) -> bool");
     }
 
 }

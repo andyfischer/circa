@@ -13,7 +13,7 @@ namespace term_to_source_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "term_to_source(any :meta) -> String");
+        import_function(kernel, evaluate, "term_to_source(any term :meta) -> String");
     }
 }
 } // namespace circa

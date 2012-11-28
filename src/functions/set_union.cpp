@@ -23,7 +23,7 @@ namespace set_union_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "set_union(Set :multiple) -> Set");
+        import_function(kernel, evaluate, "set_union(Set sets :multiple) -> Set");
     }
 }
 }

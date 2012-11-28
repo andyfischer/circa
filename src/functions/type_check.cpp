@@ -85,19 +85,19 @@ namespace type_check_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, hosted_is_list, "is_list(any) -> bool");
-        import_function(kernel, hosted_is_int, "is_int(any) -> bool");
-        import_function(kernel, hosted_is_float, "is_float(any) -> bool");
-        import_function(kernel, hosted_is_bool, "is_bool(any) -> bool");
-        import_function(kernel, hosted_is_string, "is_string(any) -> bool");
-        import_function(kernel, hosted_is_null, "is_null(any) -> bool");
-        import_function(kernel, hosted_is_function, "is_function(any) -> bool");
-        import_function(kernel, hosted_is_type, "is_type(any) -> bool");
+        import_function(kernel, hosted_is_list, "is_list(any v) -> bool");
+        import_function(kernel, hosted_is_int, "is_int(any v) -> bool");
+        import_function(kernel, hosted_is_float, "is_float(any v) -> bool");
+        import_function(kernel, hosted_is_bool, "is_bool(any v) -> bool");
+        import_function(kernel, hosted_is_string, "is_string(any v) -> bool");
+        import_function(kernel, hosted_is_null, "is_null(any v) -> bool");
+        import_function(kernel, hosted_is_function, "is_function(any v) -> bool");
+        import_function(kernel, hosted_is_type, "is_type(any v) -> bool");
 
         FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
-            "inputs_fit_function(List,Function) -> bool");
+            "inputs_fit_function(List inputs,Function func) -> bool");
         FUNCS.overload_error_no_match = import_function(kernel,
-            overload_error_no_match, "overload_error_no_match(List)");
+            overload_error_no_match, "overload_error_no_match(List inputs)");
     }
 
 } // namespace type_check_function

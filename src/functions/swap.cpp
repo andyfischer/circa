@@ -13,7 +13,7 @@ namespace swap_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, swap, "swap(any :out, any :out)");
+        import_function(kernel, swap, "swap(any @left, any @right)");
     }
 }
 }

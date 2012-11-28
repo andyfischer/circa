@@ -4,7 +4,7 @@
 def assert(bool condition)
     -- Raises an error if 'condition' is false.
 
-def length(List) -> int
+def length(List list) -> int
     -- Return the number of items in the given list
 
 def from_string(String s) -> any
@@ -39,9 +39,9 @@ def actor_run_message(Actor actor, any msg)
 
 def test_oracle() -> any
     -- For internal testing. This function will output values that are manually
-    -- inserted with the c++ function oracle_send.
+    -- inserted with the C++ function oracle_send.
 
-def test_spy(any)
+def test_spy(any val)
     -- For internal testing. This function will save inputs to a global list which
     -- can be easily examined from C++ code.
 
@@ -139,7 +139,8 @@ type Closure {
 def Closure.call(self, any inputs :multiple) -> any
 
 def closure_block() -> Closure
-def unbound_input(any) -> any
+def unbound_input(any _) -> any
+    -- Internally used function, used inside closure blocks to mark an unbound input.
 
 def Dict.count(self) -> int
     -- Return the number of elements
@@ -181,7 +182,7 @@ def Interpreter.push_frame(self, Block, List inputs)
     -- Push a new frame, using the given block and input list.
 def Interpreter.pop_frame(self)
     -- Pop the topmost frame.
-def Interpreter.set_state_input(self, any)
+def Interpreter.set_state_input(self, any val)
     -- Assign a value to the :state input of the topmost frame (if any)
 def Interpreter.get_state_output(self) -> any
 def Interpreter.reset(self)
@@ -220,7 +221,7 @@ def List.resize(@self, int length)
 def List.count(self) -> int
     -- Return the number of elements in this list.
 
-def List.insert(@self, int, any)
+def List.insert(@self, int index, any val)
     -- Insert an element at the given index. If necessary, existing elements will
     -- be shifted to the right to make room.
     --
@@ -311,11 +312,11 @@ def String.ends_with(self,String) -> bool
     -- Return true if this string ends with the given substring.
 def String.length(self) -> int
     -- Returns the string length.
-def String.slice(self,int,int) -> String
+def String.slice(self,int start,int fin) -> String
 def String.starts_with(self,String prefix) -> bool
     -- Returns true if the string starts with the given prefix.
 def String.split(self,String sep) -> List
-def String.substr(self,int,int) -> String
+def String.substr(self,int start,int fin) -> String
 def String.to_camel_case(self) -> String
     -- Deprecated function
 def String.to_lower(self) -> String
@@ -331,14 +332,14 @@ def Type.name(self) -> String
 def Type.property(self, String) -> any
 def Type.declaringTerm(self) -> Term
 
-def type(any) -> Type
+def type(any val) -> Type
     -- Returns the runtime type of a value
-def static_type(any :meta) -> Type
+def static_type(any term :meta) -> Type
     -- Returns the static type of a value
 
 -- Metaprogramming on Term
 def term_ref(any :ignore_error) -> Term
-def Term.assign(self, any)
+def Term.assign(self, any val)
 def Term.asint(self) -> int
 def Term.asfloat(self) -> number
 def Term.parent(self) -> Block
@@ -364,7 +365,7 @@ def Term.get_type(self) -> Type
 def Term.value(self) -> any
     -- For a value term, this fetches the actual value.
 def Term.tweak(self, number steps)
-def Term.input(self, int) -> Term
+def Term.input(self, int index) -> Term
     -- Fetch an input term by index.
 def Term.inputs(self) -> List
     -- Return a list of input terms.

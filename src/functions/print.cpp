@@ -23,10 +23,10 @@ namespace print_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "print(any :multiple) "
+        import_function(kernel, evaluate, "print(any items :multiple) "
                 "'Prints a line of text output to the console'");
 
-        import_function(kernel, evaluate, "trace(any :multiple) "
+        import_function(kernel, evaluate, "trace(any items :multiple) "
                 "'Prints a line of text output to the console'");
     }
 }

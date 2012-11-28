@@ -17,7 +17,7 @@ namespace to_string_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate, "to_string(any) -> String");
+        import_function(kernel, evaluate, "to_string(any val) -> String");
     }
 }
 } // namespace circa

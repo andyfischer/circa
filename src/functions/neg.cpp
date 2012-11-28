@@ -23,8 +23,8 @@ namespace neg_function  {
 
     void setup(Block* kernel)
     {
-        Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int) -> int");
-        Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number) -> number");
+        Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int i) -> int");
+        Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number n) -> number");
 
         as_function(neg_i)->formatSource = formatSource;
         as_function(neg_f)->formatSource = formatSource;

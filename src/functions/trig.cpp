@@ -79,20 +79,20 @@ namespace trig_function {
         Term* sin_func = import_function(kernel, evaluate_sin, "sin(number degrees) -> number;"
             "'Trigonometric sin() function");
         as_function(sin_func)->feedbackFunc = 
-            import_function(kernel, feedback_evaluate_sin, "sin_feedback(any, number) -> number");
+            import_function(kernel, feedback_evaluate_sin, "sin_feedback(any a, number b) -> number");
 
         Term* cos_func = import_function(kernel, evaluate_cos, "cos(number degrees) -> number;"
             "'Trigonometric cos() function'");
         as_function(cos_func)->feedbackFunc = 
-            import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, number) -> number");
+            import_function(kernel, feedback_evaluate_cos, "cos_feedback(any a, number b) -> number");
 
         import_function(kernel, evaluate_tan, "tan(number degrees) -> number;"
             "'Trigonometric tan() function'");
-        import_function(kernel, evaluate_arcsin, "arcsin(number) -> number;"
+        import_function(kernel, evaluate_arcsin, "arcsin(number n) -> number;"
             "'Trigonometric arcsin() function'");
-        import_function(kernel, evaluate_arccos, "arccos(number) -> number;"
+        import_function(kernel, evaluate_arccos, "arccos(number n) -> number;"
             "'Trigonometric arccos() function'");
-        import_function(kernel, evaluate_arctan, "arctan(number) -> number;"
+        import_function(kernel, evaluate_arctan, "arctan(number n) -> number;"
             "'Trigonometric arctan() function'");
     }
 } // namespace trig_function

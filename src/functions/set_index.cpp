@@ -25,7 +25,7 @@ namespace set_index_function {
     void setup(Block* kernel)
     {
         FUNCS.set_index = import_function(kernel, evaluate,
-                "set_index(any, int, any) -> List");
+                "set_index(any list, int index, any val) -> List");
         function_set_specialize_type_func(FUNCS.set_index, specializeType);
     }
 }

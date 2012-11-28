@@ -46,7 +46,7 @@ namespace set_field_function {
     void setup(Block* kernel)
     {
         FUNCS.set_field = import_function(kernel, evaluate,
-                "set_field(any, String, any) -> any");
+                "set_field(any obj, String key, any val) -> any");
         as_function(FUNCS.set_field)->specializeType = specializeType;
         as_function(FUNCS.set_field)->formatSource = formatSource;
     }

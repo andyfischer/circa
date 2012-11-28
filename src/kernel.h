@@ -35,7 +35,6 @@ struct BuiltinFuncs {
     Term* exit_point;
     Term* extra_output;
     Term* feedback;
-    Term* freeze;
     Term* for_func;
     Term* get_field;
     Term* get_index;

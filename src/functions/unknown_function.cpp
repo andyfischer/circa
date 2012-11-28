@@ -17,7 +17,7 @@ namespace unknown_function_function {
     void setup(Block* kernel)
     {
         FUNCS.unknown_function = import_function(kernel, evaluate_unknown_function,
-            "unknown_function(any :multiple) -> any");
+            "unknown_function(any ins :multiple) -> any");
     }
 }
 }

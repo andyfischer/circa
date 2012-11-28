@@ -50,8 +50,8 @@ OLD_FEEDBACK_IMPL_DISABLED
 
     void setup(Block* kernel)
     {
-        import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
-        import_function(kernel, evaluate_f, "mult_f(number,number) -> number");
+        import_function(kernel, evaluate_i, "mult_i(int a,int b) -> int");
+        import_function(kernel, evaluate_f, "mult_f(number a,number b) -> number");
     }
 }
 } // namespace circa
