@@ -24,7 +24,7 @@ namespace make_function {
 
     void setup(Block* kernel)
     {
-        Term* func = import_function(kernel, make_func, "make(Type) -> any");
+        Term* func = import_function(kernel, make_func, "make(Type t) -> any");
         as_function(func)->specializeType = specializeType;
     }
 }

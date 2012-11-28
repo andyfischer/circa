@@ -1,6 +1,6 @@
 
 def f();
-def g(any);
+def g(any v);
 
 -- If
 if true { true x = 1 }

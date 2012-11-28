@@ -909,52 +909,52 @@ void bootstrap_kernel()
     // Now we can build derived functions
 
     // Create overloaded functions
-    FUNCS.add = create_overloaded_function(kernel, "add(any,any) -> any");
+    FUNCS.add = create_overloaded_function(kernel, "add(any a,any b) -> any");
     append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
     append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
 
-    Term* less_than = create_overloaded_function(kernel, "less_than(any,any) -> bool");
+    Term* less_than = create_overloaded_function(kernel, "less_than(any a,any b) -> bool");
     append_to_overloaded_function(less_than, kernel->get("less_than_i"));
     append_to_overloaded_function(less_than, kernel->get("less_than_f"));
 
-    Term* less_than_eq = create_overloaded_function(kernel, "less_than_eq(any,any) -> bool");
+    Term* less_than_eq = create_overloaded_function(kernel, "less_than_eq(any a,any b) -> bool");
     append_to_overloaded_function(less_than_eq, kernel->get("less_than_eq_i"));
     append_to_overloaded_function(less_than_eq, kernel->get("less_than_eq_f"));
 
-    Term* greater_than = create_overloaded_function(kernel, "greater_than(any,any) -> bool");
+    Term* greater_than = create_overloaded_function(kernel, "greater_than(any a,any b) -> bool");
     append_to_overloaded_function(greater_than, kernel->get("greater_than_i"));
     append_to_overloaded_function(greater_than, kernel->get("greater_than_f"));
 
-    Term* greater_than_eq = create_overloaded_function(kernel, "greater_than_eq(any,any) -> bool");
+    Term* greater_than_eq = create_overloaded_function(kernel, "greater_than_eq(any a,any b) -> bool");
     append_to_overloaded_function(greater_than_eq, kernel->get("greater_than_eq_i"));
     append_to_overloaded_function(greater_than_eq, kernel->get("greater_than_eq_f"));
 
-    Term* max_func = create_overloaded_function(kernel, "max(any,any) -> any");
+    Term* max_func = create_overloaded_function(kernel, "max(any a,any b) -> any");
     append_to_overloaded_function(max_func, kernel->get("max_i"));
     append_to_overloaded_function(max_func, kernel->get("max_f"));
 
-    Term* min_func = create_overloaded_function(kernel, "min(any,any) -> any");
+    Term* min_func = create_overloaded_function(kernel, "min(any a,any b) -> any");
     append_to_overloaded_function(min_func, kernel->get("min_i"));
     append_to_overloaded_function(min_func, kernel->get("min_f"));
 
-    Term* remainder_func = create_overloaded_function(kernel, "remainder(any,any) -> any");
+    Term* remainder_func = create_overloaded_function(kernel, "remainder(any a,any b) -> any");
     append_to_overloaded_function(remainder_func, kernel->get("remainder_i"));
     append_to_overloaded_function(remainder_func, kernel->get("remainder_f"));
 
-    Term* mod_func = create_overloaded_function(kernel, "mod(any,any) -> any");
+    Term* mod_func = create_overloaded_function(kernel, "mod(any a,any b) -> any");
     append_to_overloaded_function(mod_func, kernel->get("mod_i"));
     append_to_overloaded_function(mod_func, kernel->get("mod_f"));
 
-    FUNCS.mult = create_overloaded_function(kernel, "mult(any,any) -> any");
+    FUNCS.mult = create_overloaded_function(kernel, "mult(any a,any b) -> any");
     append_to_overloaded_function(FUNCS.mult, kernel->get("mult_i"));
     append_to_overloaded_function(FUNCS.mult, kernel->get("mult_f"));
 
-    FUNCS.neg = create_overloaded_function(kernel, "neg(any) -> any");
+    FUNCS.neg = create_overloaded_function(kernel, "neg(any n) -> any");
     append_to_overloaded_function(FUNCS.neg, kernel->get("neg_i"));
     append_to_overloaded_function(FUNCS.neg, kernel->get("neg_f"));
     as_function(FUNCS.neg)->formatSource = neg_function::formatSource;
 
-    FUNCS.sub = create_overloaded_function(kernel, "sub(any,any) -> any");
+    FUNCS.sub = create_overloaded_function(kernel, "sub(any a,any b) -> any");
     append_to_overloaded_function(FUNCS.sub, kernel->get("sub_i"));
     append_to_overloaded_function(FUNCS.sub, kernel->get("sub_f"));
 

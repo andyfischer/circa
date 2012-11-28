@@ -161,7 +161,7 @@ def Frame.pc(self) -> int
 def Frame.parentPc(self) -> int
 def Frame.pc_term(self) -> Term
     -- Fetch the term associated with the current program counter.
-def Frame.create_expansion(self, Term) -> Frame
+def Frame.create_expansion(self, Term term) -> Frame
     -- Create an expansion frame using the given Term.
     -- Errors if the Term is not part of this frame's block.
 def Frame.inputs(self) -> List
@@ -178,7 +178,7 @@ def Function.block(self) -> Block
 type Interpreter;
 def make_interpreter() -> Interpreter
     -- Create a new interpreter
-def Interpreter.push_frame(self, Block, List inputs)
+def Interpreter.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
 def Interpreter.pop_frame(self)
     -- Pop the topmost frame.
@@ -256,7 +256,7 @@ def List.slice(self, int start, int fin) -> List
     --  [1 2 3 4].slice(0 -1)
     --  Outputs: [1 2 3]
 
-def List.get(self, index) -> any
+def List.get(self, int index) -> any
     -- Get an element by index.
 def List.empty(self) -> bool
     -- Returns whether the list is empty.
@@ -308,15 +308,15 @@ def String.append(@self, String right)
     
 def String.char_at(self, int index) -> String
 
-def String.ends_with(self,String) -> bool
+def String.ends_with(self, String suffix) -> bool
     -- Return true if this string ends with the given substring.
 def String.length(self) -> int
     -- Returns the string length.
-def String.slice(self,int start,int fin) -> String
-def String.starts_with(self,String prefix) -> bool
+def String.slice(self, int start, int fin) -> String
+def String.starts_with(self, String prefix) -> bool
     -- Returns true if the string starts with the given prefix.
-def String.split(self,String sep) -> List
-def String.substr(self,int start,int fin) -> String
+def String.split(self, String sep) -> List
+def String.substr(self, int start, int fin) -> String
 def String.to_camel_case(self) -> String
     -- Deprecated function
 def String.to_lower(self) -> String
@@ -329,7 +329,7 @@ def String.characters(self) -> List
 
 def Type.name(self) -> String
     -- Returns this Term's local name. May be empty.
-def Type.property(self, String) -> any
+def Type.property(self, String name) -> any
 def Type.declaringTerm(self) -> Term
 
 def type(any val) -> Type
@@ -338,7 +338,7 @@ def static_type(any term :meta) -> Type
     -- Returns the static type of a value
 
 -- Metaprogramming on Term
-def term_ref(any :ignore_error) -> Term
+def term_ref(any term :ignore_error) -> Term
 def Term.assign(self, any val)
 def Term.asint(self) -> int
 def Term.asfloat(self) -> number
@@ -377,7 +377,7 @@ def Term.location_string(self) -> String
 def Term.global_id(self) -> int
     -- Fetch this term's global identifier.
 def Term.properties(self) -> Map
-def Term.property(self, String) -> any
+def Term.property(self, String name) -> any
     -- Fetch a term property by name.
 def Term.is_value(self) -> bool
     self.function == block_ref(value)

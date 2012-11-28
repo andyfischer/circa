@@ -11,17 +11,17 @@ def hi()->int { return add(sub(1,1),1) }
 def hi() {1}
 def hi()   {}
 def hi() { 1  }
-def hi(int)  {}
-def hi(int) {}
-def hi(int) {   }
-def hi(int) { 1 }
-def hi(number, String, bool)  {}
+def hi(int i)  {}
+def hi(int i) {}
+def hi(int i) {   }
+def hi(int i) { 1 }
+def hi(number n, String s, bool b)  {}
 
 type Point { number x, number y }
 def hi() -> Point { return [0 0] }
 
 def hi() { if true { return 1 } else { return 2 } }
-def my_func(int :multiple) -> int {}
+def my_func(int _ :multiple) -> int {}
 
 def f(int i) -> int;
 def f(int i :out) -> int;

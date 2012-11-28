@@ -13,7 +13,8 @@ namespace feedback_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.feedback = import_function(kernel, evaluate, "feedback(any target :meta, any)");
+        FUNCS.feedback = import_function(kernel, evaluate,
+                "feedback(any target :meta, any desired)");
     }
 }
 }

@@ -104,10 +104,10 @@ void control_flow_setup_funcs(Block* kernel)
 {
     ca_assert(kernel->get("return") == NULL);
 
-    FUNCS.exit_point = import_function(kernel, NULL, "exit_point(any :multiple :optional)");
+    FUNCS.exit_point = import_function(kernel, NULL, "exit_point(any outs :multiple :optional)");
 
     FUNCS.return_func = import_function(kernel, evaluate_return,
-        "return(any :optional) -> any");
+        "return(any outs :optional) -> any");
     as_function(FUNCS.return_func)->formatSource = return_formatSource;
     as_function(FUNCS.return_func)->postCompile = controlFlow_postCompile;
 

@@ -1,5 +1,5 @@
 
-def print_success(number)
+def print_success(number n)
     print("Called print_success")
 
 print_success(0.0)
