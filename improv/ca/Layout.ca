@@ -43,6 +43,7 @@ def Layout.addNode(@self, cursor, data)
     self.elements[cursor].children.append(newCursor)
     return newCursor
 
+def Layout.modifyCurrentNote(@self, Closure f)
 def Layout.setProp(@self, name, value)
     self.elements[self.cursor].props.set(name, value)
 def Layout.setStrategy(@self, strategy)

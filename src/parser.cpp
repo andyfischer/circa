@@ -313,6 +313,17 @@ void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* con
     }
 }
 
+// Look at the parse result, and check if we need to store any information on the newly-created
+// term.
+void apply_hints_from_parsed_input(Term* term, int index, ParseResult const& parseResult)
+{
+    if (parseResult.identifierRebind) {
+        Value value;
+        set_bool(&value, true);
+        set_input_syntax_hint(term, index, "syntax:identifierRebind", &value);
+    }
+}
+
 // ---------------------------- Parsing steps ---------------------------------
 
 ParseResult statement_list(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -1255,7 +1266,7 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
         std::string name = context->pendingRebind;
         context->pendingRebind = "";
         rename(term, name_from_string(name));
-        term->setStringProp("syntax:rebindOperator", name);
+        term->setBoolProp("syntax:implicitName", true);
     }
 
     set_source_location(term, startPosition, tokens);
@@ -1713,10 +1724,17 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
             inputHints.set(index, "rebindInput", "t");
         }
 
-        Term* term = expression(block, tokens, context).term;
+        ParseResult parseResult = expression(block, tokens, context);
+
+        if (parseResult.identifierRebind) {
+            Value trueValue;
+            set_bool(&trueValue, true);
+            inputHints.set(index, "syntax:identifierRebind", &trueValue);
+        }
+
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
-        arguments.append(term);
+        arguments.append(parseResult.term);
 
         if (tokens.nextIs(tok_Comma) || tokens.nextIs(tok_Semicolon))
             inputHints.append(index, "postWhitespace", tokens.consumeStr());
@@ -1791,6 +1809,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     // If the function is known, then check if the function wants to rebind the name,
     // even if the .@ operator was not used.
+    // DEPRECATED: Context-sensitive-rebind
     if (function_input_is_extra_output(as_function(function), 0)) {
         rebindLHS = true;
     }
@@ -1812,6 +1831,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     inputHints.apply(term);
     check_to_insert_implicit_inputs(term);
+    apply_hints_from_parsed_input(term, 0, root);
     term->setStringProp("syntax:functionName", functionName);
     term->setStringProp("syntax:declarationStyle", "method-call");
     if (!hasParens)
@@ -2417,8 +2437,10 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
     else
         result = ParseResult(head, id);
 
-    if (rebindOperator)
+    if (rebindOperator) {
         context->pendingRebind = result.term->name;
+        result.identifierRebind = true;
+    }
 
     return result;
 }

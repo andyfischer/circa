@@ -258,6 +258,8 @@ def List.slice(self, int start, int fin) -> List
 
 def List.get(self, int index) -> any
     -- Get an element by index.
+def List.set(self, int index, any val) -> List
+    -- Set an element by index.
 def List.empty(self) -> bool
     -- Returns whether the list is empty.
     self.length == 0
@@ -283,6 +285,9 @@ def List.filter(self, Closure func) -> List
 def List.map(self, Closure func) -> List
     for i in self
         func.call(i)
+
+def List.mapItem(self, int index, Closure func) -> List
+    self.set(index, func(self[index]))
 
 def Map.contains(self, any key) -> bool
     -- Returns true if the map contains the given key.

@@ -285,11 +285,6 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
         get_input_syntax_hint_optional(term, inputIndex, "preWhitespace", defaultPre), 
         term, name_Whitespace);
 
-    // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
-    if (input->name != ""
-            && input->name == term->stringProp("syntax:rebindOperator",""))
-        append_phrase(source, "@", term, tok_At);
-
     // Also, possibly insert the & operator.
     if (input->name != ""
             && function_call_rebinds_input(term, inputIndex)) {
@@ -304,6 +299,10 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     if (byValue) {
         format_term_source(source, input);
     } else {
+        // Named input
+        caValue* identifierRebind = get_input_syntax_hint_value(term, inputIndex, "syntax:identifierRebind");
+        if (identifierRebind != NULL && as_bool(identifierRebind))
+            append_phrase(source, "@", term, name_TermName);
         append_phrase(source, get_relative_name_at(term, input), term, name_TermName);
     }
 
@@ -427,6 +426,14 @@ int get_first_visible_input_index(Term* term)
             break;
     }
     return i;
+}
+
+caValue* get_input_syntax_hint_value(Term* term, int index, const char* field)
+{
+    if (term->inputInfo(index) == NULL)
+        return NULL;
+
+    return dict_get(&term->inputInfo(index)->properties, field);
 }
 
 std::string get_input_syntax_hint(Term* term, int index, const char* field)

@@ -32,6 +32,7 @@ bool should_print_term_source_line(Term* term);
 bool is_hidden(Term* term);
 int get_first_visible_input_index(Term* term);
 
+caValue* get_input_syntax_hint_value(Term* term, int index, const char* field);
 std::string get_input_syntax_hint(Term* term, int index, const char* field);
 std::string get_input_syntax_hint_optional(Term* term, int index, const char* field,
         std::string const& defaultValue);

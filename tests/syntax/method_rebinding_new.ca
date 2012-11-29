@@ -1,0 +1,31 @@
+
+type T {
+    int i
+}
+
+def T.increment(self) -> T
+    self.i += 1
+
+t = make(T)
+assert(t == [0])
+
+-- Test that an undecorated method call doesn't rebind the object.
+t2 = t.increment
+assert(t2 == [1])
+assert(t == [0])
+
+-- Now test that @ syntax works
+
+@t.increment
+
+assert(t == [1])
+
+@t.increment
+@t.increment
+
+assert(t == [3])
+
+-- Chained calls
+@t.increment.increment.increment
+
+assert(t == [6])

@@ -39,9 +39,12 @@ struct ParseResult {
     // a new term.
     std::string identifierName;
 
-    ParseResult() : term(NULL) {}
-    explicit ParseResult(Term* t) : term(t) {}
-    explicit ParseResult(Term* t, std::string s) : term(t), identifierName(s) {}
+    // For an identifier term, whether the identifier has a @ decoration.
+    bool identifierRebind;
+
+    ParseResult() : term(NULL), identifierRebind(false) {}
+    explicit ParseResult(Term* t) : term(t), identifierRebind(false) {}
+    explicit ParseResult(Term* t, std::string s) : term(t), identifierName(s), identifierRebind(false) {}
     bool isIdentifier() { return identifierName != ""; }
 };
 
