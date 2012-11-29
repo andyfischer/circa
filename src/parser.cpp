@@ -632,19 +632,16 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Term* input = apply(contents, FUNCS.input, TermList(), name_from_string(name));
         change_declared_type(input, type);
 
+        // Save some information on the input as properties.
+        if (!explicitType)
+            input->setBoolProp("syntax:explicitType", false);
+
         if (isStateArgument)
             input->setBoolProp("state", true);
 
         if (rebindSymbol) {
             input->setBoolProp("output", true);
             input->setBoolProp("syntax:rebindSymbol", true);
-        }
-
-        // Variable args when ... is appended
-        if (tokens.nextIs(tok_Ellipsis)) {
-            std::cout << "ellipsis used in " << as_cstring(&functionName) << std::endl;
-            tokens.consume(tok_Ellipsis);
-            input->setBoolProp("multiple", true);
         }
 
         // Optional list of qualifiers

@@ -1,0 +1,10 @@
+myfunc arg1 static_type: <Type any>
+myfunc arg1 type: <Type String>
+myfunc arg1: sample string
+myfunc arg2 static_type: <Type any>
+myfunc arg2 type: <Type int>
+myfunc arg2: 123
+T.func self static_type: <Type T>
+T.func type: <Type T>
+T.func b static_type: <Type any>
+T.func b: <Type String>

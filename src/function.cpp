@@ -391,24 +391,18 @@ void function_format_header_source(caValue* source, Block* function)
             append_phrase(source, ", ", term, name_None);
         first = false;
 
-        bool showType = true;
-        if (i == 0 && term->boolProp("syntax:methodDecl", false))
-            showType = false;
-
-        // Type
-        if (showType)
+        // Type (may be omitted)
+        if (input->boolProp("syntax:explicitType", true)) {
             append_phrase(source, as_cstring(&input->type->name),
                 input->type->declaringTerm, name_TypeName);
+            append_phrase(source, " ", term, tok_Whitespace);
+        }
 
         // Name
-        if (name != "" && name[0] != '#') {
-            if (input->boolProp("syntax:rebindSymbol", false))
-                append_phrase(source, "@", term, name_None);
+        if (input->boolProp("syntax:rebindSymbol", false))
+            append_phrase(source, "@", term, name_None);
 
-            if (showType)
-                append_phrase(source, " ", term, tok_Whitespace);
-            append_phrase(source, name, term, name_None);
-        }
+        append_phrase(source, name, term, name_None);
 
         if (input->boolProp("output", false)
                 && !input->boolProp("syntax:rebindSymbol", false)) {

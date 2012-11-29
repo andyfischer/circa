@@ -1,0 +1,31 @@
+
+
+def my_func(arg1, arg2) -> any
+    print('myfunc arg1 static_type: ' static_type(arg1))
+    print('myfunc arg1 type: ' type(arg1))
+    print('myfunc arg1: ' arg1)
+
+    print('myfunc arg2 static_type: ' static_type(arg2))
+    print('myfunc arg2 type: ' type(arg2))
+    print('myfunc arg2: ' arg2)
+
+    return arg1
+
+my_func('sample string', 123)
+
+def my_cond(bool b, option1, option2) -> any
+    if b { option1 } else { option2 }
+
+assert(my_cond(true, 1, 'hi') == 1)
+assert(my_cond(false, 1, 'hi') == 'hi')
+
+-- Methods
+type T {}
+
+def T.func(self, b)
+    print('T.func self static_type: ' static_type(self))
+    print('T.func type: ' type(self))
+    print('T.func b static_type: ' static_type(b))
+    print('T.func b: ' type(b))
+
+make(T).func('b value')
