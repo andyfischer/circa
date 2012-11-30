@@ -385,6 +385,18 @@ void List__get(caStack* stack)
     copy(list_get(self, as_int(index)), circa_output(stack, 0));
 }
 
+void List__set(caStack* stack)
+{
+    caValue* self = circa_output(stack, 0);
+    copy(circa_input(stack, 0), self);
+
+    int index = circa_int_input(stack, 1);
+    caValue* value = circa_input(stack, 2);
+
+    touch(self);
+    copy(value, list_get(self, index));
+}
+
 void Map__contains(caStack* stack)
 {
     caValue* value = hashtable_get(circa_input(stack, 0), circa_input(stack, 1));
@@ -1032,6 +1044,7 @@ void bootstrap_kernel()
         {"List.join", List__join},
         {"List.slice", List__slice},
         {"List.get", List__get},
+        {"List.set", List__set},
 
         {"Map.contains", Map__contains},
         {"Map.remove", Map__remove},
