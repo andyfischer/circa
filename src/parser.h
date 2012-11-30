@@ -19,11 +19,13 @@ enum BlockSyntax {
 };
 
 struct ParserCxt {
-    std::string pendingRebind;
 
     // Number of open parenthesis on the current expression. This affects whether we'll
     // consume newlines as part of an expression).
     int openParens;
+
+    // Information about statements in progress.
+    Value statementStack;
 
     ParserCxt()
       : openParens(0)

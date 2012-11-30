@@ -79,6 +79,10 @@ bool list_empty(caValue* value);
 // list_touch, so the returned value is safe to modify.
 caValue* list_append(caValue* list);
 
+void list_pop(caValue* list);
+
+caValue* list_last(caValue* list);
+
 // Appends each element from the given right-hand-side.
 void list_extend(caValue* list, caValue* rhsList);
 

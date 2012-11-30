@@ -344,6 +344,12 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     int sourceStartPosition = tokens.getPosition();
     bool foundWhitespace = preWhitespace != "";
 
+    // Push info to the statement stack.
+    if (!is_list(&context->statementStack))
+        set_list(&context->statementStack);
+
+    set_dict(list_append(&context->statementStack));
+
     ParseResult result;
 
     // Comment (blank lines count as comments). This should do the same thing
@@ -429,6 +435,8 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     // Avoid an infinite loop
     if (initialPosition == tokens.getPosition())
         internal_error("parser::statement is stuck, next token is: " + tokens.nextStr());
+
+    list_pop(&context->statementStack);
 
     return result;
 }
@@ -1262,10 +1270,9 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
         term = apply(block, FUNCS.copy, TermList(term));
 
     // Apply a pending rebind
-    if (context->pendingRebind != "") {
-        std::string name = context->pendingRebind;
-        context->pendingRebind = "";
-        rename(term, name_from_string(name));
+    caValue* pendingRebind = dict_get(list_last(&context->statementStack), "pendingRebind");
+    if (pendingRebind != NULL) {
+        rename(term, name_from_string(as_cstring(pendingRebind)));
         term->setBoolProp("syntax:implicitName", true);
     }
 
@@ -2438,7 +2445,8 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
         result = ParseResult(head, id);
 
     if (rebindOperator) {
-        context->pendingRebind = result.term->name;
+        caValue* statementInfo = list_last(&context->statementStack);
+        set_string(dict_insert(statementInfo, "pendingRebind"), result.term->name);
         result.identifierRebind = true;
     }
 

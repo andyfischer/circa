@@ -1,0 +1,14 @@
+
+
+def some_func(String s, Closure ignored) -> String
+    "Rebound"
+
+
+s = "original"
+
+-- This line once had a parser bug. The pending rebind of the @ symbol was being lost, because
+-- there wasn't a statement-based stack, and it was being wrongly taken by the statement inside
+-- the closure.
+some_func(@s, { 1 + 2 })
+
+assert(s == "Rebound")

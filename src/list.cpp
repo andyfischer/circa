@@ -239,6 +239,16 @@ caValue* list_append(ListData** dataPtr)
     return &data->items[data->count - 1];
 }
 
+void list_pop(caValue* list)
+{
+    list_resize(list, list_length(list) - 1);
+}
+
+caValue* list_last(caValue* list)
+{
+    return list_get(list, list_length(list) - 1);
+}
+
 caValue* list_insert(ListData** dataPtr, int index)
 {
     list_append(dataPtr);
