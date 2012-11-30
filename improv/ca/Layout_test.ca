@@ -3,12 +3,12 @@ require Layout
 
 layout = Layout:start([100 100])
 
-layout.setStrategy(:percent)
-
 root = layout.cursor
 
 layout.addNode(root, 1)
+print(layout)
 layout.setProp('height', [:percent 30])
+print(layout)
 
 layout.addNode(root, 2)
 layout.setProp('height', [:percent 30])

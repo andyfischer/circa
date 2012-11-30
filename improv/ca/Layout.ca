@@ -5,7 +5,7 @@ def sum(List numbers) -> number
         result += i
     result
     
-type Element {
+type Node {
     int parent
     List children
     Name strategy
@@ -14,7 +14,7 @@ type Element {
 }
 
 type Layout {
-    List elements
+    List nodes
     Point size
     int cursor
 }
@@ -24,47 +24,46 @@ def start(Point size) -> Layout
     layout.size = size
 
     -- set up the initial element
-    root = make(Element)
+    root = make(Node)
     root.parent = -1
-    layout.elements.append(root)
+    layout.nodes.append(root)
     layout.cursor = 0
 
     layout
 
-def Element.setStrategy(@self, Name strategy)
-    self.elements[self.cursor].strategy = strategy
+def Node.setStrategy(@self, Name strategy)
+    self.nodes[self.cursor].strategy = strategy
 
 def Layout.addNode(@self, cursor, data)
-    element = make(Element)
+    element = make(Node)
     element.data = data
     element.parent = cursor
 
-    newCursor = self.elements.append(element)
-    self.elements[cursor].children.append(newCursor)
+    newCursor = self.nodes.append(element)
+    self.nodes[cursor].children.append(newCursor)
     return newCursor
 
-def Layout.modifyCurrentNote(@self, Closure f)
+def Layout.modifyCurrentNode(@self, Closure f)
+    self.nodes.mapItem(self.cursor, f)
 def Layout.setProp(@self, name, value)
-    self.elements[self.cursor].props.set(name, value)
-def Layout.setStrategy(@self, strategy)
-    self.elements[self.cursor].strategy = strategy
+    self.modifyCurrentNode({ Node(input()).props.set(name,value) })
 
 def Layout.applyBoxLayout(@self, cursor, List @positions)
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
-    positions = empty_list(null, self.elements.length)
+    positions = empty_list(null, self.nodes.length)
 
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)
 
-    for Element e in self.elements
+    for Node e in self.nodes
 
         -- Dispatch on strategy
         if e.strategy == :percent
             percentTags = for child in e.children
-                self.elements[child].props.get('height', :none)
+                self.nodes[child].props.get('height', :none)
 
             print('tags: ' percentTags)
-            -- totalPercent = sum(for child in e.children { self.elements[child]
+            -- totalPercent = sum(for child in e.children { self.nodes[child]
 

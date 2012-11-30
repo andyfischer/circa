@@ -385,7 +385,7 @@ void finish_frame(Stack* stack)
             if (!success) {
                 Value msg;
                 set_string(&msg, "Couldn't cast output value ");
-                string_append(&msg, to_string(result).c_str());
+                string_append(&msg, to_string(dest).c_str());
                 string_append(&msg, " to type ");
                 string_append(&msg, &placeholder->type->name);
                 set_error_string(result, as_cstring(&msg));
