@@ -1279,12 +1279,16 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
     if (result.isIdentifier())
         term = apply(block, FUNCS.copy, TermList(term));
 
+#if 0
     // Apply a pending rebind
     caValue* pendingRebind = dict_get(list_last(&context->statementStack), "pendingRebind");
     if (pendingRebind != NULL) {
         rename(term, name_from_string(as_cstring(pendingRebind)));
         term->setBoolProp("syntax:implicitName", true);
     }
+#endif
+
+    resolve_rebind_operators_in_inputs(block, term);
 
     set_source_location(term, startPosition, tokens);
     set_is_statement(term, true);
@@ -1793,7 +1797,8 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
                 "Expected identifier after dot");
     }
 
-    std::string functionName = tokens.consumeStr(tok_Identifier);
+    Value functionName;
+    tokens.consumeStr(&functionName);
 
     bool hasParens = false;
     if (tokens.nextIs(tok_LParen)) {
@@ -1817,7 +1822,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     Type* rootType = root.term->type;
 
     // Find the function
-    Term* function = find_method(block, rootType, functionName.c_str());
+    Term* function = find_method(block, rootType, as_cstring(&functionName));
 
     if (function == NULL) {
         // Method could not be statically found. Create a dynamic_method call.
@@ -1849,7 +1854,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     inputHints.apply(term);
     check_to_insert_implicit_inputs(term);
     apply_hints_from_parsed_input(term, 0, root);
-    term->setStringProp("syntax:functionName", functionName);
+    term->setStringProp("syntax:functionName", as_cstring(&functionName));
     term->setStringProp("syntax:declarationStyle", "method-call");
     if (!hasParens)
         term->setBoolProp("syntax:no-parens", true);

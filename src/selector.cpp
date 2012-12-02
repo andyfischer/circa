@@ -104,6 +104,21 @@ bool is_accessor_function(Term* accessor)
     return false;
 }
 
+bool term_is_accessor_traceable(Term* accessor)
+{
+    if (!has_empty_name(accessor))
+        return false;
+
+    if (accessor->function == FUNCS.get_index
+            || accessor->function == FUNCS.get_field
+            || is_copying_call(accessor)
+            || accessor->function == FUNCS.dynamic_method
+            || is_subroutine(accessor->function))
+        return true;
+
+    return false;
+}
+
 void trace_accessor_chain(Term* accessor, TermList* chainResult)
 {
     Term* bottomAccessor = accessor;
@@ -113,23 +128,11 @@ void trace_accessor_chain(Term* accessor, TermList* chainResult)
     while (true) {
         chainResult->append(accessor);
 
-        // Stop when we find a named term.
-        if (!has_empty_name(accessor))
+        if (!term_is_accessor_traceable(accessor))
             break;
 
-        if (accessor->function == FUNCS.get_index
-                || accessor->function == FUNCS.get_field
-                || is_copying_call(accessor)
-                || accessor->function == FUNCS.dynamic_method
-                || is_subroutine(accessor->function)) {
-
-            // Continue the trace upward.
-            accessor = accessor->input(0);
-            continue;
-        }
-
-        // Accessor search can't continue past this term.
-        break;
+        // Continue the trace upward.
+        accessor = accessor->input(0);
     }
 
     chainResult->reverse();
@@ -190,6 +193,46 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
 
     change_declared_type(set, declared_type(head));
     return set;
+}
+
+void resolve_rebind_operators_in_inputs(Block* block, Term* result)
+{
+    for (int inputIndex=0; inputIndex < result->numInputs(); inputIndex++) {
+        Term* input = result->input(inputIndex);
+
+        if (input == NULL)
+            continue;
+
+        // Walk upwards on 'input', see if one of the terms uses the @ operator.
+        Term* head = input;
+        Term* termBeforeHead = result;
+        while (head->input(0) != NULL && term_is_accessor_traceable(head)) {
+            termBeforeHead = head;
+            head = head->input(0);
+        }
+
+        // Ignore term if there isn't a rebind.
+        caValue* identifierRebindHint = get_input_syntax_hint_value(termBeforeHead, 0, "syntax:identifierRebind");
+        if (head == NULL || has_empty_name(head) || identifierRebindHint == NULL || !as_bool(identifierRebindHint))
+            continue;
+
+        if (input == head) {
+            // No accessor expression, then just do a name rebind.
+            rename(result, head->nameSymbol);
+            result->setBoolProp("syntax:implicitName", true);
+        } else {
+            // Create a set_with_selector expression.
+            TermList accessorChain;
+            trace_accessor_chain(input, &accessorChain);
+
+            Term* selector = write_selector_for_accessor_chain(block, &accessorChain);
+
+            Term* set = apply(block, FUNCS.set_with_selector,
+                    TermList(head, selector, result), head->nameSymbol);
+
+            change_declared_type(set, declared_type(head));
+        }
+    }
 }
 
 void selector_format_source(caValue* source, Term* term)

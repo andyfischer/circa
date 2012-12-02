@@ -15,6 +15,9 @@ void selector_prepend(caValue* selector, caValue* element);
 // If 'possibleAccessor' isn't an accessor, then just create a named copy from 'result'.
 Term* rebind_possible_accessor(Block* block, Term* possibleAccessor, Term* result);
 
+bool term_is_accessor_traceable(Term* accessor);
+void resolve_rebind_operators_in_inputs(Block* block, Term* result);
+
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error);
 void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caValue* error);
 
