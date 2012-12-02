@@ -5,10 +5,10 @@
 namespace circa {
 namespace cond_function {
 
-    CA_FUNCTION(cond_evaluate)
+    void cond_evaluate(caStack* stack)
     {
-        int index = BOOL_INPUT(0) ? 1 : 2;
-        copy(INPUT(index), OUTPUT);
+        int index = circa_bool_input(stack, 0) ? 1 : 2;
+        copy(circa_input(stack, index), circa_output(stack, 0));
     }
 
     Type* specializeType(Term* caller)
@@ -47,8 +47,8 @@ OLD_FEEDBACK_IMPL_DISABLED
     void setup(Block* kernel)
     {
         FUNCS.cond = import_function(kernel, cond_evaluate,
-                "cond(bool condition, any pos :meta, any neg :meta) -> any;"
-                "\"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\"");
+                "cond(bool condition, any pos, any neg) -> any"
+                "-- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.");
         function_set_specialize_type_func(FUNCS.cond, specializeType);
     }
 }

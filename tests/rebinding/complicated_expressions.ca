@@ -1,0 +1,40 @@
+
+type T {
+    String s
+}
+
+def make_t() -> T
+    return ['string']
+
+def T.setStr(self, s) -> T
+    self.s = s
+
+-- Simple method call with simple name binding
+t = make_t()
+assert(t == ['string'])
+
+t = t.setStr('hello')
+assert(t == ['hello'])
+
+-- Simple method call with @ operator
+@t.setStr('goodbye')
+assert(t == ['goodbye'])
+
+type T2 {
+    List list
+}
+
+def make_t2() -> T2
+    return [[1 2 3]]
+
+t = make_t2()
+assert(t == [[1 2 3]])
+
+-- Nested method call with simple name binding
+t.list = t.list.append_style2(4)
+assert(t == [[1 2 3 4]])
+
+-- Nested method call with @ operator
+-- TODO
+--@t.list.append_style2(5)
+--assert(t == [[1 2 3 4]])

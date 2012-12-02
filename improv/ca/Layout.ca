@@ -5,6 +5,14 @@ def sum(List numbers) -> number
         result += i
     result
     
+def label(any val) -> Name
+    if is_name(val)
+        val
+    elif is_list(val) and length(val) > 0
+        label(val[0])
+    else
+        null
+
 type Node {
     int parent
     List children
@@ -34,21 +42,25 @@ def start(Point size) -> Layout
 def Node.setStrategy(@self, Name strategy)
     self.nodes[self.cursor].strategy = strategy
 
-def Layout.addNode(@self, cursor, data)
+def Layout.addNode(self, cursor, data) -> Layout
     element = make(Node)
     element.data = data
     element.parent = cursor
 
     newCursor = self.nodes.append(element)
     self.nodes[cursor].children.append(newCursor)
-    return newCursor
 
-def Layout.modifyCurrentNode(@self, Closure f)
-    self.nodes.mapItem(self.cursor, f)
-def Layout.setProp(@self, name, value)
-    self.modifyCurrentNode({ Node(input()).props.set(name,value) })
+    self.cursor = newCursor
 
-def Layout.applyBoxLayout(@self, cursor, List @positions)
+    self
+
+def Layout.modifyCurrentNode(self, Closure f) -> Layout
+    self.nodes = self.nodes.mapItem(self.cursor, f)
+    self
+
+def Layout.setProp(self, name, value) -> Layout
+    @self.modifyCurrentNode({ Node(input()).props.set(name,value) })
+
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
@@ -57,13 +69,18 @@ def Layout.getRects(self) -> List
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)
 
-    for Node e in self.nodes
+    for Node node in self.nodes
+        -- Get a total of :percent tags, it should be 100, but it doesn't need to be.
+        print('children: ' node.children)
+        totalPercent = sum(for int child in node.children {
+            heightTag = self.nodes[child].props['height']
+            print('heightTag: ' heightTag)
+            if label(heightTag) == :percent
+                heightTag[1]
+            else
+                0
+            })
 
-        -- Dispatch on strategy
-        if e.strategy == :percent
-            percentTags = for child in e.children
-                self.nodes[child].props.get('height', :none)
+        print('totalPercent: ' totalPercent)
 
-            print('tags: ' percentTags)
-            -- totalPercent = sum(for child in e.children { self.nodes[child]
-
+    positions

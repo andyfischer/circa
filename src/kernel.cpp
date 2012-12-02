@@ -264,6 +264,28 @@ void List__append(caStack* stack)
     set_int(circa_output(stack, 0), list_length(out) - 1);
 }
 
+void List__append_style2(caStack* stack)
+{
+    caValue* out = circa_output(stack, 0);
+    copy(circa_input(stack, 0), out);
+    copy(circa_input(stack, 1), list_append(out));
+}
+
+void List__concat(caStack* stack)
+{
+    caValue* out = circa_output(stack, 0);
+    copy(circa_input(stack, 0), out);
+
+    caValue* additions = circa_input(stack, 1);
+
+    int oldLength = list_length(out);
+    int additionsLength = list_length(additions);
+
+    list_resize(out, oldLength + additionsLength);
+    for (int i = 0; i < additionsLength; i++)
+        copy(list_get(additions, i), list_get(out, oldLength + i));
+}
+
 Type* List__append_specializeType(Term* term)
 {
     Term* listInput = term->input(0);
@@ -1036,6 +1058,8 @@ void bootstrap_kernel()
 
         {"empty_list", empty_list},
         {"List.append", List__append},
+        {"List.append_style2", List__append_style2},
+        {"List.concat", List__concat},
         {"List.extend", List__extend},
         {"List.resize", List__resize},
         {"List.count", List__count},
@@ -1167,13 +1191,9 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
     free(world);
 }
 
-} // namespace circa
-
-// Public API
-
-using namespace circa;
-
-caBlock* circa_kernel(caWorld* world)
+CIRCA_EXPORT caBlock* circa_kernel(caWorld* world)
 {
     return world->root;
 }
+
+} // namespace circa

@@ -718,30 +718,40 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     // Output type
-    Term* outputType = TYPES.void_type->declaringTerm;
+    Type* outputType = NULL;
+
+    bool specificOutputType = false;
 
     if (tok_RightArrow == lookahead_next_non_whitespace(tokens, false)) {
         result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));
         tokens.consume(tok_RightArrow);
+        result->setBoolProp("syntax:explicitType", true);
         result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
 
-        outputType = type_expr(block, tokens, context).term;
-        ca_assert(outputType != NULL);
-    }
+        Term* typeTerm = type_expr(block, tokens, context).term;
+        ca_assert(typeTerm != NULL);
 
-    if (!is_type(outputType))
-        return compile_error_for_line(result, tokens, startPosition,
-                outputType->name +" is not a type");
+        if (!is_type(typeTerm))
+            return compile_error_for_line(result, tokens, startPosition,
+                    typeTerm->name +" is not a type");
+
+        outputType = unbox_type(typeTerm);
+        specificOutputType = true;
+    } else {
+        // No output type specified.
+        outputType = TYPES.void_type;
+    }
 
     ca_assert(is_value(result));
     ca_assert(is_function(result));
 
     // Create the primary output placeholder
     Term* primaryOutput = append_output_placeholder(contents, NULL);
-    change_declared_type(primaryOutput, as_type(outputType));
+    if (specificOutputType)
+        change_declared_type(primaryOutput, outputType);
 
-    // Consume contents, if there are still tokens left. It's okay to reach EOF here, this
-    // behavior is used when declaring some builtins.
+    // Consume contents, if there are still tokens left. It's okay to reach EOF here (this
+    // behavior is used when declaring some builtins).
     if (!tokens.finished())
         consume_block(contents, tokens, context);
 

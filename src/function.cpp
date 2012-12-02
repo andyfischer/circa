@@ -106,8 +106,12 @@ void finish_building_function(Block* contents)
     // Connect the primary output placeholder with the last expression.
     Term* primaryOutput = get_output_placeholder(contents, 0);
     ca_assert(primaryOutput->input(0) == NULL);
-    set_input(primaryOutput, 0,
-        find_last_non_comment_expression(contents));
+    Term* lastExpression = find_last_non_comment_expression(contents);
+    set_input(primaryOutput, 0, lastExpression);
+
+    // Make output type more specific.
+    if (primaryOutput->type == TYPES.any && lastExpression != NULL)
+        change_declared_type(primaryOutput, lastExpression->type);
 
     // Write a list of output_placeholder terms.
 
@@ -428,8 +432,8 @@ void function_format_header_source(caValue* source, Block* function)
 
     append_phrase(source, ")", term, tok_LParen);
 
-    Term* primaryOutput = get_output_placeholder(function, 0);
-    if (primaryOutput != NULL && primaryOutput->type != TYPES.void_type) {
+    if (term->boolProp("syntax:explicitType", false)) {
+        Term* primaryOutput = get_output_placeholder(function, 0);
         append_phrase(source, term->stringProp("syntax:whitespacePreColon", ""),
                 term, tok_Whitespace);
         append_phrase(source, "->", term, name_None);

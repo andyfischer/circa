@@ -1,0 +1,15 @@
+
+type T {
+    int i
+}
+
+-- T.f should implicitly have output type T.
+def T.f(self)
+    self.i += 1
+
+t = make(T)
+assert(t == [0])
+
+t = t.f
+assert(t == [1])
+assert(static_type(t) == T)

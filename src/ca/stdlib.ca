@@ -211,10 +211,18 @@ def Interpreter.toString(self) -> String
 def empty_list(any initialValue, int size) -> List
 def List.append(@self, any element) -> int
     -- Append an element to the end of this list, return the new element's index.
+def List.append_style2(self, any item) -> List
+    -- Append an item to the end of this list.
+def List.concat(self, List rightSide) -> List
+    -- Concatenate two lists.
 def List.extend(@self, List right)
     -- Extend this list with the given input. Afterwards, 'self' will be the
     -- concatenation of the old 'self' and 'right'.
 def List.resize(@self, int length)
+    -- Resize the list to have the given length. If the length is increased, then
+    -- null values are appended on the right; if the length is decreased then
+    -- existing values on the right are dropped.
+def List.resize_style2(self, int length) -> List
     -- Resize the list to have the given length. If the length is increased, then
     -- null values are appended on the right; if the length is decreased then
     -- existing values on the right are dropped.
