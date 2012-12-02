@@ -35,6 +35,5 @@ t.list = t.list.append_style2(4)
 assert(t == [[1 2 3 4]])
 
 -- Nested method call with @ operator
--- TODO
---@t.list.append_style2(5)
---assert(t == [[1 2 3 4]])
+@t.list.append_style2(5)
+assert(t == [[1 2 3 4 5]])

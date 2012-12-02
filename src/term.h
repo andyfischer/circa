@@ -136,8 +136,7 @@ caValue* term_insert_property(Term* term, const char* name);
 // Fetches a term property.
 caValue* term_get_property(Term* term, const char* name);
 
-// Assigns a property with the given name and value. The argument 'value' is
-// consumed.
+// Assigns a property with the given name and value. The argument 'value' is consumed.
 void term_set_property(Term* term, const char* name, caValue* value);
 
 // Removes a term property.
@@ -146,6 +145,9 @@ void term_remove_property(Term* term, const char* name);
 // Removes the property with the given name from 'source', and assigns that
 // property to 'dest'. Has no effect if 'source' does not have the property.
 void term_move_property(Term* source, Term* dest, const char* propName);
+
+// Fetches an input property.
+caValue* term_get_input_property(Term* term, int inputIndex, const char* name);
 
 caValue* term_value(Term* term);
 bool is_type(Term* term);

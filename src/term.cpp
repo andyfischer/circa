@@ -246,6 +246,11 @@ void term_move_property(Term* from, Term* to, const char* propName)
     term_remove_property(from, propName);
 }
 
+caValue* term_get_input_property(Term* term, int inputIndex, const char* name)
+{
+    return dict_get(&term->inputInfo(inputIndex)->properties, name);
+}
+
 caValue* term_value(Term* term)
 {
     return &term->value;
