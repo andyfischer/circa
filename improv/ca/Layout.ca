@@ -42,7 +42,7 @@ def start(Point size) -> Layout
 def Node.setStrategy(@self, Name strategy)
     self.nodes[self.cursor].strategy = strategy
 
-def Layout.addNode(self, cursor, data) -> Layout
+def Layout.addNode(self, int cursor, data) -> Layout
     element = make(Node)
     element.data = data
     element.parent = cursor

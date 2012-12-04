@@ -1,0 +1,13 @@
+
+def f(int i, int j) -> int
+    3
+
+a = 1
+b = 2
+
+-- There was a bug where this call would wrongly think that it should rebind
+-- the name 'b' to the result.
+f(@a, b)
+
+assert(a == 3)
+assert(b == 2)

@@ -5,9 +5,13 @@ layout = Layout:start([100 100])
 
 root = layout.cursor
 
+print('root1 = ' root)
+
 @layout.addNode(root, 1)
+print('root2 = ' root)
 @layout.setProp('height', [:percent 30])
 
+print('root3 = ' root)
 @layout.addNode(root, 2)
 @layout.setProp('height', [:percent 30])
 

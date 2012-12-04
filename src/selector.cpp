@@ -212,7 +212,12 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* result)
         }
 
         // Ignore term if there isn't a rebind.
-        caValue* identifierRebindHint = term_get_input_property(termBeforeHead, 0, "syntax:identifierRebind");
+        int inputIndexOfInterest = 0;
+        if (termBeforeHead == result)
+            inputIndexOfInterest = inputIndex;
+
+        caValue* identifierRebindHint = term_get_input_property(termBeforeHead,
+                inputIndexOfInterest, "syntax:identifierRebind");
         if (head == NULL || has_empty_name(head) || identifierRebindHint == NULL || !as_bool(identifierRebindHint))
             continue;
 
