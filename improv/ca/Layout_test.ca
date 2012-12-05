@@ -2,20 +2,20 @@
 require Layout
 
 layout = Layout:start([100 100])
+print('start: ' layout)
 
 root = layout.cursor
 
-print('root1 = ' root)
-
 @layout.addNode(root, 1)
-print('root2 = ' root)
+@layout.setProp('width', [:percent 30])
 @layout.setProp('height', [:percent 30])
 
-print('root3 = ' root)
 @layout.addNode(root, 2)
+@layout.setProp('width', [:percent 30])
 @layout.setProp('height', [:percent 30])
 
 @layout.addNode(root, 3)
+@layout.setProp('width', [:percent 30])
 @layout.setProp('height', [:percent 45])
 
 print('prelayout: ' layout)

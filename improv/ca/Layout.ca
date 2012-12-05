@@ -6,12 +6,11 @@ def sum(List numbers) -> number
     result
     
 def label(any val) -> Name
-    if is_name(val)
+    if type(val) == Name
         val
-    elif is_list(val) and length(val) > 0
-        label(val[0])
-    else
-        null
+    elif type(val) == List
+        if length(val) > 0
+            label(val[0])
 
 type Node {
     int parent
@@ -34,7 +33,7 @@ def start(Point size) -> Layout
     -- set up the initial element
     root = make(Node)
     root.parent = -1
-    layout.nodes.append(root)
+    @layout.nodes.append(root)
     layout.cursor = 0
 
     layout
@@ -47,19 +46,54 @@ def Layout.addNode(self, int cursor, data) -> Layout
     element.data = data
     element.parent = cursor
 
-    newCursor = self.nodes.append(element)
+    newCursor = self.nodes.length
+
+    @self.nodes.append(element)
     @self.nodes[cursor].children.append(newCursor)
 
     self.cursor = newCursor
 
-    self
+    return self
 
 def Layout.modifyCurrentNode(self, Closure f) -> Layout
-    self.nodes = self.nodes.mapItem(self.cursor, f)
+    @self.nodes.mapItem(self.cursor, f)
     self
 
 def Layout.setProp(self, name, value) -> Layout
-    @self.modifyCurrentNode({ Node(input()).props.set(name,value) })
+    @self.modifyCurrentNode({ 
+        node = Node(input())
+        @node.props.set(name,value)
+    })
+    self
+
+def Layout.solveX(self) -> List
+    -- Return a [(Number,Number)] list of X coordinates for each node.
+    results = empty_list(null, self.nodes.length)
+    results[0] = [0 self.size.x]
+
+    -- Running total of percent-based fields.
+    percentUsed = 0
+
+    for Node node in self.nodes
+        nodeX1 = results[0][0]
+        nodeX2 = results[0][1]
+        availableWidth = nodeX2 - nodeX1
+
+        for int childIndex in node.children
+            child = self.nodes[childIndex]
+            widthProp = child.props.get('width')
+
+            if label(widthProp) == :percent
+                percent = widthProp[1]
+                min(@percent, 100 - percentUsed)
+                left = percentUsed / 100 * availableWidth
+                right = (percentUsed + percent) / 100 * availableWidth
+
+                results[childIndex] = [left right]
+                percentUsed += percent
+
+     return results
+
 
 
 -- Returns a list of layed-out [Rect, any] pairs.
@@ -69,18 +103,10 @@ def Layout.getRects(self) -> List
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)
 
-    for Node node in self.nodes
-        -- Get a total of :percent tags, it should be 100, but it doesn't need to be.
-        print('children: ' node.children)
-        totalPercent = sum(for int child in node.children {
-            heightTag = self.nodes[child].props['height']
-            print('heightTag: ' heightTag)
-            if label(heightTag) == :percent
-                heightTag[1]
-            else
-                0
-            })
+    x_ranges = self.solveX()
 
-        print('totalPercent: ' totalPercent)
+    for node in self.nodes
+        x_range = x_ranges[index()]
+        positions[index()] = [x_range[0] 0 x_range[1] 0]
 
     positions

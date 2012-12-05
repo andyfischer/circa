@@ -7,21 +7,20 @@ namespace get_index_function {
 
     void hosted_get_index(caStack* stack)
     {
+        caValue* list = circa_input(stack, 0);
         int index = circa_int_input(stack, 1);
 
         if (index < 0) {
             char indexStr[40];
             sprintf(indexStr, "Negative index: %d", index);
             return circa_output_error(stack, indexStr);
+        } else if (index >= list_length(list)) {
+            char indexStr[40];
+            sprintf(indexStr, "Index out of range: %d", index);
+            return circa_output_error(stack, indexStr);
         }
 
-        caValue* result = get_index(circa_input(stack, 0), index);
-
-        if (result == NULL) {
-            std::stringstream err;
-            err << "Index out of range: " << index;
-            return circa_output_error(stack, err.str().c_str());
-        }
+        caValue* result = get_index(list, index);
 
         copy(result, circa_output(stack, 0));
         cast(circa_output(stack, 0), declared_type((Term*) circa_caller_term(stack)));

@@ -143,7 +143,7 @@ namespace math_function {
         import_function(kernel, max_f, "max_f(number a,number b) -> number; 'Maximum of two numbers'");
         import_function(kernel, max_i, "max_i(int a,int b) -> int; 'Maximum of two integers'");
         import_function(kernel, min_f, "min_f(number a,number b) -> number; 'Minimum of two numbers'");
-        import_function(kernel, min_f, "min_i(int a,int b) -> int; 'Minimum of two integers'");
+        import_function(kernel, min_i, "min_i(int a,int b) -> int; 'Minimum of two integers'");
         import_function(kernel, remainder_i, "remainder_i(int a,int b) -> int");
         import_function(kernel, remainder_f,  "remainder_f(number a,number b) -> number");
         import_function(kernel, mod_i, "mod_i(int a,int b) -> int");
