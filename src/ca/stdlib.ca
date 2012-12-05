@@ -268,11 +268,9 @@ def List.first(self) -> any
 def List.last(self) -> any
     -- Returns the last element
     self.get(self.length - 1)
-def List.pop(@self) -> any
-    -- Returns the last element, and removes it from the list.
-    result = self.last
-    self = self.slice(0, -1)
-    result
+
+-- def List.pop(self) -> (List, any)
+-- TODO: List.pop, needs proper support for multiple outputs
 
 def List.filter(self, Closure func) -> List
     result = []
@@ -290,13 +288,13 @@ def List.mapItem(self, int index, Closure func) -> List
 
 def Map.contains(self, any key) -> bool
     -- Returns true if the map contains the given key.
-def Map.remove(@self, any key)
+def Map.remove(self, any key) -> Map
     -- Removes the given key from the map.
 def Map.get(self, any key) -> any
     -- Gets the key associated with this value.
-def Map.set(@self, any key, any value)
+def Map.set(self, any key, any value) -> Map
     -- Sets the value associated with this key.
-def Map.insertPairs(@self, List pairs)
+def Map.insertPairs(self, List pairs) -> Map
     -- Set multiple key-value pairs.
 
 -- Overloaded functions

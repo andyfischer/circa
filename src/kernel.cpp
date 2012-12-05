@@ -419,7 +419,7 @@ void Map__contains(caStack* stack)
 
 void Map__remove(caStack* stack)
 {
-    caValue* out = circa_output(stack, 1);
+    caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
 
     hashtable_remove(out, circa_input(stack, 1));
@@ -439,7 +439,7 @@ void Map__get(caStack* stack)
 
 void Map__set(caStack* stack)
 {
-    caValue* out = circa_output(stack, 1);
+    caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
 
     caValue* key = circa_input(stack, 1);
@@ -450,7 +450,7 @@ void Map__set(caStack* stack)
 
 void Map__insertPairs(caStack* stack)
 {
-    caValue* out = circa_output(stack, 1);
+    caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
 
     caValue* pairs = circa_input(stack, 1);
