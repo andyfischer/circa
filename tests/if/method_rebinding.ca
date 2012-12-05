@@ -5,24 +5,24 @@ b = false
 x = make(List)
 
 if true
-    x.append(1)
+    @x.append(1)
 
-x.append(2)
+@x.append(2)
 
 if true
-    x.append(3)
+    @x.append(3)
 else
-    x.append('no 1')
+    @x.append('no 1')
 
-x.append(4)
+@x.append(4)
 
 if true
     if true
-        x.append(5)
+        @x.append(5)
     else
-        x.append('no 2')
+        @x.append('no 2')
 
 elif false
-    x.append('no 3')
+    @x.append('no 3')
 
 print(x)

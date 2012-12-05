@@ -6,7 +6,7 @@ assert(l.count() == 2)
 assert(l[0] == 1)
 assert(l[1] == 2)
 
-l.append(3)
+@l.append(3)
 
 assert(to_string(l) == "[1, 2, 3]");
 assert(l.count() == 3)
@@ -14,5 +14,5 @@ assert(l[0] == 1)
 assert(l[1] == 2)
 assert(l[2] == 3)
 
-l.extend([4 5])
+@l.concat([4 5])
 assert(to_string(l) == "[1, 2, 3, 4, 5]");

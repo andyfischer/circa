@@ -1,20 +1,18 @@
 
 def letter(List output, int i) -> List
     if i % 3 == 0
-       output.append('a')
+       @output.append('a')
     elif i % 3 == 1
-       output.append('b')
+       @output.append('b')
     else
-       output.append('c')
+       @output.append('c')
     return output
 
 def number(List output, int i) -> List
     output.append(i)
-    return output
 
 def underscore(List output, int i) -> List
     output.append('_')
-    return output
 
 function_list = [letter number underscore letter letter letter underscore number number]
 dispatch_result = []

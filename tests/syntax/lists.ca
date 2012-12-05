@@ -5,7 +5,7 @@ print(l -> to_string)
 print(l.count() -> to_string)
 print(l -> to_string)
 
-l.append(3)
+@l.append(3)
 
 print(l -> to_string)
 print(l.count() -> to_string)

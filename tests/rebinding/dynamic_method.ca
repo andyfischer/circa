@@ -13,7 +13,7 @@ assert(t == [[0]])
 t.v.v = []
 assert(t == [[[]]])
 
-assert(t.v.v.append_style2(1) == [1])
+assert(t.v.v.append(1) == [1])
 
-@t.v.v.append_style2(1)
+@t.v.v.append(1)
 assert(t == [[[1]]])

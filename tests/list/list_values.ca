@@ -13,7 +13,7 @@ assert(b == [1])
 
 a = [0 1 2]
 b = a
-b.append(3)
+b = b.append(3)
 
 assert(a == [0 1 2])
 assert(b == [0 1 2 3])

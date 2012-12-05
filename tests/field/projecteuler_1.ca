@@ -9,7 +9,7 @@ multiples = []
 
 for n in 0..1000
     if (n % 3 == 0) or (n % 5 == 0)
-        multiples.append(n)
+        @multiples.append(n)
 
 sum = 0
 

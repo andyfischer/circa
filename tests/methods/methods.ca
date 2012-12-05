@@ -5,13 +5,12 @@ type Object
     int a
 }
 
-def Object.f(self :out) -> Object
+def Object.f(self) -> Object
     self.a = 5
-    return self
 
 o = [3] -> Object
 assert(o.a == 3)
-o.f()
+@o.f()
 assert(o.a == 5)
 
 -- Same test, but with a nested object
@@ -20,16 +19,16 @@ type Object2
     List list
 }
 
-def Object2.f(self :out)
-    self.list.append(5)
+def Object2.f(self)
+    @self.list.append(5)
 
 o = make(Object2)
 assert(o.list == [])
-o.f()
+@o.f()
 assert(o.list == [5])
-o.f()
+@o.f()
 assert(o.list == [5 5])
-o.f()
+@o.f()
 assert(o.list == [5 5 5])
 
 -- Multiple levels of nesting
@@ -41,7 +40,7 @@ type T4 { T3 t }
 t = make(T4)
 assert(to_string(t) == "{t: {t: {t: {list: []}}}}")
 assert(t.t.t.t.list == [])
-t.t.t.t.list.append(10)
+@t.t.t.t.list.append(10)
 assert(t.t.t.t.list == [10])
 assert(to_string(t) == "{t: {t: {t: {list: [10]}}}}")
 

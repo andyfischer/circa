@@ -31,31 +31,18 @@ assert(not [0].empty)
 assert([0].last == 0)
 assert([0 1 2].last == 2)
 
--- Pop
-a = [1 2 3]
-assert(a.pop == 3)
-assert(a == [1 2])
-assert(a.pop == 2)
-assert(a == [1])
-assert(a.pop == 1)
-assert(a == [])
-
 -- Resize
 a = [1 2]
-a.resize(4)
+@a.resize(4)
 assert(a == [1 2 null null])
-a.resize(2)
+@a.resize(2)
 assert(a == [1 2])
-a.resize(1)
+@a.resize(1)
 assert(a == [1])
-a.resize(0)
+@a.resize(0)
 assert(a == [])
 
 -- Append
 a = [1 2]
-a.append(3)
+@a.append(3)
 assert(a == [1 2 3])
-pos = a.append(4)
-assert(a == [1 2 3 4])
-a[pos] = 5
-assert(a == [1 2 3 5])

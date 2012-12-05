@@ -31,9 +31,9 @@ t = make_t2()
 assert(t == [[1 2 3]])
 
 -- Nested method call with simple name binding
-t.list = t.list.append_style2(4)
+t.list = t.list.append(4)
 assert(t == [[1 2 3 4]])
 
 -- Nested method call with @ operator
-@t.list.append_style2(5)
+@t.list.append(5)
 assert(t == [[1 2 3 4 5]])
