@@ -48,7 +48,7 @@ def Layout.addNode(self, int cursor, data) -> Layout
     element.parent = cursor
 
     newCursor = self.nodes.append(element)
-    self.nodes[cursor].children.append(newCursor)
+    @self.nodes[cursor].children.append(newCursor)
 
     self.cursor = newCursor
 

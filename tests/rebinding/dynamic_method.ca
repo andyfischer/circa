@@ -1,0 +1,19 @@
+
+type T {
+    any v
+}
+
+t = make(T)
+t.v = 0
+assert(t == [0])
+
+t.v = t
+assert(t == [[0]])
+
+t.v.v = []
+assert(t == [[[]]])
+
+assert(t.v.v.append_style2(1) == [1])
+
+@t.v.v.append_style2(1)
+assert(t == [[[1]]])
