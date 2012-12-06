@@ -66,35 +66,35 @@ def Layout.setProp(self, name, value) -> Layout
     })
     self
 
-def Layout.solveX(self) -> List
-    -- Return a [(Number,Number)] list of X coordinates for each node.
+def Layout.solveDim(self, String dim) -> List
+    -- Return a [(Number,Number)] list of pairs for each node.
     results = empty_list(null, self.nodes.length)
     results[0] = [0 self.size.x]
 
-    -- Running total of percent-based fields.
-    percentUsed = 0
-
     for Node node in self.nodes
-        nodeX1 = results[0][0]
-        nodeX2 = results[0][1]
-        availableWidth = nodeX2 - nodeX1
+        availableStart = results[0][0]
+        availableFin = results[0][1]
+        nextLoc = availableStart
 
         for int childIndex in node.children
             child = self.nodes[childIndex]
-            widthProp = child.props.get('width')
+            prop = child.props.get(dim)
 
-            if label(widthProp) == :percent
-                percent = widthProp[1]
-                min(@percent, 100 - percentUsed)
-                left = percentUsed / 100 * availableWidth
-                right = (percentUsed + percent) / 100 * availableWidth
+            if label(prop) == :percent
+                percent = prop[1] -> number / 100.0
+                desiredSize = (availableFin - availableStart) * percent
+            else
+                desiredSize = prop -> number
+            
+            min(@desiredSize, availableFin - nextLoc)
 
-                results[childIndex] = [left right]
-                percentUsed += percent
+            start = nextLoc
+            fin = nextLoc + desiredSize
 
-     return results
+            results[childIndex] = [start fin]
+            nextLoc = fin
 
-
+    return results
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
@@ -103,10 +103,12 @@ def Layout.getRects(self) -> List
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)
 
-    x_ranges = self.solveX()
+    x_ranges = self.solveDim('width')
+    y_ranges = self.solveDim('height')
 
     for node in self.nodes
         x_range = x_ranges[index()]
-        positions[index()] = [x_range[0] 0 x_range[1] 0]
+        y_range = y_ranges[index()]
+        positions[index()] = [x_range[0] y_range[0] x_range[1] y_range[1]]
 
     positions
