@@ -1,4 +1,5 @@
 
+
 type Node {
     int parent
     List children
@@ -99,3 +100,31 @@ def Layout.getRects(self) -> List
         positions[index()] = [x_range[0] y_range[0] x_range[1] y_range[1]]
 
     positions
+
+
+-- Test code:
+
+layout = start([100 100])
+
+@layout.addNode(layout.cursor, 1)
+@layout.setProp('width', [:percent 100])
+@layout.setProp('height', [:percent 100])
+
+assert(layout.getRects ==
+    [[0 0 100 100] [0 0 100 100]])
+
+layout = start([100 100])
+
+root = layout.cursor
+
+@layout.addNode(root, 1)
+@layout.setProp('width', [:percent 25])
+@layout.setProp('height', [:percent 75])
+
+@layout.addNode(root, 2)
+@layout.setProp('width', [:percent 75])
+@layout.setProp('height', [:percent 25])
+
+assert(layout.getRects ==
+    [[0 0 100 100] [0 0 25 75] [25 75 100 100]])
+

@@ -1,6 +1,5 @@
 
 -- Builtin functions
-
 def assert(bool condition)
     -- Raises an error if 'condition' is false.
 
@@ -257,6 +256,14 @@ def List.slice(self, int start, int fin) -> List
 
 def List.get(self, int index) -> any
     -- Get an element by index.
+
+def List.get_optional(self, int index, any fallback) -> any
+    -- Get an element by index if it exists, otherwise return 'fallback'.
+    if index < 0 or index >= self.length
+        fallback
+    else
+        self.get(index)
+
 def List.set(self, int index, any val) -> List
     -- Set an element by index.
 def List.empty(self) -> bool
@@ -495,6 +502,25 @@ def Rect.translate(self, Point p) -> Rect
 def Rect.contains(self, Point p) -> bool
     p.x >= self.x1 and p.y >= self.y1 and p.x < self.x2 and p.y < self.y2
 
+def sum(List numbers) -> number
+    result = 0
+    for i in numbers
+        result += i
+    result
+    
+def label(any val) -> Name
+    if type(val) == Name
+        val
+    elif type(val) == List
+        if length(val) > 0
+            label(val[0])
+
+def zip(List left, List right) -> List
+    for l in left
+        [l, right.get_optional(index(), null)]
+
+-- Stateful functions
+
 def toggle(bool tog) -> bool
     -- Stateful function, returns a boolean status. Every frame the function is called
     -- with (true), the result flips. Starts out false.
@@ -507,7 +533,6 @@ def toggle(bool tog) -> bool
 def approach(number target, number maximum_change) -> number
     -- Stateful function, returns a result which approaches 'target'. Each time the
     -- function is called, the result will change at most by 'maximum_change'.
-
     state current = target
     if target > current
         current += min(maximum_change, target - current)
@@ -517,7 +542,6 @@ def approach(number target, number maximum_change) -> number
 
 def once() -> bool
     -- Stateful function, returns true the first time it's called, and false thereafter.
-
     state bool s = true
     result = s
     s = false
