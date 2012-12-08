@@ -1,4 +1,7 @@
 
+-- This build file is leftover from something that once sorta worked. It doesn't
+-- work now. But it might be a good place to start.
+
 solution "Improv"
     configurations { "Debug", "Release" }
     language "C++"
@@ -20,7 +23,7 @@ solution "Improv"
         files {
             "src/*.cpp",
             }
-        includedirs {".", "../include", "libs"}
+        includedirs {".", "../include", "deps"}
 
         -- Freetype2
         buildoptions {"`freetype-config --cflags`"}
@@ -36,28 +39,9 @@ solution "Improv"
         linkoptions {"`pkg-config --libs pango`" }
         links { "pangocairo-1.0.0" }
 
-        -- Qt
-        includedirs {
-            "/usr/local/Cellar/qt/4.8.2/include",
-            "/usr/local/Cellar/qt/4.8.2/Frameworks/QtCore.framework/Headers",
-            "/usr/local/Cellar/qt/4.8.2/Frameworks/QtGui.framework/Headers",
-            "/usr/local/Cellar/qt/4.8.2/Frameworks/QtOpenGL.framework/Headers",
-        }
-
-        linkoptions { "-F/usr/local/Cellar/qt/4.8.2/lib/"}
         libdirs {
             "../build"
         }
-        links {
-            "QtCore.framework",
-            "QtGui.framework",
-            "QtOpenGL.framework",
-            "OpenGL.framework",
-            "AGL.framework",
-        }
-
-
- -- -F/usr/local/Cellar/qt/4.8.2/lib -L/usr/local/Cellar/qt/4.8.2/lib -L../build -L/usr/X11/lib -lfreetype -lcirca_d -framework OpenGL -framework AGL -framework QtOpenGL -L/usr/local/Cellar/qt/4.8.2/lib -F/usr/local/Cellar/qt/4.8.2/lib -framework QtGui -framework QtCore 
 
         configuration "Debug"
             links { "circa_d" }
