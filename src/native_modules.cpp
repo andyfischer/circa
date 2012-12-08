@@ -2,7 +2,10 @@
 
 #include "common_headers.h"
 
-#include <dlfcn.h>
+#ifndef CIRCA_DISABLE_DLL
+  #include <dlfcn.h>
+#endif
+
 #include <vector>
 #include <map>
 
@@ -279,14 +282,21 @@ void native_module_add_platform_specific_suffix(caValue* filename)
 
 void native_module_close(NativeModule* module)
 {
+#ifdef CIRCA_DISABLE_DLL
+    internal_error("native_module_close failed, DLL support compiled out");
+#else
     if (module->dll != NULL)
         dlclose(module->dll);
 
     module->dll = NULL;
+#endif
 }
 
 void native_module_load_from_file(NativeModule* module, const char* filename)
 {
+#ifdef CIRCA_DISABLE_DLL
+    internal_error("native_module_load_from_file failed, DLL support compiled out");
+#else
     native_module_close(module);
 
     module->dll = dlopen(filename, RTLD_NOW);
@@ -306,6 +316,7 @@ void native_module_load_from_file(NativeModule* module, const char* filename)
     }
 
     moduleLoad(module);
+#endif
 }
 
 CIRCA_EXPORT caNativeModule* circa_create_native_patch(caWorld* world, const char* name)

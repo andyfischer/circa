@@ -1,9 +1,4 @@
 
-newoption {
-    trigger = "windows",
-    description = "Build for Windows platform"
-}
-
 solution "Circa"
     configurations { "Debug", "Release" }
     language "C++"

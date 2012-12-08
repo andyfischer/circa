@@ -14,6 +14,7 @@
 #include "modules.h"
 #include "names.h"
 #include "parser.h"
+#include "repl.h"
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
@@ -37,9 +38,31 @@
     }
 #endif
 
+
 namespace circa {
 
-int run_repl(World* world);
+void run_repl_stdin(World* world);
+
+bool circa_get_line(caValue* lineOut)
+{
+#ifdef CIRCA_USE_LINENOISE
+    char* input = linenoise("> ");
+
+    if (input == NULL)
+        return false;
+
+    linenoiseHistoryAdd(input);
+
+    set_string(lineOut, input);
+    free(input);
+    return true;
+
+#else
+    internal_error("This tool was built without line reader support");
+#endif
+
+    return true;
+}
 
 void read_stdin_line(caValue* line)
 {
@@ -469,8 +492,10 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     // Start repl
-    if (string_eq(list_get(args, 0), "-repl"))
-        return run_repl(world);
+    if (string_eq(list_get(args, 0), "-repl")) {
+        run_repl_stdin(world);
+        return 0;
+    }
 
     if (string_eq(list_get(args, 0), "-call")) {
         Name loadResult = load_script(mainBlock, as_cstring(list_get(args, 1)));
@@ -611,76 +636,15 @@ int run_command_line(caWorld* world, caValue* args)
     return 0;
 }
 
-int run_command_line(caWorld* world, int argc, const char* args[])
+void run_repl_stdin(World* world)
 {
-    Value args_v;
-    set_list(&args_v, 0);
-    for (int i=1; i < argc; i++)
-        circa_set_string(circa_append(&args_v), args[i]);
-
-    return run_command_line(world, &args_v);
-}
-
-bool circa_get_line(caValue* lineOut)
-{
-#ifdef CIRCA_USE_LINENOISE
-    char* input = linenoise("> ");
-
-    if (input == NULL)
-        return false;
-
-    linenoiseHistoryAdd(input);
-
-    set_string(lineOut, input);
-    free(input);
-    return true;
-
-#else
-    internal_error("This tool was built without line reader support");
-#endif
-
-    return true;
-}
-
-void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& output)
-{
-    // If there is a leftover error stack, then blow it away.
-    stack_clear_error(stack);
-
-    Block* block = top_block(stack);
-
-    parser::compile(block, parser::statement_list, input);
-    
-    // Run the stack to the new end of the block.
-
-    run_interpreter(stack);
-
-    if (error_occurred(stack)) {
-        output << "error: ";
-        print_error_stack(stack, std::cout);
-        return;
-    }
-
-    // Print results of the last expression
-    Term* result = block->get(block->length() - 1);
-    if (result->type != TYPES.void_type) {
-        output << to_string(find_stack_value_for_term(stack, result, 0)) << std::endl;
-    }
-}
-
-int run_repl(World* world)
-{
-    Block* block = fetch_module(world, "main");
-
     Stack* stack = alloc_stack(world);
-    bool displayRaw = false;
-
-    push_frame(stack, block);
+    repl_start(world, stack);
 
     printf("Started REPL, type /help for reference.\n");
 
     while (true) {
-        circa::Value input;
+        Value input;
 
         // Get next line
         if (!circa_get_line(&input))
@@ -689,75 +653,28 @@ int run_repl(World* world)
         // Before doing any work, process any pending file changes.
         file_watch_check_all(world);
 
-        if (string_eq(&input, "exit") || string_eq(&input, "/exit"))
-            break;
+        Value output;
+        repl_run_line(stack, &input, &output);
 
-        if (string_eq(&input, ""))
-            continue;
+        for (int i=0; i < list_length(&output); i++)
+            std::cout << as_cstring(list_get(&output, i)) << std::endl;
 
-        if (string_eq(&input, "/raw")) {
-            displayRaw = !displayRaw;
-            if (displayRaw)
-                printf("Displaying raw format for new expressions.\n");
-            else
-                printf("Not displaying raw format.");
-            continue;
-        }
-        if (string_eq(&input, "/clear")) {
-            block = fetch_module(world, "main");
-            clear_block(block);
-            printf("Cleared working area.\n");
-            continue;
-        }
-        if (string_eq(&input, "/show")) {
-            std::cout << get_block_source_text(block);
-            continue;
-        }
-        if (string_eq(&input, "/dump")) {
-            print_block(block, std::cout);
-            continue;
-        }
-        if (string_eq(&input, "/stack")) {
-            print_stack(stack, std::cout);
-            continue;
-        }
+        // Check if we've finished.
+        if (top_frame(stack) == NULL)
+            return;
 
-        if (string_eq(&input, "/help")) {
-            printf("Enter any Circa expression to evaluate it and print the result.\n");
-            printf("All commands are appended to a 'working area' block, which can\n");
-            printf("be inspected.\n");
-            printf("\n");
-            printf("This REPL is not yet multi-line smart, so long code fragments must\n");
-            printf("be typed as one line.\n");
-            printf("\n");
-            printf("Special REPL commands:\n");
-            printf(" /raw   - Toggle the display of raw format\n");
-            printf(" /show  - Print all code in working area\n");
-            printf(" /dump  - Print all code in working area, raw format\n");
-            printf(" /stack - Display the current stack, raw format\n");
-            printf(" /help  - Print this text\n");
-            printf(" /exit  - Exit the REPL. Also, Ctrl-C will work\n");
-            continue;
-        }
-
-        // Evaluate as an expression.
-
-        // Append a newline for the benefit of source repro.
-        string_append(&input, "\n");
-
-        int previousHead = block->length();
-        repl_evaluate_line(stack, as_cstring(&input), std::cout);
-
-        if (displayRaw) {
-            for (int i=previousHead; i < block->length(); i++) {
-                std::cout << get_term_to_string_extended(block->get(i)) << std::endl;
-                if (nested_contents(block->get(i))->length() > 0)
-                    print_block(nested_contents(block->get(i)), std::cout);
-            }
-        }
     }
+}
 
-    return 0;
+
+int run_command_line(caWorld* world, int argc, const char* args[])
+{
+    Value args_v;
+    set_list(&args_v, 0);
+    for (int i=1; i < argc; i++)
+        circa_set_string(circa_append(&args_v), args[i]);
+
+    return run_command_line(world, &args_v);
 }
 
 } // namespace circa

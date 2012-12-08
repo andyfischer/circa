@@ -88,6 +88,9 @@ struct Stack
     // Owning world
     caWorld* world;
 
+    // Value slot, may be used by the stack's owner.
+    Value context;
+
     Stack();
     ~Stack();
 
@@ -111,9 +114,6 @@ Block* top_block(Stack* stack);
 
 // Retrieve the frame with the given depth, this function is O(n).
 Frame* frame_by_depth(Stack* stack, int depth);
-
-// Compute the current stack depth.
-int stack_depth(Stack* stack);
 
 // Run the interpreter.
 void run_interpreter(Stack* stack);

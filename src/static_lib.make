@@ -98,6 +98,7 @@ OBJECTS := \
 	$(OBJDIR)/object.o \
 	$(OBJDIR)/parser.o \
 	$(OBJDIR)/reflection.o \
+	$(OBJDIR)/repl.o \
 	$(OBJDIR)/selector.o \
 	$(OBJDIR)/source_repro.o \
 	$(OBJDIR)/stateful_code.o \
@@ -280,6 +281,9 @@ $(OBJDIR)/parser.o: parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/reflection.o: reflection.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/repl.o: repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/selector.o: selector.cpp

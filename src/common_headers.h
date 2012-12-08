@@ -116,19 +116,6 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 
 // Build flags
 
-// ENABLE_DLL_LOADING - Enables functions that can load shared libraries using dlopen.
-#ifndef CIRCA_ENABLE_DLL_LOADING
-
-// Currently disabled
-#define CIRCA_ENABLE_DLL_LOADING 0
-
-#endif
-
-// ENABLE_STDIN - Enables functions that read from STDIN, such as the interactive command line.
-#ifndef CIRCA_ENABLE_STDIN
-#define CIRCA_ENABLE_STDIN 1
-#endif
-
 // ENABLE_FILESYSTEM - Enables functions that look at the filesystem, including getcwd() and
 // fopen()
 #ifndef CIRCA_ENABLE_FILESYSTEM
