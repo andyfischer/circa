@@ -36,10 +36,48 @@ void test_module_get_default_name_from_filename()
     test_equals(&filename, "path");
 }
 
+void test_get_parent_directory()
+{
+    Value path, result;
+
+    set_string(&path, "a/b");
+    get_parent_directory(&path, &result);
+    test_equals(&result, "a");
+
+    set_string(&path, "a/b/c");
+    get_parent_directory(&path, &result);
+    test_equals(&result, "a/b");
+
+    set_string(&path, "a/b///c");
+    get_parent_directory(&path, &result);
+    test_equals(&result, "a/b");
+
+    set_string(&path, "a/b/");
+    get_parent_directory(&path, &result);
+    test_equals(&result, "a");
+
+    set_string(&path, "a");
+    get_parent_directory(&path, &result);
+    test_equals(&result, ".");
+
+    set_string(&path, ".");
+    get_parent_directory(&path, &result);
+    test_equals(&result, ".");
+
+    set_string(&path, "/a");
+    get_parent_directory(&path, &result);
+    test_equals(&result, "/");
+
+    set_string(&path, "/");
+    get_parent_directory(&path, &result);
+    test_equals(&result, "/");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file::test_get_just_filename_for_path);
     REGISTER_TEST_CASE(file::test_module_get_default_name_from_filename);
+    REGISTER_TEST_CASE(file::test_get_parent_directory);
 }
 
 }

@@ -624,8 +624,6 @@ void update_extra_outputs(Term* term)
         Name name = name_None;
 
         // Find the associated input placeholder (if any).
-        Term* associatedInput = NULL;
-
         int rebindsInput = placeholder->intProp("rebindsInput", -1);
 
         if (rebindsInput == -1) {

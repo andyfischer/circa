@@ -33,3 +33,5 @@ void font_update_metrics(FontBitmap* op);
 bool font_render(FontBitmap* op);
 
 void font_cleanup_operation(FontBitmap* op);
+
+void FontBitmap_moduleLoad(caNativeModule* module);

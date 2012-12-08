@@ -22,10 +22,9 @@ solution "Improv"
             }
         includedirs {".", "../include", "libs"}
 
-        -- For freetype2 on OSX. Will need cross-platform fix
-        includedirs {"/usr/X11/include", "/usr/X11/include/freetype2"}
-        libdirs { "/usr/X11/lib" }
-        links { "freetype" }
+        -- Freetype2
+        buildoptions {"`freetype-config --cflags`"}
+        linkoptions {"`freetype-config --libs~"}
 
         -- Cairo
         includedirs { "/usr/local/Cellar/cairo/1.12.2/include/cairo" }

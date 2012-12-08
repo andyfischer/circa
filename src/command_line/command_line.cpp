@@ -649,12 +649,8 @@ void repl_evaluate_line(Stack* stack, std::string const& input, std::ostream& ou
 
     Block* block = top_block(stack);
 
-    int previousHead = block->length();
     parser::compile(block, parser::statement_list, input);
-    int newHead = block->length();
-
-    bool anyErrors = false;
-
+    
     // Run the stack to the new end of the block.
 
     run_interpreter(stack);

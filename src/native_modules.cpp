@@ -308,6 +308,11 @@ void native_module_load_from_file(NativeModule* module, const char* filename)
     moduleLoad(module);
 }
 
+CIRCA_EXPORT caNativeModule* circa_create_native_patch(caWorld* world, const char* name)
+{
+    return add_native_module(world, name);
+}
+
 CIRCA_EXPORT void circa_patch_function(caNativeModule* module, const char* name,
         caEvaluateFunc func)
 {

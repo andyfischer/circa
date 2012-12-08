@@ -9,11 +9,6 @@
 extern "C" {
 #endif
 
-void circa_read_file(const char* filename, caValue* contentsOut);
-
-bool circa_file_exists(const char* filename);
-
-int circa_file_get_version(const char* filename);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -549,6 +549,11 @@ caName leading_name(caValue* value)
     return name_None;
 }
 
+CIRCA_EXPORT caName circa_leading_name(caValue* value)
+{
+    return leading_name(value);
+}
+
 } // namespace circa
 
 using namespace circa;

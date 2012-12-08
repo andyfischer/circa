@@ -76,3 +76,5 @@ struct RenderTarget
 };
 
 void check_gl_error();
+
+void RenderTarget_moduleLoad(caNativeModule* module);

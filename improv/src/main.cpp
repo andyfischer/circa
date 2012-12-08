@@ -1,11 +1,12 @@
 
-#include <qapplication.h>
-#include <qlabel.h>
-#include <QDir>
-#include <QMessageBox>
+#include <cstdio>
 
-#include "Scripts.h"
-#include "Window.h"
+#include "circa/circa.h"
+
+#include "RenderTarget.h"
+#include "FontBitmap.h"
+
+caWorld* g_world;
 
 bool fix_current_directory()
 {
@@ -14,36 +15,38 @@ bool fix_current_directory()
 
     while (true) {
 
-        if (QDir("ca").exists())
+        if (circa_file_exists("ca"))
             return true;
 
         // chdir to parent
-        QDir current = QDir::current();
-        current.cdUp();
-
+        circa::Value currentDir, parentDir;
+        circa_cwd(&currentDir);
+        circa_get_parent_directory(&currentDir, &parentDir);
         // If we reached the top, then fatal.
-        if (current == QDir::current()) {
-            QMessageBox msg;
-            msg.setText("Fatal: Couldn't find the 'ca' directory");
-            msg.exec();
+        if (circa_equals(&currentDir, &parentDir)) {
+            printf("Fatal: Couldn't find the 'ca' directory");
             return false;
         }
-
-        QDir::setCurrent(current.path());
+        
+        circa_chdir(&parentDir);
     }
 }
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    g_world = circa_initialize();
 
     if (!fix_current_directory())
         return -1;
+ 
+    circa_add_module_search_path(g_world, "ca");
 
-    scripts_initialize();
+    circa_load_module_from_file(g_world, "EngineBindings", "ca/EngineBindings.ca");
+    circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
+    circa_load_module_from_file(g_world, "UserApi", "ca/UserApi.ca");
 
-    Window window;
-    window.show();
-    return app.exec();
+    RenderTarget_moduleLoad(circa_create_native_patch(g_world, "RenderTarget"));
+    FontBitmap_moduleLoad(circa_create_native_patch(g_world, "FontBitmap"));
+
+    return 1;
 }
-

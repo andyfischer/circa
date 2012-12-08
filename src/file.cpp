@@ -4,6 +4,7 @@
 
 #include "circa/file.h"
 
+#include <unistd.h>
 #include <fstream>
 #include <sys/stat.h>
 
@@ -15,6 +16,12 @@
 
 namespace circa {
 
+static bool is_path_seperator(char c)
+{
+    // Not UTF safe.
+    return c == '/' || c == '\\';
+}
+
 int file_get_mtime(const char* filename)
 {
     if (fakefs_enabled())
@@ -24,14 +31,11 @@ int file_get_mtime(const char* filename)
     s.st_mtime = 0;
 
     stat(filename, &s);
-    return s.st_mtime;
+    return (int) s.st_mtime;
 }
 
 bool is_absolute_path(caValue* path)
 {
-    // TODO: This function is bad, need to use an existing library for dealing
-    // with paths.
-    
     int len = string_length(path);
 
     if (len >= 1 && string_get(path, 0) == '/')
@@ -58,6 +62,60 @@ void get_directory_for_filename(caValue* filename, caValue* result)
     }
 
     circa_set_string_size(result, as_cstring(filename), last_slash);
+}
+
+CIRCA_EXPORT void circa_get_directory_for_filename(caValue* filename, caValue* result)
+{
+    get_directory_for_filename(filename, result);
+}
+
+void get_parent_directory(caValue* filename, caValue* result)
+{
+    int end = string_length(filename);
+
+    // Advance past trailing seperators.
+    while (end > 0 && is_path_seperator(string_get(filename, end - 1)))
+        end--;
+
+    bool foundSep = false;
+
+    while (end > 0) {
+        while (end > 0 && is_path_seperator(string_get(filename, end - 1))) {
+            foundSep = true;
+            end--;
+        }
+
+        if (foundSep)
+            break;
+
+        end--;
+    }
+
+    if (end == 0) {
+        if (is_absolute_path(filename))
+            set_string(result, "/");
+        else
+            set_string(result, ".");
+    } else
+        string_slice(filename, 0, end, result);
+}
+
+CIRCA_EXPORT void circa_get_parent_directory(caValue* filename, caValue* result)
+{
+    get_parent_directory(filename, result);
+}
+
+CIRCA_EXPORT void circa_chdir(caValue* dir)
+{
+    chdir(as_cstring(dir));
+}
+CIRCA_EXPORT void circa_cwd(caValue* cwd)
+{
+    char buf[1024];
+    if (getcwd(buf, sizeof(buf)) != NULL)
+        set_string(cwd, buf);
+    else
+        set_string(cwd, "");
 }
 
 void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue* result)
@@ -89,18 +147,13 @@ void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue*
 
 }
 
-static bool is_path_seperator(char c)
-{
-    // Not UTF safe.
-    return c == '/' || c == '\\';
-}
 
 void join_path(caValue* left, caValue* right)
 {
     const char* leftStr = as_cstring(left);
     const char* rightStr = as_cstring(right);
-    int left_len = strlen(leftStr);
-    int right_len = strlen(leftStr);
+    int left_len = (int) strlen(leftStr);
+    int right_len = (int) strlen(leftStr);
 
     int seperatorCount = 0;
     if (left_len > 0 && is_path_seperator(leftStr[left_len-1]))
@@ -152,7 +205,7 @@ void read_text_file(const char* filename, caValue* contentsOut)
 
     // Read raw data.
     touch(contentsOut);
-    char* contentsData = string_initialize(contentsOut, file_size + 1);
+    char* contentsData = string_initialize(contentsOut, int(file_size + 1));
     size_t bytesRead = fread(contentsData, 1, file_size, fp);
 
     contentsData[bytesRead] = 0;

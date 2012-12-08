@@ -280,7 +280,7 @@ Term* find_or_create_state_container(Block* block)
     Term* input = append_state_input(block);
 
     // Add a final pack_state call too
-    Term* packState = append_final_pack_state(block);
+    append_final_pack_state(block);
 
     // And the state output
     append_state_output(block);

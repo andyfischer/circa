@@ -315,6 +315,8 @@ caValue* circa_index(caValue* value, int index);
 // Number of elements in a list value.
 int circa_count(caValue* container);
 
+caName circa_leading_name(caValue* value);
+
 // -- Writing to a caValue --
 
 // Assign to a caValue.
@@ -488,8 +490,18 @@ void circa_setup_int_type(caType* type);
 void circa_setup_pointer_type(caType* type);
 
 // -- Native Module support --
-
+caNativeModule* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func);
+
+// -- File IO --
+
+void circa_read_file(const char* filename, caValue* contentsOut);
+bool circa_file_exists(const char* filename);
+int circa_file_get_version(const char* filename);
+void circa_get_directory_for_filename(caValue* filename, caValue* result);
+void circa_get_parent_directory(caValue* filename, caValue* result);
+void circa_chdir(caValue* dir);
+void circa_cwd(caValue* cwd);
 
 // -- Debugging Helpers --
 

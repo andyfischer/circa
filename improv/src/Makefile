@@ -24,12 +24,12 @@ ifeq ($(config),debug)
   TARGETDIR  = ../build/improv_d.app/Contents/MacOS
   TARGET     = $(TARGETDIR)/improv_d
   DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I.. -I../../include -I../libs -I/usr/X11/include -I/usr/X11/include/freetype2 -I/usr/local/Cellar/cairo/1.12.2/include/cairo -I/usr/local/Cellar/qt/4.8.2/include -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtCore.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtGui.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtOpenGL.framework/Headers
+  INCLUDES  += -I../include -I.. -I../../include -I../libs -I/usr/local/Cellar/cairo/1.12.2/include/cairo -I/usr/local/Cellar/qt/4.8.2/include -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtCore.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtGui.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtOpenGL.framework/Headers
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g `pkg-config --cflags pango`
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g `freetype-config --cflags` `pkg-config --cflags pango`
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += `pkg-config --libs pango` -F/usr/local/Cellar/qt/4.8.2/lib/ -L/usr/X11/lib -L/usr/local/Cellar/cairo/1.12.2/lib -L../../build
-  LIBS      += -lfreetype -lcairo -lpangocairo-1.0.0 -framework QtCore -framework QtGui -framework QtOpenGL -framework OpenGL -framework AGL -lcirca_d
+  LDFLAGS   += `freetype-config --libs~ `pkg-config --libs pango` -F/usr/local/Cellar/qt/4.8.2/lib/ -L/usr/local/Cellar/cairo/1.12.2/lib -L../../build
+  LIBS      += -lcairo -lpangocairo-1.0.0 -framework QtCore -framework QtGui -framework QtOpenGL -framework OpenGL -framework AGL -lcirca_d
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -46,12 +46,12 @@ ifeq ($(config),release)
   TARGETDIR  = ../build/improv.app/Contents/MacOS
   TARGET     = $(TARGETDIR)/improv
   DEFINES   += 
-  INCLUDES  += -I../include -I.. -I../../include -I../libs -I/usr/X11/include -I/usr/X11/include/freetype2 -I/usr/local/Cellar/cairo/1.12.2/include/cairo -I/usr/local/Cellar/qt/4.8.2/include -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtCore.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtGui.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtOpenGL.framework/Headers
+  INCLUDES  += -I../include -I.. -I../../include -I../libs -I/usr/local/Cellar/cairo/1.12.2/include/cairo -I/usr/local/Cellar/qt/4.8.2/include -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtCore.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtGui.framework/Headers -I/usr/local/Cellar/qt/4.8.2/Frameworks/QtOpenGL.framework/Headers
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3 `pkg-config --cflags pango`
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3 `freetype-config --cflags` `pkg-config --cflags pango`
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += `pkg-config --libs pango` -F/usr/local/Cellar/qt/4.8.2/lib/ -L/usr/X11/lib -L/usr/local/Cellar/cairo/1.12.2/lib -L../../build
-  LIBS      += -lfreetype -lcairo -lpangocairo-1.0.0 -framework QtCore -framework QtGui -framework QtOpenGL -framework OpenGL -framework AGL -lcirca
+  LDFLAGS   += `freetype-config --libs~ `pkg-config --libs pango` -F/usr/local/Cellar/qt/4.8.2/lib/ -L/usr/local/Cellar/cairo/1.12.2/lib -L../../build
+  LIBS      += -lcairo -lpangocairo-1.0.0 -framework QtCore -framework QtGui -framework QtOpenGL -framework OpenGL -framework AGL -lcirca
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -64,7 +64,6 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/CircaBindings.o \
 	$(OBJDIR)/Common.o \
 	$(OBJDIR)/FontBitmap.o \
 	$(OBJDIR)/GLWidget.o \
@@ -72,7 +71,6 @@ OBJECTS := \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/RenderTarget.o \
 	$(OBJDIR)/ResourceManager.o \
-	$(OBJDIR)/Scripts.o \
 	$(OBJDIR)/ShaderUtils.o \
 	$(OBJDIR)/TextTexture.o \
 	$(OBJDIR)/Texture.o \
@@ -142,9 +140,6 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/CircaBindings.o: CircaBindings.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Common.o: Common.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -164,9 +159,6 @@ $(OBJDIR)/RenderTarget.o: RenderTarget.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ResourceManager.o: ResourceManager.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/Scripts.o: Scripts.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ShaderUtils.o: ShaderUtils.cpp

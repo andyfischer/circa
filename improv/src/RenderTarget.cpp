@@ -3,7 +3,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "CircaBindings.h"
 #include "RenderEntity.h"
 #include "RenderTarget.h"
 #include "TextTexture.h"
@@ -17,13 +16,13 @@ const bool CHECK_GL_ERROR = false;
 #endif
 
 void TextVbo_Update(GLuint vbo, TextTexture* texture, float posX, float posY);
-void TextVbo_Render(GLuint vbo, Program* program, TextTexture* texture, Color color);
+void TextVbo_Render(GLuint vbo, Program* program, TextTexture* texture, caValue* color);
 void Rect_Update(GLuint vbo, float x1, float y1, float x2, float y2);
-void Rect_Render(GLuint vbo, Program* program, Color color);
+void Rect_Render(GLuint vbo, Program* program, caValue* color);
 void Lines_Update(GLuint vbo, caValue* points);
-void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color);
+void Lines_Render(GLuint vbo, Program* program, int vertexCount, caValue* color);
 int Ngon_Update(GLuint vbo, caValue* points);
-void Triangles_Render(GLuint vbo, Program* program, int vertexCount, Color color);
+void Triangles_Render(GLuint vbo, Program* program, int vertexCount, caValue* color);
 
 RenderTarget::RenderTarget()
   : viewportWidth(0),
@@ -114,7 +113,7 @@ RenderTarget::render()
 
     // Run incoming commands
     for (size_t commandIndex=0; commandIndex < circa_count(&incomingCommands); commandIndex++) {
-        caValue* command = circa_index(&incomingCommands, commandIndex);
+        caValue* command = circa_index(&incomingCommands, (int) commandIndex);
         caName commandName = circa_name(circa_index(command, 0));
 
         if (commandName == name_textSprite) {
@@ -132,16 +131,16 @@ RenderTarget::render()
 
             // Handle extra arguments
             for (int i=0; i < circa_count(args); i++) {
-                caName tag = get_tag(circa_index(args, i));
-                if (tag == name_AlignHCenter) {
+                caName name = circa_leading_name(circa_index(args, i));
+                if (name == name_AlignHCenter) {
                     posX -= texture->width() / 2;
-                } else if (tag == name_AlignVCenter) {
+                } else if (name == name_AlignVCenter) {
                     posY += texture->height() / 2;
                 }
             }
 
             TextVbo_Update(textVbo, texture, posX, posY);
-            TextVbo_Render(textVbo, currentProgram, texture, unpack_color(color));
+            TextVbo_Render(textVbo, currentProgram, texture, color);
 
         } else if (commandName == name_rect) {
             // Draw a solid rectangle
@@ -152,7 +151,7 @@ RenderTarget::render()
             circa_vec4(pos, &x1, &y1, &x2, &y2);
 
             Rect_Update(geomVbo, x1, y1, x2, y2);
-            Rect_Render(geomVbo, currentProgram, unpack_color(color));
+            Rect_Render(geomVbo, currentProgram, color);
         } else if (commandName == name_lines) {
             // Draw a list of lines.
             switchProgram(&geomProgram);
@@ -161,7 +160,7 @@ RenderTarget::render()
             int count = circa_count(points);
 
             Lines_Update(geomVbo, points);
-            Lines_Render(geomVbo, currentProgram, count, unpack_color(color));
+            Lines_Render(geomVbo, currentProgram, count, color);
         } else if (commandName == name_polygon) {
             // Triangulate and draw an N-gon.
             switchProgram(&geomProgram);
@@ -169,7 +168,7 @@ RenderTarget::render()
             caValue* color = circa_index(command, 2);
             
             int count = Ngon_Update(geomVbo, points);
-            Triangles_Render(geomVbo, currentProgram, count, unpack_color(color));
+            Triangles_Render(geomVbo, currentProgram, count, color);
 
         } else {
             printf("unrecognized command name: %s\n", circa_name_to_string(commandName));
@@ -261,7 +260,7 @@ void TextVbo_Update(GLuint vbo, TextTexture* textTexture, float posX, float posY
     check_gl_error();
 }
 
-void TextVbo_Render(GLuint vbo, Program* program, TextTexture* textTexture, Color color)
+void TextVbo_Render(GLuint vbo, Program* program, TextTexture* textTexture, caValue* color)
 {
     check_gl_error();
     const int floatsPerVertex = 5;
@@ -288,7 +287,10 @@ void TextVbo_Render(GLuint vbo, Program* program, TextTexture* textTexture, Colo
     check_gl_error();
     
     glUniform1i(program->uniforms.sampler, 0);
-    glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
+
+    float r, g, b, a;
+    circa_vec4(color, &r, &g, &b, &a);
+    glUniform4f(program->uniforms.color, r, g, b, a);
     check_gl_error();
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
@@ -314,7 +316,7 @@ void Rect_Update(GLuint vbo, float x1, float y1, float x2, float y2)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Rect_Render(GLuint vbo, Program* program, Color color)
+void Rect_Render(GLuint vbo, Program* program, caValue* color)
 {
     const int floatsPerVertex = 5;
     const int vertexCount = 4;
@@ -328,7 +330,9 @@ void Rect_Render(GLuint vbo, Program* program, Color color)
             floatsPerVertex*vertexCount, BUFFER_OFFSET(0));
     check_gl_error();
     
-    glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
+    float r, g, b, a;
+    circa_vec4(color, &r, &g, &b, &a);
+    glUniform4f(program->uniforms.color, r, g, b, a);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
 
@@ -356,10 +360,8 @@ void Lines_Update(GLuint vbo, caValue* points)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     free(vertices);
 }
-void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color)
+void Lines_Render(GLuint vbo, Program* program, int vertexCount, caValue* color)
 {
-    const int floatsPerVertex = 3;
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     GLuint attribVertex = program->attributes.vertex;
@@ -367,7 +369,9 @@ void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color)
     glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     check_gl_error();
     
-    glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
+    float r, g, b, a;
+    circa_vec4(color, &r, &g, &b, &a);
+    glUniform4f(program->uniforms.color, r, g, b, a);
 
     glDrawArrays(GL_LINES, 0, vertexCount);
 
@@ -403,10 +407,8 @@ int Ngon_Update(GLuint vbo, caValue* points)
 
     return count;
 }
-void Triangles_Render(GLuint vbo, Program* program, int vertexCount, Color color)
+void Triangles_Render(GLuint vbo, Program* program, int vertexCount, caValue* color)
 {
-    const int floatsPerVertex = 3;
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     GLuint attribVertex = program->attributes.vertex;
@@ -414,7 +416,9 @@ void Triangles_Render(GLuint vbo, Program* program, int vertexCount, Color color
     glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     check_gl_error();
     
-    glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
+    float r, g, b, a;
+    circa_vec4(color, &r, &g, &b, &a);
+    glUniform4f(program->uniforms.color, r, g, b, a);
 
     glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
@@ -514,3 +518,29 @@ void Sprite::render(RenderTarget* target)
 }
 #endif
 
+// Circa bindings
+void RenderTarget__getTextRender(caStack* stack)
+{
+    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    caValue* args = circa_input(stack, 1);
+    caValue* cachedRender = target->getTextRender(args);
+    circa_copy(cachedRender, circa_output(stack, 0));
+}
+void RenderTarget__sendCommand(caStack* stack)
+{
+    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    caValue* command = circa_input(stack, 1);
+    target->sendCommand(command);
+}
+void RenderTarget__getViewportSize(caStack* stack)
+{
+    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    circa_set_vec2(circa_output(stack, 0), target->viewportWidth, target->viewportHeight);
+}
+
+void RenderTarget_moduleLoad(caNativeModule* module)
+{
+    circa_patch_function(module, "RenderTarget.getTextRender", RenderTarget__getTextRender);
+    circa_patch_function(module, "RenderTarget.sendCommand", RenderTarget__sendCommand);
+    circa_patch_function(module, "RenderTarget.getViewportSize", RenderTarget__getViewportSize);
+}
