@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E1AA2381672AC07006A8DBF /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E1AA2371672AC07006A8DBF /* SDLMain.m */; };
+		2E1AA23A1672ACAB006A8DBF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E1AA2391672ACAB006A8DBF /* Cocoa.framework */; };
 		A1AA2B0F1671B06800CB0135 /* FreeType.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1AA2B0E1671B06800CB0135 /* FreeType.framework */; };
 		A1AA2B111671B13600CB0135 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1AA2B101671B13600CB0135 /* OpenGL.framework */; };
 		A1AA2C051671B21900CB0135 /* block.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1AA2B151671B21900CB0135 /* block.cpp */; };
@@ -144,7 +146,6 @@
 		A1F3B10F16719BEC002202FA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0F816719BEC002202FA /* main.cpp */; };
 		A1F3B11016719BEC002202FA /* RenderTarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0FC16719BEC002202FA /* RenderTarget.cpp */; };
 		A1F3B11116719BEC002202FA /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0FE16719BEC002202FA /* ResourceManager.cpp */; };
-		A1F3B11216719BEC002202FA /* SDLShell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B10016719BEC002202FA /* SDLShell.cpp */; };
 		A1F3B11316719BEC002202FA /* ShaderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B10216719BEC002202FA /* ShaderUtils.cpp */; };
 		A1F3B11416719BEC002202FA /* TextTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B10416719BEC002202FA /* TextTexture.cpp */; };
 		A1F3B11516719BEC002202FA /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B10616719BEC002202FA /* Texture.cpp */; };
@@ -175,6 +176,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2E1AA2361672AC07006A8DBF /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = deps/sdl_mac/SDLMain.h; sourceTree = SOURCE_ROOT; };
+		2E1AA2371672AC07006A8DBF /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = deps/sdl_mac/SDLMain.m; sourceTree = SOURCE_ROOT; };
+		2E1AA2391672ACAB006A8DBF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
 		A1AA2B0E1671B06800CB0135 /* FreeType.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FreeType.framework; path = deps/FreeType.framework; sourceTree = "<group>"; };
 		A1AA2B101671B13600CB0135 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = ../../../../System/Library/Frameworks/OpenGL.framework; sourceTree = "<group>"; };
 		A1AA2B151671B21900CB0135 /* block.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = block.cpp; path = ../src/block.cpp; sourceTree = "<group>"; };
@@ -413,8 +417,6 @@
 		A1F3B0FD16719BEC002202FA /* RenderTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderTarget.h; path = src/RenderTarget.h; sourceTree = SOURCE_ROOT; };
 		A1F3B0FE16719BEC002202FA /* ResourceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceManager.cpp; path = src/ResourceManager.cpp; sourceTree = SOURCE_ROOT; };
 		A1F3B0FF16719BEC002202FA /* ResourceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceManager.h; path = src/ResourceManager.h; sourceTree = SOURCE_ROOT; };
-		A1F3B10016719BEC002202FA /* SDLShell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SDLShell.cpp; path = src/SDLShell.cpp; sourceTree = SOURCE_ROOT; };
-		A1F3B10116719BEC002202FA /* SDLShell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLShell.h; path = src/SDLShell.h; sourceTree = SOURCE_ROOT; };
 		A1F3B10216719BEC002202FA /* ShaderUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderUtils.cpp; path = src/ShaderUtils.cpp; sourceTree = SOURCE_ROOT; };
 		A1F3B10316719BEC002202FA /* ShaderUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderUtils.h; path = src/ShaderUtils.h; sourceTree = SOURCE_ROOT; };
 		A1F3B10416719BEC002202FA /* TextTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextTexture.cpp; path = src/TextTexture.cpp; sourceTree = SOURCE_ROOT; };
@@ -434,6 +436,7 @@
 				A1F3B11916719F91002202FA /* SDL.framework in Frameworks */,
 				A1AA2B0F1671B06800CB0135 /* FreeType.framework in Frameworks */,
 				A1AA2B111671B13600CB0135 /* OpenGL.framework in Frameworks */,
+				2E1AA23A1672ACAB006A8DBF /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -731,6 +734,7 @@
 				A1AA2B101671B13600CB0135 /* OpenGL.framework */,
 				A1AA2B0E1671B06800CB0135 /* FreeType.framework */,
 				A1F3B11816719F91002202FA /* SDL.framework */,
+				2E1AA2391672ACAB006A8DBF /* Cocoa.framework */,
 				A1BAC78C16719A470048831B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -746,6 +750,8 @@
 		A1BAC78E16719A470048831B /* improv */ = {
 			isa = PBXGroup;
 			children = (
+				2E1AA2361672AC07006A8DBF /* SDLMain.h */,
+				2E1AA2371672AC07006A8DBF /* SDLMain.m */,
 				A1F3B0F216719BEC002202FA /* Common.cpp */,
 				A1F3B0F316719BEC002202FA /* Common.h */,
 				A1F3B0F416719BEC002202FA /* FontBitmap.cpp */,
@@ -758,8 +764,6 @@
 				A1F3B0FD16719BEC002202FA /* RenderTarget.h */,
 				A1F3B0FE16719BEC002202FA /* ResourceManager.cpp */,
 				A1F3B0FF16719BEC002202FA /* ResourceManager.h */,
-				A1F3B10016719BEC002202FA /* SDLShell.cpp */,
-				A1F3B10116719BEC002202FA /* SDLShell.h */,
 				A1F3B10216719BEC002202FA /* ShaderUtils.cpp */,
 				A1F3B10316719BEC002202FA /* ShaderUtils.h */,
 				A1F3B10416719BEC002202FA /* TextTexture.cpp */,
@@ -865,7 +869,6 @@
 				A1F3B10F16719BEC002202FA /* main.cpp in Sources */,
 				A1F3B11016719BEC002202FA /* RenderTarget.cpp in Sources */,
 				A1F3B11116719BEC002202FA /* ResourceManager.cpp in Sources */,
-				A1F3B11216719BEC002202FA /* SDLShell.cpp in Sources */,
 				A1F3B11316719BEC002202FA /* ShaderUtils.cpp in Sources */,
 				A1F3B11416719BEC002202FA /* TextTexture.cpp in Sources */,
 				A1F3B11516719BEC002202FA /* Texture.cpp in Sources */,
@@ -999,6 +1002,7 @@
 				A1AA2C981671B21900CB0135 /* update_cascades.cpp in Sources */,
 				A1AA2C991671B21900CB0135 /* weak_ptrs.cpp in Sources */,
 				A1AA2C9A1671B21900CB0135 /* world.cpp in Sources */,
+				2E1AA2381672AC07006A8DBF /* SDLMain.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1073,13 +1077,10 @@
 		A1BAC79616719A470048831B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Application Support/Canon/ScanGear/Frameworks\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Printers/Canon/BJPrinter/Frameworks\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Printers/Canon/IJScanner/Frameworks\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Printers/EPSON/CIOSupport\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1092,13 +1093,10 @@
 		A1BAC79716719A470048831B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Application Support/Canon/ScanGear/Frameworks\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Printers/Canon/BJPrinter/Frameworks\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Printers/Canon/IJScanner/Frameworks\"",
-					"\"$(LOCAL_LIBRARY_DIR)/Printers/EPSON/CIOSupport\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

@@ -121,8 +121,6 @@ bool term_is_accessor_traceable(Term* accessor)
 
 void trace_accessor_chain(Term* accessor, TermList* chainResult)
 {
-    Term* bottomAccessor = accessor;
-
     chainResult->resize(0);
 
     while (true) {

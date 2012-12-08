@@ -79,7 +79,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
     create_block_unevaluated(contents, "#zero");
 
     // Add an loop output index
-    Term* loopOutputIndex = apply(contents, FUNCS.loop_output_index, TermList());
+    apply(contents, FUNCS.loop_output_index, TermList());
 
     return iterator;
 }

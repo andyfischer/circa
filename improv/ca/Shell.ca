@@ -1,0 +1,17 @@
+
+require InputEvent
+
+def mouse_down(number x, number y) -> InputEvent
+    [:MouseDown [x y] 0]
+
+def mouse_up(number x, number y) -> InputEvent
+    [:MouseUp [x y] 0]
+
+def mouse_move(number x, number y) -> InputEvent
+    [:MouseMove [x y] 0]
+
+def key_down(int code) -> InputEvent
+    [:KeyDown [0 0] code]
+    
+def key_up(int code) -> InputEvent
+    [:KeyUp [0 0] code]

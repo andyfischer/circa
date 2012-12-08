@@ -1,0 +1,4 @@
+
+msg = input() -> any
+
+print('received msg: ' msg)

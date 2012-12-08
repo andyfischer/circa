@@ -369,8 +369,6 @@ static bool is_digit(char c)
 
 int name_find_ordinal_suffix(const char* name, int* endPos)
 {
-    int originalEndPos = *endPos;
-
     // Walk backwards, see if this name even has an ordinal suffix.
     int search = *endPos - 1;
     if (*endPos == -1)
