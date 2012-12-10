@@ -1,19 +1,20 @@
 # submodules:
-gh-pages
+/gh-pages
 
 # build results:
 /build
 
 # miscellaneous artifacts:
-tags
+/tags
 
 # generated docs
-docs/nanodoc/index.html
+/docs/nanodoc/index.html
 
 # miscellaneous
-x.ca
-y.ca
-z.ca
+/x.ca
+/y.ca
+/z.ca
+
 *.swp
 *.pyc
 .DS_Store
