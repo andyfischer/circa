@@ -1,2 +1,0 @@
-
-mxmlc -library-path=../../build/circa.swc --target-player=10.0.0 Main.as

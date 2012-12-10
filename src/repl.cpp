@@ -85,15 +85,18 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
 
     // Evaluate as an expression.
 
+    Value expressionText;
+    copy(line, &expressionText);
+
     // Append a newline for the benefit of source repro.
-    string_append(line, "\n");
+    string_append(&expressionText, "\n");
 
     int previousHead = block->length();
 
     // If there is a leftover error stack, then blow it away.
     stack_clear_error(stack);
 
-    parser::compile(block, parser::statement_list, as_cstring(line));
+    parser::compile(block, parser::statement_list, as_cstring(&expressionText));
     
     // Run the stack to the new end of the block.
 

@@ -1,4 +1,13 @@
 
+if not os.getenv("PNACL_TOOLCHAIN") then 
+  print("Error: PNACL_TOOLCHAIN envvar was not set. It should look something like this:")
+  print("  /nacl_sdk/pepper24/toolchain/mac_x86_pnacl")
+end
+
+premake.gcc.cc = "$(PNACL_TOOLCHAIN)/newlib/bin/pnacl-clang"
+premake.gcc.cxx = "$(PNACL_TOOLCHAIN)/newlib/bin/pnacl-clang++"
+premake.gcc.ar = "$(PNACL_TOOLCHAIN)/newlib/bin/pnacl-ar"
+
 solution "Circa"
     configurations { "Debug", "Release" }
     language "C++"
@@ -11,10 +20,10 @@ solution "Circa"
     defines { "CIRCA_DISABLE_DLL" }
 
     project "main"
+        kind "ConsoleApp"
 
     files {
         "src/*.cpp",
-        "src/command_line/command_line.cpp",
         "src/generated/all_builtin_functions.cpp",
         "src/generated/all_builtin_types.cpp",
         "src/generated/setup_builtin_functions.cpp",
