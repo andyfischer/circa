@@ -639,7 +639,7 @@ int run_command_line(caWorld* world, caValue* args)
 void run_repl_stdin(World* world)
 {
     Stack* stack = alloc_stack(world);
-    repl_start(world, stack);
+    repl_start(stack);
 
     printf("Started REPL, type /help for reference.\n");
 

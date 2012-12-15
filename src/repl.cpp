@@ -18,9 +18,9 @@
 
 namespace circa {
 
-void repl_start(World* world, Stack* stack)
+void repl_start(Stack* stack)
 {
-    Block* block = fetch_module(world, "main");
+    Block* block = fetch_module(stack->world, "main");
     set_bool(&stack->context, false);
     push_frame(stack, block);
 }
@@ -124,5 +124,14 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     }
 }
 
+CIRCA_EXPORT void circa_repl_start(caStack* stack)
+{
+    return repl_start(stack);
+}
+
+CIRCA_EXPORT void circa_repl_run_line(caStack* stack, caValue* input, caValue* output)
+{
+    return repl_run_line(stack, input, output);
+}
 
 }

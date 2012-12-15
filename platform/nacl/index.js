@@ -5,20 +5,29 @@ function onLoad(event) {
     console.log("onLoad");
     var replForm = document.getElementById('replForm');
     replForm.addEventListener('submit', function(event) {
-        console.log('submit');
         event.preventDefault();
         sendCommand(document.getElementById('textInput').value);
     }, false);
 }
 
-function handleMessage(event) {
-    var repl_output = document.getElementById('repl_output');
-    repl_output.appendChild(document.createTextNode(event.data));
+function printLine(line) {
+    repl_output.appendChild(document.createTextNode(line));
     repl_output.appendChild(document.createElement('br'));
+}
+
+function handleMessage(event) {
+    var msg = JSON.parse(event.data);
+
+    var repl_output = document.getElementById('repl_output');
+
+    for (var i in msg) {
+        printLine(msg[i]);
+    }
 }
 
 function sendCommand(cmd) {
     console.log('sending: ' + cmd);
+    printLine('> ' + cmd);
     nacl_module.postMessage(cmd);
 }
 

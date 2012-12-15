@@ -503,6 +503,10 @@ void circa_get_parent_directory(caValue* filename, caValue* result);
 void circa_chdir(caValue* dir);
 void circa_cwd(caValue* cwd);
 
+// -- Builtin REPL --
+void circa_repl_start(caStack* stack);
+void circa_repl_run_line(caStack* stack, caValue* input, caValue* output);
+
 // -- Debugging Helpers --
 
 // 'dump' commands will print a representation to stdout
