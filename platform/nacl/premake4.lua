@@ -8,15 +8,43 @@ solution "Circa"
     language "C++"
     flags { "Symbols" }
     objdir "../../build/nacl"
+    targetname "circa_cl.pexe"
 
-    defines { "CIRCA_DISABLE_DLL" }
+    defines { "CIRCA_NACL", "CIRCA_DISABLE_DLL" }
 
     project "main"
         kind "ConsoleApp"
 
     includedirs {
         "../../include",
-        "../../src"
+        "../../src",
+        "$(NACL_SDK_ROOT)/include"
+    }
+
+    buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__",
+			"-pthread",
+			"-fno-stack-protector",
+			"-fdiagnostics-show-option",
+			"-Wunused-value",
+			"-fdata-sections",
+			"-ffunction-sections",
+    }
+
+    links {
+        "nosys",
+        "ppapi",
+        "ppapi_cpp"
+    }
+
+    libdirs {
+        "$(NACL_SDK_ROOT)/lib/mac_PNACL_pnacl/Debug"
+    }
+
+    linkoptions {
+        -- "-Wl",
+        -- "--gc-sections"
     }
 
     files {

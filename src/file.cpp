@@ -107,15 +107,26 @@ CIRCA_EXPORT void circa_get_parent_directory(caValue* filename, caValue* result)
 
 CIRCA_EXPORT void circa_chdir(caValue* dir)
 {
+#ifdef CIRCA_NACL
+    internal_error("can't chdir on current platform");
+#else
+
     chdir(as_cstring(dir));
+#endif
 }
 CIRCA_EXPORT void circa_cwd(caValue* cwd)
 {
+#ifdef CIRCA_NACL
+    set_string(cwd, "");
+    return;
+
+#else
     char buf[1024];
     if (getcwd(buf, sizeof(buf)) != NULL)
         set_string(cwd, buf);
     else
         set_string(cwd, "");
+#endif
 }
 
 void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue* result)

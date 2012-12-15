@@ -22,14 +22,14 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = ../../build/nacl/Debug
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/main
-  DEFINES   += -DCIRCA_DISABLE_DLL
-  INCLUDES  += -I../../include -I../../src
+  TARGET     = $(TARGETDIR)/circa_cl.pexe
+  DEFINES   += -DCIRCA_NACL -DCIRCA_DISABLE_DLL
+  INCLUDES  += -I../../include -I../../src -I$(NACL_SDK_ROOT)/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c++0x -U__STRICT_ANSI__ -pthread -fno-stack-protector -fdiagnostics-show-option -Wunused-value -fdata-sections -ffunction-sections
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += 
-  LIBS      += 
+  LDFLAGS   += -L$(NACL_SDK_ROOT)/lib/mac_PNACL_pnacl/Debug
+  LIBS      += -lnosys -lppapi -lppapi_cpp
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -44,14 +44,14 @@ endif
 ifeq ($(config),release)
   OBJDIR     = ../../build/nacl/Release
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/main
-  DEFINES   += -DCIRCA_DISABLE_DLL
-  INCLUDES  += -I../../include -I../../src
+  TARGET     = $(TARGETDIR)/circa_cl.pexe
+  DEFINES   += -DCIRCA_NACL -DCIRCA_DISABLE_DLL
+  INCLUDES  += -I../../include -I../../src -I$(NACL_SDK_ROOT)/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -std=c++0x -U__STRICT_ANSI__ -pthread -fno-stack-protector -fdiagnostics-show-option -Wunused-value -fdata-sections -ffunction-sections
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += 
-  LIBS      += 
+  LDFLAGS   += -L$(NACL_SDK_ROOT)/lib/mac_PNACL_pnacl/Debug
+  LIBS      += -lnosys -lppapi -lppapi_cpp
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)

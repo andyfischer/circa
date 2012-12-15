@@ -1,0 +1,11 @@
+
+NAME="circa_cl"
+
+echo "Translating i686.."
+pnacl-translate ${NAME}.pexe -arch i686 -o ${NAME}_x86_32.nexe
+
+echo "Translating x86-64.."
+pnacl-translate ${NAME}.pexe -arch x86-64 -o ${NAME}_x86_64.nexe
+
+echo "Translating armv7.."
+pnacl-translate ${NAME}.pexe -arch armv7 -o ${NAME}_arm.nexe

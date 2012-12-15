@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="-1">
+  <title>Circa REPL test app</title>
+
+  <script type="text/javascript" src="index.js"></script>
+  
+</head>
+<body>
+    <form id="replForm" action="" method="get">
+      <input type="text" name="textInput" id="textInput" name=inputBox" /><p>
+      <input type="submit" id="submitButton" value="Send a command" />
+    </form>
+
+    <div id="repl_output">
+    </div>
+
+    <embed id="nacl_module" width="100" height="100" src="circa_cl.nmf"
+        type="application/x-nacl" />
+</body>
+</html>

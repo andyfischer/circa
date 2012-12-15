@@ -1,0 +1,15 @@
+{
+  "files": {},
+  "program": {
+    "x86-64": {
+      "url": "circa_cl_x86_64.nexe"
+    },
+    "arm": {
+      "url": "circa_cl_arm.nexe"
+    },
+    "x86-32": {
+      "url": "circa_cl_x86_32.nexe"
+    }
+  }
+}
+
