@@ -2,10 +2,10 @@
 
 #include "Common.h"
 #include "TextTexture.h"
-#include "RenderTarget.h"
+#include "RenderList.h"
 
 TextTexture*
-TextTexture::create(RenderTarget* target)
+TextTexture::create(RenderList* target)
 {
     TextTexture* obj = new TextTexture();
     target->appendEntity(obj);

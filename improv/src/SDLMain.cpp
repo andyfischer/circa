@@ -7,7 +7,7 @@
 
 #include "circa/circa.h"
 
-#include "RenderTarget.h"
+#include "RenderList.h"
 #include "FontBitmap.h"
 
 caWorld* g_world;
@@ -73,14 +73,14 @@ int main(int argc, char *argv[])
     circa_add_module_search_path(g_world, "ca");
 
     // Load any modules that are either 1) directly accessed by C code, or 2) are patched with native code.
-    circa_load_module_from_file(g_world, "EngineBindings", "ca/EngineBindings.ca");
+    circa_load_module_from_file(g_world, "RenderList", "ca/RenderList.ca");
     circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
     circa_load_module_from_file(g_world, "UserApi", "ca/UserApi.ca");
     circa_load_module_from_file(g_world, "Shell", "ca/Shell.ca");
     circa_load_module_from_file(g_world, "App", "ca/App.ca");
 
     // Apply native patches.
-    RenderTarget_moduleLoad(circa_create_native_patch(g_world, "RenderTarget"));
+    RenderList_moduleLoad(circa_create_native_patch(g_world, "RenderList"));
     FontBitmap_moduleLoad(circa_create_native_patch(g_world, "FontBitmap"));
 
     // Initialize SDL
@@ -99,13 +99,19 @@ int main(int argc, char *argv[])
         exit(1);
     }
     
-    // Redraw timer
+    // Setup redraw timer
     SDL_TimerID timer_id = SDL_AddTimer(16, redraw_timer_callback, NULL);
     if (timer_id == NULL) {
         printf("SDL_AddTimer failed: %s\n", SDL_GetError());
         exit(1);
-        
     }
+
+    // Setup ResourceManager
+    ResourceManager resourceManager;
+
+    // Setup RenderList
+    RenderList renderList;
+    renderList.setup(&resourceManager);
 
     // Event loop.
     SDL_Event event;
@@ -121,8 +127,15 @@ int main(int argc, char *argv[])
               case SDL_KEYDOWN:
                    printf("keypress\n");
                    break;
-              case SDL_USEREVENT:
+              case SDL_USEREVENT: {
                    // Tick & redraw.
+                   circa::Value redrawMsg;
+                   circa_set_list(&redrawMsg, 2);
+                   circa_set_name(list_get(&redrawMsg, 0), circa_to_name("redraw"));
+                   circa_handle_set_object(list_get(&redrawMsg, 1), &renderList);
+
+                   break;
+              }
             
                       
               }

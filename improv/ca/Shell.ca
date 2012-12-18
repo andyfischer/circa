@@ -1,5 +1,6 @@
 
 require InputEvent
+require RenderList
 
 -- Incoming messages
 msgs = input() -> List
@@ -19,6 +20,14 @@ def key_down(int code) -> InputEvent
 def key_up(int code) -> InputEvent
     [:KeyUp [0 0] code]
 
-for msg in msgs
+def testpaint(Painter painter)
+    painter.fillRect([0 0 100 100] #f00)
+    painter.text([30 30] "hello" #fff [])
 
+-- Main message dispatch
+for msg in msgs
     if :redraw == first_name(msg)
+        renderList = msg[1] -> RenderList
+
+        painter = start_painter(renderList)
+        testpaint(painter)

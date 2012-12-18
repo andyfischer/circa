@@ -3,7 +3,7 @@
 
 #pragma once
 
-struct RenderTarget;
+struct RenderList;
 
 struct RenderEntity
 {

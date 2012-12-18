@@ -4,10 +4,10 @@ type TextRender {
     Point size
 }
 
-type RenderTarget;
-def RenderTarget.getTextRender(self, List args) -> TextRender
-def RenderTarget.sendCommand(self, List command)
-def RenderTarget.getViewportSize(self) -> Point
+type RenderList = handle_type()
+def RenderList.getTextRender(self, List args) -> TextRender
+def RenderList.sendCommand(self, List command)
+def RenderList.getViewportSize(self) -> Point
 
 type Font;
 def create_font(String name, number size) -> Font
@@ -19,7 +19,7 @@ def Font.textSize(self, String text) -> Point
 type Texture;
 
 type LineList;
-def create_line_list(RenderTarget target) -> LineList
+def create_line_list(RenderList target) -> LineList
 
 -- Wrappers
 def font(String name, number size) -> Font
@@ -29,29 +29,33 @@ def font(String name, number size) -> Font
     f
 
 type Painter {
-    RenderTarget target
-    Rect viewport
+    RenderList renderList
 
     Font currentFont
 
     Font mediumSans
 }
 
+def start_painter(RenderList renderList) -> Painter
+    p = make(Painter)
+    p.renderList = renderList
+    p
+
 def Painter.setFont(@self, Font font)
     self.currentFont = font
 
 def Painter.text(self, Point position, String text, Color color, List args) -> Rect
     font = self.currentFont
-    textRender = self.target.getTextRender([text font])
-    self.target.sendCommand([:textSprite textRender.object position color args])
+    textRender = self.renderList.getTextRender([text font])
+    self.renderList.sendCommand([:textSprite textRender.object position color args])
     rect = [position.x, position.y, position.x + textRender.size.x, position.y + textRender.size.y]
     return rect
 
 def Painter.fillRect(self, Rect r, Color c)
-    self.target.sendCommand([:rect r c])
+    self.renderList.sendCommand([:rect r c])
 
 def Painter.drawLines(self, List points, Color c)
-    self.target.sendCommand([:lines points c])
+    self.renderList.sendCommand([:lines points c])
 
 def Painter.lineLoop(self, List points, Color c)
     line_points = []
@@ -60,7 +64,7 @@ def Painter.lineLoop(self, List points, Color c)
         line_points.append(points[i+1])
     line_points.append(points.last)
     line_points.append(points.first)
-    self.target.sendCommand([:lines line_points c])
+    self.renderList.sendCommand([:lines line_points c])
 
 def Painter.polygon(self, List points, Color c)
-    self.target.sendCommand([:polygon points c])
+    self.renderList.sendCommand([:polygon points c])

@@ -594,17 +594,17 @@ void String__slice(caStack* stack)
     std::string const& s = as_string(circa_input(stack, 0));
 
     // Negative indexes are relatve to end of string
-    if (start < 0) start = s.length() + start;
-    if (end < 0) end = s.length() + end;
+    if (start < 0) start = (int) s.length() + start;
+    if (end < 0) end = (int) s.length() + end;
 
     if (start < 0) return set_string(circa_output(stack, 0), "");
     if (end < 0) return set_string(circa_output(stack, 0), "");
 
     if ((unsigned) start > s.length())
-        start = s.length();
+        start = (int) s.length();
 
     if ((unsigned) end > s.length())
-        end = s.length();
+        end = (int) s.length();
 
     if (end < start)
         return set_string(circa_output(stack, 0), "");

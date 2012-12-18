@@ -3,11 +3,11 @@
 #include <cstring>
 
 #include "Common.h"
-#include "RenderTarget.h"
+#include "RenderList.h"
 #include "Texture.h"
 
 Texture*
-Texture::create(RenderTarget* target)
+Texture::create(RenderList* target)
 {
     Texture* obj = new Texture();
     target->appendEntity(obj);

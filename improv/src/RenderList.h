@@ -11,7 +11,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 struct RenderEntity;
-struct RenderTarget;
+struct RenderList;
 struct ResourceManager;
 
 struct AttributeList {
@@ -34,10 +34,10 @@ struct Program {
     UniformList uniforms;
 };
 
-struct RenderTarget
+struct RenderList
 {
     // RenderEntities store objects/data that is actively being used for drawing (and
-    // may be referenced by RenderCommands). These objects are owned by RenderTarget.
+    // may be referenced by RenderCommands). These objects are owned by RenderList.
     std::vector<RenderEntity*> entities;
     
     Program textProgram;
@@ -55,7 +55,7 @@ struct RenderTarget
     GLuint textVbo;
     GLuint geomVbo;
 
-    RenderTarget();
+    RenderList();
     void setup(ResourceManager* resourceManager);
     void appendEntity(RenderEntity* entity);
     void sendCommand(caValue* command);
@@ -77,4 +77,4 @@ struct RenderTarget
 
 void check_gl_error();
 
-void RenderTarget_moduleLoad(caNativeModule* module);
+void RenderList_moduleLoad(caNativeModule* module);

@@ -19,7 +19,7 @@ struct TextTexture : RenderEntity
     int version;
     FontBitmap metrics;
 
-    static TextTexture* create(RenderTarget* target);
+    static TextTexture* create(RenderList* target);
 
     void setFont(FontFace* font);
     void setText(caValue* text);

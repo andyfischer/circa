@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "RenderEntity.h"
-#include "RenderTarget.h"
+#include "RenderList.h"
 #include "TextTexture.h"
 #include "ShaderUtils.h"
 #include "triangulate.h"
@@ -24,7 +24,7 @@ void Lines_Render(GLuint vbo, Program* program, int vertexCount, caValue* color)
 int Ngon_Update(GLuint vbo, caValue* points);
 void Triangles_Render(GLuint vbo, Program* program, int vertexCount, caValue* color);
 
-RenderTarget::RenderTarget()
+RenderList::RenderList()
   : viewportWidth(0),
     viewportHeight(0)
 {
@@ -40,7 +40,7 @@ RenderTarget::RenderTarget()
 }
 
 void
-RenderTarget::setup(ResourceManager* resourceManager)
+RenderList::setup(ResourceManager* resourceManager)
 {
     load_shaders(resourceManager, "assets/shaders/Text", &textProgram);
     load_shaders(resourceManager, "assets/shaders/Geom", &geomProgram);
@@ -50,13 +50,13 @@ RenderTarget::setup(ResourceManager* resourceManager)
 }
 
 void
-RenderTarget::sendCommand(caValue* command)
+RenderList::sendCommand(caValue* command)
 {
     circa_copy(command, circa_append(&incomingCommands));
 }
 
 caValue*
-RenderTarget::getTextRender(caValue* key)
+RenderList::getTextRender(caValue* key)
 {
     caValue* value = circa_map_insert(&textRenderCache, key);
 
@@ -80,13 +80,13 @@ RenderTarget::getTextRender(caValue* key)
 }
 
 void
-RenderTarget::appendEntity(RenderEntity* command)
+RenderList::appendEntity(RenderEntity* command)
 {
     entities.push_back(command);
 }
 
 void
-RenderTarget::setViewportSize(int w, int h)
+RenderList::setViewportSize(int w, int h)
 {
     viewportWidth = w;
     viewportHeight = h;
@@ -94,7 +94,7 @@ RenderTarget::setViewportSize(int w, int h)
 }
 
 void
-RenderTarget::switchProgram(Program* program)
+RenderList::switchProgram(Program* program)
 {
     if (currentProgram == program)
         return;
@@ -107,7 +107,7 @@ RenderTarget::switchProgram(Program* program)
 }
 
 void
-RenderTarget::render()
+RenderList::render()
 {
     check_gl_error();
 
@@ -181,7 +181,7 @@ RenderTarget::render()
 }
 
 void
-RenderTarget::flushDestroyedEntities()
+RenderList::flushDestroyedEntities()
 {
     // Cleanup destroyed entities
     int numDestroyed = 0;
@@ -470,7 +470,7 @@ void Sprite::setSize(float w, float h)
     vboNeedsUpdate = true;
 }
 
-void Sprite::render(RenderTarget* target)
+void Sprite::render(RenderList* target)
 {
     if (texture == NULL || !texture->hasTexture)
         return;
@@ -519,28 +519,28 @@ void Sprite::render(RenderTarget* target)
 #endif
 
 // Circa bindings
-void RenderTarget__getTextRender(caStack* stack)
+void RenderList__getTextRender(caStack* stack)
 {
-    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    RenderList* target = (RenderList*) circa_handle_get_object(circa_input(stack, 0));
     caValue* args = circa_input(stack, 1);
     caValue* cachedRender = target->getTextRender(args);
     circa_copy(cachedRender, circa_output(stack, 0));
 }
-void RenderTarget__sendCommand(caStack* stack)
+void RenderList__sendCommand(caStack* stack)
 {
-    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    RenderList* target = (RenderList*) circa_handle_get_object(circa_input(stack, 0));
     caValue* command = circa_input(stack, 1);
     target->sendCommand(command);
 }
-void RenderTarget__getViewportSize(caStack* stack)
+void RenderList__getViewportSize(caStack* stack)
 {
-    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    RenderList* target = (RenderList*) circa_handle_get_object(circa_input(stack, 0));
     circa_set_vec2(circa_output(stack, 0), target->viewportWidth, target->viewportHeight);
 }
 
-void RenderTarget_moduleLoad(caNativeModule* module)
+void RenderList_moduleLoad(caNativeModule* module)
 {
-    circa_patch_function(module, "RenderTarget.getTextRender", RenderTarget__getTextRender);
-    circa_patch_function(module, "RenderTarget.sendCommand", RenderTarget__sendCommand);
-    circa_patch_function(module, "RenderTarget.getViewportSize", RenderTarget__getViewportSize);
+    circa_patch_function(module, "RenderList.getTextRender", RenderList__getTextRender);
+    circa_patch_function(module, "RenderList.sendCommand", RenderList__sendCommand);
+    circa_patch_function(module, "RenderList.getViewportSize", RenderList__getViewportSize);
 }
