@@ -110,6 +110,7 @@ void to_string_repr(caStack* stack)
 
 void call_actor_func(caStack* stack)
 {
+#if 0 // actorList disabled
     const char* actorName = circa_string_input(stack, 0);
     caValue* msg = circa_input(stack, 1);
 
@@ -119,6 +120,7 @@ void call_actor_func(caStack* stack)
     }
 
     circa_actor_run_message(stack->world, actorName, msg);
+#endif
 }
 
 void dynamic_method_call(caStack* stack)
@@ -159,6 +161,7 @@ void dynamic_method_call(caStack* stack)
 
 void send_func(caStack* stack)
 {
+#if 0 // actorList disabled
     const char* actorName = circa_string_input(stack, 0);
     caValue* msg = circa_input(stack, 1);
 
@@ -177,6 +180,7 @@ void send_func(caStack* stack)
     }
 
     actor_send_message(actor, msg);
+#endif
 }
 
 void refactor__rename(caStack* stack)

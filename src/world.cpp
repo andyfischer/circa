@@ -28,25 +28,64 @@ World* alloc_world()
     World* world = (World*) malloc(sizeof(World));
     memset(world, 0, sizeof(World));
 
-    initialize_null(&world->actorList);
-    initialize_null(&world->moduleSearchPaths);
-
     return world;
 }
 
 void world_initialize(World* world)
 {
-    set_list(&world->actorList, 0);
     set_list(&world->moduleSearchPaths);
 
     world->nativeModuleWorld = create_native_module_world();
     world->fileWatchWorld = create_file_watch_world();
-    world->actorStack = circa_alloc_stack(world);
 
     world->nextTermID = 1;
     world->nextBlockID = 1;
     world->nextStackID = 1;
 }
+
+
+void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
+{
+    // Noop if the target is our new block
+    if (target == newBlock)
+        return;
+
+    ca_assert(target != oldBlock);
+
+    update_all_code_references(target, oldBlock, newBlock);
+}
+
+void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock)
+{
+    // Update references in every module
+    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+        if (term->function == FUNCS.module) {
+            update_block_after_module_reload(term->nestedContents, oldBlock, newBlock);
+        }
+    }
+}
+
+void refresh_all_modules(caWorld* world)
+{
+    // Iterate over top-level modules
+    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+        if (term->function == FUNCS.module) {
+            
+            Block* existing = term->nestedContents;
+            Block* latest = load_latest_block(existing);
+
+            if (existing != latest) {
+                term->nestedContents = latest;
+
+                update_world_after_module_reload(world, existing, latest);
+            }
+        }
+    }
+}
+
+#if 0 // actorList disabled
 
 ListData* find_actor(World* world, const char* name)
 {
@@ -146,53 +185,6 @@ int actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
     return count;
 }
 
-void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
-{
-    // Noop if the target is our new block
-    if (target == newBlock)
-        return;
-
-    ca_assert(target != oldBlock);
-
-    update_all_code_references(target, oldBlock, newBlock);
-}
-
-void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock)
-{
-    // Update references in every module
-    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        if (term->function == FUNCS.module) {
-            update_block_after_module_reload(term->nestedContents, oldBlock, newBlock);
-        }
-    }
-
-    // Update top-level state
-    for (int i=0; i < list_length(&world->actorList); i++) {
-        caValue* actor = list_get(&world->actorList, i);
-        caValue* state = list_get(actor, 3);
-        update_all_code_references_in_value(state, oldBlock, newBlock);
-    }
-}
-
-void refresh_all_modules(caWorld* world)
-{
-    // Iterate over top-level modules
-    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        if (term->function == FUNCS.module) {
-            
-            Block* existing = term->nestedContents;
-            Block* latest = load_latest_block(existing);
-
-            if (existing != latest) {
-                term->nestedContents = latest;
-
-                update_world_after_module_reload(world, existing, latest);
-            }
-        }
-    }
-}
 
 CIRCA_EXPORT void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
 {
@@ -291,6 +283,7 @@ CIRCA_EXPORT void circa_actor_clear_all(caWorld* world)
 {
     set_list(&world->actorList, 0);
 }
+#endif
 
 CIRCA_EXPORT void circa_refresh_all_modules(caWorld* world)
 {

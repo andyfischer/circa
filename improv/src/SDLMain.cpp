@@ -113,6 +113,9 @@ int main(int argc, char *argv[])
     RenderList renderList;
     renderList.setup(&resourceManager);
 
+    caStack stack;
+    circa_push_module_as_function(&stack, "Shell");
+
     // Event loop.
     SDL_Event event;
     while (true) {
@@ -129,15 +132,17 @@ int main(int argc, char *argv[])
                    break;
               case SDL_USEREVENT: {
                    // Tick & redraw.
-                   circa::Value redrawMsg;
+                   caValue* msgs = circa_input(&stack, 0);
+                   circa_set_list(msgs, 0);
+                   caValue* redrawMsg = circa_index(msgs, 0);
                    circa_set_list(&redrawMsg, 2);
                    circa_set_name(list_get(&redrawMsg, 0), circa_to_name("redraw"));
                    circa_handle_set_object(list_get(&redrawMsg, 1), &renderList);
 
+                   circa_run(&stack);
+
                    break;
               }
-            
-                      
               }
          }
     }

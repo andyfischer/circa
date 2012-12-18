@@ -8,15 +8,11 @@ struct World {
 
     Block* root;
 
-    // Actors.
-    circa::Value actorList;
-    caStack* actorStack;
-
     // Private data.
     NativeModuleWorld* nativeModuleWorld;
     FileWatchWorld* fileWatchWorld;
 
-    // Next unused global IDs.
+    // Global IDs.
     int nextTermID;
     int nextBlockID;
     int nextStackID;
@@ -24,7 +20,7 @@ struct World {
     // Module information.
     List moduleSearchPaths;
 
-    // Whether the world is currently bootstrapping. Either Bootstrapping or Done.
+    // Whether the world is currently bootstrapping. Either :Bootstrapping or :Done.
     Name bootstrapStatus;
 
 protected:
@@ -36,9 +32,11 @@ protected:
 World* alloc_world();
 void world_initialize(World* world);
 
+#if 0 // actorList disabled
 void actor_send_message(ListData* actor, caValue* message);
 void actor_run_message(caStack* stack, ListData* actor, caValue* message);
 ListData* find_actor(World* world, const char* name);
+#endif
 
 void refresh_all_modules(caWorld* world);
 

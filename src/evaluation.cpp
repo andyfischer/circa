@@ -1927,6 +1927,12 @@ CIRCA_EXPORT void circa_push_function(caStack* stack, caBlock* func)
     push_frame(stack, func);
 }
 
+CIRCA_EXPORT void circa_push_module_as_function(caStack* stack, const char* name)
+{
+    Block* block = find_module(stack->world, name);
+    push_frame(stack, block);
+}
+
 CIRCA_EXPORT caValue* circa_frame_input(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);

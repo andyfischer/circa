@@ -5,6 +5,8 @@ require RenderList
 -- Incoming messages
 msgs = input() -> List
 
+print("running: " msgs)
+
 def mouse_down(number x, number y) -> InputEvent
     [:MouseDown [x y] 0]
 
