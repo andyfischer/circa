@@ -543,4 +543,5 @@ void RenderList_moduleLoad(caNativeModule* module)
     circa_patch_function(module, "RenderList.getTextRender", RenderList__getTextRender);
     circa_patch_function(module, "RenderList.sendCommand", RenderList__sendCommand);
     circa_patch_function(module, "RenderList.getViewportSize", RenderList__getViewportSize);
+    circa_finish_native_module(module);
 }

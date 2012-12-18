@@ -53,7 +53,7 @@ caValue* circa_create_default_output(caStack* stack, int index)
     caValue* val = circa_output(stack, index);
     caBlock* top = circa_top_block(stack);
     caTerm* placeholder = circa_output_placeholder(top, index);
-    circa_create_value(val, circa_term_declared_type(placeholder));
+    circa_make(val, circa_term_declared_type(placeholder));
     return val;
 }
 
@@ -137,7 +137,7 @@ void* circa_handle_get_object(caValue* handle)
     return circa_as_pointer(circa_handle_get_value(handle));
 }
 
-void circa_create_value(caValue* value, caType* type)
+void circa_make(caValue* value, caType* type)
 {
     make((Type*) type, value);
 }

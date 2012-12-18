@@ -29,7 +29,5 @@ def testpaint(Painter painter)
 -- Main message dispatch
 for msg in msgs
     if :redraw == first_name(msg)
-        renderList = msg[1] -> RenderList
-
-        painter = start_painter(renderList)
+        painter = RenderList:start_painter(msg[1])
         testpaint(painter)

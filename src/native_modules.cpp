@@ -230,6 +230,11 @@ void native_module_finish_change(NativeModule* module)
     }
 }
 
+CIRCA_EXPORT void circa_finish_native_module(caNativeModule* module)
+{
+    native_module_finish_change(module);
+}
+
 void module_possibly_patch_new_function(World* world, Block* function)
 {
     NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
@@ -329,5 +334,7 @@ CIRCA_EXPORT void circa_patch_function(caNativeModule* module, const char* name,
 {
     module_patch_function((NativeModule*) module, name, func);
 }
+
+CIRCA_EXPORT void circa_finish_native_module(caNativeModule* module);
 
 } // namespace circa

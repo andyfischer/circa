@@ -256,4 +256,5 @@ void FontBitmap_moduleLoad(caNativeModule* module)
     circa_patch_function(module, "create_font", create_font);
     circa_patch_function(module, "Font.height", Font__height);
     circa_patch_function(module, "Font.width", Font__width);
+    circa_finish_native_module(module);
 }

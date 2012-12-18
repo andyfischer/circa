@@ -167,6 +167,8 @@ void circa_push_function(caStack* stack, caBlock* func);
 // name was found.
 bool circa_push_function_by_name(caStack* stack, const char* name);
 
+bool circa_push_module_as_function(caStack* stack, const char* name);
+
 // Run the current stack.
 void circa_run(caStack* stack);
 
@@ -182,6 +184,9 @@ bool circa_has_error(caStack* stack);
 
 // Clear all frames from a Stack.
 void circa_clear_stack(caStack* stack);
+
+// Clear all frames but the topmost, rewind the PC, and clear temporary values.
+void circa_restart(caStack* stack);
 
 // Print a human-readable description of the stack's error to stdout.
 void circa_print_error_to_stdout(caStack* stack);
@@ -264,7 +269,7 @@ caValue* circa_alloc_list(int size);
 caType* circa_type_of(caValue* value);
 
 // Assign a Value using the Type's default create() handler.
-void circa_create_value(caValue* value, caType* type);
+void circa_make(caValue* value, caType* type);
 
 // -- Accessors --
 
@@ -489,9 +494,11 @@ void circa_setup_int_type(caType* type);
 // Configure a Circa type so that each value holds an opaque pointer.
 void circa_setup_pointer_type(caType* type);
 
-// -- Native Module support --
+// -- Native module support --
+
 caNativeModule* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func);
+void circa_finish_native_module(caNativeModule* module);
 
 // -- File IO --
 

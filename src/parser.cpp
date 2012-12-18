@@ -2150,7 +2150,7 @@ ParseResult literal_integer(Block* block, TokenStream& tokens, ParserCxt* contex
 {
     int startPosition = tokens.getPosition();
     std::string text = tokens.consumeStr(tok_Integer);
-    int value = strtoul(text.c_str(), NULL, 0);
+    int value = (int) strtoul(text.c_str(), NULL, 0);
     Term* term = create_int(block, value);
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
@@ -2160,7 +2160,7 @@ ParseResult literal_hex(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
     std::string text = tokens.consumeStr(tok_HexInteger);
-    int value = strtoul(text.c_str(), NULL, 0);
+    int value = (int) strtoul(text.c_str(), NULL, 0);
     Term* term = create_int(block, value);
     term->setStringProp("syntax:integerFormat", "hex");
     set_source_location(term, startPosition, tokens);
@@ -2692,7 +2692,7 @@ void unquote_and_unescape_string(const char* input, caValue* out)
     if (quote == '<')
         quoteSize = 3;
 
-    int end = strlen(input) - quoteSize;
+    int end = (int) strlen(input) - quoteSize;
 
     // Unescape any escaped characters
     std::stringstream result;

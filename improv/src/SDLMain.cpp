@@ -7,6 +7,7 @@
 
 #include "circa/circa.h"
 
+#include "ResourceManager.h"
 #include "RenderList.h"
 #include "FontBitmap.h"
 
@@ -99,13 +100,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
     
-    // Setup redraw timer
-    SDL_TimerID timer_id = SDL_AddTimer(16, redraw_timer_callback, NULL);
-    if (timer_id == NULL) {
-        printf("SDL_AddTimer failed: %s\n", SDL_GetError());
-        exit(1);
-    }
-
     // Setup ResourceManager
     ResourceManager resourceManager;
 
@@ -113,8 +107,11 @@ int main(int argc, char *argv[])
     RenderList renderList;
     renderList.setup(&resourceManager);
 
-    caStack stack;
-    circa_push_module_as_function(&stack, "Shell");
+    caStack* stack = circa_alloc_stack(g_world);
+    circa_push_module_as_function(stack, "Shell");
+    
+    // Initial redraw event
+    redraw_timer_callback(0, NULL);
 
     // Event loop.
     SDL_Event event;
@@ -132,14 +129,28 @@ int main(int argc, char *argv[])
                    break;
               case SDL_USEREVENT: {
                    // Tick & redraw.
-                   caValue* msgs = circa_input(&stack, 0);
-                   circa_set_list(msgs, 0);
-                   caValue* redrawMsg = circa_index(msgs, 0);
-                   circa_set_list(&redrawMsg, 2);
-                   circa_set_name(list_get(&redrawMsg, 0), circa_to_name("redraw"));
-                   circa_handle_set_object(list_get(&redrawMsg, 1), &renderList);
+                   circa_restart(stack);
 
-                   circa_run(&stack);
+                   caValue* msgs = circa_input(stack, 0);
+                   circa_set_list(msgs, 1);
+                   caValue* redrawMsg = circa_index(msgs, 0);
+                   circa_set_list(redrawMsg, 2);
+                   circa_set_name(circa_index(redrawMsg, 0), circa_to_name("redraw"));
+                  
+                   circa_make(circa_index(redrawMsg, 1), circa_find_type(g_world, "RenderList"));
+                   circa_handle_set_object(circa_index(redrawMsg, 1), &renderList);
+
+                   circa_run(stack);
+
+                   if (circa_has_error(stack))
+                       circa_print_error_to_stdout(stack);
+                  
+                   // Prepare another timer
+                   SDL_TimerID timer_id = SDL_AddTimer(16, redraw_timer_callback, NULL);
+                   if (timer_id == NULL) {
+                       printf("SDL_AddTimer failed: %s\n", SDL_GetError());
+                       exit(1);
+                   }
 
                    break;
               }

@@ -1888,6 +1888,22 @@ CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 {
     reset_stack(stack);
 }
+CIRCA_EXPORT void circa_restart(caStack* stack)
+{
+    if (top_frame(stack) == NULL)
+        return;
+
+    while (top_frame_parent(stack) != NULL)
+        pop_frame(stack);
+
+    Frame* top = top_frame(stack);
+    top->pc = 0;
+    top->nextPc = 0;
+
+    for (int i=0; i < list_length(&top->registers); i++)
+        set_null(list_get(&top->registers, i));
+}
+
 CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Block* block = function_contents((Function*) func);

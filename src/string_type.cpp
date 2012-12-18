@@ -101,7 +101,7 @@ void string_resize(StringData** data, int newLength)
 
 int string_length(StringData* data)
 {
-    return strlen(data->str);
+    return (int) strlen(data->str);
 }
 
 // Tagged-value wrappers
@@ -230,7 +230,7 @@ void string_append(caValue* left, const char* right)
     StringData** data = (StringData**) &left->value_data.ptr;
     
     int leftLength = string_length(*data);
-    int rightLength = strlen(right);
+    int rightLength = (int) strlen(right);
     int newLength = leftLength + rightLength;
 
     string_resize(data, newLength);
