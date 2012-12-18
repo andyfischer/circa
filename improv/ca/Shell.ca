@@ -1,6 +1,9 @@
 
 require InputEvent
 
+-- Incoming messages
+msgs = input() -> List
+
 def mouse_down(number x, number y) -> InputEvent
     [:MouseDown [x y] 0]
 
@@ -15,3 +18,7 @@ def key_down(int code) -> InputEvent
     
 def key_up(int code) -> InputEvent
     [:KeyUp [0 0] code]
+
+for msg in msgs
+
+    if :redraw == first_name(msg)

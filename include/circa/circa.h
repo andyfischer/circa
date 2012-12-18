@@ -315,7 +315,7 @@ caValue* circa_index(caValue* value, int index);
 // Number of elements in a list value.
 int circa_count(caValue* container);
 
-caName circa_leading_name(caValue* value);
+caName circa_first_name(caValue* value);
 
 // -- Writing to a caValue --
 

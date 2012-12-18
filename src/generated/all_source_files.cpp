@@ -32,6 +32,7 @@
 #include "../object.cpp"
 #include "../parser.cpp"
 #include "../reflection.cpp"
+#include "../repl.cpp"
 #include "../selector.cpp"
 #include "../source_repro.cpp"
 #include "../stateful_code.cpp"

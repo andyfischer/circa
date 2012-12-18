@@ -1,5 +1,7 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include <cstdio>
+#include <unistd.h>
 
 #include "SDL/SDL.h"
 
@@ -11,10 +13,24 @@
 caWorld* g_world;
 SDL_Surface* g_surface;
 
+void getcwd(caValue* cwd)
+{
+    char buf[1024];
+    if (getcwd(buf, sizeof(buf)) != NULL)
+        circa_set_string(cwd, buf);
+    else
+        circa_set_string(cwd, "");
+}
+
+void chdir(caValue* dir)
+{
+    chdir(circa_string(dir));
+}
+
 bool fix_current_directory()
 {
     // First step, we need to find the "ca" directory. If we're running from a Mac
-    // bundle, then we'll need to walk up a few directories.
+    // bundle, then we might need to walk up a few directories.
 
     while (true) {
 
@@ -23,7 +39,7 @@ bool fix_current_directory()
 
         // chdir to parent
         circa::Value currentDir, parentDir;
-        circa_cwd(&currentDir);
+        getcwd(&currentDir);
         circa_get_parent_directory(&currentDir, &parentDir);
         // If we reached the top, then fatal.
         if (circa_equals(&currentDir, &parentDir)) {
@@ -31,8 +47,19 @@ bool fix_current_directory()
             return false;
         }
         
-        circa_chdir(&parentDir);
+        chdir(&parentDir);
     }
+}
+
+Uint32 redraw_timer_callback(Uint32 interval, void *not_used)
+{
+    SDL_Event e;
+    e.type = SDL_USEREVENT;
+    e.user.code = 0;
+    e.user.data1 = NULL;
+    e.user.data2 = NULL;
+    SDL_PushEvent(& e);
+    return interval;
 }
 
 int main(int argc, char *argv[])
@@ -45,12 +72,14 @@ int main(int argc, char *argv[])
  
     circa_add_module_search_path(g_world, "ca");
 
+    // Load any modules that are either 1) directly accessed by C code, or 2) are patched with native code.
     circa_load_module_from_file(g_world, "EngineBindings", "ca/EngineBindings.ca");
     circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
     circa_load_module_from_file(g_world, "UserApi", "ca/UserApi.ca");
     circa_load_module_from_file(g_world, "Shell", "ca/Shell.ca");
     circa_load_module_from_file(g_world, "App", "ca/App.ca");
 
+    // Apply native patches.
     RenderTarget_moduleLoad(circa_create_native_patch(g_world, "RenderTarget"));
     FontBitmap_moduleLoad(circa_create_native_patch(g_world, "FontBitmap"));
 
@@ -67,9 +96,18 @@ int main(int argc, char *argv[])
 
     if (g_surface == NULL) {
         printf("SDL_SetVideoMode failed: %s\n", SDL_GetError());
-        exit(1);     
+        exit(1);
+    }
+    
+    // Redraw timer
+    SDL_TimerID timer_id = SDL_AddTimer(16, redraw_timer_callback, NULL);
+    if (timer_id == NULL) {
+        printf("SDL_AddTimer failed: %s\n", SDL_GetError());
+        exit(1);
+        
     }
 
+    // Event loop.
     SDL_Event event;
     while (true) {
 
@@ -83,9 +121,20 @@ int main(int argc, char *argv[])
               case SDL_KEYDOWN:
                    printf("keypress\n");
                    break;
+              case SDL_USEREVENT:
+                   // Tick & redraw.
+            
+                      
               }
          }
     }
 
     return 1;
+}
+
+void DrawScreen()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    SDL_GL_SwapBuffers();
 }

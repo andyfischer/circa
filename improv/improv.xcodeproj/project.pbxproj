@@ -141,9 +141,10 @@
 		A1AA2C991671B21900CB0135 /* weak_ptrs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1AA2C011671B21900CB0135 /* weak_ptrs.cpp */; };
 		A1AA2C9A1671B21900CB0135 /* world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1AA2C031671B21900CB0135 /* world.cpp */; };
 		A1AA2CA41671B80D00CB0135 /* SDL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A1F3B11816719F91002202FA /* SDL.framework */; };
+		A1E52D46167F7D2A00D41B7D /* SDLMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E52D45167F7D2A00D41B7D /* SDLMain.cpp */; };
+		A1E52D4A167F7D9400D41B7D /* repl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1E52D48167F7D9400D41B7D /* repl.cpp */; };
 		A1F3B10C16719BEC002202FA /* Common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0F216719BEC002202FA /* Common.cpp */; };
 		A1F3B10D16719BEC002202FA /* FontBitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0F416719BEC002202FA /* FontBitmap.cpp */; };
-		A1F3B10F16719BEC002202FA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0F816719BEC002202FA /* main.cpp */; };
 		A1F3B11016719BEC002202FA /* RenderTarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0FC16719BEC002202FA /* RenderTarget.cpp */; };
 		A1F3B11116719BEC002202FA /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B0FE16719BEC002202FA /* ResourceManager.cpp */; };
 		A1F3B11316719BEC002202FA /* ShaderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F3B10216719BEC002202FA /* ShaderUtils.cpp */; };
@@ -405,12 +406,13 @@
 		A1AA2CB316727EF400CB0135 /* UIHelper.ca */ = {isa = PBXFileReference; lastKnownFileType = text; path = UIHelper.ca; sourceTree = "<group>"; };
 		A1AA2CB416727EF400CB0135 /* UserApi.ca */ = {isa = PBXFileReference; lastKnownFileType = text; path = UserApi.ca; sourceTree = "<group>"; };
 		A1BAC78B16719A470048831B /* improv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = improv; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1E52D45167F7D2A00D41B7D /* SDLMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SDLMain.cpp; path = src/SDLMain.cpp; sourceTree = SOURCE_ROOT; };
+		A1E52D48167F7D9400D41B7D /* repl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = repl.cpp; path = ../src/repl.cpp; sourceTree = "<group>"; };
+		A1E52D49167F7D9400D41B7D /* repl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = repl.h; path = ../src/repl.h; sourceTree = "<group>"; };
 		A1F3B0F216719BEC002202FA /* Common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Common.cpp; path = src/Common.cpp; sourceTree = SOURCE_ROOT; };
 		A1F3B0F316719BEC002202FA /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Common.h; path = src/Common.h; sourceTree = SOURCE_ROOT; };
 		A1F3B0F416719BEC002202FA /* FontBitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FontBitmap.cpp; path = src/FontBitmap.cpp; sourceTree = SOURCE_ROOT; };
 		A1F3B0F516719BEC002202FA /* FontBitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontBitmap.h; path = src/FontBitmap.h; sourceTree = SOURCE_ROOT; };
-		A1F3B0F816719BEC002202FA /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
-		A1F3B0F916719BEC002202FA /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = main.h; path = src/main.h; sourceTree = SOURCE_ROOT; };
 		A1F3B0FA16719BEC002202FA /* RenderBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderBuffer.h; path = src/RenderBuffer.h; sourceTree = SOURCE_ROOT; };
 		A1F3B0FB16719BEC002202FA /* RenderEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderEntity.h; path = src/RenderEntity.h; sourceTree = SOURCE_ROOT; };
 		A1F3B0FC16719BEC002202FA /* RenderTarget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTarget.cpp; path = src/RenderTarget.cpp; sourceTree = SOURCE_ROOT; };
@@ -446,6 +448,8 @@
 		A1AA2B141671B1E600CB0135 /* circa */ = {
 			isa = PBXGroup;
 			children = (
+				A1E52D48167F7D9400D41B7D /* repl.cpp */,
+				A1E52D49167F7D9400D41B7D /* repl.h */,
 				A1AA2B151671B21900CB0135 /* block.cpp */,
 				A1AA2B161671B21900CB0135 /* block.h */,
 				A1AA2B171671B21900CB0135 /* building.cpp */,
@@ -731,6 +735,7 @@
 				A1AA2CA616727EF300CB0135 /* ca */,
 				A1AA2B141671B1E600CB0135 /* circa */,
 				A1BAC78E16719A470048831B /* improv */,
+				A1E52D47167F7D4000D41B7D /* sdl_mac */,
 				A1AA2B101671B13600CB0135 /* OpenGL.framework */,
 				A1AA2B0E1671B06800CB0135 /* FreeType.framework */,
 				A1F3B11816719F91002202FA /* SDL.framework */,
@@ -750,14 +755,11 @@
 		A1BAC78E16719A470048831B /* improv */ = {
 			isa = PBXGroup;
 			children = (
-				2E1AA2361672AC07006A8DBF /* SDLMain.h */,
-				2E1AA2371672AC07006A8DBF /* SDLMain.m */,
+				A1E52D45167F7D2A00D41B7D /* SDLMain.cpp */,
 				A1F3B0F216719BEC002202FA /* Common.cpp */,
 				A1F3B0F316719BEC002202FA /* Common.h */,
 				A1F3B0F416719BEC002202FA /* FontBitmap.cpp */,
 				A1F3B0F516719BEC002202FA /* FontBitmap.h */,
-				A1F3B0F816719BEC002202FA /* main.cpp */,
-				A1F3B0F916719BEC002202FA /* main.h */,
 				A1F3B0FA16719BEC002202FA /* RenderBuffer.h */,
 				A1F3B0FB16719BEC002202FA /* RenderEntity.h */,
 				A1F3B0FC16719BEC002202FA /* RenderTarget.cpp */,
@@ -774,6 +776,15 @@
 				A1F3B10916719BEC002202FA /* triangulate.h */,
 			);
 			path = improv;
+			sourceTree = "<group>";
+		};
+		A1E52D47167F7D4000D41B7D /* sdl_mac */ = {
+			isa = PBXGroup;
+			children = (
+				2E1AA2361672AC07006A8DBF /* SDLMain.h */,
+				2E1AA2371672AC07006A8DBF /* SDLMain.m */,
+			);
+			name = sdl_mac;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -866,7 +877,6 @@
 			files = (
 				A1F3B10C16719BEC002202FA /* Common.cpp in Sources */,
 				A1F3B10D16719BEC002202FA /* FontBitmap.cpp in Sources */,
-				A1F3B10F16719BEC002202FA /* main.cpp in Sources */,
 				A1F3B11016719BEC002202FA /* RenderTarget.cpp in Sources */,
 				A1F3B11116719BEC002202FA /* ResourceManager.cpp in Sources */,
 				A1F3B11316719BEC002202FA /* ShaderUtils.cpp in Sources */,
@@ -1003,6 +1013,8 @@
 				A1AA2C991671B21900CB0135 /* weak_ptrs.cpp in Sources */,
 				A1AA2C9A1671B21900CB0135 /* world.cpp in Sources */,
 				2E1AA2381672AC07006A8DBF /* SDLMain.m in Sources */,
+				A1E52D46167F7D2A00D41B7D /* SDLMain.cpp in Sources */,
+				A1E52D4A167F7D9400D41B7D /* repl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

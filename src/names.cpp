@@ -372,7 +372,7 @@ int name_find_ordinal_suffix(const char* name, int* endPos)
     // Walk backwards, see if this name even has an ordinal suffix.
     int search = *endPos - 1;
     if (*endPos == -1)
-        search = strlen(name) - 1;
+        search = (int) strlen(name) - 1;
 
     bool foundADigit = false;
     bool foundOrdinalSuffix = false;

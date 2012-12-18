@@ -372,7 +372,7 @@ int string_find_char_from_end(caValue* s, char c)
 {
     const char* cstr = as_cstring(s);
 
-    for (int i=strlen(cstr) - 1; i >= 0; i--)
+    for (int i= (int) strlen(cstr) - 1; i >= 0; i--)
         if (cstr[i] == c)
             return i;
     return -1;

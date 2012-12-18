@@ -91,7 +91,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
     for (int i = 0; i < list_length(&watch->onChangeActions); i++) {
         caValue* action = list_get(&watch->onChangeActions, i);
 
-        Name label = leading_name(action);
+        Name label = first_name(action);
         ca_assert(label != name_None);
 
         switch (label) {

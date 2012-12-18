@@ -155,7 +155,7 @@ static void update_patch_function_lookup_for_module(NativeModule* module)
 
         // std::cout << "looking at action: " << to_string(action) << std::endl;
 
-        if (leading_name(action) != name_PatchBlock)
+        if (first_name(action) != name_PatchBlock)
             continue;
 
         caValue* blockName = list_get(action, 1);
@@ -210,7 +210,7 @@ void native_module_finish_change(NativeModule* module)
     for (int i=0; i < list_length(&module->onChangeActions); i++) {
         caValue* action = list_get(&module->onChangeActions, i);
 
-        Name tag = leading_name(action);
+        Name tag = first_name(action);
 
         switch (tag) {
         case name_PatchBlock: {

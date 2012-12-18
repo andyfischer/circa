@@ -68,7 +68,7 @@ def Layout.solveDim(self, String dim) -> List
             child = self.nodes[childIndex]
             prop = child.props.get(dim)
 
-            if label(prop) == :percent
+            if first_name(prop) == :percent
                 percent = prop[1] -> number / 100.0
                 desiredSize = (availableFin - availableStart) * percent
             else

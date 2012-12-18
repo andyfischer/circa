@@ -540,18 +540,18 @@ int to_int(caValue* value)
     return 0;
 }
 
-caName leading_name(caValue* value)
+caName first_name(caValue* value)
 {
     if (is_name(value))
         return as_name(value);
     if (is_list(value))
-        return leading_name(list_get(value, 0));
+        return first_name(list_get(value, 0));
     return name_None;
 }
 
-CIRCA_EXPORT caName circa_leading_name(caValue* value)
+CIRCA_EXPORT caName circa_first_name(caValue* value)
 {
-    return leading_name(value);
+    return first_name(value);
 }
 
 } // namespace circa

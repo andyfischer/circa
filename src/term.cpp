@@ -67,7 +67,7 @@ Term::inputInfo(int index)
 int
 Term::numInputs() const
 {
-    return this->inputs.size();
+    return (int) this->inputs.size();
 }
 
 void

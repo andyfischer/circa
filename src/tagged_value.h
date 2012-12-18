@@ -136,6 +136,6 @@ int to_int(caValue* value);
 // If the value is a name, return it. If it's a value and the first element is a name,
 // then return that. Will recursively search if the first element is itself a list.
 // Returns name_None if a name value was not found.
-caName leading_name(caValue* value);
+caName first_name(caValue* value);
 
 } // namespace circa

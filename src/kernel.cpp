@@ -508,7 +508,7 @@ void String__char_at(caStack* stack)
 void String__length(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
-    set_int(circa_output(stack, 0), strlen(str));
+    set_int(circa_output(stack, 0), (int) strlen(str));
 }
 
 void String__substr(caStack* stack)
@@ -556,7 +556,7 @@ void String__to_camel_case(caStack* stack)
 void String__to_lower(caStack* stack)
 {
     const char* in = circa_string_input(stack, 0);
-    int len = strlen(in);
+    int len = (int) strlen(in);
 
     set_string(circa_output(stack, 0), in);
     char* out = (char*) as_cstring(circa_output(stack, 0));
@@ -573,7 +573,7 @@ void String__to_lower(caStack* stack)
 void String__to_upper(caStack* stack)
 {
     const char* in = circa_string_input(stack, 0);
-    int len = strlen(in);
+    int len = (int) strlen(in);
 
     set_string(circa_output(stack, 0), in);
     char* out = (char*) as_cstring(circa_output(stack, 0));
