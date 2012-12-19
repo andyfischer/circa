@@ -279,7 +279,7 @@ void upload_surface_to_opengl(caStack* stack)
     circa_set_null(circa_output(stack, 0));
 }
 
-CIRCA_EXPORT void circa_module_load(caNativeModule* module)
+CIRCA_EXPORT void circa_module_load(caNativePatch* module)
 {
     circa_patch_function(module, "Context.release", Context_release);
     circa_patch_function(module, "Context.save", Context_save);

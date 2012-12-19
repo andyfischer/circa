@@ -752,7 +752,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // Consume contents, if there are still tokens left. It's okay to reach EOF here (this
     // behavior is used when declaring some builtins).
-    if (!tokens.finished())
+    if (!tokens.finished() && lookahead_next_non_whitespace(tokens, false) != tok_Semicolon)
         consume_block(contents, tokens, context);
 
     // Finish up

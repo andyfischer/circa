@@ -95,10 +95,10 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         ca_assert(label != name_None);
 
         switch (label) {
-        case name_NativeModule: {
-            caValue* nativeModuleName = list_get(action, 1);
+        case name_NativePatch: {
+            caValue* moduleName = list_get(action, 1);
 
-            NativeModule* nativeModule = add_native_module(world, as_cstring(nativeModuleName));
+            NativePatch* nativeModule = add_native_patch(world, as_cstring(moduleName));
             native_module_load_from_file(nativeModule, as_cstring(&watch->filename));
             native_module_finish_change(nativeModule);
             break;
@@ -158,12 +158,12 @@ FileWatch* add_file_watch_module_load(World* world, const char* filename, const 
     return add_file_watch_action(world, filename, &action);
 }
 
-FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* name)
+FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* moduleName)
 {
     circa::Value action;
     set_list(&action, 2);
-    set_name(list_get(&action, 0), name_NativeModule);
-    set_string(list_get(&action, 1), name);
+    set_name(list_get(&action, 0), name_NativePatch);
+    set_string(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }
 

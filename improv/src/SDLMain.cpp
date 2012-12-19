@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     renderList.setup(&resourceManager);
 
     caStack* stack = circa_alloc_stack(g_world);
-    circa_push_module_as_function(stack, "Shell");
+    circa_push_module(stack, "Shell");
     
     // Initial redraw event
     redraw_timer_callback(0, NULL);

@@ -251,7 +251,7 @@ void Font__width(caStack* stack)
             fontOperation.textWidth);
 }
 
-void FontBitmap_moduleLoad(caNativeModule* module)
+void FontBitmap_moduleLoad(caNativePatch* module)
 {
     circa_patch_function(module, "create_font", create_font);
     circa_patch_function(module, "Font.height", Font__height);

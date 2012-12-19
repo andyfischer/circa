@@ -52,7 +52,7 @@ const char* builtin_name_to_string(int name)
     case name_UniformListType: return "UniformListType";
     case name_AnonStructType: return "AnonStructType";
     case name_StructType: return "StructType";
-    case name_NativeModule: return "NativeModule";
+    case name_NativePatch: return "NativePatch";
     case name_PatchBlock: return "PatchBlock";
     case name_ParseTime: return "ParseTime";
     case name_Bootstrapping: return "Bootstrapping";

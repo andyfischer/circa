@@ -34,4 +34,4 @@ bool font_render(FontBitmap* op);
 
 void font_cleanup_operation(FontBitmap* op);
 
-void FontBitmap_moduleLoad(caNativeModule* module);
+void FontBitmap_moduleLoad(caNativePatch* module);

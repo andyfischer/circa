@@ -1939,13 +1939,17 @@ CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)
 CIRCA_EXPORT void circa_push_function(caStack* stack, caBlock* func)
 {
     block_finish_changes(func);
-    
     push_frame(stack, func);
 }
 
-CIRCA_EXPORT void circa_push_module_as_function(caStack* stack, const char* name)
+CIRCA_EXPORT void circa_push_module(caStack* stack, const char* name)
 {
     Block* block = find_module(stack->world, name);
+    if (block == NULL) {
+        // TODO: Save this error on the stack instead of stdout
+        std::cout << "in circa_push_module, module not found: " << name << std::endl;
+        return;
+    }
     push_frame(stack, block);
 }
 

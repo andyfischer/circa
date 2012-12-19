@@ -3,6 +3,7 @@
 #include "unit_test_common.h"
 
 #include "evaluation.h"
+#include "fakefs.h"
 #include "kernel.h"
 #include "modules.h"
 #include "native_modules.h"
@@ -42,7 +43,7 @@ void patch_manually()
     test_equals(test_spy_get_results(), "[2]");
 
     // Create a patch for my_add
-    NativeModule* module = create_native_module(global_world());
+    NativePatch* module = create_native_module(global_world());
     module_patch_function(module, "my_add", my_add);
     native_module_apply_patch(module, &block);
 
@@ -67,7 +68,7 @@ void patch_manually_ns()
     block.compile("test_spy(ns_a:f1())");
     block.compile("test_spy(ns_b:ns_a:f1())");
 
-    NativeModule* module = create_native_module(global_world());
+    NativePatch* module = create_native_module(global_world());
     module_patch_function(module, "ns_a:f1", my_5);
     module_patch_function(module, "ns_b:ns_a:f1", my_6);
     native_module_apply_patch(module, &block);
@@ -89,9 +90,7 @@ void trigger_change()
     block->compile("def f() -> int { 1 }");
     block->compile("test_spy(f())");
 
-    NativeModule* module = create_native_module(global_world());
-
-    native_module_add_change_action_patch_block(module, "trigger_change_test");
+    NativePatch* module = add_native_patch(global_world(), "trigger_change_test");
 
     Stack stack;
     push_frame(&stack, block);
@@ -118,9 +117,8 @@ void trigger_change()
 void new_function_patched_by_world()
 {
     // First create the module, as part of the global world.
-    NativeModule* module = add_native_module(global_world(), "nativemod_module");
+    NativePatch* module = add_native_patch(global_world(), "nativemod_block");
     module_patch_function(module, "my_add", my_add);
-    native_module_add_change_action_patch_block(module, "nativemod_block");
     native_module_finish_change(module);
 
     // Now create our function, it should get patched instantly.
@@ -138,12 +136,35 @@ void new_function_patched_by_world()
     delete_native_module(global_world(), "native_modules_test");
 }
 
+void patch_manually_public_api()
+{
+    FakeFilesystem fs;
+    fs.set("Module.ca", "def my_5() -> int; result = my_5()");
+
+    caWorld* world = global_world();
+    caBlock* module = circa_load_module_from_file(world, "Module", "Module.ca");
+
+    caNativePatch* npatch = circa_create_native_patch(world, "Module");
+    circa_patch_function(npatch, "my_5", my_5);
+    circa_finish_native_module(npatch);
+
+    caStack* stack = circa_alloc_stack(world);
+    circa_push_module(stack, "Module");
+    circa_run(stack);
+
+    test_assert(stack);
+    test_equals(circa_output(stack, 0), "5");
+
+    circa_dealloc_stack(stack);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(native_modules::patch_manually);
     REGISTER_TEST_CASE(native_modules::patch_manually_ns);
-    REGISTER_TEST_CASE(native_modules::new_function_patched_by_world);
     REGISTER_TEST_CASE(native_modules::trigger_change);
+    REGISTER_TEST_CASE(native_modules::new_function_patched_by_world);
+    REGISTER_TEST_CASE(native_modules::patch_manually_public_api);
 }
 
 }

@@ -77,4 +77,4 @@ struct RenderList
 
 void check_gl_error();
 
-void RenderList_moduleLoad(caNativeModule* module);
+void RenderList_moduleLoad(caNativePatch* module);

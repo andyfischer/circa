@@ -54,7 +54,7 @@ AnonStructType
 StructType
 
 # File watch actions
-NativeModule
+NativePatch
 PatchBlock
 
 # Block's function attributes

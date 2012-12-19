@@ -538,7 +538,7 @@ void RenderList__getViewportSize(caStack* stack)
     circa_set_vec2(circa_output(stack, 0), target->viewportWidth, target->viewportHeight);
 }
 
-void RenderList_moduleLoad(caNativeModule* module)
+void RenderList_moduleLoad(caNativePatch* module)
 {
     circa_patch_function(module, "RenderList.getTextRender", RenderList__getTextRender);
     circa_patch_function(module, "RenderList.sendCommand", RenderList__sendCommand);

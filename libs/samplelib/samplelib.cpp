@@ -17,7 +17,7 @@ CIRCA_EXPORT const char* circa_api_version()
     return "1";
 }
 
-CIRCA_EXPORT void circa_module_load(caNativeModule* module)
+CIRCA_EXPORT void circa_module_load(caNativePatch* module)
 {
     circa_patch_function(module, "sample_a", sample_a);
     circa_patch_function(module, "ns:sample_b", sample_b);

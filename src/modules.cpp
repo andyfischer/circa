@@ -281,14 +281,11 @@ void native_patch_this_postCompile(Term* term)
     string_remove_suffix(&filename, ".ca");
     native_module_add_platform_specific_suffix(&filename);
 
-    // Add a file watch that will update the NativeModule on file change.
+    // Add a file watch that will update the NativePatch on file change.
     FileWatch* watch = add_file_watch_native_patch(global_world(),
-            as_cstring(&filename), as_cstring(&filename));
+            as_cstring(&filename), as_cstring(&blockName));
 
-    NativeModule* module = add_native_module(global_world(), as_cstring(&filename));
-
-    // Hook up the NativeModule to patch this block when changed.
-    native_module_add_change_action_patch_block(module, as_cstring(&blockName));
+    NativePatch* module = add_native_patch(global_world(), as_cstring(&blockName));
 
     file_watch_check_now(global_world(), watch);
 }

@@ -24,7 +24,7 @@ namespace circa {
     struct Term;
     struct Type;
     struct World;
-    struct NativeModule;
+    struct NativePatch;
 }
 
 typedef circa::Block caBlock;
@@ -43,7 +43,7 @@ typedef circa::Type caType;
 // World that is used across the program.
 typedef circa::World caWorld;
 
-typedef circa::NativeModule caNativeModule;
+typedef circa::NativePatch caNativePatch;
 
 #else
 
@@ -52,7 +52,7 @@ typedef struct caStack caStack;
 typedef struct caTerm caTerm;
 typedef struct caType caType;
 typedef struct caWorld caWorld;
-typedef struct caNativeModule caNativeModule;
+typedef struct caNativePatch caNativePatch;
 
 #endif
 
@@ -167,7 +167,8 @@ void circa_push_function(caStack* stack, caBlock* func);
 // name was found.
 bool circa_push_function_by_name(caStack* stack, const char* name);
 
-bool circa_push_module_as_function(caStack* stack, const char* name);
+// Push a module to the stack by name.
+void circa_push_module(caStack* stack, const char* name);
 
 // Run the current stack.
 void circa_run(caStack* stack);
@@ -496,9 +497,9 @@ void circa_setup_pointer_type(caType* type);
 
 // -- Native module support --
 
-caNativeModule* circa_create_native_patch(caWorld* world, const char* name);
-void circa_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func);
-void circa_finish_native_module(caNativeModule* module);
+caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
+void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
+void circa_finish_native_module(caNativePatch* module);
 
 // -- File IO --
 
