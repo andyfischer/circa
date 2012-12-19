@@ -279,7 +279,7 @@ void native_patch_this_postCompile(Term* term)
     }
 
     string_remove_suffix(&filename, ".ca");
-    native_module_add_platform_specific_suffix(&filename);
+    native_patch_add_platform_specific_suffix(&filename);
 
     // Add a file watch that will update the NativePatch on file change.
     FileWatch* watch = add_file_watch_native_patch(global_world(),

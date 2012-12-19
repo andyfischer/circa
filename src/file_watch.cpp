@@ -99,8 +99,8 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             caValue* moduleName = list_get(action, 1);
 
             NativePatch* nativeModule = add_native_patch(world, as_cstring(moduleName));
-            native_module_load_from_file(nativeModule, as_cstring(&watch->filename));
-            native_module_finish_change(nativeModule);
+            native_patch_load_from_file(nativeModule, as_cstring(&watch->filename));
+            native_patch_finish_change(nativeModule);
             break;
         }
         case name_PatchBlock: {

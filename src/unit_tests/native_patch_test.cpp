@@ -47,7 +47,7 @@ void patch_manually()
     // Create a patch for my_add
     NativePatch* patch = add_native_patch(world, "patch_manually");
     module_patch_function(patch, "my_add", my_add);
-    native_module_apply_patch(patch, &block);
+    native_patch_apply_patch(patch, &block);
 
     reset_stack(&stack);
     push_frame(&stack, &block);
@@ -75,7 +75,7 @@ void patch_manually_ns()
     NativePatch* patch = add_native_patch(world, "patch_manually_ns");
     module_patch_function(patch, "ns_a:f1", my_5);
     module_patch_function(patch, "ns_b:ns_a:f1", my_6);
-    native_module_apply_patch(patch, &block);
+    native_patch_apply_patch(patch, &block);
 
     Stack stack;
     push_frame(&stack, &block);
@@ -108,7 +108,7 @@ void trigger_change()
 
     // Now, patch in effect.
     module_patch_function(patch, "f", my_5);
-    native_module_finish_change(patch);
+    native_patch_finish_change(patch);
 
     reset_stack(&stack);
     push_frame(&stack, block);
@@ -127,7 +127,7 @@ void new_function_patched_by_world()
     // First create the patch, as part of the global world.
     NativePatch* patch = add_native_patch(global_world(), "nativemod_block");
     module_patch_function(patch, "my_add", my_add);
-    native_module_finish_change(patch);
+    native_patch_finish_change(patch);
 
     // Now create our function, it should get patched instantly.
     Block* block = fetch_module(global_world(), "nativemod_block");
@@ -154,7 +154,7 @@ void patch_manually_public_api()
 
     caNativePatch* npatch = circa_create_native_patch(world, "Module");
     circa_patch_function(npatch, "my_5", my_5);
-    circa_finish_native_module(npatch);
+    circa_finish_native_patch(npatch);
 
     caStack* stack = circa_alloc_stack(world);
     circa_push_module(stack, "Module");

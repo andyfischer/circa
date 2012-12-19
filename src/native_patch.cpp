@@ -67,7 +67,7 @@ static void free_native_patch(NativePatch* patch)
     delete patch;
 }
 
-NativePatch* get_existing_native_module(World* world, const char* name)
+NativePatch* get_existing_native_patch(World* world, const char* name)
 {
     NativePatchWorld* nativeWorld = world->nativePatchWorld;
 
@@ -85,7 +85,7 @@ NativePatch* add_native_patch(World* world, const char* targetName)
 {
     NativePatchWorld* nativeWorld = world->nativePatchWorld;
 
-    NativePatch* module = get_existing_native_module(world, targetName);
+    NativePatch* module = get_existing_native_patch(world, targetName);
 
     if (module != NULL)
         return module;
@@ -115,7 +115,7 @@ void module_patch_function(NativePatch* module, const char* name, EvaluateFunc f
     module->patches[name] = func;
 }
 
-void native_module_apply_patch(NativePatch* module, Block* block)
+void native_patch_apply_patch(NativePatch* module, Block* block)
 {
     // Walk through list of patches, and try to find any functions to apply them to.
     std::map<std::string, EvaluateFunc>::const_iterator it;
@@ -178,7 +178,7 @@ static void update_patch_function_lookup(World* world)
     }
 }
 
-void native_module_finish_change(NativePatch* module)
+void native_patch_finish_change(NativePatch* module)
 {
     World* world = module->world;
 
@@ -191,12 +191,12 @@ void native_module_finish_change(NativePatch* module)
         // It's okay if the block doesn't exist yet.
         return;
 
-    native_module_apply_patch(module, block);
+    native_patch_apply_patch(module, block);
 }
 
-CIRCA_EXPORT void circa_finish_native_module(caNativePatch* module)
+CIRCA_EXPORT void circa_finish_native_patch(caNativePatch* module)
 {
-    native_module_finish_change(module);
+    native_patch_finish_change(module);
 }
 
 void module_possibly_patch_new_function(World* world, Block* function)
@@ -222,7 +222,7 @@ void module_possibly_patch_new_function(World* world, Block* function)
     caValue* functionName = list_get(patchEntry, 1);
 
     // Found a patch; apply it.
-    NativePatch* module = get_existing_native_module(world, as_cstring(nativeModuleName));
+    NativePatch* module = get_existing_native_patch(world, as_cstring(nativeModuleName));
 
     if (module == NULL) {
         std::cout << "in module_possibly_patch_new_function, couldn't find module: "
@@ -244,15 +244,15 @@ void module_possibly_patch_new_function(World* world, Block* function)
     install_function(function->owningTerm, evaluateFunc);
 }
 
-void native_module_add_platform_specific_suffix(caValue* filename)
+void native_patch_add_platform_specific_suffix(caValue* filename)
 {
     string_append(filename, ".so");
 }
 
-void native_module_close(NativePatch* module)
+void native_patch_close(NativePatch* module)
 {
 #ifdef CIRCA_DISABLE_DLL
-    internal_error("native_module_close failed, DLL support compiled out");
+    internal_error("native_patch_close failed, DLL support compiled out");
 #else
     if (module->dll != NULL)
         dlclose(module->dll);
@@ -261,12 +261,12 @@ void native_module_close(NativePatch* module)
 #endif
 }
 
-void native_module_load_from_file(NativePatch* module, const char* filename)
+void native_patch_load_from_file(NativePatch* module, const char* filename)
 {
 #ifdef CIRCA_DISABLE_DLL
-    internal_error("native_module_load_from_file failed, DLL support compiled out");
+    internal_error("native_patch_load_from_file failed, DLL support compiled out");
 #else
-    native_module_close(module);
+    native_patch_close(module);
 
     module->dll = dlopen(filename, RTLD_NOW);
 

@@ -499,7 +499,7 @@ void circa_setup_pointer_type(caType* type);
 
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
-void circa_finish_native_module(caNativePatch* module);
+void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --
 
