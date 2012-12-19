@@ -60,11 +60,10 @@ struct RenderList
     void appendEntity(RenderEntity* entity);
     void sendCommand(caValue* command);
 
-    caValue* getTextRender(caValue* key);
-
     void setViewportSize(int w, int h);
     void switchProgram(Program* program);
-    void render();
+    void startFrame();
+    void submitFrame();
     void flushDestroyedEntities();
 
     caName name_textSprite;

@@ -8,11 +8,12 @@ TextTexture*
 TextTexture::create(RenderList* target)
 {
     TextTexture* obj = new TextTexture();
-    target->appendEntity(obj);
+    if (target != NULL)
+        target->appendEntity(obj);
 
     glGenTextures(1, &obj->texid);
 
-    obj->font = 0;
+    obj->font = NULL;
     circa_set_null(&obj->text);
     obj->needsRasterize = false;
     obj->version = 1;

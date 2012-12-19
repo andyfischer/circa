@@ -1,70 +1,11 @@
 
-type TextRender {
-    any object
-    Point size
-}
 
 type RenderList = handle_type()
-def RenderList.getTextRender(self, List args) -> TextRender
 def RenderList.sendCommand(self, List command)
 def RenderList.getViewportSize(self) -> Point
 
-type Font;
-def create_font(String name, number size) -> Font
-def Font.height(self) -> number
-def Font.width(self, String text) -> number
-def Font.textSize(self, String text) -> Point
-    [self.width(text) self.height]
+type Texture = handle_type()
 
-type Texture;
-
-type LineList;
+type LineList = handle_type()
 def create_line_list(RenderList target) -> LineList
 
--- Wrappers
-def font(String name, number size) -> Font
-    state Font f
-    if changed([name size])
-        f = create_font(name size)
-    f
-
-type Painter {
-    RenderList renderList
-
-    Font currentFont
-
-    Font mediumSans
-}
-
-def start_painter(RenderList renderList) -> Painter
-    p = make(Painter)
-    p.renderList = renderList
-    p
-
-def Painter.setFont(@self, Font font)
-    self.currentFont = font
-
-def Painter.text(self, Point position, String text, Color color, List args) -> Rect
-    font = self.currentFont
-    textRender = self.renderList.getTextRender([text font])
-    self.renderList.sendCommand([:textSprite textRender.object position color args])
-    rect = [position.x, position.y, position.x + textRender.size.x, position.y + textRender.size.y]
-    return rect
-
-def Painter.fillRect(self, Rect r, Color c)
-    self.renderList.sendCommand([:rect r c])
-
-def Painter.drawLines(self, List points, Color c)
-    self.renderList.sendCommand([:lines points c])
-
-def Painter.lineLoop(self, List points, Color c)
-    line_points = []
-    for i in 0..(points.length-1)
-        line_points.append(points[i])
-        line_points.append(points[i+1])
-    line_points.append(points.last)
-    line_points.append(points.first)
-    self.renderList.sendCommand([:lines line_points c])
-
-def Painter.polygon(self, List points, Color c)
-    self.renderList.sendCommand([:polygon points c])

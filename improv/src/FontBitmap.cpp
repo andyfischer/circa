@@ -8,6 +8,7 @@
 
 #include "Common.h"
 #include "FontBitmap.h"
+#include "TextTexture.h"
 
 FT_Library g_library = NULL;
 
@@ -100,6 +101,8 @@ void load_glyph(FontBitmap* op, int charIndex)
     FT_UInt glyph_index;
     
     FT_Face face = op->face->face;
+
+    printf("load_glyph using face: %p\n", face);
     
     glyph_index = FT_Get_Char_Index( face, op->str[charIndex] );
     
@@ -227,18 +230,18 @@ void create_font(caStack* stack)
     const char* name = circa_string(circa_input(stack, 0));
     float size = circa_float(circa_input(stack, 1));
     FontFace* font = font_load(name, size);
-    circa_create_default_output(stack, 0)->value_data.ptr = font;
+    circa_handle_set_object(circa_create_default_output(stack, 0), font);
 }
 
 void Font__height(caStack* stack)
 {
-    FontFace* font = (FontFace*) circa_get_pointer(circa_input(stack, 0));
+    FontFace* font = (FontFace*) circa_handle_get_object(circa_input(stack, 0));
     circa_set_float(circa_output(stack, 0),
         font_get_face_height(font));
 }
 void Font__width(caStack* stack)
 {
-    FontFace* font = (FontFace*) circa_get_pointer(circa_input(stack, 0));
+    FontFace* font = (FontFace*) circa_handle_get_object(circa_input(stack, 0));
     const char* str = circa_string_input(stack, 1);
 
     FontBitmap fontOperation;
@@ -247,14 +250,33 @@ void Font__width(caStack* stack)
 
     font_update_metrics(&fontOperation);
 
-    circa_set_float(circa_output(stack, 0),
-            fontOperation.textWidth);
+    circa_set_float(circa_output(stack, 0), fontOperation.textWidth);
 }
 
-void FontBitmap_moduleLoad(caNativePatch* module)
+void Font__render(caStack* stack)
 {
-    circa_patch_function(module, "create_font", create_font);
-    circa_patch_function(module, "Font.height", Font__height);
-    circa_patch_function(module, "Font.width", Font__width);
-    circa_finish_native_module(module);
+    FontFace* font = (FontFace*) circa_handle_get_object(circa_input(stack, 0));
+    caValue* text = circa_input(stack, 1);
+
+    printf("rendering text: %s\n", circa_string(text));
+
+    TextTexture* texture = TextTexture::create(NULL);
+
+    texture->setText(text);
+    texture->setFont(font);
+    texture->update();
+
+    caValue* out = circa_create_default_output(stack, 0);
+
+    circa_handle_set_object(circa_index(out, 0), texture);
+    circa_set_vec2(circa_index(out, 1), texture->width(), texture->height());
+}
+
+void FontBitmap_moduleLoad(caNativePatch* patch)
+{
+    circa_patch_function(patch, "create_font", create_font);
+    circa_patch_function(patch, "Font.height", Font__height);
+    circa_patch_function(patch, "Font.width", Font__width);
+    circa_patch_function(patch, "Font.render", Font__render);
+    circa_finish_native_patch(patch);
 }

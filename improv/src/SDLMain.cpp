@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 
     // Load any modules that are either 1) directly accessed by C code, or 2) are patched with native code.
     circa_load_module_from_file(g_world, "RenderList", "ca/RenderList.ca");
+    circa_load_module_from_file(g_world, "Font", "ca/Font.ca");
     circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
     circa_load_module_from_file(g_world, "UserApi", "ca/UserApi.ca");
     circa_load_module_from_file(g_world, "Shell", "ca/Shell.ca");
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
 
     // Apply native patches.
     RenderList_moduleLoad(circa_create_native_patch(g_world, "RenderList"));
-    FontBitmap_moduleLoad(circa_create_native_patch(g_world, "FontBitmap"));
+    FontBitmap_moduleLoad(circa_create_native_patch(g_world, "Font"));
 
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
@@ -99,6 +100,20 @@ int main(int argc, char *argv[])
         printf("SDL_SetVideoMode failed: %s\n", SDL_GetError());
         exit(1);
     }
+
+    // OpenGL setup.
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glClearColor(0.0,0.0,0.0,0.0);
     
     // Setup ResourceManager
     ResourceManager resourceManager;
@@ -106,12 +121,15 @@ int main(int argc, char *argv[])
     // Setup RenderList
     RenderList renderList;
     renderList.setup(&resourceManager);
+    renderList.setViewportSize(width, height);
 
     caStack* stack = circa_alloc_stack(g_world);
     circa_push_module(stack, "Shell");
     
-    // Initial redraw event
+    // Queue up the initial redraw event
     redraw_timer_callback(0, NULL);
+
+    const int redrawDelay = 16;
 
     // Event loop.
     SDL_Event event;
@@ -124,9 +142,11 @@ int main(int argc, char *argv[])
               case SDL_QUIT:
 	              exit(0);
 	              break;
+
               case SDL_KEYDOWN:
                    printf("keypress\n");
                    break;
+
               case SDL_USEREVENT: {
                    // Tick & redraw.
                    circa_restart(stack);
@@ -140,13 +160,19 @@ int main(int argc, char *argv[])
                    circa_make(circa_index(redrawMsg, 1), circa_find_type(g_world, "RenderList"));
                    circa_handle_set_object(circa_index(redrawMsg, 1), &renderList);
 
+                   renderList.startFrame();
+
                    circa_run(stack);
+
+                   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+                   renderList.submitFrame();
+                   SDL_GL_SwapBuffers();
 
                    if (circa_has_error(stack))
                        circa_print_error_to_stdout(stack);
                   
                    // Prepare another timer
-                   SDL_TimerID timer_id = SDL_AddTimer(16, redraw_timer_callback, NULL);
+                   SDL_TimerID timer_id = SDL_AddTimer(redrawDelay, redraw_timer_callback, NULL);
                    if (timer_id == NULL) {
                        printf("SDL_AddTimer failed: %s\n", SDL_GetError());
                        exit(1);
@@ -159,11 +185,4 @@ int main(int argc, char *argv[])
     }
 
     return 1;
-}
-
-void DrawScreen()
-{
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    SDL_GL_SwapBuffers();
 }

@@ -55,30 +55,6 @@ RenderList::sendCommand(caValue* command)
     circa_copy(command, circa_append(&incomingCommands));
 }
 
-caValue*
-RenderList::getTextRender(caValue* key)
-{
-    caValue* value = circa_map_insert(&textRenderCache, key);
-
-    if (circa_is_null(value)) {
-        printf("Re-rendering text with key: ");
-        key->dump();
-        
-        // Value doesn't exist in cache.
-        TextTexture* texture = TextTexture::create(this);
-
-        texture->setText(circa_index(key, 0));
-        texture->setFont((FontFace*) circa_get_pointer(circa_index(key, 1)));
-        texture->update();
-
-        circa_set_list(value, 2);
-        circa_set_pointer(circa_index(value, 0), texture);
-        circa_set_vec2(circa_index(value, 1), texture->width(), texture->height());
-    }
-
-    return value;
-}
-
 void
 RenderList::appendEntity(RenderEntity* command)
 {
@@ -107,7 +83,13 @@ RenderList::switchProgram(Program* program)
 }
 
 void
-RenderList::render()
+RenderList::startFrame()
+{
+    circa_set_list(&incomingCommands, 0);
+}
+
+void
+RenderList::submitFrame()
 {
     check_gl_error();
 
@@ -120,7 +102,7 @@ RenderList::render()
             // Draw a text label
             switchProgram(&textProgram);
 
-            TextTexture* texture = (TextTexture*) circa_get_pointer(circa_index(command, 1));
+            TextTexture* texture = (TextTexture*) circa_handle_get_object(circa_index(command, 1));
 
             caValue* position = circa_index(command, 2);
             caValue* color = circa_index(command, 3);
@@ -176,8 +158,6 @@ RenderList::render()
         
         check_gl_error();
     }
-
-    circa_set_list(&incomingCommands, 0);
 }
 
 void
@@ -519,13 +499,6 @@ void Sprite::render(RenderList* target)
 #endif
 
 // Circa bindings
-void RenderList__getTextRender(caStack* stack)
-{
-    RenderList* target = (RenderList*) circa_handle_get_object(circa_input(stack, 0));
-    caValue* args = circa_input(stack, 1);
-    caValue* cachedRender = target->getTextRender(args);
-    circa_copy(cachedRender, circa_output(stack, 0));
-}
 void RenderList__sendCommand(caStack* stack)
 {
     RenderList* target = (RenderList*) circa_handle_get_object(circa_input(stack, 0));
@@ -540,8 +513,7 @@ void RenderList__getViewportSize(caStack* stack)
 
 void RenderList_moduleLoad(caNativePatch* module)
 {
-    circa_patch_function(module, "RenderList.getTextRender", RenderList__getTextRender);
     circa_patch_function(module, "RenderList.sendCommand", RenderList__sendCommand);
     circa_patch_function(module, "RenderList.getViewportSize", RenderList__getViewportSize);
-    circa_finish_native_module(module);
+    circa_finish_native_patch(module);
 }

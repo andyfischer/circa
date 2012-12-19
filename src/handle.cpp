@@ -82,12 +82,27 @@ void handle_copy(Type* type, caValue* source, caValue* dest)
     dest->value_data.ptr = source->value_data.ptr;
 }
 
+bool handle_equals(caValue* left, caValue* right)
+{
+    if (!is_handle(right))
+        return false;
+
+    return left->value_data.ptr == right->value_data.ptr;
+}
+
+int handle_hash(caValue* val)
+{
+    return val->value_data.asint;
+}
+
 void setup_handle_type(Type* type)
 {
     type->storageType = name_StorageTypeHandle;
     type->initialize = handle_initialize;
     type->copy = handle_copy;
     type->release = handle_release;
+    type->equals = handle_equals;
+    type->hashFunc = handle_hash;
 }
 
 } // namespace circa
