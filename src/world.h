@@ -9,7 +9,7 @@ struct World {
     Block* root;
 
     // Private data.
-    NativePatchWorld* nativeModuleWorld;
+    NativePatchWorld* nativePatchWorld;
     FileWatchWorld* fileWatchWorld;
 
     // Global IDs.

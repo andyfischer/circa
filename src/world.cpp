@@ -13,7 +13,7 @@
 #include "inspection.h"
 #include "list.h"
 #include "modules.h"
-#include "native_modules.h"
+#include "native_patch.h"
 #include "reflection.h"
 #include "static_checking.h"
 #include "string_type.h"
@@ -35,7 +35,7 @@ void world_initialize(World* world)
 {
     set_list(&world->moduleSearchPaths);
 
-    world->nativeModuleWorld = create_native_module_world();
+    world->nativePatchWorld = create_native_patch_world();
     world->fileWatchWorld = create_file_watch_world();
 
     world->nextTermID = 1;

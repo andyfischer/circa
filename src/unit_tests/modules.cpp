@@ -41,10 +41,31 @@ void test_require()
     test_equals(test_spy_get_results(), "[5]");
 }
 
+void test_explicit_output()
+{
+    World* world = global_world();
+
+    FakeFilesystem fs;
+    fs.set("module.ca", "99 -> output");
+
+    circa_load_module_from_file(world, "Module", "module.ca");
+
+    Stack* stack = circa_alloc_stack(world);
+
+    circa_push_module(stack, "Module");
+    circa_run(stack);
+
+    test_assert(stack);
+    test_equals(circa_output(stack, 0), "99");
+
+    circa_dealloc_stack(stack);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(modules::source_file_location);
     REGISTER_TEST_CASE(modules::test_require);
+    REGISTER_TEST_CASE(modules::test_explicit_output);
 }
 
 } // namespace modules

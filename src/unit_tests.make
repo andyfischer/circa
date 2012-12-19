@@ -79,7 +79,7 @@ OBJECTS := \
 	$(OBJDIR)/migration.o \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
-	$(OBJDIR)/native_modules.o \
+	$(OBJDIR)/native_patch_test.o \
 	$(OBJDIR)/tokenizer.o \
 
 RESOURCES := \
@@ -186,7 +186,7 @@ $(OBJDIR)/modules.o: unit_tests/modules.cpp
 $(OBJDIR)/names.o: unit_tests/names.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/native_modules.o: unit_tests/native_modules.cpp
+$(OBJDIR)/native_patch_test.o: unit_tests/native_patch_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tokenizer.o: unit_tests/tokenizer.cpp

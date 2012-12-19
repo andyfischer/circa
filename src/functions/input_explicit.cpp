@@ -13,7 +13,7 @@ namespace input_explicit_function {
         copy(input, circa_output(stack, 0));
     }
 
-    void postCompile(Term* term)
+    void input_postCompile(Term* term)
     {
         Block* block = term->owningBlock;
 
@@ -22,12 +22,19 @@ namespace input_explicit_function {
         term->inputInfo(0)->properties.setBool("hidden", true);
     }
 
+    void output_postCompile(Term* term)
+    {
+        Term* out = append_output_placeholder(term->owningBlock, term->input(0));
+        hide_from_source(out);
+    }
+
     void setup(Block* kernel)
     {
         FUNCS.input_explicit = import_function(kernel, input_explicit, "input(any _) -> any");
-        as_function(FUNCS.input_explicit)->postCompile = postCompile;
+        as_function(FUNCS.input_explicit)->postCompile = input_postCompile;
         
         FUNCS.output_explicit = import_function(kernel, NULL, "output(any _)");
+        as_function(FUNCS.output_explicit)->postCompile = output_postCompile;
     }
 }
 }

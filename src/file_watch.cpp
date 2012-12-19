@@ -8,7 +8,7 @@
 #include "list.h"
 #include "modules.h"
 #include "names.h"
-#include "native_modules.h"
+#include "native_patch.h"
 #include "tagged_value.h"
 #include "world.h"
 

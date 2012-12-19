@@ -16,7 +16,7 @@
 #include "inspection.h"
 #include "list.h"
 #include "names.h"
-#include "native_modules.h"
+#include "native_patch.h"
 #include "parser.h"
 #include "stateful_code.h"
 #include "source_repro.h"

@@ -9,19 +9,14 @@ typedef void (*OnModuleLoad)(NativePatch* nativeModule);
 struct NativePatchWorld;
 struct NativePatch;
 
-NativePatchWorld* create_native_module_world();
-
-// Create a new NativePatch object. This function isn't commonly used (you might want
-// add_native_patch instead).
-NativePatch* create_native_module(World* world);
-void free_native_module(NativePatch* module);
+NativePatchWorld* create_native_patch_world();
 
 NativePatch* get_existing_native_module(World* world, const char* name);
 
 // Add a module with the given unique name to the World. If a module with this name already
 // exists, return the existing one. The name is usually the filename.
 NativePatch* add_native_patch(World* world, const char* name);
-void delete_native_module(World* world, const char* name);
+void remove_native_patch(World* world, const char* name);
 
 // Add a function patch on the given module.
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func);

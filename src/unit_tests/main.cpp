@@ -348,7 +348,7 @@ namespace interpreter { void register_tests(); }
 namespace migration { void register_tests(); }
 namespace modules { void register_tests(); }
 namespace names { void register_tests(); }
-namespace native_modules { void register_tests(); }
+namespace native_patch_test { void register_tests(); }
 namespace tokenizer { void register_tests(); }
 
 int main(int argc, char** argv)
@@ -366,7 +366,7 @@ int main(int argc, char** argv)
     migration::register_tests();
     modules::register_tests();
     names::register_tests();
-    native_modules::register_tests();
+    native_patch_test::register_tests();
     tokenizer::register_tests();
 
     caWorld* world = circa_initialize();

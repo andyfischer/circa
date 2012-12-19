@@ -9,7 +9,7 @@
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
-#include "native_modules.h"
+#include "native_patch.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "string_type.h"

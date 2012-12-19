@@ -16,7 +16,7 @@
 #include "importing.h"
 #include "kernel.h"
 #include "names.h"
-#include "native_modules.h"
+#include "native_patch.h"
 #include "string_type.h"
 #include "term.h"
 #include "update_cascades.h"
@@ -47,29 +47,29 @@ struct NativePatch
     void* dll;
 };
 
-NativePatchWorld* create_native_module_world()
+NativePatchWorld* create_native_patch_world()
 {
     NativePatchWorld* world = new NativePatchWorld();
     set_hashtable(&world->everyPatchedFunction);
     return world;
 }
 
-NativePatch* create_native_module(World* world)
+static NativePatch* create_native_patch(World* world)
 {
-    NativePatch* module = new NativePatch();
-    module->world = world;
-    module->dll = NULL;
-    return module;
+    NativePatch* patch = new NativePatch();
+    patch->world = world;
+    patch->dll = NULL;
+    return patch;
 }
 
-void free_native_module(NativePatch* module)
+static void free_native_patch(NativePatch* patch)
 {
-    delete module;
+    delete patch;
 }
 
 NativePatch* get_existing_native_module(World* world, const char* name)
 {
-    NativePatchWorld* nativeWorld = world->nativeModuleWorld;
+    NativePatchWorld* nativeWorld = world->nativePatchWorld;
 
     // Return existing module, if it exists.
     std::map<std::string, NativePatch*>::const_iterator it =
@@ -83,7 +83,7 @@ NativePatch* get_existing_native_module(World* world, const char* name)
 
 NativePatch* add_native_patch(World* world, const char* targetName)
 {
-    NativePatchWorld* nativeWorld = world->nativeModuleWorld;
+    NativePatchWorld* nativeWorld = world->nativePatchWorld;
 
     NativePatch* module = get_existing_native_module(world, targetName);
 
@@ -91,15 +91,23 @@ NativePatch* add_native_patch(World* world, const char* targetName)
         return module;
 
     // Create new module with this name.
-    module = create_native_module(world);
+    module = create_native_patch(world);
     set_string(&module->targetName, targetName);
     nativeWorld->nativeModules[targetName] = module;
     return module;
 }
 
-void delete_native_module(World* world, const char* name)
+void remove_native_patch(World* world, const char* name)
 {
-    world->nativeModuleWorld->nativeModules.erase(name);
+    world->nativePatchWorld->nativeModules.erase(name);
+
+    std::map<std::string, NativePatch*>::iterator it;
+    it = world->nativePatchWorld->nativeModules.find(name);
+
+    if (it != world->nativePatchWorld->nativeModules.end()) {
+        free_native_patch(it->second);
+        world->nativePatchWorld->nativeModules.erase(it);
+    }
 }
 
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func)
@@ -129,7 +137,7 @@ void native_module_apply_patch(NativePatch* module, Block* block)
 static void update_patch_function_lookup_for_module(NativePatch* module)
 {
     World* world = module->world;
-    caValue* everyPatchedFunction = &world->nativeModuleWorld->everyPatchedFunction;
+    caValue* everyPatchedFunction = &world->nativePatchWorld->everyPatchedFunction;
 
     caValue* targetName = &module->targetName;
 
@@ -157,7 +165,7 @@ static void update_patch_function_lookup_for_module(NativePatch* module)
 
 static void update_patch_function_lookup(World* world)
 {
-    NativePatchWorld* nativeWorld = world->nativeModuleWorld;
+    NativePatchWorld* nativeWorld = world->nativePatchWorld;
     set_hashtable(&nativeWorld->everyPatchedFunction);
 
     // For every native module.
@@ -193,7 +201,7 @@ CIRCA_EXPORT void circa_finish_native_module(caNativePatch* module)
 
 void module_possibly_patch_new_function(World* world, Block* function)
 {
-    NativePatchWorld* moduleWorld = world->nativeModuleWorld;
+    NativePatchWorld* moduleWorld = world->nativePatchWorld;
 
     Value globalName;
     get_global_name(function, &globalName);
@@ -290,7 +298,5 @@ CIRCA_EXPORT void circa_patch_function(caNativePatch* module, const char* name,
 {
     module_patch_function((NativePatch*) module, name, func);
 }
-
-CIRCA_EXPORT void circa_finish_native_module(caNativePatch* module);
 
 } // namespace circa

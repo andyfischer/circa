@@ -1,0 +1,10 @@
+
+-- Make sure that a semicolon after a function defn will start a new statement.
+
+def func();a = 1 + 2
+
+assert(a == 3)
+
+def func()->int;a = 3 + 4
+
+assert(a == 7)

@@ -17,7 +17,7 @@
 #include "kernel.h"
 #include "modules.h"
 #include "names.h"
-#include "native_modules.h"
+#include "native_patch.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
