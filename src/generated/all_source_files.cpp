@@ -28,7 +28,7 @@
 #include "../modules.cpp"
 #include "../names.cpp"
 #include "../names_builtin.cpp"
-#include "../native_modules.cpp"
+#include "../native_patch.cpp"
 #include "../object.cpp"
 #include "../parser.cpp"
 #include "../reflection.cpp"

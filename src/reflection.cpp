@@ -3,9 +3,11 @@
 #include "common_headers.h"
 #include "circa/circa.h"
 
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
+#include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
 #include "generic.h"
@@ -147,6 +149,26 @@ void Block__owner(caStack* stack)
     }
 
     set_term_ref(circa_output(stack, 0), block->owningTerm);
+}
+void Block__property(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+
+    caValue* value = block_get_property(block, as_name(circa_input(stack, 1)));
+
+    if (value == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        copy(value, circa_output(stack, 0));
+}
+void Block__properties(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+
+    if (is_null(&block->properties))
+        set_hashtable(circa_output(stack, 0));
+    else
+        copy(&block->properties, circa_output(stack, 0));
 }
 
 void Block__format_source(caStack* stack)
@@ -628,15 +650,11 @@ void reflection_install_functions(Block* kernel)
     static const ImportRecord records[] = {
         {"term_ref", term_ref},
         {"block_ref", block_ref},
-        {"Block.input", Block__input},
-        {"Block.inputs", Block__inputs},
-        {"Block.is_null", Block__is_null},
-        {"Block.output", Block__output},
-        {"Block.outputs", Block__outputs},
-        {"Block.owner", Block__owner},
         {"Block.dump", Block__dump},
         {"Block.call", Block__call},
+        {"Block.find_term", Block__find_term},
         {"Block.file_signature", Block__file_signature},
+        {"Block.functions", Block__functions},
         {"Block.statements", Block__statements},
         {"Block.format_source", Block__format_source},
         {"Block.format_function_heading", Block__format_function_heading},
@@ -644,13 +662,19 @@ void reflection_install_functions(Block* kernel)
         {"Block.get_static_errors", Block__get_static_errors},
         {"Block.get_static_errors_formatted", Block__get_static_errors_formatted},
         {"Block.has_static_error", Block__has_static_error},
+        {"Block.input", Block__input},
+        {"Block.inputs", Block__inputs},
+        {"Block.is_null", Block__is_null},
+        {"Block.link", Block__link},
         {"Block.list_configs", Block__list_configs},
-        {"Block.find_term", Block__find_term},
-        {"Block.functions", Block__functions},
+        {"Block.output", Block__output},
+        {"Block.outputs", Block__outputs},
+        {"Block.owner", Block__owner},
+        {"Block.property", Block__property},
+        {"Block.properties", Block__properties},
         {"Block.terms", Block__terms},
         {"Block.version", Block__version},
         {"Block.walk_terms", Block__walk_terms},
-        {"Block.link", Block__link},
         {"Term.assign", Term__assign},
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},

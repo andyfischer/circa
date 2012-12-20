@@ -217,5 +217,6 @@ const int name_LastStatIndex = 207;
 const int name_LastBuiltinName = 208;
 
 const char* builtin_name_to_string(int name);
+int builtin_name_from_string(const char* str);
 
 } // namespace circa

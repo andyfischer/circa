@@ -799,6 +799,10 @@ Name existing_name_from_string(const char* str)
 {
     INCREMENT_STAT(InternedNameLookup);
 
+    int builtinName = builtin_name_from_string(str);
+    if (builtinName != -1)
+        return builtinName;
+
     std::map<std::string,Name>::const_iterator it;
     it = g_stringToSymbol.find(str);
     if (it != g_stringToSymbol.end())
