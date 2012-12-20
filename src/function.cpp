@@ -456,11 +456,6 @@ void function_format_source(caValue* source, Term* term)
     format_block_source(source, contents, term);
 }
 
-void function_set_empty_evaluation(Function* function)
-{
-    function_contents(function)->emptyEvaluation = true;
-}
-
 void evaluate_subroutine(caStack*)
 {
     // This once did something, but now the default function calling behavior

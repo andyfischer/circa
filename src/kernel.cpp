@@ -862,7 +862,7 @@ void bootstrap_kernel()
     function_t::initialize(TYPES.function, term_value(valueFunc));
     initialize_function(valueFunc);
     as_function(valueFunc)->name = "value";
-    function_set_empty_evaluation(as_function(valueFunc));
+    block_set_evaluation_empty(function_contents(valueFunc), true);
 
     // Initialize primitive types (this requires value() function)
     create_type_value(kernel, TYPES.bool_type, "bool");
@@ -902,7 +902,7 @@ void bootstrap_kernel()
 
     // input_placeholder() is needed before we can declare a function with inputs
     FUNCS.input = import_function(kernel, NULL, "input_placeholder() -> any");
-    function_set_empty_evaluation(as_function(FUNCS.input));
+    block_set_evaluation_empty(function_contents(FUNCS.input), true);
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
     apply(function_contents(as_function(FUNCS.output)),

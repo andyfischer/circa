@@ -9,6 +9,11 @@ Repeat
 Success
 Failure
 
+# Block properties
+EvaluationEmpty
+IsPure
+Origin
+
 # Misc errors
 FileNotFound
 NotEnoughInputs

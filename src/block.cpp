@@ -12,6 +12,7 @@
 #include "evaluation.h"
 #include "file.h"
 #include "function.h"
+#include "hashtable.h"
 #include "importing_macros.h"
 #include "inspection.h"
 #include "list.h"
@@ -45,8 +46,7 @@ Block::Block()
   : owningTerm(NULL),
     version(0),
     inProgress(false),
-    stateType(NULL),
-    emptyEvaluation(false)
+    stateType(NULL)
 {
     id = global_world()->nextBlockID++;
     gc_register_new_object((CircaObject*) this, TYPES.block, true);
@@ -630,14 +630,53 @@ std::string get_source_file_location(Block* block)
     return as_string(&directory);
 }
 
-bool block_get_function_attr_bool(Block* block, Name attr)
+caValue* block_get_property(Block* block, Name name)
 {
-    if (is_null(&block->functionAttrs))
+    if (is_null(&block->properties))
+        return NULL;
+
+    Value nameVal;
+    set_name(&nameVal, name);
+    return hashtable_get(&block->properties, &nameVal);
+}
+
+caValue* block_insert_property(Block* block, Name name)
+{
+    if (is_null(&block->properties))
+        set_hashtable(&block->properties);
+
+    Value nameVal;
+    set_name(&nameVal, name);
+    return hashtable_insert(&block->properties, &nameVal);
+}
+
+void block_remove_property(Block* block, Name name)
+{
+    if (is_null(&block->properties))
+        return;
+
+    Value nameVal;
+    set_name(&nameVal, name);
+    hashtable_remove(&block->properties, &nameVal);
+}
+
+bool block_is_evaluation_empty(Block* block)
+{
+    caValue* prop = block_get_property(block, name_EvaluationEmpty);
+
+    if (prop == NULL)
         return false;
 
-    // TODO
+    return as_bool(prop);
+}
 
-    return false;
+void block_set_evaluation_empty(Block* block, bool empty)
+{
+    if (empty) {
+        set_bool(block_insert_property(block, name_EvaluationEmpty), true);
+    } else {
+        block_remove_property(block, name_EvaluationEmpty);
+    }
 }
 
 List* block_get_file_origin(Block* block)

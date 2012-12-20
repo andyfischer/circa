@@ -106,8 +106,6 @@ void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeT
 void function_format_header_source(caValue* source, Block* func);
 void function_format_source(caValue* source, Term* term);
 
-void function_set_empty_evaluation(Function* function);
-
 void evaluate_subroutine(caStack*);
 bool is_subroutine(Term* term);
 bool is_subroutine(Block* block);

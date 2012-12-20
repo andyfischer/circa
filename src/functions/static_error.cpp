@@ -10,7 +10,7 @@ namespace static_error_function {
         FUNCS.static_error = 
             import_function(kernel, NULL, "static_error(any msg)");
 
-        function_set_empty_evaluation(as_function(FUNCS.static_error));
+        block_set_evaluation_empty(function_contents(FUNCS.static_error), true);
     }
 
 }

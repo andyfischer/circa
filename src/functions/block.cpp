@@ -15,7 +15,7 @@ namespace block_function {
     {
         // deprecated
         FUNCS.block_unevaluated = import_function(kernel, NULL, "block_unevaluated()");
-        function_set_empty_evaluation(as_function(FUNCS.block_unevaluated));
+        block_set_evaluation_empty(function_contents(FUNCS.block_unevaluated), true);
 
         // deprecated
         FUNCS.lambda = import_function(kernel, NULL, "lambda(any inputs :multiple) -> Block");

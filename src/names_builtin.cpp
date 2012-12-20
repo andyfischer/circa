@@ -22,6 +22,9 @@ const char* builtin_name_to_string(int name)
     case name_Repeat: return "Repeat";
     case name_Success: return "Success";
     case name_Failure: return "Failure";
+    case name_EvaluationEmpty: return "EvaluationEmpty";
+    case name_IsPure: return "IsPure";
+    case name_Origin: return "Origin";
     case name_FileNotFound: return "FileNotFound";
     case name_NotEnoughInputs: return "NotEnoughInputs";
     case name_TooManyInputs: return "TooManyInputs";

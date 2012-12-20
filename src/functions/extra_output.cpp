@@ -16,7 +16,7 @@ namespace extra_output_function {
     {
         FUNCS.extra_output = import_function(kernel, NULL, "extra_output(any _) -> any");
         as_function(FUNCS.extra_output)->specializeType = specializeType;
-        function_set_empty_evaluation(as_function(FUNCS.extra_output));
+        block_set_evaluation_empty(function_contents(FUNCS.extra_output), true);
     }
 }
 }

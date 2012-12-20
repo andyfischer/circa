@@ -51,17 +51,11 @@ struct Block
     //  [2] int inputIndex (only used for errors related to inputs)
     Value staticErrors;
 
-    // If this block is used as a function, this dict may contain extra metadata.
-    Value functionAttrs;
-
     // Compound type object describing our inlined state. May be NULL.
     Type* stateType;
 
-    // Evaluation advice
-    bool emptyEvaluation;
-
-    // Whether this block is effectual or contains any effectual calls.
-    bool effectual;
+    // Dictionary with additional metadata.
+    Value properties;
 
     // Compiled interpreter instructions.
     Value bytecode;
@@ -183,7 +177,14 @@ Term* find_term_by_id(Block* block, int id);
 
 std::string get_source_file_location(Block* block);
 
-bool block_get_function_attr_bool(Block* block, Name attr);
+// Block properties
+caValue* block_get_property(Block* block, Name name);
+caValue* block_insert_property(Block* block, Name name);
+void block_remove_property(Block* block, Name name);
+
+// Convenience functions for accessing block properties.
+bool block_is_evaluation_empty(Block* block);
+void block_set_evaluation_empty(Block* block, bool empty);
 
 // Returns a List pointer if the block has a file origin, NULL if not.
 List* block_get_file_origin(Block* block);

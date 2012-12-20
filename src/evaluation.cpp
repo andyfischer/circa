@@ -1112,7 +1112,7 @@ void write_term_bytecode(Term* term, caValue* result)
         tag = op_CallBlock;
     }
 
-    if (tag == op_NoOp || block == NULL || block->emptyEvaluation) {
+    if (tag == op_NoOp || block == NULL || block_is_evaluation_empty(block)) {
         // No-op
         set_name(outputTag, op_NoOp);
         list_resize(result, 1);

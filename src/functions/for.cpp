@@ -37,10 +37,10 @@ namespace for_function {
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any _, any _) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(int index) -> int");
-        function_set_empty_evaluation(as_function(FUNCS.loop_index));
+        block_set_evaluation_empty(function_contents(FUNCS.loop_index), true);
 
         FUNCS.loop_output_index = import_function(kernel, NULL, "loop_output_index() -> any");
-        function_set_empty_evaluation(as_function(FUNCS.loop_output_index));
+        block_set_evaluation_empty(function_contents(FUNCS.loop_output_index), true);
 
         FUNCS.unbounded_loop = import_function(kernel, evaluate_unbounded_loop,
             "loop(bool condition)");

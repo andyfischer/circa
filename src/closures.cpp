@@ -84,7 +84,7 @@ void closures_install_functions(Block* kernel)
     as_function(FUNCS.closure_block)->formatSource = closure_block_formatSource;
 
     FUNCS.unbound_input = install_function(kernel, "unbound_input", NULL);
-    function_set_empty_evaluation(as_function(FUNCS.unbound_input));
+    block_set_evaluation_empty(function_contents(FUNCS.unbound_input), true);
 
     FUNCS.closure_call = kernel->get("Closure.call");
 }

@@ -15,6 +15,11 @@ namespace name_t {
         append_phrase(source, s.c_str(), term, tok_Name);
     }
 
+    int hash_func(caValue* value)
+    {
+        return as_int(value);
+    }
+
     void setup_type(Type* type)
     {
         reset_type(type);
@@ -22,6 +27,7 @@ namespace name_t {
         type->storageType = name_StorageTypeInt;
         type->toString = to_string;
         type->formatSource = format_source;
+        type->hashFunc = hash_func;
     }
 }
 }
