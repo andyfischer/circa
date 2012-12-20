@@ -672,11 +672,26 @@ bool block_is_evaluation_empty(Block* block)
 
 void block_set_evaluation_empty(Block* block, bool empty)
 {
-    if (empty) {
+    if (empty)
         set_bool(block_insert_property(block, name_EvaluationEmpty), true);
-    } else {
+    else
         block_remove_property(block, name_EvaluationEmpty);
-    }
+}
+bool block_has_effects(Block* block)
+{
+    caValue* prop = block_get_property(block, name_HasEffects);
+
+    if (prop == NULL)
+        return false;
+
+    return as_bool(prop);
+}
+void block_set_has_effects(Block* block, bool hasEffects)
+{
+    if (hasEffects)
+        set_bool(block_insert_property(block, name_HasEffects), true);
+    else
+        block_remove_property(block, name_HasEffects);
 }
 
 caValue* block_get_file_origin(Block* block)

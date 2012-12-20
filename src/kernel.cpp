@@ -1101,15 +1101,18 @@ void bootstrap_kernel()
     interpreter_install_functions(kernel);
 
     // Fetch refereneces to certain builtin funcs.
+    FUNCS.block_dynamic_call = kernel->get("Block.call");
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
-    FUNCS.block_dynamic_call = kernel->get("Block.call");
+    FUNCS.has_effects = kernel->get("has_effects");
     FUNCS.length = kernel->get("length");
+    FUNCS.list_append = kernel->get("List.append");
     FUNCS.native_patch = kernel->get("native_patch");
     FUNCS.not_func = kernel->get("not");
-    FUNCS.type = kernel->get("type");
     FUNCS.output_explicit = kernel->get("output");
-    FUNCS.list_append = kernel->get("List.append");
+    FUNCS.type = kernel->get("type");
+
+    block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
     // Finish setting up some hosted types
     TYPES.actor = as_type(kernel->get("Actor"));

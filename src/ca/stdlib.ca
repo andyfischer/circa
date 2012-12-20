@@ -12,6 +12,12 @@ def from_string(String s) -> any
 def to_string_repr(any val) -> String
     -- Encode a Circa value as a string representation
 
+def has_effects()
+    -- Declare that a function has effects. Used in native-patched functions.
+
+def native_patch(String filename)
+    -- Declare that this block should be patched by a native module.
+
 def changed(any current) -> bool
     state any prev = null
     result = prev != current
@@ -81,9 +87,6 @@ namespace sys
     def module_search_paths() -> List
     def perf_stats_reset()
     def perf_stats_dump() -> List
-
--- Declare that this block should be patched by a native module.
-def native_patch(String filename)
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block

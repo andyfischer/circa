@@ -39,6 +39,7 @@ struct BuiltinFuncs {
     Term* get_field;
     Term* get_index;
     Term* get_with_selector;
+    Term* has_effects;
     Term* if_block;
     Term* require;
     Term* include_func;
