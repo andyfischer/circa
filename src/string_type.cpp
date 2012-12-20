@@ -119,10 +119,11 @@ void string_release(caValue* value)
 
 void string_copy(Type* type, caValue* source, caValue* dest)
 {
-    make(type, dest);
+    set_null(dest);
     StringData* data = (StringData*) source->value_data.ptr;
     if (data != NULL)
         incref(data);
+    dest->value_type = source->value_type;
     dest->value_data.ptr = data;
 
     INCREMENT_STAT(StringSoftCopy);
@@ -163,14 +164,23 @@ bool string_equals(caValue* left, caValue* right)
     if (left->value_data.ptr == NULL)
         return false;
 
-    const char* leftChars = as_cstring(left);
-    const char* rightChars = as_cstring(right);
+    StringData* leftData = (StringData*) left->value_data.ptr;
+    StringData* rightData = (StringData*) right->value_data.ptr;
+
     for (int i=0;; i++) {
-        if (leftChars[i] != rightChars[i])
+        if (leftData->str[i] != rightData->str[i])
             return false;
-        if (leftChars[i] == 0)
+        if (leftData->str[i] == 0)
             break;
     }
+
+    // Strings are equal. Sneakily have both values reference the same data.
+    // Prefer to preserve the one that has more references.
+    if (leftData->refCount >= rightData->refCount)
+        string_copy(NULL, right, left);
+    else
+        string_copy(NULL, left, right);
+
 
     return true;
 }

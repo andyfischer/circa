@@ -80,6 +80,7 @@ OBJECTS := \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/native_patch_test.o \
+	$(OBJDIR)/string_tests.o \
 	$(OBJDIR)/tokenizer.o \
 
 RESOURCES := \
@@ -187,6 +188,9 @@ $(OBJDIR)/names.o: unit_tests/names.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/native_patch_test.o: unit_tests/native_patch_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/string_tests.o: unit_tests/string_tests.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tokenizer.o: unit_tests/tokenizer.cpp
