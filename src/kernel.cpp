@@ -62,6 +62,10 @@ void setup_builtin_functions(Block*);
 BuiltinFuncs FUNCS;
 BuiltinTypes TYPES;
 
+caValue* str_evaluationEmpty;
+caValue* str_hasEffects;
+caValue* str_origin;
+
 caValue* g_oracleValues;
 caValue* g_spyValues;
 
@@ -815,6 +819,15 @@ void bootstrap_kernel()
     type_t::setup_type(TYPES.type);
     void_t::setup_type(TYPES.void_type);
 
+    // Initialize permanent strings
+    str_evaluationEmpty = new Value();
+    set_string(str_evaluationEmpty, "evaluationEmpty");
+    str_hasEffects = new Value();
+    set_string(str_hasEffects, "hasEffects");
+    str_origin = new Value();
+    set_string(str_origin, "origin");
+
+    // Start building World
     g_world = alloc_world();
     g_world->bootstrapStatus = name_Bootstrapping;
 

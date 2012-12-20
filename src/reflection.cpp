@@ -154,7 +154,7 @@ void Block__property(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
-    caValue* value = block_get_property(block, as_name(circa_input(stack, 1)));
+    caValue* value = block_get_property(block, circa_input(stack, 1));
 
     if (value == NULL)
         set_null(circa_output(stack, 0));

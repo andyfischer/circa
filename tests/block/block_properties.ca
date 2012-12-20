@@ -1,6 +1,6 @@
 
 def f() {}
 
-assert(block_ref(comment).property(:EvaluationEmpty) == true)
+assert(block_ref(comment).property('evaluationEmpty') == true)
 
-assert(block_ref(f).property(:EvaluationEmpty) == null)
+assert(block_ref(f).property('evaluationEmpty') == null)

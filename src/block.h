@@ -173,9 +173,9 @@ Term* find_term_by_id(Block* block, int id);
 std::string get_source_file_location(Block* block);
 
 // Block properties
-caValue* block_get_property(Block* block, Name name);
-caValue* block_insert_property(Block* block, Name name);
-void block_remove_property(Block* block, Name name);
+caValue* block_get_property(Block* block, caValue* name);
+caValue* block_insert_property(Block* block, caValue* name);
+void block_remove_property(Block* block, caValue* name);
 
 // Convenience functions for accessing block properties.
 bool block_is_evaluation_empty(Block* block);

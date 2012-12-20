@@ -118,6 +118,10 @@ struct BuiltinTypes {
     Type* void_type;
 };
 
+extern caValue* str_evaluationEmpty;
+extern caValue* str_hasEffects;
+extern caValue* str_origin;
+
 extern BuiltinFuncs FUNCS;
 extern BuiltinTypes TYPES;
 
