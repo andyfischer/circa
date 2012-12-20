@@ -128,6 +128,14 @@ Term* get_input_placeholder(Block* block, int index)
     return term;
 }
 
+Term* get_effective_input_placeholder(Block* block, int inputIndex)
+{
+    if (has_variable_args(block))
+        return get_input_placeholder(block, 0);
+    else
+        return get_input_placeholder(block, inputIndex);
+}
+
 Term* get_output_placeholder(Block* block, int index)
 {
     if (index >= block->length())
@@ -241,6 +249,13 @@ bool is_state_input(Term* placeholder)
 bool is_state_output(Term* placeholder)
 {
     return placeholder->boolProp("state", false);
+}
+bool is_input_meta(Block* block, int index)
+{
+    Term* placeholder = get_input_placeholder(block, index);
+    if (placeholder == NULL)
+        return false;
+    return placeholder->boolProp("meta", false);
 }
 
 Block* term_get_function_details(Term* call)

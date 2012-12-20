@@ -78,15 +78,6 @@ Type* function_get_output_type(Term* function, int index);
 Type* function_get_input_type(Function* func, int index);
 Type* function_get_output_type(Function* func, int index);
 
-// Returns the number of input placeholders. Note that a function might have one
-// input placeholder, but accept a variable number of inputs.
-int function_num_inputs(Function* func);
-int function_num_outputs(Function* func);
-
-bool function_get_input_meta(Function* func, int index);
-bool function_has_variable_args(Function* func);
-bool function_has_variable_args(Term* func);
-
 Term* function_get_input_placeholder(Function* func, int index);
 Term* function_get_output_placeholder(Function* func, int index);
 

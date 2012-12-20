@@ -1538,8 +1538,7 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
                     continue;
 
                 // don't follow :meta inputs.
-                if (function_get_input_meta(as_function(term_value(checkTerm->function)),
-                            inputIndex))
+                if (is_input_meta(nested_contents(checkTerm->function), inputIndex))
                     continue;
 
                 marked[input->index] = true;

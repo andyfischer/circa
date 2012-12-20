@@ -119,7 +119,7 @@ void write_function(SourceWriter* writer, Term* term)
 
     writer->write(term->name.c_str());
 
-    int inputCount = function_num_inputs(func);
+    int inputCount = count_input_placeholders(function_contents(term));
 
     writer->write("(");
 

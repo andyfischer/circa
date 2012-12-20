@@ -41,23 +41,24 @@ namespace type_check_function {
     {
         caValue* inputs = circa_input(stack, 0);
         Function* function = as_function(circa_input(stack, 1));
+        Block* block = function_contents(function);
         caValue* result = circa_output(stack, 0);
 
-        bool varArgs = function_has_variable_args(function);
+        bool varArgs = has_variable_args(block);
 
         // Fail if wrong # of inputs
-        if (!varArgs && (function_num_inputs(function) != circa_count(inputs))) {
+        if (!varArgs && (count_input_placeholders(block) != circa_count(inputs))) {
             set_bool(result, false);
             return;
         }
 
         // Check each input
         for (int i=0; i < circa_count(inputs); i++) {
-            Type* type = function_get_input_type(function, i);
+            Term* placeholder = get_effective_input_placeholder(block, i);
             caValue* value = circa_index(inputs, i);
             if (value == NULL)
                 continue;
-            if (!cast_possible(value, type)) {
+            if (!cast_possible(value, declared_type(placeholder))) {
                 set_bool(result, false);
                 return;
             }

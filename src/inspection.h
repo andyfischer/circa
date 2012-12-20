@@ -47,6 +47,11 @@ int get_locals_count(Block* block);
 
 // Input & output placeholders
 Term* get_input_placeholder(Block* block, int index);
+
+// Get the input placeholder that corresponds with a call-site index. This takes varargs
+// into account.
+Term* get_effective_input_placeholder(Block* block, int inputIndex);
+
 Term* get_output_placeholder(Block* block, int index);
 int count_input_placeholders(Block* block);
 int count_output_placeholders(Block* block);
@@ -67,6 +72,9 @@ Term* find_state_output(Block* block);
 bool has_state_output(Block* block);
 bool is_state_input(Term* placeholder);
 bool is_state_output(Term* placeholder);
+
+// Other properties on inputs.
+bool is_input_meta(Block* block, int index);
 
 // Accessors that use a term's 'details' block, which may be the nested block,
 // or it might be the function's block, depending on the function.

@@ -195,7 +195,7 @@ Type* function_get_input_type(Term* func, int index)
 }
 Type* function_get_input_type(Function* func, int index)
 {
-    bool varArgs = function_has_variable_args(func);
+    bool varArgs = has_variable_args(function_contents(func));
     if (varArgs)
         index = 0;
 
@@ -223,54 +223,6 @@ Type* function_get_output_type(Function* func, int index)
         return TYPES.any;
 
     return placeholder->type;
-}
-
-// TODO: Replace with count_input_placeholders
-int function_num_inputs(Function* func)
-{
-    Block* contents = function_get_contents(func);
-
-    int count = 0;
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term == NULL || term->function != FUNCS.input)
-            break;
-
-        count++;
-    }
-    return count;
-}
-
-// TODO: Replace with count_output_placeholders
-int function_num_outputs(Function* func)
-{
-    Block* contents = function_get_contents(func);
-
-    int count = 0;
-    for (int i=contents->length() - 1; i >= 0; i--) {
-        Term* term = contents->get(i);
-        if (term == NULL || term->function != FUNCS.output)
-            break;
-
-        count++;
-    }
-    return count;
-}
-
-bool function_get_input_meta(Function* func, int index)
-{
-    Term* placeholder = function_get_input_placeholder(func, index);
-    if (placeholder == NULL)
-        return false;
-    return placeholder->boolProp("meta", false);
-}
-bool function_has_variable_args(Function* func)
-{
-    return has_variable_args(function_get_contents(func));
-}
-bool function_has_variable_args(Term* func)
-{
-    return function_has_variable_args(as_function(func));
 }
 
 Term* function_get_input_placeholder(Function* func, int index)
@@ -311,8 +263,8 @@ std::string function_get_documentation_string(Function* func)
     // A function can optionally have a documentation string. If present,
     // it will be the first thing defined in the function, and it'll be
     // anonymous and be a statement.
-    int expected_index = function_num_inputs(func);
     Block* contents = function_get_contents(func);
+    int expected_index = count_input_placeholders(contents);
 
     if (expected_index >= contents->length()) return "";
     Term* possibleDocString = contents->get(expected_index);
