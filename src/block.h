@@ -38,11 +38,6 @@ struct Block
     // while in this state.
     bool inProgress;
 
-    // Variant value describing where this block came from. 
-    //   If the block came from a file, then the value will be of format:
-    //     [:file, String filename, int nullable_timestamp]
-    Value origin;
-
     // If this block has any static errors, then they are listed here. If there
     // are no errors then this value is null.
     // If this has a list, each element has structure:
@@ -187,7 +182,7 @@ bool block_is_evaluation_empty(Block* block);
 void block_set_evaluation_empty(Block* block, bool empty);
 
 // Returns a List pointer if the block has a file origin, NULL if not.
-List* block_get_file_origin(Block* block);
+caValue* block_get_file_origin(Block* block);
 
 // Checks Block.origin, and checks the modified time of 'filename'. If the origin
 // does not match the file's modified time, then we return true and update the

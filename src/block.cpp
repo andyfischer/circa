@@ -412,12 +412,12 @@ void block_graft_replacement(Block* target, Block* replacement)
 
 caValue* block_get_source_filename(Block* block)
 {
-    List* fileOrigin = block_get_file_origin(block);
+    caValue* fileOrigin = block_get_file_origin(block);
 
     if (fileOrigin == NULL)
         return NULL;
 
-    return fileOrigin->get(1);
+    return list_get(fileOrigin, 1);
 }
 
 Block* get_outer_scope(Block* block)
@@ -573,7 +573,7 @@ void duplicate_block(Block* source, Block* dest)
 Name load_script(Block* block, const char* filename)
 {
     // Store the file origin
-    caValue* origin = &block->origin;
+    caValue* origin = block_insert_property(block, name_Origin);
     set_list(origin, 3);
     set_name(list_get(origin, 0), name_File);
     set_string(list_get(origin, 1), filename);
@@ -679,20 +679,19 @@ void block_set_evaluation_empty(Block* block, bool empty)
     }
 }
 
-List* block_get_file_origin(Block* block)
+caValue* block_get_file_origin(Block* block)
 {
-    if (!is_list(&block->origin))
+    caValue* origin = block_get_property(block, name_Origin);
+    if (origin == NULL)
         return NULL;
 
-    List* list = (List*) &block->origin;
-
-    if (list->length() != 3)
+    if (list_length(origin) != 3)
         return NULL;
 
-    if (as_name(list->get(0)) != name_File)
+    if (as_name(list_get(origin, 0)) != name_File)
         return NULL;
 
-    return list;
+    return origin;
 }
 
 bool check_and_update_file_origin(Block* block, const char* filename)
@@ -702,7 +701,7 @@ bool check_and_update_file_origin(Block* block, const char* filename)
     caValue* origin = block_get_file_origin(block);
 
     if (origin == NULL) {
-        origin = &block->origin;
+        origin = block_insert_property(block, name_Origin);
         set_list(origin, 3);
         set_name(list_get(origin, 0), name_File);
         set_string(list_get(origin, 1), filename);

@@ -324,14 +324,14 @@ void Block__file_signature(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    List* fileOrigin = block_get_file_origin(block);
+    caValue* fileOrigin = block_get_file_origin(block);
     if (fileOrigin == NULL)
         set_null(circa_output(stack, 0));
     else
     {
         caValue* output = set_list(circa_output(stack, 0), 2);
-        copy(fileOrigin->get(1), list_get(output, 0));
-        copy(fileOrigin->get(2), list_get(output, 1));
+        copy(list_get(fileOrigin, 1), list_get(output, 0));
+        copy(list_get(fileOrigin, 2), list_get(output, 1));
     }
 }
 
