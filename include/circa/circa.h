@@ -282,7 +282,6 @@ bool circa_is_function(caValue* value);
 bool circa_is_float(caValue* value);
 bool circa_is_int(caValue* value);
 bool circa_is_list(caValue* value);
-bool circa_is_name(caValue* value);
 bool circa_is_null(caValue* value);
 bool circa_is_number(caValue* value);
 bool circa_is_string(caValue* value);
@@ -294,7 +293,6 @@ caBlock*   circa_block(caValue* value);
 float       circa_float(caValue* value);
 caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
-caName      circa_name(caValue* value);
 void*       circa_object(caValue* value);
 const char* circa_string(caValue* value);
 caType*     circa_type(caValue* value);
@@ -321,7 +319,7 @@ caValue* circa_index(caValue* value, int index);
 // Number of elements in a list value.
 int circa_count(caValue* container);
 
-caName circa_first_name(caValue* value);
+caValue* circa_first_string(caValue* value);
 
 // -- Writing to a caValue --
 
@@ -330,7 +328,6 @@ void circa_set_bool(caValue* container, bool value);
 void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);
 void circa_set_int(caValue* container, int value);
-void circa_set_name(caValue* container, caName value);
 void circa_set_null(caValue* container);
 void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);
@@ -381,7 +378,6 @@ caValue* circa_handle_get_value(caValue* handle);
 
 void circa_handle_set_object(caValue* handle, void* object);
 void* circa_handle_get_object(caValue* handle);
-
 
 // -- Names --
 

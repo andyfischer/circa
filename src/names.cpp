@@ -251,7 +251,7 @@ void get_global_name(Term* term, caValue* nameOut)
             // Parent is NULL but we haven't yet reached the global root. This is
             // a deprecated style of block that isn't connected to root. No global
             // name is possible.
-            set_name(nameOut, name_None);
+            set_null(nameOut);
             return;
         }
     }
@@ -263,7 +263,7 @@ void get_global_name(Term* term, caValue* nameOut)
 
         // If this term has no name then we can't construct a global name. Bail out.
         if (subTerm->nameSymbol == name_None) {
-            set_name(nameOut, name_None);
+            set_null(nameOut);
             return;
         }
 
@@ -780,19 +780,6 @@ Name qualified_name_get_remainder_after_first_section(Name name)
         return 0;
     else
         return g_runtimeNames[name - c_FirstRuntimeName].namespaceRightRemainder;
-}
-
-Name as_name(caValue* tv)
-{
-    return tv->value_data.asint;
-}
-
-void set_name(caValue* tv, Name val)
-{
-    ca_assert(name_is_valid(val));
-    set_null(tv);
-    tv->value_type = TYPES.name;
-    tv->value_data.asint = val;
 }
 
 Name existing_name_from_string(const char* str)

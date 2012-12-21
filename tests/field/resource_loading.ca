@@ -67,7 +67,7 @@ def create_line() -> Line
 def Line.set(_, Point a, Point b)
 def Line.setColor(_, Color c)
 
-def create_sprite(Name pass) -> Sprite
+def create_sprite(String pass) -> Sprite
   return make(Sprite)
 def Sprite.loadFromFile(_, String filename)
   print('loading: ' filename)
@@ -85,17 +85,17 @@ def Sprite.bounds(_) -> Vec4
   s = _.size()
   return [p.x, p.y, p.x + s.x, p.y + s.y]
 
-def sprite(String filename, Name pass) -> Sprite
+def sprite(String filename, String pass) -> Sprite
   state s = create_sprite(pass)
   if changed(filename)
     s.loadFromFile(filename)
   return s
   
-def sprite_blank(Name pass) -> Sprite
+def sprite_blank(String pass) -> Sprite
   state s = create_sprite(pass)
   return s
   
-def sprite_from_tex(Texture tex, Name pass) -> Sprite
+def sprite_from_tex(Texture tex, String pass) -> Sprite
   state s = create_sprite(pass)
   if changed(tex)
     s.setTexture(tex)

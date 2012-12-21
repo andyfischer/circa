@@ -77,7 +77,7 @@ StorageTypeObject
 
 # Tokens
 tok_Identifier
-tok_Name
+tok_ColonString
 tok_Integer
 tok_HexInteger
 tok_Float

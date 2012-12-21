@@ -234,6 +234,15 @@ void test_string_literal()
     test_equals(tokens.nextStr(), "'string2'");
     tokens.consume(tok_String);
     test_assert(tokens.finished());
+
+    tokens.reset(":abc :a :1");
+    test_equals(tokens.consumeStr(tok_ColonString), ":abc");
+    test_equals(tokens.consumeStr(tok_Whitespace), " ");
+    test_equals(tokens.consumeStr(tok_ColonString), ":a");
+    test_equals(tokens.consumeStr(tok_Whitespace), " ");
+    test_equals(tokens.consumeStr(tok_Colon), ":");
+    test_equals(tokens.consumeStr(tok_Integer), "1");
+    test_assert(tokens.finished());
 }
 
 void test_triple_quote_string_literal()
@@ -334,18 +343,6 @@ void test_comment()
     test_assert(tokens.finished());
 }
 
-void test_names()
-{
-    TokenStream tokens(":abc :a :1");
-    test_equals(tokens.consumeStr(tok_Name), ":abc");
-    test_equals(tokens.consumeStr(tok_Whitespace), " ");
-    test_equals(tokens.consumeStr(tok_Name), ":a");
-    test_equals(tokens.consumeStr(tok_Whitespace), " ");
-    test_equals(tokens.consumeStr(tok_Colon), ":");
-    test_equals(tokens.consumeStr(tok_Integer), "1");
-    test_assert(tokens.finished());
-}
-
 void test_number_followed_by_dot_call()
 {
     TokenStream tokens("1.something");
@@ -374,7 +371,6 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer::test_keyword_followed_by_lparen);
     REGISTER_TEST_CASE(tokenizer::test_preceding_indent);
     REGISTER_TEST_CASE(tokenizer::test_comment);
-    REGISTER_TEST_CASE(tokenizer::test_names);
     REGISTER_TEST_CASE(tokenizer::test_number_followed_by_dot_call);
 }
 

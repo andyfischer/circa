@@ -1,14 +1,15 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "../common_headers.h"
+#include "common_headers.h"
 
-#include "../building.h"
-#include "../function.h"
-#include "../inspection.h"
-#include "../list.h"
-#include "../names.h"
-#include "../names.h"
-#include "../type.h"
+#include "building.h"
+#include "function.h"
+#include "inspection.h"
+#include "list.h"
+#include "names.h"
+#include "names.h"
+#include "string_type.h"
+#include "type.h"
 
 #include "generate_cpp.h"
 
@@ -48,7 +49,7 @@ struct SourceWriter
     {
         possiblyStartNewLine();
 
-        if (as_name(item) == name_Newline) {
+        if (string_eq(item, "\n")) {
             set_string(output.append(), "\n");
             startNewLine = true;
             return;
@@ -66,7 +67,7 @@ struct SourceWriter
     void newline()
     {
         Value val;
-        set_name(&val, name_Newline);
+        set_string(&val, "\n");
         write(&val);
     }
 

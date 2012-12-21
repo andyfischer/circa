@@ -212,7 +212,7 @@ void rewrite_block(Block* block, caValue* contents, caValue* reply)
         print_static_errors_formatted(block);
         set_string(reply, errors.str());
     } else {
-        set_name(reply, name_Success);
+        set_string(reply, "success");
     }
 }
 

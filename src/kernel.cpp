@@ -42,7 +42,6 @@
 #include "types/eval_context.h"
 #include "types/indexable.h"
 #include "types/int.h"
-#include "types/name.h"
 #include "types/number.h"
 #include "types/set.h"
 #include "types/void.h"
@@ -796,7 +795,6 @@ void bootstrap_kernel()
     TYPES.int_type = create_type();
     TYPES.list = create_type();
     TYPES.map = create_type();
-    TYPES.name = create_type();
     TYPES.opaque_pointer = create_type();
     TYPES.term = create_type();
     TYPES.void_type = create_type();
@@ -810,7 +808,6 @@ void bootstrap_kernel()
     hashtable_setup_type(TYPES.map);
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
-    name_t::setup_type(TYPES.name);
     null_t::setup_type(TYPES.null);
     number_t::setup_type(TYPES.float_type);
     opaque_pointer_t::setup_type(TYPES.opaque_pointer);
@@ -884,7 +881,6 @@ void bootstrap_kernel()
     create_type_value(kernel, TYPES.float_type, "number");
     create_type_value(kernel, TYPES.int_type, "int");
     create_type_value(kernel, TYPES.list, "List");
-    create_type_value(kernel, TYPES.name, "Name");
     create_type_value(kernel, TYPES.opaque_pointer, "opaque_pointer");
     create_type_value(kernel, TYPES.string, "String");
     create_type_value(kernel, TYPES.term, "Term");

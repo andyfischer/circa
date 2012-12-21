@@ -375,7 +375,7 @@ void append_phrase(caValue* source, const char* str, Term* term, Name type)
     list->resize(3);
     set_string((*list)[0], str);
     set_term_ref((*list)[1], term);
-    set_name((*list)[2], type);
+    set_int((*list)[2], type);
 }
 
 void append_phrase(caValue* source, std::string const& str, Term* term, Name type)

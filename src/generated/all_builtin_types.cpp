@@ -6,7 +6,6 @@
 #include "../types/eval_context.cpp"
 #include "../types/indexable.cpp"
 #include "../types/int.cpp"
-#include "../types/name.cpp"
 #include "../types/null.cpp"
 #include "../types/number.cpp"
 #include "../types/opaque_pointer_t.cpp"

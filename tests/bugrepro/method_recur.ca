@@ -1,6 +1,6 @@
 
 type UIElement {
-    Name tag
+    String tag
     List args
     Rect rect
     bool rollover

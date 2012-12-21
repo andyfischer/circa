@@ -91,7 +91,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
     for (int i = 0; i < list_length(&watch->onChangeActions); i++) {
         caValue* action = list_get(&watch->onChangeActions, i);
 
-        Name label = first_name(action);
+        Name label = as_int(list_get(action, 0));
         ca_assert(label != name_None);
 
         switch (label) {
@@ -153,7 +153,7 @@ FileWatch* add_file_watch_module_load(World* world, const char* filename, const 
 {
     circa::Value action;
     set_list(&action, 2);
-    set_name(list_get(&action, 0), name_PatchBlock);
+    set_int(list_get(&action, 0), name_PatchBlock);
     set_string(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }
@@ -162,7 +162,7 @@ FileWatch* add_file_watch_native_patch(World* world, const char* filename, const
 {
     circa::Value action;
     set_list(&action, 2);
-    set_name(list_get(&action, 0), name_NativePatch);
+    set_int(list_get(&action, 0), name_NativePatch);
     set_string(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }

@@ -539,13 +539,6 @@ Term* create_type_value(Block* block, Type* value, std::string const& name)
     return term;
 }
 
-Term* create_symbol_value(Block* block, int value, std::string const& name)
-{
-    Term* term = create_value(block, TYPES.type, name);
-    set_name(term_value(term), value);
-    return term;
-}
-
 Term* duplicate_value(Block* block, Term* term)
 {
     Term* dup = create_value(block, term->type);

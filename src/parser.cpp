@@ -562,8 +562,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     // Optional list of qualifiers
-    while (tokens.nextIs(tok_Name)) {
-        std::string symbolText = tokens.consumeStr(tok_Name);
+    while (tokens.nextIs(tok_ColonString)) {
+        std::string symbolText = tokens.consumeStr(tok_ColonString);
         if (symbolText == ":throws")
             attrs->throws = true;
         else
@@ -664,8 +664,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
 
         // Optional list of qualifiers
-        while (tokens.nextIs(tok_Name)) {
-            std::string symbolText = tokens.consumeStr(tok_Name);
+        while (tokens.nextIs(tok_ColonString)) {
+            std::string symbolText = tokens.consumeStr(tok_ColonString);
 
             // Future: store syntax hint
             if (symbolText == ":ignore_error") {
@@ -705,9 +705,9 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     tokens.consume(tok_RParen);
 
     // Another optional list of symbols
-    if (tok_Name == lookahead_next_non_whitespace(tokens, false)) {
+    if (tok_ColonString == lookahead_next_non_whitespace(tokens, false)) {
         possible_whitespace(tokens);
-        std::string symbolText = tokens.consumeStr(tok_Name);
+        std::string symbolText = tokens.consumeStr(tok_ColonString);
         if (symbolText == ":parsetime") {
         }
         else
@@ -786,7 +786,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    while (tokens.nextIs(tok_Name)) {
+    while (tokens.nextIs(tok_ColonString)) {
         std::string s = tokens.consumeStr();
 
         // There were once type attributes here
@@ -2105,8 +2105,8 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
         result = literal_list(block, tokens, context);
 
     // literal name?
-    else if (tokens.nextIs(tok_Name))
-        result = literal_name(block, tokens, context);
+    else if (tokens.nextIs(tok_ColonString))
+        result = literal_string(block, tokens, context);
 
     // closure block?
     else if (tokens.nextIs(tok_LBrace))
@@ -2202,19 +2202,27 @@ ParseResult literal_string(Block* block, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    std::string text = tokens.consumeStr(tok_String);
+    std::string text = tokens.consumeStr();
 
     std::string quoteType = text.substr(0,1);
 
-    Value escaped;
-    unquote_and_unescape_string(text.c_str(), &escaped);
+    Value rawString;
 
-    Term* term = create_string(block, as_cstring(&escaped));
+    if (text[0] == ':') {
+        // :String
+        set_string(&rawString, text.c_str() + 1);
+
+    } else {
+        // 'String' or "String"
+        unquote_and_unescape_string(text.c_str(), &rawString);
+    }
+
+    Term* term = create_string(block, as_cstring(&rawString));
     set_source_location(term, startPosition, tokens);
 
     if (quoteType != "'")
         term->setStringProp("syntax:quoteType", quoteType);
-    if (!string_eq(&escaped, text.c_str()))
+    if (!string_eq(&rawString, text.c_str()))
         term->setStringProp("syntax:originalString", text);
 
     return ParseResult(term);
@@ -2332,22 +2340,6 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
 
     term->setBoolProp("syntax:literal-list", true);
     term->setStringProp("syntax:declarationStyle", "bracket-list");
-    set_source_location(term, startPosition, tokens);
-
-    return ParseResult(term);
-}
-
-ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-
-    std::string s = tokens.nextStr();
-    tokens.consume(tok_Name);
-
-    Term* term = create_value(block, TYPES.null);
-
-    // Skip the leading ':' in the name string
-    set_name(term_value(term), name_from_string(s.c_str() + 1));
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);

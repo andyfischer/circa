@@ -101,7 +101,6 @@ bool is_number(caValue* value);
 bool is_opaque_pointer(caValue* value);
 bool is_ref(caValue* value);
 bool is_string(caValue* value);
-bool is_name(caValue* value);
 bool is_type(caValue* value);
 
 // Unboxing using builtin types.
@@ -133,9 +132,6 @@ void set_function(caValue* value, Function* function);
 float to_float(caValue* value);
 int to_int(caValue* value);
 
-// If the value is a name, return it. If it's a value and the first element is a name,
-// then return that. Will recursively search if the first element is itself a list.
-// Returns name_None if a name value was not found.
-caName first_name(caValue* value);
+caValue* first_string(caValue* value);
 
 } // namespace circa

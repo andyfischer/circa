@@ -575,7 +575,7 @@ Name load_script(Block* block, const char* filename)
     // Store the file origin
     caValue* origin = block_insert_property(block, str_origin);
     set_list(origin, 3);
-    set_name(list_get(origin, 0), name_File);
+    set_string(list_get(origin, 0), "file");
     set_string(list_get(origin, 1), filename);
     set_int(list_get(origin, 2), circa_file_get_version(filename));
 
@@ -697,7 +697,7 @@ caValue* block_get_file_origin(Block* block)
     if (list_length(origin) != 3)
         return NULL;
 
-    if (as_name(list_get(origin, 0)) != name_File)
+    if (!string_eq(list_get(origin, 0), "file"))
         return NULL;
 
     return origin;
@@ -712,7 +712,7 @@ bool check_and_update_file_origin(Block* block, const char* filename)
     if (origin == NULL) {
         origin = block_insert_property(block, str_origin);
         set_list(origin, 3);
-        set_name(list_get(origin, 0), name_File);
+        set_string(list_get(origin, 0), "file");
         set_string(list_get(origin, 1), filename);
         set_int(list_get(origin, 2), version);
         return true;

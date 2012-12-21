@@ -51,7 +51,7 @@ void controlFlow_postCompile(Term* term)
         rename(term, name_from_string("#return"));
 
     // Create a #control value
-    Term* controlTerm = create_value(term->owningBlock, TYPES.name, "#control");
+    Term* controlTerm = create_value(term->owningBlock, TYPES.int_type, "#control");
     hide_from_source(controlTerm);
 
     Name controlValue = name_None;
@@ -64,7 +64,7 @@ void controlFlow_postCompile(Term* term)
     else if (term->function == FUNCS.discard)
         controlValue = name_Discard;
 
-    set_name(term_value(controlTerm), controlValue);
+    set_int(term_value(controlTerm), controlValue);
 
     // Add an exit_point after each control-flow term
     Block* block = term->owningBlock;

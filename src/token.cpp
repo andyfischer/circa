@@ -21,7 +21,7 @@ const char* get_token_text(int match)
         case tok_Comma: return ",";
         case tok_At: return "@";
         case tok_Identifier: return "IDENTIFIER";
-        case tok_Name: return "NAME";
+        case tok_ColonString: return "COLON_STRING";
         case tok_Integer: return "INTEGER";
         case tok_HexInteger: return "HEX_INTEGER";
         case tok_Float: return "FLOAT";
@@ -207,7 +207,7 @@ struct TokenizeContext
 
 void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
-void consume_name(TokenizeContext &context);
+void consume_colon_string(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_comment(TokenizeContext& context);
 void consume_multiline_comment(TokenizeContext& context);
@@ -440,7 +440,7 @@ void top_level_consume_token(TokenizeContext &context)
                 context.consume(tok_DoubleColon, 2);
                 return;
             } else if (is_identifier_first_letter(context.next(1))) {
-                return consume_name(context);
+                return consume_colon_string(context);
             }
 
             context.consume(tok_Colon, 1);
@@ -726,7 +726,7 @@ void consume_color_literal(TokenizeContext &context)
         context.consume(tok_Unrecognized, lookahead);
 }
 
-void consume_name(TokenizeContext &context)
+void consume_colon_string(TokenizeContext &context)
 {
     int lookahead = 0;
 
@@ -736,7 +736,7 @@ void consume_name(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.consume(tok_Name, lookahead);
+    context.consume(tok_ColonString, lookahead);
 }
 
 void TokenStream::reset(caValue* inputString)

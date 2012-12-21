@@ -24,8 +24,8 @@ def changed(any current) -> bool
     prev = current
     return result
 
-def first_name(any val) -> Name
-    if type(val) == Name
+def first_name(any val) -> String
+    if type(val) == String
         val
     elif type(val) == List
         if length(val) > 0

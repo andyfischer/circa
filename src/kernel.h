@@ -107,7 +107,6 @@ struct BuiltinTypes {
     Type* int_type;
     Type* list;
     Type* map;
-    Type* name;
     Type* null;
     Type* opaque_pointer;
     Type* point;

@@ -107,9 +107,6 @@ void name_to_string(Name name, String* string);
 Name qualified_name_get_first_section(Name name);
 Name qualified_name_get_remainder_after_first_section(Name name);
 
-Name as_name(caValue* tv);
-void set_name(caValue* tv, Name name);
-
 // Returns a name if there is already one with this string, otherwise returns None.
 Name existing_name_from_string(const char* str);
 Name existing_name_from_string(const char* str, int len);

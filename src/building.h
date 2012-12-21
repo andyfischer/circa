@@ -62,7 +62,6 @@ Block* create_namespace(Block*, std::string const& name);
 Block* create_block_unevaluated(Block* owner, const char* name);
 Term* create_type(Block* block, std::string name="");
 Term* create_type_value(Block* block, Type* value, std::string const& name="");
-Term* create_symbol_value(Block* block, int value, std::string const& name="");
 Term* duplicate_value(Block* block, Term* term);
 
 // Add an input_placeholder() term after the existing placeholders.

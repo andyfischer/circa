@@ -112,7 +112,7 @@ void perf_stats_to_list(caValue* list)
         int64 value = PERF_STATS[i - c_firstStatIndex];
         caValue* element = list_get(list, i - c_firstStatIndex);
         set_list(element, 2);
-        set_name(list_get(element, 0), name);
+        set_string(list_get(element, 0), builtin_name_to_string(name));
         char buf[100];
         sprintf(buf, "%llu", value);
         set_string(list_get(element, 1), buf);

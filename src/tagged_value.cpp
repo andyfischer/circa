@@ -510,7 +510,6 @@ bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == name_StorageTypeOpaquePointer; }
 bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeTerm; }
 bool is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
-bool is_name(caValue* value) { return value->value_type == TYPES.name; }
 bool is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
 
 bool is_number(caValue* value)
@@ -540,18 +539,18 @@ int to_int(caValue* value)
     return 0;
 }
 
-caName first_name(caValue* value)
+caValue* first_string(caValue* value)
 {
-    if (is_name(value))
-        return as_name(value);
+    if (is_string(value))
+        return value;
     if (is_list(value))
-        return first_name(list_get(value, 0));
-    return name_None;
+        return first_string(list_get(value, 0));
+    return NULL;
 }
 
-CIRCA_EXPORT caName circa_first_name(caValue* value)
+CIRCA_EXPORT caValue* circa_first_string(caValue* value)
 {
-    return first_name(value);
+    return first_string(value);
 }
 
 } // namespace circa
@@ -567,7 +566,6 @@ bool circa_is_float(caValue* value) { return value->value_type->storageType == n
 bool circa_is_function(caValue* value) { return value->value_type == TYPES.function; }
 bool circa_is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
 bool circa_is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
-bool circa_is_name(caValue* value) { return value->value_type == TYPES.name; }
 bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
 bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
 bool circa_is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
@@ -591,11 +589,6 @@ caFunction* circa_function(caValue* value) {
 }
 int circa_int(caValue* value) {
     ca_assert(circa_is_int(value));
-    return value->value_data.asint;
-}
-caName circa_name(caValue* value)
-{
-    ca_assert(circa_is_name(value));
     return value->value_data.asint;
 }
 void* circa_object(caValue* value)
@@ -686,10 +679,6 @@ void circa_set_int(caValue* container, int i)
 {
     change_type(container, TYPES.int_type);
     container->value_data.asint = i;
-}
-void circa_set_name(caValue* container, caName value)
-{
-    set_name(container, value);
 }
 void circa_set_null(caValue* container)
 {
