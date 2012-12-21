@@ -42,31 +42,6 @@ def every_symbol():
 
     yield ('LastBuiltinName', 'name_LastBuiltinName', index)
 
-def names_to_trie(names, i):
-    by_prefix = {}
-
-    for name in names:
-
-        if i >= len(name):
-            c = 0
-        else:
-            c = name[i]
-
-        if c not in by_prefix:
-            by_prefix[c] = []
-
-        by_prefix[c].append(name)
-
-    result = {}
-    for prefix,contains in by_prefix.items():
-        if len(contains) == 1:
-            assert len(contains) == 1
-            result[prefix] = contains[0]
-        else:
-            result[prefix] = names_to_trie(contains, i + 1)
-
-    return result
-
 def write_header(lines):
     lines.append('// Copyright (c) Andrew Fischer. See LICENSE file for license terms.')
     lines.append('')
@@ -82,7 +57,6 @@ def write_header(lines):
     
     lines.append('')
     lines.append('const char* builtin_name_to_string(int name);')
-    lines.append('int builtin_name_from_string(const char* str);')
     lines.append('')
     lines.append('} // namespace circa')
 
@@ -110,29 +84,6 @@ def write_impl(lines):
     lines.append('    }')
     lines.append('}')
     lines.append('')
-    lines.append('int builtin_name_from_string(const char* str)')
-    lines.append('{')
-
-    def write_name_lookup_switch(trie, dist):
-        yield "switch (str[" + str(dist) + "]) {"
-        yield "default: return -1;"
-        for prefix,sub in trie.items():
-            yield "case " + ('0' if prefix == 0 else "'" + prefix + "'") + ':'
-            if type(sub) == str:
-                yield "    if (strcmp(str + " + str(dist+1) + ", \"" + sub[dist+1:] + "\") == 0)"
-                yield "        return " + get_c_name(sub) + ";"
-                yield "    break;"
-            else:
-                for line in write_name_lookup_switch(sub, dist + 1):
-                    yield line
-        yield "}"
-
-    for line in write_name_lookup_switch(names_to_trie([name for (name,_,_) in every_symbol()], 0), 0):
-        lines.append('    ' + line)
-
-    lines.append('')
-    lines.append('    return -1;')
-    lines.append('}')
     lines.append('} // namespace circa')
 
 def save(lines, filename):

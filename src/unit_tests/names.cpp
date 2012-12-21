@@ -173,13 +173,6 @@ void type_name_visible_from_module()
     test_equals(test_spy_get_results(), "[{i: 0}]");
 }
 
-void lookup_builtin_name()
-{
-    test_assert(existing_name_from_string("None") == name_None);
-    test_assert(existing_name_from_string("Default") == name_Default);
-    test_assert(existing_name_from_string("tok_Semicolon") == tok_Semicolon);
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(names::find_name);
@@ -189,7 +182,6 @@ void register_tests()
     REGISTER_TEST_CASE(names::search_every_global_name);
     REGISTER_TEST_CASE(names::bug_with_lookup_type_and_qualified_name);
     REGISTER_TEST_CASE(names::type_name_visible_from_module);
-    REGISTER_TEST_CASE(names::lookup_builtin_name);
 }
 
 } // namespace names
