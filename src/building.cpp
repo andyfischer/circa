@@ -6,7 +6,7 @@
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "building.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "function.h"
 #include "heap_debugging.h"
 #include "if_block.h"

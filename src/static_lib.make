@@ -74,7 +74,6 @@ OBJECTS := \
 	$(OBJDIR)/debug.o \
 	$(OBJDIR)/dict.o \
 	$(OBJDIR)/dll_loading.o \
-	$(OBJDIR)/evaluation.o \
 	$(OBJDIR)/fakefs.o \
 	$(OBJDIR)/feedback.o \
 	$(OBJDIR)/file.o \
@@ -88,6 +87,7 @@ OBJECTS := \
 	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing.o \
 	$(OBJDIR)/inspection.o \
+	$(OBJDIR)/interpreter.o \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/loops.o \
@@ -211,9 +211,6 @@ $(OBJDIR)/dict.o: dict.cpp
 $(OBJDIR)/dll_loading.o: dll_loading.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/evaluation.o: evaluation.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/fakefs.o: fakefs.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -251,6 +248,9 @@ $(OBJDIR)/importing.o: importing.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/inspection.o: inspection.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/interpreter.o: interpreter.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/kernel.o: kernel.cpp

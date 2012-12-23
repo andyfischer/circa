@@ -4,7 +4,7 @@
 
 #include "block.h"
 #include "debug.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "file_watch.h"
 #include "inspection.h"
 #include "kernel.h"

@@ -6,7 +6,7 @@
 
 #include "kernel.h"
 #include "importing.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "list.h"
 #include "string_type.h"
 #include "source_repro.h"

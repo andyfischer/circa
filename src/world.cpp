@@ -7,7 +7,7 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "file_watch.h"
 #include "kernel.h"
 #include "inspection.h"

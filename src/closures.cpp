@@ -5,9 +5,9 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
-#include "evaluation.h"
 #include "importing.h"
 #include "inspection.h"
+#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "source_repro.h"
@@ -89,4 +89,4 @@ void closures_install_functions(Block* kernel)
     FUNCS.closure_call = kernel->get("Closure.call");
 }
 
-}
+} // namespace circa

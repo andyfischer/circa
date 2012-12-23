@@ -5,7 +5,7 @@
 #include <cassert>
 
 #include "block.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "inspection.h"
 #include "names_builtin.h"
 

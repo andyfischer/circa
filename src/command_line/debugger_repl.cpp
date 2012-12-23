@@ -1,11 +1,11 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "../common_headers.h"
+#include "common_headers.h"
 
-#include "../block.h"
-#include "../evaluation.h"
-#include "../inspection.h"
-#include "../static_checking.h"
+#include "block.h"
+#include "interpreter.h"
+#include "inspection.h"
+#include "static_checking.h"
 
 namespace circa {
 

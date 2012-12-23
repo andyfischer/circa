@@ -6,7 +6,7 @@
 #include "kernel.h"
 #include "building.h"
 #include "code_iterators.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "function.h"
 #include "inspection.h"
 #include "names.h"

@@ -5,10 +5,10 @@
 #include "block.h"
 #include "building.h"
 #include "debug.h"
-#include "evaluation.h"
 #include "file.h"
 #include "file_watch.h"
 #include "inspection.h"
+#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"
@@ -37,7 +37,6 @@
         #include "linenoise.h"
     }
 #endif
-
 
 namespace circa {
 

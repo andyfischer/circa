@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "evaluation.h"
+#include "interpreter.h"
 #include "function.h"
 #include "type.h"
 #include "tagged_value.h"

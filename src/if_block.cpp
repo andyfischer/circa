@@ -8,7 +8,7 @@
 #include "code_iterators.h"
 #include "kernel.h"
 #include "building.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "importing_macros.h"
 #include "inspection.h"
 #include "stateful_code.h"

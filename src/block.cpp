@@ -9,7 +9,7 @@
 #include "kernel.h"
 #include "code_iterators.h"
 #include "dll_loading.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "file.h"
 #include "function.h"
 #include "hashtable.h"

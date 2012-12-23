@@ -3,7 +3,7 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "function.h"
 #include "heap_debugging.h"
 #include "kernel.h"

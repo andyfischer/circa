@@ -2,7 +2,7 @@
 
 #include "unit_test_common.h"
 
-#include "evaluation.h"
+#include "interpreter.h"
 #include "inspection.h"
 #include "source_repro.h"
 #include "static_checking.h"

@@ -2,7 +2,7 @@
 
 #include "unit_test_common.h"
 
-#include "evaluation.h"
+#include "interpreter.h"
 #include "object.h"
 #include "type.h"
 

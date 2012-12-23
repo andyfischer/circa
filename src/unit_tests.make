@@ -74,7 +74,7 @@ OBJECTS := \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/handle.o \
 	$(OBJDIR)/importing.o \
-	$(OBJDIR)/interpreter.o \
+	$(OBJDIR)/interpreter_test.o \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/migration.o \
 	$(OBJDIR)/modules.o \
@@ -172,7 +172,7 @@ $(OBJDIR)/handle.o: unit_tests/handle.cpp
 $(OBJDIR)/importing.o: unit_tests/importing.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/interpreter.o: unit_tests/interpreter.cpp
+$(OBJDIR)/interpreter_test.o: unit_tests/interpreter_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/main.o: unit_tests/main.cpp

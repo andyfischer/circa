@@ -3,7 +3,7 @@
 #include "unit_test_common.h"
 
 #include "block.h"
-#include "evaluation.h"
+#include "interpreter.h"
 #include "kernel.h"
 #include "fakefs.h"
 #include "function.h"

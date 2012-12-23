@@ -3,7 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
-#include "evaluation.h"
+#include "interpreter.h"
 
 #define CALLER ((Term*) circa_caller_term(_stack))
 #define STACK (_stack)
