@@ -1,5 +1,8 @@
 
 -- Builtin functions
+def convert(any value, Type t) -> any
+    -- Convert the value to the given type, if possible.
+
 def assert(bool condition)
     -- Raises an error if 'condition' is false.
 

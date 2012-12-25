@@ -822,6 +822,16 @@ TokenStream::consumeStr(caValue* output, int match)
     getNextStr(output, 0);
     consume(match);
 }
+void
+TokenStream::consumeAppend(caValue* str)
+{
+    if (!is_string(str))
+        set_string(str, "");
+
+    std::string next = nextStr();
+    string_append(str, next.c_str());
+    consume(-1);
+}
 
 Name
 TokenStream::consumeName(int match)

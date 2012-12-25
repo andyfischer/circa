@@ -425,7 +425,7 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
         // Consume some trailing whitespace
         append_whitespace(result.term, possible_whitespace(tokens));
 
-        // Consume a newline or ; or ,
+        // Consume a newline or ;
         result.term->setStringProp("syntax:lineEnding", possible_statement_ending(tokens));
     }
 
@@ -878,12 +878,24 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Term* accessorOutput = append_output_placeholder(accessorContents, accessorGetIndex);
         change_declared_type(accessorOutput, as_type(fieldType));
 
-        //Term* field = apply(contents, FUNCS.declare_field, TermList(), name_from_string(fieldName));
-        //change_declared_type(field, as_type(fieldType));
-
         accessor->setStringProp("syntax:preWhitespace", preWs);
         accessor->setStringProp("syntax:postNameWs", postNameWs);
-        accessor->setStringProp("syntax:postWhitespace", possible_statement_ending(tokens));
+
+        Value postWhitespace;
+        if (tokens.nextIs(tok_Whitespace))
+            tokens.consumeAppend(&postWhitespace);
+        if (tokens.nextIs(tok_Semicolon))
+            tokens.consumeAppend(&postWhitespace);
+        if (tokens.nextIs(tok_Comma))
+            tokens.consumeAppend(&postWhitespace);
+        if (tokens.nextIs(tok_Whitespace))
+            tokens.consumeAppend(&postWhitespace);
+        if (tokens.nextIs(tok_Newline))
+            tokens.consumeAppend(&postWhitespace);
+
+        if (!is_null(&postWhitespace))
+            accessor->setProp("syntax:postWhitespace", &postWhitespace);
+
         fieldIndex++;
     }
 
@@ -2626,7 +2638,7 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 
 bool is_statement_ending(int t)
 {
-    return t == tok_Comma || t == tok_Semicolon || t == tok_Newline;
+    return t == tok_Semicolon || t == tok_Newline;
 }
 
 std::string possible_statement_ending(TokenStream& tokens)
@@ -2635,7 +2647,7 @@ std::string possible_statement_ending(TokenStream& tokens)
     if (tokens.nextIs(tok_Whitespace))
         result << tokens.consumeStr();
 
-    if (tokens.nextIs(tok_Comma) || tokens.nextIs(tok_Semicolon))
+    if (tokens.nextIs(tok_Semicolon))
         result << tokens.consumeStr();
 
     if (tokens.nextIs(tok_Whitespace))

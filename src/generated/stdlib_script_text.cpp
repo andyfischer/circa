@@ -7,6 +7,9 @@ extern "C" {
 const char* STDLIB_CA_TEXT = 
     "\n"
     "-- Builtin functions\n"
+    "def convert(any value, Type t) -> any\n"
+    "    -- Convert the value to the given type, if possible.\n"
+    "\n"
     "def assert(bool condition)\n"
     "    -- Raises an error if 'condition' is false.\n"
     "\n"
