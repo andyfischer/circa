@@ -24,7 +24,7 @@ assert("abcd".char_at(2) == "c")
 
 -- append
 s = "hello"
-s.append(" there")
+@s.append(" there")
 assert(s == "hello there")
 
 -- characters

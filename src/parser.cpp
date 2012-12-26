@@ -1291,15 +1291,6 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
     if (result.isIdentifier())
         term = apply(block, FUNCS.copy, TermList(term));
 
-#if 0
-    // Apply a pending rebind
-    caValue* pendingRebind = dict_get(list_last(&context->statementStack), "pendingRebind");
-    if (pendingRebind != NULL) {
-        rename(term, name_from_string(as_cstring(pendingRebind)));
-        term->setBoolProp("syntax:implicitName", true);
-    }
-#endif
-
     resolve_rebind_operators_in_inputs(block, term);
 
     set_source_location(term, startPosition, tokens);

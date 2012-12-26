@@ -229,7 +229,7 @@ void Dict__count(caStack* stack)
 
 void Dict__set(caStack* stack)
 {
-    caValue* dict = circa_output(stack, 1);
+    caValue* dict = circa_output(stack, 0);
     copy(circa_input(stack, 0), dict);
 
     const char* key = circa_string_input(stack, 1);

@@ -3,15 +3,15 @@ d = make(Dict)
 print('d = ' d)
 print('d.count = ' d.count)
 
-d.set('a', 1)
+@d.set('a', 1)
 print('d = ' d)
 print('d.count = ' d.count)
 
-d.set('b', 2)
+@d.set('b', 2)
 print('d = ' d)
 print('d.count = ' d.count)
 
-d.set('b', 3)
+@d.set('b', 3)
 print('d = ' d)
 print('d.count = ' d.count)
 

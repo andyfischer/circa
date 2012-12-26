@@ -158,7 +158,7 @@ def unbound_input(any _) -> any
 
 def Dict.count(self) -> int
     -- Return the number of elements
-def Dict.set(@self, String key, any value)
+def Dict.set(self, String key, any value) -> Dict
     -- Assign a key-value pair.
 def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
@@ -326,9 +326,9 @@ def is_overloaded_func(Block block) -> bool
 def overload_get_contents(Block block) -> List
     -- Get a list of all the functions that this overloaded function uses.
 
-def String.append(@self, String right)
-    -- Modify 'self' by appending the given string on the right side.
-    self = concat(self, right)
+def String.append(self, String right) -> String
+    -- Append a string to the right side.
+    concat(self, right)
     
 def String.char_at(self, int index) -> String
 
@@ -728,19 +728,17 @@ def hsv_to_rgb(List hsv) -> Color
 
     return [0 0 0 0]
 
-def Color.lighten(@self, number factor)
-    self = [
-        min(self.r + factor, 1.0)
-        min(self.g + factor, 1.0)
-        min(self.b + factor, 1.0)
-        self.a]
+def Color.lighten(self, number factor) -> Color
+    [ min(self.r + factor, 1.0)
+      min(self.g + factor, 1.0)
+      min(self.b + factor, 1.0)
+      self.a]
         
-def Color.darken(@self, number factor)
-    self = [
-        max(self.r - factor, 0.0)
-        max(self.g - factor, 0.0)
-        max(self.b - factor, 0.0)
-        self.a]
+def Color.darken(self, number factor) -> Color
+    [ max(self.r - factor, 0.0)
+      max(self.g - factor, 0.0)
+      max(self.b - factor, 0.0)
+      self.a]
 
 def delta(number val) -> number
     -- Stateful function, return the difference between this value and the value from
