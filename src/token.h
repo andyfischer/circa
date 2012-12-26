@@ -88,11 +88,8 @@ struct TokenStream
     // Like consume(), but also returns the text of the consumed token.
     std::string consumeStr(int match = -1);
 
-    // Like consume(), but saves the text of the consumed token in a caValue.
+    // Like consume(), but appends the text of the consumed token to a caValue.
     void consumeStr(caValue* output, int match = -1);
-
-    // Consume the next token, and appends the text to the given string.
-    void consumeAppend(caValue* str);
 
     // Like consume(), but registers the string as a runtime symbol.
     Name consumeName(int match = -1);

@@ -820,17 +820,11 @@ TokenStream::consumeStr(int match)
 void
 TokenStream::consumeStr(caValue* output, int match)
 {
-    getNextStr(output, 0);
-    consume(match);
-}
-void
-TokenStream::consumeAppend(caValue* str)
-{
-    if (!is_string(str))
-        set_string(str, "");
+    if (!is_string(output))
+        set_string(output, "");
 
     std::string next = nextStr();
-    string_append(str, next.c_str());
+    string_append(output, next.c_str());
     consume(-1);
 }
 

@@ -342,12 +342,26 @@ void format_name_binding(caValue* source, Term* term)
     else if (has_implicit_name_binding(term))
         return;
     else {
-        append_phrase(source, term->name.c_str(), term, name_None);
-        append_phrase(source, term->stringProp("syntax:preEqualsSpace", " "),
-                term, name_Whitespace);
-        append_phrase(source, "=", term, tok_Equals);
-        append_phrase(source, term->stringProp("syntax:postEqualsSpace", " "),
-                term, name_Whitespace);
+
+        caValue* nameBindingSyntax = term_get_property(term, "syntax:nameBinding");
+
+        if (nameBindingSyntax == NULL) {
+            // Default formatting.
+            append_phrase(source, term->name, term, name_None);
+            append_phrase(source, " ", term, tok_Whitespace);
+            append_phrase(source, "=", term, tok_Equals);
+            append_phrase(source, " ", term, tok_Whitespace);
+        } else {
+            for (int i=0; i < list_length(nameBindingSyntax); i++) {
+                caValue* element = list_get(nameBindingSyntax, i);
+                if (is_int(element)) {
+                    Term* output = get_output_term(term, as_int(element));
+                    append_phrase(source, output->name, term, name_None);
+                } else {
+                    append_phrase(source, as_cstring(element), term, name_None);
+                }
+            }
+        }
     }
 }
 

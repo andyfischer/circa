@@ -543,7 +543,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         copy(&functionName, &typeName);
         methodType = find_name(block, as_cstring(&typeName));
         string_append(&functionName, ".");
-        string_append(&functionName, tokens.consumeStr(tok_Identifier).c_str());
+        tokens.consumeStr(&functionName, tok_Identifier);
 
         if (methodType == NULL || !is_type(methodType))
             return compile_error_for_line(block, tokens, startPosition,
@@ -909,15 +909,15 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         Value postWhitespace;
         if (tokens.nextIs(tok_Whitespace))
-            tokens.consumeAppend(&postWhitespace);
+            tokens.consumeStr(&postWhitespace);
         if (tokens.nextIs(tok_Semicolon))
-            tokens.consumeAppend(&postWhitespace);
+            tokens.consumeStr(&postWhitespace);
         if (tokens.nextIs(tok_Comma))
-            tokens.consumeAppend(&postWhitespace);
+            tokens.consumeStr(&postWhitespace);
         if (tokens.nextIs(tok_Whitespace))
-            tokens.consumeAppend(&postWhitespace);
+            tokens.consumeStr(&postWhitespace);
         if (tokens.nextIs(tok_Newline))
-            tokens.consumeAppend(&postWhitespace);
+            tokens.consumeStr(&postWhitespace);
 
         if (!is_null(&postWhitespace))
             accessor->setProp("syntax:postWhitespace", &postWhitespace);
@@ -1440,44 +1440,78 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
 {
     int startPosition = tokens.getPosition();
 
-    bool hasName = false;
-    std::string nameBinding;
-    std::string preEqualsSpace;
-    std::string postEqualsSpace;
+    bool hasSimpleNameBinding = false;
 
-    // Lookahead for a name binding.
+    // 'nameBindingSyntax' holds a list of strings and integers, for source reproduction.
+    // Each integer in this list corresponds to a name.
+    // For the following syntax:
+    //   a,  b,   c = expression()
+    // the nameBindingSyntax might be equal to:
+    //   [1 ',', '  ', 2, ',', '   ', 3]
+    //   
+    Value nameBindingSyntax;
+    set_list(&nameBindingSyntax, 0);
+
+    // 'names' is a list of name bindings.
+    Value names;
+    set_list(&names, 0);
+
+    // Lookahead for a name binding. (or multiple)
     if (lookahead_match_leading_name_binding(tokens)) {
-        hasName = true;
 
-        nameBinding = tokens.consumeStr(tok_Identifier);
-        preEqualsSpace = possible_whitespace(tokens);
-        tokens.consume(tok_Equals);
-        postEqualsSpace = possible_whitespace(tokens);
+        hasSimpleNameBinding = true;
+
+        for (int nameIndex=0;; nameIndex++) {
+
+            tokens.consumeStr(list_append(&names), tok_Identifier);
+             set_int(list_append(&nameBindingSyntax), nameIndex);
+
+            if (tokens.nextIs(tok_Whitespace))
+                tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
+
+            if (!tokens.nextIs(tok_Comma))
+                break;
+
+            tokens.consumeStr(list_append(&nameBindingSyntax), tok_Comma);
+
+            if (tokens.nextIs(tok_Whitespace))
+                tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
+        }
+        
+        tokens.consumeStr(list_append(&nameBindingSyntax), tok_Equals);
+        if (tokens.nextIs(tok_Whitespace))
+            tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
     }
 
     ParseResult result = expression(block, tokens, context);
     Term* term = result.term;
 
-    if (hasName) {
+    if (hasSimpleNameBinding) {
         // If the term already has a name, then make it a copy. This is the case for a
         // plain renaming, such as:
         //   a = b
-        if (!has_empty_name(term))
+        if (!has_empty_name(term)) {
             term = apply(block, FUNCS.copy, TermList(term));
+            result = ParseResult(term);
+        }
 
-        term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
-        term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
+        term->setProp("syntax:nameBinding", &nameBindingSyntax);
 
-        rename(term, name_from_string(nameBinding));
+        //rename(term, name_from_string(as_cstring(list_get(&names, 0))));
+
+        for (int i=0; i < list_length(&names); i++) {
+            Term* output = get_output_term(term, i);
+            ca_assert(output != NULL);
+            rename(output, name_from_string(as_cstring(list_get(&names, i))));
+        }
         set_source_location(term, startPosition, tokens);
-        result = ParseResult(term);
     }
     
     // Check for <complicated selector> = <expression> syntax.
-    else if (!hasName && lookahead_match_equals(tokens)) {
-        preEqualsSpace = possible_whitespace(tokens);
+    else if (lookahead_match_equals(tokens)) {
+        std::string preEqualsSpace = possible_whitespace(tokens);
         tokens.consume(tok_Equals);
-        postEqualsSpace = possible_whitespace(tokens);
+        std::string postEqualsSpace = possible_whitespace(tokens);
 
         Term* right = expression(block, tokens, context).term;
 

@@ -21,11 +21,6 @@ static ExitRank get_exit_level_rank(Name level);
 static Name max_exit_level(Name left, Name right);
 static Name get_highest_exit_level(Block* block);
 
-void evaluate_return(caStack* stack)
-{
-    copy(circa_input(stack, 0), circa_output(stack, 0));
-}
-
 static ExitRank get_exit_level_rank(Name level)
 {
     if (level == name_Return)
@@ -109,8 +104,9 @@ void control_flow_setup_funcs(Block* kernel)
 
     FUNCS.exit_point = import_function(kernel, NULL, "exit_point(any outs :multiple :optional)");
 
-    FUNCS.return_func = import_function(kernel, evaluate_return,
-        "return(any outs :optional) -> any");
+    FUNCS.return_func = import_function(kernel, NULL,
+        "return(any outs :multiple :optional) -> any");
+    block_set_evaluation_empty(function_contents(FUNCS.return_func), true);
     as_function(FUNCS.return_func)->formatSource = return_formatSource;
     as_function(FUNCS.return_func)->postCompile = controlFlow_postCompile;
 
@@ -229,7 +225,8 @@ Name find_highest_escaping_exit_level(Term* term)
 void force_term_to_output_to_parent(Term* term)
 {
     Block* block = term->owningBlock;
-    ca_assert(term->name != "");
+    if (term->name == "")
+        return;
 
     // If this term is inside an if-block, then add it as a block output.
     if (is_case_block(block)) {
@@ -262,14 +259,20 @@ void update_exit_points(Block* block)
         Term* term = it.current();
 
         if (term->name == "#return" && !is_output_placeholder(term)) {
-            force_term_to_output_to_parent(term);
+            for (int outputIndex=0; outputIndex < term->numInputs(); outputIndex++) {
+                Term* returnValue = term->input(outputIndex);
+                if (returnValue == NULL)
+                    continue;
 
-            // If this is a subroutine, make sure that the primary output is properly
-            // connected.
-            if (is_major_block(block)) {
-                Term* output = get_output_placeholder(block, 0);
-                if (output != NULL) {
-                    set_input(output, 0, term);
+                force_term_to_output_to_parent(returnValue);
+
+                // If this is a subroutine, make sure that the primary output is properly
+                // connected.
+                if (is_major_block(block)) {
+                    Term* output = get_output_placeholder(block, outputIndex);
+                    if (output != NULL) {
+                        set_input(output, 0, returnValue);
+                    }
                 }
             }
         }
