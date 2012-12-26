@@ -2,8 +2,9 @@
 
 #include "common_headers.h"
 
-#include "string_type.h"
+#include "debug.h"
 #include "names.h"
+#include "string_type.h"
 #include "tagged_value.h"
 #include "token.h"
 
@@ -750,10 +751,10 @@ TokenStream::next(int lookahead) const
     int i = this->_position + lookahead;
 
     if (i >= (int) tokens.size())
-        throw std::runtime_error("index out of bounds");
+        internal_error("in TokenStream::next, index out of bounds");
 
     if (i < 0)
-        throw std::runtime_error("index < 0");
+        internal_error("in Tokenstream::next, index < 0");
 
     return tokens[i];
 }
@@ -794,7 +795,7 @@ void
 TokenStream::consume(int match)
 {
     if (finished())
-        throw std::runtime_error(std::string("Unexpected EOF while looking for ")
+        internal_error(std::string("Unexpected EOF while looking for ")
                 + get_token_text(match));
 
     if ((match != -1) && next().match != match) {
@@ -802,7 +803,7 @@ TokenStream::consume(int match)
         msg << "Unexpected token (expected " << get_token_text(match)
             << ", found " << get_token_text(next().match)
             << " '" << nextStr() << "')";
-        throw std::runtime_error(msg.str());
+        internal_error(msg.str());
     }
 
     _position++;

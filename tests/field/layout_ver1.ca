@@ -14,6 +14,14 @@ type Layout {
     int cursor
 }
 
+def first_name(any val) -> String
+    if type(val) == String
+        val
+    elif type(val) == List
+        if length(val) > 0
+            first_name(val[0])
+
+
 def start(Point size) -> Layout
     layout = make(Layout)
     layout.size = size

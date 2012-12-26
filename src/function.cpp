@@ -385,16 +385,45 @@ void function_format_header_source(caValue* source, Block* function)
     append_phrase(source, ")", term, tok_LParen);
 
     if (term->boolProp("syntax:explicitType", false)) {
-        Term* primaryOutput = get_output_placeholder(function, 0);
         append_phrase(source, term->stringProp("syntax:whitespacePreColon", ""),
                 term, tok_Whitespace);
         append_phrase(source, "->", term, name_None);
         append_phrase(source, term->stringProp("syntax:whitespacePostColon", ""),
                 term, tok_Whitespace);
-        append_phrase(source,
-            as_cstring(&primaryOutput->type->name),
-            primaryOutput->type->declaringTerm,
-            name_TypeName);
+
+        int unhiddenOutputCount = 0;
+
+        for (int i=0;; i++) {
+            Term* output = get_output_placeholder(function, i);
+            if (output == NULL)
+                break;
+            if (is_hidden(output))
+                continue;
+            unhiddenOutputCount++;
+        }
+
+        bool multiOutputSyntax = unhiddenOutputCount > 1;
+
+        if (multiOutputSyntax)
+            append_phrase(source, "(", term, name_None);
+
+        for (int i=0;; i++) {
+
+            Term* output = get_output_placeholder(function, i);
+            if (output == NULL)
+                break;
+            if (is_hidden(output))
+                continue;
+
+            if (i > 0)
+                append_phrase(source, ", ", term, name_None);
+
+            append_phrase(source, as_cstring(&output->type->name),
+                output->type->declaringTerm, name_TypeName);
+        }
+
+        if (multiOutputSyntax)
+            append_phrase(source, ")", term, name_None);
     }
 }
 

@@ -24,7 +24,11 @@ def hi() { if true { return 1 } else { return 2 } }
 def my_func(int _ :multiple) -> int {}
 
 def f(int i) -> int;
-def f(int i :out) -> int;
+
+-- multi outputs
+def f() -> (int, int)
+def f() -> (String, int, number)
+
 def f(int i :meta) -> int;
 
 def f() { return 1; }

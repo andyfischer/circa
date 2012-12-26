@@ -8,7 +8,7 @@ type A {
 def A.blah(self) -> String
     return "A.blah"
 
-def A.modify(self :out)
+def A.increment(self)
     self.x += 1
 
 type B {
@@ -17,7 +17,7 @@ type B {
 def B.blah(self) -> String
     return "B.blah"
 
-def B.modify(self :out)
+def B.increment(self)
     self.x += 2
 
 call_blah(make(A))
@@ -56,12 +56,12 @@ call_blah3(b, 22)
 
 -- Test modifying the target object
 
-def call_modify(any a :out) -> any
-    a.@modify
+def call_increment(any a) -> any
+    @a.increment
 
 a = make(A)
 b = make(B)
-call_modify(&a)
-call_modify(&b)
+call_increment(@a)
+call_increment(@b)
 print(a)
 print(b)

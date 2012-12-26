@@ -27,13 +27,6 @@ def changed(any current) -> bool
     prev = current
     return result
 
-def first_name(any val) -> String
-    if type(val) == String
-        val
-    elif type(val) == List
-        if length(val) > 0
-            first_name(val[0])
-
 def dynamic_call(Block block, List inputs) -> List
     -- Dynamic function dispatch
 
@@ -90,6 +83,16 @@ namespace sys
     def module_search_paths() -> List
     def perf_stats_reset()
     def perf_stats_dump() -> List
+
+-- Builtin types
+type Actor { String name, String moduleName, List incomingQueue, any stateVal }
+type FileSignature { String filename, int time_modified }
+type Callable;
+type Color { number r, number g, number b, number a }
+type Point { number x, number y }
+type Point_i { int x, int y }
+type Rect { number x1, number y1, number x2, number y2 }
+type Rect_i { int x1 int y1 int x2 int y2 }
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block
@@ -436,16 +439,6 @@ def Block.get_top_comments(self) -> List
             break
 
     return out
-
--- Builtin types
-type Actor { String name, String moduleName, List incomingQueue, any stateVal }
-type FileSignature { String filename, int time_modified }
-type Callable;
-type Color { number r, number g, number b, number a }
-type Point { number x, number y }
-type Point_i { int x, int y }
-type Rect { number x1, number y1, number x2, number y2 }
-type Rect_i { int x1 int y1 int x2 int y2 }
 
 def Point.magnitude(self) -> number
     -- Return the magnitude of this point, or the distance to [0 0].

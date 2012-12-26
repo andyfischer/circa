@@ -717,38 +717,64 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
     }
 
-    // Output type
-    Type* outputType = NULL;
-
-    bool specificOutputType = false;
-
-    if (tok_RightArrow == lookahead_next_non_whitespace(tokens, false)) {
+    // Output arguments.
+    if (tok_RightArrow != lookahead_next_non_whitespace(tokens, false)) {
+        // No output type specified.
+        append_output_placeholder(contents, NULL);
+    } else {
         result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));
         tokens.consume(tok_RightArrow);
         result->setBoolProp("syntax:explicitType", true);
         result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
 
-        Term* typeTerm = type_expr(block, tokens, context).term;
-        ca_assert(typeTerm != NULL);
+        bool expectMultiple = false;
+        
+        if (tokens.nextIs(tok_LParen)) {
+            tokens.consume(tok_LParen);
+            expectMultiple = true;
+        }
 
-        if (!is_type(typeTerm))
-            return compile_error_for_line(result, tokens, startPosition,
-                    typeTerm->name +" is not a type");
+consume_next_output: {
+            if (!tokens.nextIs(tok_Identifier)) {
+                return compile_error_for_line(result, tokens, startPosition,
+                        "Expected type name after ->");
+            }
 
-        outputType = unbox_type(typeTerm);
-        specificOutputType = true;
-    } else {
-        // No output type specified.
-        outputType = TYPES.void_type;
+            std::string typeName = tokens.consumeStr();
+            Term* typeTerm = find_name(block, typeName.c_str(), -1, name_LookupType);
+
+            if (typeTerm == NULL) {
+                std::string msg;
+                msg += "Couldn't find type named: ";
+                msg += typeName;
+                return compile_error_for_line(result, tokens, startPosition, msg);
+            }
+
+            if (!is_type(typeTerm)) {
+                return compile_error_for_line(result, tokens, startPosition,
+                        typeTerm->name +" is not a type");
+            }
+
+            Term* output = append_output_placeholder(contents, NULL);
+            change_declared_type(output, unbox_type(typeTerm));
+
+            if (expectMultiple && lookahead_next_non_whitespace(tokens, false) == tok_Comma) {
+                tokens.consume(tok_Comma);
+                possible_whitespace(tokens);
+                goto consume_next_output;
+            }
+        }
+
+        if (expectMultiple) {
+            if (!tokens.nextIs(tok_RParen))
+                return compile_error_for_line(result, tokens, startPosition,
+                    "Expected ')'");
+            tokens.consume(tok_RParen);
+        }
     }
 
     ca_assert(is_value(result));
     ca_assert(is_function(result));
-
-    // Create the primary output placeholder
-    Term* primaryOutput = append_output_placeholder(contents, NULL);
-    if (specificOutputType)
-        change_declared_type(primaryOutput, outputType);
 
     // Consume contents, if there are still tokens left. It's okay to reach EOF here (this
     // behavior is used when declaring some builtins).
@@ -1329,17 +1355,27 @@ ParseResult return_statement(Block* block, TokenStream& tokens, ParserCxt* conte
     tokens.consume(tok_Return);
     std::string postKeywordWs = possible_whitespace(tokens);
 
-    Term* output = NULL;
+    TermList outputs;
 
-    bool returnsValue = !is_statement_ending(tokens.next().match) &&
-        tokens.next().match != tok_RBrace;
+consume_next_output:
+    if (!is_statement_ending(tokens.next().match) &&
+            tokens.next().match != tok_RBrace) {
 
-    if (returnsValue)
-        output = expression(block, tokens, context).term;
+        outputs.append(expression(block, tokens, context).term);
+
+        if (tokens.nextIs(tok_Comma)) {
+            tokens.consume(tok_Comma);
+            possible_whitespace(tokens);
+            goto consume_next_output;
+        }
+    }
+
+    if (outputs.length() == 0)
+        outputs.append(NULL);
 
     block_add_pack_state(block);
 
-    Term* result = apply(block, FUNCS.return_func, TermList(output));
+    Term* result = apply(block, FUNCS.return_func, outputs);
 
     if (postKeywordWs != " ")
         result->setStringProp("syntax:postKeywordWs", postKeywordWs);
@@ -1423,8 +1459,9 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
     Term* term = result.term;
 
     if (hasName) {
-        // If the term already has a name (this is the case for method syntax
-        // and for unknown_identifier), then make a copy.
+        // If the term already has a name, then make it a copy. This is the case for a
+        // plain renaming, such as:
+        //   a = b
         if (!has_empty_name(term))
             term = apply(block, FUNCS.copy, TermList(term));
 
@@ -2003,14 +2040,25 @@ static bool lookahead_match_equals(TokenStream& tokens)
 static bool lookahead_match_leading_name_binding(TokenStream& tokens)
 {
     int lookahead = 0;
+
+expect_identifier:
+    
     if (!tokens.nextIs(tok_Identifier, lookahead))
         return false;
     lookahead++;
+
     if (tokens.nextIs(tok_Whitespace, lookahead))
         lookahead++;
+
+    if (tokens.nextIs(tok_Comma, lookahead)) {
+        lookahead++;
+        goto expect_identifier;
+    }
+
     if (!tokens.nextIs(tok_Equals, lookahead))
         return false;
     lookahead++;
+
     return true;
 }
 

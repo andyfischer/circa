@@ -93,8 +93,11 @@ void return_formatSource(caValue* source, Term* term)
                 term->stringProp("syntax:postKeywordWs", " "),
                 term, name_Whitespace);
 
-        if (term->input(0) != NULL)
-            format_source_for_input(source, term, 0, "", "");
+        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            if (inputIndex != 0)
+                append_phrase(source, ", ", term, name_None);
+            format_source_for_input(source, term, inputIndex, "", "");
+        }
     } else {
         format_term_source_default_formatting(source, term);
     }

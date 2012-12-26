@@ -43,27 +43,3 @@ assert(t.t.t.t.list == [])
 @t.t.t.t.list.append(10)
 assert(t.t.t.t.list == [10])
 assert(to_string(t) == "{t: {t: {t: {list: [10]}}}}")
-
--- Rebinding method that returns a value
-type Object3
-{
-    int i
-}
-
-def Object3.swap(self :out, int i) -> int
-  old = self.i
-  self.i = i
-  return old
-    
-
-o = make(Object3)
-assert(to_string(o) == "{i: 0}")
-result = o.swap(5)
-assert(result == 0)
-assert(to_string(o) == "{i: 5}")
-result = o.swap(10)
-assert(result == 5)
-assert(to_string(o) == "{i: 10}")
-result = o.swap(123)
-assert(result == 10)
-assert(to_string(o) == "{i: 123}")
