@@ -351,6 +351,21 @@ int string_length(caValue* s)
     return string_length((StringData*) s->value_data.ptr);
 }
 
+void string_prepend(caValue* result, caValue* prefix)
+{
+    Value output;
+    copy(prefix, &output);
+    string_append(&output, result);
+    move(&output, result);
+}
+void string_prepend(caValue* result, const char* prefix)
+{
+    Value output;
+    set_string(&output, prefix);
+    string_append(&output, result);
+    move(&output, result);
+}
+
 void string_slice(caValue* s, int start, int end, caValue* out)
 {
     // TODO: This func could be improved to work correctly when 's' is the same object

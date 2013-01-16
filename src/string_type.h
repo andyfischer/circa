@@ -30,6 +30,8 @@ bool string_ends_with(caValue* s, const char* str);
 void string_remove_suffix(caValue* s, const char* str);
 char string_get(caValue* s, int index);
 int string_length(caValue* s);
+void string_prepend(caValue* result, caValue* prefix);
+void string_prepend(caValue* result, const char* prefix);
 void string_slice(caValue* s, int start, int end, caValue* out);
 int string_find_char(caValue* s, int start, char c);
 int string_find_char_from_end(caValue* s, char c);
