@@ -101,6 +101,7 @@ bool is_number(caValue* value);
 bool is_opaque_pointer(caValue* value);
 bool is_ref(caValue* value);
 bool is_string(caValue* value);
+bool is_symbol(caValue* value);
 bool is_type(caValue* value);
 
 // Unboxing using builtin types.
@@ -110,6 +111,7 @@ const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
 Function*   as_function(caValue* value);
 int         as_int(caValue* value);
+Symbol      as_symbol(caValue* value);
 void*       as_opaque_pointer(caValue* value);
 Type*       as_type(caValue* value);
 
@@ -125,6 +127,7 @@ caValue* set_list(caValue* value, int size);
 void set_opaque_pointer(caValue* value, void* addr);
 void set_string(caValue* value, const char* s);
 void set_string(caValue* value, std::string const& s);
+void set_symbol(caValue* value, Symbol val);
 void set_type(caValue* value, Type* type);
 void set_function(caValue* value, Function* function);
 
@@ -132,6 +135,9 @@ void set_function(caValue* value, Function* function);
 float to_float(caValue* value);
 int to_int(caValue* value);
 
-caValue* first_string(caValue* value);
+// If the value is a name, return it. If it's a value and the first element is a name,
+// then return that. Will recursively search if the first element is itself a list.
+// Returns name_None if a name value was not found.
+Symbol first_name(caValue* value);
 
 } // namespace circa

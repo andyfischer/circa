@@ -255,10 +255,7 @@ caFunction* circa_declare_function(caBlock* block, const char* name)
 
 caValue* circa_declare_value(caBlock* block, const char* name)
 {
-    std::string nameStr;
-    if (name != NULL)
-        nameStr = name;
-    Term* term = create_value((Block*) block, TYPES.any, nameStr);
+    Term* term = create_value((Block*) block, TYPES.any, name);
     return term_value(term);
 }
 

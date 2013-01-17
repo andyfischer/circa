@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
                    circa_set_list(msgs, 1);
                    caValue* redrawMsg = circa_index(msgs, 0);
                    circa_set_list(redrawMsg, 2);
-                   circa_set_name(circa_index(redrawMsg, 0), circa_to_name("redraw"));
+                   circa_set_symbol(circa_index(redrawMsg, 0), circa_to_name("redraw"));
                   
                    circa_make(circa_index(redrawMsg, 1), circa_find_type(g_world, "RenderList"));
                    circa_handle_set_object(circa_index(redrawMsg, 1), &renderList);

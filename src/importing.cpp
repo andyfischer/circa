@@ -35,9 +35,9 @@ void install_function(Term* function, EvaluateFunc evaluate)
 
 Term* install_function(Block* block, const char* name, EvaluateFunc evaluate)
 {
-    Term* term = find_name(block, name_from_string(name));
+    Term* term = find_name(block, name);
     if (term == NULL) {
-        std::string msg = "Name not found in install_function: ";
+        std::string msg = "Symbol not found in install_function: ";
         msg += name;
         internal_error(msg.c_str());
     }

@@ -3,7 +3,7 @@
 type Node {
     int parent
     List children
-    String strategy
+    Symbol strategy
     Map props
     any data
 }
@@ -34,7 +34,7 @@ def start(Point size) -> Layout
 
     layout
 
-def Node.setStrategy(@self, String strategy)
+def Node.setStrategy(@self, Symbol strategy)
     self.nodes[self.cursor].strategy = strategy
 
 def Layout.addNode(self, int cursor, data) -> Layout
@@ -99,8 +99,8 @@ def Layout.getRects(self) -> List
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)
 
-    x_ranges = self.solveDim(:width)
-    y_ranges = self.solveDim(:height)
+    x_ranges = self.solveDim('width')
+    y_ranges = self.solveDim('height')
 
     for node in self.nodes
         x_range = x_ranges[index()]
@@ -115,8 +115,8 @@ def Layout.getRects(self) -> List
 layout = start([100 100])
 
 @layout.addNode(layout.cursor, 1)
-@layout.setProp(:width, [:percent 100])
-@layout.setProp(:height, [:percent 100])
+@layout.setProp('width', [:percent 100])
+@layout.setProp('height', [:percent 100])
 
 assert(layout.getRects ==
     [[0 0 100 100] [0 0 100 100]])
@@ -126,12 +126,12 @@ layout = start([100 100])
 root = layout.cursor
 
 @layout.addNode(root, 1)
-@layout.setProp(:width, [:percent 25])
-@layout.setProp(:height, [:percent 75])
+@layout.setProp('width', [:percent 25])
+@layout.setProp('height', [:percent 75])
 
 @layout.addNode(root, 2)
-@layout.setProp(:width, [:percent 75])
-@layout.setProp(:height, [:percent 25])
+@layout.setProp('width', [:percent 75])
+@layout.setProp('height', [:percent 25])
 
 assert(layout.getRects ==
     [[0 0 100 100] [0 0 25 75] [25 75 100 100]])

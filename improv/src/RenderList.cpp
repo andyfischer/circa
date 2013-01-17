@@ -96,9 +96,9 @@ RenderList::submitFrame()
     // Run incoming commands
     for (size_t commandIndex=0; commandIndex < circa_count(&incomingCommands); commandIndex++) {
         caValue* command = circa_index(&incomingCommands, (int) commandIndex);
-        caName commandName = circa_name(circa_index(command, 0));
+        caSymbol commandSymbol = circa_name(circa_index(command, 0));
 
-        if (commandName == name_textSprite) {
+        if (commandSymbol == name_textSprite) {
             // Draw a text label
             switchProgram(&textProgram);
 
@@ -113,7 +113,7 @@ RenderList::submitFrame()
 
             // Handle extra arguments
             for (int i=0; i < circa_count(args); i++) {
-                caName name = circa_first_name(circa_index(args, i));
+                caSymbol name = circa_first_name(circa_index(args, i));
                 if (name == name_AlignHCenter) {
                     posX -= texture->width() / 2;
                 } else if (name == name_AlignVCenter) {
@@ -124,7 +124,7 @@ RenderList::submitFrame()
             TextVbo_Update(textVbo, texture, posX, posY);
             TextVbo_Render(textVbo, currentProgram, texture, color);
 
-        } else if (commandName == name_rect) {
+        } else if (commandSymbol == name_rect) {
             // Draw a solid rectangle
             switchProgram(&geomProgram);
             caValue* pos = circa_index(command, 1);
@@ -134,7 +134,7 @@ RenderList::submitFrame()
 
             Rect_Update(geomVbo, x1, y1, x2, y2);
             Rect_Render(geomVbo, currentProgram, color);
-        } else if (commandName == name_lines) {
+        } else if (commandSymbol == name_lines) {
             // Draw a list of lines.
             switchProgram(&geomProgram);
             caValue* points = circa_index(command, 1);
@@ -143,7 +143,7 @@ RenderList::submitFrame()
 
             Lines_Update(geomVbo, points);
             Lines_Render(geomVbo, currentProgram, count, color);
-        } else if (commandName == name_polygon) {
+        } else if (commandSymbol == name_polygon) {
             // Triangulate and draw an N-gon.
             switchProgram(&geomProgram);
             caValue* points = circa_index(command, 1);

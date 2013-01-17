@@ -34,7 +34,7 @@ def ConstraintSet.getKnowledge(@self, Term term) -> any
         null
 
 type Desire {
-    Name name
+    Symbol name
     List args
 }
 
@@ -45,12 +45,12 @@ type Request {
 }
 
 type Failure {
-    Name name
+    Symbol name
     List args
 }
 
 type ChangeOperation {
-    Name name
+    Symbol name
     List args
 }
 

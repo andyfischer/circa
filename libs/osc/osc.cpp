@@ -37,8 +37,8 @@ void AddressRelease(caValue* value)
     lo_address_free((lo_address) as_opaque_pointer(value));
 }
 
-Name name_Server = name_from_string("Server");
-Name name_Address = name_from_string("Address");
+Symbol name_Server = name_from_string("Server");
+Symbol name_Address = name_from_string("Address");
 
 void error_callback(int num, const char *m, const char *path)
 {

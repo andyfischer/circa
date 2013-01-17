@@ -8,6 +8,7 @@
 #include "kernel.h"
 #include "heap_debugging.h"
 #include "if_block.h"
+#include "inspection.h"
 #include "names_builtin.h"
 #include "source_repro.h"
 #include "string_type.h"
@@ -18,30 +19,13 @@
 
 namespace circa {
 
-struct RuntimeName
-{
-    // A RuntimeName is a name created dynamically at runtime (as opposed to a builtin
-    // name, which is predeclared in names_builtin.h).
-
-    char* str;
-    Name namespaceFirst;
-    Name namespaceRightRemainder;
-};
-
-const int c_FirstRuntimeName = name_LastBuiltinName + 1;
-const int c_maxRuntimeNames = 2000;
-
-RuntimeName g_runtimeNames[c_maxRuntimeNames];
-int g_nextFreeNameIndex = 0;
-std::map<std::string,Name> g_stringToSymbol;
-
 // run_name_search: takes a NameSearch object and actually performs the search.
 // There are many variations of find_name and find_local_name which all just wrap
 // around this function.
 Term* run_name_search(NameSearch* params);
 bool exposes_nested_names(Term* term);
 
-bool fits_lookup_type(Term* term, Name type)
+bool fits_lookup_type(Term* term, Symbol type)
 {
     switch (type) {
         case name_LookupAny:
@@ -59,7 +43,7 @@ bool fits_lookup_type(Term* term, Name type)
 
 Term* run_name_search(NameSearch* params)
 {
-    if (params->name == 0)
+    if (is_null(&params->name) || string_eq(&params->name, ""))
         return NULL;
 
     Block* block = params->block;
@@ -81,7 +65,7 @@ Term* run_name_search(NameSearch* params)
         if (term == NULL)
             continue;
 
-        if (term->nameSymbol == params->name
+        if (equals(&term->nameValue, &params->name)
                 && fits_lookup_type(term, params->lookupType)
                 && (params->ordinal == -1 || term->uniqueOrdinal == params->ordinal))
             return term;
@@ -102,10 +86,11 @@ Term* run_name_search(NameSearch* params)
     }
 
     // Check if the name is a qualified name.
-    Name namespacePrefix = qualified_name_get_first_section(params->name);
+    Value namespacePrefix;
+    qualified_name_get_first_section(&params->name, &namespacePrefix);
 
     // If it's a qualified name, search for the first prefix.
-    if (namespacePrefix != name_None) {
+    if (!is_null(&namespacePrefix)) {
         NameSearch nsSearch;
         nsSearch.block = params->block;
         nsSearch.name = namespacePrefix;
@@ -119,7 +104,7 @@ Term* run_name_search(NameSearch* params)
             // Recursively search inside the prefix for the remainder of the name.
             NameSearch nestedSearch;
             nestedSearch.block = nested_contents(nsPrefixTerm);
-            nestedSearch.name = qualified_name_get_remainder_after_first_section(params->name);
+            qualified_name_get_remainder_after_first_section(&params->name, &nestedSearch.name);
             nestedSearch.position = -1;
             nestedSearch.ordinal = params->ordinal;
             nestedSearch.lookupType = params->lookupType;
@@ -166,6 +151,7 @@ Term* run_name_search(NameSearch* params)
             parentSearch.block = global_root_block();
             parentSearch.position = -1;
         }
+        copy(&params->name, &parentSearch.name);
         parentSearch.name = params->name;
         parentSearch.lookupType = params->lookupType;
         parentSearch.ordinal = -1;
@@ -176,11 +162,11 @@ Term* run_name_search(NameSearch* params)
     return NULL;
 }
 
-Term* find_name(Block* block, Name name, int position, Name lookupType)
+Term* find_name(Block* block, caValue* name, int position, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
-    nameSearch.name = name;
+    copy(name, &nameSearch.name);
     nameSearch.position = position;
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
@@ -188,11 +174,11 @@ Term* find_name(Block* block, Name name, int position, Name lookupType)
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Block* block, Name name, int position, Name lookupType)
+Term* find_local_name(Block* block, caValue* name, int position, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
-    nameSearch.name = name;
+    copy(name, &nameSearch.name);
     nameSearch.position = position;
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
@@ -200,15 +186,11 @@ Term* find_local_name(Block* block, Name name, int position, Name lookupType)
     return run_name_search(&nameSearch);
 }
 
-Term* find_name(Block* block, const char* nameStr, int position, Name lookupType)
+Term* find_name(Block* block, const char* nameStr, int position, Symbol lookupType)
 {
-    Name name = name_from_string(nameStr);
-    if (name == name_None)
-        return NULL;
-
     NameSearch nameSearch;
     nameSearch.block = block;
-    nameSearch.name = name;
+    set_string(&nameSearch.name, nameStr);
     nameSearch.position = position;
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
@@ -216,15 +198,11 @@ Term* find_name(Block* block, const char* nameStr, int position, Name lookupType
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Block* block, const char* nameStr, int position, Name lookupType)
+Term* find_local_name(Block* block, const char* nameStr, int position, Symbol lookupType)
 {
-    Name name = name_from_string(nameStr);
-    if (name == name_None)
-        return NULL;
-
     NameSearch nameSearch;
     nameSearch.block = block;
-    nameSearch.name = name;
+    set_string(&nameSearch.name, nameStr);
     nameSearch.position = position;
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
@@ -251,7 +229,7 @@ void get_global_name(Term* term, caValue* nameOut)
             // Parent is NULL but we haven't yet reached the global root. This is
             // a deprecated style of block that isn't connected to root. No global
             // name is possible.
-            set_null(nameOut);
+            set_symbol(nameOut, name_None);
             return;
         }
     }
@@ -262,12 +240,12 @@ void get_global_name(Term* term, caValue* nameOut)
         Term* subTerm = stack[i];
 
         // If this term has no name then we can't construct a global name. Bail out.
-        if (subTerm->nameSymbol == name_None) {
-            set_null(nameOut);
+        if (has_empty_name(subTerm)) {
+            set_symbol(nameOut, name_None);
             return;
         }
 
-        string_append(nameOut, name_to_string(subTerm->nameSymbol));
+        string_append(nameOut, &subTerm->nameValue);
 
         if (subTerm->uniqueOrdinal != 0) {
             string_append(nameOut, "#");
@@ -288,21 +266,24 @@ void get_global_name(Block* block, caValue* nameOut)
     get_global_name(block->owningTerm, nameOut);
 }
 
-Term* find_from_global_name(World* world, const char* globalName)
+Term* find_from_global_name(World* world, const char* globalNameStr)
 {
     Block* block = world->root;
 
     // Loop, walking down the (possibly) qualified name.
     for (int step=0;; step++) {
 
+        Value globalName;
+        set_string(&globalName, globalNameStr);
+
         ca_assert(block != NULL);
 
-        int separatorPos = name_find_qualified_separator(globalName);
+        int separatorPos = name_find_qualified_separator(globalNameStr);
         int nameEnd = separatorPos;
-        int ordinal = name_find_ordinal_suffix(globalName, &nameEnd);
+        int ordinal = name_find_ordinal_suffix(globalNameStr, &nameEnd);
 
         NameSearch nameSearch;
-        nameSearch.name = existing_name_from_string(globalName, nameEnd);
+        string_slice(&globalName, 0, nameEnd, &nameSearch.name);
         nameSearch.block = block;
         nameSearch.position = -1;
         nameSearch.ordinal = ordinal;
@@ -320,20 +301,16 @@ Term* find_from_global_name(World* world, const char* globalName)
             return foundTerm;
 
         // Otherwise, continue the search.
-        globalName = globalName + separatorPos + 1;
+        globalNameStr = globalNameStr + separatorPos + 1;
         block = nested_contents(foundTerm);
     }
 }
 
-Term* find_name_at(Term* term, const char* nameStr)
+Term* find_name_at(Term* term, const char* name)
 {
-    Name name = name_from_string(nameStr);
-    if (name == name_None)
-        return NULL;
-
     NameSearch nameSearch;
     nameSearch.block = term->owningBlock;
-    nameSearch.name = name;
+    set_string(&nameSearch.name, name);
     nameSearch.position = term->index;
     nameSearch.ordinal = -1;
     nameSearch.lookupType = name_LookupAny;
@@ -341,11 +318,11 @@ Term* find_name_at(Term* term, const char* nameStr)
     return run_name_search(&nameSearch);
 }
 
-Term* find_name_at(Term* term, Name name)
+Term* find_name_at(Term* term, caValue* name)
 {
     NameSearch nameSearch;
     nameSearch.block = term->owningBlock;
-    nameSearch.name = name;
+    copy(name, &nameSearch.name);
     nameSearch.position = term->index;
     nameSearch.ordinal = -1;
     nameSearch.lookupType = name_LookupAny;
@@ -420,11 +397,7 @@ bool exposes_nested_names(Term* term)
 
 Term* find_global(const char* nameStr)
 {
-    Name name = name_from_string(nameStr);
-    if (name == name_None)
-        return NULL;
-
-    return find_name(global_root_block(), name);
+    return find_name(global_root_block(), nameStr);
 }
 
 Block* get_parent_block(Block* block)
@@ -731,58 +704,31 @@ Block* find_module(World* world, const char* name)
     return nested_contents(term);
 }
 
-bool name_is_valid(Name name)
+void qualified_name_get_first_section(caValue* name, caValue* prefixResult)
 {
-    if (name < 0)
-        return false;
-
-    const char* builtin = builtin_name_to_string(name);
-    if (builtin != NULL)
-        return true;
-
-    int runtimeIndex = name - c_FirstRuntimeName;
-    if (runtimeIndex < 0 || runtimeIndex >= g_nextFreeNameIndex)
-        return false;
-
-    return true;
+    int len = string_length(name);
+    for (int i=0; i < len; i++) {
+        if (string_get(name, i) == ':') {
+            string_slice(name, 0, i, prefixResult);
+            return;
+        }
+    }
+    set_null(prefixResult);
+}
+void qualified_name_get_remainder_after_first_section(caValue* name, caValue* suffixResult)
+{
+    int len = string_length(name);
+    for (int i=0; i < len; i++) {
+        if (string_get(name, i) == ':') {
+            string_slice(name, i + 1, -1, suffixResult);
+            return;
+        }
+    }
+    set_null(suffixResult);
 }
 
-const char* name_to_string(Name name)
-{
-    const char* builtin = builtin_name_to_string(name);
-    if (builtin != NULL)
-        return builtin;
-
-    // Runtime symbols
-    if (name >= c_FirstRuntimeName)
-        return g_runtimeNames[name - c_FirstRuntimeName].str;
-
-    internal_error("Unknown name in name_to_string");
-    return "";
-}
-
-void name_to_string(Name name, String* string)
-{
-    set_string((caValue*) string, name_to_string(name));
-}
-
-Name qualified_name_get_first_section(Name name)
-{
-    if (name < c_FirstRuntimeName)
-        return 0;
-    else
-        return g_runtimeNames[name - c_FirstRuntimeName].namespaceFirst;
-}
-
-Name qualified_name_get_remainder_after_first_section(Name name)
-{
-    if (name < c_FirstRuntimeName)
-        return 0;
-    else
-        return g_runtimeNames[name - c_FirstRuntimeName].namespaceRightRemainder;
-}
-
-Name existing_name_from_string(const char* str)
+#if 0
+Symbol existing_name_from_string(const char* str)
 {
     INCREMENT_STAT(InternedNameLookup);
 
@@ -794,7 +740,7 @@ Name existing_name_from_string(const char* str)
     return 0;
 }
 
-Name existing_name_from_string(const char* str, int len)
+Symbol existing_name_from_string(const char* str, int len)
 {
     INCREMENT_STAT(InternedNameLookup);
 
@@ -813,25 +759,25 @@ Name existing_name_from_string(const char* str, int len)
 }
 
 // Runtime symbols
-Name name_from_string(const char* str)
+Symbol name_from_string(const char* str)
 {
     // Empty string is name_None
     if (str[0] == 0)
         return name_None;
 
     // Check if name is already registered
-    Name existing = existing_name_from_string(str);
+    Symbol existing = existing_name_from_string(str);
     if (existing != name_None)
         return existing;
 
     // Not yet registered; add it to the list.
     INCREMENT_STAT(InternedNameCreate);
 
-    Name index = g_nextFreeNameIndex++;
+    Symbol index = g_nextFreeNameIndex++;
     g_runtimeNames[index].str = strdup(str);
     g_runtimeNames[index].namespaceFirst = 0;
     g_runtimeNames[index].namespaceRightRemainder = 0;
-    Name name = index + c_FirstRuntimeName;
+    Symbol name = index + c_FirstRuntimeName;
     g_stringToSymbol[str] = name;
 
     // Search the string for a : name, if found we'll update the name's
@@ -853,11 +799,11 @@ Name name_from_string(const char* str)
 
     return name;
 }
-Name name_from_string(std::string const& str)
+Symbol name_from_string(std::string const& str)
 {
     return name_from_string(str.c_str());
 }
-Name name_from_string(caValue* str)
+Symbol name_from_string(caValue* str)
 {
     return name_from_string(as_cstring(str));
 }
@@ -868,14 +814,17 @@ void name_dealloc_global_data()
     g_nextFreeNameIndex = 0;
     g_stringToSymbol.clear();
 }
+#endif
 
 } // namespace circa
 
-extern "C" caName circa_to_name(const char* str)
+#if 0
+extern "C" caSymbol circa_to_name(const char* str)
 {
     return circa::name_from_string(str);
 }
-extern "C" const char* circa_name_to_string(caName name)
+extern "C" const char* circa_name_to_string(caSymbol name)
 {
     return circa::name_to_string(name);
 }
+#endif

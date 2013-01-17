@@ -29,7 +29,7 @@ def Context.clip_preserve(self)
 def Context.reset_clip(self)
 def Context.set_source_color(self, Color color)
 def Context.fill_preserve(self)
-def Context.set_operator(self, Name operator)
+def Context.set_operator(self, Symbol operator)
 
 -- Surfaces
 def make_image_surface(Point size) -> Surface

@@ -94,12 +94,11 @@ Term* preceding_term(Term* term);
 // Following term in the same block (may be NULL).
 Term* following_term(Term* term);
 
-Term* find_input_placeholder_with_name(Block* block, const char* name);
-Term* find_output_placeholder_with_name(Block* block, const char* name);
+Term* find_input_placeholder_with_name(Block* block, caValue* name);
+Term* find_output_placeholder_with_name(Block* block, caValue* name);
 
 Term* find_last_non_comment_expression(Block* block);
 Term* find_term_with_function(Block* block, Term* func);
-Term* find_input_placeholder_with_name(Block* block, const char* name);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);
 

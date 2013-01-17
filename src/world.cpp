@@ -28,6 +28,10 @@ World* alloc_world()
     World* world = (World*) malloc(sizeof(World));
     memset(world, 0, sizeof(World));
 
+    world->nextTermID = 1;
+    world->nextBlockID = 1;
+    world->nextStackID = 1;
+
     return world;
 }
 
@@ -37,12 +41,7 @@ void world_initialize(World* world)
 
     world->nativePatchWorld = create_native_patch_world();
     world->fileWatchWorld = create_file_watch_world();
-
-    world->nextTermID = 1;
-    world->nextBlockID = 1;
-    world->nextStackID = 1;
 }
-
 
 void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
 {
@@ -146,7 +145,7 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message)
 
     // Do something with an error. TODO is a more robust way of saving errors.
     if (error_occurred(stack)) {
-        caValue* actorName = list_get(actor, 0);
+        caValue* actorSymbol = list_get(actor, 0);
         std::cout << "Error occured in actor " << as_string(actorName)
             << " with message: " << to_string(message) << std::endl;
         circa_print_error_to_stdout(stack);

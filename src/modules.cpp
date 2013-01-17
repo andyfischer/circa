@@ -65,7 +65,7 @@ Block* fetch_module(World* world, const char* name)
     if (existing != NULL)
         return existing;
 
-    Term* term = apply(world->root, FUNCS.module, TermList(), name_from_string(name));
+    Term* term = apply(world->root, FUNCS.module, TermList(), name);
     return nested_contents(term);
 }
 
@@ -112,8 +112,7 @@ Block* load_module_file(World* world, const char* moduleName, const char* filena
     Block* existing = find_module(world, moduleName);
 
     if (existing == NULL) {
-        Term* term = apply(world->root, FUNCS.module, TermList(),
-                name_from_string(moduleName));
+        Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
         existing = nested_contents(term);
     }
 

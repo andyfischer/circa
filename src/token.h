@@ -91,9 +91,6 @@ struct TokenStream
     // Like consume(), but appends the text of the consumed token to a caValue.
     void consumeStr(caValue* output, int match = -1);
 
-    // Like consume(), but registers the string as a runtime symbol.
-    Name consumeName(int match = -1);
-
     bool finished() const
     {
         return (_position >= tokens.size());

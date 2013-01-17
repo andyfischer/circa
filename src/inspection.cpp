@@ -80,7 +80,7 @@ bool is_hidden(Term* term)
 
 bool has_empty_name(Term* term)
 {
-    return term->nameSymbol == name_None;
+    return is_null(&term->nameValue) || string_eq(&term->nameValue, "");
 }
 
 bool is_copying_call(Term* term)
@@ -351,16 +351,6 @@ bool has_variable_args(Block* block)
             return true;
     }
 }
-Term* find_output_placeholder_with_name(Block* block, const char* name)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(block, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (placeholder->name == name)
-            return placeholder;
-    }
-}
 
 Term* find_last_non_comment_expression(Block* block)
 {
@@ -396,13 +386,24 @@ Term* find_term_with_function(Block* block, Term* func)
     return NULL;
 }
 
-Term* find_input_placeholder_with_name(Block* block, const char* name)
+Term* find_input_placeholder_with_name(Block* block, caValue* name)
 {
     for (int i=0;; i++) {
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
-        if (placeholder->name == name)
+        if (equals(&placeholder->nameValue, name))
+            return placeholder;
+    }
+}
+
+Term* find_output_placeholder_with_name(Block* block, caValue* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(block, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (equals(&placeholder->nameValue, name))
             return placeholder;
     }
 }
@@ -454,7 +455,7 @@ std::string global_id(Term* term)
         return "NULL";
 
     std::stringstream out;
-    out << "$" << term->id;
+    out << "#" << term->id;
     return out.str();
 }
 

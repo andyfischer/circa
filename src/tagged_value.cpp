@@ -378,15 +378,22 @@ void set_float(caValue* value, float f)
     value->value_data.asfloat = f;
 }
 
+caValue* set_list(caValue* value)
+{
+    make(TYPES.list, value);
+    return value;
+}
+
 void set_string(caValue* value, std::string const& s)
 {
     set_string(value, s.c_str());
 }
 
-caValue* set_list(caValue* value)
+void set_symbol(caValue* tv, Symbol val)
 {
-    make(TYPES.list, value);
-    return value;
+    set_null(tv);
+    tv->value_type = TYPES.symbol;
+    tv->value_data.asint = val;
 }
 
 caValue* set_list(caValue* value, int size)
@@ -468,6 +475,11 @@ void* as_opaque_pointer(caValue* value)
     return value->value_data.ptr;
 }
 
+Symbol as_symbol(caValue* tv)
+{
+    return tv->value_data.asint;
+}
+
 Type* as_type(caValue* value)
 {
     ca_assert(is_type(value));
@@ -510,6 +522,7 @@ bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == name_StorageTypeOpaquePointer; }
 bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeTerm; }
 bool is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
+bool is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
 bool is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
 
 bool is_number(caValue* value)
@@ -539,18 +552,13 @@ int to_int(caValue* value)
     return 0;
 }
 
-caValue* first_string(caValue* value)
+Symbol first_name(caValue* value)
 {
-    if (is_string(value))
-        return value;
+    if (is_symbol(value))
+        return as_symbol(value);
     if (is_list(value))
-        return first_string(list_get(value, 0));
-    return NULL;
-}
-
-CIRCA_EXPORT caValue* circa_first_string(caValue* value)
-{
-    return first_string(value);
+        return first_name(list_get(value, 0));
+    return name_None;
 }
 
 } // namespace circa

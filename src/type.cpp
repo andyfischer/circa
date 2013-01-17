@@ -340,7 +340,7 @@ Term* create_tuple_type(caValue* types)
     }
     typeName << ">";
 
-    Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str());
+    Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str().c_str());
     list_t::setup_type(unbox_type(result));
 
     unbox_type(result)->parent = TYPES.list;
@@ -396,7 +396,7 @@ Term* find_method(Block* block, Type* type, const char* name)
     // possibly other stuff.
     Block* typeDef = type_declaration_block(type);
     if (typeDef != NULL) {
-        Term* func = find_local_name(typeDef, name_from_string(name));
+        Term* func = find_local_name(typeDef, name);
         if (func != NULL && is_function(func))
             return func;
     }
@@ -412,9 +412,9 @@ Term* find_method(Block* block, Type* type, const char* name)
 
     // If the type name is complex (such as List<int>), then try searching
     // for the base type name (such as List).
-    std::string baseTypeName = get_base_type_name(as_cstring(&type->name));
-    if (baseTypeName != "") {
-        std::string searchName = baseTypeName + "." + name;
+    std::string baseTypeSymbol = get_base_type_name(as_cstring(&type->name));
+    if (baseTypeSymbol != "") {
+        std::string searchName = baseTypeSymbol + "." + name;
         result = find_method_with_search_name(block, type, searchName.c_str());
 
         if (result != NULL)

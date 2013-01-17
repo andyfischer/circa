@@ -20,6 +20,7 @@
 #include "selector.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "string_type.h"
 #include "term.h"
 #include "type.h"
 #include "update_cascades.h"
@@ -31,7 +32,7 @@ void on_term_created(Term* term)
     // debugging hook
 }
 
-Term* apply(Block* block, Term* function, TermList const& inputs, Name name)
+Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 {
     block_start_changes(block);
 
@@ -81,7 +82,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, Name name)
     // Position the term before any output_placeholder terms.
     block->move(term, position);
 
-    if (name != name_None)
+    if (name != NULL && !string_eq(name, ""))
         rename(term, name);
 
     for (int i=0; i < inputs.length(); i++)
@@ -104,6 +105,14 @@ Term* apply(Block* block, Term* function, TermList const& inputs, Name name)
     }
 
     return term;
+}
+
+Term* apply(Block* block, Term* function, TermList const& inputs, const char* nameStr)
+{
+    Value name;
+    if (nameStr != NULL)
+        set_string(&name, nameStr);
+    return apply(block, function, inputs, &name);
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -295,10 +304,10 @@ void respecialize_type(Term* term)
         change_declared_type(term, outputType);
 }
 
-void rename(Term* termToRename, Name name)
+void rename(Term* termToRename, caValue* name)
 {
     // No-op if term already has this name.
-    if (termToRename->nameSymbol == name)
+    if (equals(&termToRename->nameValue, name))
         return;
 
     Block* block = termToRename->owningBlock;
@@ -308,14 +317,14 @@ void rename(Term* termToRename, Name name)
         if (!has_empty_name(termToRename)) {
             termToRename->owningBlock->names.remove(termToRename->name);
             termToRename->name = "";
-            termToRename->nameSymbol = name_None;
+            set_null(&termToRename->nameValue);
         }
         termToRename->owningBlock->bindName(termToRename, name);
     }
 
     // Update name symbol.
-    termToRename->nameSymbol = name;
-    termToRename->name = name_to_string(name);
+    termToRename->name = as_cstring(name);
+    copy(name, &termToRename->nameValue);
     update_unique_name(termToRename);
 
     // Update unique ordinal. If any neighbor term has the same name, then give this
@@ -330,7 +339,7 @@ void rename(Term* termToRename, Name name)
             if (neighbor == NULL)
                 continue;
 
-            if (neighbor->nameSymbol == name) {
+            if (equals(&neighbor->nameValue, name)) {
                 // Check if the neighbor has ordinal value 0 (meaning no name collision).
                 // If so, then promote it to 1 (meaning there is a collision.
                 if (neighbor->uniqueOrdinal == 0)
@@ -348,7 +357,7 @@ void rename(Term* termToRename, Name name)
     bool foundShadowedNameBinding = false;
     Term* shadowedNameBinding = NULL;
     
-    if (name != name_None) {
+    if (name != NULL) {
         // The new name may have shadowed an existing name.
         for (NameVisibleIterator it(termToRename); it.unfinished(); ++it) {
             Term* possibleUser = it.current();
@@ -357,7 +366,7 @@ void rename(Term* termToRename, Name name)
                 // Only look at inputs that have our name binding.
                 if (possibleUser->input(i) == NULL)
                     continue;
-                if (possibleUser->input(i)->nameSymbol != name)
+                if (!equals(&possibleUser->input(i)->nameValue, name))
                     continue;
 
                 if (!foundShadowedNameBinding) {
@@ -383,14 +392,21 @@ void rename(Term* termToRename, Name name)
     }
 }
 
-Term* create_duplicate(Block* block, Term* original, std::string const& name)
+void rename(Term* term, const char* name)
+{
+    Value nameVal;
+    set_string(&nameVal, name);
+    return rename(term, &nameVal);
+}
+
+Term* create_duplicate(Block* block, Term* original, caValue* name)
 {
     ca_assert(original != NULL);
 
     TermList inputs;
     original->inputsToList(inputs);
 
-    Term* term = apply(block, original->function, inputs, name_from_string(name));
+    Term* term = apply(block, original->function, inputs, name);
     change_declared_type(term, original->type);
 
     copy(term_value(original), term_value(term));
@@ -407,88 +423,89 @@ Term* create_duplicate(Block* block, Term* original, std::string const& name)
     return term;
 }
 
-Term* apply(Block* block, std::string const& functionName, TermList const& inputs, std::string const& name)
+Term* apply(Block* block, std::string const& functionName, TermList const& inputs, caValue* name)
 {
     Term* function = find_name(block, functionName.c_str());
     if (function == NULL)
         internal_error("function not found: "+functionName);
 
-    Term* result = apply(block, function, inputs, name_from_string(name));
+    Term* result = apply(block, function, inputs, name);
     result->setStringProp("syntax:functionName", functionName.c_str());
     return result;
 }
 
-Term* create_value(Block* block, Type* type, std::string const& name)
+Term* create_value(Block* block, Type* type, const char* name)
 {
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
 
-    Term *term = apply(block, FUNCS.value, TermList(), name_from_string(name));
+    Term *term = apply(block, FUNCS.value, TermList(), name);
 
     change_declared_type(term, type);
     make(type, term_value(term));
 
     if (type == TYPES.type) {
-        set_string(&as_type(term)->name, name.c_str());
+        if (name != NULL)
+            set_string(&as_type(term)->name, name);
         as_type(term)->declaringTerm = term;
     }
 
     return term;
 }
 
-Term* create_value(Block* block, std::string const& typeName, std::string const& name)
+Term* create_value(Block* block, const char* typeName, const char* name)
 {
     Term* type = NULL;
 
-    type = find_name(block, typeName.c_str());
+    type = find_name(block, typeName);
 
     if (type == NULL)
-        internal_error("Couldn't find type: "+typeName);
+        internal_error(std::string("Couldn't find type: ")+typeName);
 
     return create_value(block, as_type(term_value(type)), name);
 }
 
-Term* create_value(Block* block, caValue* initialValue, std::string const& name)
+Term* create_value(Block* block, caValue* initialValue, const char* name)
 {
     Term* term = create_value(block, initialValue->value_type, name);
     copy(initialValue, term_value(term));
     return term;
 }
 
-Term* create_string(Block* block, std::string const& s, std::string const& name)
+Term* create_string(Block* block, const char* s, const char* name)
 {
     Term* term = create_value(block, TYPES.string, name);
     set_string(term_value(term), s);
     return term;
 }
 
-Term* create_int(Block* block, int i, std::string const& name)
+Term* create_int(Block* block, int i, const char* name)
 {
     Term* term = create_value(block, TYPES.int_type, name);
     set_int(term_value(term), i);
     return term;
 }
 
-Term* create_float(Block* block, float f, std::string const& name)
+Term* create_float(Block* block, float f, const char* name)
 {
     Term* term = create_value(block, TYPES.float_type, name);
     set_float(term_value(term), f);
     return term;
 }
 
-Term* create_bool(Block* block, bool b, std::string const& name)
+Term* create_bool(Block* block, bool b, const char* name)
 {
     Term* term = create_value(block, TYPES.bool_type, name);
     set_bool(term_value(term), b);
     return term;
 }
 
-Term* create_void(Block* block, std::string const& name)
+Term* create_void(Block* block, const char* name)
 {
     return create_value(block, TYPES.void_type, name);
 }
 
-Term* create_list(Block* block, std::string const& name)
+Term* create_list(Block* block, const char* name)
 {
     Term* term = create_value(block, TYPES.list, name);
     return term;
@@ -496,7 +513,7 @@ Term* create_list(Block* block, std::string const& name)
 
 Block* create_block(Block* owner, const char* name)
 {
-    return nested_contents(apply(owner, FUNCS.section_block, TermList(), name_from_string(name)));
+    return nested_contents(apply(owner, FUNCS.section_block, TermList(), name));
 }
 
 Block* find_or_create_block(Block* owner, const char* name)
@@ -507,28 +524,21 @@ Block* find_or_create_block(Block* owner, const char* name)
     return create_block(owner, name);
 }
 
-Block* create_namespace(Block* block, std::string const& name)
+Block* create_namespace(Block* block, const char* name)
 {
-    return apply(block, FUNCS.namespace_func, TermList(), name_from_string(name))->contents();
+    return apply(block, FUNCS.namespace_func, TermList(), name)->contents();
 }
 Block* create_block_unevaluated(Block* owner, const char* name)
 {
-    return nested_contents(apply(owner, FUNCS.block_unevaluated, TermList(), name_from_string(name)));
+    return nested_contents(apply(owner, FUNCS.block_unevaluated, TermList(), name));
 }
 
-Term* create_type(Block* block, std::string nameStr)
+Term* create_type(Block* block, const char* name)
 {
-    Term* term = create_value(block, TYPES.type);
-
-    if (nameStr != "") {
-        set_string(&as_type(term_value(term))->name, nameStr.c_str());
-        rename(term, name_from_string(nameStr));
-    }
-
-    return term;
+    return create_value(block, TYPES.type, name);
 }
 
-Term* create_type_value(Block* block, Type* value, std::string const& name)
+Term* create_type_value(Block* block, Type* value, const char* name)
 {
     Term* term = create_value(block, TYPES.type, name);
     set_type(term_value(term), value);
@@ -536,6 +546,13 @@ Term* create_type_value(Block* block, Type* value, std::string const& name)
     if (value->declaringTerm == NULL)
         value->declaringTerm = term;
         
+    return term;
+}
+
+Term* create_symbol_value(Block* block, int value, const char* name)
+{
+    Term* term = create_value(block, TYPES.symbol, name);
+    set_symbol(term_value(term), value);
     return term;
 }
 
@@ -614,7 +631,7 @@ void update_extra_outputs(Term* term)
         if (placeholder == NULL)
             break;
 
-        Name name = name_None;
+        Value name;
 
         // Find the associated input placeholder (if any).
         int rebindsInput = placeholder->intProp("rebindsInput", -1);
@@ -630,11 +647,12 @@ void update_extra_outputs(Term* term)
         if (rebindsInput >= 0) {
             Term* input = term->input(rebindsInput);
 
-            if (input != NULL)
-                name = input->nameSymbol;
+            if (input != NULL) {
+                copy(&input->nameValue, &name);
+            }
 
         } else {
-            name = placeholder->nameSymbol;
+            copy(&placeholder->nameValue, &name);
         }
 
         Term* extra_output = NULL;
@@ -645,7 +663,7 @@ void update_extra_outputs(Term* term)
             extra_output = existingSlot;
         
         if (extra_output == NULL) {
-            extra_output = apply(block, FUNCS.extra_output, TermList(term), name);
+            extra_output = apply(block, FUNCS.extra_output, TermList(term), &name);
             move_to_index(extra_output, term->index + index);
 
             if (rebindsInput >= 0)
@@ -1156,7 +1174,7 @@ void create_inputs_for_outer_references(Term* term)
                 } else {
                     // Need to create a new placeholder
                     int placeholderIndex = term->numInputs();
-                    Term* placeholder = apply(block, FUNCS.input, TermList(), input->nameSymbol);
+                    Term* placeholder = apply(block, FUNCS.input, TermList(), &input->nameValue);
                     change_declared_type(placeholder, input->type);
                     block->move(placeholder, placeholderIndex);
                     set_input(term, placeholderIndex, placeholder);

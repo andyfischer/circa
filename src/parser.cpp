@@ -562,8 +562,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     // Optional list of qualifiers
-    while (tokens.nextIs(tok_ColonString)) {
-        std::string symbolText = tokens.consumeStr(tok_ColonString);
+    while (tokens.nextIs(tok_Name)) {
+        std::string symbolText = tokens.consumeStr(tok_Name);
         if (symbolText == ":throws")
             attrs->throws = true;
         else
@@ -648,7 +648,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         possible_whitespace(tokens);
 
         // Create an input placeholder term
-        Term* input = apply(contents, FUNCS.input, TermList(), name_from_string(name));
+        Term* input = apply(contents, FUNCS.input, TermList(), name.c_str());
         change_declared_type(input, type);
 
         // Save some information on the input as properties.
@@ -664,8 +664,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
 
         // Optional list of qualifiers
-        while (tokens.nextIs(tok_ColonString)) {
-            std::string symbolText = tokens.consumeStr(tok_ColonString);
+        while (tokens.nextIs(tok_Name)) {
+            std::string symbolText = tokens.consumeStr(tok_Name);
 
             // Future: store syntax hint
             if (symbolText == ":ignore_error") {
@@ -705,9 +705,9 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     tokens.consume(tok_RParen);
 
     // Another optional list of symbols
-    if (tok_ColonString == lookahead_next_non_whitespace(tokens, false)) {
+    if (tok_Name == lookahead_next_non_whitespace(tokens, false)) {
         possible_whitespace(tokens);
-        std::string symbolText = tokens.consumeStr(tok_ColonString);
+        std::string symbolText = tokens.consumeStr(tok_Name);
         if (symbolText == ":parsetime") {
         }
         else
@@ -805,14 +805,13 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         return compile_error_for_line(block, tokens, startPosition);
 
     std::string name = tokens.consumeStr(tok_Identifier);
-
-    Term* result = create_value(block, TYPES.type, name);
+    Term* result = create_value(block, TYPES.type, name.c_str());
 
     // Attributes
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    while (tokens.nextIs(tok_ColonString)) {
+    while (tokens.nextIs(tok_Name)) {
         std::string s = tokens.consumeStr();
 
         // There were once type attributes here
@@ -989,7 +988,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
             // Create an 'else' block
             encounteredElse = true;
             caseTerm = if_block_append_case(contents, NULL);
-            rename(caseTerm, name_from_string("else"));
+            rename(caseTerm, "else");
         }
 
         caseTerm->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
@@ -1024,7 +1023,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
         Term* elseTerm = if_block_append_case(contents, NULL);
-        rename(elseTerm, name_from_string("else"));
+        rename(elseTerm, "else");
         hide_from_source(elseTerm);
     }
 
@@ -1100,7 +1099,7 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     Term* moduleName = NULL;
 
     if (tokens.nextIs(tok_Identifier)) {
-        moduleName = create_string(block, tokens.consumeStr());
+        moduleName = create_string(block, tokens.consumeStr().c_str());
     } else if (tokens.nextIs(tok_String)) {
         moduleName = literal_string(block, tokens, context).term;
     } else {
@@ -1123,7 +1122,7 @@ ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     Term* moduleName = NULL;
 
     if (tokens.nextIs(tok_Identifier)) {
-        moduleName = create_string(block, tokens.consumeStr());
+        moduleName = create_string(block, tokens.consumeStr().c_str());
     } else if (tokens.nextIs(tok_String)) {
         moduleName = literal_string(block, tokens, context).term;
     } else {
@@ -1288,7 +1287,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     }
 
     // Create the declared_state() term.
-    Term* result = apply(block, FUNCS.declared_state, TermList(), name_from_string(name));
+    Term* result = apply(block, FUNCS.declared_state, TermList(), name.c_str());
 
     if (unknownType)
         result->setStringProp("error:unknownType", typeName);
@@ -1342,7 +1341,7 @@ ParseResult include_statement(Block* block, TokenStream& tokens, ParserCxt* cont
                 "Expected identifier or string after 'include'");
     }
 
-    Term* filenameTerm = create_string(block, filename);
+    Term* filenameTerm = create_string(block, filename.c_str());
     hide_from_source(filenameTerm);
 
     Term* result = apply(block, FUNCS.include_func, TermList(filenameTerm));
@@ -1502,7 +1501,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         for (int i=0; i < list_length(&names); i++) {
             Term* output = get_output_term(term, i);
             ca_assert(output != NULL);
-            rename(output, name_from_string(as_cstring(list_get(&names, i))));
+            rename(output, list_get(&names, i));
         }
         set_source_location(term, startPosition, tokens);
     }
@@ -1716,7 +1715,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 // Just bind the name if left side is an identifier.
                 // Example: a += 1
                 if (left.isIdentifier()) {
-                    rename(term, left.term->nameSymbol);
+                    rename(term, &left.term->nameValue);
 
                 // Otherwise, create a set_with_selector call.
                 } else {
@@ -1846,7 +1845,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     int startPosition = tokens.getPosition();
 
     bool forceRebindLHS = false;
-    Name dotOperator = name_None;
+    Symbol dotOperator = name_None;
 
     if (tokens.nextIs(tok_DotAt)) {
         forceRebindLHS = true;
@@ -2190,8 +2189,8 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
         result = literal_list(block, tokens, context);
 
     // literal name?
-    else if (tokens.nextIs(tok_ColonString))
-        result = literal_string(block, tokens, context);
+    else if (tokens.nextIs(tok_Name))
+        result = literal_name(block, tokens, context);
 
     // closure block?
     else if (tokens.nextIs(tok_LBrace))
@@ -2287,27 +2286,19 @@ ParseResult literal_string(Block* block, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    std::string text = tokens.consumeStr();
+    std::string text = tokens.consumeStr(tok_String);
 
     std::string quoteType = text.substr(0,1);
 
-    Value rawString;
+    Value escaped;
+    unquote_and_unescape_string(text.c_str(), &escaped);
 
-    if (text[0] == ':') {
-        // :String
-        set_string(&rawString, text.c_str() + 1);
-
-    } else {
-        // 'String' or "String"
-        unquote_and_unescape_string(text.c_str(), &rawString);
-    }
-
-    Term* term = create_string(block, as_cstring(&rawString));
+    Term* term = create_string(block, as_cstring(&escaped));
     set_source_location(term, startPosition, tokens);
 
     if (quoteType != "'")
         term->setStringProp("syntax:quoteType", quoteType);
-    if (!string_eq(&rawString, text.c_str()))
+    if (!string_eq(&escaped, text.c_str()))
         term->setStringProp("syntax:originalString", text);
 
     return ParseResult(term);
@@ -2430,6 +2421,23 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(term);
 }
 
+ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    std::string s = tokens.nextStr();
+    tokens.consume(tok_Name);
+
+    Term* term = create_value(block, TYPES.null);
+
+    // Skip the leading ':' in the name string
+    //set_symbol(term_value(term), s.c_str() + 1);
+    set_string(term_value(term), s.c_str() + 1);
+    set_source_location(term, startPosition, tokens);
+
+    return ParseResult(term);
+}
+
 ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -2460,8 +2468,7 @@ ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     int startPosition = tokens.getPosition();
-    Term* term = apply(block, FUNCS.section_block, TermList(),
-            name_from_string(as_cstring(&name)));
+    Term* term = apply(block, FUNCS.section_block, TermList(), as_cstring(&name));
     Block* resultBlock = nested_contents(term);
     set_source_location(term, startPosition, tokens);
     consume_block_with_braces(resultBlock, tokens, context, term);
@@ -2480,8 +2487,9 @@ ParseResult namespace_block(Block* block, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(block, tokens, startPosition,
             "Expected identifier after 'namespace'");
 
-    Name name = tokens.consumeName(tok_Identifier);
-    Term* term = apply(block, FUNCS.namespace_func, TermList(), name);
+    Value name;
+    tokens.consumeStr(&name, tok_Identifier);
+    Term* term = apply(block, FUNCS.namespace_func, TermList(), &name);
     set_starting_source_location(term, startPosition, tokens);
 
     consume_block(nested_contents(term), tokens, context);
@@ -2493,7 +2501,7 @@ ParseResult namespace_block(Block* block, TokenStream& tokens, ParserCxt* contex
 
 ParseResult unknown_identifier(Block* block, std::string const& name)
 {
-    Term* term = apply(block, FUNCS.unknown_identifier, TermList(), name_from_string(name));
+    Term* term = apply(block, FUNCS.unknown_identifier, TermList(), name.c_str());
     set_is_statement(term, false);
     term->setStringProp("message", name);
     return ParseResult(term);

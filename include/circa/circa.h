@@ -111,7 +111,7 @@ struct Value : caValue
 // EvaluateFunc which is triggered when the function is called.
 typedef struct caFunction caFunction;
 
-// a Name is an alias for an integer, used to reference an interned string.
+// a Symbol is an alias for an integer, used to reference an interned string.
 typedef int caName;
 
 // EvaluateFunc is the signature for a C evaluation function. The function will access the
@@ -319,8 +319,6 @@ caValue* circa_index(caValue* value, int index);
 // Number of elements in a list value.
 int circa_count(caValue* container);
 
-caValue* circa_first_string(caValue* value);
-
 // -- Writing to a caValue --
 
 // Assign to a caValue.
@@ -378,14 +376,6 @@ caValue* circa_handle_get_value(caValue* handle);
 
 void circa_handle_set_object(caValue* handle, void* object);
 void* circa_handle_get_object(caValue* handle);
-
-// -- Names --
-
-// Fetch the interned name for the given string. Returns 0 if the name doesn't exist.
-caName circa_to_name(const char* str);
-
-// Fetch the string for an interned name.
-const char* circa_name_to_string(caName name);
 
 // -- String Representation --
 

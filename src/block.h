@@ -25,7 +25,7 @@ struct Block
     // List of content terms. This block owns all the Term objects in this list.
     TermList _terms;
 
-    // Name bindings.
+    // Symbol bindings.
     TermNamespace names;
 
     // Points to the Term which owns this block as a value.
@@ -70,14 +70,14 @@ struct Block
 
     // Get a term from a name binding.
     inline Term* get(std::string const& name) {
-        return find_local_name(this, circa_to_name(name.c_str()));
+        return find_local_name(this, name.c_str());
     }
     inline Term* getNamed(const char* name) {
-        return find_local_name(this, circa_to_name(name));
+        return find_local_name(this, name);
     }
 
     inline Term* operator[](std::string const& name) {
-        return find_local_name(this, circa_to_name(name.c_str()));
+        return find_local_name(this, name.c_str());
     }
 
     // Returns true if there is a term with the given name
@@ -88,7 +88,7 @@ struct Block
     Term* last();
 
     // Find the first term with the given name binding.
-    Term* findFirstBinding(Name name);
+    Term* findFirstBinding(caValue* name);
 
     void insert(int index, Term* term);
     void append(Term* term);
@@ -108,7 +108,7 @@ struct Block
     void clear();
 
     // Bind a name to a term
-    void bindName(Term* term, Name name);
+    void bindName(Term* term, caValue* name);
 
     // Remap pointers
     void remapPointers(TermMap const& map);
@@ -156,7 +156,7 @@ void clear_block(Block* block);
 
 void duplicate_block(Block* source, Block* dest);
 
-Name load_script(Block* block, const char* filename);
+Symbol load_script(Block* block, const char* filename);
 void post_module_load(Block* block);
 
 // Create an include() call that loads the given file. Returns the included

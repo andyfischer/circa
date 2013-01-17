@@ -22,7 +22,6 @@ Term::Term()
   : weakPtr(0),
     type(NULL),
     function(NULL),
-    nameSymbol(name_None),
     uniqueOrdinal(0),
     owningBlock(NULL),
     index(0),
@@ -45,7 +44,7 @@ Term::~Term()
 const char*
 Term::nameStr()
 {
-    return name_to_string(this->nameSymbol);
+    return as_cstring(&nameValue);
 }
 
 Term*

@@ -515,7 +515,7 @@ void list_remove_nulls(caValue* value)
     list_remove_nulls((ListData**) &value->value_data);
 }
 
-Name list_get_parameter_type(caValue* parameter)
+Symbol list_get_parameter_type(caValue* parameter)
 {
     if (is_null(parameter))
         return name_Untyped;

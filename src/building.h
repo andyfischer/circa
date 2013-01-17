@@ -8,15 +8,16 @@
 namespace circa {
 
 // Examine 'function' and 'inputs' and returns a result term.
-Term* apply(Block* block, Term* function, TermList const& inputs,
-        Name name = name_None);
+Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name = NULL);
 
 // Find the named function in this block, and then call the above apply.
-Term* apply(Block* block, std::string const& functionName,
-                 TermList const& inputs, Name name = name_None);
+Term* apply(Block* block, const char* functionName, TermList const& inputs,
+        caValue* name = NULL);
+
+Term* apply(Block* block, Term* function, TermList const& inputs, const char* name);
 
 // Create a duplicate of the given term. Doesn't duplicate nestedContents.
-Term* create_duplicate(Block* block, Term* original, std::string const& name="");
+Term* create_duplicate(Block* block, Term* original, caValue* name);
 
 // Inputs and user lists:
 void set_input(Term* term, int index, Term* input);
@@ -43,25 +44,27 @@ void change_declared_type(Term* term, Type* type);
 void respecialize_type(Term* term);
 
 // Rename term, modify the name binding of the owning block if necessary
-void rename(Term* term, Name name);
+void rename(Term* term, caValue* name);
+void rename(Term* term, const char* name);
 
 // Create a new value term with the given type.
-Term* create_value(Block* block, Type* type, std::string const& name="");
-Term* create_value(Block* block, std::string const& typeName, std::string const& name="");
-Term* create_value(Block* block, caValue* initialValue, std::string const& name="");
+Term* create_value(Block* block, Type* type, const char* name=NULL);
+Term* create_value(Block* block, const char* typeName, const char* name=NULL);
+Term* create_value(Block* block, caValue* initialValue, const char* name=NULL);
 
-Term* create_string(Block* block, std::string const& s, std::string const& name="");
-Term* create_int(Block* block, int i, std::string const& name="");
-Term* create_float(Block* block, float f, std::string const& name="");
-Term* create_bool(Block* block, bool b, std::string const& name="");
-Term* create_void(Block* block, std::string const& name="");
-Term* create_list(Block* block, std::string const& name="");
+Term* create_string(Block* block, const char* s, const char* name=NULL);
+Term* create_int(Block* block, int i, const char* name=NULL);
+Term* create_float(Block* block, float f, const char* name=NULL);
+Term* create_bool(Block* block, bool b, const char* name=NULL);
+Term* create_void(Block* block, const char* name=NULL);
+Term* create_list(Block* block, const char* name=NULL);
 Block* create_block(Block* owner, const char* name);
 Block* find_or_create_block(Block* owner, const char* name);
-Block* create_namespace(Block*, std::string const& name);
+Block* create_namespace(Block*, const char* name);
 Block* create_block_unevaluated(Block* owner, const char* name);
-Term* create_type(Block* block, std::string name="");
-Term* create_type_value(Block* block, Type* value, std::string const& name="");
+Term* create_type(Block* block, const char* name);
+Term* create_type_value(Block* block, Type* value, const char* name=NULL);
+Term* create_symbol_value(Block* block, int value, const char* name=NULL);
 Term* duplicate_value(Block* block, Term* term);
 
 // Add an input_placeholder() term after the existing placeholders.

@@ -66,8 +66,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
     hide_from_source(index);
 
     // Add get_index to fetch the list's current element.
-    Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index),
-        name_from_string(iteratorName));
+    Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index), iteratorName);
 
     if (iteratorType == NULL)
         iteratorType = infer_type_of_get_index(forTerm->input(0));
@@ -112,7 +111,7 @@ void add_implicit_placeholders(Term* forTerm)
         Term* result = contents->get(name);
 
         // Create input_placeholder
-        Term* input = apply(contents, FUNCS.input, TermList(), name_from_string(name));
+        Term* input = apply(contents, FUNCS.input, TermList(), name.c_str());
         Type* type = find_common_type(original->type, result->type);
         change_declared_type(input, type);
         contents->move(input, inputIndex);
@@ -124,7 +123,7 @@ void add_implicit_placeholders(Term* forTerm)
             remap_pointers_quick(*it, original, input);
 
         // Create output_placeholder
-        Term* term = apply(contents, FUNCS.output, TermList(result), name_from_string(name));
+        Term* term = apply(contents, FUNCS.output, TermList(result), name.c_str());
 
         // Move output into the correct output slot
         contents->move(term, contents->length() - 1 - inputIndex);
@@ -150,7 +149,7 @@ void repoint_terms_to_use_input_placeholders(Block* contents)
             if (input->owningBlock == contents || input->name == "")
                 continue;
 
-            Term* replacement = find_input_placeholder_with_name(contents, input->name.c_str());
+            Term* replacement = find_input_placeholder_with_name(contents, &input->nameValue);
             if (replacement == NULL)
                 continue;
 
@@ -239,7 +238,7 @@ void for_loop_remake_zero_block(Block* forContents)
         if (placeholder == NULL)
             break;
         Term* clone = append_input_placeholder(zero);
-        rename(clone, placeholder->nameSymbol);
+        rename(clone, &placeholder->nameValue);
     }
 
     Term* loopOutput = create_list(zero);
@@ -257,7 +256,7 @@ void for_loop_remake_zero_block(Block* forContents)
             result = loopOutput;
 
         Term* clone = append_output_placeholder(zero, result);
-        rename(clone, placeholder->nameSymbol);
+        rename(clone, &placeholder->nameValue);
     }
 
     block_finish_changes(zero);

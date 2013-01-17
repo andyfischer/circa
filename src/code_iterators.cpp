@@ -370,7 +370,7 @@ void NameVisibleIterator::advance()
 
     // If we reach a term with the same name binding as our target, then stop.
     // Our target term is no longer visible.
-    if (_iterator.current()->nameSymbol == _target->nameSymbol) {
+    if (equals(&_iterator.current()->nameValue, &_target->nameValue)) {
         _iterator.stop();
         return;
     }

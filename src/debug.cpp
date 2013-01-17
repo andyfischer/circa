@@ -97,7 +97,7 @@ void perf_stats_dump()
 {
     printf("perf_stats_dump:\n");
     for (int i=c_firstStatIndex; i < name_LastStatIndex-1; i++)
-        printf("  %s = %llu\n", name_to_string(i), PERF_STATS[i - c_firstStatIndex]);
+        printf("  %s = %llu\n", builtin_name_to_string(i), PERF_STATS[i - c_firstStatIndex]);
 }
 void perf_stats_reset()
 {
@@ -108,11 +108,11 @@ void perf_stats_to_list(caValue* list)
 {
     set_list(list, c_numPerfStats);
     for (int i = c_firstStatIndex; i < name_LastStatIndex-1; i++) {
-        Name name = i;
+        Symbol name = i;
         int64 value = PERF_STATS[i - c_firstStatIndex];
         caValue* element = list_get(list, i - c_firstStatIndex);
         set_list(element, 2);
-        set_string(list_get(element, 0), builtin_name_to_string(name));
+        set_symbol(list_get(element, 0), name);
         char buf[100];
         sprintf(buf, "%llu", value);
         set_string(list_get(element, 1), buf);

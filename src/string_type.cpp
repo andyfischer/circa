@@ -204,8 +204,6 @@ void string_format_source(caValue* source, Term* term)
     std::string result;
     if (quoteType == "<")
         result = "<<<" + as_string(term_value(term)) + ">>>";
-    else if (quoteType == ":")
-        result = ":" + as_string(term_value(term));
     else
         result = quoteType + as_cstring(term_value(term)) + quoteType;
 

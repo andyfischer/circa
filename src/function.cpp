@@ -131,7 +131,7 @@ void finish_building_function(Block* contents)
             Term* result = find_name(contents, input->name.c_str());
             
             Term* output = append_output_placeholder(contents, result);
-            rename(output, input->nameSymbol);
+            rename(output, &input->nameValue);
             change_declared_type(output, input->type);
             output->setIntProp("rebindsInput", i);
         }

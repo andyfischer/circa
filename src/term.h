@@ -41,14 +41,13 @@ struct Term
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
-    // Name binding.
-    Name nameSymbol;
-
     // An ordinal value that is locally unique among terms with the same name.
     int uniqueOrdinal;
 
-    // (Deprecated) Name binding as string.
+    // (Deprecated) Symbol binding as string.
     std::string name;
+
+    Value nameValue;
 
     // A name which is unique across this block.
     struct UniqueName

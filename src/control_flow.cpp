@@ -17,11 +17,11 @@
 namespace circa {
 
 static Term* find_exit_point_for_term(Term* term);
-static ExitRank get_exit_level_rank(Name level);
-static Name max_exit_level(Name left, Name right);
-static Name get_highest_exit_level(Block* block);
+static ExitRank get_exit_level_rank(Symbol level);
+static Symbol max_exit_level(Symbol left, Symbol right);
+static Symbol get_highest_exit_level(Block* block);
 
-static ExitRank get_exit_level_rank(Name level)
+static ExitRank get_exit_level_rank(Symbol level)
 {
     if (level == name_Return)
         return EXIT_RANK_SUBROUTINE;
@@ -31,7 +31,7 @@ static ExitRank get_exit_level_rank(Name level)
         return EXIT_RANK_NONE;
 }
 
-static Name max_exit_level(Name left, Name right)
+static Symbol max_exit_level(Symbol left, Symbol right)
 {
     if (get_exit_level_rank(left) >= get_exit_level_rank(right))
         return left;
@@ -42,14 +42,17 @@ static Name max_exit_level(Name left, Name right)
 void controlFlow_postCompile(Term* term)
 {
     // If this is a return() then give it the special name #return
-    if (term->function == FUNCS.return_func)
-        rename(term, name_from_string("#return"));
+    if (term->function == FUNCS.return_func) {
+        Value return_str;
+        set_string(&return_str, "#return");
+        rename(term, &return_str);
+    }
 
     // Create a #control value
-    Term* controlTerm = create_value(term->owningBlock, TYPES.int_type, "#control");
+    Term* controlTerm = create_value(term->owningBlock, TYPES.symbol, "#control");
     hide_from_source(controlTerm);
 
-    Name controlValue = name_None;
+    Symbol controlValue = name_None;
     if (term->function == FUNCS.return_func)
         controlValue = name_Return;
     else if (term->function == FUNCS.break_func)
@@ -59,7 +62,7 @@ void controlFlow_postCompile(Term* term)
     else if (term->function == FUNCS.discard)
         controlValue = name_Discard;
 
-    set_int(term_value(controlTerm), controlValue);
+    set_symbol(term_value(controlTerm), controlValue);
 
     // Add an exit_point after each control-flow term
     Block* block = term->owningBlock;
@@ -155,9 +158,9 @@ static Term* find_exit_point_for_term(Term* term)
     return NULL;
 }
 
-static Name get_highest_exit_level(Block* block)
+static Symbol get_highest_exit_level(Block* block)
 {
-    Name highest = name_None;
+    Symbol highest = name_None;
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
@@ -173,8 +176,12 @@ static Name get_highest_exit_level(Block* block)
 }
 
 // Returns the highest exit level that can escape out of this term.
-Name find_highest_escaping_exit_level(Term* term)
+Symbol find_highest_escaping_exit_level(Term* term)
 {
+    // Term's function might be NULL during bootstrapping.
+    if (term->function == NULL)
+        return name_None;
+
     // Check if this is just an exiting term.
     if (term->function == FUNCS.return_func)
         return name_Return;
@@ -196,7 +203,7 @@ Name find_highest_escaping_exit_level(Term* term)
     if (is_major_block(block))
         return name_None;
 
-    Name highestLevel = name_None;
+    Symbol highestLevel = name_None;
 
     if (term->function == FUNCS.if_block) {
         // For an if-block, we need to iterate over each case block.
@@ -233,18 +240,18 @@ void force_term_to_output_to_parent(Term* term)
         Block* ifBlock = get_block_for_case_block(block);
         Term* existing = if_block_get_output_by_name(ifBlock, term->name.c_str());
         if (existing == NULL) {
-            if_block_append_output(ifBlock, term->name.c_str());
+            if_block_append_output(ifBlock, &term->nameValue);
         } else {
             // Connect to existing output
-            set_input(find_output_placeholder_with_name(block, term->name.c_str()),
+            set_input(find_output_placeholder_with_name(block, &term->nameValue),
                 0, term);
         }
     } else if (is_minor_block(block)) {
 
-        Term* existing = find_output_placeholder_with_name(block, term->name.c_str());
+        Term* existing = find_output_placeholder_with_name(block, &term->nameValue);
         if (existing == NULL) {
             Term* placeholder = append_output_placeholder(block, term);
-            rename(placeholder, term->nameSymbol);
+            rename(placeholder, &term->nameValue);
         }
     }
 }
@@ -277,7 +284,7 @@ void update_exit_points(Block* block)
             }
         }
 
-        Name escapingExitLevel = find_highest_escaping_exit_level(term);
+        Symbol escapingExitLevel = find_highest_escaping_exit_level(term);
         if (get_exit_level_rank(escapingExitLevel) > EXIT_RANK_NONE) {
 
             // This term can cause this block to exit.

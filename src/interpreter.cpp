@@ -347,7 +347,7 @@ void finish_frame(Stack* stack)
 
     // Copy outputs
 
-    if (as_int(outputAction) == name_FlatOutputs) {
+    if (as_symbol(outputAction) == name_FlatOutputs) {
 
         Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
         int outputSlotCount = count_actual_output_terms(finishedTerm);
@@ -395,7 +395,7 @@ void finish_frame(Stack* stack)
                 return;
             }
         }
-    } else if (as_int(outputAction) == name_OutputsToList) {
+    } else if (as_symbol(outputAction) == name_OutputsToList) {
         Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
         caValue* dest = get_frame_register(parentFrame, finishedTerm->index);
 
@@ -916,13 +916,13 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
 
     if (inputCount < requiredCount) {
         // Fail, not enough inputs.
-        set_int(outputTag, op_ErrorNotEnoughInputs);
+        set_symbol(outputTag, op_ErrorNotEnoughInputs);
         return;
     }
 
     if (inputCount > expectedCount && !varargs) {
         // Fail, too many inputs.
-        set_int(outputTag, op_ErrorTooManyInputs);
+        set_symbol(outputTag, op_ErrorTooManyInputs);
         return;
     }
     
@@ -944,7 +944,7 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
             int packCount = inputCount - inputIndex;
             set_list(inputsResult, packCount + 1);
 
-            set_int(list_get(inputsResult, 0), name_Multiple);
+            set_symbol(list_get(inputsResult, 0), name_Multiple);
 
             for (int i=0; i < packCount; i++)
                 set_term_ref(list_get(inputsResult, i + 1), term->input(i + inputIndex));
@@ -963,7 +963,7 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
         // Check if a cast is necessary
         else if (input->type != placeholder->type && placeholder->type != TYPES.any) {
             set_list(action, 3);
-            set_int(list_get(action, 0), name_Cast);
+            set_symbol(list_get(action, 0), name_Cast);
             set_term_ref(list_get(action, 1), input);
             set_type(list_get(action, 2), placeholder->type);
         }
@@ -979,19 +979,19 @@ void write_term_output_instructions(Term* term, caValue* op, Block* finishingBlo
 {
     caValue* action = list_get(op, 2);
 
-    set_int(action, name_FlatOutputs);
+    set_symbol(action, name_FlatOutputs);
 }
 
 static void bytecode_write_noop(caValue* op)
 {
     set_list(op, 1);
-    set_int(list_get(op, 0), op_NoOp);
+    set_symbol(list_get(op, 0), op_NoOp);
 }
 
 static void bytecode_write_finish_op(caValue* op)
 {
     set_list(op, 1);
-    set_int(list_get(op, 0), op_FinishFrame);
+    set_symbol(list_get(op, 0), op_FinishFrame);
 }
 
 void write_term_bytecode(Term* term, caValue* result)
@@ -1011,11 +1011,11 @@ void write_term_bytecode(Term* term, caValue* result)
     Block* parent = term->owningBlock;
     if (term->index == 0 && get_override_for_block(parent) != NULL) {
         list_resize(result, 1);
-        set_int(list_get(result, 0), op_FireNative);
+        set_symbol(list_get(result, 0), op_FireNative);
 
         if (get_parent_term(term) == FUNCS.dynamic_call) {
             list_resize(result, 3);
-            set_int(list_get(result, 2), name_OutputsToList);
+            set_symbol(list_get(result, 2), name_OutputsToList);
         }
         return;
     }
@@ -1031,11 +1031,11 @@ void write_term_bytecode(Term* term, caValue* result)
             return;
 
         } else if (input == NULL) {
-            set_int(outputTag, op_SetNull);
+            set_symbol(outputTag, op_SetNull);
             list_resize(result, 1);
             return;
         } else {
-            set_int(outputTag, op_InlineCopy);
+            set_symbol(outputTag, op_InlineCopy);
             set_list(inputs, 1);
             set_term_ref(list_get(inputs, 0), term->input(0));
             list_resize(result, 2);
@@ -1045,22 +1045,22 @@ void write_term_bytecode(Term* term, caValue* result)
 
     if (term->function == FUNCS.for_func) {
         list_resize(result, 5);
-        set_int(list_get(result, 0), op_ForLoop);
+        set_symbol(list_get(result, 0), op_ForLoop);
         write_term_input_instructions(term, result, term->nestedContents); // index 1
         write_term_output_instructions(term, result, term->nestedContents); // index 2
 
         // index 3 - a flag which might say LoopProduceOutput
         if (user_count(term) == 0) {
-            set_int(list_get(result, 3), name_None);
+            set_null(list_get(result, 3));
         } else {
-            set_int(list_get(result, 3), name_LoopProduceOutput);
+            set_symbol(list_get(result, 3), name_LoopProduceOutput);
         }
         return;
     }
 
     if (term->function == FUNCS.exit_point) {
         list_get(result, 2);
-        set_int(list_get(result, 0), op_ExitPoint);
+        set_symbol(list_get(result, 0), op_ExitPoint);
         write_term_input_instructions(term, result, function_contents(term->function));
         return;
     }
@@ -1068,23 +1068,23 @@ void write_term_bytecode(Term* term, caValue* result)
     if (term->function == FUNCS.dynamic_call
             || term->function == FUNCS.block_dynamic_call) {
         list_resize(result, 3);
-        set_int(list_get(result, 0), op_DynamicCall);
+        set_symbol(list_get(result, 0), op_DynamicCall);
         write_term_input_instructions(term, result, function_contents(term->function));
-        set_int(list_get(result, 2), name_OutputsToList);
+        set_symbol(list_get(result, 2), name_OutputsToList);
         return;
     }
 
     if (term->function == FUNCS.closure_call) {
         list_resize(result, 3);
-        set_int(list_get(result, 0), op_ClosureCall);
+        set_symbol(list_get(result, 0), op_ClosureCall);
         write_term_input_instructions(term, result, function_contents(term->function));
-        set_int(list_get(result, 2), name_FlatOutputs);
+        set_symbol(list_get(result, 2), name_FlatOutputs);
         return;
     }
     
     // Choose the next block
     Block* block = NULL;
-    Name tag = 0;
+    Symbol tag = 0;
 
     if (is_value(term)) {
         // Value terms are no-ops.
@@ -1114,7 +1114,7 @@ void write_term_bytecode(Term* term, caValue* result)
 
     if (tag == op_NoOp || block == NULL || block_is_evaluation_empty(block)) {
         // No-op
-        set_int(outputTag, op_NoOp);
+        set_symbol(outputTag, op_NoOp);
         list_resize(result, 1);
         return;
     }
@@ -1125,7 +1125,7 @@ void write_term_bytecode(Term* term, caValue* result)
     }
 
     // If we made it this far, then it's a normal call. Save the tag.
-    set_int(outputTag, tag);
+    set_symbol(outputTag, tag);
 
     // Write input & output instructions
     write_term_input_instructions(term, result, block);
@@ -1166,13 +1166,13 @@ void write_block_bytecode(Block* block, caValue* output)
 
         // Finish for-loop.
         set_list(finishOp, 2);
-        set_int(list_get(finishOp, 0), op_FinishLoop);
+        set_symbol(list_get(finishOp, 0), op_FinishLoop);
 
         // Possibly produce output, depending on if this term is used.
         if ((block->owningTerm != NULL) && user_count(block->owningTerm) > 0) {
-            set_int(list_get(finishOp, 1), name_LoopProduceOutput);
+            set_symbol(list_get(finishOp, 1), name_LoopProduceOutput);
         } else {
-            set_int(list_get(finishOp, 1), name_None);
+            set_null(list_get(finishOp, 1));
         }
     } else {
         // Normal finish op.
@@ -1191,7 +1191,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
 
             // Tagged list
 
-            caName tag = as_int(list_get(action, 0));
+            Symbol tag = as_symbol(list_get(action, 0));
 
             switch (tag) {
             case name_Multiple: {
@@ -1248,7 +1248,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
 
 static Block* find_pushed_block_for_action(caValue* action)
 {
-    switch (as_int(list_get(action, 0))) {
+    switch (first_name(action)) {
     case op_CallBlock:
         return as_block(list_get(action, 2));
     default:
@@ -1348,7 +1348,7 @@ static void step_interpreter(Stack* stack)
         Frame* frame = push_frame(stack, block);
         caValue* inputActions = list_get(action, 1);
         populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
-        bool enableLoopOutput = as_int(list_get(action, 3)) == name_LoopProduceOutput;
+        bool enableLoopOutput = as_symbol(list_get(action, 3)) == name_LoopProduceOutput;
         start_for_loop(stack, enableLoopOutput);
         break;
     }
@@ -1384,7 +1384,7 @@ static void step_interpreter(Stack* stack)
         caValue* control = find_stack_value_for_term(stack, currentTerm->input(0), 0);
 
         // Only exit if the control says we should exit.
-        if (!is_int(control) || as_int(control) == name_None)
+        if (!is_symbol(control) || as_symbol(control) == name_None)
             return;
 
         int intermediateOutputCount = currentTerm->numInputs() - 1;
@@ -1409,7 +1409,7 @@ static void step_interpreter(Stack* stack)
         }
 
         // Set PC to end
-        frame->exitType = as_int(control);
+        frame->exitType = as_symbol(control);
         frame->nextPc = block->length();
         break;
     }
@@ -1418,7 +1418,7 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_FinishLoop: {
-        bool enableLoopOutput = as_int(list_get(action, 1)) == name_LoopProduceOutput;
+        bool enableLoopOutput = as_symbol(list_get(action, 1)) == name_LoopProduceOutput;
         for_loop_finish_iteration(stack, enableLoopOutput);
         break;
     }

@@ -171,7 +171,7 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         return;
     }
 
-    // Name binding
+    // Symbol binding
     format_name_binding(source, term);
 
     // possibly add parens
@@ -365,7 +365,7 @@ void format_name_binding(caValue* source, Term* term)
     }
 }
 
-void append_phrase(caValue* source, const char* str, Term* term, Name type)
+void append_phrase(caValue* source, const char* str, Term* term, Symbol type)
 {
     // No-op if string is empty
     if (str[0] == 0)
@@ -389,10 +389,10 @@ void append_phrase(caValue* source, const char* str, Term* term, Name type)
     list->resize(3);
     set_string((*list)[0], str);
     set_term_ref((*list)[1], term);
-    set_int((*list)[2], type);
+    set_symbol((*list)[2], type);
 }
 
-void append_phrase(caValue* source, std::string const& str, Term* term, Name type)
+void append_phrase(caValue* source, std::string const& str, Term* term, Symbol type)
 {
     return append_phrase(source, str.c_str(), term, type);
 }

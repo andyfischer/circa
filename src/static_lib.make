@@ -106,6 +106,7 @@ OBJECTS := \
 	$(OBJDIR)/str_repr.o \
 	$(OBJDIR)/string_type.o \
 	$(OBJDIR)/switch_block.o \
+	$(OBJDIR)/symbols.o \
 	$(OBJDIR)/tagged_value.o \
 	$(OBJDIR)/term.o \
 	$(OBJDIR)/term_list.o \
@@ -305,6 +306,9 @@ $(OBJDIR)/string_type.o: string_type.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/switch_block.o: switch_block.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/symbols.o: symbols.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tagged_value.o: tagged_value.cpp

@@ -9,7 +9,7 @@ struct NameSearch
     Block* block;
 
     // Search name.
-    Name name;
+    Value name;
 
     // Search position; the name search will look for bindings at this block index and
     // above.
@@ -23,7 +23,7 @@ struct NameSearch
 
     // Lookup type, this may specify that we only search for type, function or module
     // values. This might also be LookupAny, to ignore the term's type.
-    Name lookupType;
+    Symbol lookupType;
 
     // Whether to search parent blockes (if not found in target block).
     bool searchParent;
@@ -31,30 +31,30 @@ struct NameSearch
 
 // Finds a name in this block or a visible parent block.
 Term* find_name(Block* block,
-                Name name,
+                caValue* name,
                 int position = -1,
-                Name lookupType = name_LookupAny);
+                Symbol lookupType = name_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
-                      Name name,
+                      caValue* name,
                       int position = -1,
-                      Name lookupType = name_LookupAny);
+                      Symbol lookupType = name_LookupAny);
 
 // Convenient overloads for using a string as a name
 Term* find_name(Block* block,
                 const char* name,
                 int position = -1,
-                Name lookupType = name_LookupAny);
+                Symbol lookupType = name_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       const char* name,
                       int position = -1,
-                      Name lookupType = name_LookupAny);
+                      Symbol lookupType = name_LookupAny);
 
 Term* find_name_at(Term* term, const char* name);
-Term* find_name_at(Term* term, Name name);
+Term* find_name_at(Term* term, caValue* name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
 // of the first colon. If the string isn't a qualified name then returns -1.
@@ -101,22 +101,25 @@ Block* find_function(World* world, const char* name);
 Block* find_function_local(Block* block, const char* name);
 Block* find_module(World* world, const char* name);
 
-bool name_is_valid(Name index);
-const char* name_to_string(Name name);
-void name_to_string(Name name, String* string);
-Name qualified_name_get_first_section(Name name);
-Name qualified_name_get_remainder_after_first_section(Name name);
+#if 0
+const char* name_to_string(Symbol name);
+void name_to_string(Symbol name, String* string);
+#endif
+void qualified_name_get_first_section(caValue* name, caValue* prefixResult);
+void qualified_name_get_remainder_after_first_section(caValue* name, caValue* suffixResult);
 
 // Returns a name if there is already one with this string, otherwise returns None.
-Name existing_name_from_string(const char* str);
-Name existing_name_from_string(const char* str, int len);
+#if 0
+Symbol existing_name_from_string(const char* str);
+Symbol existing_name_from_string(const char* str, int len);
 
 // Return a name from this string, adding it if necessary.
-Name name_from_string(const char* str);
-Name name_from_string(std::string const& str);
-Name name_from_string(caValue* str);
+Symbol name_from_string(const char* str);
+Symbol name_from_string(std::string const& str);
+Symbol name_from_string(caValue* str);
 
 // Deallocate all interned names, this should be called at shutdown
 void name_dealloc_global_data();
+#endif
 
 } // namespace circa

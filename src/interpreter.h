@@ -30,7 +30,7 @@ struct Frame
     int parentPc;
 
     // The role or state of this frame.
-    caName role;
+    Symbol role;
 
     // Register values.
     List registers;
@@ -49,7 +49,7 @@ struct Frame
     int nextPc;
 
     // When a block is exited early, this stores the exit type.
-    caName exitType;
+    Symbol exitType;
     
     // If true, the interpreter should stop after completing this frame. The frame
     // will be left on the stack.

@@ -111,7 +111,7 @@ bool list_contains(caValue* list, caValue* element);
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.
-Name list_get_parameter_type(caValue* parameter);
+Symbol list_get_parameter_type(caValue* parameter);
 bool list_type_has_specific_size(caValue* parameter);
 void list_initialize_parameter_from_type_decl(Block* typeDecl, caValue* parameter);
 

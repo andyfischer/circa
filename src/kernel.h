@@ -113,6 +113,7 @@ struct BuiltinTypes {
     Type* term;
     Type* selector;
     Type* string;
+    Type* symbol;
     Type* type;
     Type* void_type;
 };

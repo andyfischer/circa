@@ -296,28 +296,28 @@ Block::clear()
     clear_block(this);
 }
 
-Term* Block::findFirstBinding(Name name)
+Term* Block::findFirstBinding(caValue* name)
 {
     for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
             continue;
-        if (_terms[i]->nameSymbol == name)
+        if (equals(&_terms[i]->nameValue, name))
             return _terms[i];
     }
 
     return NULL;
 }
 
-void Block::bindName(Term* term, Name name)
+void Block::bindName(Term* term, caValue* name)
 {
     assert_valid_term(term);
-    if (!has_empty_name(term) && term->nameSymbol != name) {
+    if (!has_empty_name(term) && !equals(&term->nameValue, name)) {
         internal_error(std::string("term already has a name: ") + term->nameStr());
     }
 
-    names.bind(term, name_to_string(name));
-    term->nameSymbol = name;
-    term->name = name_to_string(name);
+    names.bind(term, as_cstring(name));
+    copy(name, &term->nameValue);
+    term->name = as_cstring(name);
     update_unique_name(term);
 }
 
@@ -541,7 +541,7 @@ void duplicate_block_nested(TermMap& newTermMap, Block* source, Block* dest)
     for (int index=0; index < source->length(); index++) {
         Term* source_term = source->get(index);
 
-        Term* dest_term = create_duplicate(dest, source_term, source_term->name);
+        Term* dest_term = create_duplicate(dest, source_term, &source_term->nameValue);
 
         newTermMap[source_term] = dest_term;
 
@@ -570,12 +570,12 @@ void duplicate_block(Block* source, Block* dest)
     dest->names.remapPointers(newTermMap);
 }
 
-Name load_script(Block* block, const char* filename)
+Symbol load_script(Block* block, const char* filename)
 {
     // Store the file origin
     caValue* origin = block_insert_property(block, str_origin);
     set_list(origin, 3);
-    set_string(list_get(origin, 0), "file");
+    set_symbol(list_get(origin, 0), name_File);
     set_string(list_get(origin, 1), filename);
     set_int(list_get(origin, 2), circa_file_get_version(filename));
 
@@ -697,7 +697,7 @@ caValue* block_get_file_origin(Block* block)
     if (list_length(origin) != 3)
         return NULL;
 
-    if (!string_eq(list_get(origin, 0), "file"))
+    if (as_symbol(list_get(origin, 0)) != name_File)
         return NULL;
 
     return origin;
@@ -712,7 +712,7 @@ bool check_and_update_file_origin(Block* block, const char* filename)
     if (origin == NULL) {
         origin = block_insert_property(block, str_origin);
         set_list(origin, 3);
-        set_string(list_get(origin, 0), "file");
+        set_symbol(list_get(origin, 0), name_File);
         set_string(list_get(origin, 1), filename);
         set_int(list_get(origin, 2), version);
         return true;

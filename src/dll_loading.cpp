@@ -138,7 +138,7 @@ void patch_block_recr(Dll* dll, Block* block, std::string namespacePrefix)
                 if (name[i] == '.')
                     name[i] = '_';
 
-            std::string searchName = namespacePrefix + name;
+            std::string searchSymbol = namespacePrefix + name;
 
             void* newEvaluateFunc = find_func_in_dll(dll, searchName.c_str());
 
@@ -183,7 +183,7 @@ void find_dll_for_script(Block* block, caValue* resultOut)
     String* filename = (String*) block_get_source_filename(block);
 
     if (!is_string(filename)) {
-        set_name(resultOut, name_Failure);
+        set_symbol(resultOut, name_Failure);
         return;
     }
 

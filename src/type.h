@@ -65,7 +65,7 @@ struct Type
     Value name;
 
     // Enum describing the data structure used to store this type's value.
-    Name storageType;
+    Symbol storageType;
 
     Term* declaringTerm;
 

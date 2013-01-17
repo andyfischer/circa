@@ -41,7 +41,7 @@ Keyword
 Whitespace
 UnknownIdentifier
 
-# Name search options
+# Symbol search options
 LookupAny
 LookupType
 LookupFunction
@@ -77,7 +77,7 @@ StorageTypeObject
 
 # Tokens
 tok_Identifier
-tok_ColonString
+tok_Name
 tok_Integer
 tok_HexInteger
 tok_Float

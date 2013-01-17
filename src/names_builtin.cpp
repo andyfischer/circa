@@ -69,7 +69,7 @@ const char* builtin_name_to_string(int name)
     case name_StorageTypeHashtable: return "StorageTypeHashtable";
     case name_StorageTypeObject: return "StorageTypeObject";
     case tok_Identifier: return "tok_Identifier";
-    case tok_ColonString: return "tok_ColonString";
+    case tok_Name: return "tok_Name";
     case tok_Integer: return "tok_Integer";
     case tok_HexInteger: return "tok_HexInteger";
     case tok_Float: return "tok_Float";
@@ -1253,10 +1253,6 @@ int builtin_name_from_string(const char* str)
         if (strcmp(str + 10, "") == 0)
             return tok_Colon;
         break;
-    case 'S':
-        if (strcmp(str + 10, "tring") == 0)
-            return tok_ColonString;
-        break;
     case 'E':
         if (strcmp(str + 10, "quals") == 0)
             return tok_ColonEquals;
@@ -1546,9 +1542,25 @@ int builtin_name_from_string(const char* str)
     switch (str[5]) {
     default: return -1;
     case 'a':
-        if (strcmp(str + 6, "mespace") == 0)
+    switch (str[6]) {
+    default: return -1;
+    case 'm':
+    switch (str[7]) {
+    default: return -1;
+    case 'e':
+    switch (str[8]) {
+    default: return -1;
+    case 0:
+        if (strcmp(str + 9, "") == 0)
+            return tok_Name;
+        break;
+    case 's':
+        if (strcmp(str + 9, "pace") == 0)
             return tok_Namespace;
         break;
+    }
+    }
+    }
     case 'u':
         if (strcmp(str + 6, "ll") == 0)
             return tok_Null;

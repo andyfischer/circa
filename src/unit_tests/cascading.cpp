@@ -21,7 +21,7 @@ void test_rename()
     test_assert(d->input(0) == b);
     test_assert(d->input(1) == b);
 
-    rename(c, name_from_string("b"));
+    rename(c, "b");
 
     test_assert(d->input(0) == c);
     test_assert(d->input(1) == c);

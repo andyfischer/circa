@@ -63,7 +63,7 @@ struct TermMap;
 struct Type;
 
 typedef bool (*TermVisitor)(Term* term, caValue* context);
-typedef int Name;
+typedef int Symbol;
 
 // Function-related typedefs:
 
@@ -74,8 +74,6 @@ typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(caValue* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 typedef void (*ReleaseFunc)(caValue* value);
-
-const int MAX_INPUTS = 64;
 
 // Garbage collection
 typedef char GCColor;

@@ -84,7 +84,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     int existingInputCount = ifBlock->numInputs();
 
     Term* placeholder = append_input_placeholder(contents);
-    rename(placeholder, input->nameSymbol);
+    rename(placeholder, &input->nameValue);
     change_declared_type(placeholder, input->type);
 
     set_input(ifBlock, existingInputCount, input);
@@ -95,7 +95,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
         Block* caseContents = nested_contents(term);
         Term* casePlaceholder = append_input_placeholder(caseContents);
         change_declared_type(casePlaceholder, placeholder->type);
-        rename(casePlaceholder, input->nameSymbol);
+        rename(casePlaceholder, &input->nameValue);
     }
 
     return placeholder;
@@ -122,10 +122,8 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     return placeholder;
 }
 
-Term* if_block_append_output(Block* block, const char* nameString)
+Term* if_block_append_output(Block* block, caValue* name)
 {
-    Name name = name_from_string(nameString);
-
     Term* placeholder = append_output_placeholder(block, NULL);
     if (name != name_None)
         rename(placeholder, name);
@@ -189,7 +187,7 @@ Term* if_block_append_case(Block* block, Term* input)
         if (placeholder == NULL) break;
         Term* localPlaceholder = append_input_placeholder(nested_contents(newCase));
         change_declared_type(localPlaceholder, placeholder->type);
-        rename(localPlaceholder, placeholder->nameSymbol);
+        rename(localPlaceholder, &placeholder->nameValue);
     }
 
     // Add existing output placeholders to this case
@@ -198,7 +196,7 @@ Term* if_block_append_case(Block* block, Term* input)
         if (placeholder == NULL) break;
         Term* localPlaceholder = append_output_placeholder(nested_contents(newCase), NULL);
         change_declared_type(localPlaceholder, placeholder->type);
-        rename(localPlaceholder, placeholder->nameSymbol);
+        rename(localPlaceholder, &placeholder->nameValue);
     }
 
     return newCase;
@@ -288,7 +286,7 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 
         set_input(ifCall, i, outer);
         Term* placeholder = append_input_placeholder(nested_contents(ifCall));
-        rename(placeholder, outer->nameSymbol);
+        rename(placeholder, &outer->nameValue);
 
         // Go through each case and repoint to this new placeholder
         for (CaseIterator it(contents); it.unfinished(); it.advance()) {
@@ -354,7 +352,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
         if (term->name == "")
             continue;
 
-        Name name = term->nameSymbol;
+        caValue* name = &term->nameValue;
 
         Term* outer = find_name(outerBlock, name);
         if (outer == NULL)
@@ -365,7 +363,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
         // First, bring in the outer name as an input to the block.
 
         // Check if we already have an output for this name.
-        Term* inputPlaceholder = find_input_placeholder_with_name(mainBlock, name_to_string(name));
+        Term* inputPlaceholder = find_input_placeholder_with_name(mainBlock, name);
 
         // Create it if necessary
         if (inputPlaceholder == NULL) {
@@ -383,10 +381,10 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
         }
 
         // Now make sure there is an output placeholder for this name.
-        Term* outputPlaceholder = find_output_placeholder_with_name(mainBlock, name_to_string(name));
+        Term* outputPlaceholder = find_output_placeholder_with_name(mainBlock, name);
 
         if (outputPlaceholder == NULL)
-            outputPlaceholder = if_block_append_output(mainBlock, name_to_string(name));
+            outputPlaceholder = if_block_append_output(mainBlock, name);
     }
 }
 
@@ -428,7 +426,7 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
     names.removeNulls();
 
     for (int i=0; i < names.length(); i++) {
-        const char* name = as_cstring(names[i]);
+        caValue* name = names[i];
 
         // Skip if name is already bound
         if (find_output_placeholder_with_name(contents, name) != NULL)

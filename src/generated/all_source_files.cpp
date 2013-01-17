@@ -40,6 +40,7 @@
 #include "../str_repr.cpp"
 #include "../string_type.cpp"
 #include "../switch_block.cpp"
+#include "../symbols.cpp"
 #include "../tagged_value.cpp"
 #include "../term.cpp"
 #include "../term_list.cpp"

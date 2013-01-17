@@ -162,7 +162,7 @@ Term* write_selector_for_accessor_chain(Block* block, TermList* chain)
             selectorInputs.append(term->input(1));
 
         } else if (is_accessor_function(term)) {
-            Term* element = create_string(block, term->stringProp("syntax:functionName", ""));
+            Term* element = create_string(block, term->stringProp("syntax:functionName", "").c_str());
             selectorInputs.append(element);
         }
     }
@@ -175,7 +175,7 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
     // Check if this isn't a recognized accessor.
     if (!has_empty_name(accessor)) {
         // Just create a named copy of 'result'.
-        return apply(block, FUNCS.copy, TermList(result), accessor->nameSymbol);
+        return apply(block, FUNCS.copy, TermList(result), &accessor->nameValue);
     }
 
     TermList accessorChain;
@@ -187,7 +187,7 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
     Term* selector = write_selector_for_accessor_chain(block, &accessorChain);
 
     Term* set = apply(block, FUNCS.set_with_selector,
-            TermList(head, selector, result), head->nameSymbol);
+            TermList(head, selector, result), &head->nameValue);
 
     change_declared_type(set, declared_type(head));
     return set;
@@ -221,7 +221,7 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* result)
 
         if (input == head) {
             // No accessor expression, then just do a name rebind.
-            rename(result, head->nameSymbol);
+            rename(result, &head->nameValue);
             result->setBoolProp("syntax:implicitName", true);
         } else {
             // Create a set_with_selector expression.
@@ -231,7 +231,7 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* result)
             Term* selector = write_selector_for_accessor_chain(block, &accessorChain);
 
             Term* set = apply(block, FUNCS.set_with_selector,
-                    TermList(head, selector, result), head->nameSymbol);
+                    TermList(head, selector, result), &head->nameValue);
 
             change_declared_type(set, declared_type(head));
         }

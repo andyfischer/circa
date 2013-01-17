@@ -27,6 +27,13 @@ def changed(any current) -> bool
     prev = current
     return result
 
+def first_name(any val) -> Symbol
+    if type(val) == Symbol
+        val
+    elif type(val) == List
+        if length(val) > 0
+            first_name(val[0])
+
 def dynamic_call(Block block, List inputs) -> List
     -- Dynamic function dispatch
 

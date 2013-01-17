@@ -211,7 +211,7 @@ void rewrite_block(Block* block, caValue* contents, caValue* reply)
         print_static_errors_formatted(block);
         set_string(reply, errors.str());
     } else {
-        set_string(reply, "success");
+        set_symbol(reply, name_Success);
     }
 }
 
@@ -221,8 +221,7 @@ void do_write_block(caValue* blockName, caValue* contents, caValue* reply)
 
     // Create the block if needed
     if (term == NULL)
-        term = apply(global_root_block(), FUNCS.section_block, TermList(),
-                name_from_string(blockName));
+        term = apply(global_root_block(), FUNCS.section_block, TermList(), blockName);
 
     // Import the new block contents
     Block* block = nested_contents(term);
@@ -497,7 +496,7 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     if (string_eq(list_get(args, 0), "-call")) {
-        Name loadResult = load_script(mainBlock, as_cstring(list_get(args, 1)));
+        Symbol loadResult = load_script(mainBlock, as_cstring(list_get(args, 1)));
 
         if (loadResult == name_Failure) {
             std::cout << "Failed to load file: " <<  as_cstring(list_get(args, 1)) << std::endl;

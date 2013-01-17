@@ -42,6 +42,7 @@
 #include "types/eval_context.h"
 #include "types/indexable.h"
 #include "types/int.h"
+#include "types/name.h"
 #include "types/number.h"
 #include "types/set.h"
 #include "types/void.h"
@@ -114,7 +115,7 @@ void to_string_repr(caStack* stack)
 void call_actor_func(caStack* stack)
 {
 #if 0 // actorList disabled
-    const char* actorName = circa_string_input(stack, 0);
+    const char* actorSymbol = circa_string_input(stack, 0);
     caValue* msg = circa_input(stack, 1);
 
     if (stack->world == NULL) {
@@ -165,7 +166,7 @@ void dynamic_method_call(caStack* stack)
 void send_func(caStack* stack)
 {
 #if 0 // actorList disabled
-    const char* actorName = circa_string_input(stack, 0);
+    const char* actorSymbol = circa_string_input(stack, 0);
     caValue* msg = circa_input(stack, 1);
 
     if (stack->world == NULL) {
@@ -188,8 +189,7 @@ void send_func(caStack* stack)
 
 void refactor__rename(caStack* stack)
 {
-    rename(as_term_ref(circa_input(stack, 0)),
-            name_from_string(circa_input(stack, 1)));
+    rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
 }
 
 void refactor__change_function(caStack* stack)
@@ -796,6 +796,7 @@ void bootstrap_kernel()
     TYPES.list = create_type();
     TYPES.map = create_type();
     TYPES.opaque_pointer = create_type();
+    TYPES.symbol = create_type();
     TYPES.term = create_type();
     TYPES.void_type = create_type();
 
@@ -808,6 +809,7 @@ void bootstrap_kernel()
     hashtable_setup_type(TYPES.map);
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
+    name_t::setup_type(TYPES.symbol);
     null_t::setup_type(TYPES.null);
     number_t::setup_type(TYPES.float_type);
     opaque_pointer_t::setup_type(TYPES.opaque_pointer);
@@ -834,7 +836,7 @@ void bootstrap_kernel()
 
     // Create value function
     Term* valueFunc = kernel->appendNew();
-    rename(valueFunc, name_from_string("value"));
+    rename(valueFunc, "value");
     FUNCS.value = valueFunc;
 
     // Create Type type
@@ -844,7 +846,7 @@ void bootstrap_kernel()
     term_value(typeType)->value_type = TYPES.type;
     term_value(typeType)->value_data.ptr = TYPES.type;
     TYPES.type->declaringTerm = typeType;
-    rename(typeType, name_from_string("Type"));
+    rename(typeType, "Type");
 
     // Create Any type
     Term* anyType = kernel->appendNew();
@@ -853,7 +855,7 @@ void bootstrap_kernel()
     term_value(anyType)->value_type = TYPES.type;
     term_value(anyType)->value_data.ptr = TYPES.any;
     TYPES.any->declaringTerm = anyType;
-    rename(anyType, name_from_string("any"));
+    rename(anyType, "any");
 
     // Create Function type
     Term* functionType = kernel->appendNew();
@@ -862,7 +864,7 @@ void bootstrap_kernel()
     TYPES.function->declaringTerm = functionType;
     term_value(functionType)->value_type = TYPES.type;
     term_value(functionType)->value_data.ptr = TYPES.function;
-    rename(functionType, name_from_string("Function"));
+    rename(functionType, "Function");
 
     // Initialize value() func
     valueFunc->type = TYPES.function;
@@ -883,6 +885,7 @@ void bootstrap_kernel()
     create_type_value(kernel, TYPES.list, "List");
     create_type_value(kernel, TYPES.opaque_pointer, "opaque_pointer");
     create_type_value(kernel, TYPES.string, "String");
+    create_type_value(kernel, TYPES.symbol, "Symbol");
     create_type_value(kernel, TYPES.term, "Term");
     create_type_value(kernel, TYPES.void_type, "void");
     create_type_value(kernel, TYPES.map, "Map");
@@ -1189,8 +1192,6 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
     world->root = NULL;
 
     memset(&FUNCS, 0, sizeof(FUNCS));
-
-    name_dealloc_global_data();
 
     gc_collect();
 
