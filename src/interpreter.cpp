@@ -1248,7 +1248,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
 
 static Block* find_pushed_block_for_action(caValue* action)
 {
-    switch (first_name(action)) {
+    switch (first_symbol(action)) {
     case op_CallBlock:
         return as_block(list_get(action, 2));
     default:

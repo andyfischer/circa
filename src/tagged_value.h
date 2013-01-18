@@ -135,9 +135,9 @@ void set_function(caValue* value, Function* function);
 float to_float(caValue* value);
 int to_int(caValue* value);
 
-// If the value is a name, return it. If it's a value and the first element is a name,
+// If the value is a symbol, return it. If it's a value and the first element is a symbol,
 // then return that. Will recursively search if the first element is itself a list.
-// Returns name_None if a name value was not found.
-Symbol first_name(caValue* value);
+// Returns name_None if a symbol value was not found.
+Symbol first_symbol(caValue* value);
 
 } // namespace circa

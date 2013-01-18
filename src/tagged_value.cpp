@@ -552,12 +552,12 @@ int to_int(caValue* value)
     return 0;
 }
 
-Symbol first_name(caValue* value)
+Symbol first_symbol(caValue* value)
 {
     if (is_symbol(value))
         return as_symbol(value);
     if (is_list(value))
-        return first_name(list_get(value, 0));
+        return first_symbol(list_get(value, 0));
     return name_None;
 }
 
