@@ -80,6 +80,8 @@ struct TokenStream
 
     bool nextIs(int match, int lookahead=0) const;
 
+    Symbol nextMatch(int lookahead=0) const;
+
     // Consume the next token. If a token match is provided, and the next token doesn't
     // have this match, then we trigger a fatal error. This matching should be treated
     // like an assert().

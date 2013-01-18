@@ -31,6 +31,14 @@ Return
 Continue
 Break
 Discard
+Control
+ExitLevelFunction
+ExitLevelLoop
+HighestExitLevel
+ExtraReturn
+Name
+Primary
+Anonymous
 
 # Formatted-source phrase types
 InfixOperator
@@ -77,7 +85,7 @@ StorageTypeObject
 
 # Tokens
 tok_Identifier
-tok_Name
+tok_ColonString
 tok_Integer
 tok_HexInteger
 tok_Float
@@ -176,6 +184,10 @@ op_FireNative
 op_CaseBlock
 op_ForLoop
 op_ExitPoint
+op_Return
+op_Continue
+op_Break
+op_Discard
 op_FinishFrame
 op_FinishLoop
 op_ErrorNotEnoughInputs

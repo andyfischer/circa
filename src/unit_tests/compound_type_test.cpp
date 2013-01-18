@@ -6,7 +6,7 @@
 #include "list.h"
 #include "type.h"
 
-namespace compound_type {
+namespace compound_type_test {
 
 void build_compound_type()
 {
@@ -28,7 +28,7 @@ void build_compound_type()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(build_compound_type);
+    REGISTER_TEST_CASE(compound_type_test::build_compound_type);
 }
 
 }

@@ -17,7 +17,7 @@ Term* if_block_get_output_by_name(Block* block, const char* name);
 // Building
 void if_block_start(Block* block);
 Term* if_block_append_case(Block* block, Term* input);
-Term* if_block_append_output(Block* block, caValue* name);
+Term* if_block_append_output(Block* block, caValue* description);
 void if_block_finish_appended_case(Block* block, Term* caseTerm);
 void finish_if_block(Term* ifBlock);
 

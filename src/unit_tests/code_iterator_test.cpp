@@ -6,7 +6,7 @@
 #include "code_iterators.h"
 #include "debug.h"
 
-namespace code_iterators {
+namespace code_iterator_test {
 
 void block_iterator_2()
 {
@@ -53,9 +53,9 @@ void name_visible_iterator_1()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(code_iterators::block_iterator_2);
-    REGISTER_TEST_CASE(code_iterators::block_iterator_2_2);
-    REGISTER_TEST_CASE(code_iterators::name_visible_iterator_1);
+    REGISTER_TEST_CASE(code_iterator_test::block_iterator_2);
+    REGISTER_TEST_CASE(code_iterator_test::block_iterator_2_2);
+    REGISTER_TEST_CASE(code_iterator_test::name_visible_iterator_1);
 }
 
-} // namespace code_iterators
+} // namespace code_iterator_test

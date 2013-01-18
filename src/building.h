@@ -70,9 +70,16 @@ Term* duplicate_value(Block* block, Term* term);
 // Add an input_placeholder() term after the existing placeholders.
 Term* append_input_placeholder(Block* block);
 Term* append_output_placeholder(Block* block, Term* result);
+Term* append_output_placeholder_with_description(Block* block, caValue* description);
 Term* prepend_output_placeholder(Block* block, Term* result);
+Term* insert_output_placeholder(Block* block, Term* result, int location);
 Term* append_state_input(Block* block);
 Term* append_state_output(Block* block);
+
+Term* find_output_placeholder_with_name(Block* block, caValue* name);
+Term* find_output_from_description(Block* block, caValue* description);
+void get_output_description(Term* output, caValue* result);
+int count_anonymous_outputs(Block* block);
 
 // Extra outputs
 void update_extra_outputs(Term* term);
@@ -111,7 +118,6 @@ void list_outer_pointers(Block* block, TermList* list);
 int find_input_index_for_pointer(Term* call, Term* input);
 void check_to_add_primary_output_placeholder(Block* block);
 void check_to_add_state_output_placeholder(Block* block);
-Term* find_intermediate_result_for_output(Term* location, Term* output);
 
 // Refactoring
 

@@ -21,9 +21,26 @@ void test_sneaky_equals()
     test_assert(circa_string(&val1) == circa_string(&val2));
 }
 
+void test_prepend()
+{
+    Value hello, there;
+    set_string(&hello, "hello");
+    set_string(&there, "there");
+
+    test_equals(&hello, "hello");
+    test_equals(&there, "there");
+
+    string_prepend(&there, " ");
+    test_equals(&there, " there");
+    string_prepend(&there, &hello);
+    string_prepend(&there, "hello there");
+    test_equals(&hello, "hello");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_sneaky_equals);
+    REGISTER_TEST_CASE(test_prepend);
 }
 
 } // namespace string_tests

@@ -6,7 +6,7 @@
 #include "building.h"
 #include "block.h"
 
-namespace cascading {
+namespace cascading_test {
 
 void test_rename()
 {
@@ -29,7 +29,7 @@ void test_rename()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(cascading::test_rename);
+    REGISTER_TEST_CASE(cascading_test::test_rename);
 }
 
 } // namespace cascading

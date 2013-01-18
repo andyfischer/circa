@@ -335,10 +335,12 @@ void test_block_as_assertions_list(Block* block, std::string const& contextStr)
     }
 }
 
-namespace block { void register_tests(); }
-namespace c_objects { void register_tests(); }
-namespace code_iterators { void register_tests(); }
-namespace compound_type { void register_tests(); }
+namespace block_test { void register_tests(); }
+namespace building_test { void register_tests(); }
+namespace c_objects_test { void register_tests(); }
+namespace code_iterator_test { void register_tests(); }
+namespace compound_type_test { void register_tests(); }
+namespace control_flow_test { void register_tests(); }
 namespace fakefs { void register_tests(); }
 namespace file { void register_tests(); }
 namespace file_watch { void register_tests(); }
@@ -354,10 +356,12 @@ namespace tokenizer { void register_tests(); }
 
 int main(int argc, char** argv)
 {
-    block::register_tests();
-    c_objects::register_tests();
-    code_iterators::register_tests();
-    compound_type::register_tests();
+    block_test::register_tests();
+    building_test::register_tests();
+    c_objects_test::register_tests();
+    code_iterator_test::register_tests();
+    compound_type_test::register_tests();
+    control_flow_test::register_tests();
     fakefs::register_tests();
     file::register_tests();
     file_watch::register_tests();

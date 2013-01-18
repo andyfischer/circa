@@ -213,15 +213,6 @@ Block* find_enclosing_for_loop_contents(Term* term)
     return nested_contents(loop);
 }
 
-bool is_for_loop(Block* block)
-{
-    if (block->owningTerm == NULL)
-        return false;
-    if (FUNCS.for_func == NULL)
-        return false;
-    return block->owningTerm->function == FUNCS.for_func;
-}
-
 Block* for_loop_get_zero_block(Block* contents)
 {
     return contents->get("#zero")->contents();

@@ -168,6 +168,8 @@ Block* include_script(Block* block, const char* filename);
 // block.
 Block* load_script_term(Block* block, const char* filename);
 
+void remove_nulls(Block* block);
+
 Term* find_term_by_id(Block* block, int id);
 
 std::string get_source_file_location(Block* block);

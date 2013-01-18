@@ -17,7 +17,6 @@ void finish_for_loop(Term* forTerm);
 Term* find_enclosing_for_loop(Term* term);
 Block* find_enclosing_for_loop_contents(Term* term);
 
-bool is_for_loop(Block* block);
 Block* for_loop_get_zero_block(Block* forContents);
 void for_loop_remake_zero_block(Block* forContents);
 

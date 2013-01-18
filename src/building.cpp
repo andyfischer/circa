@@ -577,9 +577,42 @@ Term* append_output_placeholder(Block* block, Term* result)
     block->move(term, block->length() - count - 1);
     return term;
 }
+Term* append_output_placeholder_with_description(Block* block, caValue* description)
+{
+    if (is_string(description)) {
+        Term* result = append_output_placeholder(block, find_name(block, description));
+        rename(result, description);
+        return result;
+    }
+
+    caValue* descriptionTag = list_get(description, 0);
+
+    if (as_symbol(descriptionTag) == name_Name) {
+        caValue* name = list_get(description, 1);
+        Term* result = append_output_placeholder(block, find_name(block, name));
+        rename(result, name);
+        return result;
+    } else if (as_symbol(descriptionTag) == name_Control) {
+        Term* result = append_output_placeholder(block, NULL);
+        result->setBoolProp("control", true);
+        return result;
+    } else {
+        Term* result = append_output_placeholder(block, NULL);
+        return result;
+    }
+}
 Term* prepend_output_placeholder(Block* block, Term* result)
 {
     return apply(block, FUNCS.output, TermList(result));
+}
+
+Term* insert_output_placeholder(Block* block, Term* result, int location)
+{
+    Term* term = apply(block, FUNCS.output, TermList(result));
+    if (location != 0) {
+        block->move(term, block->length() - location - 1);
+    }
+    return term;
 }
 
 Term* append_state_input(Block* block)
@@ -614,6 +647,103 @@ Term* append_state_output(Block* block)
     term->setBoolProp("state", true);
     hide_from_source(term);
     return term;
+}
+
+Term* find_output_placeholder_with_name(Block* block, caValue* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(block, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (equals(&placeholder->nameValue, name))
+            return placeholder;
+    }
+}
+
+Term* find_output_from_description(Block* block, caValue* description)
+{
+    if (is_string(description))
+        return find_output_placeholder_with_name(block, description);
+
+    caValue* tag = list_get(description, 0);
+    if (as_symbol(tag) == name_Name) {
+        return find_output_placeholder_with_name(block, list_get(description, 1));
+    }
+
+    else if (as_symbol(tag) == name_Control) {
+        for (int i=0;; i++) {
+            Term* placeholder = get_output_placeholder(block, i);
+            if (placeholder == NULL)
+                return NULL;
+            if (placeholder->hasProperty("control"))
+                return placeholder;
+        }
+    }
+    else if (as_symbol(tag) == name_ExtraReturn) {
+        for (int i=0;; i++) {
+            Term* placeholder = get_output_placeholder(block, i);
+            if (placeholder == NULL)
+                return NULL;
+            if (placeholder->hasProperty("extraReturn"))
+                return placeholder;
+        }
+    }
+
+    return NULL;
+}
+
+void get_output_description(Term* output, caValue* result)
+{
+    // control output
+    if (output->hasProperty("control")) {
+        // return [:control]
+        set_list(result, 1);
+        set_symbol(list_get(result, 0), name_Control);
+        return;
+    }
+
+    // extraReturn output
+    else if (output->hasProperty("extraReturn")) {
+        // return [:extraReturn <index>]
+        set_list(result, 2);
+        set_symbol(list_get(result, 0), name_ExtraReturn);
+        set_int(list_get(result, 1), output->intProp("extraReturn", 0));
+        return;
+    }
+
+    // Named output.
+    else if (!has_empty_name(output)) {
+        // return [:name, <name>]
+        set_list(result, 2);
+        set_symbol(list_get(result, 0), name_Name);
+        copy(term_name(output), list_get(result, 1));
+        return;
+    }
+
+    // Primary output.
+    else if (input_placeholder_index(output) == 0) {
+        // return [:primary]
+        set_list(result, 1);
+        set_symbol(list_get(result, 0), name_Primary);
+        return;
+    }
+
+    set_list(result, 1);
+    set_symbol(list_get(result, 0), name_Anonymous);
+}
+
+int count_anonymous_outputs(Block* block)
+{
+    int result = 0;
+    while (true) {
+        Term* output = get_output_placeholder(block, result);
+        if (output == NULL)
+            break;
+        if (!has_empty_name(output))
+            break;
+        result++;
+    }
+    return result;
 }
 
 void update_extra_outputs(Term* term)
@@ -997,30 +1127,6 @@ void check_to_add_state_output_placeholder(Block* block)
 
     Term* output = apply(block, FUNCS.output, TermList(result));
     output->setBoolProp("state", true);
-}
-
-Term* find_intermediate_result_for_output(Term* location, Term* output)
-{
-    // Check whether the output's connection is valid at this location
-    Term* result = output->input(0);
-    if (result != NULL
-            && result->owningBlock == output->owningBlock
-            && result->index < location->index)
-        return result;
-
-    // State output
-    if (is_state_input(output))
-        return find_open_state_result(location);
-
-    // #return output
-    if (result != NULL && result->name == "#return")
-        return find_name_at(location, "#return");
-
-    // Nearest with same name
-    if (output->name != "")
-        return find_name_at(location, output->name.c_str());
-
-    return NULL;
 }
 
 void rewrite(Term* term, Term* function, TermList const& inputs)

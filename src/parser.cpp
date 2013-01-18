@@ -562,8 +562,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     // Optional list of qualifiers
-    while (tokens.nextIs(tok_Name)) {
-        std::string symbolText = tokens.consumeStr(tok_Name);
+    while (tokens.nextIs(tok_ColonString)) {
+        std::string symbolText = tokens.consumeStr(tok_ColonString);
         if (symbolText == ":throws")
             attrs->throws = true;
         else
@@ -664,8 +664,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
 
         // Optional list of qualifiers
-        while (tokens.nextIs(tok_Name)) {
-            std::string symbolText = tokens.consumeStr(tok_Name);
+        while (tokens.nextIs(tok_ColonString)) {
+            std::string symbolText = tokens.consumeStr(tok_ColonString);
 
             // Future: store syntax hint
             if (symbolText == ":ignore_error") {
@@ -705,9 +705,9 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     tokens.consume(tok_RParen);
 
     // Another optional list of symbols
-    if (tok_Name == lookahead_next_non_whitespace(tokens, false)) {
+    if (tok_ColonString == lookahead_next_non_whitespace(tokens, false)) {
         possible_whitespace(tokens);
-        std::string symbolText = tokens.consumeStr(tok_Name);
+        std::string symbolText = tokens.consumeStr(tok_ColonString);
         if (symbolText == ":parsetime") {
         }
         else
@@ -811,7 +811,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    while (tokens.nextIs(tok_Name)) {
+    while (tokens.nextIs(tok_ColonString)) {
         std::string s = tokens.consumeStr();
 
         // There were once type attributes here
@@ -1357,8 +1357,8 @@ ParseResult return_statement(Block* block, TokenStream& tokens, ParserCxt* conte
     TermList outputs;
 
 consume_next_output:
-    if (!is_statement_ending(tokens.next().match) &&
-            tokens.next().match != tok_RBrace) {
+    if (!is_statement_ending(tokens.nextMatch()) &&
+            tokens.nextMatch() != tok_RBrace) {
 
         outputs.append(expression(block, tokens, context).term);
 
@@ -1389,12 +1389,6 @@ ParseResult discard_statement(Block* block, TokenStream& tokens, ParserCxt* cont
 
     tokens.consume(tok_Discard);
     
-    Term* enclosingForLoop = find_enclosing_for_loop(block->owningTerm);
-
-    if (enclosingForLoop == NULL)
-        return compile_error_for_line(block, tokens, startPosition,
-                "'discard' can only be used inside a for loop");
-
     Term* result = apply(block, FUNCS.discard, TermList());
 
     set_source_location(result, startPosition, tokens);
@@ -1406,12 +1400,6 @@ ParseResult break_statement(Block* block, TokenStream& tokens, ParserCxt* contex
 
     tokens.consume(tok_Break);
     
-    Term* enclosingForLoop = find_enclosing_for_loop(block->owningTerm);
-
-    if (enclosingForLoop == NULL)
-        return compile_error_for_line(block, tokens, startPosition,
-                "'break' can only be used inside a for loop");
-
     Term* result = apply(block, FUNCS.break_func, TermList());
 
     set_source_location(result, startPosition, tokens);
@@ -1423,12 +1411,6 @@ ParseResult continue_statement(Block* block, TokenStream& tokens, ParserCxt* con
 
     tokens.consume(tok_Continue);
     
-    Term* enclosingForLoop = find_enclosing_for_loop(block->owningTerm);
-
-    if (enclosingForLoop == NULL)
-        return compile_error_for_line(block, tokens, startPosition,
-                "'continue' can only be used inside a for loop");
-
     Term* result = apply(block, FUNCS.continue_func, TermList());
 
     set_source_location(result, startPosition, tokens);
@@ -2188,8 +2170,8 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_LBracket))
         result = literal_list(block, tokens, context);
 
-    // literal name?
-    else if (tokens.nextIs(tok_Name))
+    // literal symbol?
+    else if (tokens.nextIs(tok_ColonString))
         result = literal_name(block, tokens, context);
 
     // closure block?
@@ -2426,7 +2408,7 @@ ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context)
     int startPosition = tokens.getPosition();
 
     std::string s = tokens.nextStr();
-    tokens.consume(tok_Name);
+    tokens.consume(tok_ColonString);
 
     Term* term = create_value(block, TYPES.null);
 

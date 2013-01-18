@@ -173,17 +173,6 @@ void type_name_visible_from_module()
     test_equals(test_spy_get_results(), "[{i: 0}]");
 }
 
-void parse_qualified_name()
-{
-    Value name, result;
-
-    set_string(&name, "a:b:c");
-    qualified_name_get_first_section(&name, &result);
-    test_equals(&result, "a");
-    qualified_name_get_remainder_after_first_section(&name, &result);
-    test_equals(&result, "b:c");
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(names::find_name);
@@ -193,7 +182,6 @@ void register_tests()
     REGISTER_TEST_CASE(names::search_every_global_name);
     REGISTER_TEST_CASE(names::bug_with_lookup_type_and_qualified_name);
     REGISTER_TEST_CASE(names::type_name_visible_from_module);
-    REGISTER_TEST_CASE(names::parse_qualified_name);
 }
 
 } // namespace names

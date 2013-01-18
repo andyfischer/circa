@@ -64,11 +64,13 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/block.o \
-	$(OBJDIR)/c_objects.o \
-	$(OBJDIR)/cascading.o \
-	$(OBJDIR)/code_iterators.o \
-	$(OBJDIR)/compound_type.o \
+	$(OBJDIR)/block_test.o \
+	$(OBJDIR)/building_test.o \
+	$(OBJDIR)/c_objects_test.o \
+	$(OBJDIR)/cascading_test.o \
+	$(OBJDIR)/code_iterator_test.o \
+	$(OBJDIR)/compound_type_test.o \
+	$(OBJDIR)/control_flow_test.o \
 	$(OBJDIR)/fakefs.o \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
@@ -142,19 +144,25 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/block.o: unit_tests/block.cpp
+$(OBJDIR)/block_test.o: unit_tests/block_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/c_objects.o: unit_tests/c_objects.cpp
+$(OBJDIR)/building_test.o: unit_tests/building_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/cascading.o: unit_tests/cascading.cpp
+$(OBJDIR)/c_objects_test.o: unit_tests/c_objects_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/code_iterators.o: unit_tests/code_iterators.cpp
+$(OBJDIR)/cascading_test.o: unit_tests/cascading_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/compound_type.o: unit_tests/compound_type.cpp
+$(OBJDIR)/code_iterator_test.o: unit_tests/code_iterator_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/compound_type_test.o: unit_tests/compound_type_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/control_flow_test.o: unit_tests/control_flow_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/fakefs.o: unit_tests/fakefs.cpp

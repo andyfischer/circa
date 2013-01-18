@@ -901,11 +901,8 @@ static void start_interpreter_session(Stack* stack)
     }
 }
 
-void write_term_input_instructions(Term* term, caValue* op, Block* block)
+void write_term_input_instructions(Term* term, Block* block, caValue* result)
 {
-    caValue* outputTag = list_get(op, 0);
-    caValue* inputs = list_get(op, 1);
-
     // Check the input count
     int inputCount = term->numInputs();
     int expectedCount = count_input_placeholders(block);
@@ -916,18 +913,18 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
 
     if (inputCount < requiredCount) {
         // Fail, not enough inputs.
-        set_symbol(outputTag, op_ErrorNotEnoughInputs);
+        set_symbol(result, op_ErrorNotEnoughInputs);
         return;
     }
 
     if (inputCount > expectedCount && !varargs) {
         // Fail, too many inputs.
-        set_symbol(outputTag, op_ErrorTooManyInputs);
+        set_symbol(result, op_ErrorTooManyInputs);
         return;
     }
     
     // Now prepare the list of inputs
-    list_resize(inputs, expectedCount);
+    list_resize(result, expectedCount);
     int inputIndex = 0;
     for (int placeholderIndex=0;; placeholderIndex++, inputIndex++) {
         Term* placeholder = get_input_placeholder(block, placeholderIndex);
@@ -939,7 +936,7 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
             // This list starts with a tag and looks like:
             //   [:multiple arg0 arg1 ...]
             
-            caValue* inputsResult = list_get(inputs, placeholderIndex);
+            caValue* inputsResult = list_get(result, placeholderIndex);
 
             int packCount = inputCount - inputIndex;
             set_list(inputsResult, packCount + 1);
@@ -953,7 +950,7 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
         }
 
         Term* input = term->input(inputIndex);
-        caValue* action = list_get(inputs, placeholderIndex);
+        caValue* action = list_get(result, placeholderIndex);
 
         // Check for no input provided. (this check must be after the check for :multiple).
         if (input == NULL) {
@@ -975,11 +972,9 @@ void write_term_input_instructions(Term* term, caValue* op, Block* block)
     }
 }
 
-void write_term_output_instructions(Term* term, caValue* op, Block* finishingBlock)
+void write_term_output_instructions(Term* term, Block* finishingBlock, caValue* result)
 {
-    caValue* action = list_get(op, 2);
-
-    set_symbol(action, name_FlatOutputs);
+    set_symbol(result, name_FlatOutputs);
 }
 
 static void bytecode_write_noop(caValue* op)
@@ -1046,8 +1041,8 @@ void write_term_bytecode(Term* term, caValue* result)
     if (term->function == FUNCS.for_func) {
         list_resize(result, 5);
         set_symbol(list_get(result, 0), op_ForLoop);
-        write_term_input_instructions(term, result, term->nestedContents); // index 1
-        write_term_output_instructions(term, result, term->nestedContents); // index 2
+        write_term_input_instructions(term, term->nestedContents, list_get(result, 1));
+        write_term_output_instructions(term, term->nestedContents, list_get(result, 2));
 
         // index 3 - a flag which might say LoopProduceOutput
         if (user_count(term) == 0) {
@@ -1058,10 +1053,38 @@ void write_term_bytecode(Term* term, caValue* result)
         return;
     }
 
+    if (term->function == FUNCS.return_func) {
+        list_resize(result, 2);
+        set_symbol(list_get(result, 0), op_Return);
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
+        return;
+    }
+
+    if (term->function == FUNCS.break_func) {
+        list_resize(result, 2);
+        set_symbol(list_get(result, 0), op_Break);
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
+        return;
+    }
+
+    if (term->function == FUNCS.continue_func) {
+        list_resize(result, 2);
+        set_symbol(list_get(result, 0), op_Continue);
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
+        return;
+    }
+
+    if (term->function == FUNCS.discard) {
+        list_resize(result, 2);
+        set_symbol(list_get(result, 0), op_Discard);
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
+        return;
+    }
+
     if (term->function == FUNCS.exit_point) {
-        list_get(result, 2);
+        list_resize(result, 2);
         set_symbol(list_get(result, 0), op_ExitPoint);
-        write_term_input_instructions(term, result, function_contents(term->function));
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
         return;
     }
 
@@ -1069,7 +1092,7 @@ void write_term_bytecode(Term* term, caValue* result)
             || term->function == FUNCS.block_dynamic_call) {
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_DynamicCall);
-        write_term_input_instructions(term, result, function_contents(term->function));
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
         set_symbol(list_get(result, 2), name_OutputsToList);
         return;
     }
@@ -1077,7 +1100,7 @@ void write_term_bytecode(Term* term, caValue* result)
     if (term->function == FUNCS.closure_call) {
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_ClosureCall);
-        write_term_input_instructions(term, result, function_contents(term->function));
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
         set_symbol(list_get(result, 2), name_FlatOutputs);
         return;
     }
@@ -1128,8 +1151,8 @@ void write_term_bytecode(Term* term, caValue* result)
     set_symbol(outputTag, tag);
 
     // Write input & output instructions
-    write_term_input_instructions(term, result, block);
-    write_term_output_instructions(term, result, block);
+    write_term_input_instructions(term, block, list_get(result, 1));
+    write_term_output_instructions(term, block, list_get(result, 2));
 
     // Finally, do some lightweight optimization.
 
@@ -1146,10 +1169,9 @@ void write_term_bytecode(Term* term, caValue* result)
 void write_block_bytecode(Block* block, caValue* output)
 {
     // Block bytecode is a list with length + 1 elements.
-    // The first 'length' elements are operations that correspond with
-    // Terms with matching index.
-    // The final element is a 'finish' instruction that usually pops the
-    // block or something.
+    // The first 'length' elements are operations that correspond with Terms
+    // with matching index.
+    // The final element is a 'finish' instruction that usually pops the frame.
     
     set_list(output, block->length() + 1);
 
@@ -1190,7 +1212,6 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
         if (is_list(action)) {
 
             // Tagged list
-
             Symbol tag = as_symbol(list_get(action, 0));
 
             switch (tag) {
@@ -1359,8 +1380,8 @@ static void step_interpreter(Stack* stack)
     }
     case op_InlineCopy: {
         caValue* currentRegister = get_frame_register(frame, frame->pc);
-        caValue* inputActions = list_get(action, 1);
-        caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputActions, 0)), 0);
+        caValue* inputs = list_get(action, 1);
+        caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
         copy(value, currentRegister);
         break;
     }
@@ -1411,6 +1432,57 @@ static void step_interpreter(Stack* stack)
         // Set PC to end
         frame->exitType = as_symbol(control);
         frame->nextPc = block->length();
+        break;
+    }
+    case op_Return: {
+        // Capture outputs.
+        Value outputs;
+        set_list(&outputs, 1);
+        populate_inputs_from_bytecode(stack, list_get(action, 1), &outputs, 0);
+
+        // Pop frames.
+        while (!is_major_block(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
+            pop_frame(stack);
+        frame = top_frame(stack);
+
+        // Copy outputs to placeholders.
+        caValue* outputList = list_get(&outputs, 0);
+
+        for (int i=0; i < list_length(outputList); i++)
+            copy(list_get(outputList, i), get_frame_register_from_end(frame, i));
+
+        finish_frame(stack);
+        break;
+    }
+    case op_Continue:
+    case op_Break:
+    case op_Discard: {
+        // Capture outputs.
+        Value outputs;
+        set_list(&outputs, 1);
+        populate_inputs_from_bytecode(stack, list_get(action, 1), &outputs, 0);
+
+        // Pop frames.
+        while (!is_for_loop(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
+            pop_frame(stack);
+        frame = top_frame(stack);
+
+        if (op == op_Continue)
+            frame->exitType = name_Continue;
+        else if (op == op_Break)
+            frame->exitType = name_Break;
+        else if (op == op_Discard)
+            frame->exitType = name_Discard;
+
+#if 0
+        // Copy outputs to placeholders.
+        caValue* outputList = list_get(&outputs, 0);
+
+        for (int i=0; i < list_length(outputList); i++)
+            copy(list_get(outputList, i), get_frame_register_from_end(frame, i));
+#endif
+
+        for_loop_finish_iteration(stack, true);
         break;
     }
     case op_FinishFrame: {

@@ -41,6 +41,7 @@ bool is_an_unknown_identifier(Term* term);
 bool is_major_block(Term* term);
 bool is_major_block(Block* block);
 bool is_minor_block(Block* block);
+bool is_for_loop(Block* block);
 
 bool has_variable_args(Block* block);
 int get_locals_count(Block* block);
@@ -95,7 +96,6 @@ Term* preceding_term(Term* term);
 Term* following_term(Term* term);
 
 Term* find_input_placeholder_with_name(Block* block, caValue* name);
-Term* find_output_placeholder_with_name(Block* block, caValue* name);
 
 Term* find_last_non_comment_expression(Block* block);
 Term* find_term_with_function(Block* block, Term* func);

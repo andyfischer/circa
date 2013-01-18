@@ -109,6 +109,7 @@ struct Term
 
     bool hasProperty(const char* name);
     void removeProperty(const char* name);
+    caValue* getProp(const char* name);
 
     int intProp(const char* name, int defaultValue);
     float floatProp(const char* name, float defaultValue);
@@ -148,6 +149,12 @@ void term_move_property(Term* source, Term* dest, const char* propName);
 // Fetches an input property.
 caValue* term_get_input_property(Term* term, int inputIndex, const char* name);
 
+int term_get_int_prop(Term* term, Symbol prop, int defaultValue);
+const char* term_get_string_prop(Term* term, Symbol prop, const char* defaultValue);
+void term_set_int_prop(Term* term, Symbol prop, int value);
+void term_set_string_prop(Term* term, Symbol prop, const char* value);
+
+caValue* term_name(Term* term);
 caValue* term_value(Term* term);
 bool is_type(Term* term);
 bool is_function(Term* term);

@@ -262,18 +262,7 @@ void Block::remove(std::string const& name)
 
 void Block::removeNulls()
 {
-    int numDeleted = 0;
-    for (int i=0; i < _terms.length(); i++) {
-        if (_terms[i] == NULL) {
-            numDeleted++;
-        } else if (numDeleted > 0) {
-            _terms.setAt(i - numDeleted, _terms[i]);
-            _terms[i - numDeleted]->index = i - numDeleted;
-        }
-    }
-
-    if (numDeleted > 0)
-        _terms.resize(_terms.length() - numDeleted);
+    remove_nulls(this);
 }
 
 void Block::removeNameBinding(Term* term)
@@ -520,6 +509,22 @@ void clear_block(Block* block)
     }
 
     block->_terms.clear();
+}
+
+void remove_nulls(Block* block)
+{
+    int numDeleted = 0;
+    for (int i=0; i < block->_terms.length(); i++) {
+        if (block->_terms[i] == NULL) {
+            numDeleted++;
+        } else if (numDeleted > 0) {
+            block->_terms.setAt(i - numDeleted, block->_terms[i]);
+            block->_terms[i - numDeleted]->index = i - numDeleted;
+        }
+    }
+
+    if (numDeleted > 0)
+        block->_terms.resize(block->_terms.length() - numDeleted);
 }
 
 Term* find_term_by_id(Block* block, int id)

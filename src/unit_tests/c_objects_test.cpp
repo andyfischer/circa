@@ -6,7 +6,7 @@
 #include "object.h"
 #include "type.h"
 
-namespace c_objects {
+namespace c_objects_test {
 
 struct CustomObject
 {
@@ -122,8 +122,8 @@ void test_type_not_prematurely_used()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(c_objects::test_custom_object);
-    REGISTER_TEST_CASE(c_objects::test_type_not_prematurely_used);
+    REGISTER_TEST_CASE(c_objects_test::test_custom_object);
+    REGISTER_TEST_CASE(c_objects_test::test_type_not_prematurely_used);
 }
 
 } // namespace c_objects

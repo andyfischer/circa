@@ -113,6 +113,15 @@ bool is_minor_block(Block* block)
         || owner->function == FUNCS.for_func;
 }
 
+bool is_for_loop(Block* block)
+{
+    if (block->owningTerm == NULL)
+        return false;
+    if (FUNCS.for_func == NULL)
+        return false;
+    return block->owningTerm->function == FUNCS.for_func;
+}
+
 int get_locals_count(Block* block)
 {
     return block->length();
@@ -390,17 +399,6 @@ Term* find_input_placeholder_with_name(Block* block, caValue* name)
 {
     for (int i=0;; i++) {
         Term* placeholder = get_input_placeholder(block, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (equals(&placeholder->nameValue, name))
-            return placeholder;
-    }
-}
-
-Term* find_output_placeholder_with_name(Block* block, caValue* name)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
         if (equals(&placeholder->nameValue, name))

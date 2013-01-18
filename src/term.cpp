@@ -133,6 +133,11 @@ void Term::removeProperty(const char* name)
     properties.remove(name);
 }
 
+caValue* Term::getProp(const char* name)
+{
+    return term_get_property(this, name);
+}
+
 bool Term::boolProp(const char* name, bool defaultValue)
 {
     caValue* value = term_get_property(this, name);
@@ -248,6 +253,28 @@ void term_move_property(Term* from, Term* to, const char* propName)
 caValue* term_get_input_property(Term* term, int inputIndex, const char* name)
 {
     return dict_get(&term->inputInfo(inputIndex)->properties, name);
+}
+
+int term_get_int_prop(Term* term, Symbol prop, int defaultValue)
+{
+    return term->intProp(builtin_name_to_string(prop), defaultValue);
+}
+const char* term_get_string_prop(Term* term, Symbol prop, const char* defaultValue)
+{
+    return term->stringProp(builtin_name_to_string(prop), defaultValue).c_str();
+}
+void term_set_int_prop(Term* term, Symbol prop, int value)
+{
+    term->setIntProp(builtin_name_to_string(prop), value);
+}
+void term_set_string_prop(Term* term, Symbol prop, const char* value)
+{
+    term->setStringProp(builtin_name_to_string(prop), value);
+}
+
+caValue* term_name(Term* term)
+{
+    return &term->nameValue;
 }
 
 caValue* term_value(Term* term)

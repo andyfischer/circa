@@ -12,7 +12,7 @@ namespace name_t {
     void format_source(caValue* source, Term* term)
     {
         std::string s = name_t::to_string(term_value(term));
-        append_phrase(source, s.c_str(), term, tok_Name);
+        append_phrase(source, s.c_str(), term, tok_ColonString);
     }
 
     int hash_func(caValue* value)

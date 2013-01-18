@@ -22,7 +22,7 @@ const char* get_token_text(int match)
         case tok_Comma: return ",";
         case tok_At: return "@";
         case tok_Identifier: return "IDENTIFIER";
-        case tok_Name: return "NAME";
+        case tok_ColonString: return "COLON_STRING";
         case tok_Integer: return "INTEGER";
         case tok_HexInteger: return "HEX_INTEGER";
         case tok_Float: return "FLOAT";
@@ -737,7 +737,7 @@ void consume_name(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.consume(tok_Name, lookahead);
+    context.consume(tok_ColonString, lookahead);
 }
 
 void TokenStream::reset(caValue* inputString)
@@ -789,6 +789,13 @@ bool TokenStream::nextIs(int match, int lookahead) const
         return false;
         
     return next(lookahead).match == match;
+}
+
+Symbol TokenStream::nextMatch(int lookahead) const
+{
+    if ((this->_position + lookahead) >= tokens.size())
+        return tok_Eof;
+    return next(lookahead).match;
 }
 
 void
