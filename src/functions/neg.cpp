@@ -17,7 +17,7 @@ namespace neg_function  {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "-", term, name_InfixOperator);
+        append_phrase(source, "-", term, sym_InfixOperator);
         format_source_for_input(source, term, 0);
     }
 

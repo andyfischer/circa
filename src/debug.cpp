@@ -96,18 +96,18 @@ void ca_debugger_break()
 void perf_stats_dump()
 {
     printf("perf_stats_dump:\n");
-    for (int i=c_firstStatIndex; i < name_LastStatIndex-1; i++)
-        printf("  %s = %llu\n", builtin_name_to_string(i), PERF_STATS[i - c_firstStatIndex]);
+    for (int i=c_firstStatIndex; i < sym_LastStatIndex-1; i++)
+        printf("  %s = %llu\n", builtin_symbol_to_string(i), PERF_STATS[i - c_firstStatIndex]);
 }
 void perf_stats_reset()
 {
-    for (int i = c_firstStatIndex; i < name_LastStatIndex-1; i++)
+    for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++)
         PERF_STATS[i - c_firstStatIndex] = 0;
 }
 void perf_stats_to_list(caValue* list)
 {
     set_list(list, c_numPerfStats);
-    for (int i = c_firstStatIndex; i < name_LastStatIndex-1; i++) {
+    for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++) {
         Symbol name = i;
         int64 value = PERF_STATS[i - c_firstStatIndex];
         caValue* element = list_get(list, i - c_firstStatIndex);

@@ -23,18 +23,19 @@ namespace circa {
 // There are many variations of find_name and find_local_name which all just wrap
 // around this function.
 Term* run_name_search(NameSearch* params);
+
 bool exposes_nested_names(Term* term);
 
 bool fits_lookup_type(Term* term, Symbol type)
 {
     switch (type) {
-        case name_LookupAny:
+        case sym_LookupAny:
             return true;
-        case name_LookupType:
+        case sym_LookupType:
             return is_type(term);
-        case name_LookupFunction:
+        case sym_LookupFunction:
             return is_function(term);
-        case name_LookupModule:
+        case sym_LookupModule:
             return (term->function == FUNCS.module);
     }
     internal_error("unknown type in fits_lookup_type");
@@ -96,7 +97,7 @@ Term* run_name_search(NameSearch* params)
         nsSearch.name = namespacePrefix;
         nsSearch.position = params->position;
         nsSearch.ordinal = params->ordinal;
-        nsSearch.lookupType = name_LookupAny;
+        nsSearch.lookupType = sym_LookupAny;
         nsSearch.searchParent = false;
         Term* nsPrefixTerm = run_name_search(&nsSearch);
 
@@ -229,7 +230,7 @@ void get_global_name(Term* term, caValue* nameOut)
             // Parent is NULL but we haven't yet reached the global root. This is
             // a deprecated style of block that isn't connected to root. No global
             // name is possible.
-            set_symbol(nameOut, name_None);
+            set_symbol(nameOut, sym_None);
             return;
         }
     }
@@ -241,7 +242,7 @@ void get_global_name(Term* term, caValue* nameOut)
 
         // If this term has no name then we can't construct a global name. Bail out.
         if (has_empty_name(subTerm)) {
-            set_symbol(nameOut, name_None);
+            set_symbol(nameOut, sym_None);
             return;
         }
 
@@ -287,7 +288,7 @@ Term* find_from_global_name(World* world, const char* globalNameStr)
         nameSearch.block = block;
         nameSearch.position = -1;
         nameSearch.ordinal = ordinal;
-        nameSearch.lookupType = name_LookupAny;
+        nameSearch.lookupType = sym_LookupAny;
         nameSearch.searchParent = false;
 
         Term* foundTerm = run_name_search(&nameSearch);
@@ -313,7 +314,7 @@ Term* find_name_at(Term* term, const char* name)
     set_string(&nameSearch.name, name);
     nameSearch.position = term->index;
     nameSearch.ordinal = -1;
-    nameSearch.lookupType = name_LookupAny;
+    nameSearch.lookupType = sym_LookupAny;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
 }
@@ -325,7 +326,7 @@ Term* find_name_at(Term* term, caValue* name)
     copy(name, &nameSearch.name);
     nameSearch.position = term->index;
     nameSearch.ordinal = -1;
-    nameSearch.lookupType = name_LookupAny;
+    nameSearch.lookupType = sym_LookupAny;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
 }
@@ -434,7 +435,7 @@ Term* get_parent_term(Term* term, int levels)
     return term;
 }
 
-bool name_is_reachable_from(Term* term, Block* block)
+bool sym_is_reachable_from(Term* term, Block* block)
 {
     if (term->owningBlock == block)
         return true;
@@ -444,7 +445,7 @@ bool name_is_reachable_from(Term* term, Block* block)
     if (parent == NULL)
         return false;
 
-    return name_is_reachable_from(term, parent);
+    return sym_is_reachable_from(term, parent);
 }
 
 Block* find_first_common_block(Term* left, Term* right)
@@ -488,7 +489,7 @@ bool term_is_child_of_block(Term* term, Block* block)
 // Returns whether or not we succeeded
 bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& output)
 {
-    if (name_is_reachable_from(term, block)) {
+    if (sym_is_reachable_from(term, block)) {
         output << term->name;
         return true;
     }
@@ -518,7 +519,7 @@ std::string get_relative_name(Block* block, Term* term)
 {
     ca_assert(term != NULL);
 
-    if (name_is_reachable_from(term, block))
+    if (sym_is_reachable_from(term, block))
         return term->name;
 
     // Build a dot-separated name
@@ -670,35 +671,35 @@ Term* find_from_unique_name(Block* block, const char* name)
 
 Type* find_type(World* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, name_LookupType);
+    caTerm* term = find_name(world->root, name, -1, sym_LookupType);
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
 }
 Type* find_type_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(block, name, -1, name_LookupType);
+    caTerm* term = find_name(block, name, -1, sym_LookupType);
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
 }
 Block* find_function(World* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, name_LookupFunction);
+    caTerm* term = find_name(world->root, name, -1, sym_LookupFunction);
     if (term == NULL)
         return NULL;
     return function_contents(term);
 }
 Block* find_function_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(block, name, -1, name_LookupFunction);
+    caTerm* term = find_name(block, name, -1, sym_LookupFunction);
     if (term == NULL)
         return NULL;
     return function_contents(term);
 }
 Block* find_module(World* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, name_LookupModule);
+    caTerm* term = find_name(world->root, name, -1, sym_LookupModule);
     if (term == NULL)
         return NULL;
     return nested_contents(term);
@@ -759,15 +760,15 @@ Symbol existing_name_from_string(const char* str, int len)
 }
 
 // Runtime symbols
-Symbol name_from_string(const char* str)
+Symbol sym_from_string(const char* str)
 {
-    // Empty string is name_None
+    // Empty string is sym_None
     if (str[0] == 0)
-        return name_None;
+        return sym_None;
 
     // Check if name is already registered
     Symbol existing = existing_name_from_string(str);
-    if (existing != name_None)
+    if (existing != sym_None)
         return existing;
 
     // Not yet registered; add it to the list.
@@ -790,8 +791,8 @@ Symbol name_from_string(const char* str)
             memcpy(tempstr, str, i);
             tempstr[i] = 0;
 
-            g_runtimeNames[index].namespaceFirst = name_from_string(tempstr);
-            g_runtimeNames[index].namespaceRightRemainder = name_from_string(str + i + 1);
+            g_runtimeNames[index].namespaceFirst = sym_from_string(tempstr);
+            g_runtimeNames[index].namespaceRightRemainder = sym_from_string(str + i + 1);
             free(tempstr);
             break;
         }
@@ -799,15 +800,15 @@ Symbol name_from_string(const char* str)
 
     return name;
 }
-Symbol name_from_string(std::string const& str)
+Symbol sym_from_string(std::string const& str)
 {
-    return name_from_string(str.c_str());
+    return sym_from_string(str.c_str());
 }
-Symbol name_from_string(caValue* str)
+Symbol sym_from_string(caValue* str)
 {
-    return name_from_string(as_cstring(str));
+    return sym_from_string(as_cstring(str));
 }
-void name_dealloc_global_data()
+void sym_dealloc_global_data()
 {
     for (int i=0; i < g_nextFreeNameIndex; i++)
         free(g_runtimeNames[i].str);
@@ -821,7 +822,7 @@ void name_dealloc_global_data()
 #if 0
 extern "C" caSymbol circa_to_name(const char* str)
 {
-    return circa::name_from_string(str);
+    return circa::sym_from_string(str);
 }
 extern "C" const char* circa_name_to_string(caSymbol name)
 {

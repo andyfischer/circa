@@ -587,12 +587,12 @@ Term* append_output_placeholder_with_description(Block* block, caValue* descript
 
     caValue* descriptionTag = list_get(description, 0);
 
-    if (as_symbol(descriptionTag) == name_Name) {
+    if (as_symbol(descriptionTag) == sym_Name) {
         caValue* name = list_get(description, 1);
         Term* result = append_output_placeholder(block, find_name(block, name));
         rename(result, name);
         return result;
-    } else if (as_symbol(descriptionTag) == name_Control) {
+    } else if (as_symbol(descriptionTag) == sym_Control) {
         Term* result = append_output_placeholder(block, NULL);
         result->setBoolProp("control", true);
         return result;
@@ -666,11 +666,11 @@ Term* find_output_from_description(Block* block, caValue* description)
         return find_output_placeholder_with_name(block, description);
 
     caValue* tag = list_get(description, 0);
-    if (as_symbol(tag) == name_Name) {
+    if (as_symbol(tag) == sym_Name) {
         return find_output_placeholder_with_name(block, list_get(description, 1));
     }
 
-    else if (as_symbol(tag) == name_Control) {
+    else if (as_symbol(tag) == sym_Control) {
         for (int i=0;; i++) {
             Term* placeholder = get_output_placeholder(block, i);
             if (placeholder == NULL)
@@ -679,7 +679,7 @@ Term* find_output_from_description(Block* block, caValue* description)
                 return placeholder;
         }
     }
-    else if (as_symbol(tag) == name_ExtraReturn) {
+    else if (as_symbol(tag) == sym_ExtraReturn) {
         for (int i=0;; i++) {
             Term* placeholder = get_output_placeholder(block, i);
             if (placeholder == NULL)
@@ -698,7 +698,7 @@ void get_output_description(Term* output, caValue* result)
     if (output->hasProperty("control")) {
         // return [:control]
         set_list(result, 1);
-        set_symbol(list_get(result, 0), name_Control);
+        set_symbol(list_get(result, 0), sym_Control);
         return;
     }
 
@@ -706,7 +706,7 @@ void get_output_description(Term* output, caValue* result)
     else if (output->hasProperty("extraReturn")) {
         // return [:extraReturn <index>]
         set_list(result, 2);
-        set_symbol(list_get(result, 0), name_ExtraReturn);
+        set_symbol(list_get(result, 0), sym_ExtraReturn);
         set_int(list_get(result, 1), output->intProp("extraReturn", 0));
         return;
     }
@@ -715,7 +715,7 @@ void get_output_description(Term* output, caValue* result)
     else if (!has_empty_name(output)) {
         // return [:name, <name>]
         set_list(result, 2);
-        set_symbol(list_get(result, 0), name_Name);
+        set_symbol(list_get(result, 0), sym_Name);
         copy(term_name(output), list_get(result, 1));
         return;
     }
@@ -724,12 +724,12 @@ void get_output_description(Term* output, caValue* result)
     else if (input_placeholder_index(output) == 0) {
         // return [:primary]
         set_list(result, 1);
-        set_symbol(list_get(result, 0), name_Primary);
+        set_symbol(list_get(result, 0), sym_Primary);
         return;
     }
 
     set_list(result, 1);
-    set_symbol(list_get(result, 0), name_Anonymous);
+    set_symbol(list_get(result, 0), sym_Anonymous);
 }
 
 int count_anonymous_outputs(Block* block)
@@ -910,7 +910,7 @@ void block_finish_changes(Block* block)
     if (openState != NULL)
         append_state_output(block);
 
-    update_exit_points(block);
+    update_for_control_flow(block);
 
     // Make sure the primary output is connected.
     if (is_minor_block(block)) {

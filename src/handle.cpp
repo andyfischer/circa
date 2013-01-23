@@ -20,12 +20,12 @@ struct HandleData
 
 bool is_handle(caValue* value)
 {
-    return value->value_type->storageType == name_StorageTypeHandle;
+    return value->value_type->storageType == sym_StorageTypeHandle;
 }
 
 HandleData* as_handle(caValue* handle)
 {
-    ca_assert(handle->value_type->storageType == name_StorageTypeHandle);
+    ca_assert(handle->value_type->storageType == sym_StorageTypeHandle);
     return (HandleData*) handle->value_data.ptr;
 }
 
@@ -97,7 +97,7 @@ int handle_hash(caValue* val)
 
 void setup_handle_type(Type* type)
 {
-    type->storageType = name_StorageTypeHandle;
+    type->storageType = sym_StorageTypeHandle;
     type->initialize = handle_initialize;
     type->copy = handle_copy;
     type->release = handle_release;

@@ -39,8 +39,8 @@ void perf_stats_reset();
 void perf_stats_to_list(caValue* list);
 void perf_stat_inc(int name);
 
-const int c_firstStatIndex = name_FirstStatIndex + 1;
-const int c_numPerfStats = name_LastStatIndex - 1 - c_firstStatIndex;
+const int c_firstStatIndex = sym_FirstStatIndex + 1;
+const int c_numPerfStats = sym_LastStatIndex - 1 - c_firstStatIndex;
 extern uint64 PERF_STATS[c_numPerfStats];
 
 #if CIRCA_ENABLE_PERF_STATS

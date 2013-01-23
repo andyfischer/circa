@@ -289,9 +289,9 @@ Type* List__append_specializeType(Term* term)
 {
     Term* listInput = term->input(0);
     switch (list_get_parameter_type(&listInput->type->parameter)) {
-    case name_Untyped:
+    case sym_Untyped:
         return listInput->type;
-    case name_UniformListType:
+    case sym_UniformListType:
     {
         Type* listElementType = list_get_repeated_type_from_type(listInput->type);
         Type* commonType = find_common_type(listElementType, term->input(1)->type);
@@ -300,15 +300,15 @@ Type* List__append_specializeType(Term* term)
         else
             return create_typed_unsized_list_type(commonType);
     }
-    case name_AnonStructType:
-    case name_StructType:
+    case sym_AnonStructType:
+    case sym_StructType:
     {    
         List elementTypes;
         copy(list_get_type_list_from_type(listInput->type), &elementTypes);
         set_type(elementTypes.append(), term->input(1)->type);
         return create_typed_unsized_list_type(find_common_type(&elementTypes));
     }
-    case name_Invalid:
+    case sym_Invalid:
     default:
         return TYPES.any;
     }
@@ -717,7 +717,7 @@ int term_hashFunc(caValue* val)
 void term_setup_type(Type* type)
 {
     set_string(&type->name, "Term");
-    type->storageType = name_StorageTypeTerm;
+    type->storageType = sym_StorageTypeTerm;
     type->toString = term_toString;
     type->hashFunc = term_hashFunc;
 }
@@ -765,8 +765,8 @@ void test_spy(caStack* stack)
 void section_block_formatSource(caValue* source, Term* term)
 {
     format_name_binding(source, term);
-    append_phrase(source, "section", term, name_None);
-    append_phrase(source, " ", term, name_Whitespace);
+    append_phrase(source, "section", term, sym_None);
+    append_phrase(source, " ", term, sym_Whitespace);
     format_block_source(source, nested_contents(term), term);
 }
 
@@ -828,7 +828,7 @@ void bootstrap_kernel()
 
     // Start building World
     g_world = alloc_world();
-    g_world->bootstrapStatus = name_Bootstrapping;
+    g_world->bootstrapStatus = sym_Bootstrapping;
 
     // Create root Block.
     g_world->root = new Block();
@@ -1181,7 +1181,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
     log_msg(0, "finished circa_initialize");
 
-    world->bootstrapStatus = name_Done;
+    world->bootstrapStatus = sym_Done;
 
     return world;
 }

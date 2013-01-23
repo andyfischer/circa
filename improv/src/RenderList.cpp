@@ -31,12 +31,12 @@ RenderList::RenderList()
     circa_set_map(&textRenderCache);
     circa_set_list(&incomingCommands, 0);
 
-    name_rect = circa_to_name("rect");
+    sym_rect = circa_to_name("rect");
     name_textSprite = circa_to_name("textSprite");
-    name_lines = circa_to_name("lines");
-    name_polygon = circa_to_name("polygon");
-    name_AlignHCenter = circa_to_name("AlignHCenter");
-    name_AlignVCenter = circa_to_name("AlignVCenter");
+    sym_lines = circa_to_name("lines");
+    sym_polygon = circa_to_name("polygon");
+    sym_AlignHCenter = circa_to_name("AlignHCenter");
+    sym_AlignVCenter = circa_to_name("AlignVCenter");
 }
 
 void
@@ -114,9 +114,9 @@ RenderList::submitFrame()
             // Handle extra arguments
             for (int i=0; i < circa_count(args); i++) {
                 caSymbol name = circa_first_name(circa_index(args, i));
-                if (name == name_AlignHCenter) {
+                if (name == sym_AlignHCenter) {
                     posX -= texture->width() / 2;
-                } else if (name == name_AlignVCenter) {
+                } else if (name == sym_AlignVCenter) {
                     posY += texture->height() / 2;
                 }
             }
@@ -124,7 +124,7 @@ RenderList::submitFrame()
             TextVbo_Update(textVbo, texture, posX, posY);
             TextVbo_Render(textVbo, currentProgram, texture, color);
 
-        } else if (commandSymbol == name_rect) {
+        } else if (commandSymbol == sym_rect) {
             // Draw a solid rectangle
             switchProgram(&geomProgram);
             caValue* pos = circa_index(command, 1);
@@ -134,7 +134,7 @@ RenderList::submitFrame()
 
             Rect_Update(geomVbo, x1, y1, x2, y2);
             Rect_Render(geomVbo, currentProgram, color);
-        } else if (commandSymbol == name_lines) {
+        } else if (commandSymbol == sym_lines) {
             // Draw a list of lines.
             switchProgram(&geomProgram);
             caValue* points = circa_index(command, 1);
@@ -143,7 +143,7 @@ RenderList::submitFrame()
 
             Lines_Update(geomVbo, points);
             Lines_Render(geomVbo, currentProgram, count, color);
-        } else if (commandSymbol == name_polygon) {
+        } else if (commandSymbol == sym_polygon) {
             // Triangulate and draw an N-gon.
             switchProgram(&geomProgram);
             caValue* points = circa_index(command, 1);

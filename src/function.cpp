@@ -155,7 +155,7 @@ void finish_building_function(Block* contents)
         block_update_existing_pack_state_calls(term->owningBlock);
     }
 
-    update_exit_points(contents);
+    update_for_control_flow(contents);
 
     // Possibly apply a native patch
     module_possibly_patch_new_function(global_world(), contents);
@@ -320,12 +320,12 @@ void function_format_header_source(caValue* source, Block* function)
 
     ca_assert(term != NULL);
 
-    append_phrase(source, term->name, term, name_TermName);
+    append_phrase(source, term->name, term, sym_TermName);
 
     append_phrase(source, term->stringProp("syntax:postNameWs", ""),
             term, tok_Whitespace);
     append_phrase(source, term->stringProp("syntax:properties", ""),
-            term, name_None);
+            term, sym_None);
 
     append_phrase(source, "(", term, tok_LParen);
 
@@ -341,44 +341,44 @@ void function_format_header_source(caValue* source, Block* function)
             continue;
 
         if (input->boolProp("state", false))
-            append_phrase(source, "state ", term, name_None);
+            append_phrase(source, "state ", term, sym_None);
 
         if (!first)
-            append_phrase(source, ", ", term, name_None);
+            append_phrase(source, ", ", term, sym_None);
         first = false;
 
         // Type (may be omitted)
         if (input->boolProp("syntax:explicitType", true)) {
             append_phrase(source, as_cstring(&input->type->name),
-                input->type->declaringTerm, name_TypeName);
+                input->type->declaringTerm, sym_TypeName);
             append_phrase(source, " ", term, tok_Whitespace);
         }
 
         // Name
         if (input->boolProp("syntax:rebindSymbol", false))
-            append_phrase(source, "@", term, name_None);
+            append_phrase(source, "@", term, sym_None);
 
-        append_phrase(source, name, term, name_None);
+        append_phrase(source, name, term, sym_None);
 
         if (input->boolProp("output", false)
                 && !input->boolProp("syntax:rebindSymbol", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
-            append_phrase(source, ":out", term, name_None);
+            append_phrase(source, ":out", term, sym_None);
         }
 
         if (input->boolProp("meta", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
-            append_phrase(source, ":meta", term, name_None);
+            append_phrase(source, ":meta", term, sym_None);
         }
 
         if (input->boolProp("rebind", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
-            append_phrase(source, ":rebind", term, name_None);
+            append_phrase(source, ":rebind", term, sym_None);
         }
 
         if (input->boolProp("multiple", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
-            append_phrase(source, ":multiple", term, name_None);
+            append_phrase(source, ":multiple", term, sym_None);
         }
     }
 
@@ -387,7 +387,7 @@ void function_format_header_source(caValue* source, Block* function)
     if (term->boolProp("syntax:explicitType", false)) {
         append_phrase(source, term->stringProp("syntax:whitespacePreColon", ""),
                 term, tok_Whitespace);
-        append_phrase(source, "->", term, name_None);
+        append_phrase(source, "->", term, sym_None);
         append_phrase(source, term->stringProp("syntax:whitespacePostColon", ""),
                 term, tok_Whitespace);
 
@@ -405,7 +405,7 @@ void function_format_header_source(caValue* source, Block* function)
         bool multiOutputSyntax = unhiddenOutputCount > 1;
 
         if (multiOutputSyntax)
-            append_phrase(source, "(", term, name_None);
+            append_phrase(source, "(", term, sym_None);
 
         for (int i=0;; i++) {
 
@@ -416,14 +416,14 @@ void function_format_header_source(caValue* source, Block* function)
                 continue;
 
             if (i > 0)
-                append_phrase(source, ", ", term, name_None);
+                append_phrase(source, ", ", term, sym_None);
 
             append_phrase(source, as_cstring(&output->type->name),
-                output->type->declaringTerm, name_TypeName);
+                output->type->declaringTerm, sym_TypeName);
         }
 
         if (multiOutputSyntax)
-            append_phrase(source, ")", term, name_None);
+            append_phrase(source, ")", term, sym_None);
     }
 }
 

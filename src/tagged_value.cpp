@@ -471,7 +471,7 @@ Block* as_block(caValue* value)
 
 void* as_opaque_pointer(caValue* value)
 {
-    ca_assert(value->value_type->storageType == name_StorageTypeOpaquePointer);
+    ca_assert(value->value_type->storageType == sym_StorageTypeOpaquePointer);
     return value->value_data.ptr;
 }
 
@@ -510,20 +510,20 @@ void* get_pointer(caValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-bool is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
+bool is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
 bool is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool is_error(caValue* value) { return value->value_type == TYPES.error; }
-bool is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
+bool is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
 bool is_function(caValue* value) { return value->value_type == TYPES.function; }
 bool is_function_pointer(caValue* value) { return value->value_type == TYPES.function; }
-bool is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
-bool is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
+bool is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
+bool is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool is_null(caValue* value) { return value->value_type == TYPES.null; }
-bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == name_StorageTypeOpaquePointer; }
-bool is_ref(caValue* value) { return value->value_type->storageType == name_StorageTypeTerm; }
-bool is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
+bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }
+bool is_ref(caValue* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
+bool is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
 bool is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
-bool is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
+bool is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
 bool is_number(caValue* value)
 {
@@ -558,7 +558,7 @@ Symbol first_symbol(caValue* value)
         return as_symbol(value);
     if (is_list(value))
         return first_symbol(list_get(value, 0));
-    return name_None;
+    return sym_None;
 }
 
 } // namespace circa
@@ -567,17 +567,17 @@ using namespace circa;
 
 extern "C" {
 
-bool circa_is_bool(caValue* value) { return value->value_type->storageType == name_StorageTypeBool; }
+bool circa_is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
 bool circa_is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool circa_is_error(caValue* value) { return value->value_type == TYPES.error; }
-bool circa_is_float(caValue* value) { return value->value_type->storageType == name_StorageTypeFloat; }
+bool circa_is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
 bool circa_is_function(caValue* value) { return value->value_type == TYPES.function; }
-bool circa_is_int(caValue* value) { return value->value_type->storageType == name_StorageTypeInt; }
-bool circa_is_list(caValue* value) { return value->value_type->storageType == name_StorageTypeList; }
+bool circa_is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
+bool circa_is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
 bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
-bool circa_is_string(caValue* value) { return value->value_type->storageType == name_StorageTypeString; }
-bool circa_is_type(caValue* value) { return value->value_type->storageType == name_StorageTypeType; }
+bool circa_is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
+bool circa_is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
 bool circa_bool(caValue* value) {
     ca_assert(circa_is_bool(value));

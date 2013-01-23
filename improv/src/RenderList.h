@@ -67,11 +67,11 @@ struct RenderList
     void flushDestroyedEntities();
 
     caSymbol name_textSprite;
-    caSymbol name_rect;
-    caSymbol name_lines;
-    caSymbol name_polygon;
-    caSymbol name_AlignHCenter;
-    caSymbol name_AlignVCenter;
+    caSymbol sym_rect;
+    caSymbol sym_lines;
+    caSymbol sym_polygon;
+    caSymbol sym_AlignHCenter;
+    caSymbol sym_AlignVCenter;
 };
 
 void check_gl_error();

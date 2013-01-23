@@ -21,12 +21,12 @@ void format_block_source(caValue* source, Block* block, Term* format)
 {
     if (format != NULL)
         append_phrase(source, format->stringProp("syntax:postHeadingWs", ""),
-                format, name_Whitespace);
+                format, sym_Whitespace);
 
     bool styleBraces = format && format->stringProp("syntax:blockStyle","") == "braces";
 
     if (styleBraces)
-        append_phrase(source, "{", format, name_None);
+        append_phrase(source, "{", format, sym_None);
 
     bool newlineNeeded = false;
     for (int i=0; i < block->length(); i++) {
@@ -42,13 +42,13 @@ void format_block_source(caValue* source, Block* block, Term* format)
 
         // Indentation
         append_phrase(source, term->stringProp("syntax:preWhitespace", ""),
-            term, name_Whitespace);
+            term, sym_Whitespace);
 
         format_term_source(source, term);
 
         if (term->hasProperty("syntax:lineEnding")) {
             append_phrase(source, term->stringProp("syntax:lineEnding", ""),
-                term, name_None);
+                term, sym_None);
         } else if (term->hasProperty("syntax:postHeadingWs"))  {
             // no newline needed
         } else {
@@ -58,11 +58,11 @@ void format_block_source(caValue* source, Block* block, Term* format)
 
     if (format != NULL) {
         append_phrase(source, format->stringProp("syntax:preEndWs", ""),
-                format, name_Whitespace);
+                format, sym_Whitespace);
     }
 
     if (styleBraces)
-        append_phrase(source, "}", format, name_None);
+        append_phrase(source, "}", format, sym_None);
 }
 
 std::string unformat_rich_source(caValue* source)
@@ -80,8 +80,8 @@ static void format_value_term(caValue* source, Term* valueTerm)
 {
     // Special constructor syntax
     if (valueTerm->boolProp("constructor", false)) {
-        append_phrase(source, as_cstring(&valueTerm->type->name), valueTerm, name_None);
-        append_phrase(source, "()", valueTerm, name_None);
+        append_phrase(source, as_cstring(&valueTerm->type->name), valueTerm, sym_None);
+        append_phrase(source, "()", valueTerm, sym_None);
 
     // Otherwise use formatSource on type type.
     } else {
@@ -121,7 +121,7 @@ void format_term_source(caValue* source, Term* term)
 
     // Post whitespace
     append_phrase(source, term->stringProp("syntax:postWhitespace", ""),
-            term, name_Whitespace);
+            term, sym_Whitespace);
 }
 
 void format_term_source_normal(caValue* source, Term* term)
@@ -133,23 +133,23 @@ void format_term_source_normal(caValue* source, Term* term)
         return;
     }
 
-    append_phrase(source, term->function->name.c_str(), term, name_FunctionName);
-    append_phrase(source, "(", term, name_None);
+    append_phrase(source, term->function->name.c_str(), term, sym_FunctionName);
+    append_phrase(source, "(", term, sym_None);
 
     for (int i=0; i < term->numInputs(); i++) {
         if (i > 0)
-            append_phrase(source, " ", term, name_None);
+            append_phrase(source, " ", term, sym_None);
 
         Term* input = term->input(i);
         if (input == NULL)
-            append_phrase(source, "null", NULL, name_None);
+            append_phrase(source, "null", NULL, sym_None);
         else if (has_empty_name(input))
-            append_phrase(source, global_id(term).c_str(), input, name_None);
+            append_phrase(source, global_id(term).c_str(), input, sym_None);
         else
-            append_phrase(source, input->name, input, name_None);
+            append_phrase(source, input->name, input, sym_None);
     }
 
-    append_phrase(source, ")", term, name_None);
+    append_phrase(source, ")", term, sym_None);
 }
 
 void format_term_source_default_formatting(caValue* source, Term* term)
@@ -162,11 +162,11 @@ void format_term_source_default_formatting(caValue* source, Term* term)
 
     // Check for an infix operator with implicit rebinding (like +=).
     if (declarationStyle == "infix" && term->boolProp("syntax:rebindingInfix", false)) {
-        append_phrase(source, term->name.c_str(), term, name_None);
+        append_phrase(source, term->name.c_str(), term, sym_None);
         append_phrase(source,
                 get_input_syntax_hint_optional(term, 0, "preWhitespace", " "),
-                term, name_Whitespace);
-        append_phrase(source, functionName.c_str(), term, name_InfixOperator);
+                term, sym_Whitespace);
+        append_phrase(source, functionName.c_str(), term, sym_InfixOperator);
         format_source_for_input(source, term, 1);
         return;
     }
@@ -184,7 +184,7 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         if (functionName == "")
             format_term_source(source, term->function);
         else
-            append_phrase(source, functionName.c_str(), term, name_FunctionName);
+            append_phrase(source, functionName.c_str(), term, sym_FunctionName);
 
         if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, "(", term, tok_LParen);
@@ -199,9 +199,9 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         format_source_for_input(source, term, 0);
         
         append_phrase(source, term->stringProp("syntax:operator", "."),
-            term, name_None);
+            term, sym_None);
 
-        append_phrase(source, functionName.c_str(), term, name_FunctionName);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
 
         if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, "(", term, tok_LParen);
@@ -213,28 +213,28 @@ void format_term_source_default_formatting(caValue* source, Term* term)
             append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "dot-concat") {
         format_source_for_input(source, term, 0);
-        append_phrase(source, ".", term, name_None);
-        append_phrase(source, functionName.c_str(), term, name_FunctionName);
+        append_phrase(source, ".", term, sym_None);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "infix") {
         format_source_for_input(source, term, 0);
-        append_phrase(source, functionName.c_str(), term, name_InfixOperator);
+        append_phrase(source, functionName.c_str(), term, sym_InfixOperator);
         format_source_for_input(source, term, 1);
     } else if (declarationStyle == "prefix") {
-        append_phrase(source, functionName.c_str(), term, name_FunctionName);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
         append_phrase(source, term->stringProp("syntax:postFunctionWs", ""),
-            term, name_Whitespace);
+            term, sym_Whitespace);
         format_source_for_input(source, term, 0);
     } else if (declarationStyle == "arrow-concat") {
         format_source_for_input(source, term, 0);
-        append_phrase(source, "->", term, name_None);
+        append_phrase(source, "->", term, sym_None);
         append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
-                term, name_Whitespace);
-        append_phrase(source, functionName.c_str(), term, name_FunctionName);
+                term, sym_Whitespace);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "left-arrow") {
-        append_phrase(source, functionName.c_str(), term, name_FunctionName);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
         append_phrase(source, term->stringProp("syntax:preOperatorWs", ""),
-                term, name_Whitespace);
-        append_phrase(source, "<-", term, name_None);
+                term, sym_Whitespace);
+        append_phrase(source, "<-", term, sym_None);
         format_source_for_input(source, term, 0);
     } else if (declarationStyle == "bracket-list") {
         append_phrase(source, "[", term, tok_LBracket);
@@ -272,7 +272,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     // by regular calls, only by certain implicit calls that should be hidden.
     if (input->owningBlock == term->owningBlock
             && input->index > term->index) {
-        append_phrase(source, "<!forward_reference>", term, name_None);
+        append_phrase(source, "<!forward_reference>", term, sym_None);
     }
 
     bool methodCall =
@@ -283,13 +283,13 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
 
     append_phrase(source,
         get_input_syntax_hint_optional(term, inputIndex, "preWhitespace", defaultPre), 
-        term, name_Whitespace);
+        term, sym_Whitespace);
 
     // Also, possibly insert the & operator.
     if (input->name != ""
             && function_call_rebinds_input(term, inputIndex)) {
         if (term_is_state_input(term, inputIndex))
-            append_phrase(source, "state = ", term, name_None);
+            append_phrase(source, "state = ", term, sym_None);
         else
             append_phrase(source, "&", term, tok_Ampersand);
     }
@@ -302,13 +302,13 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
         // Named input
         caValue* identifierRebind = term_get_input_property(term, inputIndex, "syntax:identifierRebind");
         if (identifierRebind != NULL && as_bool(identifierRebind))
-            append_phrase(source, "@", term, name_TermName);
-        append_phrase(source, get_relative_name_at(term, input), term, name_TermName);
+            append_phrase(source, "@", term, sym_TermName);
+        append_phrase(source, get_relative_name_at(term, input), term, sym_TermName);
     }
 
     append_phrase(source,
         get_input_syntax_hint_optional(term, inputIndex, "postWhitespace", defaultPost), 
-        term, name_Whitespace);
+        term, sym_Whitespace);
 }
 
 bool is_method_call(Term* term)
@@ -347,7 +347,7 @@ void format_name_binding(caValue* source, Term* term)
 
         if (nameBindingSyntax == NULL) {
             // Default formatting.
-            append_phrase(source, term->name, term, name_None);
+            append_phrase(source, term->name, term, sym_None);
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, "=", term, tok_Equals);
             append_phrase(source, " ", term, tok_Whitespace);
@@ -356,9 +356,9 @@ void format_name_binding(caValue* source, Term* term)
                 caValue* element = list_get(nameBindingSyntax, i);
                 if (is_int(element)) {
                     Term* output = get_output_term(term, as_int(element));
-                    append_phrase(source, output->name, term, name_None);
+                    append_phrase(source, output->name, term, sym_None);
                 } else {
-                    append_phrase(source, as_cstring(element), term, name_None);
+                    append_phrase(source, as_cstring(element), term, sym_None);
                 }
             }
         }

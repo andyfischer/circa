@@ -325,7 +325,7 @@ namespace tagged_value_wrappers {
 // Public API
 bool is_hashtable(caValue* value)
 {
-    return value->value_type->storageType == name_StorageTypeHashtable;
+    return value->value_type->storageType == sym_StorageTypeHashtable;
 }
 
 void set_hashtable(caValue* value)
@@ -369,7 +369,7 @@ void hashtable_setup_type(Type* type)
     type->copy = tagged_value_wrappers::copy;
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
-    type->storageType = name_StorageTypeHashtable;
+    type->storageType = sym_StorageTypeHashtable;
 }
 
 // Publich functions

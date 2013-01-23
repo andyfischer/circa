@@ -13,8 +13,8 @@ namespace namespace_function {
 
     void format_source(caValue* source, Term* term)
     {
-        append_phrase(source, "namespace ", term, name_Keyword);
-        append_phrase(source, term->name, term, name_TermName);
+        append_phrase(source, "namespace ", term, sym_Keyword);
+        append_phrase(source, term->name, term, sym_TermName);
         format_block_source(source, nested_contents(term), term);
         append_phrase(source, term->stringProp("syntax:preEndWs", ""),
                 term, tok_Whitespace);

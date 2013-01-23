@@ -482,7 +482,7 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
 
     std::string typeName = tokens.consumeStr();
 
-    Term* typeTerm = find_name(block, typeName.c_str(), -1, name_LookupType);
+    Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
@@ -741,7 +741,7 @@ consume_next_output: {
             }
 
             std::string typeName = tokens.consumeStr();
-            Term* typeTerm = find_name(block, typeName.c_str(), -1, name_LookupType);
+            Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
 
             if (typeTerm == NULL) {
                 std::string msg;
@@ -1249,7 +1249,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     Type* type = TYPES.any;
     bool unknownType = false;
     if (typeName != "") {
-        Term* typeTerm = find_name(block, typeName.c_str(), -1, name_LookupType);
+        Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
 
         if (typeTerm == NULL) {
             unknownType = true;
@@ -1478,7 +1478,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
 
         term->setProp("syntax:nameBinding", &nameBindingSyntax);
 
-        //rename(term, name_from_string(as_cstring(list_get(&names, 0))));
+        //rename(term, sym_from_string(as_cstring(list_get(&names, 0))));
 
         for (int i=0; i < list_length(&names); i++) {
             Term* output = get_output_term(term, i);
@@ -1827,7 +1827,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     int startPosition = tokens.getPosition();
 
     bool forceRebindLHS = false;
-    Symbol dotOperator = name_None;
+    Symbol dotOperator = sym_None;
 
     if (tokens.nextIs(tok_DotAt)) {
         forceRebindLHS = true;

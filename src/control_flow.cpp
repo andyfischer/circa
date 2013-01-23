@@ -39,50 +39,50 @@ bool is_exit_producer(Term* term)
 Symbol term_get_highest_exit_level(Term* term)
 {
     if (term->function == FUNCS.return_func)
-        return name_ExitLevelFunction;
+        return sym_ExitLevelFunction;
     else if (term->function == FUNCS.break_func
             || term->function == FUNCS.continue_func
             || term->function == FUNCS.discard)
-        return name_ExitLevelLoop;
+        return sym_ExitLevelLoop;
     else if (term->function == FUNCS.exit_point)
-        return term_get_int_prop(term, name_HighestExitLevel, name_None);
+        return term_get_int_prop(term, sym_HighestExitLevel, sym_None);
     else
-        return name_None;
+        return sym_None;
 }
 
 static Symbol max_exit_level(Symbol left, Symbol right)
 {
-    if (left == name_ExitLevelFunction || right == name_ExitLevelFunction)
-        return name_ExitLevelFunction;
-    if (left == name_ExitLevelLoop || right == name_ExitLevelLoop)
-        return name_ExitLevelLoop;
-    return name_None;
+    if (left == sym_ExitLevelFunction || right == sym_ExitLevelFunction)
+        return sym_ExitLevelFunction;
+    if (left == sym_ExitLevelLoop || right == sym_ExitLevelLoop)
+        return sym_ExitLevelLoop;
+    return sym_None;
 }
 
 void break_formatSource(caValue* source, Term* term)
 {
-    append_phrase(source, "break", term, name_Keyword);
+    append_phrase(source, "break", term, sym_Keyword);
 }
 void continue_formatSource(caValue* source, Term* term)
 {
-    append_phrase(source, "continue", term, name_Keyword);
+    append_phrase(source, "continue", term, sym_Keyword);
 }
 void discard_formatSource(caValue* source, Term* term)
 {
-    append_phrase(source, "discard", term, name_Keyword);
+    append_phrase(source, "discard", term, sym_Keyword);
 }
 
 void return_formatSource(caValue* source, Term* term)
 {
     if (term->boolProp("syntax:returnStatement", false)) {
-        append_phrase(source, "return", term, name_Keyword);
+        append_phrase(source, "return", term, sym_Keyword);
         append_phrase(source,
                 term->stringProp("syntax:postKeywordWs", " "),
-                term, name_Whitespace);
+                term, sym_Whitespace);
 
         for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
             if (inputIndex != 0)
-                append_phrase(source, ", ", term, name_None);
+                append_phrase(source, ", ", term, sym_None);
             format_source_for_input(source, term, inputIndex, "", "");
         }
     } else {
@@ -136,7 +136,7 @@ Symbol term_get_escaping_exit_level(Term* term)
 {
     // Check for a call that directly causes exit: return/continue/etc.
     Symbol directExitLevel = term_get_highest_exit_level(term);
-    if (directExitLevel != name_None)
+    if (directExitLevel != sym_None)
         return directExitLevel;
 
     // For-block
@@ -147,17 +147,17 @@ Symbol term_get_escaping_exit_level(Term* term)
             Symbol exit = term_get_highest_exit_level(contents->get(i));
 
             // Only ExitRankFunction escapes from for-block.
-            if (exit == name_ExitLevelFunction)
+            if (exit == sym_ExitLevelFunction)
                 return exit;
         }
 
-        return name_None;
+        return sym_None;
     }
 
     // If-block
     if (term->function == FUNCS.if_block) {
         Block* topContents = nested_contents(term);
-        Symbol highestExit = name_None;
+        Symbol highestExit = sym_None;
         for (int caseIndex=0; caseIndex < topContents->length(); caseIndex++) {
             Block* caseBlock = nested_contents(topContents->get(caseIndex));
             for (int i=0; i < caseBlock->length(); i++) {
@@ -171,7 +171,7 @@ Symbol term_get_escaping_exit_level(Term* term)
         return highestExit;
     }
 
-    return name_None;
+    return sym_None;
 }
 
 Term* find_trailing_exit_point(Term* term)
@@ -190,7 +190,7 @@ Term* find_trailing_exit_point(Term* term)
     }
 }
 
-void update_exit_points(Block* block)
+void update_for_control_flow(Block* block)
 {
     // Only worry about minor blocks.
     if (!is_minor_block(block))
@@ -203,7 +203,7 @@ void update_exit_points(Block* block)
 
         Symbol escapingExit = term_get_escaping_exit_level(term);
 
-        if (escapingExit != name_None) {
+        if (escapingExit != sym_None) {
             // This term can exit, make sure that all necessary values are output to parent branch.
             // TODO
             
@@ -229,7 +229,7 @@ void update_exit_points(Block* block)
         Symbol highestExitLevel = term_get_escaping_exit_level(term);
         Term* existingExitPoint = find_trailing_exit_point(term);
 
-        bool shouldHaveExitPoint = highestExitLevel != name_None;
+        bool shouldHaveExitPoint = highestExitLevel != sym_None;
         bool hasExitPoint = existingExitPoint != NULL;
 
         if (shouldHaveExitPoint && !hasExitPoint) {
@@ -238,13 +238,13 @@ void update_exit_points(Block* block)
             // no effect on major blocks.
             Value controlOutputDesc;
             set_list(&controlOutputDesc, 1);
-            set_symbol(list_get(&controlOutputDesc, 0), name_Control);
+            set_symbol(list_get(&controlOutputDesc, 0), sym_Control);
             create_output_from_minor_block(block, &controlOutputDesc);
 
             // Need to add an exit_point().
             Term* exitPoint = apply(block, FUNCS.exit_point, TermList());
             update_inputs_for_exit_point(term, exitPoint);
-            term_set_int_prop(exitPoint, name_HighestExitLevel, highestExitLevel);
+            term_set_int_prop(exitPoint, sym_HighestExitLevel, highestExitLevel);
             move_after(exitPoint, term);
 
         } else if (!shouldHaveExitPoint && hasExitPoint) {
@@ -284,7 +284,7 @@ void update_exit_points(Block* block)
         }
 
         Symbol escapingExitLevel = find_highest_escaping_exit_level(term);
-        if (escapingExitLevel != name_None) {
+        if (escapingExitLevel != sym_None) {
 
             // This term can cause this block to exit.
 
@@ -347,7 +347,7 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     caValue* descriptionTag = list_get(&description, 0);
 
     // Control value
-    if (as_symbol(descriptionTag) == name_Control) {
+    if (as_symbol(descriptionTag) == sym_Control) {
         Block* block = location->owningBlock;
         for (int i = location->index; i >= 0; i--) {
             Term* term = block->get(i);

@@ -257,19 +257,19 @@ caValue* term_get_input_property(Term* term, int inputIndex, const char* name)
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue)
 {
-    return term->intProp(builtin_name_to_string(prop), defaultValue);
+    return term->intProp(builtin_symbol_to_string(prop), defaultValue);
 }
 const char* term_get_string_prop(Term* term, Symbol prop, const char* defaultValue)
 {
-    return term->stringProp(builtin_name_to_string(prop), defaultValue).c_str();
+    return term->stringProp(builtin_symbol_to_string(prop), defaultValue).c_str();
 }
 void term_set_int_prop(Term* term, Symbol prop, int value)
 {
-    term->setIntProp(builtin_name_to_string(prop), value);
+    term->setIntProp(builtin_symbol_to_string(prop), value);
 }
 void term_set_string_prop(Term* term, Symbol prop, const char* value)
 {
-    term->setStringProp(builtin_name_to_string(prop), value);
+    term->setStringProp(builtin_symbol_to_string(prop), value);
 }
 
 caValue* term_name(Term* term)

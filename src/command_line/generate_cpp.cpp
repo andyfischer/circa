@@ -48,7 +48,7 @@ struct SourceWriter
     {
         possiblyStartNewLine();
 
-        if (as_symbol(item) == name_Newline) {
+        if (as_symbol(item) == sym_Newline) {
             set_string(output.append(), "\n");
             startNewLine = true;
             return;
@@ -66,7 +66,7 @@ struct SourceWriter
     void newline()
     {
         Value val;
-        set_symbol(&val, name_Newline);
+        set_symbol(&val, sym_Newline);
         write(&val);
     }
 

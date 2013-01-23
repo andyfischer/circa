@@ -17,10 +17,10 @@ void simple_get_exit_rank()
     Term* con = block.compile("continue");
     Term* dis = block.compile("discard");
 
-    test_assert(term_get_highest_exit_level(ret) == name_ExitLevelFunction);
-    test_assert(term_get_highest_exit_level(br) == name_ExitLevelLoop);
-    test_assert(term_get_highest_exit_level(con) == name_ExitLevelLoop);
-    test_assert(term_get_highest_exit_level(dis) == name_ExitLevelLoop);
+    test_assert(term_get_highest_exit_level(ret) == sym_ExitLevelFunction);
+    test_assert(term_get_highest_exit_level(br) == sym_ExitLevelLoop);
+    test_assert(term_get_highest_exit_level(con) == sym_ExitLevelLoop);
+    test_assert(term_get_highest_exit_level(dis) == sym_ExitLevelLoop);
 }
 
 void test_implicit_exit_points()

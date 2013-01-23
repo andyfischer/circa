@@ -31,15 +31,15 @@ namespace if_block_function {
                     caseTerm, tok_Whitespace);
 
             if (firstCase) {
-                append_phrase(source, "if ", caseTerm, name_Keyword);
+                append_phrase(source, "if ", caseTerm, sym_Keyword);
                 format_source_for_input(source, caseTerm, 0);
                 firstCase = false;
             } else if (caseTerm->input(0) != NULL) {
-                append_phrase(source, "elif ", caseTerm, name_Keyword);
+                append_phrase(source, "elif ", caseTerm, sym_Keyword);
                 format_source_for_input(source, caseTerm, 0);
             }
             else
-                append_phrase(source, "else", caseTerm, name_None);
+                append_phrase(source, "else", caseTerm, sym_None);
 
             // whitespace following the if/elif/else
             append_phrase(source,

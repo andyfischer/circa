@@ -7,7 +7,7 @@ namespace name_t {
 
     std::string to_string(caValue* value)
     {
-        return std::string(":") + builtin_name_to_string(as_int(value));
+        return std::string(":") + builtin_symbol_to_string(as_int(value));
     }
     void format_source(caValue* source, Term* term)
     {
@@ -23,8 +23,8 @@ namespace name_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        set_string(&type->name, "Name");
-        type->storageType = name_StorageTypeInt;
+        set_string(&type->name, "Symbol");
+        type->storageType = sym_StorageTypeInt;
         type->toString = to_string;
         type->formatSource = format_source;
         type->hashFunc = hash_func;

@@ -48,11 +48,11 @@ namespace type_t {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "type ", term, name_Keyword);
-        append_phrase(source, term->name, term, name_TypeName);
+        append_phrase(source, "type ", term, sym_Keyword);
+        append_phrase(source, term->name, term, sym_TypeName);
 
         if (term->boolProp("syntax:SuperSpecialHandleType", false)) {
-            append_phrase(source, " = handle_type()", term, name_None);
+            append_phrase(source, " = handle_type()", term, sym_None);
         }
 
         if (term->boolProp("syntax:noBrackets", false))
@@ -79,7 +79,7 @@ namespace type_t {
                     term, tok_Whitespace);
 
             Type* fieldType = function_get_output_type(field, 0);
-            append_phrase(source, as_cstring(&fieldType->name), term, name_TypeName);
+            append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
             append_phrase(source, field->stringProp("syntax:postNameWs"," "),
                     term, tok_Whitespace);
             append_phrase(source, field->name, term, tok_Identifier);
@@ -96,7 +96,7 @@ namespace type_t {
     void setup_type(Type* type)
     {
         set_string(&type->name, "Type");
-        type->storageType = name_StorageTypeType;
+        type->storageType = sym_StorageTypeType;
         type->initialize = type_t::initialize;
         type->copy = copy;
         type->gcRelease = type_gc_release;
@@ -179,7 +179,7 @@ Type* create_type_uninitialized()
 
 void initialize_type(Type* t)
 {
-    t->storageType = name_StorageTypeNull;
+    t->storageType = sym_StorageTypeNull;
 
     initialize_null(&t->properties);
     set_dict(&t->properties);
@@ -291,7 +291,7 @@ bool type_is_static_subset_of_type(Type* superType, Type* subType)
 
 void reset_type(Type* type)
 {
-    type->storageType = name_StorageTypeNull;
+    type->storageType = sym_StorageTypeNull;
     type->initialize = NULL;
     type->release = NULL;
     type->copy = NULL;

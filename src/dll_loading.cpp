@@ -183,7 +183,7 @@ void find_dll_for_script(Block* block, caValue* resultOut)
     String* filename = (String*) block_get_source_filename(block);
 
     if (!is_string(filename)) {
-        set_symbol(resultOut, name_Failure);
+        set_symbol(resultOut, sym_Failure);
         return;
     }
 

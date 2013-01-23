@@ -214,7 +214,7 @@ void string_setup_type(Type* type)
 {
     reset_type(type);
     set_string(&type->name, "String");
-    type->storageType = name_StorageTypeString;
+    type->storageType = sym_StorageTypeString;
     type->initialize = string_initialize;
     type->release = string_release;
     type->copy = string_copy;
@@ -226,7 +226,7 @@ void string_setup_type(Type* type)
 
 const char* as_cstring(caValue* value)
 {
-    ca_assert(value->value_type->storageType == name_StorageTypeString);
+    ca_assert(value->value_type->storageType == sym_StorageTypeString);
     StringData* data = (StringData*) value->value_data.ptr;
     if (data == NULL)
         return "";

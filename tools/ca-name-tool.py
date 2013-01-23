@@ -18,7 +18,7 @@ def get_c_name(name):
     if name.startswith('tok_') or name.startswith('stat_') or name.startswith('op_'):
         return name
     else:
-        return "name_" + name
+        return "sym_" + name
 
 def every_symbol():
     f = open(SymbolList, 'r')
@@ -40,7 +40,7 @@ def every_symbol():
         yield (line, get_c_name(line), index)
         index += 1
 
-    yield ('LastBuiltinName', 'name_LastBuiltinName', index)
+    yield ('LastBuiltinName', 'sym_LastBuiltinName', index)
 
 def names_to_trie(names, i):
     by_prefix = {}
@@ -81,8 +81,8 @@ def write_header(lines):
         lines.append('const int ' + cname + ' = ' + str(index) + ';')
     
     lines.append('')
-    lines.append('const char* builtin_name_to_string(int name);')
-    lines.append('int builtin_name_from_string(const char* str);')
+    lines.append('const char* builtin_symbol_to_string(int name);')
+    lines.append('int builtin_symbol_from_string(const char* str);')
     lines.append('')
     lines.append('} // namespace circa')
 
@@ -96,9 +96,9 @@ def write_impl(lines):
     lines.append('')
     lines.append('namespace circa {')
     lines.append('')
-    lines.append('const char* builtin_name_to_string(int name)')
+    lines.append('const char* builtin_symbol_to_string(int name)')
     lines.append('{')
-    lines.append('    if (name >= name_LastBuiltinName)')
+    lines.append('    if (name >= sym_LastBuiltinName)')
     lines.append('        return NULL;')
     lines.append('')
     lines.append('    switch (name) {')
@@ -110,7 +110,7 @@ def write_impl(lines):
     lines.append('    }')
     lines.append('}')
     lines.append('')
-    lines.append('int builtin_name_from_string(const char* str)')
+    lines.append('int builtin_symbol_from_string(const char* str)')
     lines.append('{')
 
     def write_name_lookup_switch(trie, dist):

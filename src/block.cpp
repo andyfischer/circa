@@ -580,7 +580,7 @@ Symbol load_script(Block* block, const char* filename)
     // Store the file origin
     caValue* origin = block_insert_property(block, str_origin);
     set_list(origin, 3);
-    set_symbol(list_get(origin, 0), name_File);
+    set_symbol(list_get(origin, 0), sym_File);
     set_string(list_get(origin, 1), filename);
     set_int(list_get(origin, 2), circa_file_get_version(filename));
 
@@ -591,12 +591,12 @@ Symbol load_script(Block* block, const char* filename)
     if (is_null(&contents)) {
         Term* msg = create_string(block, "file not found");
         apply(block, FUNCS.static_error, TermList(msg));
-        return name_Failure;
+        return sym_Failure;
     }
 
     parser::compile(block, parser::statement_list, as_cstring(&contents));
 
-    return name_Success;
+    return sym_Success;
 }
 
 Block* include_script(Block* block, const char* filename)
@@ -702,7 +702,7 @@ caValue* block_get_file_origin(Block* block)
     if (list_length(origin) != 3)
         return NULL;
 
-    if (as_symbol(list_get(origin, 0)) != name_File)
+    if (as_symbol(list_get(origin, 0)) != sym_File)
         return NULL;
 
     return origin;
@@ -717,7 +717,7 @@ bool check_and_update_file_origin(Block* block, const char* filename)
     if (origin == NULL) {
         origin = block_insert_property(block, str_origin);
         set_list(origin, 3);
-        set_symbol(list_get(origin, 0), name_File);
+        set_symbol(list_get(origin, 0), sym_File);
         set_string(list_get(origin, 1), filename);
         set_int(list_get(origin, 2), version);
         return true;
@@ -834,7 +834,7 @@ void block_link_missing_functions(Block* block, Block* source)
                 continue;
 
             // try to find this function
-            Term* func = find_local_name(source, funcName.c_str(), name_LookupFunction);
+            Term* func = find_local_name(source, funcName.c_str(), sym_LookupFunction);
 
             if (func != NULL)
                 change_function(term, func);

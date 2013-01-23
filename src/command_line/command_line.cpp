@@ -211,7 +211,7 @@ void rewrite_block(Block* block, caValue* contents, caValue* reply)
         print_static_errors_formatted(block);
         set_string(reply, errors.str());
     } else {
-        set_symbol(reply, name_Success);
+        set_symbol(reply, sym_Success);
     }
 }
 
@@ -498,7 +498,7 @@ int run_command_line(caWorld* world, caValue* args)
     if (string_eq(list_get(args, 0), "-call")) {
         Symbol loadResult = load_script(mainBlock, as_cstring(list_get(args, 1)));
 
-        if (loadResult == name_Failure) {
+        if (loadResult == sym_Failure) {
             std::cout << "Failed to load file: " <<  as_cstring(list_get(args, 1)) << std::endl;
             return -1;
         }

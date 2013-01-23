@@ -42,7 +42,7 @@ namespace int_t {
     {
         if (string_eq(&type->name, ""))
             set_string(&type->name, "int");
-        type->storageType = name_StorageTypeInt;
+        type->storageType = sym_StorageTypeInt;
         type->reset = reset;
         type->equals = equals;
         type->hashFunc = hashFunc;

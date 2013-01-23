@@ -340,7 +340,7 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
     set_int(index, as_int(index) + 1);
 
     // Preserve list output
-    if (enableLoopOutput && frame->exitType != name_Discard) {
+    if (enableLoopOutput && frame->exitType != sym_Discard) {
         caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
 
         Term* outputPlaceholder = get_output_placeholder(contents, 0);
@@ -360,8 +360,8 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
 
     // Check if we are finished
     if (as_int(index) >= list_length(listInput)
-            || frame->exitType == name_Break
-            || frame->exitType == name_Return) {
+            || frame->exitType == sym_Break
+            || frame->exitType == sym_Return) {
 
         // Possibly truncate output list, in case any elements were discarded.
         if (enableLoopOutput) {
@@ -394,7 +394,7 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
     // Return to start of loop body
     frame->pc = 0;
     frame->nextPc = 0;
-    frame->exitType = name_None;
+    frame->exitType = sym_None;
 }
 
 void finish_while_loop(Term* whileTerm)

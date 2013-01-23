@@ -36,7 +36,7 @@ void block_iterator_2_2()
     test_assert(it.finished());
 }
 
-void name_visible_iterator_1()
+void sym_visible_iterator_1()
 {
     Block block;
     block.compile("a = 1");
@@ -55,7 +55,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(code_iterator_test::block_iterator_2);
     REGISTER_TEST_CASE(code_iterator_test::block_iterator_2_2);
-    REGISTER_TEST_CASE(code_iterator_test::name_visible_iterator_1);
+    REGISTER_TEST_CASE(code_iterator_test::sym_visible_iterator_1);
 }
 
 } // namespace code_iterator_test

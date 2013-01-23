@@ -177,7 +177,7 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
     frame->blockVersion = block->version;
     frame->pc = 0;
     frame->nextPc = 0;
-    frame->exitType = name_None;
+    frame->exitType = sym_None;
     frame->stop = false;
 
     // Associate with parent
@@ -347,7 +347,7 @@ void finish_frame(Stack* stack)
 
     // Copy outputs
 
-    if (as_symbol(outputAction) == name_FlatOutputs) {
+    if (as_symbol(outputAction) == sym_FlatOutputs) {
 
         Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
         int outputSlotCount = count_actual_output_terms(finishedTerm);
@@ -395,7 +395,7 @@ void finish_frame(Stack* stack)
                 return;
             }
         }
-    } else if (as_symbol(outputAction) == name_OutputsToList) {
+    } else if (as_symbol(outputAction) == sym_OutputsToList) {
         Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
         caValue* dest = get_frame_register(parentFrame, finishedTerm->index);
 
@@ -941,7 +941,7 @@ void write_term_input_instructions(Term* term, Block* block, caValue* result)
             int packCount = inputCount - inputIndex;
             set_list(inputsResult, packCount + 1);
 
-            set_symbol(list_get(inputsResult, 0), name_Multiple);
+            set_symbol(list_get(inputsResult, 0), sym_Multiple);
 
             for (int i=0; i < packCount; i++)
                 set_term_ref(list_get(inputsResult, i + 1), term->input(i + inputIndex));
@@ -960,7 +960,7 @@ void write_term_input_instructions(Term* term, Block* block, caValue* result)
         // Check if a cast is necessary
         else if (input->type != placeholder->type && placeholder->type != TYPES.any) {
             set_list(action, 3);
-            set_symbol(list_get(action, 0), name_Cast);
+            set_symbol(list_get(action, 0), sym_Cast);
             set_term_ref(list_get(action, 1), input);
             set_type(list_get(action, 2), placeholder->type);
         }
@@ -974,7 +974,7 @@ void write_term_input_instructions(Term* term, Block* block, caValue* result)
 
 void write_term_output_instructions(Term* term, Block* finishingBlock, caValue* result)
 {
-    set_symbol(result, name_FlatOutputs);
+    set_symbol(result, sym_FlatOutputs);
 }
 
 static void bytecode_write_noop(caValue* op)
@@ -1010,7 +1010,7 @@ void write_term_bytecode(Term* term, caValue* result)
 
         if (get_parent_term(term) == FUNCS.dynamic_call) {
             list_resize(result, 3);
-            set_symbol(list_get(result, 2), name_OutputsToList);
+            set_symbol(list_get(result, 2), sym_OutputsToList);
         }
         return;
     }
@@ -1048,7 +1048,7 @@ void write_term_bytecode(Term* term, caValue* result)
         if (user_count(term) == 0) {
             set_null(list_get(result, 3));
         } else {
-            set_symbol(list_get(result, 3), name_LoopProduceOutput);
+            set_symbol(list_get(result, 3), sym_LoopProduceOutput);
         }
         return;
     }
@@ -1093,7 +1093,7 @@ void write_term_bytecode(Term* term, caValue* result)
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_DynamicCall);
         write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        set_symbol(list_get(result, 2), name_OutputsToList);
+        set_symbol(list_get(result, 2), sym_OutputsToList);
         return;
     }
 
@@ -1101,7 +1101,7 @@ void write_term_bytecode(Term* term, caValue* result)
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_ClosureCall);
         write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        set_symbol(list_get(result, 2), name_FlatOutputs);
+        set_symbol(list_get(result, 2), sym_FlatOutputs);
         return;
     }
     
@@ -1192,7 +1192,7 @@ void write_block_bytecode(Block* block, caValue* output)
 
         // Possibly produce output, depending on if this term is used.
         if ((block->owningTerm != NULL) && user_count(block->owningTerm) > 0) {
-            set_symbol(list_get(finishOp, 1), name_LoopProduceOutput);
+            set_symbol(list_get(finishOp, 1), sym_LoopProduceOutput);
         } else {
             set_null(list_get(finishOp, 1));
         }
@@ -1215,7 +1215,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
             Symbol tag = as_symbol(list_get(action, 0));
 
             switch (tag) {
-            case name_Multiple: {
+            case sym_Multiple: {
 
                 // Multiple input: create a list in dest register.
                 int inputCount = list_length(action) - 1;
@@ -1232,7 +1232,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
                 }
                 break;
             }
-            case name_Cast: {
+            case sym_Cast: {
 
                 // Cast action: copy and cast to type.
                 Term* term = as_term_ref(list_get(action, 1));
@@ -1369,7 +1369,7 @@ static void step_interpreter(Stack* stack)
         Frame* frame = push_frame(stack, block);
         caValue* inputActions = list_get(action, 1);
         populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
-        bool enableLoopOutput = as_symbol(list_get(action, 3)) == name_LoopProduceOutput;
+        bool enableLoopOutput = as_symbol(list_get(action, 3)) == sym_LoopProduceOutput;
         start_for_loop(stack, enableLoopOutput);
         break;
     }
@@ -1405,7 +1405,7 @@ static void step_interpreter(Stack* stack)
         caValue* control = find_stack_value_for_term(stack, currentTerm->input(0), 0);
 
         // Only exit if the control says we should exit.
-        if (!is_symbol(control) || as_symbol(control) == name_None)
+        if (!is_symbol(control) || as_symbol(control) == sym_None)
             return;
 
         int intermediateOutputCount = currentTerm->numInputs() - 1;
@@ -1468,11 +1468,11 @@ static void step_interpreter(Stack* stack)
         frame = top_frame(stack);
 
         if (op == op_Continue)
-            frame->exitType = name_Continue;
+            frame->exitType = sym_Continue;
         else if (op == op_Break)
-            frame->exitType = name_Break;
+            frame->exitType = sym_Break;
         else if (op == op_Discard)
-            frame->exitType = name_Discard;
+            frame->exitType = sym_Discard;
 
 #if 0
         // Copy outputs to placeholders.
@@ -1490,7 +1490,7 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_FinishLoop: {
-        bool enableLoopOutput = as_symbol(list_get(action, 1)) == name_LoopProduceOutput;
+        bool enableLoopOutput = as_symbol(list_get(action, 1)) == sym_LoopProduceOutput;
         for_loop_finish_iteration(stack, enableLoopOutput);
         break;
     }

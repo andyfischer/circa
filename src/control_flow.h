@@ -15,8 +15,7 @@ Term* find_trailing_exit_point(Term* term);
 // the intermediate value is the nearby term with the same name binding.
 Term* find_intermediate_result_for_output(Term* location, Term* output);
 
-// Create or destroy the necessary exit_point calls inside 'block'.
-void update_exit_points(Block* block);
+void update_for_control_flow(Block* block);
 
 void control_flow_setup_funcs(Block* kernel);
 

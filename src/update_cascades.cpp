@@ -58,7 +58,7 @@ void dirty_bytecode(Block* block)
 void refresh_bytecode(Block* block)
 {
     // Don't bother touching bytecode if we're still bootstrapping.
-    if (global_world()->bootstrapStatus == name_Bootstrapping)
+    if (global_world()->bootstrapStatus == sym_Bootstrapping)
         return;
 
     if (is_null(&block->bytecode))

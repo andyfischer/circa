@@ -33,25 +33,25 @@ struct NameSearch
 Term* find_name(Block* block,
                 caValue* name,
                 int position = -1,
-                Symbol lookupType = name_LookupAny);
+                Symbol lookupType = sym_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       caValue* name,
                       int position = -1,
-                      Symbol lookupType = name_LookupAny);
+                      Symbol lookupType = sym_LookupAny);
 
 // Convenient overloads for using a string as a name
 Term* find_name(Block* block,
                 const char* name,
                 int position = -1,
-                Symbol lookupType = name_LookupAny);
+                Symbol lookupType = sym_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       const char* name,
                       int position = -1,
-                      Symbol lookupType = name_LookupAny);
+                      Symbol lookupType = sym_LookupAny);
 
 Term* find_name_at(Term* term, const char* name);
 Term* find_name_at(Term* term, caValue* name);
@@ -72,7 +72,7 @@ Term* find_global(const char* name);
 Block* get_parent_block(Block* block);
 Term* get_parent_term(Term* term);
 Term* get_parent_term(Term* term, int levels);
-bool name_is_reachable_from(Term* term, Block* block);
+bool sym_is_reachable_from(Term* term, Block* block);
 Block* find_first_common_block(Term* left, Term* right);
 bool term_is_child_of_block(Term* term, Block* block);
 
@@ -114,12 +114,12 @@ Symbol existing_name_from_string(const char* str);
 Symbol existing_name_from_string(const char* str, int len);
 
 // Return a name from this string, adding it if necessary.
-Symbol name_from_string(const char* str);
-Symbol name_from_string(std::string const& str);
-Symbol name_from_string(caValue* str);
+Symbol sym_from_string(const char* str);
+Symbol sym_from_string(std::string const& str);
+Symbol sym_from_string(caValue* str);
 
 // Deallocate all interned names, this should be called at shutdown
-void name_dealloc_global_data();
+void sym_dealloc_global_data();
 #endif
 
 } // namespace circa
