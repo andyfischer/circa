@@ -1,0 +1,33 @@
+
+Thinking about whether to have Symbols.
+
+Useful as an identifying element. Very commonly the subject of a switch statement.
+
+[:location [:x 10] [:y 10]]
+
+Are they essentially strings? What if we just stored symbols as strings?
+
+['location' ['x' 10] ['y' 10]]
+
+The nice thing about a symbol, is that it's distinct from a regular value. Say we have
+the following pattern:
+
+  f() may return
+    <any value>
+      or
+    [:symbol <some other value>]
+
+In order to avoid problems, we must guarantee that the second form does not overlap
+with the first form.
+
+If symbols are strings, then this is harder. We must guarantee that the value isn't
+a string with the particular value.
+
+If symbols are not strings, then it's easier, we just need to guarantee that the value
+doesn't have the symbol type. It can be a string of any value.
+
+We would still need to worry about the case where <any value> is a symbol. So, it's not
+really any value, it's any non-symbol value.
+
+If we really want to guarantee that a value is distinct, we can create a local type for
+that.

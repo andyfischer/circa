@@ -893,6 +893,9 @@ void bootstrap_kernel()
     // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
 
+    // Create global symbol table (requires Hashtable type)
+    symbol_initialize_global_table();
+
     // Setup output_placeholder() function, needed to declare functions properly.
     FUNCS.output = create_value(kernel, TYPES.function, "output_placeholder");
     function_t::initialize(TYPES.function, term_value(FUNCS.output));
@@ -1188,6 +1191,8 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
 CIRCA_EXPORT void circa_shutdown(caWorld* world)
 {
+    symbol_deinitialize_global_table();
+
     delete world->root;
     world->root = NULL;
 

@@ -21,6 +21,7 @@
 #include "static_checking.h"
 #include "string_type.h"
 #include "switch_block.h"
+#include "symbols.h"
 #include "names.h"
 #include "term.h"
 #include "token.h"
@@ -2172,7 +2173,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // literal symbol?
     else if (tokens.nextIs(tok_ColonString))
-        result = literal_name(block, tokens, context);
+        result = literal_symbol(block, tokens, context);
 
     // closure block?
     else if (tokens.nextIs(tok_LBrace))
@@ -2403,18 +2404,17 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(term);
 }
 
-ParseResult literal_name(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
     std::string s = tokens.nextStr();
     tokens.consume(tok_ColonString);
 
-    Term* term = create_value(block, TYPES.null);
+    Term* term = create_value(block, TYPES.symbol);
 
     // Skip the leading ':' in the name string
-    //set_symbol(term_value(term), s.c_str() + 1);
-    set_string(term_value(term), s.c_str() + 1);
+    set_symbol_from_string(term_value(term), s.c_str() + 1);
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);

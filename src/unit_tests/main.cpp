@@ -352,6 +352,7 @@ namespace modules { void register_tests(); }
 namespace names { void register_tests(); }
 namespace native_patch_test { void register_tests(); }
 namespace string_tests { void register_tests(); }
+namespace symbol_test { void register_tests(); }
 namespace tokenizer { void register_tests(); }
 
 int main(int argc, char** argv)
@@ -373,6 +374,7 @@ int main(int argc, char** argv)
     names::register_tests();
     native_patch_test::register_tests();
     string_tests::register_tests();
+    symbol_test::register_tests();
     tokenizer::register_tests();
 
     caWorld* world = circa_initialize();

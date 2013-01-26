@@ -119,9 +119,17 @@ def write_impl(lines):
         for prefix,sub in trie.items():
             yield "case " + ('0' if prefix == 0 else "'" + prefix + "'") + ':'
             if type(sub) == str:
-                yield "    if (strcmp(str + " + str(dist+1) + ", \"" + sub[dist+1:] + "\") == 0)"
-                yield "        return " + get_c_name(sub) + ";"
-                yield "    break;"
+                # This leaf only has a string value, meaning that it can be only one possible thing.
+
+                if (dist+1) >= len(sub):
+                    # We've already checked every character.
+                    yield "        return " + get_c_name(sub) + ";"
+                else:
+                    # There is still the remainder of this match to check. We'll either
+                    # match this string or match nothing.
+                    yield "    if (strcmp(str + " + str(dist+1) + ", \"" + sub[dist+1:] + "\") == 0)"
+                    yield "        return " + get_c_name(sub) + ";"
+                    yield "    break;"
             else:
                 for line in write_name_lookup_switch(sub, dist + 1):
                     yield line

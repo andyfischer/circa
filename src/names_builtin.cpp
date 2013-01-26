@@ -411,9 +411,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 5, "") == 0)
             return sym_File;
-        break;
     case 'N':
         if (strcmp(str + 5, "otFound") == 0)
             return sym_FileNotFound;
@@ -544,9 +542,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[3]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 4, "") == 0)
             return sym_Out;
-        break;
     case 'p':
         if (strcmp(str + 4, "utsToList") == 0)
             return sym_OutputsToList;
@@ -756,9 +752,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[7]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 8, "") == 0)
             return sym_Unknown;
-        break;
     case 'I':
         if (strcmp(str + 8, "dentifier") == 0)
             return sym_UnknownIdentifier;
@@ -1421,9 +1415,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[14]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 15, "") == 0)
             return stat_ValueCast;
-        break;
     case 'D':
         if (strcmp(str + 15, "ispatched") == 0)
             return stat_ValueCastDispatched;
@@ -1474,9 +1466,7 @@ int builtin_symbol_from_string(const char* str)
             return tok_Ampersand;
         break;
     case 't':
-        if (strcmp(str + 6, "") == 0)
             return tok_At;
-        break;
     case 'n':
         if (strcmp(str + 6, "d") == 0)
             return tok_And;
@@ -1499,9 +1489,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     default: return -1;
     case 'a':
-        if (strcmp(str + 9, "") == 0)
             return tok_Comma;
-        break;
     case 'e':
         if (strcmp(str + 9, "nt") == 0)
             return tok_Comment;
@@ -1515,16 +1503,12 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     default: return -1;
     case 'r':
-        if (strcmp(str + 9, "") == 0)
             return tok_Color;
-        break;
     case 'n':
     switch (str[9]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 10, "") == 0)
             return tok_Colon;
-        break;
     case 'S':
         if (strcmp(str + 10, "tring") == 0)
             return tok_ColonString;
@@ -1636,9 +1620,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[7]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 8, "") == 0)
             return tok_Dot;
-        break;
     case 'A':
         if (strcmp(str + 8, "t") == 0)
             return tok_DotAt;
@@ -1662,9 +1644,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 10, "") == 0)
             return tok_GThan;
-        break;
     case 'E':
         if (strcmp(str + 10, "q") == 0)
             return tok_GThanEq;
@@ -1697,9 +1677,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[6]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 7, "") == 0)
             return tok_In;
-        break;
     case 'c':
         if (strcmp(str + 7, "lude") == 0)
             return tok_Include;
@@ -1714,9 +1692,7 @@ int builtin_symbol_from_string(const char* str)
             return tok_Identifier;
         break;
     case 'f':
-        if (strcmp(str + 6, "") == 0)
             return tok_If;
-        break;
     }
     case 'H':
         if (strcmp(str + 5, "exInteger") == 0)
@@ -1738,9 +1714,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 10, "") == 0)
             return tok_Minus;
-        break;
     case 'E':
         if (strcmp(str + 10, "quals") == 0)
             return tok_MinusEquals;
@@ -1774,9 +1748,7 @@ int builtin_symbol_from_string(const char* str)
             return tok_LBracket;
         break;
     case 'e':
-        if (strcmp(str + 10, "") == 0)
             return tok_LBrace;
-        break;
     }
     }
     }
@@ -1798,9 +1770,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 10, "") == 0)
             return tok_LThan;
-        break;
     case 'E':
         if (strcmp(str + 10, "q") == 0)
             return tok_LThanEq;
@@ -1836,9 +1806,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[7]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 8, "") == 0)
             return tok_Not;
-        break;
     case 'E':
         if (strcmp(str + 8, "quals") == 0)
             return tok_NotEquals;
@@ -1871,9 +1839,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 9, "") == 0)
             return tok_Plus;
-        break;
     case 'E':
         if (strcmp(str + 9, "quals") == 0)
             return tok_PlusEquals;
@@ -1911,9 +1877,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 9, "") == 0)
             return tok_Star;
-        break;
     case 'E':
         if (strcmp(str + 9, "quals") == 0)
             return tok_StarEquals;
@@ -1946,9 +1910,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     default: return -1;
     case 0:
-        if (strcmp(str + 10, "") == 0)
             return tok_Slash;
-        break;
     case 'E':
         if (strcmp(str + 10, "quals") == 0)
             return tok_SlashEquals;
@@ -1986,9 +1948,7 @@ int builtin_symbol_from_string(const char* str)
             return tok_RBracket;
         break;
     case 'e':
-        if (strcmp(str + 10, "") == 0)
             return tok_RBrace;
-        break;
     }
     }
     }
@@ -2041,17 +2001,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[14]) {
     default: return -1;
     case '1':
-        if (strcmp(str + 15, "") == 0)
             return tok_UnusedName1;
-        break;
     case '3':
-        if (strcmp(str + 15, "") == 0)
             return tok_UnusedName3;
-        break;
     case '2':
-        if (strcmp(str + 15, "") == 0)
             return tok_UnusedName2;
-        break;
     }
     }
     }
