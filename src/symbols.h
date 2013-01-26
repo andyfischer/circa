@@ -4,6 +4,6 @@
 
 namespace circa {
 
-const char* symbol_to_string(Symbol symbol);
+void symbol_setup_type(Type* type);
 
 } // namespace circa

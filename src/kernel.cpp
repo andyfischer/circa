@@ -28,6 +28,7 @@
 #include "stateful_code.h"
 #include "static_checking.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "names.h"
 #include "term.h"
 #include "type_inference.h"
@@ -42,7 +43,6 @@
 #include "types/eval_context.h"
 #include "types/indexable.h"
 #include "types/int.h"
-#include "types/name.h"
 #include "types/number.h"
 #include "types/set.h"
 #include "types/void.h"
@@ -809,7 +809,7 @@ void bootstrap_kernel()
     hashtable_setup_type(TYPES.map);
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
-    name_t::setup_type(TYPES.symbol);
+    symbol_setup_type(TYPES.symbol);
     null_t::setup_type(TYPES.null);
     number_t::setup_type(TYPES.float_type);
     opaque_pointer_t::setup_type(TYPES.opaque_pointer);
