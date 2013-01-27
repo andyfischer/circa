@@ -213,6 +213,19 @@ Block* find_enclosing_for_loop_contents(Term* term)
     return nested_contents(loop);
 }
 
+bool loop_produces_output_value(Term* forTerm)
+{
+    ca_assert(forTerm->function == FUNCS.for_func);
+    return user_count(forTerm) > 0;
+}
+bool enclosing_loop_produces_output_value(Term* term)
+{
+    Term* enclosingForLoop = find_enclosing_for_loop(term);
+    if (enclosingForLoop == NULL)
+        return false;
+    return loop_produces_output_value(enclosingForLoop);
+}
+
 Block* for_loop_get_zero_block(Block* contents)
 {
     return contents->get("#zero")->contents();

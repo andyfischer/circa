@@ -252,7 +252,14 @@ void term_move_property(Term* from, Term* to, const char* propName)
 
 caValue* term_get_input_property(Term* term, int inputIndex, const char* name)
 {
-    return dict_get(&term->inputInfo(inputIndex)->properties, name);
+    Term::Input* info = term->inputInfo(inputIndex);
+    if (info == NULL)
+        return NULL;
+    return dict_get(&info->properties, name);
+}
+caValue* term_insert_input_property(Term* term, int inputIndex, const char* name)
+{
+    return dict_insert(&term->inputInfo(inputIndex)->properties, name);
 }
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue)
@@ -270,6 +277,17 @@ void term_set_int_prop(Term* term, Symbol prop, int value)
 void term_set_string_prop(Term* term, Symbol prop, const char* value)
 {
     term->setStringProp(builtin_symbol_to_string(prop), value);
+}
+bool is_input_implicit(Term* term, int index)
+{
+    caValue* val = term_get_input_property(term, index, "implicit");
+    if (val == NULL)
+        return false;
+    return as_bool(val);
+}
+void set_input_implicit(Term* term, int index, bool implicit)
+{
+    set_bool(term_insert_input_property(term, index, "implicit"), true);
 }
 
 caValue* term_name(Term* term)

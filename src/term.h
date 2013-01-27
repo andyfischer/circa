@@ -154,6 +154,10 @@ const char* term_get_string_prop(Term* term, Symbol prop, const char* defaultVal
 void term_set_int_prop(Term* term, Symbol prop, int value);
 void term_set_string_prop(Term* term, Symbol prop, const char* value);
 
+// Specific helper functions for input properties.
+bool is_input_implicit(Term* term, int index);
+void set_input_implicit(Term* term, int index, bool implicit);
+
 caValue* term_name(Term* term);
 caValue* term_value(Term* term);
 bool is_type(Term* term);

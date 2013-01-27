@@ -25,11 +25,6 @@ static void create_implicit_outputs_for_exit_point(Term* exitCall, Term* exitPoi
 
 bool is_exit_point(Term* term)
 {
-    return term->function == FUNCS.exit_point;
-}
-
-bool is_exit_producer(Term* term)
-{
     return term->function == FUNCS.return_func
         || term->function == FUNCS.break_func
         || term->function == FUNCS.continue_func
@@ -44,8 +39,6 @@ Symbol term_get_highest_exit_level(Term* term)
             || term->function == FUNCS.continue_func
             || term->function == FUNCS.discard)
         return sym_ExitLevelLoop;
-    else if (term->function == FUNCS.exit_point)
-        return term_get_int_prop(term, sym_HighestExitLevel, sym_None);
     else
         return sym_None;
 }
@@ -174,25 +167,30 @@ Symbol term_get_escaping_exit_level(Term* term)
     return sym_None;
 }
 
-Term* find_trailing_exit_point(Term* term)
+void update_derived_inputs_for_exit_point(Block* block, Term* term)
 {
-    Term* lookahead = term;
-    while (true) {
-        lookahead = following_term(lookahead);
-        if (lookahead == NULL)
-            return NULL;
+    // Make sure that this exit point includes every block output as an input.
+    // The intermediate value might be different at this location.
+    
+    for (int i=0;; i++) {
+        Term* blockOutput = get_output_placeholder(block, i);
+        if (blockOutput == NULL)
+            break;
 
-        if (lookahead->function == FUNCS.exit_point)
-            return lookahead;
+        // Don't touch input if it's explicit.
+        if (i < term->numInputs() && !is_input_implicit(term, i))
+            return;
 
-        if (lookahead->function != FUNCS.extra_output)
-            return NULL;
+        Term* intermediateValue = find_intermediate_result_for_output(term, blockOutput);
+
+        set_input(term, i, intermediateValue);
+        set_input_implicit(term, i, true);
+        set_input_hidden(term, i, true);
     }
 }
 
 void update_for_control_flow(Block* block)
 {
-    // Only worry about minor blocks.
     if (!is_minor_block(block))
         return;
 
@@ -200,144 +198,11 @@ void update_for_control_flow(Block* block)
         Term* term = block->get(i);
         if (term == NULL)
             continue;
-
-        Symbol escapingExit = term_get_escaping_exit_level(term);
-
-        if (escapingExit != sym_None) {
-            // This term can exit, make sure that all necessary values are output to parent branch.
-            // TODO
-            
-            break;
-        }
-    }
-
-#if 0
-    here's the 1/7/13 version
-
-    bool needToRemoveNulls = false;
-
-    // Primary pass: insert or delete exit_point() calls.
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (term == NULL)
+        if (!is_exit_point(term))
             continue;
 
-        // Don't examine existing exit_point() calls (examine their owner instead).
-        if (term->function == FUNCS.exit_point)
-            continue;
-
-        Symbol highestExitLevel = term_get_escaping_exit_level(term);
-        Term* existingExitPoint = find_trailing_exit_point(term);
-
-        bool shouldHaveExitPoint = highestExitLevel != sym_None;
-        bool hasExitPoint = existingExitPoint != NULL;
-
-        if (shouldHaveExitPoint && !hasExitPoint) {
-
-            // Make sure that a minor block outputs the :control value. Has
-            // no effect on major blocks.
-            Value controlOutputDesc;
-            set_list(&controlOutputDesc, 1);
-            set_symbol(list_get(&controlOutputDesc, 0), sym_Control);
-            create_output_from_minor_block(block, &controlOutputDesc);
-
-            // Need to add an exit_point().
-            Term* exitPoint = apply(block, FUNCS.exit_point, TermList());
-            update_inputs_for_exit_point(term, exitPoint);
-            term_set_int_prop(exitPoint, sym_HighestExitLevel, highestExitLevel);
-            move_after(exitPoint, term);
-
-        } else if (!shouldHaveExitPoint && hasExitPoint) {
-
-            // Need to remove this exit_point.
-            erase_term(existingExitPoint);
-            needToRemoveNulls = true;
-        } else if (hasExitPoint) {
-
-            // Always refresh the inputs for exit_point(), if there is one.
-            update_inputs_for_exit_point(term, existingExitPoint);
-        }
+        update_derived_inputs_for_exit_point(block, term);
     }
-
-    if (needToRemoveNulls)
-        block->removeNulls();
-
-#endif
-#if 0
-        if (term->name == "#return" && !is_output_placeholder(term)) {
-            for (int outputIndex=0; outputIndex < term->numInputs(); outputIndex++) {
-                Term* returnValue = term->input(outputIndex);
-                if (returnValue == NULL)
-                    continue;
-
-                //force_term_to_output_to_parent(returnValue);
-
-                // If this is a subroutine, make sure that the primary output is properly
-                // connected.
-                if (is_major_block(block)) {
-                    Term* output = get_output_placeholder(block, outputIndex);
-                    if (output != NULL) {
-                        set_input(output, 0, returnValue);
-                    }
-                }
-            }
-        }
-
-        Symbol escapingExitLevel = find_highest_escaping_exit_level(term);
-        if (escapingExitLevel != sym_None) {
-
-            // This term can cause this block to exit.
-
-            // Make sure that there is an exit_point call that follows this term.
-            Term* exitPoint = find_exit_point_for_term(term);
-
-            Term* controlVar = NULL;
-
-            if (exitPoint == NULL) {
-                // Create a new exit_point()
-                exitPoint = apply(block, FUNCS.exit_point, TermList(NULL));
-                move_after(exitPoint, term);
-
-                // Make sure we find a #control term that is in term's extra outputs.
-                controlVar = find_name_at(exitPoint, "#control");
-                set_input(exitPoint, 0, controlVar);
-            } else {
-                controlVar = find_name_at(exitPoint, "#control");
-            }
-
-            exitPoint->setIntProp("highestExitLevel", escapingExitLevel);
-
-            // If this exit_point is inside an if-block, then we should add #control as
-            // a block output.
-            if (controlVar != NULL)
-                force_term_to_output_to_parent(controlVar);
-        }
-    }
-
-    // 2nd pass, now that we have finished creating derived terms, go back
-    // and ensure that the inputs to each exit_point are corrent.
-    for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
-
-        Term* exitPoint = it.current();
-
-        if (exitPoint->function != FUNCS.exit_point)
-            continue;
-
-        // For each output in this block, assign an input to the exit_point that
-        // has the 'intermediate' result at this term's location. (such as, if the output
-        // has a name, use the term at this location with the given name.
-
-        for (int i=0;; i++) {
-            Term* output = get_output_placeholder(block, i);
-            if (output == NULL)
-                break;
-
-            Term* intermediate = find_intermediate_result_for_output(exitPoint, output);
-
-            // exit_point() uses input 0 for control flow, so assign each input to i+1.
-            set_input(exitPoint, i + 1, intermediate);
-        }
-#endif
 }
 
 Term* find_intermediate_result_for_output(Term* location, Term* output)
@@ -426,22 +291,19 @@ static void create_implicit_outputs_for_exit_point(Term* exitCall, Term* exitPoi
 
 void control_flow_setup_funcs(Block* kernel)
 {
-    FUNCS.exit_point =
-        import_function(kernel, NULL, "exit_point(any outs :multiple :optional)");
-
     FUNCS.return_func = import_function(kernel, NULL, "return(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.return_func), true);
     as_function(FUNCS.return_func)->formatSource = return_formatSource;
 
-    FUNCS.discard = import_function(kernel, NULL, "discard()");
+    FUNCS.discard = import_function(kernel, NULL, "discard(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.discard), true);
     as_function(FUNCS.discard)->formatSource = discard_formatSource;
 
-    FUNCS.break_func = import_function(kernel, NULL, "break()");
+    FUNCS.break_func = import_function(kernel, NULL, "break(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.break_func), true);
     as_function(FUNCS.break_func)->formatSource = break_formatSource;
 
-    FUNCS.continue_func = import_function(kernel, NULL, "continue()");
+    FUNCS.continue_func = import_function(kernel, NULL, "continue(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.continue_func), true);
     as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
 }

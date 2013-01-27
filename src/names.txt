@@ -8,6 +8,9 @@ Unknown
 Repeat
 Success
 Failure
+Yes
+No
+Maybe
 
 # Misc errors
 FileNotFound

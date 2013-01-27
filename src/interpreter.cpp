@@ -5,6 +5,7 @@
 #include "building.h"
 #include "block.h"
 #include "code_iterators.h"
+#include "control_flow.h"
 #include "dict.h"
 #include "function.h"
 #include "generic.h"
@@ -1045,46 +1046,34 @@ void write_term_bytecode(Term* term, caValue* result)
         write_term_output_instructions(term, term->nestedContents, list_get(result, 2));
 
         // index 3 - a flag which might say LoopProduceOutput
-        if (user_count(term) == 0) {
-            set_null(list_get(result, 3));
-        } else {
-            set_symbol(list_get(result, 3), sym_LoopProduceOutput);
+        set_symbol(list_get(result, 3), 
+                loop_produces_output_value(term) ? sym_LoopProduceOutput : sym_None);
+        return;
+    }
+
+    if (is_exit_point(term)) {
+        if (term->function == FUNCS.return_func)
+            list_resize(result, 2);
+        else
+            list_resize(result, 3);
+
+        if (term->function == FUNCS.return_func)
+            set_symbol(list_get(result, 0), op_Return);
+        else if (term->function == FUNCS.break_func)
+            set_symbol(list_get(result, 0), op_Break);
+        else if (term->function == FUNCS.continue_func)
+            set_symbol(list_get(result, 0), op_Continue);
+        else if (term->function == FUNCS.discard)
+            set_symbol(list_get(result, 0), op_Discard);
+        else
+            internal_error("unrecognized exit point function");
+
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
+
+        if (term->function != FUNCS.return_func) {
+            set_symbol(list_get(result, 2), 
+                enclosing_loop_produces_output_value(term) ? sym_LoopProduceOutput : sym_None);
         }
-        return;
-    }
-
-    if (term->function == FUNCS.return_func) {
-        list_resize(result, 2);
-        set_symbol(list_get(result, 0), op_Return);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        return;
-    }
-
-    if (term->function == FUNCS.break_func) {
-        list_resize(result, 2);
-        set_symbol(list_get(result, 0), op_Break);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        return;
-    }
-
-    if (term->function == FUNCS.continue_func) {
-        list_resize(result, 2);
-        set_symbol(list_get(result, 0), op_Continue);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        return;
-    }
-
-    if (term->function == FUNCS.discard) {
-        list_resize(result, 2);
-        set_symbol(list_get(result, 0), op_Discard);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        return;
-    }
-
-    if (term->function == FUNCS.exit_point) {
-        list_resize(result, 2);
-        set_symbol(list_get(result, 0), op_ExitPoint);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
         return;
     }
 
@@ -1191,11 +1180,9 @@ void write_block_bytecode(Block* block, caValue* output)
         set_symbol(list_get(finishOp, 0), op_FinishLoop);
 
         // Possibly produce output, depending on if this term is used.
-        if ((block->owningTerm != NULL) && user_count(block->owningTerm) > 0) {
-            set_symbol(list_get(finishOp, 1), sym_LoopProduceOutput);
-        } else {
-            set_null(list_get(finishOp, 1));
-        }
+        set_symbol(list_get(finishOp, 1),
+                loop_produces_output_value(block->owningTerm) ? sym_LoopProduceOutput: sym_None);
+
     } else {
         // Normal finish op.
         bytecode_write_finish_op(finishOp);
@@ -1461,6 +1448,7 @@ static void step_interpreter(Stack* stack)
         Value outputs;
         set_list(&outputs, 1);
         populate_inputs_from_bytecode(stack, list_get(action, 1), &outputs, 0);
+        bool enableLoopOutput = as_symbol(list_get(action, 2)) == sym_LoopProduceOutput;
 
         // Pop frames.
         while (!is_for_loop(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
@@ -1474,15 +1462,13 @@ static void step_interpreter(Stack* stack)
         else if (op == op_Discard)
             frame->exitType = sym_Discard;
 
-#if 0
         // Copy outputs to placeholders.
         caValue* outputList = list_get(&outputs, 0);
 
         for (int i=0; i < list_length(outputList); i++)
             copy(list_get(outputList, i), get_frame_register_from_end(frame, i));
-#endif
 
-        for_loop_finish_iteration(stack, true);
+        for_loop_finish_iteration(stack, enableLoopOutput);
         break;
     }
     case op_FinishFrame: {

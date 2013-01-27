@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "control_flow.h"
 #include "kernel.h"
 #include "function.h"
 #include "if_block.h"
@@ -230,7 +231,7 @@ void block_update_existing_pack_state_calls(Block* block)
             set_inputs(term, inputs);
         }
 
-        if (term->function == FUNCS.exit_point) {
+        if (is_exit_point(term)) {
             // Check if we need to insert a pack_state call
             Term* existing = term->input(stateOutputIndex);
 
