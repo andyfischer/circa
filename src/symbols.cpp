@@ -12,7 +12,8 @@
 
 namespace circa {
 
-Value* g_runtimeSymbolMap;
+Value* g_runtimeSymbolMap;    // Maps strings to Symbol values.
+Value* g_runtimeSymbolTable;   // List, associating Symbol values with strings.
 int g_nextRuntimeSymbol = sym_LastBuiltinName + 1;
 
 void set_symbol_from_string(caValue* val, caValue* str)
@@ -36,6 +37,9 @@ void set_symbol_from_string(caValue* val, caValue* str)
     int index = g_nextRuntimeSymbol++;
     set_symbol(newRuntime, index);
     set_symbol(val, index);
+
+    list_resize(g_runtimeSymbolTable, index+1);
+    set_value(list_get(g_runtimeSymbolTable, index), str);
 }
 
 void set_symbol_from_string(caValue* val, const char* str)
@@ -47,7 +51,15 @@ void set_symbol_from_string(caValue* val, const char* str)
 
 static std::string symbol_to_string(caValue* value)
 {
-    return std::string(":") + builtin_symbol_to_string(as_int(value));
+    const char* builtinName = builtin_symbol_to_string(as_int(value));
+    if (builtinName == NULL) {
+        caValue* tableVal = list_get(g_runtimeSymbolTable, as_int(value));
+        if (tableVal != NULL)
+            builtinName = as_cstring(tableVal);
+        else
+            builtinName = "";
+    }
+    return std::string(":") + builtinName;
 }
 
 static void format_source(caValue* source, Term* term)
@@ -65,6 +77,8 @@ void symbol_initialize_global_table()
 {
     g_runtimeSymbolMap = new Value();
     set_hashtable(g_runtimeSymbolMap);
+    g_runtimeSymbolTable = new Value();
+    set_list(g_runtimeSymbolTable, 0);
 }
 
 void symbol_deinitialize_global_table()
@@ -72,6 +86,9 @@ void symbol_deinitialize_global_table()
     set_null(g_runtimeSymbolMap);
     delete g_runtimeSymbolMap;
     g_runtimeSymbolMap = NULL;
+    set_null(g_runtimeSymbolTable);
+    delete g_runtimeSymbolTable;
+    g_runtimeSymbolTable = NULL;
 }
 
 void symbol_setup_type(Type* type)

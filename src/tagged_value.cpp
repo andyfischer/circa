@@ -348,6 +348,11 @@ bool equals_int(caValue* value, int i)
     return as_int(value) == i;
 }
 
+void set_value(caValue* target, caValue* value)
+{
+    copy(value, target);
+}
+
 void set_bool(caValue* value, bool b)
 {
     change_type(value, TYPES.bool_type);

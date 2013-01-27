@@ -115,6 +115,8 @@ Symbol      as_symbol(caValue* value);
 void*       as_opaque_pointer(caValue* value);
 Type*       as_type(caValue* value);
 
+void set_value(caValue* target, caValue* value);
+
 // Boxing using builtin types.
 void set_bool(caValue* value, bool b);
 void set_block(caValue* value, Block* block);
