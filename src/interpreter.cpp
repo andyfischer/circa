@@ -363,7 +363,6 @@ void finish_frame(Stack* stack)
                 break;
             }
 
-
             if (placeholder->type == TYPES.void_type)
                 continue;
 
@@ -1008,11 +1007,14 @@ void write_term_bytecode(Term* term, caValue* result)
 
         // Special case: don't use InlineCopy for an accumulatingOutput (this is used
         // in for-loop).
+#if 0
         if (term->boolProp("accumulatingOutput", false)) {
             bytecode_write_noop(result);
             return;
 
-        } else if (input == NULL) {
+        } else
+#endif
+        if (input == NULL) {
             set_symbol(outputTag, op_SetNull);
             list_resize(result, 1);
             return;
@@ -1382,6 +1384,7 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_ExitPoint: {
+#if 0
         Frame* frame = top_frame(stack);
         Term* currentTerm = block->get(frame->pc);
 
@@ -1415,6 +1418,7 @@ static void step_interpreter(Stack* stack)
         // Set PC to end
         frame->exitType = as_symbol(control);
         frame->nextPc = block->length();
+#endif
         break;
     }
     case op_Return: {

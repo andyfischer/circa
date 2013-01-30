@@ -329,10 +329,12 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
     set_int(get_frame_register(frame, for_loop_find_index(contents)), 0);
 
     if (enableLoopOutput) {
-        // Initialize output value
+        // Initialize output index.
         set_int(get_frame_register(frame, for_loop_find_output_index(contents)), 0);
-        caValue* listInput = circa_input(stack, 0);
-        set_list(get_frame_register_from_end(frame, 0), list_length(listInput));
+
+        // Initialize output value.
+        caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
+        set_list(outputList, 0);
     }
 
     // Interpreter will run the contents of the block
@@ -356,14 +358,10 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
     if (enableLoopOutput && frame->exitType != sym_Discard) {
         caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
 
-        Term* outputPlaceholder = get_output_placeholder(contents, 0);
-        caValue* outputList = get_frame_register(frame, outputPlaceholder);
-        caValue* outputValue = find_stack_value_for_term(stack, outputPlaceholder->input(0), 0);
+        caValue* resultValue = get_frame_register_from_end(frame, 0);
+        caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
 
-        if (!is_list(outputList))
-            set_list(outputList);
-        list_touch(outputList);
-        copy(outputValue, list_get(outputList, as_int(outputIndex)));
+        copy(resultValue, list_append(outputList));
 
         INCREMENT_STAT(LoopWriteOutput);
 
@@ -376,16 +374,25 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
             || frame->exitType == sym_Break
             || frame->exitType == sym_Return) {
 
-        // Possibly truncate output list, in case any elements were discarded.
+#if 0
+        // Possibly truncate the output list, in case any elements were discarded.
         if (enableLoopOutput) {
             caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
-            Term* outputPlaceholder = get_output_placeholder(contents, 0);
-            caValue* outputList = get_frame_register(frame, outputPlaceholder);
+            caValue* outputList = get_frame_register(frame, contents->owningTerm);
             list_resize(outputList, as_int(outputIndex));
         } else {
-            Term* outputPlaceholder = get_output_placeholder(contents, 0);
-            caValue* outputList = get_frame_register(frame, outputPlaceholder);
+            caValue* outputList = get_frame_register(frame, contents->owningTerm);
             set_list(outputList, 0);
+        }
+#endif
+
+        // Silly code- move the output list (in the parent frame) to our frame's output,
+        // where it will get copied back to parent in finish_frame.
+        if (enableLoopOutput) {
+            caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
+            move(outputList, get_frame_register_from_end(frame, 0));
+        } else {
+            set_list(get_frame_register_from_end(frame, 0), 0);
         }
         
         finish_frame(stack);
