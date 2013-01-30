@@ -153,13 +153,7 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
         else
             growth = 200;
 
-        //printf("pre resize:\n");
-        //dump_frames_raw(stack);
         resize_frame_list(stack, stack->framesCapacity + growth);
-
-        // TEMP
-        //printf("post resize:\n");
-        //dump_frames_raw(stack);
     }
 
     Frame* frame = frame_by_id(stack, stack->firstFreeFrame);
@@ -229,11 +223,7 @@ Frame* push_frame(Stack* stack, Block* block)
 void pop_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
-#if 0 // shared register list
-    list_resize(&stack->registers, top->registerFirst);
-#else
     set_null(&top->registers);
-#endif
 
     if (top->parent == 0)
         stack->top = 0;
@@ -581,11 +571,7 @@ Block* current_block(Stack* stack)
 
 caValue* get_frame_register(Frame* frame, int index)
 {
-#if 0 // shared register list
-    return list_get(&frame->stack->registers, frame->registerFirst + index);
-#else
     return list_get(&frame->registers, index);
-#endif
 }
 
 caValue* get_frame_register(Frame* frame, Term* term)
@@ -1048,6 +1034,7 @@ void write_term_bytecode(Term* term, caValue* result)
         // index 3 - a flag which might say LoopProduceOutput
         set_symbol(list_get(result, 3), 
                 loop_produces_output_value(term) ? sym_LoopProduceOutput : sym_None);
+
         return;
     }
 
@@ -1140,7 +1127,16 @@ void write_term_bytecode(Term* term, caValue* result)
     set_symbol(outputTag, tag);
 
     // Write input & output instructions
-    write_term_input_instructions(term, block, list_get(result, 1));
+    caValue* inputInstructions = list_get(result, 1);
+    write_term_input_instructions(term, block, inputInstructions);
+
+    // Check for an input error.
+    if (is_symbol(inputInstructions)) {
+        copy(inputInstructions, list_get(result, 0));
+        list_resize(result, 1);
+        return;
+    }
+
     write_term_output_instructions(term, block, list_get(result, 2));
 
     // Finally, do some lightweight optimization.
@@ -1448,9 +1444,8 @@ static void step_interpreter(Stack* stack)
         Value outputs;
         set_list(&outputs, 1);
         populate_inputs_from_bytecode(stack, list_get(action, 1), &outputs, 0);
-        bool enableLoopOutput = as_symbol(list_get(action, 2)) == sym_LoopProduceOutput;
 
-        // Pop frames.
+        // Pop frames until the for-loop.
         while (!is_for_loop(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
             pop_frame(stack);
         frame = top_frame(stack);
@@ -1468,7 +1463,8 @@ static void step_interpreter(Stack* stack)
         for (int i=0; i < list_length(outputList); i++)
             copy(list_get(outputList, i), get_frame_register_from_end(frame, i));
 
-        for_loop_finish_iteration(stack, enableLoopOutput);
+        // Jump to for loop finish op.
+        frame->nextPc = list_length(frame_bytecode(frame)) - 1;
         break;
     }
     case op_FinishFrame: {

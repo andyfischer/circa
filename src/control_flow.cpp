@@ -74,6 +74,8 @@ void return_formatSource(caValue* source, Term* term)
                 term, sym_Whitespace);
 
         for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            if (is_input_hidden(term, inputIndex) || term->input(inputIndex) == NULL)
+                continue;
             if (inputIndex != 0)
                 append_phrase(source, ", ", term, sym_None);
             format_source_for_input(source, term, inputIndex, "", "");

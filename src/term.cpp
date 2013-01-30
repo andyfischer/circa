@@ -289,6 +289,17 @@ void set_input_implicit(Term* term, int index, bool implicit)
 {
     set_bool(term_insert_input_property(term, index, "implicit"), true);
 }
+bool is_input_hidden(Term* term, int index)
+{
+    caValue* val = term_get_input_property(term, index, "hidden");
+    if (val == NULL)
+        return false;
+    return as_bool(val);
+}
+void set_input_hidden(Term* term, int index, bool hidden)
+{
+    set_bool(term_insert_input_property(term, index, "hidden"), true);
+}
 
 caValue* term_name(Term* term)
 {

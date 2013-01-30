@@ -478,9 +478,4 @@ void hide_from_source(Term* term)
     term->setBoolProp("syntax:hidden", true);
 }
 
-void set_input_hidden(Term* term, int inputIndex, bool hidden)
-{
-    set_bool(term->inputInfo(inputIndex)->properties.insert("hidden"), hidden);
-}
-
 } // namespace circa

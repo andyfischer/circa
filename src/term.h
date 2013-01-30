@@ -157,6 +157,8 @@ void term_set_string_prop(Term* term, Symbol prop, const char* value);
 // Specific helper functions for input properties.
 bool is_input_implicit(Term* term, int index);
 void set_input_implicit(Term* term, int index, bool implicit);
+bool is_input_hidden(Term* term, int inputIndex);
+void set_input_hidden(Term* term, int inputIndex, bool hidden);
 
 caValue* term_name(Term* term);
 caValue* term_value(Term* term);

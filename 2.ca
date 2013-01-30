@@ -1,9 +1,9 @@
 
-a = 1
 
-for i in [1]
-    a = 2
-    break
-    a = 3
+out = for i in [1 2 3]
+    print(i)
+    if i == 2
+        continue
+    print('fin: ' i)
 
-print('a = ' a)
+print(out)

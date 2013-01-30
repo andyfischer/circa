@@ -338,6 +338,7 @@ std::string list_to_string(ListData* value)
 
 int list_length(caValue* value)
 {
+    ca_assert(value->value_type->storageType == sym_StorageTypeList);
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
         return 0;
