@@ -12,7 +12,7 @@
 #include "token.h"
 #include "type.h"
 
-using namespace circa;
+namespace circa {
 
 struct ParseContext
 {
@@ -32,13 +32,13 @@ static void parse_value(TokenStream* tokens, caValue* out)
     drop_whitespace(tokens);
 
     if (tokens->finished()) {
-        circa_set_string(out, "unexpected end of string");
+        set_string(out, "unexpected end of string");
 
     } else if (tokens->nextIs(tok_Integer)) {
-        circa_set_int(out, atoi(tokens->nextStr().c_str()));
+        set_int(out, atoi(tokens->nextStr().c_str()));
         tokens->consume(tok_Integer);
     } else if (tokens->nextIs(tok_Float)) {
-        circa_set_float(out, (float) atof(tokens->nextStr().c_str()));
+        set_float(out, (float) atof(tokens->nextStr().c_str()));
         tokens->consume(tok_Float);
     } else if (tokens->nextIs(tok_String)) {
         std::string s = tokens->nextStr();
@@ -48,10 +48,10 @@ static void parse_value(TokenStream* tokens, caValue* out)
         tokens->consume(tok_LBracket);
         drop_whitespace(tokens);
 
-        circa_set_list(out, 0);
+        set_list(out, 0);
 
         while (!tokens->nextIs(tok_RBracket) && !tokens->finished()) {
-            caValue* element = circa_append(out);
+            caValue* element = list_append(out);
             parse_value(tokens, element);
 
             if (tokens->nextIs(tok_Comma))
@@ -62,27 +62,27 @@ static void parse_value(TokenStream* tokens, caValue* out)
         if (!tokens->finished())
             tokens->consume(tok_RBracket);
     } else if (tokens->nextIs(tok_True)) {
-        circa_set_bool(out, true);
+        set_bool(out, true);
         tokens->consume();
     } else if (tokens->nextIs(tok_False)) {
-        circa_set_bool(out, false);
+        set_bool(out, false);
         tokens->consume();
     } else if (tokens->nextIs(tok_Minus)) {
         tokens->consume(tok_Minus);
 
         parse_value(tokens, out);
 
-        if (circa_is_int(out)) {
-            circa_set_int(out, -1 * circa_int(out));
-        } else if (circa_is_float(out)) {
-            circa_set_float(out, -1 * circa_float(out));
+        if (is_int(out)) {
+            set_int(out, -1 * as_int(out));
+        } else if (is_float(out)) {
+            set_float(out, -1 * as_float(out));
         } else {
-            circa_set_string(out, "error, minus sign must preceed number");
+            set_string(out, "error, minus sign must preceed number");
         }
 
     } else {
-        circa_set_string(out, "unrecognized token: ");
-        circa_string_append(out, tokens->nextStr().c_str());
+        set_string(out, "unrecognized token: ");
+        string_append(out, tokens->nextStr().c_str());
         tokens->consume();
     }
 
@@ -90,13 +90,13 @@ static void parse_value(TokenStream* tokens, caValue* out)
     drop_whitespace(tokens);
 }
 
-extern "C" void circa_parse_string(const char* str, caValue* out)
+void parse_string_repr(const char* str, caValue* out)
 {
     TokenStream tokens(str);
     parse_value(&tokens, out);
 }
 
-extern "C" void circa_to_string_repr(caValue* value, caValue* out)
+void write_string_repr(caValue* value, caValue* out)
 {
     // For certain types, just use to_string
     if (is_int(value) || is_float(value) || is_bool(value)) {
@@ -110,7 +110,7 @@ extern "C" void circa_to_string_repr(caValue* value, caValue* out)
                 string_append(out, ", ");
 
             Value elementStr;
-            circa_to_string_repr(list_get(value, i), &elementStr);
+            write_string_repr(list_get(value, i), &elementStr);
             string_append(out, &elementStr);
         }
 
@@ -123,3 +123,4 @@ extern "C" void circa_to_string_repr(caValue* value, caValue* out)
     }
 }
 
+} // namespace circa

@@ -103,7 +103,7 @@ OBJECTS := \
 	$(OBJDIR)/source_repro.o \
 	$(OBJDIR)/stateful_code.o \
 	$(OBJDIR)/static_checking.o \
-	$(OBJDIR)/str_repr.o \
+	$(OBJDIR)/string_repr.o \
 	$(OBJDIR)/string_type.o \
 	$(OBJDIR)/switch_block.o \
 	$(OBJDIR)/symbols.o \
@@ -299,7 +299,7 @@ $(OBJDIR)/stateful_code.o: stateful_code.cpp
 $(OBJDIR)/static_checking.o: static_checking.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/str_repr.o: str_repr.cpp
+$(OBJDIR)/string_repr.o: string_repr.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_type.o: string_type.cpp
