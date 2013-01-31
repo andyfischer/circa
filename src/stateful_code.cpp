@@ -241,9 +241,9 @@ void block_update_existing_pack_state_calls(Block* block)
                 if (inputs.length() != 0) {
                     Term* pack_state = apply(block, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
-                    set_input(term, stateOutputIndex + 1, pack_state);
-                    set_input_hidden(term, stateOutputIndex + 1, true);
-                    set_input_implicit(term, stateOutputIndex + 1, true);
+                    set_input(term, stateOutputIndex, pack_state);
+                    set_input_hidden(term, stateOutputIndex, true);
+                    set_input_implicit(term, stateOutputIndex, true);
 
                     // Advance i to compensate for the term just added
                     i++;

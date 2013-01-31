@@ -23,32 +23,24 @@ void simple_get_exit_rank()
     test_assert(term_get_highest_exit_level(dis) == sym_ExitLevelLoop);
 }
 
-void test_implicit_exit_points()
+void has_control_flow_prop()
 {
-#if 0
     Block block;
 
-    Term* a = block.compile("a = 1");
-    update_exit_points(&block);
-    test_assert(find_trailing_exit_point(a) == NULL);
+    Term* f_def = block.compile("def f() { if true { return } }");
 
-    Term* ret = block.compile("return 1");
-    update_exit_points(&block);
-    test_assert(find_trailing_exit_point(ret) != NULL);
+    // Top-level block has no control flow, it shouldn't escape f().
+    test_assert(block_get_bool_property(&block, sym_HasControlFlow, false) == false);
 
-    Term* f = block.compile("for i in 0..3 { return 1 }");
-    update_exit_points(&block);
-    test_assert(find_trailing_exit_point(f) != NULL);
-
-    // Double check that 'a' isn't messed up.
-    test_assert(find_trailing_exit_point(a) == NULL);
-#endif
+    // Contents of f has control flow.
+    Block* f = f_def->nestedContents;
+    test_assert(block_get_bool_property(f, sym_HasControlFlow, false) == true);
 }
 
 void register_tests()
 {
     REGISTER_TEST_CASE(control_flow_test::simple_get_exit_rank);
-    REGISTER_TEST_CASE(control_flow_test::test_implicit_exit_points);
+    REGISTER_TEST_CASE(control_flow_test::has_control_flow_prop);
 }
 
 }

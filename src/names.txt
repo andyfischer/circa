@@ -12,6 +12,12 @@ Yes
 No
 Maybe
 
+# Block properties
+EvaluationEmpty
+HasEffects
+Origin
+HasControlFlow
+
 # Misc errors
 FileNotFound
 NotEnoughInputs

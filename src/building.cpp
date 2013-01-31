@@ -910,6 +910,7 @@ void block_finish_changes(Block* block)
     if (openState != NULL)
         append_state_output(block);
 
+    // After we are finished creating outputs, update any nested control flow operators.
     update_for_control_flow(block);
 
     // Make sure the primary output is connected.

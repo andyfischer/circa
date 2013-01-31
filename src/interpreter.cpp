@@ -1383,44 +1383,6 @@ static void step_interpreter(Stack* stack)
 
         break;
     }
-    case op_ExitPoint: {
-#if 0
-        Frame* frame = top_frame(stack);
-        Term* currentTerm = block->get(frame->pc);
-
-        caValue* control = find_stack_value_for_term(stack, currentTerm->input(0), 0);
-
-        // Only exit if the control says we should exit.
-        if (!is_symbol(control) || as_symbol(control) == sym_None)
-            return;
-
-        int intermediateOutputCount = currentTerm->numInputs() - 1;
-
-        // Copy intermediate values to the frame's output placeholders.
-        for (int i=0; i < intermediateOutputCount; i++) {
-
-            // Don't touch this output if it is an accumulatingOutput; it already has
-            // its output value.
-            Term* outputPlaceholder = get_output_placeholder(block, i);
-            if (outputPlaceholder->boolProp("accumulatingOutput", false))
-                continue;
-
-            caValue* result = find_stack_value_for_term(stack, currentTerm->input(i + 1), 0);
-            caValue* out = get_frame_register_from_end(frame, i);
-
-            if (result != NULL) {
-                copy(result, out);
-            } else {
-                set_null(out);
-            }
-        }
-
-        // Set PC to end
-        frame->exitType = as_symbol(control);
-        frame->nextPc = block->length();
-#endif
-        break;
-    }
     case op_Return: {
         // Capture outputs.
         Value outputs;

@@ -578,7 +578,7 @@ void duplicate_block(Block* source, Block* dest)
 Symbol load_script(Block* block, const char* filename)
 {
     // Store the file origin
-    caValue* origin = block_insert_property(block, str_origin);
+    caValue* origin = block_insert_property(block, sym_Origin);
     set_list(origin, 3);
     set_symbol(list_get(origin, 0), sym_File);
     set_string(list_get(origin, 1), filename);
@@ -635,33 +635,48 @@ std::string get_source_file_location(Block* block)
     return as_string(&directory);
 }
 
-caValue* block_get_property(Block* block, caValue* name)
+caValue* block_get_property(Block* block, Symbol key)
 {
     if (is_null(&block->properties))
         return NULL;
 
-    return hashtable_get(&block->properties, name);
+    Value keyVal;
+    set_symbol(&keyVal, key);
+    return hashtable_get(&block->properties, &keyVal);
 }
 
-caValue* block_insert_property(Block* block, caValue* name)
+caValue* block_insert_property(Block* block, Symbol key)
 {
     if (is_null(&block->properties))
         set_hashtable(&block->properties);
 
-    return hashtable_insert(&block->properties, name);
+    Value keyVal;
+    set_symbol(&keyVal, key);
+    return hashtable_insert(&block->properties, &keyVal);
 }
 
-void block_remove_property(Block* block, caValue* name)
+void block_remove_property(Block* block, Symbol key)
 {
     if (is_null(&block->properties))
         return;
 
-    hashtable_remove(&block->properties, name);
+    Value keyVal;
+    set_symbol(&keyVal, key);
+    hashtable_remove(&block->properties, &keyVal);
+}
+
+bool block_get_bool_property(Block* block, Symbol key, bool defaultValue)
+{
+    caValue* propVal = block_get_property(block, key);
+    if (propVal == NULL)
+        return defaultValue;
+
+    return as_bool(propVal);
 }
 
 bool block_is_evaluation_empty(Block* block)
 {
-    caValue* prop = block_get_property(block, str_evaluationEmpty);
+    caValue* prop = block_get_property(block, sym_EvaluationEmpty);
 
     if (prop == NULL)
         return false;
@@ -672,13 +687,13 @@ bool block_is_evaluation_empty(Block* block)
 void block_set_evaluation_empty(Block* block, bool empty)
 {
     if (empty)
-        set_bool(block_insert_property(block, str_evaluationEmpty), true);
+        set_bool(block_insert_property(block, sym_EvaluationEmpty), true);
     else
-        block_remove_property(block, str_evaluationEmpty);
+        block_remove_property(block, sym_EvaluationEmpty);
 }
 bool block_has_effects(Block* block)
 {
-    caValue* prop = block_get_property(block, str_hasEffects);
+    caValue* prop = block_get_property(block, sym_HasEffects);
 
     if (prop == NULL)
         return false;
@@ -688,14 +703,14 @@ bool block_has_effects(Block* block)
 void block_set_has_effects(Block* block, bool hasEffects)
 {
     if (hasEffects)
-        set_bool(block_insert_property(block, str_hasEffects), true);
+        set_bool(block_insert_property(block, sym_HasEffects), true);
     else
-        block_remove_property(block, str_hasEffects);
+        block_remove_property(block, sym_HasEffects);
 }
 
 caValue* block_get_file_origin(Block* block)
 {
-    caValue* origin = block_get_property(block, str_origin);
+    caValue* origin = block_get_property(block, sym_Origin);
     if (origin == NULL)
         return NULL;
 
@@ -715,7 +730,7 @@ bool check_and_update_file_origin(Block* block, const char* filename)
     caValue* origin = block_get_file_origin(block);
 
     if (origin == NULL) {
-        origin = block_insert_property(block, str_origin);
+        origin = block_insert_property(block, sym_Origin);
         set_list(origin, 3);
         set_symbol(list_get(origin, 0), sym_File);
         set_string(list_get(origin, 1), filename);

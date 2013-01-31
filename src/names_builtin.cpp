@@ -22,6 +22,13 @@ const char* builtin_symbol_to_string(int name)
     case sym_Repeat: return "Repeat";
     case sym_Success: return "Success";
     case sym_Failure: return "Failure";
+    case sym_Yes: return "Yes";
+    case sym_No: return "No";
+    case sym_Maybe: return "Maybe";
+    case sym_EvaluationEmpty: return "EvaluationEmpty";
+    case sym_HasEffects: return "HasEffects";
+    case sym_Origin: return "Origin";
+    case sym_HasControlFlow: return "HasControlFlow";
     case sym_FileNotFound: return "FileNotFound";
     case sym_NotEnoughInputs: return "NotEnoughInputs";
     case sym_TooManyInputs: return "TooManyInputs";
@@ -373,6 +380,10 @@ int builtin_symbol_from_string(const char* str)
     }
     }
     }
+    case 'v':
+        if (strcmp(str + 2, "aluationEmpty") == 0)
+            return sym_EvaluationEmpty;
+        break;
     }
     case 'D':
     switch (str[1]) {
@@ -453,17 +464,45 @@ int builtin_symbol_from_string(const char* str)
     }
     }
     case 'H':
-        if (strcmp(str + 1, "ighestExitLevel") == 0)
+    switch (str[1]) {
+    default: return -1;
+    case 'a':
+    switch (str[2]) {
+    default: return -1;
+    case 's':
+    switch (str[3]) {
+    default: return -1;
+    case 'C':
+        if (strcmp(str + 4, "ontrolFlow") == 0)
+            return sym_HasControlFlow;
+        break;
+    case 'E':
+        if (strcmp(str + 4, "ffects") == 0)
+            return sym_HasEffects;
+        break;
+    }
+    }
+    case 'i':
+        if (strcmp(str + 2, "ghestExitLevel") == 0)
             return sym_HighestExitLevel;
         break;
+    }
     case 'K':
         if (strcmp(str + 1, "eyword") == 0)
             return sym_Keyword;
         break;
     case 'M':
-        if (strcmp(str + 1, "ultiple") == 0)
+    switch (str[1]) {
+    default: return -1;
+    case 'a':
+        if (strcmp(str + 2, "ybe") == 0)
+            return sym_Maybe;
+        break;
+    case 'u':
+        if (strcmp(str + 2, "ltiple") == 0)
             return sym_Multiple;
         break;
+    }
     case 'L':
     switch (str[1]) {
     default: return -1;
@@ -535,6 +574,10 @@ int builtin_symbol_from_string(const char* str)
     case 'O':
     switch (str[1]) {
     default: return -1;
+    case 'r':
+        if (strcmp(str + 2, "igin") == 0)
+            return sym_Origin;
+        break;
     case 'u':
     switch (str[2]) {
     default: return -1;
@@ -572,6 +615,8 @@ int builtin_symbol_from_string(const char* str)
     case 'o':
     switch (str[2]) {
     default: return -1;
+    case 0:
+            return sym_No;
     case 't':
         if (strcmp(str + 3, "EnoughInputs") == 0)
             return sym_NotEnoughInputs;
@@ -795,6 +840,10 @@ int builtin_symbol_from_string(const char* str)
     case 'W':
         if (strcmp(str + 1, "hitespace") == 0)
             return sym_Whitespace;
+        break;
+    case 'Y':
+        if (strcmp(str + 1, "es") == 0)
+            return sym_Yes;
         break;
     case 'o':
     switch (str[1]) {

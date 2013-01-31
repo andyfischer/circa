@@ -374,18 +374,6 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
             || frame->exitType == sym_Break
             || frame->exitType == sym_Return) {
 
-#if 0
-        // Possibly truncate the output list, in case any elements were discarded.
-        if (enableLoopOutput) {
-            caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
-            caValue* outputList = get_frame_register(frame, contents->owningTerm);
-            list_resize(outputList, as_int(outputIndex));
-        } else {
-            caValue* outputList = get_frame_register(frame, contents->owningTerm);
-            set_list(outputList, 0);
-        }
-#endif
-
         // Silly code- move the output list (in the parent frame) to our frame's output,
         // where it will get copied back to parent in finish_frame.
         if (enableLoopOutput) {

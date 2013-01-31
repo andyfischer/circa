@@ -4,8 +4,6 @@
 
 namespace circa {
 
-void selector_prepend(caValue* selector, caValue* element);
-
 // Write a set_with_selector expression that creates a selector() from 'accessor', and
 // assigns 'result' to the subelement. If the accessor has no selector then we simply
 // rename 'result' to have 'accessor's name.

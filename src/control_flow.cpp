@@ -101,32 +101,6 @@ void create_output_from_minor_block(Block* block, caValue* description)
     }
 }
 
-void create_block_output_for_term(Term* term)
-{
-#if 0
-    Block* block = term->owningBlock;
-
-    // If this term is inside an if-block, then add it as a block output.
-    if (is_case_block(block)) {
-        Block* ifBlock = get_block_for_case_block(block);
-        Term* existing = if_block_get_output_by_name(ifBlock, term->name.c_str());
-        if (existing == NULL) {
-            if_block_append_output(ifBlock, term->name.c_str());
-        } else {
-            // Connect to existing output
-            set_input(find_output_placeholder_with_name(block, term->name.c_str()), 0, term);
-        }
-    } else if (is_minor_block(block)) {
-
-        Term* existing = find_output_placeholder_with_name(block, term->name.c_str());
-        if (existing == NULL) {
-            Term* placeholder = append_output_placeholder(block, term);
-            rename(placeholder, term->nameSymbol);
-        }
-    }
-#endif
-}
-
 Symbol term_get_escaping_exit_level(Term* term)
 {
     // Check for a call that directly causes exit: return/continue/etc.
@@ -193,17 +167,20 @@ void update_derived_inputs_for_exit_point(Block* block, Term* term)
 
 void update_for_control_flow(Block* block)
 {
-    if (!is_minor_block(block))
+    if (!block_get_bool_property(block, sym_HasControlFlow, false))
         return;
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
         if (term == NULL)
             continue;
-        if (!is_exit_point(term))
-            continue;
 
-        update_derived_inputs_for_exit_point(block, term);
+        if (is_exit_point(term))
+            update_derived_inputs_for_exit_point(block, term);
+
+        Block* nestedBlock = term->nestedContents;
+        if (nestedBlock != NULL && is_minor_block(nestedBlock))
+            update_for_control_flow(nestedBlock);
     }
 }
 
@@ -291,23 +268,45 @@ static void create_implicit_outputs_for_exit_point(Term* exitCall, Term* exitPoi
     // exitLevel value.
 }
 
+void controlFlow_postCompile(Term* term)
+{
+    // Mark the owning block, and all parent minor blocks, as hasControlFlow.
+    Block* block = term->owningBlock;
+
+    while (true) {
+        set_bool(block_insert_property(block, sym_HasControlFlow), true);
+
+        if (!is_minor_block(block))
+            break;
+
+        block = get_parent_block(block);
+
+        if (block == NULL)
+            break;
+    }
+}
+
 void control_flow_setup_funcs(Block* kernel)
 {
     FUNCS.return_func = import_function(kernel, NULL, "return(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.return_func), true);
     as_function(FUNCS.return_func)->formatSource = return_formatSource;
+    as_function(FUNCS.return_func)->postCompile = controlFlow_postCompile;
 
     FUNCS.discard = import_function(kernel, NULL, "discard(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.discard), true);
     as_function(FUNCS.discard)->formatSource = discard_formatSource;
+    as_function(FUNCS.discard)->postCompile = controlFlow_postCompile;
 
     FUNCS.break_func = import_function(kernel, NULL, "break(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.break_func), true);
     as_function(FUNCS.break_func)->formatSource = break_formatSource;
+    as_function(FUNCS.break_func)->postCompile = controlFlow_postCompile;
 
     FUNCS.continue_func = import_function(kernel, NULL, "continue(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.continue_func), true);
     as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
+    as_function(FUNCS.continue_func)->postCompile = controlFlow_postCompile;
 }
 
 } // namespace circa
