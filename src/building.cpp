@@ -136,6 +136,9 @@ void set_input(Term* term, int index, Term* input)
 
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
+
+    if (term->owningBlock != NULL)
+        dirty_bytecode(term->owningBlock);
 }
 
 void set_inputs(Term* term, TermList const& inputs)

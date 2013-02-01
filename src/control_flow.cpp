@@ -172,10 +172,12 @@ Symbol term_get_escaping_exit_level(Term* term)
     return sym_None;
 }
 
-void update_derived_inputs_for_exit_point(Block* block, Term* term)
+void update_derived_inputs_for_exit_point(Term* term)
 {
     // Make sure that this exit point includes every block output as an input.
     // The intermediate value might be different at this location.
+
+    Block* block = find_block_that_exit_point_will_reach(term);
     
     for (int i=0;; i++) {
         Term* blockOutput = get_output_placeholder(block, i);
@@ -205,7 +207,7 @@ void update_for_control_flow(Block* block)
             continue;
 
         if (is_exit_point(term))
-            update_derived_inputs_for_exit_point(block, term);
+            update_derived_inputs_for_exit_point(term);
 
         Block* nestedBlock = term->nestedContents;
         if (nestedBlock != NULL && is_minor_block(nestedBlock))
