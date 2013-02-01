@@ -1,0 +1,8 @@
+
+a = 1
+
+for i in [1]
+    a = 2
+    continue
+
+assert(a == 2)

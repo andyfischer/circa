@@ -46,10 +46,28 @@ void has_control_flow_prop()
     test_assert(block_get_bool_property(returnCall->owningBlock, sym_HasControlFlow, true));
 }
 
+void test_find_block_that_exit_point_will_reach()
+{
+    Block block;
+    block.compile("def f1() { def f2() { if true { return }}}");
+
+    Term* returnCall = find_term_from_path_expression(&block, "** / function=return");
+    Block* exitsTo = find_block_that_exit_point_will_reach(returnCall);
+    test_assert(exitsTo == find_block_from_path_expression(&block, "f1 / f2"));
+
+    block.clear();
+    block.compile("def f1() { def f2() { for i in [1] { if true { break } } } }");
+
+    Term* breakCall = find_term_from_path_expression(&block, "**/function=break");
+    exitsTo = find_block_that_exit_point_will_reach(breakCall);
+    test_assert(exitsTo == find_block_from_path_expression(&block, "** / function=for"));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(control_flow_test::simple_get_exit_rank);
     REGISTER_TEST_CASE(control_flow_test::has_control_flow_prop);
+    REGISTER_TEST_CASE(control_flow_test::test_find_block_that_exit_point_will_reach);
 }
 
 }

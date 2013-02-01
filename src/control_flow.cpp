@@ -43,6 +43,35 @@ Symbol term_get_highest_exit_level(Term* term)
         return sym_None;
 }
 
+Block* find_block_that_exit_point_will_reach(Term* term)
+{
+    ca_assert(is_exit_point(term));
+
+    Block* block = term->owningBlock;
+
+    // Function exit
+    if (term->function == FUNCS.return_func) {
+        while (is_minor_block(block)) {
+            Block* parent = get_parent_block(block);
+            if (parent == NULL)
+                return block;
+
+            block = parent;
+        }
+        return block;
+    }
+
+    // For-loop exit
+    while (!is_for_loop(block)) {
+        Block* parent = get_parent_block(block);
+        if (parent == NULL)
+            return block;
+
+        block = parent;
+    }
+    return block;
+}
+
 static Symbol max_exit_level(Symbol left, Symbol right)
 {
     if (left == sym_ExitLevelFunction || right == sym_ExitLevelFunction)
