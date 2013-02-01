@@ -144,7 +144,7 @@ def Block.outputs(self) -> List
     -- Return a list of all output placeholders.
 def Block.owner(self) -> Term
     -- Return the Term that owns this Block (may be null).
-def Block.property(self, String name) -> any
+def Block.property(self, Symbol key) -> any
 def Block.properties(self) -> Map
 def Block.statements(self) -> List
     -- Return a list of Terms that are statements.

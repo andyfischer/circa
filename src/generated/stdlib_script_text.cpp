@@ -151,7 +151,7 @@ const char* STDLIB_CA_TEXT =
     "    -- Return a list of all output placeholders.\n"
     "def Block.owner(self) -> Term\n"
     "    -- Return the Term that owns this Block (may be null).\n"
-    "def Block.property(self, String name) -> any\n"
+    "def Block.property(self, Symbol key) -> any\n"
     "def Block.properties(self) -> Map\n"
     "def Block.statements(self) -> List\n"
     "    -- Return a list of Terms that are statements.\n"

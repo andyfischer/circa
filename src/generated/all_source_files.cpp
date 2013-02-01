@@ -37,7 +37,7 @@
 #include "../source_repro.cpp"
 #include "../stateful_code.cpp"
 #include "../static_checking.cpp"
-#include "../str_repr.cpp"
+#include "../string_repr.cpp"
 #include "../string_type.cpp"
 #include "../switch_block.cpp"
 #include "../symbols.cpp"
