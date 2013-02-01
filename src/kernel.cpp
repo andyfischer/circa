@@ -27,6 +27,7 @@
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "static_checking.h"
+#include "string_repr.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "names.h"
@@ -100,12 +101,12 @@ void file__read_text(caStack* stack)
 
 void from_string(caStack* stack)
 {
-    circa_parse_string(circa_string_input(stack, 0), circa_output(stack, 0));
+    parse_string_repr(circa_string_input(stack, 0), circa_output(stack, 0));
 }
 
 void to_string_repr(caStack* stack)
 {
-    circa_to_string_repr(circa_input(stack, 0), circa_output(stack, 0));
+    write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
 void call_actor_func(caStack* stack)

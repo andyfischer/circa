@@ -14,13 +14,6 @@ type Layout {
     int cursor
 }
 
-def first_name(any val) -> String
-    if type(val) == String
-        val
-    elif type(val) == List
-        if length(val) > 0
-            first_name(val[0])
-
 
 def start(Point size) -> Layout
     layout = make(Layout)
@@ -76,7 +69,7 @@ def Layout.solveDim(self, String dim) -> List
             child = self.nodes[childIndex]
             prop = child.props.get(dim)
 
-            if first_name(prop) == :percent
+            if first_symbol(prop) == :percent
                 percent = prop[1] -> number / 100.0
                 desiredSize = (availableFin - availableStart) * percent
             else

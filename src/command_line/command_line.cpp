@@ -17,6 +17,7 @@
 #include "repl.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "string_repr.h"
 #include "string_type.h"
 #include "tagged_value.h"
 #include "term.h"
@@ -514,7 +515,7 @@ int run_command_line(caWorld* world, caValue* args)
         // Push inputs
         for (int i=3, inputIndex = 0; i < circa_count(args); i++) {
             caValue* val = circa_input(stack, inputIndex++);
-            circa_parse_string(as_cstring(list_get(args, i)), val);
+            parse_string_repr(as_cstring(list_get(args, i)), val);
         }
 
         circa_run(stack);
