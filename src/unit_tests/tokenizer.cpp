@@ -160,6 +160,15 @@ void test_misc3()
     test_assert(tokens.finished());
 }
 
+void test_stars()
+{
+    TokenStream tokens("* **");
+    tokens.consume(tok_Star);
+    tokens.consume(tok_Whitespace);
+    tokens.consume(tok_DoubleStar);
+    test_assert(tokens.finished());
+}
+
 void test_keywords()
 {
     TokenStream tokens("if,else,for,state,elif");
@@ -361,6 +370,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer::test_misc1);
     REGISTER_TEST_CASE(tokenizer::test_misc2);
     REGISTER_TEST_CASE(tokenizer::test_misc3);
+    REGISTER_TEST_CASE(tokenizer::test_stars);
     REGISTER_TEST_CASE(tokenizer::test_keywords);
     REGISTER_TEST_CASE(tokenizer::test_keywords2);
     REGISTER_TEST_CASE(tokenizer::test_keywords3);

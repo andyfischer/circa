@@ -32,6 +32,7 @@ const char* get_token_text(int match)
         case tok_Dot: return ".";
         case tok_DotAt: return ".@";
         case tok_Star: return "*";
+        case tok_DoubleStar: return "**";
         case tok_Question: return "?";
         case tok_Slash: return "/";
         case tok_DoubleSlash: return "//";
@@ -409,6 +410,10 @@ void top_level_consume_token(TokenizeContext &context)
         case '*':
             if (context.next(1) == '=') {
                 context.consume(tok_StarEquals, 2);
+                return;
+            }
+            if (context.next(1) == '*') {
+                context.consume(tok_DoubleStar, 2);
                 return;
             }
 
@@ -789,6 +794,13 @@ bool TokenStream::nextIs(int match, int lookahead) const
         return false;
         
     return next(lookahead).match == match;
+}
+bool TokenStream::nextEqualsString(const char* str, int lookahead) const
+{
+    if ((this->_position + lookahead) >= tokens.size())
+        return false;
+
+    return nextStr(lookahead) == str;
 }
 
 Symbol TokenStream::nextMatch(int lookahead) const

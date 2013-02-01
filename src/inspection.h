@@ -156,4 +156,10 @@ TermList get_involved_terms(TermList inputs, TermList outputs);
 typedef bool (*NamedTermVisitor) (Term* term, const char* name, caValue* context);
 void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context);
 
-}
+// Path expressions
+void parse_path_expression(const char* expr, caValue* valueOut);
+Term* find_term_from_path_expression(Block* root, caValue* path);
+Term* find_term_from_path_expression(Block* root, const char* pathExpr);
+Block* find_block_from_path_expression(Block* root, const char* pathExpr);
+
+} // namespace circa

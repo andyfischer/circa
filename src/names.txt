@@ -18,6 +18,11 @@ HasEffects
 Origin
 HasControlFlow
 
+# Path expression elements
+Wildcard
+RecursiveWildcard
+Function
+
 # Misc errors
 FileNotFound
 NotEnoughInputs
@@ -113,6 +118,7 @@ tok_At
 tok_Dot
 tok_DotAt
 tok_Star
+tok_DoubleStar
 tok_Question
 tok_Slash
 tok_DoubleSlash

@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "control_flow.h"
+#include "inspection.h"
 #include "term.h"
 
 namespace control_flow_test {
@@ -32,9 +33,17 @@ void has_control_flow_prop()
     // Top-level block has no control flow, it shouldn't escape f().
     test_assert(block_get_bool_property(&block, sym_HasControlFlow, false) == false);
 
-    // Contents of f has control flow.
-    Block* f = f_def->nestedContents;
-    test_assert(block_get_bool_property(f, sym_HasControlFlow, false) == true);
+    // Inside "f" does have control flow.
+    test_assert(true == block_get_bool_property(
+                find_block_from_path_expression(&block, "f"), sym_HasControlFlow, false));
+
+    // Inside if-block does too.
+    test_assert(true == block_get_bool_property(
+                find_block_from_path_expression(&block, "f / function=if_block"),
+                sym_HasControlFlow, false));
+
+    Term* returnCall = find_term_from_path_expression(&block, "**/function=return");
+    test_assert(block_get_bool_property(returnCall->owningBlock, sym_HasControlFlow, true));
 }
 
 void register_tests()

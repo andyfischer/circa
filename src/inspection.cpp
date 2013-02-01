@@ -14,6 +14,7 @@
 #include "string_type.h"
 #include "term.h"
 #include "term_list.h"
+#include "token.h"
 #include "type.h"
 
 namespace circa {
@@ -778,5 +779,155 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caVal
         visit_name_accessible_terms(block->owningTerm, visitor, context);
 }
 
+void parse_path_expression(const char* expr, caValue* valueOut)
+{
+    set_list(valueOut, 0);
+
+    TokenStream tokens(expr);
+
+    while (!tokens.finished()) {
+
+        // Ignore prepending whitespace.
+        if (tokens.nextIs(tok_Whitespace))
+            tokens.consume();
+
+        // Parse node contents.
+        if (tokens.nextIs(tok_Star)) {
+            tokens.consume();
+            set_symbol(list_append(valueOut), sym_Wildcard);
+        }
+
+        else if (tokens.nextIs(tok_DoubleStar)) {
+            tokens.consume();
+            set_symbol(list_append(valueOut), sym_RecursiveWildcard);
+        }
+
+        else if (tokens.nextIs(tok_Identifier) && tokens.nextEqualsString("function")) {
+            tokens.consume();
+
+            if (!tokens.nextIs(tok_Equals)) {
+                caValue* err = list_append(valueOut);
+                set_string(err, "Expected = after 'function'");
+                return;
+            }
+            tokens.consume(tok_Equals);
+
+            caValue* node = list_append(valueOut);
+            set_list(node, 2);
+            set_symbol(list_get(node, 0), sym_Function);
+            tokens.consumeStr(list_get(node, 1));
+        }
+
+        else if (tokens.nextIs(tok_Identifier)) {
+            tokens.consumeStr(list_append(valueOut));
+        }
+
+        else {
+            caValue* err = list_append(valueOut);
+            set_string(err, "Unrecognized syntax: ");
+            string_append(err, tokens.nextStr().c_str());
+            return;
+        }
+
+        // Finish node, expect a slash.
+        if (tokens.nextIs(tok_Whitespace))
+            tokens.consume();
+
+        if (tokens.finished())
+            break;
+
+        if (!tokens.nextIs(tok_Slash)) {
+            set_string(list_append(valueOut), "Expected /");
+            return;
+        }
+
+        tokens.consume(tok_Slash);
+    }
 }
 
+static bool term_matches_path_expression_node(Term* term, caValue* node)
+{
+    if (is_string(node))
+        return equals(&term->nameValue, node);
+
+    switch (first_symbol(node)) {
+    case sym_Wildcard:
+        return true;
+    case sym_Function:
+        return equals(&term->function->nameValue, list_get(node, 1));
+    }
+
+    return false;
+}
+
+Term* find_term_from_path_expression(Block* root, caValue* path, int offset)
+{
+    if (offset >= list_length(path))
+        return NULL;
+
+    caValue* node = list_get(path, offset);
+
+    // Recursive wildcard.
+    if (is_symbol(node) && as_symbol(node) == sym_RecursiveWildcard) {
+
+        // Check if recursive wildcard matches nothing.
+        Term* match = find_term_from_path_expression(root, path, offset + 1);
+        if (match != NULL)
+            return match;
+
+        // Check if recursive wildcard matches any nested term.
+        for (BlockIterator it(root); it.unfinished(); ++it) {
+            Term* term = *it;
+            if (term->nestedContents == NULL)
+                continue;
+            Term* found = find_term_from_path_expression(term->nestedContents,
+                    path, offset + 1);
+
+            if (found != NULL)
+                return found;
+        }
+        return NULL;
+    }
+
+    for (int i=0; i < root->length(); i++) {
+        Term* term = root->get(i);
+        if (term == NULL)
+            continue;
+
+        if (!term_matches_path_expression_node(term, node))
+            continue;
+
+        if (offset + 1 >= list_length(path))
+            return term;
+
+        if (term->nestedContents != NULL) {
+            Term* found = find_term_from_path_expression(term->nestedContents,
+                    path, offset + 1);
+            if (found != NULL)
+                return found;
+        }
+    }
+    return NULL;
+}
+
+Term* find_term_from_path_expression(Block* root, caValue* path)
+{
+    return find_term_from_path_expression(root, path, 0);
+}
+
+Term* find_term_from_path_expression(Block* root, const char* pathExpr)
+{
+    Value path;
+    parse_path_expression(pathExpr, &path);
+    return find_term_from_path_expression(root, &path, 0);
+}
+
+Block* find_block_from_path_expression(Block* root, const char* pathExpr)
+{
+    Term* result = find_term_from_path_expression(root, pathExpr);
+    if (result == NULL)
+        return NULL;
+    return result->nestedContents;
+}
+
+} // namespace circa

@@ -82,6 +82,7 @@ OBJECTS := \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/native_patch_test.o \
+	$(OBJDIR)/path_expression_test.o \
 	$(OBJDIR)/string_tests.o \
 	$(OBJDIR)/symbol_test.o \
 	$(OBJDIR)/tokenizer.o \
@@ -197,6 +198,9 @@ $(OBJDIR)/names.o: unit_tests/names.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/native_patch_test.o: unit_tests/native_patch_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/path_expression_test.o: unit_tests/path_expression_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_tests.o: unit_tests/string_tests.cpp

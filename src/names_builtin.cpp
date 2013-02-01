@@ -29,6 +29,9 @@ const char* builtin_symbol_to_string(int name)
     case sym_HasEffects: return "HasEffects";
     case sym_Origin: return "Origin";
     case sym_HasControlFlow: return "HasControlFlow";
+    case sym_Wildcard: return "Wildcard";
+    case sym_RecursiveWildcard: return "RecursiveWildcard";
+    case sym_Function: return "Function";
     case sym_FileNotFound: return "FileNotFound";
     case sym_NotEnoughInputs: return "NotEnoughInputs";
     case sym_TooManyInputs: return "TooManyInputs";
@@ -102,6 +105,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_Dot: return "tok_Dot";
     case tok_DotAt: return "tok_DotAt";
     case tok_Star: return "tok_Star";
+    case tok_DoubleStar: return "tok_DoubleStar";
     case tok_Question: return "tok_Question";
     case tok_Slash: return "tok_Slash";
     case tok_DoubleSlash: return "tok_DoubleSlash";
@@ -435,9 +439,39 @@ int builtin_symbol_from_string(const char* str)
             return sym_Failure;
         break;
     case 'u':
-        if (strcmp(str + 2, "nctionName") == 0)
+    switch (str[2]) {
+    default: return -1;
+    case 'n':
+    switch (str[3]) {
+    default: return -1;
+    case 'c':
+    switch (str[4]) {
+    default: return -1;
+    case 't':
+    switch (str[5]) {
+    default: return -1;
+    case 'i':
+    switch (str[6]) {
+    default: return -1;
+    case 'o':
+    switch (str[7]) {
+    default: return -1;
+    case 'n':
+    switch (str[8]) {
+    default: return -1;
+    case 0:
+            return sym_Function;
+    case 'N':
+        if (strcmp(str + 9, "ame") == 0)
             return sym_FunctionName;
         break;
+    }
+    }
+    }
+    }
+    }
+    }
+    }
     case 'l':
         if (strcmp(str + 2, "atOutputs") == 0)
             return sym_FlatOutputs;
@@ -765,6 +799,10 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 3, "eat") == 0)
             return sym_Repeat;
         break;
+    case 'c':
+        if (strcmp(str + 3, "ursiveWildcard") == 0)
+            return sym_RecursiveWildcard;
+        break;
     case 't':
         if (strcmp(str + 3, "urn") == 0)
             return sym_Return;
@@ -838,9 +876,17 @@ int builtin_symbol_from_string(const char* str)
         break;
     }
     case 'W':
-        if (strcmp(str + 1, "hitespace") == 0)
+    switch (str[1]) {
+    default: return -1;
+    case 'i':
+        if (strcmp(str + 2, "ldcard") == 0)
+            return sym_Wildcard;
+        break;
+    case 'h':
+        if (strcmp(str + 2, "itespace") == 0)
             return sym_Whitespace;
         break;
+    }
     case 'Y':
         if (strcmp(str + 1, "es") == 0)
             return sym_Yes;
@@ -1646,9 +1692,17 @@ int builtin_symbol_from_string(const char* str)
             return tok_DoubleAmpersand;
         break;
     case 'S':
-        if (strcmp(str + 11, "lash") == 0)
+    switch (str[11]) {
+    default: return -1;
+    case 't':
+        if (strcmp(str + 12, "ar") == 0)
+            return tok_DoubleStar;
+        break;
+    case 'l':
+        if (strcmp(str + 12, "ash") == 0)
             return tok_DoubleSlash;
         break;
+    }
     case 'E':
         if (strcmp(str + 11, "quals") == 0)
             return tok_DoubleEquals;

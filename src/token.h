@@ -79,6 +79,7 @@ struct TokenStream
     bool nextIsEof(int lookahead) const;
 
     bool nextIs(int match, int lookahead=0) const;
+    bool nextEqualsString(const char* str, int lookahead=0) const;
 
     Symbol nextMatch(int lookahead=0) const;
 
