@@ -1,19 +1,24 @@
 
 def f(int level)
 
-    print('f 1, level = ' level)
+    print('called f with level = ' level)
 
-    state s = level * 2
+    state level_s = level
+    state level_2 = level * 2
 
     if level == 0
         return
         
-    print('f 2, level = ' level)
+    state level_3 = level * 3
 
-    state t = level * 3
-
+    print('recursively calling f with level: ' level-1)
     f(level - 1)
 
+    print('finished call to f with level: ' level)
+
 s = null
+print('top level, calling f with level = 3')
 f(3, state = s)
+
+print('finished, state looks like:')
 print(s)

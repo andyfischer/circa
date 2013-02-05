@@ -186,7 +186,7 @@ void update_derived_inputs_for_exit_point(Term* term)
 
         // Don't touch input if it's explicit.
         if (i < term->numInputs() && !is_input_implicit(term, i))
-            return;
+            continue;
 
         Term* intermediateValue = find_intermediate_result_for_output(term, blockOutput);
 

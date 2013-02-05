@@ -63,11 +63,27 @@ void test_find_block_that_exit_point_will_reach()
     test_assert(exitsTo == find_block_from_path_expression(&block, "** / function=for"));
 }
 
+void test_recursion_with_state()
+{
+    Block block;
+    block.compile("def f(int level) { state s = level; if level == 0 { return }; f(level - 1); }");
+    block.compile("f(3)");
+
+    Term* returnCall = find_term_from_path_expression(&block, "** / function=return");
+    Block* f = find_block_from_path_expression(&block, "f");
+
+    update_derived_inputs_for_exit_point(returnCall);
+    block.dump();
+    test_assert(find_block_that_exit_point_will_reach(returnCall) == f);
+    test_assert(returnCall->input(0) != NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(control_flow_test::simple_get_exit_rank);
     REGISTER_TEST_CASE(control_flow_test::has_control_flow_prop);
     REGISTER_TEST_CASE(control_flow_test::test_find_block_that_exit_point_will_reach);
+    REGISTER_TEST_CASE(control_flow_test::test_recursion_with_state);
 }
 
 }

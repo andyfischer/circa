@@ -697,6 +697,8 @@ Term* find_output_from_description(Block* block, caValue* description)
 
 void get_output_description(Term* output, caValue* result)
 {
+    add state output here
+
     // control output
     if (output->hasProperty("control")) {
         // return [:control]
