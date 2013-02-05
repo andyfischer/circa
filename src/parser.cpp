@@ -1446,7 +1446,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         for (int nameIndex=0;; nameIndex++) {
 
             tokens.consumeStr(list_append(&names), tok_Identifier);
-             set_int(list_append(&nameBindingSyntax), nameIndex);
+            set_int(list_append(&nameBindingSyntax), nameIndex);
 
             if (tokens.nextIs(tok_Whitespace))
                 tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
@@ -1478,8 +1478,6 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         }
 
         term->setProp("syntax:nameBinding", &nameBindingSyntax);
-
-        //rename(term, sym_from_string(as_cstring(list_get(&names, 0))));
 
         for (int i=0; i < list_length(&names); i++) {
             Term* output = get_output_term(term, i);
@@ -2058,19 +2056,27 @@ static bool lookahead_match_leading_name_binding(TokenStream& tokens)
     int lookahead = 0;
 
 expect_identifier:
+
+    // optional whitespace
+    if (tokens.nextIs(tok_Whitespace, lookahead))
+        lookahead++;
     
+    // required identifier
     if (!tokens.nextIs(tok_Identifier, lookahead))
         return false;
     lookahead++;
 
+    // optional whitespace
     if (tokens.nextIs(tok_Whitespace, lookahead))
         lookahead++;
 
+    // possible comma
     if (tokens.nextIs(tok_Comma, lookahead)) {
         lookahead++;
         goto expect_identifier;
     }
 
+    // equals sign (required if no comma)
     if (!tokens.nextIs(tok_Equals, lookahead))
         return false;
     lookahead++;

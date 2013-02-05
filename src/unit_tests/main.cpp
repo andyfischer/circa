@@ -351,6 +351,7 @@ namespace migration { void register_tests(); }
 namespace modules { void register_tests(); }
 namespace names { void register_tests(); }
 namespace native_patch_test { void register_tests(); }
+namespace parser_test { void register_tests(); }
 namespace path_expression_tests { void register_tests(); }
 namespace string_tests { void register_tests(); }
 namespace symbol_test { void register_tests(); }
@@ -374,6 +375,7 @@ int main(int argc, char** argv)
     modules::register_tests();
     names::register_tests();
     native_patch_test::register_tests();
+    parser_test::register_tests();
     path_expression_tests::register_tests();
     string_tests::register_tests();
     symbol_test::register_tests();

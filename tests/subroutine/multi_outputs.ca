@@ -2,6 +2,7 @@
 def multi_output() -> (int, int, int)
   return 1, 2, 3
 
+a = 1
 x, y, z = multi_output()
 assert(x == 1)
 assert(y == 2)
