@@ -1,4 +1,3 @@
-
 # Prerequisites #
 
  - For just building, GCC and GNU make are required.
@@ -41,7 +40,7 @@ Example commands:
   0. Build everything with 'debug' config.
   1. Run build/circa_d and verify the help text is shown
   2. Run tools/ca-tests.py
-  3. Run build/circa_test
+  3. Run build/unit_tests
 
 # Advanced building #
 
