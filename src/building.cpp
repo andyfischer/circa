@@ -691,14 +691,21 @@ Term* find_output_from_description(Block* block, caValue* description)
                 return placeholder;
         }
     }
+    else if (as_symbol(tag) == sym_State) {
+        for (int i=0;; i++) {
+            Term* placeholder = get_output_placeholder(block, i);
+            if (placeholder == NULL)
+                return NULL;
+            if (placeholder->hasProperty("state"))
+                return placeholder;
+        }
+    }
 
     return NULL;
 }
 
 void get_output_description(Term* output, caValue* result)
 {
-    add state output here
-
     // control output
     if (output->hasProperty("control")) {
         // return [:control]
@@ -713,6 +720,14 @@ void get_output_description(Term* output, caValue* result)
         set_list(result, 2);
         set_symbol(list_get(result, 0), sym_ExtraReturn);
         set_int(list_get(result, 1), output->intProp("extraReturn", 0));
+        return;
+    }
+
+    // state output
+    else if (output->hasProperty("state")) {
+        // return [:state]
+        set_list(result, 1);
+        set_symbol(list_get(result, 0), sym_State);
         return;
     }
 

@@ -55,6 +55,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Name: return "Name";
     case sym_Primary: return "Primary";
     case sym_Anonymous: return "Anonymous";
+    case sym_State: return "State";
     case sym_InfixOperator: return "InfixOperator";
     case sym_FunctionName: return "FunctionName";
     case sym_TypeName: return "TypeName";
@@ -683,6 +684,10 @@ int builtin_symbol_from_string(const char* str)
     case 't':
     switch (str[2]) {
     default: return -1;
+    case 'a':
+        if (strcmp(str + 3, "te") == 0)
+            return sym_State;
+        break;
     case 'r':
         if (strcmp(str + 3, "uctType") == 0)
             return sym_StructType;

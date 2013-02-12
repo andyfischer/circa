@@ -53,6 +53,7 @@ ExtraReturn
 Name
 Primary
 Anonymous
+State
 
 # Formatted-source phrase types
 InfixOperator
