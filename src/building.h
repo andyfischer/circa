@@ -79,6 +79,12 @@ Term* append_state_output(Block* block);
 Term* find_output_placeholder_with_name(Block* block, caValue* name);
 Term* find_output_from_description(Block* block, caValue* description);
 void get_output_description(Term* output, caValue* result);
+
+// For the given output, find the intermediate value at the given location. The definition
+// of "intermediate value" depends on what kind of output it is. For an implicit named output,
+// the intermediate value is the nearby term with the same name binding.
+Term* find_intermediate_result_for_output(Term* location, Term* output);
+
 int count_anonymous_outputs(Block* block);
 
 // Extra outputs

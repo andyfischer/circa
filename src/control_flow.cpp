@@ -114,12 +114,6 @@ void return_formatSource(caValue* source, Term* term)
     }
 }
 
-Term* find_output_placeholder_for_intermediate_term(Term* term)
-{
-    // TODO
-    return NULL;
-}
-
 void create_output_from_minor_block(Block* block, caValue* description)
 {
     if (is_case_block(block)) {
@@ -213,43 +207,6 @@ void update_for_control_flow(Block* block)
         if (nestedBlock != NULL && is_minor_block(nestedBlock))
             update_for_control_flow(nestedBlock);
     }
-}
-
-Term* find_intermediate_result_for_output(Term* location, Term* output)
-{
-    Value description;
-    get_output_description(output, &description);
-    caValue* descriptionTag = list_get(&description, 0);
-
-    // Control value
-    if (as_symbol(descriptionTag) == sym_Control) {
-        Block* block = location->owningBlock;
-        for (int i = location->index; i >= 0; i--) {
-            Term* term = block->get(i);
-            if (term == NULL)
-                continue;
-            if (term->boolProp("control", false))
-                return term;
-        }
-        return NULL;
-    }
-    
-    // Check whether the output's connection is valid at this location
-    Term* result = output->input(0);
-    if (result != NULL
-            && result->owningBlock == output->owningBlock
-            && result->index < location->index)
-        return result;
-
-    // State output
-    if (is_state_input(output))
-        return find_open_state_result(location);
-
-    // Nearest with same name
-    if (output->name != "")
-        return find_name_at(location, output->name.c_str());
-
-    return NULL;
 }
 
 static void update_inputs_for_exit_point(Term* exitCall, Term* exitPoint)

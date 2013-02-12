@@ -24,9 +24,24 @@ void state_output_routing()
     test_assert(stateOutput == t);
 }
 
+void find_open_state_result_for_nested_return()
+{
+    Block block;
+
+    block.compile("state s; s = 1; if true { return } s = 2;");
+
+    Term* stateOutput = find_state_output(&block);
+    Term* returnCall = find_term_from_path_expression(&block, "**/function=return");
+
+    Term* intermediateState = find_intermediate_result_for_output(returnCall, stateOutput);
+    test_assert(intermediateState != NULL);
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_test::state_output_routing);
+    REGISTER_TEST_CASE(stateful_code_test::find_open_state_result_for_nested_return);
 }
 
 }

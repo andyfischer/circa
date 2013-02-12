@@ -752,6 +752,43 @@ void get_output_description(Term* output, caValue* result)
     set_symbol(list_get(result, 0), sym_Anonymous);
 }
 
+Term* find_intermediate_result_for_output(Term* location, Term* output)
+{
+    Value description;
+    get_output_description(output, &description);
+    caValue* descriptionTag = list_get(&description, 0);
+
+    // Control value
+    if (as_symbol(descriptionTag) == sym_Control) {
+        Block* block = location->owningBlock;
+        for (int i = location->index; i >= 0; i--) {
+            Term* term = block->get(i);
+            if (term == NULL)
+                continue;
+            if (term->boolProp("control", false))
+                return term;
+        }
+        return NULL;
+    }
+    
+    // Check whether the output's connection is valid at this location
+    Term* result = output->input(0);
+    if (result != NULL
+            && result->owningBlock == output->owningBlock
+            && result->index < location->index)
+        return result;
+
+    // State output
+    if (is_state_input(output))
+        return find_open_state_result(location);
+
+    // Nearest with same name
+    if (output->name != "")
+        return find_name_at(location, output->name.c_str());
+
+    return NULL;
+}
+
 int count_anonymous_outputs(Block* block)
 {
     int result = 0;
@@ -835,6 +872,8 @@ void update_extra_outputs(Term* term)
 
 Term* find_open_state_result(Block* block, int position)
 {
+    should recursively search parent branches
+
     for (int i = position - 1; i >= 0; i--) {
         Term* term = block->get(i);
         if (term == NULL)
