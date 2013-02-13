@@ -89,12 +89,6 @@ bool term_has_variable_args(Term* term);
 // extra_output terms).
 int count_actual_output_terms(Term* term);
 
-// Preceding term in the same block (may be NULL).
-Term* preceding_term(Term* term);
-
-// Following term in the same block (may be NULL).
-Term* following_term(Term* term);
-
 Term* find_input_placeholder_with_name(Block* block, caValue* name);
 
 Term* find_last_non_comment_expression(Block* block);

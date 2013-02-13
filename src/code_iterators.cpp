@@ -3,6 +3,7 @@
 #include "block.h"
 #include "term.h"
 
+#include "building.h"
 #include "code_iterators.h"
 #include "inspection.h"
 

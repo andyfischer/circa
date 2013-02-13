@@ -342,15 +342,6 @@ int count_actual_output_terms(Term* term)
     return count + 1;
 }
 
-Term* preceding_term(Term* term)
-{
-    return term->owningBlock->getSafe(term->index - 1);
-}
-Term* following_term(Term* term)
-{
-    return term->owningBlock->getSafe(term->index + 1);
-}
-
 bool has_variable_args(Block* block)
 {
     for (int i=0;; i++) {

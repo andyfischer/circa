@@ -152,4 +152,14 @@ bool term_is_nested_in_block(Term* term, Block* block);
 // 'term' and repoint the referencing terms to use an input placeholder.
 void create_inputs_for_outer_references(Term* term);
 
+// Preceding term in the same block (may be NULL).
+Term* preceding_term(Term* term);
+
+// Preceding term in the same block, or in a parent block. Only searches upwards
+// within minor blocks.
+Term* preceding_term_recr_minor(Term* term);
+
+// Following term in the same block (may be NULL).
+Term* following_term(Term* term);
+
 } // namespace circa

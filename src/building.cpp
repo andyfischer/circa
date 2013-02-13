@@ -872,12 +872,10 @@ void update_extra_outputs(Term* term)
 
 Term* find_open_state_result(Block* block, int position)
 {
-    should recursively search parent branches
+    Term* term = block->getSafe(position);
+    term = preceding_term_recr_minor(term);
 
-    for (int i = position - 1; i >= 0; i--) {
-        Term* term = block->get(i);
-        if (term == NULL)
-            continue;
+    for (; term != NULL; term = preceding_term_recr_minor(term)) {
         if (term->function == FUNCS.input && is_state_input(term))
             return term;
         if (term->function == FUNCS.pack_state
@@ -1349,6 +1347,40 @@ void create_inputs_for_outer_references(Term* term)
             }
         }
     }
+}
+
+Term* preceding_term(Term* term)
+{
+    return term->owningBlock->getSafe(term->index - 1);
+}
+
+Term* preceding_term_recr_minor(Term* term)
+{
+    Block* block = term->owningBlock;
+    int position = term->index - 1;
+
+    while (true) {
+        if (position < 0) {
+            Block* parent = get_parent_block(block);
+            if (parent != NULL && is_minor_block(block)) {
+                position = get_parent_term(block)->index - 1;
+                block = parent;
+                continue;
+            } else {
+                return NULL;
+            }
+        }
+
+        if (block->get(position) == NULL)
+            continue;
+
+        return block->get(position);
+    }
+}
+
+Term* following_term(Term* term)
+{
+    return term->owningBlock->getSafe(term->index + 1);
 }
 
 } // namespace circa

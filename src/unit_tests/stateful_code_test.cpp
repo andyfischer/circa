@@ -32,6 +32,11 @@ void find_open_state_result_for_nested_return()
 
     Term* stateOutput = find_state_output(&block);
     Term* returnCall = find_term_from_path_expression(&block, "**/function=return");
+    test_assert(returnCall != NULL);
+
+    Term* openState = find_open_state_result(returnCall);
+    test_assert(openState != NULL);
+    test_equals(term_value(openState), "1");
 
     Term* intermediateState = find_intermediate_result_for_output(returnCall, stateOutput);
     test_assert(intermediateState != NULL);

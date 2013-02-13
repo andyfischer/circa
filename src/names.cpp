@@ -425,6 +425,11 @@ Term* get_parent_term(Term* term)
     return term->owningBlock->owningTerm;
 }
 
+Term* get_parent_term(Block* block)
+{
+    return block->owningTerm;
+}
+
 Term* get_parent_term(Term* term, int levels)
 {
     for (int i=0; i < levels; i++) {

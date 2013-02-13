@@ -71,6 +71,7 @@ Term* find_global(const char* name);
 
 Block* get_parent_block(Block* block);
 Term* get_parent_term(Term* term);
+Term* get_parent_term(Block* block);
 Term* get_parent_term(Term* term, int levels);
 bool sym_is_reachable_from(Term* term, Block* block);
 Block* find_first_common_block(Term* left, Term* right);
