@@ -90,8 +90,8 @@ int count_anonymous_outputs(Block* block);
 // Extra outputs
 void update_extra_outputs(Term* term);
 
-Term* find_open_state_result(Block* block, int position);
 Term* find_open_state_result(Term* location);
+Term* find_open_state_result(Block* block);
 
 // Check the term's inputs to see if it's missing an implicit input (such as the state
 // input). If one is missing, it will be inserted. This should be called after creating

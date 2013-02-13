@@ -50,8 +50,8 @@ void pack_any_open_state_vars(Block* block)
             if (find_user_with_function(result, FUNCS.pack_state) != NULL)
                 continue;
 
-            Term* pack = apply(block, FUNCS.pack_state, TermList(
-                find_open_state_result(block, block->length()), result, term));
+            Term* pack = apply(block, FUNCS.pack_state,
+                TermList(find_open_state_result(block), result, term));
             pack->setStringProp("field", unique_name(term));
             block->move(pack, result->index + 1);
         }

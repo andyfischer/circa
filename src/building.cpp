@@ -646,7 +646,7 @@ Term* append_state_output(Block* block)
         return existing;
 
     Term* term = append_output_placeholder(block, 
-        find_open_state_result(block, block->length()));
+        find_open_state_result(block));
     term->setBoolProp("state", true);
     hide_from_source(term);
     return term;
@@ -870,24 +870,24 @@ void update_extra_outputs(Term* term)
         block_update_existing_pack_state_calls(block);
 }
 
-Term* find_open_state_result(Block* block, int position)
+Term* find_open_state_result(Term* term)
 {
-    Term* term = block->getSafe(position);
-    term = preceding_term_recr_minor(term);
-
     for (; term != NULL; term = preceding_term_recr_minor(term)) {
+        if (term == NULL)
+            break;
         if (term->function == FUNCS.input && is_state_input(term))
             return term;
         if (term->function == FUNCS.pack_state
                 || term->function == FUNCS.pack_state_list_n)
             return term;
     }
+
     return NULL;
 }
 
-Term* find_open_state_result(Term* location)
+Term* find_open_state_result(Block* block)
 {
-    return find_open_state_result(location->owningBlock, location->index);
+    return find_open_state_result(block->last());
 }
 
 void check_to_insert_implicit_inputs(Term* term)
@@ -963,7 +963,7 @@ void block_finish_changes(Block* block)
     fix_forward_function_references(block);
 
     // Create an output_placeholder for state, if necessary.
-    Term* openState = find_open_state_result(block, block->length());
+    Term* openState = find_open_state_result(block);
     if (openState != NULL)
         append_state_output(block);
 
@@ -1177,7 +1177,7 @@ void check_to_add_state_output_placeholder(Block* block)
     if (find_state_output(block) != NULL)
         return;
 
-    Term* result = find_open_state_result(block, block->length());
+    Term* result = find_open_state_result(block);
 
     // No-op if no state is being used
     if (result == NULL)

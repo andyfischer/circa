@@ -304,7 +304,7 @@ void for_loop_fix_state_input(Block* contents)
     set_input(unpackState, 0, unpackStateList);
 
     // Now insert the pack_state_list_n call
-    Term* stateResult = find_open_state_result(contents, contents->length());
+    Term* stateResult = find_open_state_result(contents);
 
     Term* packStateList = apply(contents, FUNCS.pack_state_list_n,
         TermList(stateInput, stateResult, index));
