@@ -20,6 +20,6 @@ void pack_state(caStack* stack);
 
 void get_declared_state(caStack* stack);
 
-void block_update_existing_pack_state_calls(Block* block);
+void block_update_pack_state_calls(Block* block);
 
 } // namespace circa

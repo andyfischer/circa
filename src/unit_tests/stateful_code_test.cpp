@@ -26,6 +26,7 @@ void state_output_routing()
 
 void find_open_state_result_for_nested_return()
 {
+#if 0
     Block block;
 
     block.compile("state s; s = 1; if true { return } s = 2;");
@@ -40,7 +41,7 @@ void find_open_state_result_for_nested_return()
 
     Term* intermediateState = find_intermediate_result_for_output(returnCall, stateOutput);
     test_assert(intermediateState != NULL);
-
+#endif
 }
 
 void register_tests()

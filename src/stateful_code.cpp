@@ -151,7 +151,7 @@ void block_update_state_type(Block* block)
         block->stateType = type;
 
         // Might need to update any existing pack_state calls.
-        block_update_existing_pack_state_calls(block);
+        block_update_pack_state_calls(block);
     }
 }
 
@@ -208,7 +208,12 @@ static void get_list_of_state_outputs(Block* block, int position, TermList* outp
     }
 }
 
-void block_update_existing_pack_state_calls(Block* block)
+static bool should_have_preceeding_pack_state(Term* term)
+{
+    return has_escaping_control_flow(term);
+}
+
+void block_update_pack_state_calls(Block* block)
 {
     if (block->stateType == NULL) {
         // No state type, make sure there's no pack_state call.
@@ -231,7 +236,7 @@ void block_update_existing_pack_state_calls(Block* block)
             set_inputs(term, inputs);
         }
 
-        if (is_exit_point(term)) {
+        if (should_have_preceeding_pack_state(term)) {
             // Check if we need to insert a pack_state call
             Term* existing = term->input(stateOutputIndex);
 

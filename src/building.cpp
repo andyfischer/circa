@@ -867,14 +867,12 @@ void update_extra_outputs(Term* term)
     }
 
     if (needToUpdatePackState)
-        block_update_existing_pack_state_calls(block);
+        block_update_pack_state_calls(block);
 }
 
 Term* find_open_state_result(Term* term)
 {
     for (; term != NULL; term = preceding_term_recr_minor(term)) {
-        if (term == NULL)
-            break;
         if (term->function == FUNCS.input && is_state_input(term))
             return term;
         if (term->function == FUNCS.pack_state

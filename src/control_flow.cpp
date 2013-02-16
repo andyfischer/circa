@@ -166,6 +166,11 @@ Symbol term_get_escaping_exit_level(Term* term)
     return sym_None;
 }
 
+bool has_escaping_control_flow(Term* term)
+{
+    return term_get_escaping_exit_level(term) != sym_None;
+}
+
 void update_derived_inputs_for_exit_point(Term* term)
 {
     // Make sure that this exit point includes every block output as an input.
