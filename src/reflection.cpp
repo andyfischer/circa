@@ -24,23 +24,6 @@
 #include "value_iterator.h"
 
 namespace circa {
-    
-void set_term_ref(caValue* val, Term* term)
-{
-    change_type(val, TYPES.term);
-    val->value_data.ptr = term;
-}
-
-Term* as_term_ref(caValue* val)
-{
-    ca_assert(is_term_ref(val));
-    return (Term*) val->value_data.ptr;
-}
-
-bool is_term_ref(caValue* val)
-{
-    return val->value_type == TYPES.term;
-}
 
 void block_ref(caStack* stack)
 {
@@ -63,7 +46,7 @@ void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block*
     for (ValueIterator it(value); it.unfinished(); it.advance()) {
         caValue* val = *it;
         if (is_ref(val)) {
-            set_term_ref(val, translate_term_across_blockes(as_term_ref(val),
+            set_term_ref(val, translate_term_across_blocks(as_term_ref(val),
                 oldBlock, newBlock));
             
         } else if (is_block(val)) {
@@ -83,7 +66,7 @@ void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block*
             if (oldTerm == NULL)
                 continue;
 
-            Term* newTerm = translate_term_across_blockes(oldTerm, oldBlock, newBlock);
+            Term* newTerm = translate_term_across_blocks(oldTerm, oldBlock, newBlock);
             if (newTerm == NULL) {
                 set_block(val, NULL);
                 continue;

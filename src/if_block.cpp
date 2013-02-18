@@ -244,7 +244,7 @@ void if_block_normalize_state_inputs(Term* ifBlock)
 {
     Block* contents = nested_contents(ifBlock);
 
-    // Check if any blockes have a state input
+    // Check if any blocks have a state input
     bool anyState = false;
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         if (has_state_input(nested_contents(it.current())))

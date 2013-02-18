@@ -29,6 +29,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_HasEffects: return "HasEffects";
     case sym_Origin: return "Origin";
     case sym_HasControlFlow: return "HasControlFlow";
+    case sym_DirtyStateType: return "DirtyStateType";
     case sym_Wildcard: return "Wildcard";
     case sym_RecursiveWildcard: return "RecursiveWildcard";
     case sym_Function: return "Function";
@@ -197,6 +198,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Multiple: return "Multiple";
     case sym_Cast: return "Cast";
     case sym_DynamicMethodOutput: return "DynamicMethodOutput";
+    case sym_NamedField: return "NamedField";
     case sym_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";
@@ -394,9 +396,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     default: return -1;
     case 'i':
-        if (strcmp(str + 2, "scard") == 0)
+    switch (str[2]) {
+    default: return -1;
+    case 's':
+        if (strcmp(str + 3, "card") == 0)
             return sym_Discard;
         break;
+    case 'r':
+        if (strcmp(str + 3, "tyStateType") == 0)
+            return sym_DirtyStateType;
+        break;
+    }
     case 'y':
         if (strcmp(str + 2, "namicMethodOutput") == 0)
             return sym_DynamicMethodOutput;
@@ -635,9 +645,19 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     default: return -1;
     case 'm':
-        if (strcmp(str + 3, "e") == 0)
+    switch (str[3]) {
+    default: return -1;
+    case 'e':
+    switch (str[4]) {
+    default: return -1;
+    case 0:
             return sym_Name;
+    case 'd':
+        if (strcmp(str + 5, "Field") == 0)
+            return sym_NamedField;
         break;
+    }
+    }
     case 't':
         if (strcmp(str + 3, "ivePatch") == 0)
             return sym_NativePatch;

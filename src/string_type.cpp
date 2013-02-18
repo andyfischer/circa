@@ -306,6 +306,14 @@ bool string_eq(caValue* s, const char* str)
         return false;
     return strcmp(as_cstring(s), str) == 0;
 }
+bool string_eq(caValue* s, caValue* rhs)
+{
+    return string_equals(s, rhs);
+}
+bool string_empty(caValue* s)
+{
+    return is_null(s) || string_eq(s, "");
+}
 
 bool string_starts_with(caValue* s, const char* beginning)
 {

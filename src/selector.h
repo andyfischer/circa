@@ -4,10 +4,6 @@
 
 namespace circa {
 
-// Write a set_with_selector expression that creates a selector() from 'accessor', and
-// assigns 'result' to the subelement. If the accessor has no selector then we simply
-// rename 'result' to have 'accessor's name.
-
 // Check if 'possibleAccessor' is an accessor expresion that we understand. If so, then create
 // a set_with_selector expression which rebinds the root name to use 'result' instead.
 // If 'possibleAccessor' isn't an accessor, then just create a named copy from 'result'.

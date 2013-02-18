@@ -22,7 +22,7 @@ void translate_terms()
     Term* b2 = block2.compile("b = 2");
     block2.compile("c = 3");
 
-    test_assert(b2 == translate_term_across_blockes(b1, &block1, &block2));
+    test_assert(b2 == translate_term_across_blocks(b1, &block1, &block2));
 }
 
 void update_references()

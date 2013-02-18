@@ -16,7 +16,7 @@ namespace declared_state_function {
             copy(value, output);
             bool cast_success = cast(output, declared_type(caller));
 
-            // If this cast succeeded then we're done. If it failed then continue on
+            // If this cast succeeded then we're done. If it failed, then continue on
             // to use a default value.
             if (cast_success)
                 return;

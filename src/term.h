@@ -52,8 +52,8 @@ struct Term
     // A name which is unique across this block.
     struct UniqueName
     {
-        std::string name;
-        std::string base;
+        Value name;
+        Value base;
         int ordinal;
         UniqueName() : ordinal(0) {}
     };
@@ -148,11 +148,14 @@ void term_move_property(Term* source, Term* dest, const char* propName);
 
 // Fetches an input property.
 caValue* term_get_input_property(Term* term, int inputIndex, const char* name);
+caValue* term_insert_input_property(Term* term, int inputIndex, const char* name);
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue);
-const char* term_get_string_prop(Term* term, Symbol prop, const char* defaultValue);
 void term_set_int_prop(Term* term, Symbol prop, int value);
+const char* term_get_string_prop(Term* term, Symbol prop, const char* defaultValue);
 void term_set_string_prop(Term* term, Symbol prop, const char* value);
+bool term_get_bool_prop(Term* term, Symbol prop, bool defaultValue);
+void term_set_bool_prop(Term* term, Symbol prop, bool value);
 
 // Specific helper functions for input properties.
 bool is_input_implicit(Term* term, int index);

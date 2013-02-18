@@ -17,6 +17,7 @@ EvaluationEmpty
 HasEffects
 Origin
 HasControlFlow
+DirtyStateType
 
 # Path expression elements
 Wildcard

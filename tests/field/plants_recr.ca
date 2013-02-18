@@ -11,8 +11,8 @@ max_segment_radius = 1.0
 max_segment_angle = 1.0 -- .5 - 1
 wiggle_factor = 0.07 -- 0 - 1
 generation_limit = 3
-distance_between_blockes_min = 30.0 -- 20 - 100
-distance_between_blockes_var = 20.0 -- 20 - 100
+distance_between_blocks_min = 30.0 -- 20 - 100
+distance_between_blocks_var = 20.0 -- 20 - 100
 block_split_angle = .1
 
 type Segment {

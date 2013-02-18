@@ -504,7 +504,7 @@ bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& ou
     if (parentTerm == NULL)
         return false;
 
-    // Don't include the names of hidden blockes
+    // Don't include the names of hidden blocks
     if (is_hidden(parentTerm)) {
         output << term->name;
         return true;
@@ -554,7 +554,7 @@ void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutpu
     // The output list will be reversed but we'll fix that.
 
     while (true) {
-        set_string(list_append(nameOutput), get_unique_name(term));
+        set_value(list_append(nameOutput), get_unique_name(term));
 
         if (term->owningBlock == relativeTo) {
             break;
@@ -600,20 +600,22 @@ void update_unique_name(Term* term)
     Term::UniqueName& name = term->uniqueName;
 
     if (term->owningBlock == NULL) {
-        name.name = term->name;
+        copy(&term->nameValue, &name.name);
         return;
     }
 
-    name.base = term->name;
+    copy(&term->nameValue, &name.base);
 
-    if (name.base == "") {
+    if (string_empty(&name.base)) {
         if (term->function == NULL)
-            name.base = "_anon";
-        else
-            name.base = "_" + term->function->name;
+            set_string(&name.base, "_anon");
+        else {
+            set_string(&name.base, "_");
+            string_append(&name.base, &term->function->nameValue);
+        }
     }
 
-    name.name = name.base;
+    copy(&name.base, &name.name);
     name.ordinal = 0;
 
     // Look for a name collision. We might need to keep looping, if our generated name
@@ -631,7 +633,7 @@ void update_unique_name(Term* term)
 
             // If another term shares the same base, then make sure our ordinal is
             // higher. This turns some O(n) cases into O(1)
-            if ((other->uniqueName.base == name.base)
+            if (string_eq(&other->uniqueName.base, &name.base)
                     && (other->uniqueName.ordinal >= name.ordinal)) {
                 name.ordinal = other->uniqueName.ordinal + 1;
                 updatedName = true;
@@ -639,7 +641,7 @@ void update_unique_name(Term* term)
             // If this name is already used, then just try the next ordinal. This
             // case results in more blind searching, but it's necessary to handle
             // the situation where a generated name is already taken.
-            } else if (other->uniqueName.name == name.name) {
+            } else if (string_eq(&other->uniqueName.name, &name.name)) {
                 name.ordinal++;
                 updatedName = true;
             }
@@ -647,16 +649,18 @@ void update_unique_name(Term* term)
             if (updatedName) {
                 char ordinalBuf[30];
                 sprintf(ordinalBuf, "%d", name.ordinal);
-                name.name = name.base + "_" + ordinalBuf;
+                copy(&name.base, &name.name);
+                string_append(&name.name, "_");
+                string_append(&name.name, ordinalBuf);
                 break;
             }
         }
     }
 }
 
-const char* get_unique_name(Term* term)
+caValue* get_unique_name(Term* term)
 {
-    return term->uniqueName.name.c_str();
+    return &term->uniqueName.name;
 }
 
 Term* find_from_unique_name(Block* block, const char* name)
@@ -667,8 +671,8 @@ Term* find_from_unique_name(Block* block, const char* name)
         Term* term = block->get(i);
         if (term == NULL)
             continue;
-        if (strcmp(get_unique_name(term), name) == 0) {
-            return block->get(i);
+        if (string_eq(get_unique_name(term), name)) {
+            return term;
         }
     }
     return NULL;

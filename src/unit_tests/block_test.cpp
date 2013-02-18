@@ -3,6 +3,7 @@
 #include "unit_test_common.h"
 
 #include "block.h"
+#include "stateful_code.h"
 #include "type.h"
 
 namespace block_test {
@@ -20,7 +21,7 @@ void test_state_type()
     block_update_state_type(&block);
     test_assert(block.stateType != NULL);
 
-    test_equals(&block.stateType->parameter, "[[<Type any>, <Type any>], ['a', 'b']]");
+    test_equals(&block.stateType->parameter, "[[<Type int>, <Type number>], ['a', 'b']]");
 }
 
 void test_erase_term()

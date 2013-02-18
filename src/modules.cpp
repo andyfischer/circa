@@ -194,7 +194,7 @@ Block* find_module_from_filename(const char* filename)
 // Returns 'term' if the translation does not apply (term is not found inside
 // oldBlock).
 // Returns NULL if the translation does apply, but a corresponding term cannot be found.
-Term* translate_term_across_blockes(Term* term, Block* oldBlock, Block* newBlock)
+Term* translate_term_across_blocks(Term* term, Block* oldBlock, Block* newBlock)
 {
     if (!term_is_child_of_block(term, oldBlock))
         return term;
@@ -226,7 +226,7 @@ void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)
             } else {
 
                 // Lookup and save result in cache
-                newRef = translate_term_across_blockes(ref, oldBlock, newBlock);
+                newRef = translate_term_across_blocks(ref, oldBlock, newBlock);
                 cache[ref] = newRef;
             }
 

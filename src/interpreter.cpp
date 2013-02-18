@@ -29,7 +29,7 @@ namespace circa {
 static Frame* frame_by_id(Stack* stack, int id);
 static void dump_frames_raw(Stack* stack);
 static Block* find_pushed_block_for_action(caValue* action);
-static void update_stack_for_possibly_changed_blockes(Stack* stack);
+static void update_stack_for_possibly_changed_blocks(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 static void step_interpreter(Stack* stack);
 static void bytecode_write_noop(caValue* op);
@@ -777,7 +777,7 @@ void print_error_stack(Stack* stack, std::ostream& out)
     }
 }
 
-static void update_stack_for_possibly_changed_blockes(Stack* stack)
+static void update_stack_for_possibly_changed_blocks(Stack* stack)
 {
     // Starting at the top frame, check each frame in the stack to make sure it still
     // matches the original block.
@@ -875,7 +875,7 @@ static void start_interpreter_session(Stack* stack)
     block_finish_changes(topBlock);
 
     // Check if our stack needs to be updated following block modification
-    update_stack_for_possibly_changed_blockes(stack);
+    update_stack_for_possibly_changed_blocks(stack);
 
     // Cast all inputs, in case they were passed in uncast.
     for (int i=0;; i++) {
@@ -942,7 +942,7 @@ void write_term_input_instructions(Term* term, Block* block, caValue* result)
         if (input == NULL) {
             set_null(action);
         }
-        
+
         // Check if a cast is necessary
         else if (input->type != placeholder->type && placeholder->type != TYPES.any) {
             set_list(action, 3);
@@ -1187,7 +1187,7 @@ void write_block_bytecode(Block* block, caValue* output)
     }
 }
 
-void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue* outputList,
+void run_input_ins(Stack* stack, caValue* inputActions, caValue* outputList,
         int stackDelta)
 {
     for (int i=0; i < list_length(inputActions); i++) {
@@ -1202,7 +1202,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
             switch (tag) {
             case sym_Multiple: {
 
-                // Multiple input: create a list in dest register.
+                // Multiple inputs: create a list in dest register.
                 int inputCount = list_length(action) - 1;
                 set_list(dest, inputCount);
                 for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
@@ -1247,7 +1247,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
             copy(inputValue, dest);
 
         } else {
-            internal_error("Unrecognized element type in populate_inputs_from_bytecode");
+            internal_error("Unrecognized element type in run_input_ins");
         }
     }
 }
@@ -1287,7 +1287,7 @@ static void step_interpreter(Stack* stack)
         Block* block = as_block(list_get(action, 3));
         caValue* inputActions = list_get(action, 1);
         Frame* frame = push_frame(stack, block);
-        populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
+        run_input_ins(stack, inputActions, &frame->registers, 1);
         break;
     }
     case op_DynamicCall: {
@@ -1295,7 +1295,7 @@ static void step_interpreter(Stack* stack)
         set_list(&incomingInputs, 2);
 
         caValue* inputActions = list_get(action, 1);
-        populate_inputs_from_bytecode(stack, inputActions, &incomingInputs, 0);
+        run_input_ins(stack, inputActions, &incomingInputs, 0);
         // May have a runtime type error.
         if (error_occurred(stack))
             return;
@@ -1312,7 +1312,7 @@ static void step_interpreter(Stack* stack)
         set_list(&incomingInputs, 2);
 
         caValue* inputActions = list_get(action, 1);
-        populate_inputs_from_bytecode(stack, inputActions, &incomingInputs, 0);
+        run_input_ins(stack, inputActions, &incomingInputs, 0);
         // May have a runtime type error.
         if (error_occurred(stack))
             return;
@@ -1345,7 +1345,7 @@ static void step_interpreter(Stack* stack)
             return;
         Frame* frame = push_frame(stack, block);
         caValue* inputActions = list_get(action, 1);
-        populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
+        run_input_ins(stack, inputActions, &frame->registers, 1);
         break;
     }
     case op_ForLoop: {
@@ -1353,7 +1353,7 @@ static void step_interpreter(Stack* stack)
         Block* block = for_loop_choose_block(stack, currentTerm);
         Frame* frame = push_frame(stack, block);
         caValue* inputActions = list_get(action, 1);
-        populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
+        run_input_ins(stack, inputActions, &frame->registers, 1);
         bool enableLoopOutput = as_symbol(list_get(action, 3)) == sym_LoopProduceOutput;
         start_for_loop(stack, enableLoopOutput);
         break;
@@ -1387,7 +1387,7 @@ static void step_interpreter(Stack* stack)
         // Capture outputs.
         Value outputs;
         set_list(&outputs, 1);
-        populate_inputs_from_bytecode(stack, list_get(action, 1), &outputs, 0);
+        run_input_ins(stack, list_get(action, 1), &outputs, 0);
 
         // Pop frames.
         while (!is_major_block(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
@@ -1409,7 +1409,7 @@ static void step_interpreter(Stack* stack)
         // Capture outputs.
         Value outputs;
         set_list(&outputs, 1);
-        populate_inputs_from_bytecode(stack, list_get(action, 1), &outputs, 0);
+        run_input_ins(stack, list_get(action, 1), &outputs, 0);
 
         // Pop frames until the for-loop.
         while (!is_for_loop(top_frame(stack)->block) && top_frame_parent(stack) != NULL)

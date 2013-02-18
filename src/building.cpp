@@ -634,6 +634,7 @@ Term* append_state_input(Block* block)
     term->setBoolProp("output", true);
 
     on_block_inputs_changed(block);
+    set_bool(block_insert_property(block, sym_DirtyStateType), true);
 
     return term;
 }
@@ -645,9 +646,9 @@ Term* append_state_output(Block* block)
     if (existing != NULL)
         return existing;
 
-    Term* term = append_output_placeholder(block, 
-        find_open_state_result(block));
+    Term* term = append_output_placeholder(block, NULL);
     term->setBoolProp("state", true);
+    set_bool(term_insert_input_property(term, 0, "statePack"), true);
     hide_from_source(term);
     return term;
 }
@@ -950,7 +951,7 @@ void block_finish_changes(Block* block)
     // Remove NULLs
     block->removeNulls();
 
-    // Make sure nested minor blockes are finished.
+    // Make sure nested minor blocks are finished.
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
 
@@ -960,9 +961,11 @@ void block_finish_changes(Block* block)
 
     fix_forward_function_references(block);
 
+    // Update block's state type
+    block_update_state_type(block);
+
     // Create an output_placeholder for state, if necessary.
-    Term* openState = find_open_state_result(block);
-    if (openState != NULL)
+    if (block_has_inline_state(block))
         append_state_output(block);
 
     // After we are finished creating outputs, update any nested control flow operators.
@@ -982,9 +985,6 @@ void block_finish_changes(Block* block)
     // Refresh for-loop zero block
     if (is_for_loop(block))
         for_loop_remake_zero_block(block);
-
-    // Update block's state type
-    block_update_state_type(block);
 
     dirty_bytecode(block);
     refresh_bytecode(block);

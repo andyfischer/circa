@@ -300,6 +300,7 @@ void for_loop_fix_state_input(Block* contents)
     Term* unpackStateList = apply(contents, FUNCS.unpack_state_list_n,
         TermList(stateInput, index));
     transfer_users(stateInput, unpackStateList);
+
     move_before(unpackStateList, unpackState);
     set_input(unpackState, 0, unpackStateList);
 

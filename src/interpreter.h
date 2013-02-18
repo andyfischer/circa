@@ -115,6 +115,7 @@ Block* top_block(Stack* stack);
 // Retrieve the frame with the given depth, this function is O(n).
 Frame* frame_by_depth(Stack* stack, int depth);
 
+
 // Run the interpreter.
 void run_interpreter(Stack* stack);
 void run_interpreter_step(Stack* stack);
@@ -212,6 +213,9 @@ void print_error_stack(Stack* stack, std::ostream& out);
 // Update bytecode
 void write_term_bytecode(Term* term, caValue* output);
 void write_block_bytecode(Block* block, caValue* output);
+
+// Internal interpreter steps
+void run_input_ins(Stack* stack, caValue* inputIns, caValue* outputList, int stackDelta);
 
 // Setup the builtin Stack type.
 void eval_context_setup_type(Type* type);

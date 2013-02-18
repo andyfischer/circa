@@ -25,6 +25,11 @@ void string_append_qualified_name(caValue* left, caValue* right);
 
 void string_resize(caValue* s, int length);
 bool string_eq(caValue* s, const char* str);
+bool string_eq(caValue* s, caValue* rhs);
+
+// Return true if s equals the empty string, or is a null value.
+bool string_empty(caValue* s);
+
 bool string_starts_with(caValue* s, const char* beginning);
 bool string_ends_with(caValue* s, const char* str);
 void string_remove_suffix(caValue* s, const char* str);

@@ -75,6 +75,7 @@ caValue* get_index(caValue* value, int index);
 void set_index(caValue* value, int index, caValue* element);
 
 caValue* get_field(caValue* value, const char* field);
+caValue* get_field2(caValue* value, caValue* field, caValue* error);
 void set_field(caValue* value, const char* field, caValue* element);
 
 int num_elements(caValue* value);
@@ -102,6 +103,7 @@ bool is_opaque_pointer(caValue* value);
 bool is_ref(caValue* value);
 bool is_string(caValue* value);
 bool is_symbol(caValue* value);
+bool is_term_ref(caValue* val);
 bool is_type(caValue* value);
 
 // Unboxing using builtin types.
@@ -113,6 +115,7 @@ Function*   as_function(caValue* value);
 int         as_int(caValue* value);
 Symbol      as_symbol(caValue* value);
 void*       as_opaque_pointer(caValue* value);
+Term*       as_term_ref(caValue* val);
 Type*       as_type(caValue* value);
 
 void set_value(caValue* target, caValue* value);
@@ -130,6 +133,7 @@ void set_opaque_pointer(caValue* value, void* addr);
 void set_string(caValue* value, const char* s);
 void set_string(caValue* value, std::string const& s);
 void set_symbol(caValue* value, Symbol val);
+void set_term_ref(caValue* val, Term* term);
 void set_type(caValue* value, Type* type);
 void set_function(caValue* value, Function* function);
 

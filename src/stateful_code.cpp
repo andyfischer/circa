@@ -11,13 +11,14 @@
 #include "inspection.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "string_type.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"
 
 namespace circa {
 
-static void get_list_of_state_outputs(Block* block, int position, TermList* output);
+static void list_inputs_to_pack_state(Block* block, int position, TermList* output);
 static Term* append_final_pack_state(Block* block);
 
 bool is_declared_state(Term* term)
@@ -60,105 +61,53 @@ void pack_any_open_state_vars(Block* block)
 
 bool block_state_type_is_out_of_date(Block* block)
 {
-    // Alloc an array that tracks, for each field in the existing stateType,
-    // whether we have found a corresponding term for that field.
-    bool* typeFieldFound = NULL;
-    int existingFieldCount = 0;
+    // TODO: Collapse this function
+    return block_get_bool_property(block, sym_DirtyStateType, false);
+}
 
-    if (block->stateType != NULL) {
-        existingFieldCount = compound_type_get_field_count(block->stateType);
-        size_t size = sizeof(bool) * existingFieldCount;
-        typeFieldFound = (bool*) malloc(size);
-        memset(typeFieldFound, 0, size);
-    }
-    
-    // Walk through every term and check whether every unpack_state call is already
-    // mentioned in the state type.
+void block_update_state_type(Block* block)
+{
+    if (!block_state_type_is_out_of_date(block))
+        return;
+
+    // Recreate the state type
+    Type* type = create_compound_type();
+
+    // TODO: give this new type a nice name
+
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
         if (term == NULL)
             continue;
 
-        if (term->function != FUNCS.unpack_state)
+        if (term->function != FUNCS.unpack_state || FUNCS.unpack_state == NULL)
             continue;
 
-        // Found an unpack_state call
         Term* identifyingTerm = term->input(1);
 
-        // If the block doesn't yet have a stateType then that's an update.
-        if (block->stateType == NULL)
-            goto return_true;
+        caValue* fieldName = get_unique_name(identifyingTerm);
+        ca_assert(is_string(fieldName));
+        ca_assert(!string_eq(fieldName, ""));
 
-        // Look for the field name
-        int fieldIndex = list_find_field_index_by_name(block->stateType,
-            unique_name(identifyingTerm));
-
-        // If the name isn't found then that's an update
-        if (fieldIndex == -1)
-            goto return_true;
-
-        // If the type doesn't match then that's an update
-        if (compound_type_get_field_type(block->stateType, fieldIndex)
-                != declared_type(term))
-            goto return_true;
-
-        // Record this field index as 'found'
-        typeFieldFound[fieldIndex] = true;
+        compound_type_append_field(type, declared_type(term), as_cstring(fieldName));
     }
 
-    // If there were any fields in the type that weren't found in the block, then
-    // that's an update.
-    if (typeFieldFound != NULL) {
-        for (int i=0; i < existingFieldCount; i++) {
-            if (!typeFieldFound[i])
-                goto return_true;
-        }
-    }
+    block->stateType = type;
+    block_remove_property(block, sym_DirtyStateType);
 
-    // No reason to update, return false.
-    free(typeFieldFound);
-    return false;
-
-return_true:
-    free(typeFieldFound);
-    return true;
+    // Might need to update any existing pack_state calls.
+    block_update_pack_state_calls(block);
 }
 
-void block_update_state_type(Block* block)
+bool block_has_inline_state(Block* block)
 {
-    if (block_state_type_is_out_of_date(block)) {
-
-        // TODO: Handle the case where the stateType should go from non-NULL to NULL
-
-        // Recreate the state type
-        Type* type = create_compound_type();
-
-        // TODO: give this new type a nice name
-
-        for (int i=0; i < block->length(); i++) {
-            Term* term = block->get(i);
-            if (term == NULL)
-                continue;
-
-            if (term->function != FUNCS.unpack_state || FUNCS.unpack_state == NULL)
-                continue;
-
-            Term* identifyingTerm = term->input(1);
-
-            compound_type_append_field(type, declared_type(term), unique_name(identifyingTerm));
-        }
-
-        block->stateType = type;
-
-        // Might need to update any existing pack_state calls.
-        block_update_pack_state_calls(block);
-    }
+    return block->stateType != NULL;
 }
 
 static Term* append_final_pack_state(Block* block)
 {
     TermList inputs;
-    get_list_of_state_outputs(block, block->length(), &inputs);
+    list_inputs_to_pack_state(block, block->length(), &inputs);
     Term* term = apply(block, FUNCS.pack_state, inputs);
     term->setBoolProp("final", true);
     return term;
@@ -191,9 +140,7 @@ static Term* find_output_term_for_state_field(Block* block, const char* fieldNam
     return result;
 }
 
-// Write a list of terms to 'output' corresponding to the list of state outputs at this
-// position in the block. Useful for populating a list of inputs for pack_state.
-static void get_list_of_state_outputs(Block* block, int position, TermList* output)
+static void list_inputs_to_pack_state(Block* block, int position, TermList* output)
 {
     output->clear();
 
@@ -231,18 +178,17 @@ void block_update_pack_state_calls(Block* block)
         if (term->function == FUNCS.pack_state) {
             // Update the inputs for this pack_state call
             TermList inputs;
-            get_list_of_state_outputs(block, i, &inputs);
-
+            list_inputs_to_pack_state(block, i, &inputs);
             set_inputs(term, inputs);
         }
 
-        if (should_have_preceeding_pack_state(term)) {
+        else if (should_have_preceeding_pack_state(term)) {
             // Check if we need to insert a pack_state call
             Term* existing = term->input(stateOutputIndex);
 
             if (existing == NULL || existing->function != FUNCS.pack_state) {
                 TermList inputs;
-                get_list_of_state_outputs(block, i, &inputs);
+                list_inputs_to_pack_state(block, i, &inputs);
                 if (inputs.length() != 0) {
                     Term* pack_state = apply(block, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
@@ -296,10 +242,15 @@ Term* find_or_create_state_container(Block* block)
     return input;
 }
 
+Term* find_or_create_default_state_input(Block* block)
+{
+    return find_or_create_state_container(block);
+}
+
 Term* block_add_pack_state(Block* block)
 {
     TermList inputs;
-    get_list_of_state_outputs(block, block->length(), &inputs);
+    list_inputs_to_pack_state(block, block->length(), &inputs);
 
     // Don't create anything if there are no state outputs
     if (inputs.length() == 0)

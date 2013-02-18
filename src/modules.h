@@ -35,7 +35,7 @@ Block* find_loaded_module(const char* name);
 Block* find_module_from_filename(const char* filename);
 
 // Updating & migration
-Term* translate_term_across_blockes(Term* term, Block* oldBlock, Block* newBlock);
+Term* translate_term_across_blocks(Term* term, Block* oldBlock, Block* newBlock);
 
 // Look through every term in 'target', and see if it contains a reference to a term in
 // 'oldBlock'. If so, migrate that reference to the equivalent term (according to the

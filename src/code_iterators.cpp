@@ -57,7 +57,7 @@ void BlockIterator::advance()
     }
 
     // Otherwise, just advance. PS, it's not really accurate to say that we are "skipping"
-    // any blockes, because we just checked if there was one.
+    // any blocks, because we just checked if there was one.
     advanceSkippingBlock();
 }
 
@@ -315,7 +315,7 @@ void BlockIterator2::advance()
     Block* block = _current->owningBlock;
     int index = _current->index + 1;
 
-    // Possibly loop as we pop out of finished blockes.
+    // Possibly loop as we pop out of finished blocks.
     possibly_invalid:
 
     if (index >= block->length() || block == NULL) {

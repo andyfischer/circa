@@ -5,27 +5,22 @@
 namespace circa {
 namespace get_field_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        caValue* head = circa_input(STACK, 0);
-        const char* keyStr = circa_string_input(STACK, 1);
-        
-        if (!is_list_based_type(head->value_type)) {
-            std::string msg = "get_field failed, not a compound type: " + to_string(head);
-            msg += ". Field is: ";
-            msg += keyStr;
-            return RAISE_ERROR(msg.c_str());
+        caValue* head = circa_input(stack, 0);
+        const char* keyStr = circa_string_input(stack, 1);
+
+        Value error;
+        caValue* value = get_field2(head, circa_input(stack, 1), &error);
+
+        if (!is_null(&error)) {
+            circa_output_error(stack, as_cstring(&error));
+            return;
         }
 
-        int fieldIndex = list_find_field_index_by_name(head->value_type, keyStr);
+        ca_assert(value != NULL);
 
-        if (fieldIndex == -1) {
-            std::string msg = "field not found: ";
-            msg += keyStr;
-            return RAISE_ERROR(msg.c_str());
-        }
-
-        copy(circa_index(head, fieldIndex), circa_output(STACK, 0));
+        copy(value, circa_output(stack, 0));
     }
 
     Type* specializeType(Term* caller)

@@ -4,6 +4,7 @@
 
 #include "kernel.h"
 #include "debug.h"
+#include "hashtable.h"
 #include "names.h"
 #include "reflection.h"
 #include "string_type.h"
@@ -274,6 +275,33 @@ caValue* get_field(caValue* value, const char* field)
     return getField(value, field);
 }
 
+caValue* get_field2(caValue* value, caValue* field, caValue* error)
+{
+    if (is_hashtable(value)) {
+        return hashtable_get(value, field);
+    }
+
+    if (!is_list_based_type(value->value_type)) {
+        if (error != NULL) {
+            set_string(error, "get_field failed, not a compound type: ");
+            string_append(error, value);
+        }
+        return NULL;
+    }
+
+    int fieldIndex = list_find_field_index_by_name(value->value_type, as_cstring(field));
+
+    if (fieldIndex == -1) {
+        if (error != NULL) {
+            set_string(error, "field not found: ");
+            string_append(error, field);
+        }
+        return NULL;
+    }
+
+    return list_get(value, fieldIndex);
+}
+
 void set_field(caValue* value, const char* field, caValue* element)
 {
     Type::SetField setField = value->value_type->setField;
@@ -408,6 +436,12 @@ caValue* set_list(caValue* value, int size)
     return value;
 }
 
+void set_term_ref(caValue* val, Term* term)
+{
+    change_type(val, TYPES.term);
+    val->value_data.ptr = term;
+}
+
 void set_type(caValue* value, Type* type)
 {
     set_null(value);
@@ -485,6 +519,12 @@ Symbol as_symbol(caValue* tv)
     return tv->value_data.asint;
 }
 
+Term* as_term_ref(caValue* val)
+{
+    ca_assert(is_term_ref(val));
+    return (Term*) val->value_data.ptr;
+}
+
 Type* as_type(caValue* value)
 {
     ca_assert(is_type(value));
@@ -528,6 +568,7 @@ bool is_opaque_pointer(caValue* value) { return value->value_type->storageType =
 bool is_ref(caValue* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
 bool is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
 bool is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
+bool is_term_ref(caValue* val) { return val->value_type == TYPES.term; }
 bool is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
 bool is_number(caValue* value)

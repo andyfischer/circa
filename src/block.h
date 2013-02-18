@@ -203,10 +203,6 @@ Block* load_latest_block(Block* block);
 void block_check_invariants(caValue* result, Block* block);
 bool block_check_invariants_print_result(Block* block, std::ostream& out);
 
-// Update the block's stateType. Should be called after the code is changed in a way
-// that could add/remove declared state.
-void block_update_state_type(Block* block);
-
 void block_link_missing_functions(Block* block, Block* source);
 
 } // namespace circa

@@ -363,7 +363,9 @@ Term* find_last_non_comment_expression(Block* block)
         Term* func = block->get(i)->function;
         if (func == FUNCS.output
                 || func == FUNCS.input 
+#if 0 // NO_PACK_STATE
                 || func == FUNCS.pack_state
+#endif
                 || func == FUNCS.pack_state_list_n)
             continue;
 
@@ -451,7 +453,12 @@ std::string global_id(Term* term)
 
 const char* unique_name(Term* term)
 {
-    return term->uniqueName.name.c_str();
+    // TODO: remove this func
+    caValue* name = get_unique_name(term);
+    if (name == NULL || !is_string(name))
+        return "";
+
+    return as_cstring(name);
 }
 
 std::string get_short_local_name(Term* term)
