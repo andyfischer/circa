@@ -224,6 +224,7 @@ Term* find_active_state_container(Block* block)
     return NULL;
 }
 
+// TODO: rename to find_or_create_default_state_input
 Term* find_or_create_state_container(Block* block)
 {
     Term* existing = find_active_state_container(block);

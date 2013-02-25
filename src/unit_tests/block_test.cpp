@@ -21,7 +21,8 @@ void test_state_type()
     block_update_state_type(&block);
     test_assert(block.stateType != NULL);
 
-    test_equals(&block.stateType->parameter, "[[<Type int>, <Type number>], ['a', 'b']]");
+    //test_equals(&block.stateType->parameter, "[[<Type int>, <Type number>], ['a', 'b']]");
+    test_equals(&block.stateType->parameter, "[[<Type any>, <Type any>], ['a', 'b']]");
 }
 
 void test_erase_term()

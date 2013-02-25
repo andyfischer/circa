@@ -646,9 +646,8 @@ Term* append_state_output(Block* block)
     if (existing != NULL)
         return existing;
 
-    Term* term = append_output_placeholder(block, NULL);
+    Term* term = append_output_placeholder(block, find_open_state_result(block));
     term->setBoolProp("state", true);
-    set_bool(term_insert_input_property(term, 0, "statePack"), true);
     hide_from_source(term);
     return term;
 }

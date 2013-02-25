@@ -363,9 +363,7 @@ Term* find_last_non_comment_expression(Block* block)
         Term* func = block->get(i)->function;
         if (func == FUNCS.output
                 || func == FUNCS.input 
-#if 0 // NO_PACK_STATE
                 || func == FUNCS.pack_state
-#endif
                 || func == FUNCS.pack_state_list_n)
             continue;
 

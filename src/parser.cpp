@@ -1287,7 +1287,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         }
     }
 
-    Term* stateContainer = find_or_create_default_state_input(block);
+    // Term* stateContainer = find_or_create_default_state_input(block);
 
     // Create the declared_state() term.
     Term* result = apply(block, FUNCS.declared_state, TermList(), name.c_str());

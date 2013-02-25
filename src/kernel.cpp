@@ -1147,14 +1147,12 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
     Block* kernel = global_root_block();
 
-#if 0
     // Make sure there are no static errors in the kernel. This shouldn't happen.
     if (has_static_errors(kernel)) {
         std::cout << "Static errors found in kernel:" << std::endl;
         print_static_errors_formatted(kernel, std::cout);
         internal_error("circa fatal: static errors found in kernel");
     }
-#endif
 
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");
