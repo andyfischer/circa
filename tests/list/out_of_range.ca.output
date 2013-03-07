@@ -1,4 +1,4 @@
 Error occurred:
 [tests/list/out_of_range.ca:3,0] get_index()
-[#190] output_placeholder() | Index out of range: 0
+[#189] output_placeholder() | Index out of range: 0
 

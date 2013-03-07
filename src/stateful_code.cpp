@@ -192,9 +192,13 @@ void block_update_pack_state_calls(Block* block)
                 if (inputs.length() != 0) {
                     Term* pack_state = apply(block, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
-                    set_input(term, stateOutputIndex, pack_state);
-                    set_input_hidden(term, stateOutputIndex, true);
-                    set_input_implicit(term, stateOutputIndex, true);
+
+                    // Only set as an input for a non-minor block.
+                    if (term->nestedContents == NULL || !is_minor_block(term->nestedContents)) {
+                        set_input(term, stateOutputIndex, pack_state);
+                        set_input_hidden(term, stateOutputIndex, true);
+                        set_input_implicit(term, stateOutputIndex, true);
+                    }
 
                     // Advance i to compensate for the term just added
                     i++;

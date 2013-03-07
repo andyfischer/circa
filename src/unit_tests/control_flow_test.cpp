@@ -5,6 +5,7 @@
 #include "block.h"
 #include "control_flow.h"
 #include "inspection.h"
+#include "interpreter.h"
 #include "term.h"
 
 namespace control_flow_test {
@@ -73,9 +74,16 @@ void test_recursion_with_state()
     Block* f = find_block_from_path_expression(&block, "f");
 
     update_derived_inputs_for_exit_point(returnCall);
-    block.dump();
     test_assert(find_block_that_exit_point_will_reach(returnCall) == f);
-    test_assert(returnCall->input(0) != NULL);
+
+    Stack stack;
+    push_frame(&stack, &block);
+
+    run_interpreter(&stack);
+
+    Term* stateOutput = find_state_output(&block);
+    caValue* stateValue = get_frame_register(top_frame(&stack), stateOutput);
+    test_equals(stateValue, "{_f: {s: 3, _f: {s: 2, _f: {s: 1, _f: {s: 0, _f: null}}}}}");
 }
 
 void register_tests()
