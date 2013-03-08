@@ -6,7 +6,7 @@
 #include "importing.h"
 #include "inspection.h"
 
-namespace importing {
+namespace importing_test {
 
 void my_native_patch(caStack*) {}
 
@@ -27,7 +27,7 @@ void bug_with_is_major_block()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(importing::bug_with_is_major_block);
+    REGISTER_TEST_CASE(importing_test::bug_with_is_major_block);
 }
 
-} // namespace importing
+} // namespace importing_test

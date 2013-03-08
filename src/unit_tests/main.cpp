@@ -341,22 +341,22 @@ namespace c_objects_test { void register_tests(); }
 namespace code_iterator_test { void register_tests(); }
 namespace compound_type_test { void register_tests(); }
 namespace control_flow_test { void register_tests(); }
-namespace fakefs { void register_tests(); }
-namespace file { void register_tests(); }
-namespace file_watch { void register_tests(); }
-namespace handle { void register_tests(); }
-namespace importing { void register_tests(); }
-namespace interpreter { void register_tests(); }
-namespace migration { void register_tests(); }
-namespace modules { void register_tests(); }
-namespace names { void register_tests(); }
+namespace fakefs_test { void register_tests(); }
+namespace file_test { void register_tests(); }
+namespace file_watch_test { void register_tests(); }
+namespace handle_test { void register_tests(); }
+namespace importing_test { void register_tests(); }
+namespace interpreter_test { void register_tests(); }
+namespace migration_test { void register_tests(); }
+namespace modules_test { void register_tests(); }
+namespace names_test { void register_tests(); }
 namespace native_patch_test { void register_tests(); }
 namespace parser_test { void register_tests(); }
-namespace path_expression_tests { void register_tests(); }
+namespace path_expression_test { void register_tests(); }
 namespace stateful_code_test { void register_tests(); }
-namespace string_tests { void register_tests(); }
+namespace string_test { void register_tests(); }
 namespace symbol_test { void register_tests(); }
-namespace tokenizer { void register_tests(); }
+namespace tokenizer_test { void register_tests(); }
 
 int main(int argc, char** argv)
 {
@@ -366,22 +366,22 @@ int main(int argc, char** argv)
     code_iterator_test::register_tests();
     compound_type_test::register_tests();
     control_flow_test::register_tests();
-    fakefs::register_tests();
-    file::register_tests();
-    file_watch::register_tests();
-    handle::register_tests();
-    importing::register_tests();
-    interpreter::register_tests();
-    migration::register_tests();
-    modules::register_tests();
-    names::register_tests();
+    fakefs_test::register_tests();
+    file_test::register_tests();
+    file_watch_test::register_tests();
+    handle_test::register_tests();
+    importing_test::register_tests();
+    interpreter_test::register_tests();
+    migration_test::register_tests();
+    modules_test::register_tests();
+    names_test::register_tests();
     native_patch_test::register_tests();
     parser_test::register_tests();
-    path_expression_tests::register_tests();
+    path_expression_test::register_tests();
     stateful_code_test::register_tests();
-    string_tests::register_tests();
+    string_test::register_tests();
     symbol_test::register_tests();
-    tokenizer::register_tests();
+    tokenizer_test::register_tests();
 
     caWorld* world = circa_initialize();
 

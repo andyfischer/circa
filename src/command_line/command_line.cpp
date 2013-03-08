@@ -26,8 +26,6 @@
 #include "world.h"
 
 #include "circa/file.h"
-#include "build_tool.h"
-#include "codegen.h"
 #include "debugger_repl.h"
 #include "exporting_parser.h"
 #include "generate_cpp.h"
@@ -540,13 +538,6 @@ int run_command_line(caWorld* world, caValue* args)
     if (string_eq(list_get(args, 0), "-d"))
         return run_debugger_repl(as_cstring(list_get(args, 1)));
 
-    // Generate cpp headers
-    if (string_eq(list_get(args, 0), "-gh")) {
-        load_script(mainBlock, as_cstring(list_get(args, 1)));
-        std::cout << generate_cpp_headers(mainBlock);
-        return 0;
-    }
-
     // Run file checker
     if (string_eq(list_get(args, 0), "-check"))
         return run_file_checker(as_cstring(list_get(args, 1)));
@@ -560,19 +551,6 @@ int run_command_line(caWorld* world, caValue* args)
         if (list_length(args) >= 3)
             filename = as_cstring(list_get(args, 2));
         return run_exporting_parser(format, filename);
-    }
-
-    // Build tool
-    if (string_eq(list_get(args, 0), "-build")) {
-        return run_build_tool(args);
-    }
-
-    // C++ gen
-    if (string_eq(list_get(args, 0), "-cppgen")) {
-        Value remainingArgs;
-        list_slice(args, 1, -1, &remainingArgs);
-        run_generate_cpp(&remainingArgs);
-        return 0;
     }
 
     // Command reader (from stdin)

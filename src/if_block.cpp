@@ -295,53 +295,6 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
     }
 }
 
-#if 0
-void if_block_fix_outer_pointers(Term* ifCall, Block* caseContents)
-{
-    Block* contents = nested_contents(ifCall);
-
-    for (OuterInputIterator it(caseContents); it.unfinished(); ++it) {
-
-        // Don't worry about outer pointers to values. (This should probably be
-        // standard behavior)
-        if (is_value(it.currentTerm()))
-            continue;
-
-        // Fetch values from OuterInputIterator, while it's safe. The iterator
-        // may get confused soon, due to inserted terms.
-        Term* currentTerm = it.currentTerm();
-        Term* input = it.currentInput();
-        int currentInputIndex = it.currentInputIndex();
-
-        // Check if this pointer goes outside the if-block. If so, we'll have to
-        // find the corresponding placeholder (or create a new one).
-        if (input->owningBlock != contents) {
-
-            Term* placeholder = NULL;
-
-            int inputIndex = find_input_index_for_pointer(ifCall, input);
-            if (inputIndex >= 0) {
-                placeholder = get_input_placeholder(contents, inputIndex);
-            } else {
-                // Create a new placeholder
-                // This call will result in an inserted term, which will confuse
-                // our OuterInputIterator. So, don't use the iterator again until
-                // the next iteration.
-                placeholder = if_block_add_input(ifCall, input);
-            }
-
-            input = placeholder;
-        }
-
-        // Now 'input' points to an if-block placeholder, remap it to the case-local
-        // placeholder.
-        Term* caseLocal = get_input_placeholder(caseContents, input->index);
-        ca_assert(caseLocal != NULL);
-        set_input(currentTerm, currentInputIndex, caseLocal);
-    }
-}
-#endif
-
 void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBlock)
 {
     Block* mainBlock = nested_contents(ifCall);

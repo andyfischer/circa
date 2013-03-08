@@ -12,7 +12,7 @@
 #include "names.h"
 #include "string_type.h"
 
-namespace names {
+namespace names_test {
 
 void find_name()
 {
@@ -175,13 +175,13 @@ void type_name_visible_from_module()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(names::find_name);
-    REGISTER_TEST_CASE(names::global_names);
-    REGISTER_TEST_CASE(names::unique_ordinals);
-    REGISTER_TEST_CASE(names::test_find_ordinal_suffix);
-    REGISTER_TEST_CASE(names::search_every_global_name);
-    REGISTER_TEST_CASE(names::bug_with_lookup_type_and_qualified_name);
-    REGISTER_TEST_CASE(names::type_name_visible_from_module);
+    REGISTER_TEST_CASE(names_test::find_name);
+    REGISTER_TEST_CASE(names_test::global_names);
+    REGISTER_TEST_CASE(names_test::unique_ordinals);
+    REGISTER_TEST_CASE(names_test::test_find_ordinal_suffix);
+    REGISTER_TEST_CASE(names_test::search_every_global_name);
+    REGISTER_TEST_CASE(names_test::bug_with_lookup_type_and_qualified_name);
+    REGISTER_TEST_CASE(names_test::type_name_visible_from_module);
 }
 
 } // namespace names

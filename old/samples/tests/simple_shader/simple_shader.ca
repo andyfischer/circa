@@ -1,8 +1,0 @@
-
-
-shader = opengl:reload_shader('vert.glsl'->rpath, 'frag.glsl'->rpath)
-e = elapsed() * 100 % 100
-uniform_e = opengl:get_uniform_location(shader, 'elapsed')
-uniform_mouseX = opengl:get_uniform_location(shader, 'mouseX')
-uniform_mouseY = opengl:get_uniform_location(shader, 'mouseY')
-opengl:shader_quad(shader, [0 0 window.width window.height] [[uniform_e e] [uniform_mouseX mouse.x] [uniform_mouseY window.height - mouse.y]])

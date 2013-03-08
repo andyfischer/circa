@@ -6,7 +6,7 @@
 #include "modules.h"
 #include "tagged_value.h"
 
-namespace file {
+namespace file_test {
 
 void test_get_just_filename_for_path()
 {
@@ -75,9 +75,9 @@ void test_get_parent_directory()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(file::test_get_just_filename_for_path);
-    REGISTER_TEST_CASE(file::test_module_get_default_name_from_filename);
-    REGISTER_TEST_CASE(file::test_get_parent_directory);
+    REGISTER_TEST_CASE(file_test::test_get_just_filename_for_path);
+    REGISTER_TEST_CASE(file_test::test_module_get_default_name_from_filename);
+    REGISTER_TEST_CASE(file_test::test_get_parent_directory);
 }
 
 }

@@ -71,23 +71,23 @@ OBJECTS := \
 	$(OBJDIR)/code_iterator_test.o \
 	$(OBJDIR)/compound_type_test.o \
 	$(OBJDIR)/control_flow_test.o \
-	$(OBJDIR)/fakefs.o \
-	$(OBJDIR)/file.o \
-	$(OBJDIR)/file_watch.o \
-	$(OBJDIR)/handle.o \
-	$(OBJDIR)/importing.o \
+	$(OBJDIR)/fakefs_test.o \
+	$(OBJDIR)/file_test.o \
+	$(OBJDIR)/file_watch_test.o \
+	$(OBJDIR)/handle_test.o \
+	$(OBJDIR)/importing_test.o \
 	$(OBJDIR)/interpreter_test.o \
 	$(OBJDIR)/main.o \
-	$(OBJDIR)/migration.o \
-	$(OBJDIR)/modules.o \
-	$(OBJDIR)/names.o \
+	$(OBJDIR)/migration_test.o \
+	$(OBJDIR)/modules_test.o \
+	$(OBJDIR)/names_test.o \
 	$(OBJDIR)/native_patch_test.o \
 	$(OBJDIR)/parser_test.o \
 	$(OBJDIR)/path_expression_test.o \
 	$(OBJDIR)/stateful_code_test.o \
-	$(OBJDIR)/string_tests.o \
+	$(OBJDIR)/string_test.o \
 	$(OBJDIR)/symbol_test.o \
-	$(OBJDIR)/tokenizer.o \
+	$(OBJDIR)/tokenizer_test.o \
 
 RESOURCES := \
 
@@ -169,19 +169,19 @@ $(OBJDIR)/compound_type_test.o: unit_tests/compound_type_test.cpp
 $(OBJDIR)/control_flow_test.o: unit_tests/control_flow_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/fakefs.o: unit_tests/fakefs.cpp
+$(OBJDIR)/fakefs_test.o: unit_tests/fakefs_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file.o: unit_tests/file.cpp
+$(OBJDIR)/file_test.o: unit_tests/file_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_watch.o: unit_tests/file_watch.cpp
+$(OBJDIR)/file_watch_test.o: unit_tests/file_watch_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/handle.o: unit_tests/handle.cpp
+$(OBJDIR)/handle_test.o: unit_tests/handle_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/importing.o: unit_tests/importing.cpp
+$(OBJDIR)/importing_test.o: unit_tests/importing_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/interpreter_test.o: unit_tests/interpreter_test.cpp
@@ -190,13 +190,13 @@ $(OBJDIR)/interpreter_test.o: unit_tests/interpreter_test.cpp
 $(OBJDIR)/main.o: unit_tests/main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/migration.o: unit_tests/migration.cpp
+$(OBJDIR)/migration_test.o: unit_tests/migration_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/modules.o: unit_tests/modules.cpp
+$(OBJDIR)/modules_test.o: unit_tests/modules_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/names.o: unit_tests/names.cpp
+$(OBJDIR)/names_test.o: unit_tests/names_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/native_patch_test.o: unit_tests/native_patch_test.cpp
@@ -211,13 +211,13 @@ $(OBJDIR)/path_expression_test.o: unit_tests/path_expression_test.cpp
 $(OBJDIR)/stateful_code_test.o: unit_tests/stateful_code_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/string_tests.o: unit_tests/string_tests.cpp
+$(OBJDIR)/string_test.o: unit_tests/string_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/symbol_test.o: unit_tests/symbol_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/tokenizer.o: unit_tests/tokenizer.cpp
+$(OBJDIR)/tokenizer_test.o: unit_tests/tokenizer_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

@@ -4,7 +4,7 @@
 
 #include "token.h"
 
-namespace tokenizer {
+namespace tokenizer_test {
 
 void test_identifiers()
 {
@@ -364,24 +364,24 @@ void test_number_followed_by_dot_call()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(tokenizer::test_identifiers);
-    REGISTER_TEST_CASE(tokenizer::test_integers);
-    REGISTER_TEST_CASE(tokenizer::test_floats);
-    REGISTER_TEST_CASE(tokenizer::test_misc1);
-    REGISTER_TEST_CASE(tokenizer::test_misc2);
-    REGISTER_TEST_CASE(tokenizer::test_misc3);
-    REGISTER_TEST_CASE(tokenizer::test_stars);
-    REGISTER_TEST_CASE(tokenizer::test_keywords);
-    REGISTER_TEST_CASE(tokenizer::test_keywords2);
-    REGISTER_TEST_CASE(tokenizer::test_keywords3);
-    REGISTER_TEST_CASE(tokenizer::test_identifiers_that_look_like_keywords);
-    REGISTER_TEST_CASE(tokenizer::test_string_literal);
-    REGISTER_TEST_CASE(tokenizer::test_triple_quote_string_literal);
-    REGISTER_TEST_CASE(tokenizer::test_color_literal);
-    REGISTER_TEST_CASE(tokenizer::test_keyword_followed_by_lparen);
-    REGISTER_TEST_CASE(tokenizer::test_preceding_indent);
-    REGISTER_TEST_CASE(tokenizer::test_comment);
-    REGISTER_TEST_CASE(tokenizer::test_number_followed_by_dot_call);
+    REGISTER_TEST_CASE(tokenizer_test::test_identifiers);
+    REGISTER_TEST_CASE(tokenizer_test::test_integers);
+    REGISTER_TEST_CASE(tokenizer_test::test_floats);
+    REGISTER_TEST_CASE(tokenizer_test::test_misc1);
+    REGISTER_TEST_CASE(tokenizer_test::test_misc2);
+    REGISTER_TEST_CASE(tokenizer_test::test_misc3);
+    REGISTER_TEST_CASE(tokenizer_test::test_stars);
+    REGISTER_TEST_CASE(tokenizer_test::test_keywords);
+    REGISTER_TEST_CASE(tokenizer_test::test_keywords2);
+    REGISTER_TEST_CASE(tokenizer_test::test_keywords3);
+    REGISTER_TEST_CASE(tokenizer_test::test_identifiers_that_look_like_keywords);
+    REGISTER_TEST_CASE(tokenizer_test::test_string_literal);
+    REGISTER_TEST_CASE(tokenizer_test::test_triple_quote_string_literal);
+    REGISTER_TEST_CASE(tokenizer_test::test_color_literal);
+    REGISTER_TEST_CASE(tokenizer_test::test_keyword_followed_by_lparen);
+    REGISTER_TEST_CASE(tokenizer_test::test_preceding_indent);
+    REGISTER_TEST_CASE(tokenizer_test::test_comment);
+    REGISTER_TEST_CASE(tokenizer_test::test_number_followed_by_dot_call);
 }
 
 } // namespace 

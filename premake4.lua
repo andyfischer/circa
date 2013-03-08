@@ -35,7 +35,6 @@ solution "Circa"
         location "src"
         defines { "CIRCA_USE_LINENOISE" }
         files {
-            "src/command_line/build_tool.cpp",
             "src/command_line/command_line.cpp",
             "src/command_line/command_line_main.cpp",
             "src/command_line/debugger_repl.cpp",

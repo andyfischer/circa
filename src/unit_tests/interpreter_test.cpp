@@ -15,7 +15,7 @@
 #include "type.h"
 #include "world.h"
 
-namespace interpreter {
+namespace interpreter_test {
 
 void test_cast_first_inputs()
 {
@@ -110,10 +110,10 @@ void test_directly_call_native_override()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(interpreter::test_cast_first_inputs);
-    REGISTER_TEST_CASE(interpreter::run_block_after_additions);
-    REGISTER_TEST_CASE(interpreter::test_evaluate_minimum);
-    REGISTER_TEST_CASE(interpreter::test_directly_call_native_override);
+    REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
+    REGISTER_TEST_CASE(interpreter_test::run_block_after_additions);
+    REGISTER_TEST_CASE(interpreter_test::test_evaluate_minimum);
+    REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
 }
 
-} // namespace interpreter
+} // namespace interpreter_test

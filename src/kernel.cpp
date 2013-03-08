@@ -109,21 +109,6 @@ void to_string_repr(caStack* stack)
     write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void call_actor_func(caStack* stack)
-{
-#if 0 // actorList disabled
-    const char* actorSymbol = circa_string_input(stack, 0);
-    caValue* msg = circa_input(stack, 1);
-
-    if (stack->world == NULL) {
-        circa_output_error(stack, "Stack was not created with World");
-        return;
-    }
-
-    circa_actor_run_message(stack->world, actorName, msg);
-#endif
-}
-
 void dynamic_method_call(caStack* stack)
 {
     INCREMENT_STAT(DynamicMethodCall);
@@ -1038,7 +1023,6 @@ void bootstrap_kernel()
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
-        {"call_actor", call_actor_func},
         {"send", send_func},
         {"test_spy", test_spy},
         {"test_oracle", test_oracle},

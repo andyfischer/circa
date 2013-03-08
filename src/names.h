@@ -102,25 +102,7 @@ Block* find_function(World* world, const char* name);
 Block* find_function_local(Block* block, const char* name);
 Block* find_module(World* world, const char* name);
 
-#if 0
-const char* name_to_string(Symbol name);
-void name_to_string(Symbol name, String* string);
-#endif
 void qualified_name_get_first_section(caValue* name, caValue* prefixResult);
 void qualified_name_get_remainder_after_first_section(caValue* name, caValue* suffixResult);
-
-// Returns a name if there is already one with this string, otherwise returns None.
-#if 0
-Symbol existing_name_from_string(const char* str);
-Symbol existing_name_from_string(const char* str, int len);
-
-// Return a name from this string, adding it if necessary.
-Symbol sym_from_string(const char* str);
-Symbol sym_from_string(std::string const& str);
-Symbol sym_from_string(caValue* str);
-
-// Deallocate all interned names, this should be called at shutdown
-void sym_dealloc_global_data();
-#endif
 
 } // namespace circa

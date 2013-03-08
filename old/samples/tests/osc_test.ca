@@ -1,9 +1,0 @@
-
-
-outgoing = elapsed()
-
-osc:send(osc:address('localhost', 4999), '/', outgoing)
-trace('sent: ' outgoing)
-
-for m in osc:listen(4999)
-    trace('received: ' m)

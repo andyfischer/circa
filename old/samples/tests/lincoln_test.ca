@@ -1,5 +1,0 @@
-
-
-asteroids_file = include('demos/asteroids.ca')
-include('libs/lincoln.ca')
-lincoln:default_control(reflect:this_branch())

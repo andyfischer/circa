@@ -6,7 +6,7 @@
 
 #include "fakefs.h"
 
-namespace fakefs {
+namespace fakefs_test {
 
 void test_simple()
 {
@@ -31,7 +31,7 @@ void test_simple()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(fakefs::test_simple);
+    REGISTER_TEST_CASE(fakefs_test::test_simple);
 }
 
-} // namespace fakefs
+} // namespace fakefs_test

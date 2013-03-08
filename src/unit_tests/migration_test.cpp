@@ -7,7 +7,7 @@
 #include "modules.h"
 #include "reflection.h"
 
-namespace migration {
+namespace migration_test {
 
 void translate_terms()
 {
@@ -45,8 +45,8 @@ void update_references()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(translate_terms);
-    REGISTER_TEST_CASE(update_references);
+    REGISTER_TEST_CASE(migration_test::translate_terms);
+    REGISTER_TEST_CASE(migration_test::update_references);
 }
 
 }

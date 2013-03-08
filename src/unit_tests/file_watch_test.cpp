@@ -8,7 +8,7 @@
 #include "modules.h"
 #include "world.h"
 
-namespace file_watch {
+namespace file_watch_test {
 
 void test_simple()
 {
@@ -73,8 +73,8 @@ void test_check_all_watches()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(file_watch::test_simple);
-    REGISTER_TEST_CASE(file_watch::test_check_all_watches);
+    REGISTER_TEST_CASE(file_watch_test::test_simple);
+    REGISTER_TEST_CASE(file_watch_test::test_check_all_watches);
 }
 
 }

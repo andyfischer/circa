@@ -5,7 +5,7 @@
 #include "inspection.h"
 #include "kernel.h"
 
-namespace path_expression_tests {
+namespace path_expression_test {
 
 void simple_name_match()
 {
@@ -94,12 +94,12 @@ void recursive_function_match()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(path_expression_tests::simple_name_match);
-    REGISTER_TEST_CASE(path_expression_tests::nested_name_match);
-    REGISTER_TEST_CASE(path_expression_tests::wildcard_nested_match);
-    REGISTER_TEST_CASE(path_expression_tests::recursive_wildcard_match);
-    REGISTER_TEST_CASE(path_expression_tests::function_match);
-    REGISTER_TEST_CASE(path_expression_tests::recursive_function_match);
+    REGISTER_TEST_CASE(path_expression_test::simple_name_match);
+    REGISTER_TEST_CASE(path_expression_test::nested_name_match);
+    REGISTER_TEST_CASE(path_expression_test::wildcard_nested_match);
+    REGISTER_TEST_CASE(path_expression_test::recursive_wildcard_match);
+    REGISTER_TEST_CASE(path_expression_test::function_match);
+    REGISTER_TEST_CASE(path_expression_test::recursive_function_match);
 }
 
 }

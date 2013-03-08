@@ -171,25 +171,6 @@ void Block__format_function_heading(caStack* stack)
     function_format_header_source(output, block);
 }
 
-#if 0
-void Block__get_documentation(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-
-    caValue* out = circa_output(stack, 0);
-    set_list(out, 0);
-
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (is_input_placeholder(term))
-            continue;
-
-        if (is_comment(term))
-            set_string(list_append(out), term->stringProp("comment"));
-    }
-}
-#endif
-
 void Block__has_static_error(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));

@@ -64,7 +64,6 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/build_tool.o \
 	$(OBJDIR)/command_line.o \
 	$(OBJDIR)/command_line_main.o \
 	$(OBJDIR)/debugger_repl.o \
@@ -132,9 +131,6 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/build_tool.o: command_line/build_tool.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/command_line.o: command_line/command_line.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"

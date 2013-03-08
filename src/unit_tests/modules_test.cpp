@@ -9,7 +9,7 @@
 #include "modules.h"
 #include "world.h"
 
-namespace modules {
+namespace modules_test {
 
 void source_file_location()
 {
@@ -63,9 +63,9 @@ void test_explicit_output()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(modules::source_file_location);
-    REGISTER_TEST_CASE(modules::test_require);
-    REGISTER_TEST_CASE(modules::test_explicit_output);
+    REGISTER_TEST_CASE(modules_test::source_file_location);
+    REGISTER_TEST_CASE(modules_test::test_require);
+    REGISTER_TEST_CASE(modules_test::test_explicit_output);
 }
 
-} // namespace modules
+} // namespace modules_test

@@ -69,7 +69,6 @@ OBJECTS := \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/closures.o \
 	$(OBJDIR)/code_iterators.o \
-	$(OBJDIR)/codegen.o \
 	$(OBJDIR)/control_flow.o \
 	$(OBJDIR)/debug.o \
 	$(OBJDIR)/dict.o \
@@ -195,9 +194,6 @@ $(OBJDIR)/closures.o: closures.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/code_iterators.o: code_iterators.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/codegen.o: codegen.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/control_flow.o: control_flow.cpp

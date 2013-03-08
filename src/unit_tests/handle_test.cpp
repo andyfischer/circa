@@ -8,7 +8,7 @@
 #include "tagged_value.h"
 #include "type.h"
 
-namespace handle {
+namespace handle_test {
 
 void test_value_is_shared()
 {
@@ -91,8 +91,8 @@ void test_release()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(handle::test_value_is_shared);
-    REGISTER_TEST_CASE(handle::test_release);
+    REGISTER_TEST_CASE(handle_test::test_value_is_shared);
+    REGISTER_TEST_CASE(handle_test::test_release);
 }
 
 }

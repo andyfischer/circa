@@ -4,7 +4,7 @@
 
 #include "string_type.h"
 
-namespace string_tests {
+namespace string_test {
 
 void test_sneaky_equals()
 {
@@ -39,8 +39,8 @@ void test_prepend()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(test_sneaky_equals);
-    REGISTER_TEST_CASE(test_prepend);
+    REGISTER_TEST_CASE(string_test::test_sneaky_equals);
+    REGISTER_TEST_CASE(string_test::test_prepend);
 }
 
-} // namespace string_tests
+} // namespace string_test
