@@ -826,8 +826,11 @@ void update_extra_outputs(Term* term)
         if (rebindsInput == -1) {
 
             // Check if we can find the rebind-input by looking for state input.
-            if (is_state_output(placeholder))
-                rebindsInput = find_state_input(function)->index;
+            if (is_state_output(placeholder)) {
+                Term* stateInput = find_state_input(function);
+                if (stateInput != NULL)
+                    rebindsInput = stateInput->index;
+            }
         }
 
         // Use the appropriate name
@@ -1180,7 +1183,7 @@ void check_to_add_state_output_placeholder(Block* block)
     if (result == NULL)
         return;
 
-    Term* output = apply(block, FUNCS.output, TermList(result));
+    Term* output = append_output_placeholder(block, NULL);
     output->setBoolProp("state", true);
 }
 
