@@ -1,9 +1,4 @@
 
-Top 5 worst issues
-  - Static error reporting is missing (such as misspelled/nonexistant variable names)
-  - Improv sometimes fails to reload
-   - Still happening 7/18
-
 Recent
   Delete create_type (use create_type_value instead)
 
@@ -29,7 +24,7 @@ Source repro
   Each branch should store the base indent level (instead of having this data in Term)
 
 Code reload
-  Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay
+  Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay.
 
 Code cleanup
   Remove importing_macros.h
@@ -39,8 +34,8 @@ Code cleanup
 Runtime reflection
   Functions have type Function, we should get rid of that and just use Branch everywhere
 
-Parser
-  In function decl, type should be optional (rather than name being optional)
+State
+  Inlined state doesn't work in a recursive function
 
 Modules
   When compiling a module, the last value is automatically turned into an output (just
