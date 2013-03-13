@@ -59,7 +59,7 @@ Stack::~Stack()
     // Clear error, so that pop_frame doesn't complain about losing an errored frame.
     stack_ignore_error(this);
 
-    reset_stack(this);
+    stack_reset(this);
 
     free(frames);
 
@@ -440,7 +440,7 @@ Block* top_block(Stack* stack)
     return frame->block;
 }
 
-void reset_stack(Stack* stack)
+void stack_reset(Stack* stack)
 {
     stack->top = 0;
     stack->errorOccurred = false;
@@ -1760,7 +1760,7 @@ void Interpreter__reset(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
-    reset_stack(self);
+    stack_reset(self);
 }
 void Interpreter__run(caStack* callerStack)
 {
@@ -1905,7 +1905,7 @@ CIRCA_EXPORT void circa_clear_error(caStack* stack)
 }
 CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 {
-    reset_stack(stack);
+    stack_reset(stack);
 }
 CIRCA_EXPORT void circa_restart(caStack* stack)
 {

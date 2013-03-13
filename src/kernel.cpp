@@ -5,6 +5,7 @@
 #include "circa/circa.h"
 #include "circa/file.h"
 
+#include "actors.h"
 #include "block.h"
 #include "building.h"
 #include "closures.h"
@@ -147,26 +148,6 @@ void dynamic_method_call(caStack* stack)
 
 void send_func(caStack* stack)
 {
-#if 0 // actorList disabled
-    const char* actorSymbol = circa_string_input(stack, 0);
-    caValue* msg = circa_input(stack, 1);
-
-    if (stack->world == NULL) {
-        circa_output_error(stack, "Stack was not created with World");
-        return;
-    }
-
-    ListData* actor = find_actor(stack->world, actorName);
-
-    if (actor == NULL) {
-        std::string msg = "Actor not found: ";
-        msg += actorName;
-        circa_output_error(stack, msg.c_str());
-        return;
-    }
-
-    actor_send_message(actor, msg);
-#endif
 }
 
 void refactor__rename(caStack* stack)
@@ -767,6 +748,7 @@ void bootstrap_kernel()
     string_setup_type(TYPES.string);
 
     // Initialize remaining global types.
+    TYPES.actor = create_type();
     TYPES.any = create_type();
     TYPES.block = create_type();
     TYPES.bool_type = create_type();
@@ -782,6 +764,7 @@ void bootstrap_kernel()
     TYPES.term = create_type();
     TYPES.void_type = create_type();
 
+    actor_setup_type(TYPES.actor);
     any_t::setup_type(TYPES.any);
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);

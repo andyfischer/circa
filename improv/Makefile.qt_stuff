@@ -1,4 +1,0 @@
-
-all:
-	moc src/Window.h -o src/Window_moc.cpp
-	moc src/GLWidget.h -o src/GLWidget_moc.cpp

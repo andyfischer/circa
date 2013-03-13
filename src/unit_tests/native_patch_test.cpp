@@ -49,7 +49,7 @@ void patch_manually()
     module_patch_function(patch, "my_add", my_add);
     native_patch_apply_patch(patch, &block);
 
-    reset_stack(&stack);
+    stack_reset(&stack);
     push_frame(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
@@ -110,7 +110,7 @@ void trigger_change()
     module_patch_function(patch, "f", my_5);
     native_patch_finish_change(patch);
 
-    reset_stack(&stack);
+    stack_reset(&stack);
     push_frame(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);

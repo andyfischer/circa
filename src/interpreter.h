@@ -112,9 +112,10 @@ Frame* top_frame(Stack* stack);
 Frame* top_frame_parent(Stack* stack);
 Block* top_block(Stack* stack);
 
+bool stack_is_empty(Stack* stack);
+
 // Retrieve the frame with the given depth, this function is O(n).
 Frame* frame_by_depth(Stack* stack, int depth);
-
 
 // Run the interpreter.
 void run_interpreter(Stack* stack);
@@ -144,7 +145,7 @@ void stack_ignore_error(Stack* stack);
 void stack_clear_error(Stack* stack);
 
 // Reset a Stack to its default value.
-void reset_stack(Stack* stack);
+void stack_reset(Stack* stack);
 
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Block* block);
