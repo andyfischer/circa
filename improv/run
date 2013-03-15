@@ -1,2 +1,0 @@
-rm -rf build/improv.app
-ca-r && make config=release && build/improv.app/Contents/MacOS/improv $*

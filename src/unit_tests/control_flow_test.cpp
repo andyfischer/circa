@@ -82,7 +82,7 @@ void test_recursion_with_state()
     run_interpreter(&stack);
 
     Term* stateOutput = find_state_output(&block);
-    caValue* stateValue = get_frame_register(top_frame(&stack), stateOutput);
+    caValue* stateValue = frame_register(top_frame(&stack), stateOutput);
     test_equals(stateValue, "{_f: {s: 3, _f: {s: 2, _f: {s: 1, _f: {s: 0, _f: null}}}}}");
 }
 

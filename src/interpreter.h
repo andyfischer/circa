@@ -187,9 +187,9 @@ Term* current_term(Stack* stack);
 Block* current_block(Stack* stack);
 
 // Registers
-caValue* get_frame_register(Frame* frame, int index);
-caValue* get_frame_register(Frame* frame, Term* term);
-caValue* get_frame_register_from_end(Frame* frame, int index);
+caValue* frame_register(Frame* frame, int index);
+caValue* frame_register(Frame* frame, Term* term);
+caValue* frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
 caValue* frame_registers(Frame* frame);
 

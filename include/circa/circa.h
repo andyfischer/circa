@@ -19,6 +19,8 @@ extern "C" {
 
 #ifdef __cplusplus
 namespace circa {
+    struct Actor;
+    struct ActorSpace;
     struct Block;
     struct Stack;
     struct Term;
@@ -26,6 +28,9 @@ namespace circa {
     struct World;
     struct NativePatch;
 }
+
+typedef circa::Actor caActor;
+typedef circa::ActorSpace caActorSpace;
 
 typedef circa::Block caBlock;
 
@@ -486,6 +491,11 @@ void circa_setup_pointer_type(caType* type);
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
 void circa_finish_native_patch(caNativePatch* module);
+
+// -- Actors --
+caActorSpace* circa_create_actor_space(caWorld* world);
+caActor* circa_create_actor(caActorSpace* space);
+void circa_set_actor_for_role(caActorSpace* space, caActor* actor, const char* role);
 
 // -- File IO --
 

@@ -24,8 +24,8 @@ struct ActorSpace {
 
     Value actorList;
 
-    // Runtime errors are sent to errorService.
-    Value errorService;
+    Value moduleLoader;
+    Value errorListener;
 
     World* world;
 };
@@ -36,13 +36,27 @@ ActorSpace* create_actor_space(World* world)
     space->world = world;
     space->currentInbox = 0;
     space->nextInbox = 1;
-    set_list(&space->actors, 0);
+    set_list(&space->actorList, 0);
     return space;
 }
 
 void free_actor_space(ActorSpace* space)
 {
     delete space;
+}
+
+void set_actor_for_role(ActorSpace* space, Actor* actor, const char* role)
+{
+    caValue* roleSlot = NULL;
+
+    if (strcmp(role, "moduleLoader") == 0)
+        roleSlot = &space->moduleLoader;
+    else if (strcmp(role, "errorListener") == 0)
+        roleSlot = &space->moduleLoader;
+    else
+        internal_error("didn't recognize role name");
+
+    set_actor(roleSlot, actor);
 }
 
 Actor* create_actor(ActorSpace* space)
@@ -54,7 +68,7 @@ Actor* create_actor(ActorSpace* space)
     set_list(&actor->inbox[0], 0);
     set_list(&actor->inbox[1], 0);
 
-    set_actor(list_append(&space->actors), actor);
+    set_actor(list_append(&space->actorList), actor);
 
     return actor;
 }
@@ -72,8 +86,8 @@ void actors_start_iteration(ActorSpace* space)
 
 void actors_run_iteration(ActorSpace* space)
 {
-    for (int i=0; i < list_length(&space->actors); i++) {
-        Actor* actor = as_actor(list_get(&space->actors), i);
+    for (int i=0; i < list_length(&space->actorList); i++) {
+        Actor* actor = as_actor(list_get(&space->actorList, i));
         if (actor_has_incoming(actor)) {
             Value messages;
             actor_consume_incoming(actor, &messages);
@@ -111,7 +125,14 @@ void actor_consume_incoming(Actor* actor, caValue* messagesOut)
 
 caValue* actor_incoming_message_slot(Actor* actor)
 {
-    return frame_by_id
+    ca_assert(top_frame_parent(actor->stack) == NULL);
+    return frame_register(top_frame(actor->stack), 0);
+}
+
+caValue* actor_post(Actor* actor)
+{
+    caValue* inbox = &actor->inbox[actor->space->nextInbox];
+    return list_append(inbox);
 }
 
 void set_actor(caValue* value, Actor* actor)
@@ -135,6 +156,21 @@ void actor_setup_type(Type* type)
 {
     set_string(&type->name, "Actor");
     type->storageType = sym_StorageTypeObject;
+}
+
+CIRCA_EXPORT caActorSpace* circa_create_actor_space(caWorld* world)
+{
+    return create_actor_space(world);
+}
+
+CIRCA_EXPORT caActor* circa_create_actor(caActorSpace* space)
+{
+    return create_actor(space);
+}
+
+CIRCA_EXPORT void circa_set_actor_for_role(caActorSpace* space, caActor* actor, const char* role)
+{
+    return set_actor_for_role(space, actor, role);
 }
 
 } // namespace circa

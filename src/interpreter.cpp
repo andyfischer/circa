@@ -346,7 +346,7 @@ void finish_frame(Stack* stack)
         // Copy outputs to the parent frame, and advance PC.
         for (int i=0; i < outputSlotCount; i++) {
 
-            caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
+            caValue* dest = frame_register(parentFrame, finishedTerm->index + i);
 
             Term* placeholder = get_output_placeholder(finishedBlock, i);
             if (placeholder == NULL) {
@@ -366,7 +366,7 @@ void finish_frame(Stack* stack)
             if (placeholder->type == TYPES.void_type)
                 continue;
 
-            caValue* result = get_frame_register(topFrame, placeholder);
+            caValue* result = frame_register(topFrame, placeholder);
 
             move(result, dest);
             bool success = cast(dest, placeholder->type);
@@ -387,20 +387,20 @@ void finish_frame(Stack* stack)
         }
     } else if (as_symbol(outputAction) == sym_OutputsToList) {
         Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
-        caValue* dest = get_frame_register(parentFrame, finishedTerm->index);
+        caValue* dest = frame_register(parentFrame, finishedTerm->index);
 
         int count = count_output_placeholders(finishedBlock);
         set_list(dest, count);
 
         for (int i=0; i < count; i++) {
-            move(get_frame_register_from_end(topFrame, i), list_get(dest, i));
+            move(frame_register_from_end(topFrame, i), list_get(dest, i));
         }
 
     } else {
         Value msg;
         set_string(&msg, "Unrecognized output action: ");
         string_append_quoted(&msg, outputAction);
-        set_error_string(get_frame_register(parentFrame, parentFrame->pc), as_cstring(&msg));
+        set_error_string(frame_register(parentFrame, parentFrame->pc), as_cstring(&msg));
         raise_error(stack);
         return;
     }
@@ -495,7 +495,7 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
 
     while (true) {
         if (distance >= stackDelta && frame->block == term->owningBlock)
-            return get_frame_register(frame, term);
+            return frame_register(frame, term);
 
         if (frame->parent == 0)
             return NULL;
@@ -521,7 +521,7 @@ void consume_inputs_to_list(Stack* stack, List* list)
 
 caValue* get_input(Stack* stack, int index)
 {
-    return get_frame_register(top_frame(stack), index);
+    return frame_register(top_frame(stack), index);
 }
 
 bool can_consume_output(Term* consumer, Term* input)
@@ -546,14 +546,14 @@ caValue* get_output(Stack* stack, int index)
     Term* placeholder = get_output_placeholder(frame->block, index);
     if (placeholder == NULL)
         return NULL;
-    return get_frame_register(frame, placeholder);
+    return frame_register(frame, placeholder);
 }
 
 caValue* get_caller_output(Stack* stack, int index)
 {
     Frame* frame = top_frame_parent(stack);
     Term* currentTerm = frame->block->get(frame->pc);
-    return get_frame_register(frame, get_output_term(currentTerm, index));
+    return frame_register(frame, get_output_term(currentTerm, index));
 }
 
 Term* current_term(Stack* stack)
@@ -568,14 +568,14 @@ Block* current_block(Stack* stack)
     return top->block;
 }
 
-caValue* get_frame_register(Frame* frame, int index)
+caValue* frame_register(Frame* frame, int index)
 {
     return list_get(&frame->registers, index);
 }
 
-caValue* get_frame_register(Frame* frame, Term* term)
+caValue* frame_register(Frame* frame, Term* term)
 {
-    return get_frame_register(frame, term->index);
+    return frame_register(frame, term->index);
 }
 
 int frame_register_count(Frame* frame)
@@ -593,7 +593,7 @@ caValue* frame_bytecode(Frame* frame)
     return &frame->bytecode;
 }
 
-caValue* get_frame_register_from_end(Frame* frame, int index)
+caValue* frame_register_from_end(Frame* frame, int index)
 {
     return list_get(&frame->registers, frame_register_count(frame) - 1 - index);
 }
@@ -602,7 +602,7 @@ caValue* get_top_register(Stack* stack, Term* term)
 {
     Frame* frame = top_frame(stack);
     ca_assert(term->owningBlock == frame->block);
-    return get_frame_register(frame, term);
+    return frame_register(frame, term);
 }
 
 void create_output(Stack* stack)
@@ -709,7 +709,7 @@ void print_stack(Stack* stack, std::ostream& out)
                 caValue* value = NULL;
 
                 if (term->index < frame_register_count(frame))
-                    value = get_frame_register(frame, term->index);
+                    value = frame_register(frame, term->index);
 
                 if (value == NULL)
                     out << " <register OOB>";
@@ -765,7 +765,7 @@ void print_error_stack(Stack* stack, std::ostream& out)
         }
 
         // Print the error value
-        caValue* reg = get_frame_register(frame, frame->pc);
+        caValue* reg = frame_register(frame, frame->pc);
         if (lastFrame || is_error(reg)) {
             out << " | ";
             if (is_string(reg))
@@ -1359,12 +1359,12 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_SetNull: {
-        caValue* currentRegister = get_frame_register(frame, frame->pc);
+        caValue* currentRegister = frame_register(frame, frame->pc);
         set_null(currentRegister);
         break;
     }
     case op_InlineCopy: {
-        caValue* currentRegister = get_frame_register(frame, frame->pc);
+        caValue* currentRegister = frame_register(frame, frame->pc);
         caValue* inputs = list_get(action, 1);
         caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
         copy(value, currentRegister);
@@ -1398,7 +1398,7 @@ static void step_interpreter(Stack* stack)
         caValue* outputList = list_get(&outputs, 0);
 
         for (int i=0; i < list_length(outputList); i++)
-            copy(list_get(outputList, i), get_frame_register_from_end(frame, i));
+            copy(list_get(outputList, i), frame_register_from_end(frame, i));
 
         finish_frame(stack);
         break;
@@ -1427,7 +1427,7 @@ static void step_interpreter(Stack* stack)
         caValue* outputList = list_get(&outputs, 0);
 
         for (int i=0; i < list_length(outputList); i++)
-            copy(list_get(outputList, i), get_frame_register_from_end(frame, i));
+            copy(list_get(outputList, i), frame_register_from_end(frame, i));
 
         // Jump to for loop finish op.
         frame->nextPc = list_length(frame_bytecode(frame)) - 1;
@@ -1650,7 +1650,7 @@ void Frame__register(caStack* callerStack)
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     ca_assert(frame != NULL);
     int index = circa_int_input(callerStack, 1);
-    copy(get_frame_register(frame, index), circa_output(callerStack, 0));
+    copy(frame_register(frame, index), circa_output(callerStack, 0));
 }
 
 void Frame__pc(caStack* callerStack)
@@ -1795,7 +1795,7 @@ void Interpreter__output(caStack* callerStack)
     if (output == NULL)
         set_null(circa_output(callerStack, 0));
     else
-        copy(get_frame_register(frame, output), circa_output(callerStack, 0));
+        copy(frame_register(frame, output), circa_output(callerStack, 0));
 }
 void Interpreter__errored(caStack* callerStack)
 {
@@ -1808,7 +1808,7 @@ void Interpreter__error_message(caStack* callerStack)
 
     Frame* frame = top_frame(self);
 
-    caValue* errorReg = get_frame_register(frame, frame->pc);
+    caValue* errorReg = frame_register(frame, frame->pc);
 
     if (errorReg == NULL)
         set_string(circa_output(callerStack, 0), "(null error)");

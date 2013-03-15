@@ -327,11 +327,11 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
         return;
 
     // Initialize the loop index
-    set_int(get_frame_register(frame, for_loop_find_index(contents)), 0);
+    set_int(frame_register(frame, for_loop_find_index(contents)), 0);
 
     if (enableLoopOutput) {
         // Initialize output index.
-        set_int(get_frame_register(frame, for_loop_find_output_index(contents)), 0);
+        set_int(frame_register(frame, for_loop_find_output_index(contents)), 0);
 
         // Initialize output value.
         caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
@@ -349,7 +349,7 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
     Block* contents = frame->block;
 
     // Find list length
-    caValue* listInput = get_frame_register(frame, 0);
+    caValue* listInput = frame_register(frame, 0);
 
     // Increment the loop index
     caValue* index = get_top_register(stack, for_loop_find_index(contents));
@@ -357,9 +357,9 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
 
     // Preserve list output
     if (enableLoopOutput && frame->exitType != sym_Discard) {
-        caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
+        caValue* outputIndex = frame_register(frame, for_loop_find_output_index(contents));
 
-        caValue* resultValue = get_frame_register_from_end(frame, 0);
+        caValue* resultValue = frame_register_from_end(frame, 0);
         caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
 
         copy(resultValue, list_append(outputList));
@@ -379,9 +379,9 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
         // where it will get copied back to parent in finish_frame.
         if (enableLoopOutput) {
             caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
-            move(outputList, get_frame_register_from_end(frame, 0));
+            move(outputList, frame_register_from_end(frame, 0));
         } else {
-            set_list(get_frame_register_from_end(frame, 0), 0);
+            set_list(frame_register_from_end(frame, 0), 0);
         }
         
         finish_frame(stack);
@@ -394,8 +394,8 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
         if (input == NULL)
             break;
         Term* output = get_output_placeholder(contents, i);
-        copy(get_frame_register(frame, output),
-            get_frame_register(frame, input));
+        copy(frame_register(frame, output),
+            frame_register(frame, input));
 
         INCREMENT_STAT(Copy_LoopCopyRebound);
     }
