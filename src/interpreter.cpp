@@ -460,6 +460,28 @@ void stack_reset(Stack* stack)
     stack->lastFreeFrame = stack->framesCapacity;
 }
 
+void stack_restart(Stack* stack)
+{
+    if (top_frame(stack) == NULL)
+        return;
+
+    while (top_frame_parent(stack) != NULL)
+        pop_frame(stack);
+
+    Frame* top = top_frame(stack);
+    top->pc = 0;
+    top->nextPc = 0;
+
+    for (int i=0; i < list_length(&top->registers); i++) {
+        // Don't delete output values.
+        Term* term = top->block->getSafe(i);
+        if (term != NULL && is_output_placeholder(term))
+            continue;
+
+        set_null(list_get(&top->registers, i));
+    }
+}
+
 void evaluate_single_term(Stack* stack, Term* term)
 {
     Frame* frame = push_frame(stack, term->owningBlock);
@@ -1909,18 +1931,7 @@ CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 }
 CIRCA_EXPORT void circa_restart(caStack* stack)
 {
-    if (top_frame(stack) == NULL)
-        return;
-
-    while (top_frame_parent(stack) != NULL)
-        pop_frame(stack);
-
-    Frame* top = top_frame(stack);
-    top->pc = 0;
-    top->nextPc = 0;
-
-    for (int i=0; i < list_length(&top->registers); i++)
-        set_null(list_get(&top->registers, i));
+    stack_restart(stack);
 }
 
 CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)

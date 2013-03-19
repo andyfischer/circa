@@ -147,6 +147,10 @@ void stack_clear_error(Stack* stack);
 // Reset a Stack to its default value.
 void stack_reset(Stack* stack);
 
+// Pop all but the topmost frame, set the PC to the first term, and delete all temporary
+// values. Does not clear output registers.
+void stack_restart(Stack* stack);
+
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Block* block);
 Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* inputs);

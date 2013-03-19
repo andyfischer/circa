@@ -338,7 +338,7 @@ std::string list_to_string(ListData* value)
 
 int list_length(caValue* value)
 {
-    ca_assert(value->value_type->storageType == sym_StorageTypeList);
+    ca_assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
         return 0;
@@ -419,7 +419,7 @@ ListData* list_remove_index(ListData* original, int index)
 
 void list_remove_index(caValue* list, int index)
 {
-    ca_assert(list->value_type->storageType == sym_StorageTypeList);
+    ca_assert(is_list(list));
     ListData* data = (ListData*) list->value_data.ptr;
     list_remove_index(data, index);
     list->value_data.ptr = data;
@@ -427,7 +427,7 @@ void list_remove_index(caValue* list, int index)
 
 void list_resize(caValue* list, int size)
 {
-    ca_assert(list->value_type->storageType == sym_StorageTypeList);
+    ca_assert(is_list(list));
     ListData* data = (ListData*) list->value_data.ptr;
     data = list_resize(data, size);
     list->value_data.ptr = data;
@@ -435,7 +435,7 @@ void list_resize(caValue* list, int size)
 
 caValue* list_append(caValue* list)
 {
-    ca_assert(list->value_type->storageType == sym_StorageTypeList);
+    ca_assert(is_list(list));
     ListData* data = (ListData*) list->value_data.ptr;
     caValue* result = list_append(&data);
     list->value_data.ptr = data;

@@ -94,7 +94,7 @@ void string_resize(StringData** data, int newLength)
 
     StringData* oldData = *data;
     StringData* newData = string_create(newLength);
-    memcpy(newData->str, oldData->str, oldData->length + 1);
+    memcpy(newData->str, oldData->str, std::min(newLength, oldData->length) + 1);
     decref(oldData);
     *data = newData;
 }

@@ -495,7 +495,11 @@ void circa_finish_native_patch(caNativePatch* module);
 // -- Actors --
 caActorSpace* circa_create_actor_space(caWorld* world);
 caActor* circa_create_actor(caActorSpace* space);
-void circa_set_actor_for_role(caActorSpace* space, caActor* actor, const char* role);
+void circa_actor_bind_name(caActorSpace* space, caActor* actor, const char* name);
+bool circa_actor_consume_incoming(caActor* actor, caValue* messageOut);
+void circa_actors_run_iteration(caActorSpace* space);
+caValue* circa_actor_post(caActor* actor);
+caValue* circa_post(caActorSpace* space, caValue* address);
 
 // -- File IO --
 

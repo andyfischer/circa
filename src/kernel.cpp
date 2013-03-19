@@ -1086,7 +1086,6 @@ void bootstrap_kernel()
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
     // Finish setting up some hosted types
-    TYPES.actor = as_type(kernel->get("Actor"));
     TYPES.color = as_type(kernel->get("Color"));
     TYPES.closure = as_type(kernel->get("Closure"));
     callable_t::setup_type(as_type(kernel->get("Callable")));
