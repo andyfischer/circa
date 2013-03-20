@@ -43,7 +43,7 @@ solution "Circa"
             "src/command_line/generate_cpp.cpp",
             "3rdparty/linenoise/linenoise.c"
         }
-        links {"static_lib"}
+        links {"static_lib","dl"}
         includedirs { "src", "3rdparty/linenoise" }
 
         configuration "Debug"
@@ -54,4 +54,4 @@ solution "Circa"
         location "src"
         files {"src/unit_tests/*.cpp"}
         includedirs {"src"}
-        links {"static_lib"}
+        links {"static_lib","dl"}

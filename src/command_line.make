@@ -29,7 +29,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L../build
-  LIBS      += -lcirca_d
+  LIBS      += -lcirca_d -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca_d.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L../build
-  LIBS      += -lcirca
+  LIBS      += -lcirca -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
