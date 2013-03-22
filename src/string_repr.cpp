@@ -123,4 +123,9 @@ void write_string_repr(caValue* value, caValue* out)
     }
 }
 
+CIRCA_EXPORT void circa_to_string(caValue* value, caValue* out)
+{
+    write_string_repr(value, out);
+}
+
 } // namespace circa

@@ -294,7 +294,7 @@ bool circa_is_type(caValue* value);
 
 // Read the value from a caValue.
 bool        circa_bool(caValue* value);
-caBlock*   circa_block(caValue* value);
+caBlock*    circa_block(caValue* value);
 float       circa_float(caValue* value);
 caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
@@ -390,7 +390,7 @@ void* circa_handle_get_object(caValue* handle);
 void circa_parse_string(const char* str, caValue* out);
 
 // Write a string representation of 'value' to 'out'.
-void circa_to_string_repr(caValue* value, caValue* out);
+void circa_to_string(caValue* value, caValue* out);
 
 // -- Code Reflection --
 
