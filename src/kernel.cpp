@@ -365,8 +365,11 @@ void List__join(caStack* stack)
 void List__get(caStack* stack)
 {
     caValue* self = circa_input(stack, 0);
-    caValue* index = circa_input(stack, 1);
-    copy(list_get(self, as_int(index)), circa_output(stack, 0));
+    int index = circa_int_input(stack, 1);
+    if (index < 0 || index >= list_length(self))
+        return raise_error_msg(stack, "Index out of bounds");
+
+    copy(list_get(self, index), circa_output(stack, 0));
 }
 
 void List__set(caStack* stack)

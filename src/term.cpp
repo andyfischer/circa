@@ -329,5 +329,9 @@ Type* as_type(Term* term)
 {
     return as_type(term_value(term));
 }
+int term_line_number(Term* term)
+{
+    return term->sourceLoc.line;
+}
 
 } // namespace circa

@@ -154,6 +154,11 @@ void Block__properties(caStack* stack)
         copy(&block->properties, circa_output(stack, 0));
 }
 
+void Block__to_code_lines(caStack* stack)
+{
+    block_to_code_lines(as_block(circa_input(stack, 0)), circa_output(stack, 0));
+}
+
 void Block__format_source(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -423,13 +428,19 @@ void Term__assign(caStack* stack)
     // Probably should update term->type at this point.
 }
 
+void Term__is_statement(caStack* stack)
+{
+    Term* target = as_term_ref(circa_input(stack, 0));
+    if (target == NULL)
+        return circa_output_error(stack, "NULL reference");
+    set_bool(circa_output(stack, 0), is_statement(target));
+}
+
 void Term__value(caStack* stack)
 {
     Term* target = as_term_ref(circa_input(stack, 0));
-    if (target == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
+    if (target == NULL)
+        return circa_output_error(stack, "NULL reference");
 
     copy(term_value(target), circa_output(stack, 0));
 }
@@ -620,6 +631,7 @@ void reflection_install_functions(Block* kernel)
         {"Block.file_signature", Block__file_signature},
         {"Block.functions", Block__functions},
         {"Block.statements", Block__statements},
+        {"Block.to_code_lines", Block__to_code_lines},
         {"Block.format_source", Block__format_source},
         {"Block.format_function_heading", Block__format_function_heading},
         {"Block.get_term", Block__get_term},
@@ -661,6 +673,7 @@ void reflection_install_functions(Block* kernel)
         {"Term.to_source_string", Term__to_source_string},
         {"Term.properties", Term__properties},
         {"Term.property", Term__property},
+        {"Term.is_statement", Term__is_statement},
         {"Term.value", Term__value},
 
         {"is_overloaded_func", is_overloaded_func},

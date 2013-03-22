@@ -9,6 +9,7 @@
 #include "reflection.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "string_type.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "term.h"
@@ -63,6 +64,60 @@ void format_block_source(caValue* source, Block* block, Term* format)
 
     if (styleBraces)
         append_phrase(source, "}", format, sym_None);
+}
+
+void block_to_code_lines(Block* block, caValue* out)
+{
+    circa_set_list(out, 0);
+
+    bool newlineNeeded = false;
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+
+        if (!should_print_term_source_line(term))
+            continue;
+
+#if 0
+        if (newlineNeeded) {
+            append_phrase(source, "\n", NULL, tok_Newline);
+            newlineNeeded = false;
+        }
+#endif
+
+        circa::Value phrases;
+        set_list(&phrases, 0);
+
+        // Indentation
+        append_phrase(&phrases, term->stringProp("syntax:preWhitespace", ""),
+            term, sym_Whitespace);
+
+        format_term_source(&phrases, term);
+
+        caValue* currentLine = NULL;
+        int lineNumberDelta = 0;
+
+        for (int phraseIndex=0; phraseIndex < list_length(&phrases); phraseIndex++) {
+            caValue* phrase = list_get(&phrases, phraseIndex);
+            if (currentLine == NULL) {
+                currentLine = list_append(out);
+                set_list(currentLine, 3);
+                set_int(list_get(currentLine, 0), term_line_number(term) + lineNumberDelta);
+                set_term_ref(list_get(currentLine, 1), term);
+                caValue* text = list_get(currentLine, 2);
+                set_string(text, "");
+            }
+
+            caValue* phraseText = list_get(phrase, 0);
+            if (string_eq(phraseText, "\n")) {
+                currentLine = NULL;
+                lineNumberDelta++;
+            } else {
+                caValue* text = list_get(currentLine, 2);
+                string_append(text, phraseText);
+            }
+        }
+
+    }
 }
 
 std::string unformat_rich_source(caValue* source)

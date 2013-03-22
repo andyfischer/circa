@@ -112,6 +112,7 @@ def Block.file_signature(self) -> any
     -- Return a 'file signature', which contains the filename and last-modified time.
 def Block.find_term(self, String name) -> Term
     -- Find a term inside this Block with the given name.
+def Block.to_code_lines(self) -> List
 def Block.format_source(self) -> List
     -- Return the block's contents as formatted source.
 def Block.format_function_heading(self) -> List
@@ -396,6 +397,7 @@ def Term.function(self) -> Block
     -- Fetch this term's function.
 def Term.get_type(self) -> Type
     -- Fetch the declared type of this term.
+def Term.is_statement(self) -> bool
 def Term.value(self) -> any
     -- For a value term, this fetches the actual value.
 def Term.tweak(self, number steps)

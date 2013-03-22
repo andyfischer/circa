@@ -169,5 +169,6 @@ bool is_type(Term* term);
 bool is_function(Term* term);
 Function* as_function(Term* term);
 Type* as_type(Term* term);
+int term_line_number(Term* term);
 
 } // namespace circa
