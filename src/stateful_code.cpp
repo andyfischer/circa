@@ -53,21 +53,16 @@ void pack_any_open_state_vars(Block* block)
 
             Term* pack = apply(block, FUNCS.pack_state,
                 TermList(find_open_state_result(block), result, term));
-            pack->setStringProp("field", unique_name(term));
+            pack->setStringProp("field", as_cstring(unique_name(term)));
             block->move(pack, result->index + 1);
         }
     }
 }
 
-bool block_state_type_is_out_of_date(Block* block)
-{
-    // TODO: Collapse this function
-    return block_get_bool_property(block, sym_DirtyStateType, false);
-}
-
 void block_update_state_type(Block* block)
 {
-    if (!block_state_type_is_out_of_date(block))
+    // Only run if state is dirty.
+    if (!block_get_bool_property(block, sym_DirtyStateType, false))
         return;
 
     // Recreate the state type
@@ -85,7 +80,7 @@ void block_update_state_type(Block* block)
 
         Term* identifyingTerm = term->input(1);
 
-        caValue* fieldName = get_unique_name(identifyingTerm);
+        caValue* fieldName = unique_name(identifyingTerm);
         ca_assert(is_string(fieldName));
         ca_assert(!string_eq(fieldName, ""));
 
@@ -228,8 +223,7 @@ Term* find_active_state_container(Block* block)
     return NULL;
 }
 
-// TODO: rename to find_or_create_default_state_input
-Term* find_or_create_state_container(Block* block)
+Term* find_or_create_default_state_input(Block* block)
 {
     Term* existing = find_active_state_container(block);
     if (existing != NULL)
@@ -245,11 +239,6 @@ Term* find_or_create_state_container(Block* block)
     append_state_output(block);
 
     return input;
-}
-
-Term* find_or_create_default_state_input(Block* block)
-{
-    return find_or_create_state_container(block);
 }
 
 Term* block_add_pack_state(Block* block)
@@ -273,7 +262,7 @@ void unpack_state(caStack* stack)
     if (identifyingTerm == NULL)
         return circa_output_error(stack, "input 1 is NULL");
 
-    caValue* element = get_field(container, unique_name(identifyingTerm));
+    caValue* element = get_field(container, unique_name(identifyingTerm), NULL);
 
     if (element == NULL) {
         set_null(circa_output(stack, 0));

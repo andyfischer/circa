@@ -276,7 +276,7 @@ void change_function(Term* term, Term* function)
 
     // Possibly insert a state input for the enclosing subroutine.
     if (is_function_stateful(function))
-        find_or_create_state_container(term->owningBlock);
+        find_or_create_default_state_input(term->owningBlock);
 
     dirty_bytecode(term->owningBlock);
 }
@@ -902,7 +902,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
         int inputIndex = stateInput->index;
 
-        Term* container = find_or_create_state_container(term->owningBlock);
+        Term* container = find_or_create_default_state_input(term->owningBlock);
 
         // Add a unpack_state() call
         Term* unpack = apply(term->owningBlock, FUNCS.unpack_state,

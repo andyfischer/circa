@@ -85,7 +85,7 @@ void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutpu
 Term* find_from_relative_name_list(caValue* name, Block* relativeTo);
 
 void update_unique_name(Term* term);
-caValue* get_unique_name(Term* term);
+caValue* unique_name(Term* term);
 
 Term* find_from_unique_name(Block* block, const char* name);
 Term* find_from_global_name(World* world, const char* globalName);

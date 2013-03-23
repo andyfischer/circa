@@ -11,7 +11,7 @@ namespace get_field_function {
         const char* keyStr = circa_string_input(stack, 1);
 
         Value error;
-        caValue* value = get_field2(head, circa_input(stack, 1), &error);
+        caValue* value = get_field(head, circa_input(stack, 1), &error);
 
         if (!is_null(&error)) {
             circa_output_error(stack, as_cstring(&error));

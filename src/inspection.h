@@ -104,9 +104,6 @@ bool has_an_error_listener(Term* term);
 // Format the term's global id as a string that looks like: $ab3
 std::string global_id(Term* term);
 
-// Returns the UniqueName, a name that's unique within the term's block.
-const char* unique_name(Term* term);
-
 std::string get_short_local_name(Term* term);
 
 std::string block_namespace_to_string(Block* block);

@@ -554,7 +554,7 @@ void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutpu
     // The output list will be reversed but we'll fix that.
 
     while (true) {
-        set_value(list_append(nameOutput), get_unique_name(term));
+        set_value(list_append(nameOutput), unique_name(term));
 
         if (term->owningBlock == relativeTo) {
             break;
@@ -658,7 +658,7 @@ void update_unique_name(Term* term)
     }
 }
 
-caValue* get_unique_name(Term* term)
+caValue* unique_name(Term* term)
 {
     return &term->uniqueName.name;
 }
@@ -671,7 +671,7 @@ Term* find_from_unique_name(Block* block, const char* name)
         Term* term = block->get(i);
         if (term == NULL)
             continue;
-        if (string_eq(get_unique_name(term), name)) {
+        if (string_eq(unique_name(term), name)) {
             return term;
         }
     }

@@ -130,7 +130,7 @@ void write_function(SourceWriter* writer, Term* term)
         Term* placeholder = function_get_input_placeholder(func, i);
         write_type_name(writer, placeholder->type);
         writer->write(" ");
-        writer->write(get_unique_name(placeholder));
+        writer->write(unique_name(placeholder));
     }
 
     writer->write(")");
@@ -159,7 +159,7 @@ void write_term(SourceWriter* writer, Term* term)
         return;
     }
 
-    writer->write(get_unique_name(term));
+    writer->write(unique_name(term));
     writer->write(" = ");
     
     if (is_value(term)) {
@@ -174,7 +174,7 @@ void write_term(SourceWriter* writer, Term* term)
             if (i > 0) {
                 writer->write(", ");
             }
-            writer->write(get_unique_name(term));
+            writer->write(unique_name(term));
         }
     }
 

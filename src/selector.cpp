@@ -35,7 +35,7 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
         return get_index(value, selectorIndex);
     }
     else if (is_string(selectorElement)) {
-        caValue* field = get_field(value, as_cstring(selectorElement));
+        caValue* field = get_field(value, selectorElement, NULL);
         if (field == NULL) {
             set_error_string(error, "Field not found: ");
             string_append(error, selectorElement);

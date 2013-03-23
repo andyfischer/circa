@@ -449,16 +449,6 @@ std::string global_id(Term* term)
     return out.str();
 }
 
-const char* unique_name(Term* term)
-{
-    // TODO: remove this func
-    caValue* name = get_unique_name(term);
-    if (name == NULL || !is_string(name))
-        return "";
-
-    return as_cstring(name);
-}
-
 std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
@@ -655,7 +645,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
 
     out << global_id(term);
 
-    out << " " << unique_name(term);
+    out << " " << as_cstring(unique_name(term));
 
     if (term->name != "")
         out << " '" << term->name << "'";

@@ -265,17 +265,7 @@ void set_index(caValue* value, int index, caValue* element)
     setIndex(value, index, element);
 }
 
-caValue* get_field(caValue* value, const char* field)
-{
-    Type::GetField getField = value->value_type->getField;
-
-    if (getField == NULL)
-        return NULL;
-
-    return getField(value, field);
-}
-
-caValue* get_field2(caValue* value, caValue* field, caValue* error)
+caValue* get_field(caValue* value, caValue* field, caValue* error)
 {
     if (is_hashtable(value)) {
         return hashtable_get(value, field);
