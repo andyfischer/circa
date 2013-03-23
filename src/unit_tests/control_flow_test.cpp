@@ -3,6 +3,7 @@
 #include "unit_test_common.h"
 
 #include "block.h"
+#include "building.h"
 #include "control_flow.h"
 #include "inspection.h"
 #include "interpreter.h"

@@ -752,6 +752,55 @@ void get_output_description(Term* output, caValue* result)
     set_symbol(list_get(result, 0), sym_Anonymous);
 }
 
+bool term_is_state_input(Term* term, int index)
+{
+    if (index >= term->numInputs())
+        return false;
+    caValue* prop = term->inputInfo(index)->properties.get("state");
+    if (prop == NULL)
+        return false;
+    return as_bool(prop);
+}
+
+Term* find_state_input(Block* block)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(block, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (is_state_input(placeholder))
+            return placeholder;
+    }
+}
+
+bool has_state_input(Block* block)
+{
+    return find_state_input(block) != NULL;
+}
+
+Term* find_state_output(Block* block)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(block, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (is_state_output(placeholder))
+            return placeholder;
+    }
+}
+bool has_state_output(Block* block)
+{
+    return find_state_output(block) != NULL;
+}
+bool is_state_input(Term* placeholder)
+{
+    return placeholder->boolProp("state", false);
+}
+bool is_state_output(Term* placeholder)
+{
+    return placeholder->boolProp("state", false);
+}
+
 Term* find_intermediate_result_for_output(Term* location, Term* output)
 {
     Value description;

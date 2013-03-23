@@ -64,15 +64,6 @@ Term* get_output_term(Term* term, int index);
 Term* get_extra_output(Term* term, int index);
 Term* find_extra_output_for_state(Term* term);
 
-// Stateful inputs & outputs
-bool term_is_state_input(Term* term, int index);
-Term* find_state_input(Block* block);
-bool has_state_input(Block* block);
-Term* find_state_output(Block* block);
-bool has_state_output(Block* block);
-bool is_state_input(Term* placeholder);
-bool is_state_output(Term* placeholder);
-
 // Other properties on inputs.
 bool is_input_meta(Block* block, int index);
 

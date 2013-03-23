@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "actors.h"
+#include "building.h"
 #include "hashtable.h"
 #include "interpreter.h"
 #include "kernel.h"
@@ -80,7 +81,17 @@ caValue* actor_output_slot(Actor* actor)
 }
 bool actor_inject(Actor* actor, caValue* name, caValue* value)
 {
+    Frame* top = top_frame(actor->stack);
+    Term* stateInput = find_state_input(top->block);
+    if (stateInput == NULL)
+        return false;
+
+    caValue* stateValue = frame_register(top, stateInput);
+    if (stateValue == NULL || is_null(stateValue))
+        return false;
+
     // TODO
+    
     return false;
 }
 

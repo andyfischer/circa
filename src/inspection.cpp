@@ -212,54 +212,6 @@ Term* find_extra_output_for_state(Term* term)
     return NULL;
 }
 
-bool term_is_state_input(Term* term, int index)
-{
-    if (index >= term->numInputs())
-        return false;
-    caValue* prop = term->inputInfo(index)->properties.get("state");
-    if (prop == NULL)
-        return false;
-    return as_bool(prop);
-}
-
-Term* find_state_input(Block* block)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(block, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (is_state_input(placeholder))
-            return placeholder;
-    }
-}
-
-bool has_state_input(Block* block)
-{
-    return find_state_input(block) != NULL;
-}
-
-Term* find_state_output(Block* block)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(block, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (is_state_output(placeholder))
-            return placeholder;
-    }
-}
-bool has_state_output(Block* block)
-{
-    return find_state_output(block) != NULL;
-}
-bool is_state_input(Term* placeholder)
-{
-    return placeholder->boolProp("state", false);
-}
-bool is_state_output(Term* placeholder)
-{
-    return placeholder->boolProp("state", false);
-}
 bool is_input_meta(Block* block, int index)
 {
     Term* placeholder = get_input_placeholder(block, index);
