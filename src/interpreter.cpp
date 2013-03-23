@@ -72,11 +72,16 @@ Stack::dump()
     print_stack(this, std::cout);
 }
 
-Stack* alloc_stack(World* world)
+Stack* create_stack(World* world)
 {
     Stack* stack = new Stack();
     stack->world = world;
     return stack;
+}
+
+void free_stack(Stack* stack)
+{
+    delete stack;
 }
 
 void stack_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
@@ -469,16 +474,25 @@ void stack_restart(Stack* stack)
         pop_frame(stack);
 
     Frame* top = top_frame(stack);
+    Block* block = top->block;
     top->pc = 0;
     top->nextPc = 0;
 
+    // Clear registers
     for (int i=0; i < list_length(&top->registers); i++) {
         // Don't delete output values.
-        Term* term = top->block->getSafe(i);
+        Term* term = block->getSafe(i);
         if (term != NULL && is_output_placeholder(term))
             continue;
 
         set_null(list_get(&top->registers, i));
+    }
+
+    // Feed state back in to its input, if any.
+    Term* stateOut = find_state_output(block);
+    if (stateOut != NULL) {
+        Term* stateIn = find_state_input(block);
+        move(frame_register(top, stateOut), frame_register(top, stateIn));
     }
 }
 
@@ -1907,14 +1921,14 @@ void interpreter_install_functions(Block* kernel)
 
 // Public API
 
-CIRCA_EXPORT caStack* circa_alloc_stack(caWorld* world)
+CIRCA_EXPORT caStack* circa_create_stack(caWorld* world)
 {
-    return alloc_stack(world);
+    return create_stack(world);
 }
 
-CIRCA_EXPORT void circa_dealloc_stack(caStack* stack)
+CIRCA_EXPORT void circa_free_stack(caStack* stack)
 {
-    delete (Stack*) stack;
+    free_stack(stack);
 }
 
 CIRCA_EXPORT bool circa_has_error(caStack* stack)

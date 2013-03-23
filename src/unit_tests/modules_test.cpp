@@ -50,7 +50,7 @@ void test_explicit_output()
 
     circa_load_module_from_file(world, "Module", "module.ca");
 
-    Stack* stack = circa_alloc_stack(world);
+    Stack* stack = circa_create_stack(world);
 
     circa_push_module(stack, "Module");
     circa_run(stack);
@@ -58,7 +58,7 @@ void test_explicit_output()
     test_assert(stack);
     test_equals(circa_output(stack, 0), "99");
 
-    circa_dealloc_stack(stack);
+    circa_free_stack(stack);
 }
 
 void register_tests()

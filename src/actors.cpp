@@ -11,7 +11,99 @@
 #include "type.h"
 #include "world.h"
 
+
 namespace circa {
+
+// Actor system v3
+//
+// In this scheme, an "actor" is a Block with associated state. Callers can share an
+// actor (and thus share its state, indirectly). Callers can 'call' the actor to use
+// it. This calling mechanism is syncronous, there's no direct support for async.
+// (But callers can simulate async by injecting into queues).
+
+struct Actor {
+    int id;
+    Block* block;
+    Stack* stack;
+};
+
+Actor* create_actor(World* world, Block* block)
+{
+    ca_assert(block != NULL);
+    Actor* actor = new Actor();
+    actor->id = world->nextActorID++;
+    actor->block = block;
+    actor->stack = create_stack(world);
+    push_frame(actor->stack, actor->block);
+    return actor;
+}
+
+void set_actor(caValue* value, Actor* actor)
+{
+    change_type(value, TYPES.actor);
+    value->value_data.ptr = actor;
+}
+
+bool is_actor(caValue* value)
+{
+    return value->value_type == TYPES.actor;
+}
+
+Actor* as_actor(caValue* value)
+{
+    ca_assert(is_actor(value));
+    return (Actor*) value->value_data.ptr;
+}
+
+void actor_setup_type(Type* type)
+{
+    set_string(&type->name, "Actor");
+    type->storageType = sym_StorageTypeObject;
+}
+
+bool actor_call_in_progress(Actor* actor)
+{
+    // TODO
+    return false;
+}
+
+caValue* actor_input_slot(Actor* actor)
+{
+    ca_assert(top_frame_parent(actor->stack) == NULL);
+    return frame_register(top_frame(actor->stack), 0);
+}
+
+caValue* actor_output_slot(Actor* actor)
+{
+    ca_assert(top_frame_parent(actor->stack) == NULL);
+    return frame_register_from_end(top_frame(actor->stack), 0);
+}
+bool actor_inject(Actor* actor, caValue* name, caValue* value)
+{
+    // TODO
+    return false;
+}
+
+void actor_run(Actor* actor)
+{
+    Stack* stack = actor->stack;
+    ca_assert(top_block(stack) == actor->block);
+    ca_assert(top_frame_parent(stack) == NULL);
+
+    run_interpreter(stack);
+
+    if (error_occurred(stack)) {
+        // TODO: Send value to errorHandler (if any);
+        printf("Error occurred in actor_run\n");
+        dump(stack);
+    }
+
+    stack_restart(stack);
+}
+
+#if 0
+
+// Actor system v2:
 
 struct ActorSpace {
     int id;
@@ -42,7 +134,6 @@ struct Actor {
     int nextIndex;
 };
 
-
 void actor_run(Actor* actor);
 
 ActorSpace* create_actor_space(World* world)
@@ -67,7 +158,7 @@ Actor* create_actor(ActorSpace* space)
     Actor* actor = new Actor();
     actor->space = space;
     actor->block = NULL;
-    actor->stack = alloc_stack(space->world);
+    actor->stack = create_stack(space->world);
     set_list(&actor->inbox[0], 0);
     set_list(&actor->inbox[1], 0);
     actor->nextIndex = 0;
@@ -137,7 +228,6 @@ void actors_run_iteration(ActorSpace* space)
 
 void actor_run(Actor* actor)
 {
-    // TODO: Fetch state output and feed it back in to input.
     Stack* stack = actor->stack;
     ca_assert(top_block(stack) == actor->block);
     ca_assert(top_frame_parent(stack) == NULL);
@@ -215,29 +305,6 @@ caValue* actor_label(Actor* actor)
     return &actor->label;
 }
 
-void set_actor(caValue* value, Actor* actor)
-{
-    change_type(value, TYPES.actor);
-    value->value_data.ptr = actor;
-}
-
-bool is_actor(caValue* value)
-{
-    return value->value_type == TYPES.actor;
-}
-
-Actor* as_actor(caValue* value)
-{
-    ca_assert(is_actor(value));
-    return (Actor*) value->value_data.ptr;
-}
-
-void actor_setup_type(Type* type)
-{
-    set_string(&type->name, "Actor");
-    type->storageType = sym_StorageTypeObject;
-}
-
 void actors_dump(ActorSpace* space)
 {
     std::cout << "[ActorSpace #" << space->id << "]" << std::endl;
@@ -286,5 +353,7 @@ CIRCA_EXPORT caValue* circa_post(caActorSpace* space, caValue* address)
 {
     return actor_post(space, address);
 }
+#endif
 
 } // namespace circa
+

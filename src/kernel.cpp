@@ -184,6 +184,36 @@ void sys__perf_stats_dump(caStack* stack)
     perf_stats_to_list(circa_output(stack, 0));
 }
 
+void make_actor(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    Actor* actor = create_actor(stack->world, block);
+    set_actor(circa_output(stack, 0), actor);
+}
+
+void Actor__inject(caStack* stack)
+{
+    Actor* actor = as_actor(circa_input(stack, 0));
+    caValue* name = circa_input(stack, 1);
+    caValue* val = circa_input(stack, 2);
+    bool success = actor_inject(actor, name, val);
+    set_bool(circa_output(stack, 0), success);
+}
+
+void Actor__call(caStack* stack)
+{
+    Actor* actor = as_actor(circa_input(stack, 0));
+
+    if (actor_call_in_progress(actor)) {
+        return raise_error_msg(stack, "Actor is in use; maybe this is a recursive call?");
+    }
+
+    caValue* input = circa_input(stack, 1);
+    copy(input, actor_input_slot(actor));
+    actor_run(actor);
+    copy(actor_output_slot(actor), circa_output(stack, 0));
+}
+
 void Dict__count(caStack* stack)
 {
     caValue* dict = circa_input(stack, 0);
@@ -751,7 +781,6 @@ void bootstrap_kernel()
     string_setup_type(TYPES.string);
 
     // Initialize remaining global types.
-    TYPES.actor = create_type();
     TYPES.any = create_type();
     TYPES.block = create_type();
     TYPES.bool_type = create_type();
@@ -767,7 +796,6 @@ void bootstrap_kernel()
     TYPES.term = create_type();
     TYPES.void_type = create_type();
 
-    actor_setup_type(TYPES.actor);
     any_t::setup_type(TYPES.any);
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
@@ -1020,6 +1048,10 @@ void bootstrap_kernel()
         {"sys:perf_stats_reset", sys__perf_stats_reset},
         {"sys:perf_stats_dump", sys__perf_stats_dump},
 
+        {"make_actor", make_actor},
+        {"Actor.inject", Actor__inject},
+        {"Actor.call", Actor__call},
+
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},
         {"Dict.set", Dict__set},
@@ -1088,7 +1120,9 @@ void bootstrap_kernel()
 
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
-    // Finish setting up some hosted types
+    // Finish setting up types that were declared in stdlib.ca.
+    TYPES.actor = as_type(kernel->get("Actor"));
+    actor_setup_type(TYPES.actor);
     TYPES.color = as_type(kernel->get("Color"));
     TYPES.closure = as_type(kernel->get("Closure"));
     callable_t::setup_type(as_type(kernel->get("Callable")));

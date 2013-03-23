@@ -156,14 +156,14 @@ void patch_manually_public_api()
     circa_patch_function(npatch, "my_5", my_5);
     circa_finish_native_patch(npatch);
 
-    caStack* stack = circa_alloc_stack(world);
+    caStack* stack = circa_create_stack(world);
     circa_push_module(stack, "Module");
     circa_run(stack);
 
     test_assert(stack);
     test_equals(circa_output(stack, 0), "5");
 
-    circa_dealloc_stack(stack);
+    circa_free_stack(stack);
 }
 
 void register_tests()

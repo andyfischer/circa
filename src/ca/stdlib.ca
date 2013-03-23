@@ -92,7 +92,7 @@ namespace sys
     def perf_stats_dump() -> List
 
 -- Builtin types
-type Actor { String name, String moduleName, List incomingQueue, any stateVal }
+type Actor;
 type FileSignature { String filename, int time_modified }
 type Callable;
 type Color { number r, number g, number b, number a }
@@ -100,6 +100,14 @@ type Point { number x, number y }
 type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
+
+def Actor.inject(self, String name, any val) -> bool
+    -- Inject a value into the actor's state. Must correspond to an existing state definition.
+    -- Returns whether the operation was successful.
+def Actor.call(self, any input) -> any
+    -- Synchronous actor call
+def make_actor(Block block) -> Actor
+    -- Spawn a new actor
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block

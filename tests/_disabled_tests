@@ -14,3 +14,7 @@ reflection/misc.ca
 recursion_tree.ca
 simple_state.ca
 assert_failure.ca
+state/recursion.ca
+state/recursion_and_for.ca
+state/recursion_and_if.ca
+state/state_arg_recr.ca

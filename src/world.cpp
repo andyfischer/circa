@@ -28,6 +28,7 @@ World* alloc_world()
     World* world = (World*) malloc(sizeof(World));
     memset(world, 0, sizeof(World));
 
+    world->nextActorID = 1;
     world->nextTermID = 1;
     world->nextBlockID = 1;
     world->nextStackID = 1;

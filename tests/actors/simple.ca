@@ -1,0 +1,11 @@
+
+square = {
+    i = input()
+
+    output(i * i)
+}
+
+actor = make_actor(square.block)
+
+assert(actor.call(2) == 4)
+assert(actor.call(3) == 9)

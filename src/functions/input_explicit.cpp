@@ -24,7 +24,7 @@ namespace input_explicit_function {
 
     void output_postCompile(Term* term)
     {
-        Term* out = append_output_placeholder(term->owningBlock, term->input(0));
+        Term* out = insert_output_placeholder(term->owningBlock, term->input(0), 0);
         hide_from_source(out);
     }
 

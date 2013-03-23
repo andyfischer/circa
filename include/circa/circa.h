@@ -157,10 +157,10 @@ void circa_actor_clear_all(caWorld* world);
 // -- Controlling the Interpreter --
 
 // Allocate a new Stack object.
-caStack* circa_alloc_stack(caWorld* world);
+caStack* circa_create_stack(caWorld* world);
 
 // Deallocate a Stack object.
-void circa_dealloc_stack(caStack* stack);
+void circa_free_stack(caStack* stack);
 
 // Run a whole module.
 void circa_run_module(caStack* stack, const char* moduleName);

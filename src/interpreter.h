@@ -103,7 +103,8 @@ private:
 };
 
 // Allocate a new Stack object.
-Stack* alloc_stack(World* world);
+Stack* create_stack(World* world);
+void free_stack(Stack* stack);
 
 // *** High-level Stack manipulation ***
 
@@ -148,7 +149,7 @@ void stack_clear_error(Stack* stack);
 void stack_reset(Stack* stack);
 
 // Pop all but the topmost frame, set the PC to the first term, and delete all temporary
-// values. Does not clear output registers.
+// values. If there is a state register, feed the output back into its input.
 void stack_restart(Stack* stack);
 
 // Push a frame onto the stack.

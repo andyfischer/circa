@@ -122,7 +122,7 @@ void do_echo(List* args, caValue* reply)
     set_string(reply, to_string(args));
 }
 
-void do_file_command(List* args, caValue* reply)
+void do_file_command(caWorld* world, List* args, caValue* reply)
 {
     RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
@@ -186,18 +186,19 @@ void do_file_command(List* args, caValue* reply)
     if (dontRunScript)
         return;
     
-    Stack stack;
-    evaluate_block(&stack, &block);
+    Stack* stack = create_stack(world);
+    evaluate_block(stack, &block);
 
     if (printState)
-        std::cout << to_string(&stack.state) << std::endl;
+        std::cout << to_string(&stack->state) << std::endl;
 
-    if (error_occurred(&stack)) {
+    if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";
-        print_error_stack(&stack, std::cout);
+        print_error_stack(stack, std::cout);
         std::cout << std::endl;
-        return;
     }
+
+    free_stack(stack);
 }
 
 void rewrite_block(Block* block, caValue* contents, caValue* reply)
@@ -239,7 +240,7 @@ void do_update_file(caValue* filename, caValue* contents, caValue* reply)
     rewrite_block(block, contents, reply);
 }
 
-void do_admin_command(caValue* input, caValue* reply)
+void do_admin_command(caWorld* world, caValue* input, caValue* reply)
 {
     // Identify the command
     int first_space = string_find_char(input, 0, ' ');
@@ -259,7 +260,7 @@ void do_admin_command(caValue* input, caValue* reply)
 
         List args;
         parse_string_as_argument_list(input, &args);
-        do_file_command(&args, reply);
+        do_file_command(world, &args, reply);
 
     } else if (equals_string(&command, "echo")) {
 
@@ -317,7 +318,7 @@ void do_admin_command(caValue* input, caValue* reply)
     }
 }
 
-void run_commands_from_stdin()
+void run_commands_from_stdin(caWorld* world)
 {
     while (true) {
         Value line;
@@ -326,7 +327,7 @@ void run_commands_from_stdin()
             break;
 
         Value reply;
-        do_admin_command(&line, &reply);
+        do_admin_command(world, &line, &reply);
 
         if (is_null(&reply))
             ; // no op
@@ -504,7 +505,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         block_finish_changes(mainBlock);
 
-        caStack* stack = circa_alloc_stack(world);
+        caStack* stack = circa_create_stack(world);
 
         // Push function
         caBlock* func = circa_find_function_local(mainBlock, as_cstring(list_get(args, 2)));
@@ -531,7 +532,7 @@ int run_command_line(caWorld* world, caValue* args)
             std::cout << to_string(circa_output(stack, i)) << std::endl;
         }
         
-        circa_dealloc_stack(stack);
+        circa_free_stack(stack);
     }
 
     // Start debugger repl
@@ -555,7 +556,7 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Command reader (from stdin)
     if (string_eq(list_get(args, 0), "-run-stdin")) {
-        run_commands_from_stdin();
+        run_commands_from_stdin(world);
         return 0;
     }
 
@@ -592,7 +593,7 @@ int run_command_line(caWorld* world, caValue* args)
     if (dontRunScript)
         return 0;
 
-    Stack* stack = alloc_stack(world);
+    Stack* stack = create_stack(world);
 
     push_frame(stack, mainBlock);
 
@@ -615,7 +616,7 @@ int run_command_line(caWorld* world, caValue* args)
 
 void run_repl_stdin(World* world)
 {
-    Stack* stack = alloc_stack(world);
+    Stack* stack = create_stack(world);
     repl_start(stack);
 
     printf("Started REPL, type /help for reference.\n");

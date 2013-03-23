@@ -13,7 +13,7 @@ struct World {
     FileWatchWorld* fileWatchWorld;
 
     // Global IDs.
-    int nextActorSpaceID;
+    int nextActorID;
     int nextTermID;
     int nextBlockID;
     int nextStackID;

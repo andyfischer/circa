@@ -7,6 +7,7 @@
 
 namespace actor_test {
 
+#if 0
 void simple_manual()
 {
     ActorSpace* space = create_actor_space(global_world());
@@ -68,11 +69,14 @@ void simple_script_handler()
 
     free_actor_space(space);
 }
+#endif
 
 void register_tests()
 {
+#if 0
     REGISTER_TEST_CASE(actor_test::simple_manual);
     REGISTER_TEST_CASE(actor_test::simple_script_handler);
+#endif
 }
 
 } // namespace actor_test

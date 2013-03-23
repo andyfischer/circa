@@ -4,6 +4,26 @@
 
 namespace circa {
 
+// Actors v3 (current)
+
+struct Actor;
+Actor* create_actor(World* world, Block* block);
+void set_actor(caValue* value, Actor* actor);
+bool is_actor(caValue* value);
+Actor* as_actor(caValue* value);
+
+bool actor_call_in_progress(Actor* actor);
+caValue* actor_input_slot(Actor* actor);
+caValue* actor_output_slot(Actor* actor);
+bool actor_inject(Actor* actor, caValue* name, caValue* value);
+void actor_run(Actor* actor);
+
+void actor_setup_type(Type* type);
+
+#if 0
+
+// Actors v2:
+
 struct Actor;
 struct ActorSpace;
 
@@ -35,5 +55,7 @@ Actor* as_actor(caValue* value);
 void actor_setup_type(Type* type);
 
 void actors_dump(ActorSpace* space);
+
+#endif
 
 } // namespace circa
