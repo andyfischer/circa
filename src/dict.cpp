@@ -414,10 +414,6 @@ namespace tagged_value_wrappers {
     {
         return dict_to_string((DictData*) value->value_data.ptr);
     }
-    caValue* get_field(caValue* value, const char* field)
-    {
-        return dict_t::get_value((DictData*) value->value_data.ptr, field);
-    }
     void visit_heap(Type*, caValue* value, Type::VisitHeapCallback callback, caValue* context)
     {
         DictData* data = (DictData*) value->value_data.ptr;
@@ -441,7 +437,6 @@ void setup_type(Type* type)
     type->release = tagged_value_wrappers::release;
     type->copy = tagged_value_wrappers::copy;
     type->toString = tagged_value_wrappers::to_string;
-    type->getField = tagged_value_wrappers::get_field;
     type->visitHeap = tagged_value_wrappers::visit_heap;
     set_string(&type->name, "Dict");
 }

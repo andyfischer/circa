@@ -775,14 +775,6 @@ namespace list_t {
         copy(element, list_get(value, index));
     }
 
-    caValue* tv_get_field(caValue* value, const char* fieldName)
-    {
-        int index = list_find_field_index_by_name(value->value_type, fieldName);
-        if (index < 0)
-            return NULL;
-        return list_get(value, index);
-    }
-
     std::string tv_to_string(caValue* value)
     {
         ca_assert(is_list(value));
@@ -894,7 +886,6 @@ namespace list_t {
         type->cast = tv_cast;
         type->getIndex = list_get;
         type->setIndex = tv_set_index;
-        type->getField = tv_get_field;
         type->numElements = list_length;
         type->touch = tv_touch;
         type->hashFunc = list_hash;

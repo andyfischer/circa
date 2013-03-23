@@ -292,19 +292,6 @@ caValue* get_field(caValue* value, caValue* field, caValue* error)
     return list_get(value, fieldIndex);
 }
 
-void set_field(caValue* value, const char* field, caValue* element)
-{
-    Type::SetField setField = value->value_type->setField;
-
-    if (setField == NULL) {
-        std::string msg = std::string("No setField function available on type ")
-            + as_cstring(&value->value_type->name);
-        internal_error(msg.c_str());
-    }
-
-    setField(value, field, element);
-}
-
 int num_elements(caValue* value)
 {
     Type::NumElements numElements = value->value_type->numElements;

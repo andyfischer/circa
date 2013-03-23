@@ -44,8 +44,6 @@ struct Type
     typedef void (*Touch)(caValue* value);
     typedef caValue* (*GetIndex)(caValue* value, int index);
     typedef void (*SetIndex)(caValue* value, int index, caValue* element);
-    typedef caValue* (*GetField)(caValue* value, const char* field);
-    typedef void (*SetField)(caValue* value, const char* field, caValue* element);
     typedef int (*NumElements)(caValue* value);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
@@ -82,8 +80,6 @@ struct Type
     Touch touch;
     GetIndex getIndex;
     SetIndex setIndex;
-    GetField getField;
-    SetField setField;
     NumElements numElements;
     CheckInvariants checkInvariants;
     RemapPointers remapPointers;

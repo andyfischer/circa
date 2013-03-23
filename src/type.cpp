@@ -304,8 +304,6 @@ void reset_type(Type* type)
     type->touch = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;
-    type->getField = NULL;
-    type->setField = NULL;
     type->numElements = NULL;
     type->checkInvariants = NULL;
     type->remapPointers = NULL;

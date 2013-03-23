@@ -75,7 +75,6 @@ caValue* get_index(caValue* value, int index);
 void set_index(caValue* value, int index, caValue* element);
 
 caValue* get_field(caValue* value, caValue* field, caValue* error);
-void set_field(caValue* value, const char* field, caValue* element);
 
 int num_elements(caValue* value);
 

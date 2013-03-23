@@ -18,17 +18,12 @@ namespace any_t {
         // casting to 'any' always succeeds.
         result->success = true;
     }
-    caValue* getField(caValue* value, const char* name)
-    {
-        return NULL;
-    }
     void setup_type(Type* type)
     {
         set_string(&type->name, "any");
         type->toString = to_string;
         type->staticTypeQuery = staticTypeQuery;
         type->cast = cast;
-        type->getField = getField;
     }
 
 } // namespace any_t

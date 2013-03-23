@@ -14,17 +14,11 @@ namespace null_t {
         append_phrase(source, "null", term, tok_Null);
     }
 
-    caValue* getField(caValue* value, const char* field)
-    {
-        return NULL;
-    }
-
     void setup_type(Type* type)
     {
         set_string(&type->name, "null");
         type->toString = toString;
         type->formatSource = formatSource;
-        type->getField = getField;
     }
 }
 }

@@ -314,12 +314,6 @@ namespace tagged_value_wrappers {
     {
         return to_string((Hashtable*) value->value_data.ptr);
     }
-    caValue* get_field(caValue* value, const char* field)
-    {
-        Value fieldStr;
-        set_string(&fieldStr, field);
-        return hashtable_get((Hashtable*) value->value_data.ptr, &fieldStr);
-    }
 } // namespace tagged_value_wrappers
 
 // Public API
@@ -368,7 +362,6 @@ void hashtable_setup_type(Type* type)
     type->release = tagged_value_wrappers::release;
     type->copy = tagged_value_wrappers::copy;
     type->toString = tagged_value_wrappers::to_string;
-    type->getField = tagged_value_wrappers::get_field;
     type->storageType = sym_StorageTypeHashtable;
 }
 

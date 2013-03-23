@@ -5,20 +5,25 @@
 namespace circa {
 namespace set_field_function {
 
-    CA_FUNCTION(evaluate)
+    void set_field(caStack* stack)
     {
         INCREMENT_STAT(SetField);
 
-        copy(INPUT(0), OUTPUT);
-        touch(OUTPUT);
+        caValue* out = circa_output(stack, 0);
+        copy(circa_input(stack, 0), out);
+        touch(out);
 
-        const char* name = as_cstring(INPUT(1));
-        int index = list_find_field_index_by_name(OUTPUT->value_type, name);
-        if (index == -1) {
-            std::string msg = std::string("field not found: ") + name;
-            return RAISE_ERROR(msg.c_str());
+        caValue* name = circa_input(stack, 1);
+
+        caValue* slot = get_field(out, name, NULL);
+        if (slot == NULL) {
+            circa::Value msg;
+            set_string(&msg, "field not found: ");
+            string_append(&msg, name);
+            return raise_error_msg(stack, as_cstring(&msg));
         }
-        copy(INPUT(2), list_get(OUTPUT,index));
+
+        copy(circa_input(stack, 2), slot);
     }
 
     Type* specializeType(Term* caller)
@@ -45,7 +50,7 @@ namespace set_field_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.set_field = import_function(kernel, evaluate,
+        FUNCS.set_field = import_function(kernel, set_field,
                 "set_field(any obj, String key, any val) -> any");
         as_function(FUNCS.set_field)->specializeType = specializeType;
         as_function(FUNCS.set_field)->formatSource = formatSource;
