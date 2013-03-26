@@ -193,9 +193,19 @@ void make_actor(caStack* stack)
     circa::Value description;
     get_input_description(primaryInput, &description);
 
-    if ...
-        return raise_error_msg
+    int inputCount = count_input_placeholders(block);
 
+    if (inputCount < 1 || inputCount > 2)
+        return raise_error_msg(stack, "Can't use block as actor: must have either 1 or 2 inputs");
+    if (!is_symbol(&description) || as_symbol(&description) != sym_Primary)
+        return raise_error_msg(stack, "Can't use block as actor: 1st input must be primary");
+
+    if (inputCount == 2) {
+        get_input_description(get_input_placeholder(block, 1), &description);
+        if (!is_symbol(&description) || as_symbol(&description) != sym_State)
+            return raise_error_msg(stack,
+                "Can't use block as actor: 2nd input, if present, must be for state");
+    }
 
     Actor* actor = create_actor(stack->world, block);
     set_actor(circa_output(stack, 0), actor);

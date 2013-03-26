@@ -76,7 +76,7 @@ Term* insert_output_placeholder(Block* block, Term* result, int location);
 Term* append_state_input(Block* block);
 Term* append_state_output(Block* block);
 
-void get_input_description(Term* output, caValue* result);
+void get_input_description(Term* input, caValue* result);
 Term* find_output_placeholder_with_name(Block* block, caValue* name);
 Term* find_output_from_description(Block* block, caValue* description);
 void get_output_description(Term* output, caValue* result);

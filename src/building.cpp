@@ -652,9 +652,33 @@ Term* append_state_output(Block* block)
     return term;
 }
 
-void get_input_description(Term* output, caValue* result)
+void get_input_description(Term* input, caValue* result)
 {
-    ...
+    // state input
+    if (input->hasProperty("state")) {
+        // return :State
+        set_symbol(result, sym_State);
+        return;
+    }
+
+    // Named input.
+    else if (!has_empty_name(input)) {
+        // return [:Name, <name>]
+        set_list(result, 2);
+        set_symbol(list_get(result, 0), sym_Name);
+        copy(term_name(input), list_get(result, 1));
+        return;
+    }
+
+    // Primary input.
+    else if (input_placeholder_index(input) == 0) {
+        // return :Primary
+        set_symbol(result, sym_Primary);
+        return;
+    }
+
+    // return :Anonymous
+    set_symbol(result, sym_Anonymous);
 }
 
 Term* find_output_placeholder_with_name(Block* block, caValue* name)

@@ -1,5 +1,7 @@
 
 square = {
+    i = input()
+
     state injected
 
     output(concat('injected: ' injected))
