@@ -652,6 +652,11 @@ Term* append_state_output(Block* block)
     return term;
 }
 
+void get_input_description(Term* output, caValue* result)
+{
+    ...
+}
+
 Term* find_output_placeholder_with_name(Block* block, caValue* name)
 {
     for (int i=0;; i++) {

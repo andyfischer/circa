@@ -187,6 +187,16 @@ void sys__perf_stats_dump(caStack* stack)
 void make_actor(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
+
+    // Check that the block is well-defined for an actor.
+    Term* primaryInput = get_input_placeholder(block, 0);
+    circa::Value description;
+    get_input_description(primaryInput, &description);
+
+    if ...
+        return raise_error_msg
+
+
     Actor* actor = create_actor(stack->world, block);
     set_actor(circa_output(stack, 0), actor);
 }

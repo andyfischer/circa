@@ -87,12 +87,18 @@ bool actor_inject(Actor* actor, caValue* name, caValue* value)
         return false;
 
     caValue* stateValue = frame_register(top, stateInput);
+
+    // Initialize stateValue if it's currently null.
     if (stateValue == NULL || is_null(stateValue))
+        make(top->block->stateType, stateValue);
+
+    caValue* slot = get_field(stateValue, name, NULL);
+    if (slot == NULL)
         return false;
 
-    // TODO
-    
-    return false;
+    touch(stateValue);
+    copy(value, get_field(stateValue, name, NULL));
+    return true;
 }
 
 void actor_run(Actor* actor)
