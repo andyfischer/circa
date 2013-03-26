@@ -20,6 +20,7 @@ bool is_declared_state(Term* term);
 // that could add/remove declared state.
 void block_update_state_type(Block* block);
 bool block_has_inline_state(Block* block);
+void block_mark_state_type_dirty(Block* block);
 
 void block_update_pack_state_calls(Block* block);
 

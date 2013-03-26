@@ -661,15 +661,6 @@ void get_input_description(Term* input, caValue* result)
         return;
     }
 
-    // Named input.
-    else if (!has_empty_name(input)) {
-        // return [:Name, <name>]
-        set_list(result, 2);
-        set_symbol(list_get(result, 0), sym_Name);
-        copy(term_name(input), list_get(result, 1));
-        return;
-    }
-
     // Primary input.
     else if (input_placeholder_index(input) == 0) {
         // return :Primary

@@ -1304,6 +1304,8 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         result->setStringProp("syntax:explicitType", typeName);
 
     set_source_location(result, startPosition, tokens);
+    block_mark_state_type_dirty(block);
+
     return ParseResult(result);
 }
 

@@ -1140,15 +1140,16 @@ void bootstrap_kernel()
 
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
-    // Finish setting up types that were declared in stdlib.ca.
+    // Finish setting up types that are declared in stdlib.ca.
     TYPES.actor = as_type(kernel->get("Actor"));
     actor_setup_type(TYPES.actor);
     TYPES.color = as_type(kernel->get("Color"));
     TYPES.closure = as_type(kernel->get("Closure"));
+    TYPES.file_signature = as_type(kernel->get("FileSignature"));
     callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
-    TYPES.file_signature = as_type(kernel->get("FileSignature"));
+    TYPES.stack = as_type(kernel->get("Interpreter"));
 
     Type* mutableType = as_type(kernel->get("Mutable"));
     circa_setup_object_type(mutableType, sizeof(Value), MutableRelease);

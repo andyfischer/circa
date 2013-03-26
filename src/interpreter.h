@@ -112,6 +112,7 @@ void free_stack(Stack* stack);
 Frame* top_frame(Stack* stack);
 Frame* top_frame_parent(Stack* stack);
 Block* top_block(Stack* stack);
+Frame* frame_parent(Frame* frame);
 
 bool stack_is_empty(Stack* stack);
 
@@ -197,10 +198,12 @@ caValue* frame_register(Frame* frame, Term* term);
 caValue* frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
 caValue* frame_registers(Frame* frame);
+caValue* stack_find_state_input_register(Stack* stack);
 
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);
 
+Block* frame_block(Frame* frame);
 caValue* frame_bytecode(Frame* frame);
 
 EvaluateFunc get_override_for_block(Block* block);

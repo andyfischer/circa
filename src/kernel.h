@@ -111,6 +111,7 @@ struct BuiltinTypes {
     Type* point;
     Type* term;
     Type* selector;
+    Type* stack;
     Type* string;
     Type* symbol;
     Type* type;

@@ -3,6 +3,7 @@
 #include "common_headers.h"
 #include "circa/circa.h"
 
+#include "actors.h"
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
@@ -41,6 +42,56 @@ void term_ref(caStack* stack)
     set_term_ref(circa_output(stack, 0), (Term*) term);
 }
 
+// Returns the corresponding term inside newBlock, if found.
+// Returns 'term' if the translation does not apply (term is not found inside
+// oldBlock).
+// Returns NULL if the translation does apply, but a corresponding term cannot be found.
+Term* translate_term_across_blocks(Term* term, Block* oldBlock, Block* newBlock)
+{
+    if (!term_is_child_of_block(term, oldBlock))
+        return term;
+
+    Value relativeName;
+    get_relative_name_as_list(term, oldBlock, &relativeName);
+    return find_from_relative_name_list(&relativeName, newBlock);
+}
+
+// Like translate_term_across_blocks, but for block references.
+Block* translate_block_across_blocks(Block* block, Block* oldBlock, Block* newBlock)
+{
+    // If this is just a reference to 'oldBlock' then simply update it to 'newBlock'.
+    if (block == oldBlock)
+        return newBlock;
+
+    // Noop on null block.
+    if (block == NULL)
+        return block;
+
+    // Noop if block has no owner.
+    Term* owningTerm = block->owningTerm;
+    if (owningTerm == NULL)
+        return block;
+
+    // Use owning term to possibly translate a block that is nested inside oldBlock.
+    Term* newTerm = translate_term_across_blocks(owningTerm, oldBlock, newBlock);
+
+    if (newTerm == NULL)
+        // Deliberate translation to NULL.
+        return NULL;
+    else
+        return newTerm->nestedContents;
+}
+
+void translate_stack_across_blocks(Stack* stack, Block* oldBlock, Block* newBlock)
+{
+    Frame* frame = top_frame(stack);
+
+    while (frame != NULL) {
+        frame->block = translate_block_across_blocks(frame->block, oldBlock, newBlock);
+        frame = frame_parent(frame);
+    }
+}
+
 void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block* newBlock)
 {
     for (ValueIterator it(value); it.unfinished(); it.advance()) {
@@ -50,29 +101,13 @@ void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block*
                 oldBlock, newBlock));
             
         } else if (is_block(val)) {
-
-            // If this is just a reference to 'oldBlock' then simply update it to 'newBlock'.
-            if (as_block(val) == oldBlock) {
-                set_block(val, newBlock);
-                continue;
-            }
-
-            // Noop on null block.
-            if (as_block(val) == NULL)
-                continue;
-
-            // Noop if block has no owner.
-            Term* oldTerm = as_block(val)->owningTerm;
-            if (oldTerm == NULL)
-                continue;
-
-            Term* newTerm = translate_term_across_blocks(oldTerm, oldBlock, newBlock);
-            if (newTerm == NULL) {
-                set_block(val, NULL);
-                continue;
-            }
-
-            set_block(val, newTerm->nestedContents);
+            set_block(val, translate_block_across_blocks(as_block(val),
+                        oldBlock, newBlock));
+        } else if (is_stack(val)) {
+            translate_stack_across_blocks(as_stack(val), oldBlock, newBlock);
+        } else if (is_actor(val)) {
+            Actor* actor = as_actor(val);
+            translate_stack_across_blocks(actor->stack, oldBlock, newBlock);
         }
     }
 }

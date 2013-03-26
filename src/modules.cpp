@@ -18,6 +18,7 @@
 #include "modules.h"
 #include "names.h"
 #include "native_patch.h"
+#include "reflection.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -188,20 +189,6 @@ Block* find_module_from_filename(const char* filename)
     }
 
     return NULL;
-}
-
-// Returns the corresponding term inside newBlock, if found.
-// Returns 'term' if the translation does not apply (term is not found inside
-// oldBlock).
-// Returns NULL if the translation does apply, but a corresponding term cannot be found.
-Term* translate_term_across_blocks(Term* term, Block* oldBlock, Block* newBlock)
-{
-    if (!term_is_child_of_block(term, oldBlock))
-        return term;
-
-    Value relativeName;
-    get_relative_name_as_list(term, oldBlock, &relativeName);
-    return find_from_relative_name_list(&relativeName, newBlock);
 }
 
 void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)

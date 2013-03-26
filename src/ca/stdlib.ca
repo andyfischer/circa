@@ -96,6 +96,7 @@ type Actor;
 type FileSignature { String filename, int time_modified }
 type Callable;
 type Color { number r, number g, number b, number a }
+type Interpreter;
 type Point { number x, number y }
 type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
@@ -208,7 +209,6 @@ def Frame.output(self, int nth) -> any
 
 def Function.block(self) -> Block
 
-type Interpreter;
 def make_interpreter() -> Interpreter
     -- Create a new interpreter
 def Interpreter.push_frame(self, Block b, List inputs)

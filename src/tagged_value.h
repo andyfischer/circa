@@ -75,6 +75,7 @@ caValue* get_index(caValue* value, int index);
 void set_index(caValue* value, int index, caValue* element);
 
 caValue* get_field(caValue* value, caValue* field, caValue* error);
+caValue* get_field(caValue* value, const char* field, caValue* error=NULL);
 
 int num_elements(caValue* value);
 
@@ -94,6 +95,7 @@ bool is_float(caValue* value);
 bool is_function(caValue* value);
 bool is_function_pointer(caValue* value);
 bool is_int(caValue* value);
+bool is_stack(caValue* value);
 bool is_list(caValue* value);
 bool is_null(caValue* value);
 bool is_number(caValue* value);
@@ -113,6 +115,7 @@ Function*   as_function(caValue* value);
 int         as_int(caValue* value);
 Symbol      as_symbol(caValue* value);
 void*       as_opaque_pointer(caValue* value);
+Stack*      as_stack(caValue* value);
 Term*       as_term_ref(caValue* val);
 Type*       as_type(caValue* value);
 

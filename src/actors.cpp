@@ -22,20 +22,13 @@ namespace circa {
 // it. This calling mechanism is syncronous, there's no direct support for async.
 // (But callers can simulate async by injecting into queues).
 
-struct Actor {
-    int id;
-    Block* block;
-    Stack* stack;
-};
-
 Actor* create_actor(World* world, Block* block)
 {
     ca_assert(block != NULL);
     Actor* actor = new Actor();
     actor->id = world->nextActorID++;
-    actor->block = block;
     actor->stack = create_stack(world);
-    push_frame(actor->stack, actor->block);
+    push_frame(actor->stack, block);
     return actor;
 }
 
@@ -54,6 +47,12 @@ Actor* as_actor(caValue* value)
 {
     ca_assert(is_actor(value));
     return (Actor*) value->value_data.ptr;
+}
+
+Block* actor_block(Actor* actor)
+{
+    ca_assert(top_frame_parent(actor->stack) == NULL);
+    return top_frame(actor->stack)->block;
 }
 
 void actor_setup_type(Type* type)
@@ -104,7 +103,6 @@ bool actor_inject(Actor* actor, caValue* name, caValue* value)
 void actor_run(Actor* actor)
 {
     Stack* stack = actor->stack;
-    ca_assert(top_block(stack) == actor->block);
     ca_assert(top_frame_parent(stack) == NULL);
 
     run_interpreter(stack);

@@ -6,12 +6,17 @@ namespace circa {
 
 // Actors v3 (current)
 
-struct Actor;
+struct Actor {
+    int id;
+    Stack* stack;
+};
+
 Actor* create_actor(World* world, Block* block);
 void set_actor(caValue* value, Actor* actor);
 bool is_actor(caValue* value);
 Actor* as_actor(caValue* value);
 
+Block* actor_block(Actor* actor);
 bool actor_call_in_progress(Actor* actor);
 caValue* actor_input_slot(Actor* actor);
 caValue* actor_output_slot(Actor* actor);

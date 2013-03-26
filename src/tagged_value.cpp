@@ -292,6 +292,13 @@ caValue* get_field(caValue* value, caValue* field, caValue* error)
     return list_get(value, fieldIndex);
 }
 
+caValue* get_field(caValue* value, const char* field, caValue* error)
+{
+    circa::Value fieldStr;
+    set_string(&fieldStr, field);
+    return get_field(value, &fieldStr, error);
+}
+
 int num_elements(caValue* value)
 {
     Type::NumElements numElements = value->value_type->numElements;
@@ -438,6 +445,13 @@ void set_opaque_pointer(caValue* value, void* addr)
     change_type(value, TYPES.opaque_pointer);
     value->value_data.ptr = addr;
 }
+
+void set_stack(caValue* value, Stack* stack)
+{
+    change_type(value, TYPES.stack);
+    value->value_data.ptr = stack;
+}
+
 void set_block(caValue* value, Block* block)
 {
     change_type(value, TYPES.block);
@@ -491,6 +505,12 @@ void* as_opaque_pointer(caValue* value)
     return value->value_data.ptr;
 }
 
+Stack* as_stack(caValue* value)
+{
+    ca_assert(is_stack(value));
+    return (Stack*) value->value_data.ptr;
+}
+
 Symbol as_symbol(caValue* tv)
 {
     return tv->value_data.asint;
@@ -539,6 +559,7 @@ bool is_float(caValue* value) { return value->value_type->storageType == sym_Sto
 bool is_function(caValue* value) { return value->value_type == TYPES.function; }
 bool is_function_pointer(caValue* value) { return value->value_type == TYPES.function; }
 bool is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
+bool is_stack(caValue* value) { return value->value_type == TYPES.stack; }
 bool is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }

@@ -99,6 +99,11 @@ bool block_has_inline_state(Block* block)
     return block->stateType != NULL;
 }
 
+void block_mark_state_type_dirty(Block* block)
+{
+    set_bool(block_insert_property(block, sym_DirtyStateType), true);
+}
+
 static Term* append_final_pack_state(Block* block)
 {
     TermList inputs;

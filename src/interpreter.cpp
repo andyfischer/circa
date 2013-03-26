@@ -437,6 +437,12 @@ Frame* top_frame_parent(Stack* stack)
         return NULL;
     return frame_by_id(stack, top->parent);
 }
+Frame* frame_parent(Frame* frame)
+{
+    if (frame->parent == 0)
+        return NULL;
+    return frame_by_id(frame->stack, frame->parent);
+}
 Block* top_block(Stack* stack)
 {
     Frame* frame = top_frame(stack);
@@ -622,6 +628,20 @@ int frame_register_count(Frame* frame)
 caValue* frame_registers(Frame* frame)
 {
     return &frame->registers;
+}
+
+caValue* stack_find_state_input_register(Stack* stack)
+{
+    Frame* top = top_frame(stack);
+    Term* stateInput = find_state_input(top->block);
+    if (stateInput == NULL)
+        return NULL;
+    return frame_register(top, stateInput);
+}
+
+Block* frame_block(Frame* frame)
+{
+    return frame->block;
 }
 
 caValue* frame_bytecode(Frame* frame)
