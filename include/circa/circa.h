@@ -144,8 +144,10 @@ void circa_add_module_search_path(caWorld* world, const char* path);
 caBlock* circa_load_module_from_file(caWorld* world,
                                       const char* module_name,
                                       const char* filename);
+caBlock* circa_load_module(caWorld* world, const char* moduleName);
 
 // -- Controlling Actors --
+#if 0 // disabled as of actors v3
 void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename);
 caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName);
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message);
@@ -153,6 +155,7 @@ void circa_actor_run_message(caWorld* world, const char* actorName, caValue* mes
 int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages);
 int circa_actor_run_all_queues(caWorld* world, int maxMessages);
 void circa_actor_clear_all(caWorld* world);
+#endif
 
 // -- Controlling the Interpreter --
 
@@ -174,6 +177,10 @@ bool circa_push_function_by_name(caStack* stack, const char* name);
 
 // Push a module to the stack by name.
 void circa_push_module(caStack* stack, const char* name);
+
+// Refresh all loaded modules (if the source file has changed, load the latest file)
+//void circa_refresh_all_modules(caWorld* world);
+void circa_update_changed_files(caWorld* world);
 
 // Run the current stack.
 void circa_run(caStack* stack);
@@ -493,6 +500,8 @@ void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFun
 void circa_finish_native_patch(caNativePatch* module);
 
 // -- Actors --
+// (Disabled as of actors v3)
+#if 0
 caActorSpace* circa_create_actor_space(caWorld* world);
 caActor* circa_create_actor(caActorSpace* space);
 void circa_actor_bind_name(caActorSpace* space, caActor* actor, const char* name);
@@ -500,6 +509,7 @@ bool circa_actor_consume_incoming(caActor* actor, caValue* messageOut);
 void circa_actors_run_iteration(caActorSpace* space);
 caValue* circa_actor_post(caActor* actor);
 caValue* circa_post(caActorSpace* space, caValue* address);
+#endif
 
 // -- File IO --
 

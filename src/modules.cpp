@@ -70,10 +70,10 @@ Block* fetch_module(World* world, const char* name)
     return nested_contents(term);
 }
 
-static bool find_module_file(World* world, const char* module_name, caValue* filenameOut)
+static bool find_module_file(World* world, const char* moduleName, caValue* filenameOut)
 {
     Value module;
-    set_string(&module, module_name);
+    set_string(&module, moduleName);
 
     int count = list_length(&world->moduleSearchPaths);
     for (int i=0; i < count; i++) {
@@ -303,10 +303,15 @@ CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
     module_add_search_path(world, path);
 }
 
-CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* module_name,
+CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* moduleName,
         const char* filename)
 {
-    return (caBlock*) load_module_file_watched(world, module_name, filename);
+    return load_module_file_watched(world, moduleName, filename);
+}
+
+CIRCA_EXPORT caBlock* circa_load_module(caWorld* world, const char* moduleName)
+{
+    return load_module_by_name(world, moduleName);
 }
 
 } // namespace circa

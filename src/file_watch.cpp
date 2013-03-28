@@ -167,4 +167,9 @@ FileWatch* add_file_watch_native_patch(World* world, const char* filename, const
     return add_file_watch_action(world, filename, &action);
 }
 
+CIRCA_EXPORT void circa_update_changed_files(caWorld* world)
+{
+    return file_watch_check_all(world);
+}
+
 } // namespace circa

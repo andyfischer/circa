@@ -66,6 +66,7 @@ void update_world_after_module_reload(World* world, Block* oldBlock, Block* newB
     }
 }
 
+// TODO: Delete this, it was replaced by the file watch system.
 void refresh_all_modules(caWorld* world)
 {
     // Iterate over top-level modules
@@ -85,6 +86,7 @@ void refresh_all_modules(caWorld* world)
     }
 }
 
+// TODO: delete this
 CIRCA_EXPORT void circa_refresh_all_modules(caWorld* world)
 {
     refresh_all_modules(world);
