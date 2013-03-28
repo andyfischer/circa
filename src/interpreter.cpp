@@ -45,13 +45,15 @@ Stack::Stack()
 {
     gc_register_new_object((CircaObject*) this, TYPES.eval_context, true);
 
+    id = global_world()->nextStackID++;
+
     framesCapacity = 0;
     frames = NULL;
     top = 0;
     firstFreeFrame = 0;
     lastFreeFrame = 0;
-
-    id = global_world()->nextStackID;
+    nextRootStack = NULL;
+    prevRootStack = NULL;
 }
 
 Stack::~Stack()
@@ -62,6 +64,17 @@ Stack::~Stack()
     stack_reset(this);
 
     free(frames);
+
+    if (world != NULL) {
+        if (world->firstRootStack == this)
+            world->firstRootStack = world->firstRootStack->nextRootStack;
+        if (world->lastRootStack == this)
+            world->lastRootStack = world->lastRootStack->prevRootStack;
+        if (nextRootStack != NULL)
+            nextRootStack->prevRootStack = prevRootStack;
+        if (prevRootStack != NULL)
+            prevRootStack->nextRootStack = nextRootStack;
+    }
 
     gc_on_object_deleted((CircaObject*) this);
 }
@@ -76,6 +89,19 @@ Stack* create_stack(World* world)
 {
     Stack* stack = new Stack();
     stack->world = world;
+    
+    // Add this Stack as a root stack. TODO for garbage collection, is the ability to
+    // create non-root stacks.
+    if (world != NULL) {
+        if (world->firstRootStack == NULL)
+            world->firstRootStack = stack;
+        if (world->lastRootStack != NULL)
+            world->lastRootStack->nextRootStack = stack;
+        stack->prevRootStack = world->lastRootStack;
+        stack->nextRootStack = NULL;
+        world->lastRootStack = stack;
+    }
+
     return stack;
 }
 

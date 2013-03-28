@@ -32,6 +32,8 @@ World* alloc_world()
     world->nextTermID = 1;
     world->nextBlockID = 1;
     world->nextStackID = 1;
+    world->firstRootStack = NULL;
+    world->lastRootStack = NULL;
 
     return world;
 }
@@ -42,6 +44,12 @@ void world_initialize(World* world)
 
     world->nativePatchWorld = create_native_patch_world();
     world->fileWatchWorld = create_file_watch_world();
+}
+
+World* create_world()
+{
+    World* world = alloc_world();
+    world_initialize(world);
 }
 
 void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
@@ -57,39 +65,20 @@ void update_block_after_module_reload(Block* target, Block* oldBlock, Block* new
 
 void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock)
 {
-    // Update references in every module
+    // Update references in every module.
     for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.module) {
             update_block_after_module_reload(term->nestedContents, oldBlock, newBlock);
         }
     }
-}
 
-// TODO: Delete this, it was replaced by the file watch system.
-void refresh_all_modules(caWorld* world)
-{
-    // Iterate over top-level modules
-    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        if (term->function == FUNCS.module) {
-            
-            Block* existing = term->nestedContents;
-            Block* latest = load_latest_block(existing);
-
-            if (existing != latest) {
-                term->nestedContents = latest;
-
-                update_world_after_module_reload(world, existing, latest);
-            }
-        }
+    // Update references in every root stack.
+    Stack* rootStack = world->firstRootStack;
+    while (rootStack != NULL) {
+        translate_stack_across_blocks(rootStack, oldBlock, newBlock);
+        rootStack = rootStack->nextRootStack;
     }
-}
-
-// TODO: delete this
-CIRCA_EXPORT void circa_refresh_all_modules(caWorld* world)
-{
-    refresh_all_modules(world);
 }
 
 } // namespace circa

@@ -178,8 +178,7 @@ bool circa_push_function_by_name(caStack* stack, const char* name);
 // Push a module to the stack by name.
 void circa_push_module(caStack* stack, const char* name);
 
-// Refresh all loaded modules (if the source file has changed, load the latest file)
-//void circa_refresh_all_modules(caWorld* world);
+// Check for changed files, and run any relevant change actions.
 void circa_update_changed_files(caWorld* world);
 
 // Run the current stack.

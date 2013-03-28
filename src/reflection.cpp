@@ -88,6 +88,10 @@ void translate_stack_across_blocks(Stack* stack, Block* oldBlock, Block* newBloc
 
     while (frame != NULL) {
         frame->block = translate_block_across_blocks(frame->block, oldBlock, newBlock);
+
+        caValue* registers = frame_registers(frame);
+        update_all_code_references_in_value(registers, oldBlock, newBlock);
+
         frame = frame_parent(frame);
     }
 }

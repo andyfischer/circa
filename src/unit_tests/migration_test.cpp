@@ -10,6 +10,7 @@
 #include "kernel.h"
 #include "modules.h"
 #include "reflection.h"
+#include "world.h"
 
 namespace migration_test {
 
@@ -123,7 +124,7 @@ void actor_value()
     Actor* actor = as_actor(get_field(state, "actor"));
     test_assert(actor_block(actor) == f1->nestedContents);
 
-    update_all_code_references_in_value(state, &version1, &version2);
+    update_world_after_module_reload(global_world(), &version1, &version2);
 
     actor = as_actor(get_field(state, "actor"));
     test_assert(actor_block(actor) == f2->nestedContents);
@@ -137,7 +138,6 @@ void register_tests()
     REGISTER_TEST_CASE(migration_test::update_references);
     REGISTER_TEST_CASE(migration_test::term_ref_values);
     REGISTER_TEST_CASE(migration_test::stack_value);
-    REGISTER_TEST_CASE(migration_test::actor_value);
 }
 
 }

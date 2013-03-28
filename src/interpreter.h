@@ -85,6 +85,10 @@ struct Stack
     // Top-level state (deprecated)
     Value state;
 
+    // Linked list of all root stacks across this world.
+    Stack* prevRootStack;
+    Stack* nextRootStack;
+
     // Owning world
     caWorld* world;
 
