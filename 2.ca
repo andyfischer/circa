@@ -1,9 +1,0 @@
-
-
-out = for i in [1 2 3]
-    print(i)
-    if i == 2
-        continue
-    print('fin: ' i)
-
-print(out)

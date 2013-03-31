@@ -50,6 +50,7 @@ World* create_world()
 {
     World* world = alloc_world();
     world_initialize(world);
+    return world;
 }
 
 void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)

@@ -276,6 +276,13 @@ void native_patch_this_postCompile(Term* term)
     file_watch_check_now(global_world(), watch);
 }
 
+void load_module_eval(caStack* stack)
+{
+    caValue* moduleName = circa_input(stack, 0);
+    Block* module = load_module_by_name(global_world(), as_cstring(moduleName));
+    set_block(circa_output(stack, 0), module);
+}
+
 void modules_install_functions(Block* kernel)
 {
     FUNCS.require = install_function(kernel, "require", NULL);
@@ -290,6 +297,8 @@ void modules_install_functions(Block* kernel)
     as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
 
     FUNCS.module = import_function(kernel, NULL, "module() -> Block");
+
+    Term* load_module = install_function(kernel, "load_module", load_module_eval);
 }
 
 CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
