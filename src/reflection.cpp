@@ -696,7 +696,7 @@ void reflection_install_functions(Block* kernel)
         {"Term.format_source", Term__format_source},
         {"Term.format_source_normal", Term__format_source_normal},
         {"Term.function", Term__function},
-        {"Term.get_type", Term__type},
+        {"Term.get_type", Term__type},  // TODO: rename to just .type
         {"Term.tweak", Term__tweak},
         {"Term.input", Term__input},
         {"Term.inputs", Term__inputs},
