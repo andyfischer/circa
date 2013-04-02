@@ -231,10 +231,11 @@ float circa_bool_input(caStack* stack, int index);
 // Fetch the given output value. This value should be modified.
 caValue* circa_output(caStack* stack, int index);
 
-// Initialize the given output value, using the default create() function on the
+// Initialize the given value, using the default create() function on the
 // Term's declared type. Also, returns the output value for convenient writing.
 // This function is unnecessary if you write to the output using one of the
 // circa_set_XXX functions.
+caValue* circa_create_default_input(caStack* stack, int index);
 caValue* circa_create_default_output(caStack* stack, int index);
 
 // Fetch the caller Term, this is the term whose function is currently being evaluated.

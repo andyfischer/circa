@@ -48,6 +48,15 @@ caBlock* caTerm::parent()
     return circa_parent_block(this);
 }
 
+caValue* circa_create_default_input(caStack* stack, int index)
+{
+    caValue* val = circa_input(stack, index);
+    caBlock* top = circa_top_block(stack);
+    caTerm* placeholder = circa_input_placeholder(top, index);
+    circa_make(val, circa_term_declared_type(placeholder));
+    return val;
+}
+
 caValue* circa_create_default_output(caStack* stack, int index)
 {
     caValue* val = circa_output(stack, index);

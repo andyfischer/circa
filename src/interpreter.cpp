@@ -1326,6 +1326,7 @@ void run_input_ins(Stack* stack, caValue* inputActions, caValue* outputList,
             // Standard copy
             caValue* inputValue = find_stack_value_for_term(stack,
                     as_term_ref(action), stackDelta);
+            ca_assert(inputValue != NULL);
             copy(inputValue, dest);
 
         } else {
@@ -1616,7 +1617,6 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
     
     Block* block = term->owningBlock;
     block_finish_changes(block);
-
 
     bool *marked = new bool[block->length()];
     memset(marked, false, sizeof(bool)*block->length());
