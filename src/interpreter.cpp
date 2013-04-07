@@ -528,6 +528,31 @@ void stack_restart(Stack* stack)
     }
 }
 
+caValue* stack_get_state_field(Stack* stack, const char* name)
+{
+    Frame* top = top_frame(stack);
+    Term* stateInput = find_state_input(top->block);
+    if (stateInput == NULL)
+        return NULL;
+
+    caValue* stateValue = frame_register(top, stateInput);
+
+    // Initialize stateValue if it's currently null.
+    if (stateValue == NULL || is_null(stateValue))
+        make(top->block->stateType, stateValue);
+
+    caValue* slot = get_field(stateValue, name, NULL);
+    if (slot == NULL)
+        return NULL;
+
+    return slot;
+}
+
+CIRCA_EXPORT caValue* circa_get_state_field(caStack* stack, const char* name)
+{
+    return stack_get_state_field(stack, name);
+}
+
 void evaluate_single_term(Stack* stack, Term* term)
 {
     Frame* frame = push_frame(stack, term->owningBlock);

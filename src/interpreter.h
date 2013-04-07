@@ -157,6 +157,8 @@ void stack_reset(Stack* stack);
 // values. If there is a state register, feed the output back into its input.
 void stack_restart(Stack* stack);
 
+caValue* stack_get_state_field(Stack* stack, const char* name);
+
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Block* block);
 Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* inputs);

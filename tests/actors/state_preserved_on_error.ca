@@ -1,0 +1,23 @@
+
+block = {
+    i = input()
+    print('got i = ' i)
+    print('got i == :inc ' (i == :inc))
+    state n = 0
+    if i == :inc
+        n += 1
+    else
+        assert(false)
+
+    output(n)
+    
+}.block
+
+actor = make_actor(block)
+assert(actor.call(:inc) == 1)
+assert(actor.call(:inc) == 2)
+assert(actor.call(:inc) == 3)
+
+actor.call(:die) -> errored
+
+-- assert(actor.call(:inc) == 4)

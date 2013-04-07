@@ -1,0 +1,10 @@
+
+assert(:a == :a)
+assert(:a != :b)
+
+def test(any a, Symbol b)
+    return a == b
+
+assert(test(:a, :a))
+
+

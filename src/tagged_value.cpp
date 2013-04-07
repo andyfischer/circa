@@ -2,9 +2,10 @@
 
 #include "common_headers.h"
 
-#include "kernel.h"
+#include "actors.h"
 #include "debug.h"
 #include "hashtable.h"
+#include "kernel.h"
 #include "names.h"
 #include "reflection.h"
 #include "string_type.h"
@@ -613,6 +614,7 @@ bool circa_is_int(caValue* value) { return value->value_type->storageType == sym
 bool circa_is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
 bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
+bool circa_is_stack(caValue* value) { return is_stack(value); }
 bool circa_is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
 bool circa_is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
@@ -639,6 +641,14 @@ int circa_int(caValue* value) {
 void* circa_object(caValue* value)
 {
     return object_get_body(value);
+}
+caStack* circa_stack(caValue* value)
+{
+    // TODO: Fix this hack.
+    if (is_actor(value))
+        return as_actor(value)->stack;
+
+    return as_stack(value);
 }
 const char* circa_string(caValue* value) {
     ca_assert(circa_is_string(value));
@@ -732,6 +742,10 @@ void circa_set_null(caValue* container)
 void circa_set_pointer(caValue* container, void* ptr)
 {
     set_opaque_pointer(container, ptr);
+}
+void circa_set_stack(caValue* container, caStack* stack)
+{
+    set_stack(container, stack);
 }
 void circa_set_term(caValue* container, caTerm* term)
 {

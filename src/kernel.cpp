@@ -220,13 +220,19 @@ void Actor__call(caStack* stack)
 {
     Actor* actor = as_actor(circa_input(stack, 0));
 
+    if (actor == NULL) {
+        return raise_error_msg(stack, "Actor is null");
+    }
+
     if (actor_call_in_progress(actor)) {
         return raise_error_msg(stack, "Actor is in use; maybe this is a recursive call?");
     }
 
     caValue* input = circa_input(stack, 1);
     copy(input, actor_input_slot(actor));
+
     actor_run(actor);
+
     copy(actor_output_slot(actor), circa_output(stack, 0));
 }
 

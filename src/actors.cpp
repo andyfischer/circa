@@ -80,12 +80,13 @@ caValue* actor_output_slot(Actor* actor)
 }
 bool actor_inject(Actor* actor, caValue* name, caValue* value)
 {
+    // TODO: Collapse duplicate code with stack_get_state_field
     Frame* top = top_frame(actor->stack);
-    Term* stateInput = find_state_input(top->block);
-    if (stateInput == NULL)
+    Term* stateSlot = find_state_output(top->block);
+    if (stateSlot == NULL)
         return false;
 
-    caValue* stateValue = frame_register(top, stateInput);
+    caValue* stateValue = frame_register(top, stateSlot);
 
     // Initialize stateValue if it's currently null.
     if (stateValue == NULL || is_null(stateValue))
@@ -105,15 +106,13 @@ void actor_run(Actor* actor)
     Stack* stack = actor->stack;
     ca_assert(top_frame_parent(stack) == NULL);
 
+    stack_restart(stack);
     run_interpreter(stack);
 
     if (error_occurred(stack)) {
-        // TODO: Send value to errorHandler (if any);
         printf("Error occurred in actor_run\n");
         dump(stack);
     }
-
-    stack_restart(stack);
 }
 
 #if 0

@@ -200,6 +200,8 @@ void circa_clear_stack(caStack* stack);
 // Clear all frames but the topmost, rewind the PC, and clear temporary values.
 void circa_restart(caStack* stack);
 
+caValue* circa_get_state_field(caStack* stack, const char* name);
+
 // Print a human-readable description of the stack's error to stdout.
 void circa_print_error_to_stdout(caStack* stack);
 
@@ -296,6 +298,7 @@ bool circa_is_int(caValue* value);
 bool circa_is_list(caValue* value);
 bool circa_is_null(caValue* value);
 bool circa_is_number(caValue* value);
+bool circa_is_stack(caValue* value);
 bool circa_is_string(caValue* value);
 bool circa_is_type(caValue* value);
 
@@ -306,6 +309,7 @@ float       circa_float(caValue* value);
 caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
 void*       circa_object(caValue* value);
+caStack*    circa_stack(caValue* value);
 const char* circa_string(caValue* value);
 caType*     circa_type(caValue* value);
 void        circa_vec2(caValue* vec2, float* xOut, float* yOut);
@@ -341,6 +345,7 @@ void circa_set_int(caValue* container, int value);
 void circa_set_null(caValue* container);
 void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);
+void circa_set_stack(caValue* container, caStack* stack);
 void circa_set_string(caValue* container, const char* str);
 void circa_set_typed_pointer(caValue* container, caType* type, void* ptr);
 void circa_set_vec2(caValue* container, float x, float y);
