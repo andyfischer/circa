@@ -458,13 +458,6 @@ void set_block(caValue* value, Block* block)
     value->value_data.ptr = block;
 }
 
-void set_pointer(caValue* value, Type* type, void* p)
-{
-    set_null(value);
-    value->value_type = type;
-    value->value_data.ptr = p;
-}
-
 void set_pointer(caValue* value, void* ptr)
 {
     value->value_data.ptr = ptr;

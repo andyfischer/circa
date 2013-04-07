@@ -146,10 +146,6 @@ void dynamic_method_call(caStack* stack)
     circa_output_error(stack, msg.c_str());
 }
 
-void send_func(caStack* stack)
-{
-}
-
 void refactor__rename(caStack* stack)
 {
     rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
@@ -232,6 +228,12 @@ void Actor__call(caStack* stack)
     copy(input, actor_input_slot(actor));
     actor_run(actor);
     copy(actor_output_slot(actor), circa_output(stack, 0));
+}
+
+void Actor__stack(caStack* stack)
+{
+    Actor* actor = as_actor(circa_input(stack, 0));
+    set_stack(circa_output(stack, 0), actor->stack);
 }
 
 void Dict__count(caStack* stack)
@@ -878,8 +880,7 @@ void bootstrap_kernel()
     valueFunc->type = TYPES.function;
     valueFunc->function = valueFunc;
     make(TYPES.function, term_value(valueFunc));
-
-    function_t::initialize(TYPES.function, term_value(valueFunc));
+    term_value(valueFunc)->value_data.ptr = new Function();
     initialize_function(valueFunc);
     as_function(valueFunc)->name = "value";
     block_set_evaluation_empty(function_contents(valueFunc), true);
@@ -906,7 +907,7 @@ void bootstrap_kernel()
 
     // Setup output_placeholder() function, needed to declare functions properly.
     FUNCS.output = create_value(kernel, TYPES.function, "output_placeholder");
-    function_t::initialize(TYPES.function, term_value(FUNCS.output));
+    term_value(FUNCS.output)->value_data.ptr = new Function();
     initialize_function(FUNCS.output);
     as_function(FUNCS.output)->name = "output_placeholder";
     as_function(FUNCS.output)->evaluate = NULL;
@@ -1057,7 +1058,6 @@ void bootstrap_kernel()
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
-        {"send", send_func},
         {"test_spy", test_spy},
         {"test_oracle", test_oracle},
         {"refactor:rename", refactor__rename},
@@ -1071,6 +1071,7 @@ void bootstrap_kernel()
         {"make_actor", make_actor},
         {"Actor.inject", Actor__inject},
         {"Actor.call", Actor__call},
+        {"Actor.stack", Actor__stack},
 
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},

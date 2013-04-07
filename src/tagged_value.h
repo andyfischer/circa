@@ -81,7 +81,6 @@ int num_elements(caValue* value);
 
 int get_hash_value(caValue* value);
 
-void set_pointer(caValue* value, Type* type, void* p);
 void set_pointer(caValue* value, void* ptr);
 
 void* get_pointer(caValue* value);

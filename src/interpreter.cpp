@@ -1756,16 +1756,13 @@ void Frame__pc_term(caStack* callerStack)
 
 void make_interpreter(caStack* callerStack)
 {
-    Stack* newContext = new Stack();
-    gc_mark_object_referenced(&newContext->header);
-    gc_set_object_is_root(&newContext->header, false);
-
-    set_pointer(circa_create_default_output(callerStack, 0), newContext);
+    Stack* newStack = new Stack();
+    set_pointer(circa_create_default_output(callerStack, 0), newStack);
 }
 
 void Interpreter__push_frame(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
     Block* block = as_block(circa_input(callerStack, 1));
@@ -1776,13 +1773,13 @@ void Interpreter__push_frame(caStack* callerStack)
 }
 void Interpreter__pop_frame(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     pop_frame(self);
 }
 void Interpreter__set_state_input(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
     if (top_frame(self) == NULL)
@@ -1810,7 +1807,7 @@ void Interpreter__set_state_input(caStack* callerStack)
 
 void Interpreter__get_state_output(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
     if (top_frame(self) == NULL)
@@ -1840,13 +1837,13 @@ void Interpreter__get_state_output(caStack* callerStack)
 
 void Interpreter__reset(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     stack_reset(self);
 }
 void Interpreter__run(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     run_interpreter(self);
 }

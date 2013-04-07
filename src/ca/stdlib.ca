@@ -44,16 +44,6 @@ def import_file(String moduleName, String filename)
 def native_patch_this(String filename)
 def load_module(String moduleName) -> Block
 
--- Message passing
--- TODO, delete this
-def send(String name, any msg)
-    -- Pass a message to an actor by name
-def call_actor(String name, any msg)
-    -- Invoke an actor immediately
-def actor_run_message(Actor actor, any msg)
-    b = actor.block
-    dynamic_call(b, msg)
-
 def test_oracle() -> any
     -- For internal testing. This function will output values that are manually
     -- inserted with the C++ function oracle_send.
@@ -104,13 +94,13 @@ type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
 
+def make_actor(Block block) -> Actor
 def Actor.inject(self, String name, any val) -> bool
     -- Inject a value into the actor's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.
 def Actor.call(self, any input) -> any
     -- Synchronous actor call
-def make_actor(Block block) -> Actor
-    -- Spawn a new actor
+def Actor.stack(self) -> Interpreter
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block

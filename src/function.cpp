@@ -47,24 +47,9 @@ Function::~Function()
 
 namespace function_t {
 
-    void initialize(Type* type, caValue* value)
-    {
-        Function* attrs = new Function();
-        set_pointer(value, type, attrs);
-    }
-
-    void copy(Type* type, caValue* source, caValue* dest)
-    {
-        // Shallow copy.
-        change_type(dest, type);
-        dest->value_data = source->value_data;
-    }
-
     void setup_type(Type* type)
     {
         set_string(&type->name, "Function");
-        type->initialize = initialize;
-        type->copy = copy;
         type->formatSource = function_format_source;
     }
 
@@ -89,6 +74,7 @@ Term* create_function(Block* block, const char* name)
 {
     ca_assert(name != NULL);
     Term* term = create_value(block, TYPES.function, name);
+    term_value(term)->value_data.ptr = new Function();
     initialize_function(term);
     initialize_subroutine(term);
     return term;

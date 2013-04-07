@@ -50,8 +50,6 @@ struct Function
 };
 
 namespace function_t {
-    void initialize(Type* type, caValue* value);
-    void release(Type*, caValue* value);
     void copy(Type*, caValue* source, caValue* dest);
 
     void setup_type(Type* type);

@@ -90,6 +90,7 @@ StorageTypeNull
 StorageTypeInt
 StorageTypeFloat
 StorageTypeBool
+StorageTypeStack
 StorageTypeString
 StorageTypeList
 StorageTypeOpaquePointer

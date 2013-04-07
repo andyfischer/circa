@@ -235,4 +235,8 @@ void eval_context_setup_type(Type* type);
 
 void interpreter_install_functions(Block* block);
 
+bool is_stack(caValue* value);
+Stack* as_stack(caValue* value);
+void set_stack(caValue* value, Stack* stack);
+
 } // namespace circa

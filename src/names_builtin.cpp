@@ -80,6 +80,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_StorageTypeInt: return "StorageTypeInt";
     case sym_StorageTypeFloat: return "StorageTypeFloat";
     case sym_StorageTypeBool: return "StorageTypeBool";
+    case sym_StorageTypeStack: return "StorageTypeStack";
     case sym_StorageTypeString: return "StorageTypeString";
     case sym_StorageTypeList: return "StorageTypeList";
     case sym_StorageTypeOpaquePointer: return "StorageTypeOpaquePointer";
@@ -198,7 +199,6 @@ const char* builtin_symbol_to_string(int name)
     case sym_Multiple: return "Multiple";
     case sym_Cast: return "Cast";
     case sym_DynamicMethodOutput: return "DynamicMethodOutput";
-    case sym_NamedField: return "NamedField";
     case sym_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";
@@ -645,19 +645,9 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     default: return -1;
     case 'm':
-    switch (str[3]) {
-    default: return -1;
-    case 'e':
-    switch (str[4]) {
-    default: return -1;
-    case 0:
+        if (strcmp(str + 3, "e") == 0)
             return sym_Name;
-    case 'd':
-        if (strcmp(str + 5, "Field") == 0)
-            return sym_NamedField;
         break;
-    }
-    }
     case 't':
         if (strcmp(str + 3, "ivePatch") == 0)
             return sym_NativePatch;
@@ -788,9 +778,21 @@ int builtin_symbol_from_string(const char* str)
             return sym_StorageTypeNull;
         break;
     case 'S':
-        if (strcmp(str + 12, "tring") == 0)
+    switch (str[12]) {
+    default: return -1;
+    case 't':
+    switch (str[13]) {
+    default: return -1;
+    case 'a':
+        if (strcmp(str + 14, "ck") == 0)
+            return sym_StorageTypeStack;
+        break;
+    case 'r':
+        if (strcmp(str + 14, "ing") == 0)
             return sym_StorageTypeString;
         break;
+    }
+    }
     case 'T':
     switch (str[12]) {
     default: return -1;
