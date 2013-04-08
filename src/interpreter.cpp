@@ -506,6 +506,8 @@ void stack_restart(Stack* stack)
     if (top_frame(stack) == NULL)
         return;
 
+    bool errorOccurred = error_occurred(stack);
+
     while (top_frame_parent(stack) != NULL)
         pop_frame(stack);
 
@@ -521,14 +523,21 @@ void stack_restart(Stack* stack)
         if (term != NULL && is_output_placeholder(term))
             continue;
 
+        // Don't clear state input. It may be cleared by the 'loop state' step below.
+        if (is_state_input(term))
+            continue;
+
         set_null(list_get(&top->registers, i));
     }
 
-    // Feed state back in to its input, if any.
-    Term* stateOut = find_state_output(block);
-    if (stateOut != NULL) {
-        Term* stateIn = find_state_input(block);
-        move(frame_register(top, stateOut), frame_register(top, stateIn));
+    // Loop state (if any) back in to its input slot.
+    // But, don't do this if an error occurred.
+    if (!errorOccurred) {
+        Term* stateOut = find_state_output(block);
+        if (stateOut != NULL) {
+            Term* stateIn = find_state_input(block);
+            move(frame_register(top, stateOut), frame_register(top, stateIn));
+        }
     }
 
     stack->step = sym_StackReady;

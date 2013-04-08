@@ -17,6 +17,6 @@ assert(actor.call(:inc) == 1)
 assert(actor.call(:inc) == 2)
 assert(actor.call(:inc) == 3)
 
-actor.call(:die) -> errored
+assert(errored(actor.call(:die)))
 
 assert(actor.call(:inc) == 4)
