@@ -527,6 +527,25 @@ void remove_nulls(Block* block)
         block->_terms.resize(block->_terms.length() - numDeleted);
 }
 
+EvaluateFunc get_override_for_block(Block* block)
+{
+    // This relationship should be simplified.
+    Term* owner = block->owningTerm;
+    if (owner == NULL)
+        return NULL;
+
+    if (!is_function(owner))
+        return NULL;
+
+    Function* func = as_function(owner);
+
+    // Subroutine no longer acts as an override
+    if (func->evaluate == evaluate_subroutine)
+        return NULL;
+
+    return func->evaluate;
+}
+
 Term* find_term_by_id(Block* block, int id)
 {
     for (BlockIterator it(block); !it.finished(); it.advance()) {

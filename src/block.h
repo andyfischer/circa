@@ -170,6 +170,9 @@ Block* load_script_term(Block* block, const char* filename);
 
 void remove_nulls(Block* block);
 
+// Return the block's override func. May be NULL.
+EvaluateFunc get_override_for_block(Block* block);
+
 Term* find_term_by_id(Block* block, int id);
 
 std::string get_source_file_location(Block* block);

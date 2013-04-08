@@ -211,8 +211,6 @@ caValue* get_top_register(Stack* stack, Term* term);
 Block* frame_block(Frame* frame);
 caValue* frame_bytecode(Frame* frame);
 
-EvaluateFunc get_override_for_block(Block* block);
-
 // Create an output value for the current term, using the declared type's
 // initialize function.
 void create_output(Stack* stack);

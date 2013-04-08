@@ -961,25 +961,6 @@ static Block* case_block_choose_block(Stack* stack, Term* term)
     return NULL;
 }
 
-EvaluateFunc get_override_for_block(Block* block)
-{
-    // This relationship should be simplified.
-    Term* owner = block->owningTerm;
-    if (owner == NULL)
-        return NULL;
-
-    if (!is_function(owner))
-        return NULL;
-
-    Function* func = as_function(owner);
-
-    // Subroutine no longer acts as an override
-    if (func->evaluate == evaluate_subroutine)
-        return NULL;
-
-    return func->evaluate;
-}
-
 static void start_interpreter_session(Stack* stack)
 {
     Block* topBlock = top_frame(stack)->block;
