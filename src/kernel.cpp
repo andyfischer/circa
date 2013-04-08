@@ -180,68 +180,6 @@ void sys__perf_stats_dump(caStack* stack)
     perf_stats_to_list(circa_output(stack, 0));
 }
 
-void make_actor(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-
-    // Check that the block is well-defined for an actor.
-    Term* primaryInput = get_input_placeholder(block, 0);
-    circa::Value description;
-    get_input_description(primaryInput, &description);
-
-    int inputCount = count_input_placeholders(block);
-
-    if (inputCount < 1 || inputCount > 2)
-        return raise_error_msg(stack, "Can't use block as actor: must have either 1 or 2 inputs");
-    if (!is_symbol(&description) || as_symbol(&description) != sym_Primary)
-        return raise_error_msg(stack, "Can't use block as actor: 1st input must be primary");
-
-    if (inputCount == 2) {
-        get_input_description(get_input_placeholder(block, 1), &description);
-        if (!is_symbol(&description) || as_symbol(&description) != sym_State)
-            return raise_error_msg(stack,
-                "Can't use block as actor: 2nd input, if present, must be for state");
-    }
-
-    Actor* actor = create_actor(stack->world, block);
-    set_actor(circa_output(stack, 0), actor);
-}
-
-void Actor__inject(caStack* stack)
-{
-    Actor* actor = as_actor(circa_input(stack, 0));
-    caValue* name = circa_input(stack, 1);
-    caValue* val = circa_input(stack, 2);
-    bool success = actor_inject(actor, name, val);
-    set_bool(circa_output(stack, 0), success);
-}
-
-void Actor__call(caStack* stack)
-{
-    Actor* actor = as_actor(circa_input(stack, 0));
-
-    if (actor == NULL) {
-        return raise_error_msg(stack, "Actor is null");
-    }
-
-    if (actor_call_in_progress(actor)) {
-        return raise_error_msg(stack, "Actor is in use; maybe this is a recursive call?");
-    }
-
-    caValue* input = circa_input(stack, 1);
-    copy(input, actor_input_slot(actor));
-
-    actor_run(actor);
-
-    copy(actor_output_slot(actor), circa_output(stack, 0));
-}
-
-void Actor__stack(caStack* stack)
-{
-    Actor* actor = as_actor(circa_input(stack, 0));
-    set_stack(circa_output(stack, 0), actor->stack);
-}
-
 void Dict__count(caStack* stack)
 {
     caValue* dict = circa_input(stack, 0);
@@ -1074,11 +1012,6 @@ void bootstrap_kernel()
         {"sys:perf_stats_reset", sys__perf_stats_reset},
         {"sys:perf_stats_dump", sys__perf_stats_dump},
 
-        {"make_actor", make_actor},
-        {"Actor.inject", Actor__inject},
-        {"Actor.call", Actor__call},
-        {"Actor.stack", Actor__stack},
-
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},
         {"Dict.set", Dict__set},
@@ -1148,15 +1081,13 @@ void bootstrap_kernel()
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
     // Finish setting up types that are declared in stdlib.ca.
-    TYPES.actor = as_type(kernel->get("Actor"));
-    actor_setup_type(TYPES.actor);
+    TYPES.stack = as_type(kernel->get("Actor"));
     TYPES.color = as_type(kernel->get("Color"));
     TYPES.closure = as_type(kernel->get("Closure"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
     callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
-    TYPES.stack = as_type(kernel->get("Interpreter"));
 
     Type* mutableType = as_type(kernel->get("Mutable"));
     circa_setup_object_type(mutableType, sizeof(Value), MutableRelease);

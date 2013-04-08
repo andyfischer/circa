@@ -2,7 +2,6 @@
 
 #include "unit_test_common.h"
 
-#include "actors.h"
 #include "block.h"
 #include "building.h"
 #include "hashtable.h"
@@ -101,33 +100,6 @@ void stack_value()
 
     runtimeStack = as_stack(get_field(state, "int"));
     test_assert(frame_block(top_frame(runtimeStack)) == f2->nestedContents);
-
-    free_stack(stack);
-}
-
-void actor_value()
-{
-    Block version1;
-    Term* f1 = version1.compile("def f(int i)");
-    version1.compile("state actor = make_actor(f.block)");
-
-    Block version2;
-    Term* f2 = version2.compile("def f(int i)");
-
-    Stack* stack = create_stack(global_world());
-    push_frame(stack, &version1);
-    run_interpreter(stack);
-    stack_restart(stack);
-
-    caValue* state = stack_find_state_input_register(stack);
-
-    Actor* actor = as_actor(get_field(state, "actor"));
-    test_assert(actor_block(actor) == f1->nestedContents);
-
-    update_world_after_module_reload(global_world(), &version1, &version2);
-
-    actor = as_actor(get_field(state, "actor"));
-    test_assert(actor_block(actor) == f2->nestedContents);
 
     free_stack(stack);
 }

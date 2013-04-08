@@ -75,9 +75,8 @@ struct Stack
     FrameId firstFreeFrame;
     FrameId lastFreeFrame;
 
-    // Whether the interpreter is currently running. Set to false when an error occurs
-    // or when the block is completed.
-    bool running;
+    // Current step, either StackReady, StackRunning or StackFinished.
+    Symbol step;
 
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
@@ -157,7 +156,7 @@ void stack_reset(Stack* stack);
 // values. If there is a state register, feed the output back into its input.
 void stack_restart(Stack* stack);
 
-caValue* stack_get_state_field(Stack* stack, const char* name);
+caValue* stack_get_state(Stack* stack);
 
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Block* block);

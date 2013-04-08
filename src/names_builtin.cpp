@@ -57,6 +57,9 @@ const char* builtin_symbol_to_string(int name)
     case sym_Primary: return "Primary";
     case sym_Anonymous: return "Anonymous";
     case sym_State: return "State";
+    case sym_StackReady: return "StackReady";
+    case sym_StackRunning: return "StackRunning";
+    case sym_StackFinished: return "StackFinished";
     case sym_InfixOperator: return "InfixOperator";
     case sym_FunctionName: return "FunctionName";
     case sym_TypeName: return "TypeName";
@@ -695,9 +698,37 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     default: return -1;
     case 'a':
-        if (strcmp(str + 3, "te") == 0)
+    switch (str[3]) {
+    default: return -1;
+    case 'c':
+    switch (str[4]) {
+    default: return -1;
+    case 'k':
+    switch (str[5]) {
+    default: return -1;
+    case 'R':
+    switch (str[6]) {
+    default: return -1;
+    case 'e':
+        if (strcmp(str + 7, "ady") == 0)
+            return sym_StackReady;
+        break;
+    case 'u':
+        if (strcmp(str + 7, "nning") == 0)
+            return sym_StackRunning;
+        break;
+    }
+    case 'F':
+        if (strcmp(str + 6, "inished") == 0)
+            return sym_StackFinished;
+        break;
+    }
+    }
+    case 't':
+        if (strcmp(str + 4, "e") == 0)
             return sym_State;
         break;
+    }
     case 'r':
         if (strcmp(str + 3, "uctType") == 0)
             return sym_StructType;

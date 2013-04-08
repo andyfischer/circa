@@ -109,9 +109,6 @@ void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block*
                         oldBlock, newBlock));
         } else if (is_stack(val)) {
             translate_stack_across_blocks(as_stack(val), oldBlock, newBlock);
-        } else if (is_actor(val)) {
-            Actor* actor = as_actor(val);
-            translate_stack_across_blocks(actor->stack, oldBlock, newBlock);
         }
     }
 }

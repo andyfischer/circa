@@ -1,8 +1,7 @@
 
 block = {
     i = input()
-    print('got i = ' i)
-    print('got i == :inc ' (i == :inc))
+    
     state n = 0
     if i == :inc
         n += 1
@@ -20,4 +19,4 @@ assert(actor.call(:inc) == 3)
 
 actor.call(:die) -> errored
 
--- assert(actor.call(:inc) == 4)
+assert(actor.call(:inc) == 4)

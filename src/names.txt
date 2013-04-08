@@ -56,6 +56,11 @@ Primary
 Anonymous
 State
 
+# Stack steps
+StackReady
+StackRunning
+StackFinished
+
 # Formatted-source phrase types
 InfixOperator
 FunctionName

@@ -22,86 +22,36 @@ namespace circa {
 // it. This calling mechanism is syncronous, there's no direct support for async.
 // (But callers can simulate async by injecting into queues).
 
-Actor* create_actor(World* world, Block* block)
+#if 0
+Stack* create_actor(World* world, Block* block)
 {
     ca_assert(block != NULL);
-    Actor* actor = new Actor();
-    actor->id = world->nextActorID++;
-    actor->stack = create_stack(world);
-    push_frame(actor->stack, block);
-    return actor;
+    Stack* stack = create_stack(world);
+    push_frame(stack, block);
+    return stack;
 }
+#endif
 
-void set_actor(caValue* value, Actor* actor)
+bool state_inject(Stack* stack, caValue* name, caValue* value)
 {
-    change_type(value, TYPES.actor);
-    value->value_data.ptr = actor;
-}
-
-bool is_actor(caValue* value)
-{
-    return value->value_type == TYPES.actor;
-}
-
-Actor* as_actor(caValue* value)
-{
-    ca_assert(is_actor(value));
-    return (Actor*) value->value_data.ptr;
-}
-
-Block* actor_block(Actor* actor)
-{
-    ca_assert(top_frame_parent(actor->stack) == NULL);
-    return top_frame(actor->stack)->block;
-}
-
-void actor_setup_type(Type* type)
-{
-    set_string(&type->name, "Actor");
-    type->storageType = sym_StorageTypeObject;
-}
-
-bool actor_call_in_progress(Actor* actor)
-{
-    // TODO
-    return false;
-}
-
-caValue* actor_input_slot(Actor* actor)
-{
-    ca_assert(top_frame_parent(actor->stack) == NULL);
-    return frame_register(top_frame(actor->stack), 0);
-}
-
-caValue* actor_output_slot(Actor* actor)
-{
-    ca_assert(top_frame_parent(actor->stack) == NULL);
-    return frame_register_from_end(top_frame(actor->stack), 0);
-}
-bool actor_inject(Actor* actor, caValue* name, caValue* value)
-{
-    // TODO: Collapse duplicate code with stack_get_state_field
-    Frame* top = top_frame(actor->stack);
-    Term* stateSlot = find_state_output(top->block);
-    if (stateSlot == NULL)
-        return false;
-
-    caValue* stateValue = frame_register(top, stateSlot);
+    caValue* state = stack_get_state(stack);
+    Block* block = top_frame(stack)->block;
 
     // Initialize stateValue if it's currently null.
-    if (stateValue == NULL || is_null(stateValue))
-        make(top->block->stateType, stateValue);
+    if (is_null(state))
+        make(block->stateType, state);
 
-    caValue* slot = get_field(stateValue, name, NULL);
+    caValue* slot = get_field(state, name, NULL);
     if (slot == NULL)
         return false;
 
-    touch(stateValue);
-    copy(value, get_field(stateValue, name, NULL));
+    touch(state);
+    copy(value, get_field(state, name, NULL));
     return true;
 }
 
-void actor_run(Actor* actor)
+#if 0
+void actor_run(Stack* actor)
 {
     Stack* stack = actor->stack;
     ca_assert(top_frame_parent(stack) == NULL);
@@ -114,6 +64,7 @@ void actor_run(Actor* actor)
         dump(stack);
     }
 }
+#endif
 
 #if 0
 

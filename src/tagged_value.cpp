@@ -2,7 +2,6 @@
 
 #include "common_headers.h"
 
-#include "actors.h"
 #include "debug.h"
 #include "hashtable.h"
 #include "kernel.h"
@@ -644,10 +643,6 @@ void* circa_object(caValue* value)
 }
 caStack* circa_stack(caValue* value)
 {
-    // TODO: Fix this hack.
-    if (is_actor(value))
-        return as_actor(value)->stack;
-
     return as_stack(value);
 }
 const char* circa_string(caValue* value) {

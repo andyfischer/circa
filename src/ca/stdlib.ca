@@ -88,19 +88,10 @@ type Actor;
 type FileSignature { String filename, int time_modified }
 type Callable;
 type Color { number r, number g, number b, number a }
-type Interpreter;
 type Point { number x, number y }
 type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
-
-def make_actor(Block block) -> Actor
-def Actor.inject(self, String name, any val) -> bool
-    -- Inject a value into the actor's state. Must correspond to an existing state definition.
-    -- Returns whether the operation was successful.
-def Actor.call(self, any input) -> any
-    -- Synchronous actor call
-def Actor.stack(self) -> Interpreter
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block
@@ -201,37 +192,43 @@ def Frame.output(self, int nth) -> any
 
 def Function.block(self) -> Block
 
-def make_interpreter() -> Interpreter
+def make_interpreter() -> Actor
     -- Create a new interpreter
-def Interpreter.push_frame(self, Block b, List inputs)
+def make_actor(Block block) -> Actor
+def Actor.inject(self, String name, any val) -> bool
+    -- Inject a value into the actor's state. Must correspond to an existing state definition.
+    -- Returns whether the operation was successful.
+def Actor.call(self, any input) -> any
+    -- Synchronous actor call
+def Actor.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
-def Interpreter.pop_frame(self)
+def Actor.pop_frame(self)
     -- Pop the topmost frame.
-def Interpreter.set_state_input(self, any val)
+def Actor.set_state_input(self, any val)
     -- Assign a value to the :state input of the topmost frame (if any)
-def Interpreter.get_state_output(self) -> any
-def Interpreter.reset(self)
+def Actor.get_state_output(self) -> any
+def Actor.reset(self)
     -- Clear this interpreter's state, including stack frames.
-def Interpreter.run(self)
+def Actor.run(self)
     -- Run the interpreter until either the topmost frame is finished, or an error
     -- is raised.
-def Interpreter.run_steps(self, int steps)
+def Actor.run_steps(self, int steps)
     -- Run the interpreter for a specific number of steps. If an error occurs then
     -- evaluation will be stopped.
-def Interpreter.frame(self, int depth) -> Frame
+def Actor.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
-def Interpreter.top_frame(self) -> Frame
+def Actor.top_frame(self) -> Frame
     -- Return the topmost Frame.
     self.frame(0)
-def Interpreter.frames(self) -> List
+def Actor.frames(self) -> List
     -- Return the list of Frames.
-def Interpreter.output(self, int index) -> any
+def Actor.output(self, int index) -> any
     -- Fetch the value in the nth output register.
-def Interpreter.errored(self) -> bool
+def Actor.errored(self) -> bool
     -- Returns true if the interpreter has stopped to due error.
-def Interpreter.error_message(self) -> String
+def Actor.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
-def Interpreter.toString(self) -> String
+def Actor.toString(self) -> String
 
 def empty_list(any initialValue, int size) -> List
 def List.append(self, any item) -> List
