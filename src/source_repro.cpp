@@ -436,13 +436,15 @@ void append_phrase(caValue* source, const char* str, Term* term, Symbol type)
         return;
 
     // If there are any newlines, break them up into multiple phrases.
-    for (unsigned i=0; i < strlen(str); i++) {
-        if (str[i] == '\n' && i != 0) {
-            std::string leadingStr;
-            leadingStr.assign(str, i);
-            append_phrase(source, leadingStr.c_str(), term, type);
-            append_phrase(source, "\n", term, tok_Newline);
-            return append_phrase(source, &str[i + 1], term, type);
+    if (strlen(str) > 1) {
+        for (unsigned i=0; i < strlen(str); i++) {
+            if (str[i] == '\n') {
+                std::string leadingStr;
+                leadingStr.assign(str, i);
+                append_phrase(source, leadingStr.c_str(), term, type);
+                append_phrase(source, "\n", term, tok_Newline);
+                return append_phrase(source, &str[i + 1], term, type);
+            }
         }
     }
 
