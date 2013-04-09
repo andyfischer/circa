@@ -85,6 +85,7 @@ OBJECTS := \
 	$(OBJDIR)/native_patch_test.o \
 	$(OBJDIR)/parser_test.o \
 	$(OBJDIR)/path_expression_test.o \
+	$(OBJDIR)/source_repro_test.o \
 	$(OBJDIR)/stateful_code_test.o \
 	$(OBJDIR)/string_test.o \
 	$(OBJDIR)/symbol_test.o \
@@ -210,6 +211,9 @@ $(OBJDIR)/parser_test.o: unit_tests/parser_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/path_expression_test.o: unit_tests/path_expression_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/source_repro_test.o: unit_tests/source_repro_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/stateful_code_test.o: unit_tests/stateful_code_test.cpp

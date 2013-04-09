@@ -66,11 +66,26 @@ void format_block_source(caValue* source, Block* block, Term* format)
         append_phrase(source, "}", format, sym_None);
 }
 
+static caValue* append_code_line(caValue* lines, int lineNumber, Term* ref)
+{
+    caValue* line = list_append(lines);
+    set_list(line, 3);
+    set_int(list_get(line, 0), lineNumber);
+    set_term_ref(list_get(line, 1), ref);
+    set_string(list_get(line, 2), "");
+    return line;
+}
+
+static void append_text_to_code_line(caValue* line, caValue* str)
+{
+    string_append(list_get(line, 2), str);
+}
+
 void block_to_code_lines(Block* block, caValue* out)
 {
     circa_set_list(out, 0);
 
-    bool newlineNeeded = false;
+    // bool newlineNeeded = false;
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
 
@@ -93,18 +108,13 @@ void block_to_code_lines(Block* block, caValue* out)
 
         format_term_source(&phrases, term);
 
-        caValue* currentLine = NULL;
+        caValue* currentLine = append_code_line(out, term_line_number(term), term);
         int lineNumberDelta = 0;
 
         for (int phraseIndex=0; phraseIndex < list_length(&phrases); phraseIndex++) {
             caValue* phrase = list_get(&phrases, phraseIndex);
             if (currentLine == NULL) {
-                currentLine = list_append(out);
-                set_list(currentLine, 3);
-                set_int(list_get(currentLine, 0), term_line_number(term) + lineNumberDelta);
-                set_term_ref(list_get(currentLine, 1), term);
-                caValue* text = list_get(currentLine, 2);
-                set_string(text, "");
+                currentLine = append_code_line(out, term_line_number(term) + lineNumberDelta, term);
             }
 
             caValue* phraseText = list_get(phrase, 0);
@@ -112,8 +122,7 @@ void block_to_code_lines(Block* block, caValue* out)
                 currentLine = NULL;
                 lineNumberDelta++;
             } else {
-                caValue* text = list_get(currentLine, 2);
-                string_append(text, phraseText);
+                append_text_to_code_line(currentLine, phraseText);
             }
         }
 

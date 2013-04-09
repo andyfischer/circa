@@ -354,6 +354,7 @@ namespace names_test { void register_tests(); }
 namespace native_patch_test { void register_tests(); }
 namespace parser_test { void register_tests(); }
 namespace path_expression_test { void register_tests(); }
+namespace source_repro_test { void register_tests(); }
 namespace stateful_code_test { void register_tests(); }
 namespace string_test { void register_tests(); }
 namespace symbol_test { void register_tests(); }
@@ -380,6 +381,7 @@ int main(int argc, char** argv)
     native_patch_test::register_tests();
     parser_test::register_tests();
     path_expression_test::register_tests();
+    source_repro_test::register_tests();
     stateful_code_test::register_tests();
     string_test::register_tests();
     symbol_test::register_tests();
