@@ -212,9 +212,6 @@ def Actor.reset(self)
 def Actor.run(self)
     -- Run the interpreter until either the topmost frame is finished, or an error
     -- is raised.
-def Actor.run_steps(self, int steps)
-    -- Run the interpreter for a specific number of steps. If an error occurs then
-    -- evaluation will be stopped.
 def Actor.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
 def Actor.top_frame(self) -> Frame

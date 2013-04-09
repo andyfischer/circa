@@ -35,11 +35,10 @@ struct Frame
     // Register values.
     List registers;
 
-    // Bytecode
-    Value bytecode;
-
     // Source block
     Block* block;
+
+    Value customBytecode;
 
     // Which version of the block we are using.
     int blockVersion;
@@ -124,11 +123,8 @@ Frame* frame_by_depth(Stack* stack, int depth);
 
 // Run the interpreter.
 void run_interpreter(Stack* stack);
-void run_interpreter_step(Stack* stack);
-void run_interpreter_steps(Stack* stack, int steps);
 
-// Evaluate a single term. Deprecated.
-void evaluate_single_term(Stack* stack, Term* term);
+// Deprecated
 void evaluate_block(Stack* stack, Block* block);
 
 // Evaluate only the terms between 'start' and 'end'.
@@ -208,8 +204,8 @@ caValue* stack_find_state_input_register(Stack* stack);
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);
 
-Block* frame_block(Frame* frame);
 caValue* frame_bytecode(Frame* frame);
+Block* frame_block(Frame* frame);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.

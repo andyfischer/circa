@@ -11,6 +11,7 @@
 #include "function.h"
 #include "importing.h"
 #include "modules.h"
+#include "reflection.h"
 #include "string_type.h"
 #include "type.h"
 #include "world.h"
@@ -108,12 +109,39 @@ void test_directly_call_native_override()
     test_equals(circa_output(&stack, 0), "15");
 }
 
+void bug_stale_bytecode_after_migrate()
+{
+    // There was a bug where Stack was holding on to stale bytecode, which caused
+    // problems when the Block was migrated.
+
+    Stack stack;
+
+    Block version1;
+    version1.compile("test_spy(1)");
+
+    Block version2;
+    version2.compile("test_spy(2)");
+
+    push_frame(&stack, &version1);
+
+    test_spy_clear();
+    run_interpreter(&stack);
+    test_equals(test_spy_get_results(), "[1]");
+
+    stack_restart(&stack);
+    translate_stack_across_blocks(&stack, &version1, &version2);
+    test_spy_clear();
+    run_interpreter(&stack);
+    test_equals(test_spy_get_results(), "[2]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
     REGISTER_TEST_CASE(interpreter_test::run_block_after_additions);
     REGISTER_TEST_CASE(interpreter_test::test_evaluate_minimum);
     REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
+    REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
 }
 
 } // namespace interpreter_test

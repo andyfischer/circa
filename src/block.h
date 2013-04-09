@@ -138,6 +138,7 @@ Block* alloc_block_gc();
 bool is_namespace(Term* term);
 bool is_namespace(Block* block);
 
+caValue* block_bytecode(Block* block);
 bool has_nested_contents(Term* term);
 Block* nested_contents(Term* term);
 void remove_nested_contents(Term* term);

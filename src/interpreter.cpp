@@ -32,7 +32,8 @@ static void dump_frames_raw(Stack* stack);
 static Block* find_pushed_block_for_action(caValue* action);
 static void update_stack_for_possibly_changed_blocks(Stack* stack);
 static void start_interpreter_session(Stack* stack);
-static void step_interpreter(Stack* stack);
+void run(Stack* stack);
+// static void step_interpreter(Stack* stack);
 static void bytecode_write_noop(caValue* op);
 static void bytecode_write_finish_op(caValue* op);
 
@@ -156,7 +157,7 @@ static void resize_frame_list(Stack* stack, int newCapacity)
         frame->id = i + 1;
         frame->stack = stack;
         initialize_null(&frame->registers);
-        initialize_null(&frame->bytecode);
+        initialize_null(&frame->customBytecode);
         frame->blockVersion = 0;
 
         // Except for the last element, this id is updated on next iteration.
@@ -214,9 +215,6 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
     // Initialize registers
     set_list(&frame->registers, get_locals_count(block));
 
-    // Copy bytecode.
-    copy(&block->bytecode, frame_bytecode(frame));
-
     return frame;
 }
 
@@ -237,9 +235,6 @@ Frame* push_frame(Stack* stack, Block* block)
 {
     INCREMENT_STAT(PushFrame);
 
-    // Make sure the block's bytecode is up-to-date.
-    refresh_bytecode(block);
-
     int parentPc = 0;
     if (stack->top != 0)
         parentPc = top_frame(stack)->pc;
@@ -248,6 +243,8 @@ Frame* push_frame(Stack* stack, Block* block)
 
     // Update 'top'
     stack->top = frame->id;
+    
+    refresh_bytecode(block);
 
     return frame;
 }
@@ -559,15 +556,6 @@ caValue* stack_get_state(Stack* stack)
     return frame_register(top, stateSlot);
 }
 
-void evaluate_single_term(Stack* stack, Term* term)
-{
-    Frame* frame = push_frame(stack, term->owningBlock);
-    frame->pc = term->index;
-    frame->nextPc = term->index;
-
-    run_interpreter(stack);
-}
-
 void evaluate_block(Stack* stack, Block* block)
 {
     block_finish_changes(block);
@@ -696,14 +684,16 @@ caValue* stack_find_state_input_register(Stack* stack)
     return frame_register(top, stateInput);
 }
 
+caValue* frame_bytecode(Frame* frame)
+{
+    if (!is_null(&frame->customBytecode))
+        return &frame->customBytecode;
+    return block_bytecode(frame->block);
+}
+
 Block* frame_block(Frame* frame)
 {
     return frame->block;
-}
-
-caValue* frame_bytecode(Frame* frame)
-{
-    return &frame->bytecode;
 }
 
 caValue* frame_register_from_end(Frame* frame, int index)
@@ -908,9 +898,6 @@ static void update_stack_for_possibly_changed_blocks(Stack* stack)
 
             // Resize frame->registers if needed.
             list_resize(&frame->registers, get_locals_count(frame->block));
-
-            refresh_bytecode(frame->block);
-            copy(&frame->block->bytecode, &frame->bytecode);
         }
 
         // Continue to next frame.
@@ -964,6 +951,11 @@ static Block* case_block_choose_block(Stack* stack, Term* term)
 static void start_interpreter_session(Stack* stack)
 {
     Block* topBlock = top_frame(stack)->block;
+
+    // Refresh bytecode for every block in this stack.
+    for (Frame* frame = top_frame(stack); frame != NULL; frame = frame_parent(frame)) {
+        refresh_bytecode(frame->block);
+    }
 
     // Make sure there are no pending code updates.
     block_finish_changes(topBlock);
@@ -1357,12 +1349,14 @@ static Block* find_pushed_block_for_action(caValue* action)
     }
 }
 
+#if 0
 static void step_interpreter(Stack* stack)
 {
     INCREMENT_STAT(StepInterpreter);
 
     Frame* frame = top_frame(stack);
     Block* block = frame->block;
+    caValue* bytecode = block_bytecode(block);
 
     // Advance pc to nextPc
     frame->pc = frame->nextPc;
@@ -1371,7 +1365,7 @@ static void step_interpreter(Stack* stack)
     ca_assert(frame->pc <= block->length());
 
     // Grab action
-    caValue* action = list_get(frame_bytecode(frame), frame->pc);
+    caValue* action = list_get(bytecode, frame->pc);
     int op = as_int(list_get(action, 0));
 
     // Dispatch op
@@ -1524,8 +1518,8 @@ static void step_interpreter(Stack* stack)
         for (int i=0; i < list_length(outputList); i++)
             copy(list_get(outputList, i), frame_register_from_end(frame, i));
 
-        // Jump to for loop finish op.
-        frame->nextPc = list_length(frame_bytecode(frame)) - 1;
+        // Jump to for-loop finish op.
+        frame->nextPc = list_length(bytecode) - 1;
         break;
     }
     case op_FinishFrame: {
@@ -1574,6 +1568,7 @@ static void step_interpreter(Stack* stack)
         ca_assert(false);
     }
 }
+#endif
 
 void run_interpreter(Stack* stack)
 {
@@ -1582,39 +1577,256 @@ void run_interpreter(Stack* stack)
     stack->errorOccurred = false;
     stack->step = sym_StackRunning;
 
-    while (stack->step == sym_StackRunning)
-        step_interpreter(stack);
+    run(stack);
 }
 
-void run_interpreter_step(Stack* stack)
+void run(Stack* stack)
 {
-    start_interpreter_session(stack);
+    while (true) {
 
-    stack->step = sym_StackRunning;
-    step_interpreter(stack);
-    stack->step = sym_StackFinished;
-}
+        if (stack->step != sym_StackRunning)
+            return;
 
-void run_interpreter_steps(Stack* stack, int steps)
-{
-    start_interpreter_session(stack);
+        INCREMENT_STAT(StepInterpreter);
 
-    stack->step = sym_StackRunning;
-    step_interpreter(stack);
+        Frame* frame = top_frame(stack);
+        Block* block = frame->block;
 
-    while ((stack->step == sym_StackRunning) && (steps--) > 0)
-        step_interpreter(stack);
+        // Advance pc to nextPc
+        frame->pc = frame->nextPc;
+        frame->nextPc = frame->pc + 1;
 
-    stack->step = sym_StackFinished;
+        ca_assert(frame->pc <= block->length());
+
+        // Grab action
+        caValue* action = list_get(frame_bytecode(frame), frame->pc);
+        int op = as_int(list_get(action, 0));
+
+        // Dispatch op
+        switch (op) {
+        case op_NoOp:
+            break;
+        case op_CallBlock: {
+            Block* block = as_block(list_get(action, 3));
+            caValue* inputActions = list_get(action, 1);
+            Frame* frame = push_frame(stack, block);
+            run_input_ins(stack, inputActions, &frame->registers, 1);
+            break;
+        }
+        case op_DynamicCall: {
+            circa::Value incomingInputs;
+            set_list(&incomingInputs, 2);
+
+            caValue* inputActions = list_get(action, 1);
+            run_input_ins(stack, inputActions, &incomingInputs, 0);
+            // May have a runtime type error.
+            if (error_occurred(stack))
+                return;
+
+            Block* block = as_block(list_get(&incomingInputs, 0));
+
+            caValue* unpackedInputs = list_get(&incomingInputs, 1);
+            push_frame_with_inputs(stack, block, unpackedInputs);
+            break;
+        }
+
+        case op_ClosureCall: {
+            circa::Value incomingInputs;
+            set_list(&incomingInputs, 2);
+
+            caValue* inputActions = list_get(action, 1);
+            run_input_ins(stack, inputActions, &incomingInputs, 0);
+            // May have a runtime type error.
+            if (error_occurred(stack))
+                return;
+
+            caValue* closure = list_get(&incomingInputs, 0);
+            Block* block = as_block(list_get(closure, 0));
+            caValue* bindings = list_get(closure, 1);
+
+            Frame* frame = push_frame(stack, block);
+            caValue* actualInputs = list_get(&incomingInputs, 1);
+
+            caValue* registers = frame_registers(frame);
+
+            // Copy incoming inputs.
+            int registerWrite = 0;
+            for (registerWrite=0; registerWrite < list_length(actualInputs); registerWrite++)
+                copy(list_get(actualInputs, registerWrite), list_get(registers, registerWrite));
+
+            // Copy closure bindings.
+            for (int i=0; i < list_length(bindings); i++)
+                copy(list_get(bindings, i), list_get(registers, registerWrite++));
+
+            break;
+        }
+
+        case op_CaseBlock: {
+            Term* currentTerm = block->get(frame->pc);
+            Block* block = case_block_choose_block(stack, currentTerm);
+            if (block == NULL)
+                return;
+            Frame* frame = push_frame(stack, block);
+            caValue* inputActions = list_get(action, 1);
+            run_input_ins(stack, inputActions, &frame->registers, 1);
+            break;
+        }
+        case op_ForLoop: {
+            Term* currentTerm = block->get(frame->pc);
+            Block* block = for_loop_choose_block(stack, currentTerm);
+            Frame* frame = push_frame(stack, block);
+            caValue* inputActions = list_get(action, 1);
+            run_input_ins(stack, inputActions, &frame->registers, 1);
+            bool enableLoopOutput = as_symbol(list_get(action, 3)) == sym_LoopProduceOutput;
+            start_for_loop(stack, enableLoopOutput);
+            break;
+        }
+        case op_SetNull: {
+            caValue* currentRegister = frame_register(frame, frame->pc);
+            set_null(currentRegister);
+            break;
+        }
+        case op_InlineCopy: {
+            caValue* currentRegister = frame_register(frame, frame->pc);
+            caValue* inputs = list_get(action, 1);
+            caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
+            copy(value, currentRegister);
+            break;
+        }
+        case op_FireNative: {
+            EvaluateFunc override = get_override_for_block(block);
+            ca_assert(override != NULL);
+
+            // By default, we'll set nextPc to finish this frame on the next iteration.
+            // The override func may change nextPc.
+            frame->nextPc = frame->block->length();
+
+            // Call override
+            override(stack);
+
+            break;
+        }
+        case op_Return: {
+            // Capture outputs.
+            Value outputs;
+            set_list(&outputs, 1);
+            run_input_ins(stack, list_get(action, 1), &outputs, 0);
+
+            // Pop frames.
+            while (!is_major_block(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
+                pop_frame(stack);
+            frame = top_frame(stack);
+
+            // Copy outputs to placeholders.
+            caValue* outputList = list_get(&outputs, 0);
+
+            for (int i=0; i < list_length(outputList); i++)
+                copy(list_get(outputList, i), frame_register_from_end(frame, i));
+
+            finish_frame(stack);
+            break;
+        }
+        case op_Continue:
+        case op_Break:
+        case op_Discard: {
+            // Capture outputs.
+            Value outputs;
+            set_list(&outputs, 1);
+            run_input_ins(stack, list_get(action, 1), &outputs, 0);
+
+            // Pop frames until the for-loop.
+            while (!is_for_loop(top_frame(stack)->block) && top_frame_parent(stack) != NULL)
+                pop_frame(stack);
+            frame = top_frame(stack);
+
+            if (op == op_Continue)
+                frame->exitType = sym_Continue;
+            else if (op == op_Break)
+                frame->exitType = sym_Break;
+            else if (op == op_Discard)
+                frame->exitType = sym_Discard;
+
+            // Copy outputs to placeholders.
+            caValue* outputList = list_get(&outputs, 0);
+
+            for (int i=0; i < list_length(outputList); i++)
+                copy(list_get(outputList, i), frame_register_from_end(frame, i));
+
+            // Jump to for loop finish op.
+            frame->nextPc = list_length(frame_bytecode(frame)) - 1;
+            break;
+        }
+        case op_FinishFrame: {
+            finish_frame(stack);
+            break;
+        }
+        case op_FinishLoop: {
+            bool enableLoopOutput = as_symbol(list_get(action, 1)) == sym_LoopProduceOutput;
+            for_loop_finish_iteration(stack, enableLoopOutput);
+            break;
+        }
+
+        case op_ErrorNotEnoughInputs: {
+            Term* currentTerm = block->get(frame->pc);
+            circa::Value msg;
+            Block* func = function_contents(currentTerm->function);
+            int expectedCount = count_input_placeholders(func);
+            if (has_variable_args(func))
+                expectedCount--;
+            int foundCount = currentTerm->numInputs();
+            set_string(&msg, "Too few inputs, expected ");
+            string_append(&msg, expectedCount);
+            if (has_variable_args(func))
+                string_append(&msg, " (or more)");
+            string_append(&msg, ", received ");
+            string_append(&msg, foundCount);
+            raise_error_msg(stack, as_cstring(&msg));
+            break;
+        }
+        case op_ErrorTooManyInputs: {
+            Term* currentTerm = block->get(frame->pc);
+            circa::Value msg;
+            Block* func = function_contents(currentTerm->function);
+            int expectedCount = count_input_placeholders(func);
+            int foundCount = currentTerm->numInputs();
+            set_string(&msg, "Too many inputs, expected ");
+            string_append(&msg, expectedCount);
+            string_append(&msg, ", received ");
+            string_append(&msg, foundCount);
+
+            raise_error_msg(stack, as_cstring(&msg));
+            break;
+        }
+        default:
+            std::cout << "Op not recognized: " << op << std::endl;
+            ca_assert(false);
+        }
+    }
 }
 
 void evaluate_range(Stack* stack, Block* block, int start, int end)
 {
+    start_interpreter_session(stack);
+
     block_finish_changes(block);
     push_frame(stack, block);
 
-    for (int i=start; i <= end; i++)
-        evaluate_single_term(stack, block->get(i));
+    Value bytecode;
+    set_list(&bytecode, block->length() + 1);
+
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+
+        caValue* op = list_get(&bytecode, i);
+        if (i < start || i >= end)
+            bytecode_write_noop(op);
+        else
+            write_term_bytecode(term, op);
+    }
+
+    move(&bytecode, &top_frame(stack)->customBytecode);
+
+    run_interpreter(stack);
 
     if (error_occurred(stack))
         return;
@@ -1666,29 +1878,26 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        caValue* op = list_get(&bytecode, i);
-        if (!marked[i]) {
-            bytecode_write_noop(op);
-            continue;
-        }
 
-        write_term_bytecode(term, op);
+        caValue* op = list_get(&bytecode, i);
+        if (!marked[i])
+            bytecode_write_noop(op);
+        else
+            write_term_bytecode(term, op);
     }
     
     bytecode_write_finish_op(list_get(&bytecode, block->length()));
+    delete[] marked;
 
     // Push frame, use our custom bytecode.
     push_frame(stack, block);
-    move(&bytecode, frame_bytecode(top_frame(stack)));
+    move(&bytecode, &top_frame(stack)->customBytecode);
 
-    // Start evaluation.
     run_interpreter(stack);
 
     // Possibly save output
     if (result != NULL)
         copy(get_top_register(stack, term), result);
-
-    delete[] marked;
 
     pop_frame(stack);
 }
@@ -1913,13 +2122,6 @@ void Actor__run(caStack* callerStack)
     ca_assert(self != NULL);
     run_interpreter(self);
 }
-void Actor__run_steps(caStack* callerStack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
-    ca_assert(self != NULL);
-    int steps = circa_int_input(callerStack, 0);
-    run_interpreter_steps(self, steps);
-}
 void Actor__frame(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
@@ -2014,7 +2216,6 @@ void interpreter_install_functions(Block* kernel)
         {"Actor.get_state_output", Actor__get_state_output},
         {"Actor.reset", Actor__reset},
         {"Actor.run", Actor__run},
-        {"Actor.run_steps", Actor__run_steps},
         {"Actor.frame", Actor__frame},
         {"Actor.frames", Actor__frames},
         {"Actor.output", Actor__output},
