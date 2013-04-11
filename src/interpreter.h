@@ -40,6 +40,8 @@ struct Frame
 
     Value customBytecode;
 
+    Value dynamicScope;
+
     // Which version of the block we are using.
     int blockVersion;
 

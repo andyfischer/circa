@@ -87,6 +87,40 @@ void hosted_assert(caStack* stack)
         circa_output_error(stack, "Assert failed");
 }
 
+void get_context(caStack* stack)
+{
+    Frame* frame = top_frame(stack);
+
+    caValue* key = circa_input(stack, 0);
+
+    while (frame != NULL) {
+        if (!is_null(&frame->dynamicScope)) {
+            caValue* value = hashtable_get(&frame->dynamicScope, key);
+            if (value != NULL) {
+                copy(value, circa_output(stack, 0));
+                return;
+            }
+        }
+
+        frame = frame_parent(frame);
+    }
+
+    set_null(circa_output(stack, 0));
+}
+
+void set_context(caStack* stack)
+{
+    caValue* key = circa_input(stack, 0);
+    caValue* value = circa_input(stack, 1);
+
+    Frame* frame = top_frame_parent(stack);
+
+    if (!is_hashtable(&frame->dynamicScope))
+        set_hashtable(&frame->dynamicScope);
+
+    copy(value, hashtable_insert(&frame->dynamicScope, key));
+}
+
 void file__exists(caStack* stack)
 {
     set_bool(circa_output(stack, 0), circa_file_exists( circa_string_input(stack, 0)));
@@ -995,12 +1029,14 @@ void bootstrap_kernel()
     // Install C functions
     static const ImportRecord records[] = {
         {"assert", hosted_assert},
+        {"context", get_context},
         {"cppbuild:build_module", cppbuild_function::build_module},
         {"file:version", file__version},
         {"file:exists", file__exists},
         {"file:read_text", file__read_text},
         {"length", length},
         {"from_string", from_string},
+        {"set_context", set_context},
         {"to_string_repr", to_string_repr},
         {"test_spy", test_spy},
         {"test_oracle", test_oracle},

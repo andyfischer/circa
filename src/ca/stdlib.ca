@@ -15,6 +15,9 @@ def from_string(String s) -> any
 def to_string_repr(any val) -> String
     -- Encode a Circa value as a string representation
 
+def context(Symbol name) -> any
+def set_context(Symbol name, any value)
+
 def has_effects()
     -- Declare that a function has effects. Used in native-patched functions.
 

@@ -1,0 +1,26 @@
+
+def f()
+  print('inside f, context(a) = ' context(:a))
+
+  set_context(:a context(:a) + 1)
+
+  g()
+
+def g()
+  print('inside g, context(a) = ' context(:a))
+
+def with_context_5(Closure cl)
+  print('started with_context_5')
+  set_context(:a 5)
+  cl.call()
+  print('finished with_context_5')
+
+set_context(:a 1)
+print('context(a) = 1')
+f()
+
+set_context(:a 3)
+print('context(a) = 3')
+f()
+
+with_context_5({ f() })

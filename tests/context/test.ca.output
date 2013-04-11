@@ -1,0 +1,10 @@
+context(a) = 1
+inside f, context(a) = 1
+inside g, context(a) = 2
+context(a) = 3
+inside f, context(a) = 3
+inside g, context(a) = 4
+started with_context_5
+inside f, context(a) = 5
+inside g, context(a) = 6
+finished with_context_5

@@ -158,6 +158,7 @@ static void resize_frame_list(Stack* stack, int newCapacity)
         frame->stack = stack;
         initialize_null(&frame->registers);
         initialize_null(&frame->customBytecode);
+        initialize_null(&frame->dynamicScope);
         frame->blockVersion = 0;
 
         // Except for the last element, this id is updated on next iteration.
@@ -220,6 +221,9 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
 
 static void release_frame(Stack* stack, Frame* frame)
 {
+    set_null(&frame->customBytecode);
+    set_null(&frame->dynamicScope);
+
     // Newly freed frames go to the front of the free list.
     if (stack->firstFreeFrame == 0) {
         stack->firstFreeFrame = frame->id;
