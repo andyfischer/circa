@@ -1,0 +1,8 @@
+
+f = {
+    i = input()
+}.block
+
+actor = make_actor(f)
+
+assert(actor.block == f)

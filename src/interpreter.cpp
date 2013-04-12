@@ -2016,6 +2016,12 @@ void make_actor(caStack* stack)
     set_stack(circa_output(stack, 0), newStack);
 }
 
+void Actor__block(caStack* stack)
+{
+    Stack* actor = as_stack(circa_input(stack, 0));
+    set_block(circa_output(stack, 0), top_frame(actor)->block);
+}
+
 void Actor__inject_state(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
@@ -2134,6 +2140,12 @@ void Actor__reset(caStack* callerStack)
     ca_assert(self != NULL);
     stack_reset(self);
 }
+void Actor__restart(caStack* callerStack)
+{
+    Stack* self = as_stack(circa_input(callerStack, 0));
+    ca_assert(self != NULL);
+    stack_restart(self);
+}
 void Actor__run(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
@@ -2229,6 +2241,7 @@ void interpreter_install_functions(Block* kernel)
 
         {"make_interpreter", make_interpreter},
         {"make_actor", make_actor},
+        {"Actor.block", Actor__block},
         {"Actor.inject", Actor__inject_state},
         {"Actor.inject_context", Actor__inject_context},
         {"Actor.apply", Actor__call},
@@ -2238,6 +2251,7 @@ void interpreter_install_functions(Block* kernel)
         {"Actor.set_state_input", Actor__set_state_input},
         {"Actor.get_state_output", Actor__get_state_output},
         {"Actor.reset", Actor__reset},
+        {"Actor.restart", Actor__restart},
         {"Actor.run", Actor__run},
         {"Actor.frame", Actor__frame},
         {"Actor.frames", Actor__frames},
