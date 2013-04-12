@@ -113,6 +113,20 @@ void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block*
     }
 }
 
+void get_dependent_terms(caValue* dependers, Block* topBlock, caValue* result)
+{
+    set_list(result, 0);
+
+    TermMap usedTerms;
+
+    for (int i=0; i < list_length(dependers); i++) {
+        usedTerms[as_term_ref(list_get(dependers, i))] = true;
+    }
+
+    for (int i=0; i < list_length(dependers); i++) {
+    }
+}
+
 void Block__dump(caStack* stack)
 {
     dump(as_block(circa_input(stack, 0)));
