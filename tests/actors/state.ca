@@ -10,8 +10,8 @@ accum = {
 
 actor = make_actor(accum.block)
 
-assert(actor.call([1]) == 1)
-assert(actor.call([1]) == 2)
-assert(actor.call([1]) == 3)
-assert(actor.call([1]) == 4)
-assert(actor.call([6]) == 10)
+assert(actor.call(1) == 1)
+assert(actor.call(1) == 2)
+assert(actor.call(1) == 3)
+assert(actor.call(1) == 4)
+assert(actor.call(6) == 10)

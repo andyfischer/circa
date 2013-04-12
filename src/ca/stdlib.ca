@@ -202,8 +202,10 @@ def Actor.inject(self, String name, any val) -> bool
     -- Inject a value into the actor's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.
 def Actor.inject_context(self, Symbol name, any val)
-def Actor.call(self, List inputs) -> any
+def Actor.call(self, any inputs :multiple) -> any
     -- Synchronous actor call
+def Actor.apply(self, List inputs) -> any
+    -- Synchronous actor call (with inputs as a list)
 def Actor.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
 def Actor.pop_frame(self)

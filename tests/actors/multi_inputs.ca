@@ -8,4 +8,5 @@ f = {
 }.block
 
 actor = make_actor(f)
-assert(actor.call([1 2 3]) == "received inputs: 1, 2, 3")
+assert(actor.call(1 2 3) == "received inputs: 1, 2, 3")
+assert(actor.apply([4 5 6]) == "received inputs: 4, 5, 6")

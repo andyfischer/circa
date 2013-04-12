@@ -2037,18 +2037,16 @@ void Actor__call(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
 
-    if (actor == NULL) {
+    if (actor == NULL)
         return raise_error_msg(stack, "Actor is null");
-    }
 
     stack_restart(actor);
 
     // Populate inputs.
     caValue* ins = circa_input(stack, 1);
 
-    for (int i=0; i < list_length(ins); i++) {
+    for (int i=0; i < list_length(ins); i++)
         copy(list_get(ins, i), circa_input(actor, i));
-    }
 
     run_interpreter(actor);
 
@@ -2233,6 +2231,7 @@ void interpreter_install_functions(Block* kernel)
         {"make_actor", make_actor},
         {"Actor.inject", Actor__inject_state},
         {"Actor.inject_context", Actor__inject_context},
+        {"Actor.apply", Actor__call},
         {"Actor.call", Actor__call},
         {"Actor.push_frame", Actor__push_frame},
         {"Actor.pop_frame", Actor__pop_frame},

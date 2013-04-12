@@ -1,6 +1,6 @@
 
 actor = make_actor({ 1 + 2 }.block)
-actor.call([])
+actor.call()
 
 -- this once caused an interpreter crash
 assert(actor.error_message == "")

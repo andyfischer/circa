@@ -10,7 +10,7 @@ square = {
 actor = make_actor(square.block)
 
 actor.inject('injected', 'a')
-assert(actor.call([null]) == 'injected: a')
-assert(actor.call([null]) == 'injected: a')
+assert(actor.call(null) == 'injected: a')
+assert(actor.call(null) == 'injected: a')
 actor.inject('injected', 'b')
-assert(actor.call([null]) == 'injected: b')
+assert(actor.call(null) == 'injected: b')
