@@ -119,12 +119,14 @@ void get_dependent_terms(caValue* dependers, Block* topBlock, caValue* result)
 
     TermMap usedTerms;
 
+#if 0
     for (int i=0; i < list_length(dependers); i++) {
         usedTerms[as_term_ref(list_get(dependers, i))] = true;
     }
 
     for (int i=0; i < list_length(dependers); i++) {
     }
+#endif
 }
 
 void Block__dump(caStack* stack)

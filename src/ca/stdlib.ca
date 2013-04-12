@@ -201,7 +201,8 @@ def make_actor(Block block) -> Actor
 def Actor.inject(self, String name, any val) -> bool
     -- Inject a value into the actor's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.
-def Actor.call(self, any input) -> any
+def Actor.inject_context(self, Symbol name, any val)
+def Actor.call(self, List inputs) -> any
     -- Synchronous actor call
 def Actor.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.

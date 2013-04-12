@@ -50,6 +50,16 @@ bool state_inject(Stack* stack, caValue* name, caValue* value)
     return true;
 }
 
+void context_inject(Stack* stack, caValue* name, caValue* value)
+{
+    Frame* frame = top_frame(stack);
+
+    if (is_null(&frame->dynamicScope))
+        set_hashtable(&frame->dynamicScope);
+
+    copy(value, hashtable_insert(&frame->dynamicScope, name));
+}
+
 #if 0
 void actor_run(Stack* actor)
 {

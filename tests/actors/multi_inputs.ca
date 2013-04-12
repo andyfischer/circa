@@ -1,0 +1,11 @@
+
+f = {
+    a = input()
+    b = input()
+    c = input()
+
+    output(concat("received inputs: " a ", " b ", " c))
+}.block
+
+actor = make_actor(f)
+assert(actor.call([1 2 3]) == "received inputs: 1, 2, 3")

@@ -1981,6 +1981,7 @@ void Frame__pc_term(caStack* callerStack)
 
 void make_interpreter(caStack* callerStack)
 {
+    // TODO: Remove this in favor of make_actor
     Stack* newStack = new Stack();
     set_pointer(circa_create_default_output(callerStack, 0), newStack);
 }
@@ -1989,6 +1990,7 @@ void make_actor(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
+#if 0
     // Check that the block is well-defined for an actor.
     Term* primaryInput = get_input_placeholder(block, 0);
     circa::Value description;
@@ -2007,19 +2009,28 @@ void make_actor(caStack* stack)
             return raise_error_msg(stack,
                 "Can't use block as actor: 2nd input, if present, must be for state");
     }
+#endif
 
     Stack* newStack = create_stack(stack->world);
     push_frame(newStack, block);
     set_stack(circa_output(stack, 0), newStack);
 }
 
-void Actor__inject(caStack* stack)
+void Actor__inject_state(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
     caValue* val = circa_input(stack, 2);
     bool success = state_inject(actor, name, val);
     set_bool(circa_output(stack, 0), success);
+}
+
+void Actor__inject_context(caStack* stack)
+{
+    Stack* actor = as_stack(circa_input(stack, 0));
+    caValue* name = circa_input(stack, 1);
+    caValue* val = circa_input(stack, 2);
+    context_inject(actor, name, val);
 }
 
 void Actor__call(caStack* stack)
@@ -2032,7 +2043,12 @@ void Actor__call(caStack* stack)
 
     stack_restart(actor);
 
-    copy(circa_input(stack, 1), circa_input(actor, 0));
+    // Populate inputs.
+    caValue* ins = circa_input(stack, 1);
+
+    for (int i=0; i < list_length(ins); i++) {
+        copy(list_get(ins, i), circa_input(actor, i));
+    }
 
     run_interpreter(actor);
 
@@ -2159,11 +2175,14 @@ void Actor__error_message(caStack* callerStack)
 
     Frame* frame = top_frame(self);
 
+    if (frame->pc >= frame_register_count(frame)) {
+        set_string(circa_output(callerStack, 0), "");
+        return;
+    }
+
     caValue* errorReg = frame_register(frame, frame->pc);
 
-    if (errorReg == NULL)
-        set_string(circa_output(callerStack, 0), "(null error)");
-    else if (is_string(errorReg))
+    if (is_string(errorReg))
         set_string(circa_output(callerStack, 0), as_cstring(errorReg));
     else
         set_string(circa_output(callerStack, 0), to_string(errorReg).c_str());
@@ -2212,7 +2231,8 @@ void interpreter_install_functions(Block* kernel)
 
         {"make_interpreter", make_interpreter},
         {"make_actor", make_actor},
-        {"Actor.inject", Actor__inject},
+        {"Actor.inject", Actor__inject_state},
+        {"Actor.inject_context", Actor__inject_context},
         {"Actor.call", Actor__call},
         {"Actor.push_frame", Actor__push_frame},
         {"Actor.pop_frame", Actor__pop_frame},

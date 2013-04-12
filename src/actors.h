@@ -13,6 +13,7 @@ struct Actor {
 
 Stack* create_actor(World* world, Block* block);
 bool state_inject(Stack* stack, caValue* name, caValue* value);
+void context_inject(Stack* stack, caValue* name, caValue* value);
 
 #if 0
 
