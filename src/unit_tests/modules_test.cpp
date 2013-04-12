@@ -3,6 +3,7 @@
 #include "unit_test_common.h"
 
 #include "block.h"
+#include "inspection.h"
 #include "interpreter.h"
 #include "fakefs.h"
 #include "kernel.h"
@@ -61,11 +62,24 @@ void test_explicit_output()
     circa_free_stack(stack);
 }
 
+void module_always_has_primary_output()
+{
+    FakeFilesystem fs;
+    fs.set("module.ca", "1");
+
+    Block block;
+    load_script(&block, "module.ca");
+
+    test_assert(get_output_placeholder(&block, 0) != NULL);
+    test_assert(get_output_placeholder(&block, 0)->input(0) == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(modules_test::source_file_location);
     REGISTER_TEST_CASE(modules_test::test_require);
     REGISTER_TEST_CASE(modules_test::test_explicit_output);
+    REGISTER_TEST_CASE(modules_test::module_always_has_primary_output);
 }
 
 } // namespace modules_test

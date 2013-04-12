@@ -1,0 +1,3 @@
+
+actor = make_actor({}.block)
+actor.call
