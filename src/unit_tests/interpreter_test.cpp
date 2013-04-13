@@ -135,6 +135,27 @@ void bug_stale_bytecode_after_migrate()
     test_equals(test_spy_get_results(), "[2]");
 }
 
+void bug_restart_dies_after_code_delete()
+{
+    Block version1;
+    version1.compile("1 + 2");
+    version1.compile("3 + 4");
+    version1.compile("5 + 6");
+    version1.compile("assert(false)");
+
+    Block version2;
+    version1.compile("1");
+
+    Stack stack;
+    push_frame(&stack, &version1);
+    run_interpreter(&stack);
+
+    translate_stack_across_blocks(&stack, &version1, &version2);
+
+    // This was causing a crash, internal NULL deref.
+    stack_restart(&stack);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
@@ -142,6 +163,7 @@ void register_tests()
     REGISTER_TEST_CASE(interpreter_test::test_evaluate_minimum);
     REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
+    REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);
 }
 
 } // namespace interpreter_test

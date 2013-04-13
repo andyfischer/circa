@@ -525,7 +525,7 @@ void stack_restart(Stack* stack)
             continue;
 
         // Don't clear state input. It may be cleared by the 'loop state' step below.
-        if (is_state_input(term))
+        if (term != NULL && is_state_input(term))
             continue;
 
         set_null(list_get(&top->registers, i));
