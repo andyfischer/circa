@@ -2022,6 +2022,12 @@ void Actor__block(caStack* stack)
     set_block(circa_output(stack, 0), top_frame(actor)->block);
 }
 
+void Actor__dump(caStack* stack)
+{
+    Stack* actor = as_stack(circa_input(stack, 0));
+    dump(actor);
+}
+
 void Actor__inject_state(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
@@ -2242,6 +2248,7 @@ void interpreter_install_functions(Block* kernel)
         {"make_interpreter", make_interpreter},
         {"make_actor", make_actor},
         {"Actor.block", Actor__block},
+        {"Actor.dump", Actor__dump},
         {"Actor.inject", Actor__inject_state},
         {"Actor.inject_context", Actor__inject_context},
         {"Actor.apply", Actor__call},

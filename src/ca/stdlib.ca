@@ -200,6 +200,8 @@ def make_interpreter() -> Actor
 def make_actor(Block block) -> Actor
 def Actor.block(self) -> Block
     -- Returns the (topmost) block.
+def Actor.dump(self)
+    -- Dumps a string representation to stdout.
 def Actor.inject(self, String name, any val) -> bool
     -- Inject a value into the actor's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.

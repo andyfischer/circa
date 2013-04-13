@@ -207,6 +207,8 @@ const char* STDLIB_CA_TEXT =
     "def make_actor(Block block) -> Actor\n"
     "def Actor.block(self) -> Block\n"
     "    -- Returns the (topmost) block.\n"
+    "def Actor.dump(self)\n"
+    "    -- Dumps a string representation to stdout.\n"
     "def Actor.inject(self, String name, any val) -> bool\n"
     "    -- Inject a value into the actor's state. Must correspond to an existing state definition.\n"
     "    -- Returns whether the operation was successful.\n"

@@ -1,5 +1,8 @@
 
 Recent
+  It is wayyy too easy to crash by running a script that has static errors, especially references to
+  nonexistant names.
+
   Delete create_type (use create_type_value instead)
 
   Move output casting to a different spot. Currently it happens twice - once when a value
@@ -7,8 +10,6 @@ Recent
     It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
    
   For-loop index would be pretty nice
-
-  Improv needs clipping rects
 
   Type inferrence fail in extra_output from if-block
 
