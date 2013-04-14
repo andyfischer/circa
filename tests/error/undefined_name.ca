@@ -1,0 +1,10 @@
+
+f = {
+    add(a b c)
+}.block
+
+actor = make_actor(f)
+
+actor.call
+
+assert(actor.errored)

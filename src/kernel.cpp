@@ -43,7 +43,6 @@
 #include "types/color.h"
 #include "types/common.h"
 #include "types/eval_context.h"
-#include "types/indexable.h"
 #include "types/int.h"
 #include "types/number.h"
 #include "types/set.h"
@@ -918,9 +917,6 @@ void bootstrap_kernel()
     // Initialize a few more types
     Term* set_type = create_value(kernel, TYPES.type, "Set");
     set_t::setup_type(unbox_type(set_type));
-
-    Term* indexableType = create_value(kernel, TYPES.type, "Indexable");
-    indexable_t::setup_type(unbox_type(indexableType));
 
     TYPES.selector = unbox_type(create_value(kernel, TYPES.type, "Selector"));
     list_t::setup_type(TYPES.selector);

@@ -9,8 +9,6 @@ Recent
     is copied by output_placeholder (this is the correct spot), and again in finish_frame.
     It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
    
-  For-loop index would be pretty nice
-
   Type inferrence fail in extra_output from if-block
 
   This code had an error with no source location:

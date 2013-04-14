@@ -31,7 +31,7 @@ namespace for_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.for_func = import_function(kernel, NULL, "for(Indexable list) -> List");
+        FUNCS.for_func = import_function(kernel, NULL, "for(List list) -> List");
         as_function(FUNCS.for_func)->formatSource = formatSource;
 
         FUNCS.loop_iterator = import_function(kernel, NULL,
