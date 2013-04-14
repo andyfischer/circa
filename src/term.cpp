@@ -89,7 +89,7 @@ Term::dependency(int index) const
 int
 Term::numDependencies() const
 {
-    return numInputs() + 1;
+    return numInputs() + 2;
 }
 
 void
@@ -97,8 +97,10 @@ Term::setDependency(int index, Term* term)
 {
     if (index == 0)
         change_function(this, term);
+    else if (index == 1)
+        change_declared_type(this, unbox_type(term));
     else
-        set_input(this, index - 1, term);
+        set_input(this, index - 2, term);
 }
 
 Block*

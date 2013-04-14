@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "fakefs.h"
 #include "hashtable.h"
 #include "interpreter.h"
 #include "kernel.h"
@@ -104,12 +105,35 @@ void stack_value()
     free_stack(stack);
 }
 
+void translate_terms_type()
+{
+    // Setup
+    FakeFilesystem fs;
+    fs.set("lib.ca", "type T { int a }");
+    Block* lib = load_module_file(global_world(), "translate_terms_type_lib", "lib.ca");
+    Type* T = find_type_local(lib, "T");
+
+    Block block;
+    block.compile("require translate_terms_type_lib\nt = make(T)");
+    
+    test_assert(block["t"]->type == T);
+
+    fs.set("lib.ca", "type T { float a }");
+    Block* newLib = load_module_file(global_world(), "translate_terms_type_lib", "lib.ca");
+    Type* newT = find_type_local(newLib, "T");
+    test_assert(T != newT);
+
+    update_all_code_references(&block, lib, newLib);
+    test_assert(block["t"]->type == newT);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(migration_test::translate_terms);
     REGISTER_TEST_CASE(migration_test::update_references);
     REGISTER_TEST_CASE(migration_test::term_ref_values);
     REGISTER_TEST_CASE(migration_test::stack_value);
+    REGISTER_TEST_CASE(migration_test::translate_terms_type);
 }
 
 }

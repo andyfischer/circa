@@ -1,5 +1,11 @@
 
 Recent
+  Migration failure
+    Module Cairo defined type Context
+    Another module CodeView used Context as a function argument, like:
+      def CodeView.draw(@self, cairo:Context canvas, Rect rect)
+    After reloading Cairo, the CodeView module kept a reference to the old type
+
   It is wayyy too easy to crash by running a script that has static errors, especially references to
   nonexistant names.
 
