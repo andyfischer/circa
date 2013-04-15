@@ -8,6 +8,7 @@
 #include "hashtable.h"
 #include "interpreter.h"
 #include "kernel.h"
+#include "migration.h"
 #include "modules.h"
 #include "reflection.h"
 #include "world.h"

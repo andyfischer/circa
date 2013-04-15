@@ -10,6 +10,7 @@
 #include "fakefs.h"
 #include "function.h"
 #include "importing.h"
+#include "migration.h"
 #include "modules.h"
 #include "reflection.h"
 #include "string_type.h"

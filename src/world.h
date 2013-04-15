@@ -39,6 +39,5 @@ World* create_world();
 
 void refresh_all_modules(caWorld* world);
 
-void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock);
 
 } // namespace circa

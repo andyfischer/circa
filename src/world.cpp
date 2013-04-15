@@ -53,33 +53,4 @@ World* create_world()
     return world;
 }
 
-void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
-{
-    // Noop if the target is our new block
-    if (target == newBlock)
-        return;
-
-    ca_assert(target != oldBlock);
-
-    update_all_code_references(target, oldBlock, newBlock);
-}
-
-void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock)
-{
-    // Update references in every module.
-    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        if (term->function == FUNCS.module) {
-            update_block_after_module_reload(term->nestedContents, oldBlock, newBlock);
-        }
-    }
-
-    // Update references in every root stack.
-    Stack* rootStack = world->firstRootStack;
-    while (rootStack != NULL) {
-        translate_stack_across_blocks(rootStack, oldBlock, newBlock);
-        rootStack = rootStack->nextRootStack;
-    }
-}
-
 } // namespace circa

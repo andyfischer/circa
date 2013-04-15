@@ -15,6 +15,7 @@
 #include "interpreter.h"
 #include "list.h"
 #include "kernel.h"
+#include "migration.h"
 #include "modules.h"
 #include "names.h"
 #include "native_patch.h"
@@ -189,39 +190,6 @@ Block* find_module_from_filename(const char* filename)
     }
 
     return NULL;
-}
-
-void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)
-{
-    ca_assert(target != oldBlock);
-    ca_assert(target != newBlock);
-
-    // Store a cache of lookups that we've made in this call.
-    TermMap cache;
-
-    for (BlockIterator it(target); it.unfinished(); it.advance()) {
-
-        Term* term = *it;
-
-        // Iterate through each "dependency", which includes the function & inputs.
-        for (int i=0; i < term->numDependencies(); i++) {
-            Term* ref = term->dependency(i);
-            Term* newRef = NULL;
-
-            if (cache.contains(ref)) {
-                newRef = cache[ref];
-            } else {
-
-                // Lookup and save result in cache
-                newRef = translate_term_across_blocks(ref, oldBlock, newBlock);
-                cache[ref] = newRef;
-            }
-
-            // Possibly rebind
-            if (newRef != ref)
-                term->setDependency(i, newRef);
-        }
-    }
 }
 
 void require_func_postCompile(Term* term)

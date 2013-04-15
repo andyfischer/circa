@@ -34,12 +34,6 @@ Block* find_loaded_module(const char* name);
 
 Block* find_module_from_filename(const char* filename);
 
-// Look through every term in 'target', and see if it contains a reference to a term in
-// 'oldBlock'. If so, migrate that reference to the equivalent term (according to the
-// relative unique names) inside 'newBlock'. If the equivalent in 'newBlock' isn't found,
-// then the reference will be set to null.
-void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock);
-
 // Install builtin modules functions.
 void modules_install_functions(Block* kernel);
 
