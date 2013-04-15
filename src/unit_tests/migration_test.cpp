@@ -128,6 +128,37 @@ void translate_terms_type()
     test_assert(block["t"]->type == newT);
 }
 
+void bug_with_migration_and_stale_pointer()
+{
+    FakeFilesystem fs;
+    fs.set("lib.ca", "type T { int a }\n"
+            "def make_t() -> T { make(T) }\n"
+            "def inc_t(T t) -> T { t.a += 1 }");
+    load_module_file(global_world(), "bug_with_migration_and_stale_pointer", "lib.ca");
+
+    Block* block = fetch_module(global_world(), "bug_with_migration_and_stale_pointer_2");
+    block->compile("test_spy(inc_t(make_t()))");
+
+    Stack stack;
+    push_frame(&stack, block);
+
+    test_spy_clear();
+    run_interpreter(&stack);
+    test_assert(&stack);
+    test_equals(test_spy_get_results(), "[{a: 1}]");
+
+    fs.set("lib.ca", "type T { int a }\n"
+            "def make_t() -> T { make(T) }\n"
+            "def inc_t(T t) -> T { t.a += 2}");
+    load_module_file(global_world(), "bug_with_migration_and_stale_pointer", "lib.ca");
+
+    stack_restart(&stack);
+    test_spy_clear();
+    run_interpreter(&stack);
+    test_assert(&stack);
+    test_equals(test_spy_get_results(), "[{a: 2}]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(migration_test::translate_terms);
@@ -135,6 +166,7 @@ void register_tests()
     REGISTER_TEST_CASE(migration_test::term_ref_values);
     REGISTER_TEST_CASE(migration_test::stack_value);
     REGISTER_TEST_CASE(migration_test::translate_terms_type);
+    REGISTER_TEST_CASE(migration_test::bug_with_migration_and_stale_pointer);
 }
 
 }
