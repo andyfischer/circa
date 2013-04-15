@@ -28,7 +28,7 @@ void translate_terms()
     Term* b2 = block2.compile("b = 2");
     block2.compile("c = 3");
 
-    test_assert(b2 == translate_term_across_blocks(b1, &block1, &block2));
+    test_assert(b2 == migrate_term_pointer(b1, &block1, &block2));
 }
 
 void update_references()
@@ -43,7 +43,7 @@ void update_references()
     change_function(call, version1.get("f"));
     test_assert(call->function == version1.get("f"));
 
-    update_all_code_references(&target, &version1, &version2);
+    migrate_block(&target, &version1, &version2);
 
     test_assert(call->function != version1.get("f"));
     test_assert(call->function == version2.get("f"));
@@ -70,7 +70,7 @@ void term_ref_values()
     test_assert(as_term_ref(get_field(state, "tr")) == f1);
     test_assert(as_block(get_field(state, "br")) == f1->nestedContents);
 
-    update_all_code_references_in_value(state, &version1, &version2);
+    migrate_value(state, &version1, &version2);
 
     test_assert(as_term_ref(get_field(state, "tr")) == f2);
     test_assert(as_block(get_field(state, "br")) == f2->nestedContents);
@@ -98,7 +98,7 @@ void stack_value()
     Stack* runtimeStack = as_stack(get_field(state, "int"));
     test_assert(frame_block(top_frame(runtimeStack)) == f1->nestedContents);
 
-    update_all_code_references_in_value(state, &version1, &version2);
+    migrate_value(state, &version1, &version2);
 
     runtimeStack = as_stack(get_field(state, "int"));
     test_assert(frame_block(top_frame(runtimeStack)) == f2->nestedContents);
@@ -124,7 +124,7 @@ void translate_terms_type()
     Type* newT = find_type_local(newLib, "T");
     test_assert(T != newT);
 
-    update_all_code_references(&block, lib, newLib);
+    migrate_block(&block, lib, newLib);
     test_assert(block["t"]->type == newT);
 }
 

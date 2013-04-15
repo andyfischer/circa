@@ -128,7 +128,11 @@ Block* load_module_file(World* world, const char* moduleName, const char* filena
         // New block starts off with the old block's version, plus 1.
         newBlock->version = existing->version + 1;
 
-        update_world_after_module_reload(world, existing, newBlock);
+        Migration migration;
+        migration.oldBlock = existing;
+        migration.newBlock = newBlock;
+
+        migrate_world(world, &migration);
     }
 
     return newBlock;

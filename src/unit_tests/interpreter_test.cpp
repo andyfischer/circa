@@ -130,7 +130,7 @@ void bug_stale_bytecode_after_migrate()
     test_equals(test_spy_get_results(), "[1]");
 
     stack_restart(&stack);
-    translate_stack_across_blocks(&stack, &version1, &version2);
+    migrate_stack(&stack, &version1, &version2);
     test_spy_clear();
     run_interpreter(&stack);
     test_equals(test_spy_get_results(), "[2]");
@@ -151,7 +151,7 @@ void bug_restart_dies_after_code_delete()
     push_frame(&stack, &version1);
     run_interpreter(&stack);
 
-    translate_stack_across_blocks(&stack, &version1, &version2);
+    migrate_stack(&stack, &version1, &version2);
 
     // This was causing a crash, internal NULL deref.
     stack_restart(&stack);

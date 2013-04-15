@@ -14,10 +14,12 @@
 
 namespace circa {
 
-void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)
+void migrate_block(Block* target, Migration* migration)
 {
-    ca_assert(target != oldBlock);
-    ca_assert(target != newBlock);
+    ca_assert(target != migration->oldBlock);
+
+    if (target == migration->newBlock)
+        return;
 
     // Store a cache of lookups that we've made in this call.
     TermMap cache;
@@ -36,7 +38,7 @@ void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)
             } else {
 
                 // Lookup and save result in cache
-                newRef = translate_term_across_blocks(ref, oldBlock, newBlock);
+                newRef = migrate_term_pointer(ref, migration);
                 cache[ref] = newRef;
             }
 
@@ -47,38 +49,33 @@ void update_all_code_references(Block* target, Block* oldBlock, Block* newBlock)
     }
 }
 
-// Returns the corresponding term inside newBlock, if found.
-// Returns 'term' if the translation does not apply (term is not found inside
-// oldBlock).
-// Returns NULL if the translation does apply, but a corresponding term cannot be found.
-Term* translate_term_across_blocks(Term* term, Block* oldBlock, Block* newBlock)
+Term* migrate_term_pointer(Term* term, Migration* migration)
 {
-    if (!term_is_child_of_block(term, oldBlock))
+    if (!term_is_child_of_block(term, migration->oldBlock))
         return term;
 
     Value relativeName;
-    get_relative_name_as_list(term, oldBlock, &relativeName);
-    return find_from_relative_name_list(&relativeName, newBlock);
+    get_relative_name_as_list(term, migration->oldBlock, &relativeName);
+    return find_from_relative_name_list(&relativeName, migration->newBlock);
 }
 
-// Like translate_term_across_blocks, but for block references.
-Block* translate_block_across_blocks(Block* block, Block* oldBlock, Block* newBlock)
+Block* migrate_block_pointer(Block* block, Migration* migration)
 {
     // If this is just a reference to 'oldBlock' then simply update it to 'newBlock'.
-    if (block == oldBlock)
-        return newBlock;
+    if (block == migration->oldBlock)
+        return migration->newBlock;
 
-    // Noop on null block.
+    // No-op on null block.
     if (block == NULL)
         return block;
 
-    // Noop if block has no owner.
+    // No-op if block has no owner.
     Term* owningTerm = block->owningTerm;
     if (owningTerm == NULL)
         return block;
 
     // Use owning term to possibly translate a block that is nested inside oldBlock.
-    Term* newTerm = translate_term_across_blocks(owningTerm, oldBlock, newBlock);
+    Term* newTerm = migrate_term_pointer(owningTerm, migration);
 
     if (newTerm == NULL)
         // Deliberate translation to NULL.
@@ -87,64 +84,81 @@ Block* translate_block_across_blocks(Block* block, Block* oldBlock, Block* newBl
         return newTerm->nestedContents;
 }
 
-void translate_stack_across_blocks(Stack* stack, Block* oldBlock, Block* newBlock)
+void migrate_stack(Stack* stack, Migration* migration)
 {
     Frame* frame = top_frame(stack);
 
     while (frame != NULL) {
-        frame->block = translate_block_across_blocks(frame->block, oldBlock, newBlock);
+        frame->block = migrate_block_pointer(frame->block, migration);
 
         caValue* registers = frame_registers(frame);
-        update_all_code_references_in_value(registers, oldBlock, newBlock);
+        migrate_value(registers, migration);
 
         frame = frame_parent(frame);
     }
 }
 
-void update_all_code_references_in_value(caValue* value, Block* oldBlock, Block* newBlock)
+void migrate_value(caValue* value, Migration* migration)
 {
     for (ValueIterator it(value); it.unfinished(); it.advance()) {
         caValue* val = *it;
         if (is_ref(val)) {
-            set_term_ref(val, translate_term_across_blocks(as_term_ref(val),
-                oldBlock, newBlock));
+            set_term_ref(val, migrate_term_pointer(as_term_ref(val), migration));
             
         } else if (is_block(val)) {
-            set_block(val, translate_block_across_blocks(as_block(val),
-                        oldBlock, newBlock));
+            set_block(val, migrate_block_pointer(as_block(val), migration));
         } else if (is_stack(val)) {
-            translate_stack_across_blocks(as_stack(val), oldBlock, newBlock);
+            migrate_stack(as_stack(val), migration);
         }
     }
 }
 
-void update_block_after_module_reload(Block* target, Block* oldBlock, Block* newBlock)
-{
-    // Noop if the target is our new block
-    if (target == newBlock)
-        return;
-
-    ca_assert(target != oldBlock);
-
-    update_all_code_references(target, oldBlock, newBlock);
-}
-
-void update_world_after_module_reload(World* world, Block* oldBlock, Block* newBlock)
+void migrate_world(World* world, Migration* migration)
 {
     // Update references in every module.
     for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.module)
-            update_block_after_module_reload(term->nestedContents, oldBlock, newBlock);
+            migrate_block(term->nestedContents, migration);
     }
 
     // Update references in every root stack.
     Stack* rootStack = world->firstRootStack;
     while (rootStack != NULL) {
-        translate_stack_across_blocks(rootStack, oldBlock, newBlock);
+        migrate_stack(rootStack, migration);
         rootStack = rootStack->nextRootStack;
     }
 }
 
+Term* migrate_term_pointer(Term* term, Block* oldBlock, Block* newBlock)
+{
+    Migration migration;
+    migration.oldBlock = oldBlock;
+    migration.newBlock = newBlock;
+    return migrate_term_pointer(term, &migration);
+}
+void migrate_block(Block* block, Block* oldBlock, Block* newBlock)
+{
+    Migration migration;
+    migration.oldBlock = oldBlock;
+    migration.newBlock = newBlock;
+    return migrate_block(block, &migration);
+}
+
+void migrate_stack(Stack* stack, Block* oldBlock, Block* newBlock)
+{
+    Migration migration;
+    migration.oldBlock = oldBlock;
+    migration.newBlock = newBlock;
+    return migrate_stack(stack, &migration);
+}
+
+void migrate_value(caValue* value, Block* oldBlock, Block* newBlock)
+{
+    Migration migration;
+    migration.oldBlock = oldBlock;
+    migration.newBlock = newBlock;
+    return migrate_value(value, &migration);
+}
 
 } // namespace circa
