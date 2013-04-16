@@ -736,6 +736,11 @@ void block_set_has_effects(Block* block, bool hasEffects)
         block_remove_property(block, sym_HasEffects);
 }
 
+int block_locals_count(Block* block)
+{
+    return block->length();
+}
+
 caValue* block_get_file_origin(Block* block)
 {
     caValue* origin = block_get_property(block, sym_Origin);

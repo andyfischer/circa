@@ -214,7 +214,7 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
     frame->parentPc = parentPc;
 
     // Initialize registers
-    set_list(&frame->registers, get_locals_count(block));
+    set_list(&frame->registers, block_locals_count(block));
 
     return frame;
 }
@@ -895,13 +895,13 @@ static void update_stack_for_possibly_changed_blocks(Stack* stack)
         if (frame->blockVersion == frame->block->version) {
             // Same version.
 
-            if (frame_register_count(frame) != get_locals_count(frame->block))
+            if (frame_register_count(frame) != block_locals_count(frame->block))
                 internal_error("locals count has changed, but version didn't change");
 
         } else {
 
             // Resize frame->registers if needed.
-            list_resize(&frame->registers, get_locals_count(frame->block));
+            list_resize(&frame->registers, block_locals_count(frame->block));
         }
 
         // Continue to next frame.

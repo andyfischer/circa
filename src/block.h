@@ -190,6 +190,7 @@ bool block_is_evaluation_empty(Block* block);
 void block_set_evaluation_empty(Block* block, bool empty);
 bool block_has_effects(Block* block);
 void block_set_has_effects(Block* block, bool hasEffects);
+int block_locals_count(Block* block);
 
 // Returns a List pointer if the block has a file origin, NULL if not.
 caValue* block_get_file_origin(Block* block);

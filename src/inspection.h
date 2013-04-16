@@ -20,6 +20,7 @@ int user_count(Term* term);
 
 // Return the static type of 'term'.
 Type* declared_type(Term* term);
+Term* declared_type_term(Term* term);
 
 // Set / get whether this term is a 'statement'. This affects source code reproduction.
 void set_is_statement(Term* term, bool value);
@@ -43,7 +44,6 @@ bool is_minor_block(Block* block);
 bool is_for_loop(Block* block);
 
 bool has_variable_args(Block* block);
-int get_locals_count(Block* block);
 
 // Input & output placeholders
 Term* get_input_placeholder(Block* block, int index);

@@ -37,7 +37,17 @@ Type* declared_type(Term* term)
 {
     if (term->type == NULL)
         return NULL;
-    return term->type;
+    else
+        return term->type;
+}
+
+Term* declared_type_term(Term* term)
+{
+    if (term->type == NULL)
+        return NULL;
+    else
+        return term->type->declaringTerm;
+
 }
 
 void set_is_statement(Term* term, bool value)
@@ -121,11 +131,6 @@ bool is_for_loop(Block* block)
     if (FUNCS.for_func == NULL)
         return false;
     return block->owningTerm->function == FUNCS.for_func;
-}
-
-int get_locals_count(Block* block)
-{
-    return block->length();
 }
 
 Term* get_input_placeholder(Block* block, int index)

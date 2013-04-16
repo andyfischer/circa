@@ -82,8 +82,10 @@ Term::dependency(int index) const
 {
     if (index == 0)
         return this->function;
+    else if (index == 1)
+        return declared_type_term((Term*) this);
     else
-        return input(index - 1);
+        return input(index - 2);
 }
 
 int
