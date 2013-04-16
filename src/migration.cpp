@@ -91,10 +91,10 @@ void migrate_stack(Stack* stack, Migration* migration)
     while (frame != NULL) {
         frame->block = migrate_block_pointer(frame->block, migration);
 
-        list_resize(frame_registers(frame), block_locals_count(frame->block));
+        if (frame->block != NULL)
+            list_resize(frame_registers(frame), block_locals_count(frame->block));
 
-        caValue* registers = frame_registers(frame);
-        migrate_value(registers, migration);
+        migrate_value(frame_registers(frame), migration);
 
         frame = frame_parent(frame);
     }

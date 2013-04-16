@@ -159,6 +159,18 @@ void bug_with_migration_and_stale_pointer()
     test_equals(test_spy_get_results(), "[{a: 2}]");
 }
 
+void stack_migration_deletes_block()
+{
+    Block block;
+    block.compile("a = 1 + 2");
+
+    Stack stack;
+    push_frame(&stack, &block);
+
+    // This once crashed:
+    migrate_stack(&stack, &block, NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(migration_test::translate_terms);
@@ -167,6 +179,7 @@ void register_tests()
     REGISTER_TEST_CASE(migration_test::stack_value);
     REGISTER_TEST_CASE(migration_test::translate_terms_type);
     REGISTER_TEST_CASE(migration_test::bug_with_migration_and_stale_pointer);
+    REGISTER_TEST_CASE(migration_test::stack_migration_deletes_block);
 }
 
 }
