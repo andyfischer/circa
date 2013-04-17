@@ -1,5 +1,20 @@
 
 Recent
+  Got unrecognized expression on this string (missing '}'). Worst part is, no error reported.
+
+    clickResolver.call([:add, lineRect, {
+            pos = input()
+            event = input()
+
+            if event == :right_down
+                contextMenu.call(:term_details [line.term pos])
+            ])
+
+  Calling a Closure; if you forget the exact number of inputs, then it can easily mix
+  up the explicit & unbound inputs.
+
+  Calling Closure.call on an 'any' type didn't work and didn't even error.
+
   Migration failure
     Module Cairo defined type Context
     Another module CodeView used Context as a function argument, like:
@@ -45,6 +60,13 @@ State
 Modules
   When compiling a module, the last value is automatically turned into an output (just
     like a function). This should probably be explicit for modules.
+
+Types
+  Should remove constructor syntax. Instead each type should get a synthetic method Typename.make
+  As in:
+    type T { int i }
+    T.make(1)
+
 
 Code modification
   Code modification should go through a more controlled path.
