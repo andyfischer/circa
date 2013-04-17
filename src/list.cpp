@@ -421,8 +421,7 @@ void list_remove_index(caValue* list, int index)
 {
     ca_assert(is_list(list));
     ListData* data = (ListData*) list->value_data.ptr;
-    list_remove_index(data, index);
-    list->value_data.ptr = data;
+    list->value_data.ptr = list_remove_index(data, index);
 }
 
 void list_resize(caValue* list, int size)

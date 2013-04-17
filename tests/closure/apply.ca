@@ -1,8 +1,17 @@
 
 f = {
     x = input() + input()
-    output(x)
+    x
 }
 
-assert(f.apply([1 1]) == 2)
-assert(f.apply([1 3]) == 4)
+assert(f.apply([1 1]) == [2])
+assert(f.apply([1 3]) == [4])
+
+f = {
+    output(1)
+    output(2)
+    output(3)
+
+    :last
+}
+assert(f.apply([]) == [3 2 1 :last])

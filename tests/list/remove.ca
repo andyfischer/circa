@@ -1,0 +1,4 @@
+
+assert([0 1 2].remove(1) == [0 2])
+assert([0 1 2].remove(0) == [1 2])
+assert([0 1 2].remove(2) == [0 1])

@@ -205,6 +205,16 @@ void Block__get_state_input_index(caStack* stack)
         set_int(circa_output(stack, 0), stateInput->index);
 }
 
+void Block__get_state_output_index(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    Term* stateOutput = find_state_output(block);
+    if (stateOutput == NULL)
+        circa_output_error(stack, "No state output on block");
+    else
+        set_int(circa_output(stack, 0), block->length() - stateOutput->index - 1);
+}
+
 void Block__call(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -637,6 +647,7 @@ void reflection_install_functions(Block* kernel)
         {"Block.has_static_error", Block__has_static_error},
         {"Block.has_state_input", Block__has_state_input},
         {"Block.get_state_input_index", Block__get_state_input_index},
+        {"Block.get_state_output_index", Block__get_state_output_index},
         {"Block.input", Block__input},
         {"Block.inputs", Block__inputs},
         {"Block.is_null", Block__is_null},

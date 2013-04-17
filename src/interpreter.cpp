@@ -721,6 +721,8 @@ void create_output(Stack* stack)
 
 void raise_error(Stack* stack)
 {
+    // TODO: Check if there is an 'errored' catch
+    
     stack->step = sym_StackFinished;
     stack->errorOccurred = true;
 }
@@ -1169,7 +1171,10 @@ void write_term_bytecode(Term* term, caValue* result)
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_ClosureCall);
         write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        set_symbol(list_get(result, 2), sym_FlatOutputs);
+        if (term->function == FUNCS.closure_call)
+            set_symbol(list_get(result, 2), sym_FlatOutputs);
+        else
+            set_symbol(list_get(result, 2), sym_OutputsToList);
         return;
     }
     
@@ -1839,6 +1844,65 @@ void Interpreter__pop_frame(caStack* callerStack)
     pop_frame(self);
 }
 
+void Interpreter__set_state_input(caStack* callerStack)
+{
+    Stack* self = as_stack(circa_input(callerStack, 0));
+    ca_assert(self != NULL);
+
+    if (top_frame(self) == NULL)
+        return circa_output_error(callerStack, "No stack frame");
+
+    // find state input
+    Block* block = top_frame(self)->block;
+    caValue* stateSlot = NULL;
+    for (int i=0;; i++) {
+        Term* input = get_input_placeholder(block, i);
+        if (input == NULL)
+            break;
+        if (is_state_input(input)) {
+            stateSlot = get_top_register(self, input);
+            break;
+        }
+    }
+
+    if (stateSlot == NULL)
+        // No-op if block doesn't expect state
+        return;
+
+    copy(circa_input(callerStack, 1), stateSlot);
+}
+
+void Interpreter__get_state_output(caStack* callerStack)
+{
+    Stack* self = as_stack(circa_input(callerStack, 0));
+    ca_assert(self != NULL);
+
+    if (top_frame(self) == NULL)
+        return circa_output_error(callerStack, "No stack frame");
+
+    // find state output
+    Block* block = top_frame(self)->block;
+    caValue* stateSlot = NULL;
+    for (int i=0;; i++) {
+        Term* output = get_output_placeholder(block, i);
+        if (output == NULL)
+            break;
+        if (is_state_output(output)) {
+            stateSlot = get_top_register(self, output);
+            break;
+        }
+    }
+
+    if (stateSlot == NULL) {
+        // Couldn't find outgoing state
+        set_null(circa_output(callerStack, 0));
+        return;
+    }
+
+    copy(stateSlot, circa_output(callerStack, 0));
+}
+
+
 void Interpreter__reset(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
@@ -1963,6 +2027,8 @@ void interpreter_install_functions(Block* kernel)
         {"Interpreter.call", Interpreter__call},
         {"Interpreter.push_frame", Interpreter__push_frame},
         {"Interpreter.pop_frame", Interpreter__pop_frame},
+        {"Interpreter.set_state_input", Interpreter__set_state_input},
+        {"Interpreter.get_state_output", Interpreter__get_state_output},
         {"Interpreter.reset", Interpreter__reset},
         {"Interpreter.restart", Interpreter__restart},
         {"Interpreter.run", Interpreter__run},

@@ -413,6 +413,18 @@ void List__set(caStack* stack)
     copy(value, list_get(self, index));
 }
 
+void List__remove(caStack* stack)
+{
+    caValue* self = circa_output(stack, 0);
+    copy(circa_input(stack, 0), self);
+    int index = circa_int_input(stack, 1);
+
+    if (index < 0 || index >= list_length(self))
+        return circa_output_error(stack, "Invalid index");
+
+    list_remove_index(self, index);
+}
+
 void Map__contains(caStack* stack)
 {
     caValue* value = hashtable_get(circa_input(stack, 0), circa_input(stack, 1));
@@ -1061,6 +1073,7 @@ void bootstrap_kernel()
         {"List.slice", List__slice},
         {"List.get", List__get},
         {"List.set", List__set},
+        {"List.remove", List__remove},
 
         {"Map.contains", Map__contains},
         {"Map.remove", Map__remove},

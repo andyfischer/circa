@@ -3,8 +3,7 @@ f = {
     add(a b c)
 }.block
 
-actor = make_actor(f)
-
-actor.call
-
-assert(actor.errored)
+int = make_interpreter()
+int.push_frame(f [])
+int.run
+assert(int.errored)

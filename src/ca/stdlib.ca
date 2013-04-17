@@ -122,6 +122,7 @@ def Block.get_static_errors_formatted(self) -> List
     -- Return a formatted list of static errors inside this block.
 def Block.has_state_input(self) -> bool
 def Block.get_state_input_index(self) -> int
+def Block.get_state_output_index(self) -> int
 def Block.has_static_error(self) -> bool
     -- Return whether this block has any static errors.
 def Block.input(self, int index) -> Term
@@ -159,7 +160,7 @@ type Closure {
     List bindings
 }
 def Closure.call(self, any inputs :multiple) -> any
-def Closure.apply(self, List inputs) -> any
+def Closure.apply(self, List inputs) -> List
 
 def closure_block() -> Closure
 def unbound_input(any _) -> any
@@ -214,6 +215,8 @@ def Interpreter.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
 def Interpreter.pop_frame(self)
     -- Pop the topmost frame.
+def Interpreter.set_state_input(self, any)
+def Interpreter.get_state_output(self) -> any
 def Interpreter.reset(self)
     -- Clear this interpreter's state, including stack frames.
 def Interpreter.restart(self)
@@ -319,6 +322,8 @@ def List.get_optional(self, int index, any fallback) -> any
 
 def List.set(self, int index, any val) -> List
     -- Set an element by index.
+def List.remove(self, int index) -> List
+    -- Remove an element at the given index, shrinking the list by 1.
 def List.empty(self) -> bool
     -- Returns whether the list is empty.
     self.length == 0

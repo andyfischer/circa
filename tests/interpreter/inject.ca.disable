@@ -1,0 +1,17 @@
+
+square = {
+    i = input()
+
+    state injected
+
+    output(concat('injected: ' injected))
+}
+
+int = make_interpreter
+int.push_frame(square.block)
+
+int.inject('injected', 'a')
+assert(int.call(null) == 'injected: a')
+assert(int.call(null) == 'injected: a')
+int.inject('injected', 'b')
+assert(int.call(null) == 'injected: b')

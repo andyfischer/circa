@@ -1,11 +1,23 @@
 
 block = {
     state s
-    1 + 1
+    output(1 + 1)
 }.block
 
 assert(block.has_state_input)
 assert(block.get_state_input_index == 0)
+assert(block.get_state_output_index == 1)
+
+block = {
+    i = input()
+    state s
+    output(1 + 1)
+    output(4)
+}.block
+
+assert(block.has_state_input)
+assert(block.get_state_input_index == 1)
+assert(block.get_state_output_index == 2)
 
 block = {
     1 + 1
