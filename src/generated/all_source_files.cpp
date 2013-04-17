@@ -25,6 +25,7 @@
 #include "../kernel.cpp"
 #include "../list.cpp"
 #include "../loops.cpp"
+#include "../migration.cpp"
 #include "../modules.cpp"
 #include "../names.cpp"
 #include "../names_builtin.cpp"

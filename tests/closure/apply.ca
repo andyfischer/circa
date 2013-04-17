@@ -1,0 +1,8 @@
+
+f = {
+    x = input() + input()
+    output(x)
+}
+
+assert(f.apply([1 1]) == 2)
+assert(f.apply([1 3]) == 4)

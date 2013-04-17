@@ -343,7 +343,7 @@ void List__insert(caStack* stack)
     caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
 
-    copy(circa_input(stack, 1), list_insert(out, circa_int_input(stack, 2)));
+    copy(circa_input(stack, 2), list_insert(out, circa_int_input(stack, 1)));
 }
 
 void List__slice(caStack* stack)
@@ -1113,10 +1113,10 @@ void bootstrap_kernel()
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
     // Finish setting up types that are declared in stdlib.ca.
-    TYPES.stack = as_type(kernel->get("Actor"));
     TYPES.color = as_type(kernel->get("Color"));
     TYPES.closure = as_type(kernel->get("Closure"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
+    TYPES.stack = as_type(kernel->get("Interpreter"));
     callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));

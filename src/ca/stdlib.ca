@@ -87,10 +87,10 @@ namespace sys
     def perf_stats_dump() -> List
 
 -- Builtin types
-type Actor;
 type FileSignature { String filename, int time_modified }
 type Callable;
 type Color { number r, number g, number b, number a }
+type Interpreter;
 type Point { number x, number y }
 type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
@@ -120,6 +120,8 @@ def Block.get_static_errors(self) -> List
     -- Return a raw list of static errors inside this block.
 def Block.get_static_errors_formatted(self) -> List
     -- Return a formatted list of static errors inside this block.
+def Block.has_state_input(self) -> bool
+def Block.get_state_input_index(self) -> int
 def Block.has_static_error(self) -> bool
     -- Return whether this block has any static errors.
 def Block.input(self, int index) -> Term
@@ -157,6 +159,7 @@ type Closure {
     List bindings
 }
 def Closure.call(self, any inputs :multiple) -> any
+def Closure.apply(self, List inputs) -> any
 
 def closure_block() -> Closure
 def unbound_input(any _) -> any
@@ -195,50 +198,67 @@ def Frame.output(self, int nth) -> any
 
 def Function.block(self) -> Block
 
-def make_interpreter() -> Actor
+def make_interpreter() -> Interpreter
     -- Create a new interpreter
-def make_actor(Block block) -> Actor
-def Actor.block(self) -> Block
+def Interpreter.block(self) -> Block
     -- Returns the (topmost) block.
-def Actor.dump(self)
+def Interpreter.dump(self)
     -- Dumps a string representation to stdout.
-def Actor.inject(self, String name, any val) -> bool
+def Interpreter.inject(self, String name, any val) -> bool
     -- Inject a value into the actor's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.
-def Actor.inject_context(self, Symbol name, any val)
-def Actor.call(self, any inputs :multiple) -> any
-    -- Synchronous actor call
-def Actor.apply(self, List inputs) -> any
-    -- Synchronous actor call (with inputs as a list)
-def Actor.push_frame(self, Block b, List inputs)
+def Interpreter.inject_context(self, Symbol name, any val)
+def Interpreter.call(self, any inputs :multiple) -> any
+def Interpreter.apply(self, List inputs) -> any
+def Interpreter.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
-def Actor.pop_frame(self)
+def Interpreter.pop_frame(self)
     -- Pop the topmost frame.
-def Actor.set_state_input(self, any val)
-    -- Assign a value to the :state input of the topmost frame (if any)
-def Actor.get_state_output(self) -> any
-def Actor.reset(self)
+def Interpreter.reset(self)
     -- Clear this interpreter's state, including stack frames.
-def Actor.restart(self)
+def Interpreter.restart(self)
     -- Restart or "rewind" the stack, so the program counter is returned to the start
     -- of the topmost frame. State is preserved.
-def Actor.run(self)
+def Interpreter.run(self)
     -- Run the interpreter until either the topmost frame is finished, or an error
     -- is raised.
-def Actor.frame(self, int depth) -> Frame
+def Interpreter.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
-def Actor.top_frame(self) -> Frame
+def Interpreter.top_frame(self) -> Frame
     -- Return the topmost Frame.
     self.frame(0)
-def Actor.frames(self) -> List
+def Interpreter.frames(self) -> List
     -- Return the list of Frames.
-def Actor.output(self, int index) -> any
+def Interpreter.output(self, int index) -> any
     -- Fetch the value in the nth output register.
-def Actor.errored(self) -> bool
-    -- Returns true if the interpreter has stopped to due error.
-def Actor.error_message(self) -> String
+def Interpreter.errored(self) -> bool
+    -- Returns true if the interpreter has stopped due to error.
+def Interpreter.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
-def Actor.toString(self) -> String
+def Interpreter.toString(self) -> String
+
+-- Actors
+{-
+type Actor {
+    Closure func
+    Mutable stateVal
+}
+def make_actor(Closure func) -> Actor
+    actor = make(Actor)
+    actor.func = func
+    actor
+
+def Actor.call(self, any inputs :multiple) -> any
+    s = self.stateVal.get
+
+    outs = self.func.call(inputs.prepend(s))
+
+    self.stateVal.set(outs[0])
+
+    return outs.slice(1)
+    
+def Actor.apply(self, List inputs) -> any
+-}
 
 def empty_list(any initialValue, int size) -> List
 def List.append(self, any item) -> List
@@ -284,8 +304,8 @@ def List.slice(self, int start, int fin) -> List
     --  [1 2 3 4].slice(1 3)
     --  Outputs: [2 3]
     -- 
-    --  [1 2 3 4].slice(0 -1)
-    --  Outputs: [1 2 3]
+    --  [1 2 3 4].slice(0 -2)
+    --  Outputs: [1 2 3 4]
 
 def List.get(self, int index) -> any
     -- Get an element by index.

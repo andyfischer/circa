@@ -1,0 +1,4 @@
+
+assert([0 1 2].insert(0, :a) == [:a 0 1 2])
+assert([0 1 2].insert(1, :a) == [0 :a 1 2])
+assert([0 1 2].insert(3, :a) == [0 1 2 :a])

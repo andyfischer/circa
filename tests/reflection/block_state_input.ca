@@ -1,0 +1,14 @@
+
+block = {
+    state s
+    1 + 1
+}.block
+
+assert(block.has_state_input)
+assert(block.get_state_input_index == 0)
+
+block = {
+    1 + 1
+}.block
+
+assert(not block.has_state_input)
