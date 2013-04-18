@@ -1,0 +1,11 @@
+
+def func() -> String
+
+    closure = { return "closure return value" }
+
+    -- there was a bug where the closure's return was causing the entire function to exit.
+    assert(closure.call() == "closure return value")
+
+    return "func return value"
+
+assert(func() == "func return value")

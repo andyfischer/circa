@@ -486,14 +486,19 @@ void Mutable__set(caStack* stack)
     copy(circa_input(stack, 1), val);
 }
 
-void MutableInitialize(Type* type, caValue* value)
+void Mutable_initialize(Type* type, caValue* value)
 {
     object_initialize(type, value);
     caValue* val = (caValue*) object_get_body(value);
     initialize_null(val);
 }
 
-void MutableRelease(void* object)
+std::string Mutable_toString(caValue* value)
+{
+    return "Mutable[" + to_string((caValue*) object_get_body(value)) + "]";
+}
+
+void Mutable_release(void* object)
 {
     caValue* val = (caValue*) object;
     set_null(val);
@@ -1135,8 +1140,9 @@ void bootstrap_kernel()
     TYPES.point = as_type(kernel->get("Point"));
 
     Type* mutableType = as_type(kernel->get("Mutable"));
-    circa_setup_object_type(mutableType, sizeof(Value), MutableRelease);
-    mutableType->initialize = MutableInitialize;
+    circa_setup_object_type(mutableType, sizeof(Value), Mutable_release);
+    mutableType->initialize = Mutable_initialize;
+    mutableType->toString = Mutable_toString;
 
     color_t::setup_type(TYPES.color);
 

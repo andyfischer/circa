@@ -1,0 +1,5 @@
+
+actor = make_actor( { input() + input() } )
+
+assert(actor.call(1, 2) == 3)
+assert(actor.call(3, 4) == 7)

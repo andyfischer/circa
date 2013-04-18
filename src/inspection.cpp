@@ -110,7 +110,7 @@ bool is_major_block(Block* block)
     if (block->owningTerm == NULL)
         return true;
 
-    return is_function(block->owningTerm);
+    return is_function(block->owningTerm) || block->owningTerm->function == FUNCS.closure_block;
 }
 
 bool is_minor_block(Block* block)

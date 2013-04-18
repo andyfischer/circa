@@ -241,27 +241,34 @@ def Interpreter.error_message(self) -> String
 def Interpreter.toString(self) -> String
 
 -- Actors
-{-
 type Actor {
     Closure func
     Mutable stateVal
 }
+
 def make_actor(Closure func) -> Actor
     actor = make(Actor)
     actor.func = func
     actor
 
 def Actor.call(self, any inputs :multiple) -> any
-    s = self.stateVal.get
 
-    outs = self.func.call(inputs.prepend(s))
-
-    self.stateVal.set(outs[0])
-
-    return outs.slice(1)
+    outs = self.apply(inputs)
+    return outs[0]
     
 def Actor.apply(self, List inputs) -> any
--}
+    hasState = self.func.block.has_state_input
+    if hasState
+        @inputs.insert(self.func.block.get_state_input_index, self.stateVal.get)
+
+    outs = self.func.apply(inputs)
+
+    if hasState
+        outputIndex = self.func.block.get_state_output_index
+        self.stateVal.set(outs[outputIndex])
+        @outs.remove(outputIndex)
+
+    return outs
 
 def empty_list(any initialValue, int size) -> List
 def List.append(self, any item) -> List
