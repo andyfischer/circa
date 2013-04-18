@@ -162,6 +162,12 @@ type Closure {
 def Closure.call(self, any inputs :multiple) -> any
 def Closure.apply(self, List inputs) -> List
 
+def Block.to_closure(self) -> Closure
+    Closure([self, []])
+-- Language defect: Functions and closures should be stored with same data type.
+def Function.to_closure(self) -> Closure
+    self.block.to_closure
+
 def closure_block() -> Closure
 def unbound_input(any _) -> any
     -- Internally used function, used inside closure blocks to mark an unbound input.
