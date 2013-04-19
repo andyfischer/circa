@@ -1424,6 +1424,7 @@ void run(Stack* stack)
 
             caValue* inputActions = list_get(action, 1);
             run_input_ins(stack, inputActions, &incomingInputs, 0);
+
             // May have a runtime type error.
             if (error_occurred(stack))
                 return;
@@ -1488,6 +1489,8 @@ void run(Stack* stack)
             // By default, we'll set nextPc to finish this frame on the next iteration.
             // The override func may change nextPc.
             frame->nextPc = frame->block->length();
+
+            int snapNextPc = frame->nextPc;
 
             // Call override
             override(stack);

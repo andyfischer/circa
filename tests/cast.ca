@@ -1,4 +1,9 @@
 
--- This once failed:
-a = [1 0] -> Point
-print(a)
+v, b = cast([1 1], Point)
+
+assert(v == [1 1])
+assert(v.x == 1)
+assert(b)
+
+v, b = cast('hello', number)
+assert(not b)
