@@ -22,7 +22,6 @@ namespace cond_function { void setup(Block* kernel); }
 namespace container_set_function { void setup(Block* kernel); }
 namespace copy_function { void setup(Block* kernel); }
 namespace cppbuild_function { void setup(Block* kernel); }
-namespace declared_state_function { void setup(Block* kernel); }
 namespace div_function { void setup(Block* kernel); }
 namespace equals_function { void setup(Block* kernel); }
 namespace error_function { void setup(Block* kernel); }
@@ -80,7 +79,6 @@ void setup_builtin_functions(Block* kernel)
     container_set_function::setup(kernel);
     copy_function::setup(kernel);
     cppbuild_function::setup(kernel);
-    declared_state_function::setup(kernel);
     div_function::setup(kernel);
     equals_function::setup(kernel);
     error_function::setup(kernel);

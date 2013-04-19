@@ -1,4 +1,12 @@
 
+type Closure {
+    Block block
+    List bindings
+}
+def closure_block() -> Closure
+def Closure.call(self, any inputs :multiple) -> any
+def Closure.apply(self, List inputs) -> List
+
 -- Builtin functions
 def convert(any value, Type t) -> any
     -- Convert the value to the given type, if possible.
@@ -15,6 +23,14 @@ def from_string(String s) -> any
 def to_string_repr(any val) -> String
     -- Encode a Circa value as a string representation
 
+def unbound_input(any _) -> any
+    -- Internally used function, used inside closure blocks to mark an unbound input.
+
+def type(any val) -> Type
+    -- Returns the runtime type of a value
+def static_type(any term :meta) -> Type
+    -- Returns the static type of a value
+
 def context(Symbol name) -> any
 def set_context(Symbol name, any value)
 
@@ -23,6 +39,21 @@ def has_effects()
 
 def native_patch(String filename)
     -- Declare that this block should be patched by a native module.
+
+def declared_state(state any val, Type t, Closure initializer) -> any
+    if val != null
+        -- Try to cast to the desired type
+        val, cast_success = cast(val, t)
+
+        if cast_success
+            return val
+
+    -- Cast failed. Try to use the initializer.
+    if initializer != null
+        return initializer.call()
+
+    -- No initializer. Use the type's default value.
+    return make(t)
 
 def changed(any current) -> bool
     state any prev = null
@@ -155,12 +186,6 @@ def Block.version(self) -> int
 def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 
-type Closure {
-    Block block
-    List bindings
-}
-def Closure.call(self, any inputs :multiple) -> any
-def Closure.apply(self, List inputs) -> List
 
 def Block.to_closure(self) -> Closure
     Closure([self, []])
@@ -168,9 +193,6 @@ def Block.to_closure(self) -> Closure
 def Function.to_closure(self) -> Closure
     self.block.to_closure
 
-def closure_block() -> Closure
-def unbound_input(any _) -> any
-    -- Internally used function, used inside closure blocks to mark an unbound input.
 
 def Dict.count(self) -> int
     -- Return the number of elements
@@ -412,10 +434,6 @@ def Type.name(self) -> String
 def Type.property(self, String name) -> any
 def Type.declaringTerm(self) -> Term
 
-def type(any val) -> Type
-    -- Returns the runtime type of a value
-def static_type(any term :meta) -> Type
-    -- Returns the static type of a value
 
 -- Metaprogramming on Term
 def term_ref(any term :ignore_error) -> Term
@@ -500,7 +518,7 @@ def Point.magnitude(self) -> number
 
 def Point.norm(self) -> Point
     -- Returns v normalized to be along the unit circle.
-    m = magnitude(self)
+    m = self.magnitude
     [self.x / m, self.y / m]
 
 def Point.perpendicular(self) -> Point
@@ -631,10 +649,6 @@ def seed() -> number
 def polar(number angle) -> Point
     -- Return a point on the unit circle with the given angle.
     return [sin(angle) -cos(angle)]
-
-def magnitude(Point point) -> number
-    -- Returns the magnitude, or the distance from [0,0] to this point.
-    return sqrt(sqr(point.x) + sqr(point.y))
 
 def point_distance(Point a, Point b) -> number
     -- Returns the distance between a and b.

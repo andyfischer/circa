@@ -9,6 +9,7 @@
 #include "function.h"
 #include "if_block.h"
 #include "inspection.h"
+#include "parser.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "string_type.h"
@@ -296,6 +297,40 @@ void pack_state(caStack* stack)
             set_null(dest);
         else
             copy(input, dest);
+    }
+}
+
+void declared_state_format_source(caValue* source, Term* term)
+{
+    append_phrase(source, "state ", term, tok_State);
+
+    if (term->hasProperty("syntax:explicitType")) {
+        append_phrase(source, term->stringProp("syntax:explicitType",""),
+                term, sym_TypeName);
+        append_phrase(source, " ", term, tok_Whitespace);
+    }
+
+    append_phrase(source, term->name.c_str(), term, sym_TermName);
+
+    Term* defaultValue = NULL;
+    Block* initializer = NULL;
+
+    if (term->input(2) != NULL)
+        initializer = term->input(2)->nestedContents;
+
+    if (initializer != NULL) {
+        defaultValue = initializer->getFromEnd(0)->input(0);
+        if (defaultValue->boolProp("hidden", false))
+            defaultValue = defaultValue->input(0);
+    }
+
+    if (defaultValue != NULL) {
+        append_phrase(source, " = ", term, sym_None);
+        if (defaultValue->name != "")
+            append_phrase(source, get_relative_name_at(term, defaultValue),
+                    term, sym_TermName);
+        else
+            format_term_source(source, defaultValue);
     }
 }
 

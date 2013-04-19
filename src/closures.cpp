@@ -85,7 +85,6 @@ void closures_install_functions(Block* kernel)
     FUNCS.unbound_input = install_function(kernel, "unbound_input", NULL);
     block_set_evaluation_empty(function_contents(FUNCS.unbound_input), true);
 
-    FUNCS.closure_call = kernel->get("Closure.call");
     FUNCS.closure_apply = kernel->get("Closure.apply");
 }
 

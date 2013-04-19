@@ -10,7 +10,6 @@
 #include "../functions/container_set.cpp"
 #include "../functions/copy.cpp"
 #include "../functions/cppbuild.cpp"
-#include "../functions/declared_state.cpp"
 #include "../functions/div.cpp"
 #include "../functions/equals.cpp"
 #include "../functions/error.cpp"

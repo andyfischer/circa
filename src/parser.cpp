@@ -790,6 +790,16 @@ consume_next_output: {
 
     set_source_location(result, startPosition, tokens);
 
+    // Catch certain builtin functions as soon as they are defined.
+    if (FUNCS.declared_state == NULL && string_eq(&functionName, "declared_state"))
+        FUNCS.declared_state = result;
+    if (FUNCS.closure_block == NULL && string_eq(&functionName, "closure_block"))
+        FUNCS.closure_block = result;
+    if (FUNCS.closure_call == NULL && string_eq(&functionName, "Closure.call"))
+        FUNCS.closure_call = result;
+    if (FUNCS.unbound_input == NULL && string_eq(&functionName, "unbound_input"))
+        FUNCS.unbound_input = result;
+
     return ParseResult(result);
 }
 
@@ -1248,6 +1258,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
 
     // Lookup the explicit type
     Type* type = TYPES.any;
+
     bool unknownType = false;
     if (typeName != "") {
         Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
@@ -1268,7 +1279,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         possible_whitespace(tokens);
 
         // Create a lambda block for any new expressions.
-        initializer = apply(block, FUNCS.lambda, TermList());
+        initializer = apply(block, FUNCS.closure_block, TermList());
         Term* initialValue = infix_expression(nested_contents(initializer), tokens, context, 0).term;
 
         // Possibly add a cast()
@@ -1279,6 +1290,10 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         }
 
         append_output_placeholder(nested_contents(initializer), initialValue);
+        // We don't need to redirect_outside_references on this closure, because
+        // this closure can never escape.
+        // closure_redirect_outside_references(nested_contents(initializer));
+        block_finish_changes(nested_contents(initializer));
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
@@ -1298,7 +1313,8 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     // TODO: Would be better to find this input before apply.
     check_to_insert_implicit_inputs(result);
     change_declared_type(result, type);
-    set_input(result, 1, initializer);
+    set_input(result, 1, type->declaringTerm);
+    set_input(result, 2, initializer);
     
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);

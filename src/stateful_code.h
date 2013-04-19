@@ -28,4 +28,6 @@ void block_update_pack_state_calls(Block* block);
 void unpack_state(caStack* stack);
 void pack_state(caStack* stack);
 
+void declared_state_format_source(caValue* source, Term* term);
+
 } // namespace circa

@@ -57,8 +57,8 @@ void term_ref_values()
     Block version2;
     Term* f2 = version2.compile("def f()");
 
-    version1.compile("state tr = term_ref(f)");
-    version1.compile("state br = tr.contents");
+    version1.compile("state br = f.block");
+    version1.compile("state tr = br.owner");
 
     Stack* stack = create_stack(global_world());
 

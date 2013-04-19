@@ -1116,8 +1116,9 @@ void bootstrap_kernel()
     reflection_install_functions(kernel);
     interpreter_install_functions(kernel);
 
-    // Fetch refereneces to certain builtin funcs.
+    // Fetch refereneces to certain stdlib funcs.
     FUNCS.block_dynamic_call = kernel->get("Block.call");
+    FUNCS.declared_state = kernel->get("declared_state");
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
     FUNCS.has_effects = kernel->get("has_effects");
@@ -1127,6 +1128,8 @@ void bootstrap_kernel()
     FUNCS.not_func = kernel->get("not");
     FUNCS.output_explicit = kernel->get("output");
     FUNCS.type = kernel->get("type");
+
+    as_function(FUNCS.declared_state)->formatSource = declared_state_format_source;
 
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
