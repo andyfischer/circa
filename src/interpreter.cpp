@@ -1167,6 +1167,14 @@ void write_term_bytecode(Term* term, caValue* result)
         return;
     }
 
+    if (term->function == FUNCS.dynamic_method) {
+        list_resize(result, 3);
+        set_symbol(list_get(result, 0), op_DynamicMethodCall);
+        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
+        set_symbol(list_get(result, 2), sym_FlatOutputs);
+        return;
+    }
+
     if (term->function == FUNCS.closure_call || term->function == FUNCS.closure_apply) {
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_ClosureCall);
@@ -1407,6 +1415,7 @@ void run(Stack* stack)
 
             caValue* inputActions = list_get(action, 1);
             run_input_ins(stack, inputActions, &incomingInputs, 0);
+
             // May have a runtime type error.
             if (error_occurred(stack))
                 return;
@@ -1415,6 +1424,43 @@ void run(Stack* stack)
 
             caValue* unpackedInputs = list_get(&incomingInputs, 1);
             push_frame_with_inputs(stack, block, unpackedInputs);
+            break;
+        }
+
+        case op_DynamicMethodCall: {
+            INCREMENT_STAT(DynamicMethodCall);
+            circa::Value incomingInputs;
+            set_list(&incomingInputs, 1);
+
+            caValue* inputActions = list_get(action, 1);
+            run_input_ins(stack, inputActions, &incomingInputs, 0);
+
+            // May have a runtime type error.
+            if (error_occurred(stack))
+                return;
+
+            // Lookup method
+            caValue* inputs = circa_index(&incomingInputs, 0);
+            caValue* object = circa_index(inputs, 0);
+            Term* currentTerm = block->get(frame->pc);
+            std::string functionName = currentTerm->stringProp("syntax:functionName", "");
+
+            // Find and dispatch method
+            Term* method = find_method((Block*) block,
+                (Type*) circa_type_of(object), functionName.c_str());
+
+            // Method not found. Raise error.
+            if (method == NULL) {
+                Value msg;
+                set_string(&msg, "Method ");
+                string_append(&msg, functionName.c_str());
+                string_append(&msg, " not found on type ");
+                string_append(&msg, &circa_type_of(object)->name);
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
+
+            push_frame_with_inputs(stack, nested_contents(method), inputs);
             break;
         }
 
@@ -1494,6 +1540,7 @@ void run(Stack* stack)
 
             // Call override
             override(stack);
+            //ca_assert(snapNextPc == frame->nextPc);
 
             break;
         }

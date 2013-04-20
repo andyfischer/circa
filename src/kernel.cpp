@@ -143,42 +143,6 @@ void to_string_repr(caStack* stack)
     write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void dynamic_method_call(caStack* stack)
-{
-    INCREMENT_STAT(DynamicMethodCall);
-
-    caValue* args = circa_input(stack, 0);
-    caValue* object = circa_index(args, 0);
-
-    // Lookup method
-    Term* term = (Term*) circa_caller_term(stack);
-    std::string functionName = term->stringProp("syntax:functionName", "");
-
-    // Find and dispatch method
-    Term* method = find_method((Block*) circa_caller_block(stack),
-        (Type*) circa_type_of(object), functionName.c_str());
-
-    // copy(object, circa_output(stack, 1));
-
-    if (method != NULL) {
-        // Grab inputs before pop
-        Value inputs;
-        swap(args, &inputs);
-
-        pop_frame(stack);
-        push_frame_with_inputs(stack, function_contents(method), &inputs);
-        return;
-    }
-
-    // Method not found. Raise error.
-    std::string msg;
-    msg += "Method ";
-    msg += functionName;
-    msg += " not found on type ";
-    msg += as_cstring(&circa_type_of(object)->name);
-    circa_output_error(stack, msg.c_str());
-}
-
 void refactor__rename(caStack* stack)
 {
     rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
@@ -1033,7 +997,7 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
 
     // Need dynamic_method before any hosted functions
-    FUNCS.dynamic_method = import_function(kernel, dynamic_method_call,
+    FUNCS.dynamic_method = import_function(kernel, NULL,
             "def dynamic_method(any inputs :multiple) -> any");
 
     // Load the standard library from stdlib.ca
