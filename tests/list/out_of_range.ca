@@ -1,3 +1,9 @@
 
-l = []
-l[0]
+int = make_interpreter()
+
+int.push_frame({
+    l = []
+    l[0]}.block, [])
+int.run
+
+assert(int.errored)

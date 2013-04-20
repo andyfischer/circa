@@ -9,6 +9,11 @@ namespace any_t {
     {
         return "<any>";
     }
+    void initialize(Type*, caValue* value)
+    {
+        // Attempting to create an instance of 'any' will result in a value of null.
+        value->value_type = TYPES.null;
+    }
     void staticTypeQuery(Type*, StaticTypeQuery* query)
     {
         return query->succeed();
@@ -21,6 +26,7 @@ namespace any_t {
     void setup_type(Type* type)
     {
         set_string(&type->name, "any");
+        type->initialize = initialize;
         type->toString = to_string;
         type->staticTypeQuery = staticTypeQuery;
         type->cast = cast;
