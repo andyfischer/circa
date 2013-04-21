@@ -32,7 +32,6 @@ struct BuiltinFuncs {
     Term* dynamic_call;
     Term* dynamic_method;
     Term* error;
-    Term* errored;
     Term* extra_output;
     Term* feedback;
     Term* for_func;

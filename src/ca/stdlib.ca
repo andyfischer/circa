@@ -14,6 +14,8 @@ def convert(any value, Type t) -> any
 def assert(bool condition)
     -- Raises an error if 'condition' is false.
 
+def catch(any input)
+
 def length(List list) -> int
     -- Return the number of items in the given list
 

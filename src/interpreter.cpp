@@ -721,7 +721,7 @@ void create_output(Stack* stack)
 
 void raise_error(Stack* stack)
 {
-    // TODO: Check if there is an 'errored' catch
+    // TODO: Check if this error can be caught.
     
     stack->step = sym_StackFinished;
     stack->errorOccurred = true;

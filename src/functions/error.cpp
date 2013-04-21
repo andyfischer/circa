@@ -10,14 +10,9 @@ namespace error_function {
         RAISE_ERROR(STRING_INPUT(0));
     }
 
-    CA_FUNCTION(errored)
-    {
-        set_bool(OUTPUT, is_error(INPUT(0)));
-    }
     void setup(Block* kernel)
     {
         FUNCS.error = import_function(kernel, error, "error(String msg)");
-        FUNCS.errored = import_function(kernel, errored, "errored(any val) -> bool");
     }
 }
 }
