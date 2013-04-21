@@ -1,0 +1,7 @@
+
+cl = {
+    i = input(number)
+    output(i + 5)
+}
+
+cl.call('hello')

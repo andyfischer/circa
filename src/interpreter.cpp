@@ -1536,11 +1536,15 @@ void run(Stack* stack)
             // The override func may change nextPc.
             frame->nextPc = frame->block->length();
 
-            int snapNextPc = frame->nextPc;
+            // Override functions may not push/pop frames or change PC.
+            int snapshotNextPc = frame->nextPc;
+            Frame* snapshotFrame = frame;
 
             // Call override
             override(stack);
-            //ca_assert(snapNextPc == frame->nextPc);
+
+            ca_assert(snapshotNextPc == frame->nextPc);
+            ca_assert(snapshotFrame == frame);
 
             break;
         }
