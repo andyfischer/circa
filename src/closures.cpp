@@ -71,7 +71,7 @@ void closure_block_evaluate(caStack* stack)
         if (unbound->function != FUNCS.unbound_input)
             break;
 
-        caValue* input = find_stack_value_for_term(stack, unbound->input(0), 0);
+        caValue* input = stack_find_active_value(top_frame_parent(stack), unbound->input(0));
         ca_assert(input != NULL);
         copy(input, list_append(bindings));
     }

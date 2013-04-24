@@ -1,10 +1,16 @@
 
-cl = {
-    i = input()
-    output(i)
-}
 
-assert(cl.call(1) == 1)
-assert(cl.call(1 2) == 1)
-assert(cl.call(1 2 3) == 1)
-assert(cl.call(1 2 3 4) == 1)
+int = make_interpreter()
+int.push_frame({
+
+    cl = {
+        i = input()
+        output(i)
+    }
+
+    cl.call(1 2)
+}.block, [])
+
+int.run
+assert(int.errored)
+

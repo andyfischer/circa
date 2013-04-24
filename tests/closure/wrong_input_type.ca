@@ -1,7 +1,16 @@
 
-cl = {
-    i = input(number)
-    output(i + 5)
-}
 
-cl.call('hello')
+int = make_interpreter()
+int.push_frame({
+
+    cl = {
+        i = input(number)
+        output(i + 5)
+    }
+
+    cl.call('hello')
+}.block, [])
+
+int.run
+assert(int.errored)
+

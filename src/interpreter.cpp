@@ -389,7 +389,7 @@ void finish_frame(Stack* stack)
                 Term* extraOutput = get_output_term(finishedTerm, i);
                 if (extraOutput->hasProperty("rebindsInput")) {
                     int inputIndex = extraOutput->intProp("rebindsInput", 0);
-                    copy(find_stack_value_for_term(stack, finishedTerm->input(inputIndex), 1),
+                    copy(stack_find_active_value(stack, finishedTerm->input(inputIndex), 1),
                             dest);
                 }
 
@@ -573,7 +573,7 @@ void evaluate_block(Stack* stack, Block* block)
         pop_frame(stack);
 }
 
-caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
+caValue* stack_find_active_value(Stack* stack, Term* term, int stackDelta)
 {
     if (term == NULL)
         return NULL;
@@ -593,6 +593,24 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
 
         frame = frame_by_id(stack, frame->parent);
         distance++;
+    }
+}
+
+caValue* stack_find_active_value(Frame* frame, Term* term)
+{
+    if (is_value(term))
+        return term_value(term);
+
+    caStack* stack = frame->stack;
+
+    while (true) {
+        if (frame->block == term->owningBlock)
+            return frame_register(frame, term);
+
+        if (frame->parent == 0)
+            return NULL;
+
+        frame = frame_by_id(stack, frame->parent);
     }
 }
 
@@ -917,7 +935,7 @@ static void update_stack_for_possibly_changed_blocks(Stack* stack)
 static Block* for_loop_choose_block(Stack* stack, Term* term)
 {
     // If there are zero inputs, use the #zero block.
-    caValue* input = find_stack_value_for_term(stack, term->input(0), 0);
+    caValue* input = stack_find_active_value(stack, term->input(0), 0);
 
     if (is_list(input) && list_length(input) == 0)
         return for_loop_get_zero_block(term->nestedContents);
@@ -936,7 +954,7 @@ static Block* case_block_choose_block(Stack* stack, Term* term)
 
     for (; termIndex < contents->length(); termIndex++) {
         Term* caseTerm = contents->get(termIndex);
-        caValue* caseInput = find_stack_value_for_term(stack, caseTerm->input(0), 0);
+        caValue* caseInput = stack_find_active_value(stack, caseTerm->input(0), 0);
 
         // Fallback block has NULL input
         if (caseTerm->input(0) == NULL)
@@ -1175,14 +1193,17 @@ void write_term_bytecode(Term* term, caValue* result)
         return;
     }
 
-    if (term->function == FUNCS.closure_call || term->function == FUNCS.closure_apply) {
+    if (term->function == FUNCS.closure_call) {
         list_resize(result, 3);
         set_symbol(list_get(result, 0), op_ClosureCall);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        if (term->function == FUNCS.closure_call)
-            set_symbol(list_get(result, 2), sym_FlatOutputs);
-        else
-            set_symbol(list_get(result, 2), sym_OutputsToList);
+        set_symbol(list_get(result, 2), sym_FlatOutputs);
+        return;
+    }
+
+    if (term->function == FUNCS.closure_apply) {
+        list_resize(result, 3);
+        set_symbol(list_get(result, 0), op_ClosureApply);
+        set_symbol(list_get(result, 2), sym_OutputsToList);
         return;
     }
     
@@ -1311,7 +1332,7 @@ void run_input_ins(Stack* stack, caValue* inputActions, caValue* outputList,
                 for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
 
                     Term* term = as_term_ref(list_get(action, inputIndex + 1));
-                    caValue* incomingValue = find_stack_value_for_term(stack, term, stackDelta);
+                    caValue* incomingValue = stack_find_active_value(stack, term, stackDelta);
                     caValue* elementValue = list_get(dest, inputIndex);
                     if (incomingValue != NULL)
                         copy(incomingValue, elementValue);
@@ -1325,7 +1346,7 @@ void run_input_ins(Stack* stack, caValue* inputActions, caValue* outputList,
                 // Cast action: copy and cast to type.
                 Term* term = as_term_ref(list_get(action, 1));
                 Type* type = as_type(list_get(action, 2));
-                caValue* inputValue = find_stack_value_for_term(stack, term, stackDelta);
+                caValue* inputValue = stack_find_active_value(stack, term, stackDelta);
                 copy(inputValue, dest);
                 bool castSuccess = cast(dest, type);
                 if (!castSuccess) {
@@ -1345,7 +1366,7 @@ void run_input_ins(Stack* stack, caValue* inputActions, caValue* outputList,
         } else if (is_term_ref(action)) {
 
             // Standard copy
-            caValue* inputValue = find_stack_value_for_term(stack,
+            caValue* inputValue = stack_find_active_value(stack,
                     as_term_ref(action), stackDelta);
             ca_assert(inputValue != NULL);
             copy(inputValue, dest);
@@ -1354,6 +1375,57 @@ void run_input_ins(Stack* stack, caValue* inputActions, caValue* outputList,
             internal_error("Unrecognized element type in run_input_ins");
         }
     }
+}
+
+bool forward_inputs_to_new_frame(caStack* stack, Term* caller, Frame* newFrame)
+{
+    int incomingIndex = 0;
+    int incomingCount = caller->numInputs();
+
+    Frame* parentFrame = frame_by_id(stack, newFrame->parent);
+
+    for (int slotIndex=0;; slotIndex++) {
+
+        Term* slotTerm = get_input_placeholder(newFrame->block, slotIndex);
+
+        if (slotTerm == NULL)
+            break;
+
+        caValue* slot = list_get(&newFrame->registers, slotIndex);
+
+        if (slotTerm->boolProp("multiple", false)) {
+            // Copy remaining inputs to a list.
+            int remainingCount = incomingCount - slotIndex;
+            caValue* destList = set_list(slot, remainingCount);
+
+            for (int incomingIndex=slotIndex; incomingIndex < incomingCount; incomingIndex++) {
+                caValue* incoming = stack_find_active_value(parentFrame,
+                        caller->input(incomingIndex));
+                copy(incoming, list_get(destList, incomingIndex - slotIndex));
+            }
+
+            return true;
+        }
+
+        caValue* incoming = stack_find_active_value(parentFrame,
+               caller->input(incomingIndex));
+        copy(incoming, slot);
+
+        Type* type = declared_type(slotTerm);
+        bool castSuccess = cast(slot, type);
+
+        if (!castSuccess) {
+            circa::Value msg;
+            set_string(&msg, "Couldn't cast value ");
+            string_append_quoted(&msg, slot);
+            string_append(&msg, " to type ");
+            string_append(&msg, &type->name);
+            raise_error_msg(stack, as_cstring(&msg));
+            return false;
+        }
+    }
+
+    return true;
 }
 
 static Block* find_pushed_block_for_action(caValue* action)
@@ -1374,6 +1446,73 @@ void run_interpreter(Stack* stack)
     stack->step = sym_StackRunning;
 
     run(stack);
+}
+
+void raise_error_input_type_mismatch(Stack* stack)
+{
+    Frame* frame = top_frame(stack);
+    Term* term = frame->block->get(frame->pc);
+    caValue* value = frame_register(frame, frame->pc);
+
+    circa::Value msg;
+    set_string(&msg, "Couldn't cast value ");
+    string_append_quoted(&msg, value);
+    string_append(&msg, " to type ");
+    string_append(&msg, &declared_type(term)->name);
+    raise_error_msg(stack, as_cstring(&msg));
+    return;
+}
+
+int get_count_of_caller_inputs_for_error(Stack* stack)
+{
+    Frame* parentFrame = top_frame_parent(stack);
+    Term* callerTerm = parentFrame->block->get(parentFrame->pc);
+    int foundCount = callerTerm->numInputs();
+    if (callerTerm->function == FUNCS.closure_call)
+        foundCount--;
+    else if (callerTerm->function == FUNCS.closure_apply) {
+        caValue* inputs = stack_find_active_value(parentFrame, callerTerm->input(1));
+        foundCount = list_length(inputs);
+    }
+    return foundCount;
+}
+
+void raise_error_not_enough_inputs(Stack* stack)
+{
+    Frame* frame = top_frame(stack);
+
+    int expectedCount = count_input_placeholders(frame->block);
+    int foundCount = get_count_of_caller_inputs_for_error(stack);
+
+    Value msg;
+    set_string(&msg, "Too few inputs, expected ");
+    string_append(&msg, expectedCount);
+    if (has_variable_args(frame->block))
+        string_append(&msg, " (or more)");
+    string_append(&msg, ", received ");
+    string_append(&msg, foundCount);
+
+    pop_frame(stack);
+    raise_error_msg(stack, as_cstring(&msg));
+}
+
+void raise_error_too_many_inputs(Stack* stack)
+{
+    Frame* frame = top_frame(stack);
+    Frame* parentFrame = top_frame_parent(stack);
+    Term* callerTerm = parentFrame->block->get(parentFrame->pc);
+
+    int expectedCount = count_input_placeholders(frame->block);
+    int foundCount = get_count_of_caller_inputs_for_error(stack);
+
+    Value msg;
+    set_string(&msg, "Too many inputs, expected ");
+    string_append(&msg, expectedCount);
+    string_append(&msg, ", received ");
+    string_append(&msg, foundCount);
+
+    pop_frame(stack);
+    raise_error_msg(stack, as_cstring(&msg));
 }
 
 void run(Stack* stack)
@@ -1465,33 +1604,113 @@ void run(Stack* stack)
         }
 
         case op_ClosureCall: {
-            circa::Value incomingInputs;
-            set_list(&incomingInputs, 2);
+            Term* caller = block->get(frame->pc);
+            Frame* callerFrame = frame;
 
-            caValue* inputActions = list_get(action, 1);
-            run_input_ins(stack, inputActions, &incomingInputs, 0);
-
-            // May have a runtime type error.
-            if (error_occurred(stack))
-                return;
-
-            caValue* closure = list_get(&incomingInputs, 0);
+            caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
             caValue* bindings = list_get(closure, 1);
 
-            Frame* frame = push_frame(stack, block);
-            caValue* actualInputs = list_get(&incomingInputs, 1);
+            frame = push_frame(stack, block);
 
-            caValue* registers = frame_registers(frame);
+            // Pull inputs.
+            int inputIndex = 1;
+            int inputCount = caller->numInputs();
 
-            // Copy incoming inputs.
-            int registerWrite = 0;
-            for (registerWrite=0; registerWrite < list_length(actualInputs); registerWrite++)
-                copy(list_get(actualInputs, registerWrite), list_get(registers, registerWrite));
+            int bindingIndex = 0;
+            int bindingCount = list_length(bindings);
 
-            // Copy closure bindings.
-            for (int i=0; i < list_length(bindings); i++)
-                copy(list_get(bindings, i), list_get(registers, registerWrite++));
+            for (;; frame->pc++) {
+
+                Term* input = block->get(frame->pc);
+
+                caValue* source;
+
+                if (input->function == FUNCS.input) {
+                    if (input->boolProp("multiple", false)) {
+                        // todo
+                        break;
+                    } else {
+                        if (inputIndex >= inputCount)
+                            return raise_error_not_enough_inputs(stack);
+
+                        source = stack_find_active_value(callerFrame,
+                           caller->input(inputIndex++));
+                    }
+
+                } else if (input->function == FUNCS.unbound_input) {
+                    source = list_get(bindings, bindingIndex++);
+
+                } else {
+                    if (inputIndex < inputCount)
+                        return raise_error_too_many_inputs(stack);
+
+                    break;
+                }
+
+                caValue* inputRegister = frame_register(frame, frame->pc);
+                copy(source, inputRegister);
+
+                Type* slotType = declared_type(input);
+
+                if (!cast(inputRegister, slotType))
+                    return raise_error_input_type_mismatch(stack);
+            }
+
+            break;
+        }
+
+        case op_ClosureApply: {
+            Term* caller = block->get(frame->pc);
+            Frame* callerFrame = frame;
+
+            caValue* closure = stack_find_active_value(frame, caller->input(0));
+            caValue* inputs = stack_find_active_value(frame, caller->input(1));
+            Block* block = as_block(list_get(closure, 0));
+            caValue* bindings = list_get(closure, 1);
+
+            frame = push_frame(stack, block);
+
+            // Pull inputs.
+            int inputIndex = 0;
+            int inputCount = list_length(inputs);
+
+            int bindingIndex = 0;
+            int bindingCount = list_length(bindings);
+
+            for (;; frame->pc++) {
+                Term* input = block->get(frame->pc);
+
+                caValue* source;
+
+                if (input->function == FUNCS.input) {
+                    if (input->boolProp("multiple", false)) {
+                        // todo
+                        break;
+                    } else {
+                        if (inputIndex >= inputCount)
+                            return raise_error_not_enough_inputs(stack);
+
+                        source = list_get(inputs, inputIndex++);
+                    }
+                } else if (input->function == FUNCS.unbound_input) {
+                    source = list_get(bindings, bindingIndex++);
+
+                } else {
+                    if (inputIndex < inputCount)
+                        return raise_error_too_many_inputs(stack);
+
+                    break;
+                }
+
+                caValue* inputRegister = frame_register(frame, frame->pc);
+                copy(source, inputRegister);
+
+                Type* slotType = declared_type(input);
+
+                if (!cast(inputRegister, slotType))
+                    return raise_error_input_type_mismatch(stack);
+            }
 
             break;
         }
@@ -1524,7 +1743,7 @@ void run(Stack* stack)
         case op_InlineCopy: {
             caValue* currentRegister = frame_register(frame, frame->pc);
             caValue* inputs = list_get(action, 1);
-            caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
+            caValue* value = stack_find_active_value(stack, as_term_ref(list_get(inputs, 0)), 0);
             copy(value, currentRegister);
             break;
         }

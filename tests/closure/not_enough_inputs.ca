@@ -1,9 +1,14 @@
 
-cl = {
-    output([input() input() input()])
-}
+int = make_interpreter()
+int.push_frame({
 
-assert(cl.call(1) == [1 null null])
-assert(cl.call(1 2) == [1 2 null])
-assert(cl.call(1 2 3) == [1 2 3])
-assert(cl.call(1 2 3 4) == [1 2 3])
+    cl = {
+        output([input() input() input()])
+    }
+
+    cl.call(1 2)
+}.block, [])
+
+int.run
+assert(int.errored)
+

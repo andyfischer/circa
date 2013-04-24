@@ -184,7 +184,8 @@ Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);
 
 // Functions used by eval functions.
 caValue* get_input(Stack* stack, int index);
-caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta);
+caValue* stack_find_active_value(Stack* stack, Term* term, int stackDelta);
+caValue* stack_find_active_value(Frame* frame, Term* term);
 void consume_input(Stack* stack, Term* term, caValue* dest);
 void consume_input(Stack* stack, int index, caValue* dest);
 int num_inputs(Stack* stack);

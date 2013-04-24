@@ -334,7 +334,7 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
         set_int(frame_register(frame, for_loop_find_output_index(contents)), 0);
 
         // Initialize output value.
-        caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
+        caValue* outputList = stack_find_active_value(stack, contents->owningTerm, 0);
         set_list(outputList, 0);
     }
 
@@ -360,7 +360,7 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
         caValue* outputIndex = frame_register(frame, for_loop_find_output_index(contents));
 
         caValue* resultValue = frame_register_from_end(frame, 0);
-        caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
+        caValue* outputList = stack_find_active_value(stack, contents->owningTerm, 0);
 
         copy(resultValue, list_append(outputList));
 
@@ -378,7 +378,7 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
         // Silly code- move the output list (in the parent frame) to our frame's output,
         // where it will get copied back to parent in finish_frame.
         if (enableLoopOutput) {
-            caValue* outputList = find_stack_value_for_term(stack, contents->owningTerm, 0);
+            caValue* outputList = stack_find_active_value(stack, contents->owningTerm, 0);
             move(outputList, frame_register_from_end(frame, 0));
         } else {
             set_list(frame_register_from_end(frame, 0), 0);

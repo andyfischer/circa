@@ -111,7 +111,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     // Print results of the last expression
     Term* result = block->get(block->length() - 1);
     if (result->type != TYPES.void_type) {
-        std::string s = to_string(find_stack_value_for_term(stack, result, 0));
+        std::string s = to_string(stack_find_active_value(stack, result, 0));
         set_string(list_append(output), s.c_str());
     }
 
