@@ -182,7 +182,6 @@ const char* builtin_symbol_to_string(int name)
     case op_SetNull: return "op_SetNull";
     case op_InlineCopy: return "op_InlineCopy";
     case op_CallBlock: return "op_CallBlock";
-    case op_DynamicCall: return "op_DynamicCall";
     case op_DynamicMethodCall: return "op_DynamicMethodCall";
     case op_ClosureCall: return "op_ClosureCall";
     case op_ClosureApply: return "op_ClosureApply";
@@ -1052,37 +1051,9 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     default: return -1;
     case 'y':
-    switch (str[5]) {
-    default: return -1;
-    case 'n':
-    switch (str[6]) {
-    default: return -1;
-    case 'a':
-    switch (str[7]) {
-    default: return -1;
-    case 'm':
-    switch (str[8]) {
-    default: return -1;
-    case 'i':
-    switch (str[9]) {
-    default: return -1;
-    case 'c':
-    switch (str[10]) {
-    default: return -1;
-    case 'C':
-        if (strcmp(str + 11, "all") == 0)
-            return op_DynamicCall;
-        break;
-    case 'M':
-        if (strcmp(str + 11, "ethodCall") == 0)
+        if (strcmp(str + 5, "namicMethodCall") == 0)
             return op_DynamicMethodCall;
         break;
-    }
-    }
-    }
-    }
-    }
-    }
     case 'i':
         if (strcmp(str + 5, "scard") == 0)
             return op_Discard;

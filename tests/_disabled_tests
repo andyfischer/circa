@@ -2,7 +2,6 @@ benchmarks/*
 embed/*
 import_*
 script_change_listener/*
-dynamic_function_dispatch.ca
 for/infer_with_null_input.ca
 field/View.ca
 function_as_value.ca

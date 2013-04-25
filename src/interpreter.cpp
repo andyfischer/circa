@@ -1103,11 +1103,6 @@ void write_term_bytecode(Term* term, caValue* result)
     if (term->index == 0 && get_override_for_block(parent) != NULL) {
         list_resize(result, 1);
         set_symbol(list_get(result, 0), op_FireNative);
-
-        if (get_parent_term(term) == FUNCS.dynamic_call) {
-            list_resize(result, 3);
-            set_symbol(list_get(result, 2), sym_OutputsToList);
-        }
         return;
     }
 
@@ -1173,15 +1168,6 @@ void write_term_bytecode(Term* term, caValue* result)
             set_symbol(list_get(result, 2), 
                 enclosing_loop_produces_output_value(term) ? sym_LoopProduceOutput : sym_None);
         }
-        return;
-    }
-
-    if (term->function == FUNCS.dynamic_call
-            || term->function == FUNCS.block_dynamic_call) {
-        list_resize(result, 3);
-        set_symbol(list_get(result, 0), op_DynamicCall);
-        write_term_input_instructions(term, function_contents(term->function), list_get(result, 1));
-        set_symbol(list_get(result, 2), sym_OutputsToList);
         return;
     }
 
@@ -1548,24 +1534,6 @@ void run(Stack* stack)
             run_input_ins(stack, inputActions, &frame->registers, 1);
             break;
         }
-        case op_DynamicCall: {
-            circa::Value incomingInputs;
-            set_list(&incomingInputs, 2);
-
-            caValue* inputActions = list_get(action, 1);
-            run_input_ins(stack, inputActions, &incomingInputs, 0);
-
-            // May have a runtime type error.
-            if (error_occurred(stack))
-                return;
-
-            Block* block = as_block(list_get(&incomingInputs, 0));
-
-            caValue* unpackedInputs = list_get(&incomingInputs, 1);
-            push_frame_with_inputs(stack, block, unpackedInputs);
-            break;
-        }
-
         case op_DynamicMethodCall: {
             INCREMENT_STAT(DynamicMethodCall);
             circa::Value incomingInputs;

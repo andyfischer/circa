@@ -201,7 +201,6 @@ op_Pause
 op_SetNull
 op_InlineCopy
 op_CallBlock
-op_DynamicCall
 op_DynamicMethodCall
 op_ClosureCall
 op_ClosureApply

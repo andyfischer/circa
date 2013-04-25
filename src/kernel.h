@@ -11,7 +11,6 @@ struct BuiltinFuncs {
     Term* add;
     Term* add_i;
     Term* add_f;
-    Term* block_dynamic_call;
     Term* block_unevaluated;
     Term* break_func;
     Term* case_func;
@@ -29,7 +28,6 @@ struct BuiltinFuncs {
     Term* discard;
     Term* div;
     Term* dll_patch;
-    Term* dynamic_call;
     Term* dynamic_method;
     Term* error;
     Term* extra_output;

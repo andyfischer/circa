@@ -70,9 +70,6 @@ def first_symbol(any val) -> Symbol
         if length(val) > 0
             first_symbol(val[0])
 
-def dynamic_call(Block block, List inputs) -> List
-    -- Dynamic function dispatch
-
 -- Modules
 def require(String moduleName)
 def package(String moduleName)
@@ -132,8 +129,6 @@ type Rect_i { int x1 int y1 int x2 int y2 }
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block
     -- Obtain a Block ref from an expression.
-def Block.call(self, any inputs :multiple) -> List
-    -- Invoke this Block with the given inputs.
 def Block.dump(self)
     -- Dump this block's raw contents to stdout.
 def Block.file_signature(self) -> any
@@ -195,6 +190,10 @@ def Block.to_closure(self) -> Closure
 def Function.to_closure(self) -> Closure
     self.block.to_closure
 
+-- Language defect: out-of-order function definition.
+def Block.call(self, any inputs :multiple) -> List
+    -- Invoke this Block with the given inputs.
+    self.to_closure.apply(inputs)
 
 def Dict.count(self) -> int
     -- Return the number of elements

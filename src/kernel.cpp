@@ -1081,10 +1081,8 @@ void bootstrap_kernel()
     interpreter_install_functions(kernel);
 
     // Fetch refereneces to certain stdlib funcs.
-    FUNCS.block_dynamic_call = kernel->get("Block.call");
     FUNCS.declared_state = kernel->get("declared_state");
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
-    FUNCS.dynamic_call = kernel->get("dynamic_call");
     FUNCS.has_effects = kernel->get("has_effects");
     FUNCS.length = kernel->get("length");
     FUNCS.list_append = kernel->get("List.append");

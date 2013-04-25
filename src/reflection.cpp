@@ -215,17 +215,6 @@ void Block__get_state_output_index(caStack* stack)
         set_int(circa_output(stack, 0), block->length() - stateOutput->index - 1);
 }
 
-void Block__call(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    if (block == NULL)
-        return circa_output_error(stack, "NULL block");
-
-    caValue* inputs = circa_input(stack, 1);
-    ca_assert(is_list(inputs));
-    push_frame_with_inputs(stack, block, inputs);
-}
-
 // Reflection
 
 void Block__terms(caStack* stack)
@@ -633,7 +622,6 @@ void reflection_install_functions(Block* kernel)
         {"term_ref", term_ref},
         {"block_ref", block_ref},
         {"Block.dump", Block__dump},
-        {"Block.call", Block__call},
         {"Block.find_term", Block__find_term},
         {"Block.file_signature", Block__file_signature},
         {"Block.functions", Block__functions},
