@@ -247,6 +247,12 @@ Block* term_get_function_details(Term* call)
     return function_get_contents(as_function(value));
 }
 
+#if 0
+Block* get_effective_callee_block(Term* term)
+{
+}
+#endif
+
 Term* term_get_input_placeholder(Term* call, int index)
 {
     if (!is_function(call->function))

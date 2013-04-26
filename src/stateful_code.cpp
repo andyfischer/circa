@@ -27,8 +27,10 @@ bool is_declared_state(Term* term)
     return term->function == FUNCS.declared_state;
 }
 
-bool is_function_stateful(Term* func)
+bool does_callsite_have_implicit_state(Term* term)
 {
+    Term* func = term->function;
+
     if (!is_function(func))
         return false;
     Function* attrs = as_function(func);
@@ -37,6 +39,30 @@ bool is_function_stateful(Term* func)
 
     Block* block = function_contents(func);
     return has_state_input(block);
+}
+
+void check_to_insert_implicit_state_input(Term* term)
+{
+    Block* block = term_get_function_details(term);
+
+    Term* stateInput = find_state_input(block);
+
+    if (stateInput == NULL || term_is_state_input(term, stateInput->index))
+        return;
+
+    int inputIndex = stateInput->index;
+
+    Term* container = find_or_create_default_state_input(term->owningBlock);
+
+    // Add a unpack_state() call
+    Term* unpack = apply(term->owningBlock, FUNCS.unpack_state,
+        TermList(container, term));
+    hide_from_source(unpack);
+    term->owningBlock->move(unpack, term->index);
+
+    insert_input(term, inputIndex, unpack);
+    set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
+    set_input_hidden(term, inputIndex, true);
 }
 
 void pack_any_open_state_vars(Block* block)

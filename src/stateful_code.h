@@ -4,7 +4,10 @@
 
 namespace circa {
 
-bool is_function_stateful(Term* func);
+bool is_declared_state(Term* term);
+bool does_callsite_have_implicit_state(Term* term);
+
+void check_to_insert_implicit_state_input(Term* term);
 
 Term* find_active_state_container(Block* block);
 Term* find_or_create_default_state_input(Block* block);
@@ -13,8 +16,6 @@ Term* find_or_create_default_state_input(Block* block);
 // values at the current position. If the block has no state then this
 // returns NULL.
 Term* block_add_pack_state(Block* block);
-
-bool is_declared_state(Term* term);
 
 // Update the block's stateType. Should be called after the code is changed in a way
 // that could add/remove declared state.

@@ -1,0 +1,17 @@
+
+cl = {
+    i = input(int)
+    state s = 0
+
+    s += i
+
+    output(s)
+}
+
+def main() -> int
+    state t
+
+    cl.call(1)
+
+s = null
+assert(main(state = s) == 1)

@@ -1,0 +1,27 @@
+
+Inlined state is currently resolved by modifying the Block
+  Stateful inputs are first-class inputs
+
+  This works great for static code
+
+For dynamic dispatch, there are some problems.
+
+Consider:
+
+  a = {}
+  b = { state i }
+  c = cond(condition, a, b)
+
+  c.call
+
+Is 'c.call' treated as stateful?
+
+Do we create the pack/unpack state commands?
+How do we update the state type of the block?
+
+Some approaches:
+  Perform a just-in-time state modification. If we call a dynamic function which takes state, and
+  the callsite doesn't provide state, then we modify the block.
+
+    Conversely, if we call a dynamic function and the callsite provides state, but none is expected,
+    then this shouldn't be an error. The state value should be nullified and not passed to the function.
