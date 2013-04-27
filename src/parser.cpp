@@ -1307,15 +1307,15 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     // Create the declared_state() term.
     Term* result = apply(block, FUNCS.declared_state, TermList(), name.c_str());
 
-    if (unknownType)
-        result->setStringProp("error:unknownType", typeName);
-
     // TODO: Would be better to find this input before apply.
     check_to_insert_implicit_inputs(result);
     change_declared_type(result, type);
     set_input(result, 1, type->declaringTerm);
     set_input(result, 2, initializer);
     
+    result->setBoolProp("syntax:stateKeyword", true);
+    if (unknownType)
+        result->setStringProp("error:unknownType", typeName);
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);
 

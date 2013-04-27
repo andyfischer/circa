@@ -471,6 +471,10 @@ Frame* frame_parent(Frame* frame)
         return NULL;
     return frame_by_id(frame->stack, frame->parent);
 }
+Term* frame_current_term(Frame* frame)
+{
+    return frame->block->get(frame->pc);
+}
 Block* top_block(Stack* stack)
 {
     Frame* frame = top_frame(stack);
@@ -1501,6 +1505,108 @@ void raise_error_too_many_inputs(Stack* stack)
     raise_error_msg(stack, as_cstring(&msg));
 }
 
+// Runtime state
+bool does_frame_use_runtime_state(Frame* frame)
+{
+    Frame* parent = frame_parent(frame);
+    if (parent == NULL)
+        return false;
+    Term* caller = frame_current_term(frame);
+    if (caller->function == FUNCS.closure_call
+            || caller->function == FUNCS.closure_apply)
+        return true;
+
+    return false;
+}
+
+caValue* frame_find_state_container(Frame* frame)
+{
+    if (does_frame_use_runtime_state(frame))
+        return &frame->state;
+    
+    Term* containerTerm = find_state_input(frame->block);
+    if (containerTerm == NULL)
+        return NULL;
+    return frame_register(frame, containerTerm);
+}
+
+void run_input_instructions(caStack* stack)
+{
+    Frame* callerFrame = top_frame_parent(stack);
+    Frame* frame = top_frame(stack);
+    Term* caller = frame_current_term(callerFrame);
+
+    // Pull inputs.
+    int inputIndex = 0;
+    int inputCount = caller->numInputs();
+
+    int bindingIndex = 0;
+    int bindingCount = 0;
+
+    caValue* inputList = NULL;
+    caValue* bindings = NULL;
+
+    if (caller->function == FUNCS.closure_call) {
+        inputIndex++;
+
+        caValue* closure = stack_find_active_value(callerFrame, caller->input(0));
+        bindings = list_get(closure, 1);
+        bindingCount = list_length(bindings);
+    }
+    else if (caller->function == FUNCS.closure_apply) {
+        inputList = stack_find_active_value(frame, caller->input(1));
+        inputCount = list_length(inputList);
+        caValue* closure = stack_find_active_value(callerFrame, caller->input(0));
+        bindings = list_get(closure, 1);
+        bindingCount = list_length(bindings);
+    }
+
+    for (;; frame->pc++) {
+
+        Term* input = frame_current_term(frame);
+
+        caValue* source;
+
+        if (input->function == FUNCS.input) {
+            if (input->boolProp("multiple", false)) {
+                // todo
+                break;
+            } else if (input->boolProp("state", false)) {
+
+                // todo, pull state from caller frame.
+
+            } else {
+                if (inputIndex >= inputCount)
+                    return raise_error_not_enough_inputs(stack);
+
+                if (inputList == NULL)
+                    source = stack_find_active_value(callerFrame,
+                       caller->input(inputIndex++));
+                else
+                    source = list_get(inputList, inputIndex++);
+            }
+
+        } else if (input->function == FUNCS.unbound_input) {
+            source = list_get(bindings, bindingIndex++);
+
+        } else {
+            if (inputIndex < inputCount)
+                return raise_error_too_many_inputs(stack);
+
+            break;
+        }
+
+        caValue* inputRegister = frame_register(frame, frame->pc);
+        copy(source, inputRegister);
+
+        Type* slotType = declared_type(input);
+
+        if (!cast(inputRegister, slotType))
+            return raise_error_input_type_mismatch(stack);
+    }
+
+}
+
 void run(Stack* stack)
 {
     while (true) {
@@ -1573,112 +1679,21 @@ void run(Stack* stack)
 
         case op_ClosureCall: {
             Term* caller = block->get(frame->pc);
-            Frame* callerFrame = frame;
 
             caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
-            caValue* bindings = list_get(closure, 1);
-
             frame = push_frame(stack, block);
-
-            // Pull inputs.
-            int inputIndex = 1;
-            int inputCount = caller->numInputs();
-
-            int bindingIndex = 0;
-            int bindingCount = list_length(bindings);
-
-            for (;; frame->pc++) {
-
-                Term* input = block->get(frame->pc);
-
-                caValue* source;
-
-                if (input->function == FUNCS.input) {
-                    if (input->boolProp("multiple", false)) {
-                        // todo
-                        break;
-                    } else {
-                        if (inputIndex >= inputCount)
-                            return raise_error_not_enough_inputs(stack);
-
-                        source = stack_find_active_value(callerFrame,
-                           caller->input(inputIndex++));
-                    }
-
-                } else if (input->function == FUNCS.unbound_input) {
-                    source = list_get(bindings, bindingIndex++);
-
-                } else {
-                    if (inputIndex < inputCount)
-                        return raise_error_too_many_inputs(stack);
-
-                    break;
-                }
-
-                caValue* inputRegister = frame_register(frame, frame->pc);
-                copy(source, inputRegister);
-
-                Type* slotType = declared_type(input);
-
-                if (!cast(inputRegister, slotType))
-                    return raise_error_input_type_mismatch(stack);
-            }
+            run_input_instructions(stack);
 
             break;
         }
 
         case op_ClosureApply: {
             Term* caller = block->get(frame->pc);
-            Frame* callerFrame = frame;
-
             caValue* closure = stack_find_active_value(frame, caller->input(0));
-            caValue* inputs = stack_find_active_value(frame, caller->input(1));
             Block* block = as_block(list_get(closure, 0));
-            caValue* bindings = list_get(closure, 1);
-
             frame = push_frame(stack, block);
-
-            // Pull inputs.
-            int inputIndex = 0;
-            int inputCount = list_length(inputs);
-
-            int bindingIndex = 0;
-            int bindingCount = list_length(bindings);
-
-            for (;; frame->pc++) {
-                Term* input = block->get(frame->pc);
-
-                caValue* source;
-
-                if (input->function == FUNCS.input) {
-                    if (input->boolProp("multiple", false)) {
-                        // todo
-                        break;
-                    } else {
-                        if (inputIndex >= inputCount)
-                            return raise_error_not_enough_inputs(stack);
-
-                        source = list_get(inputs, inputIndex++);
-                    }
-                } else if (input->function == FUNCS.unbound_input) {
-                    source = list_get(bindings, bindingIndex++);
-
-                } else {
-                    if (inputIndex < inputCount)
-                        return raise_error_too_many_inputs(stack);
-
-                    break;
-                }
-
-                caValue* inputRegister = frame_register(frame, frame->pc);
-                copy(source, inputRegister);
-
-                Type* slotType = declared_type(input);
-
-                if (!cast(inputRegister, slotType))
-                    return raise_error_input_type_mismatch(stack);
-            }
+            run_input_instructions(stack);
 
             break;
         }

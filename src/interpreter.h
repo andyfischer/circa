@@ -38,6 +38,8 @@ struct Frame
     // Source block
     Block* block;
 
+    Value state;
+
     Value customBytecode;
 
     Value dynamicScope;

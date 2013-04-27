@@ -328,6 +328,10 @@ void pack_state(caStack* stack)
 
 void declared_state_format_source(caValue* source, Term* term)
 {
+    if (!term->boolProp("syntax:stateKeyword", false)) {
+        return format_term_source_default_formatting(source, term);
+    }
+
     append_phrase(source, "state ", term, tok_State);
 
     if (term->hasProperty("syntax:explicitType")) {
