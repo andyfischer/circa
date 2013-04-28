@@ -10,6 +10,7 @@
 #include "dict.h"
 #include "function.h"
 #include "generic.h"
+#include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
 #include "interpreter.h"
@@ -27,6 +28,7 @@
 
 namespace circa {
 
+static Term* frame_current_term(Frame* frame);
 static Frame* frame_by_id(Stack* stack, int id);
 static void dump_frames_raw(Stack* stack);
 static Block* find_pushed_block_for_action(caValue* action);
@@ -349,37 +351,35 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
 
 void finish_frame(Stack* stack)
 {
-    Frame* top = top_frame(stack);
-    Block* finishedBlock = top->block;
+    Frame* frame = top_frame(stack);
+    Block* finishedBlock = frame->block;
 
     // Undo the increment to nextPc, it's one past what it should be.
-    top->nextPc = top->pc;
+    frame->nextPc = frame->pc;
 
     // Exit if we have finished the topmost block
-    if (is_stop_frame(top)) {
+    if (is_stop_frame(frame)) {
         stack->step = sym_StackFinished;
         return;
     }
 
-    Frame* topFrame = top_frame(stack);
-    Frame* parentFrame = top_frame_parent(stack);
+    Frame* parent = top_frame_parent(stack);
 
-    ca_assert(parentFrame->pc < parentFrame->block->length());
+    ca_assert(parent->pc < parent->block->length());
 
-    caValue* callerBytecode = list_get(frame_bytecode(parentFrame), parentFrame->pc);
+    caValue* callerBytecode = list_get(frame_bytecode(parent), parent->pc);
     caValue* outputAction = list_get(callerBytecode, 2);
 
     // Copy outputs
-
     if (as_symbol(outputAction) == sym_FlatOutputs) {
 
-        Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
+        Term* finishedTerm = parent->block->get(parent->pc);
         int outputSlotCount = count_actual_output_terms(finishedTerm);
 
         // Copy outputs to the parent frame, and advance PC.
         for (int i=0; i < outputSlotCount; i++) {
 
-            caValue* dest = frame_register(parentFrame, finishedTerm->index + i);
+            caValue* dest = frame_register(parent, finishedTerm->index + i);
 
             Term* placeholder = get_output_placeholder(finishedBlock, i);
             if (placeholder == NULL) {
@@ -399,7 +399,7 @@ void finish_frame(Stack* stack)
             if (placeholder->type == TYPES.void_type)
                 continue;
 
-            caValue* result = frame_register(topFrame, placeholder);
+            caValue* result = frame_register(frame, placeholder);
 
             move(result, dest);
             bool success = cast(dest, placeholder->type);
@@ -412,33 +412,42 @@ void finish_frame(Stack* stack)
                 string_append(&msg, " to type ");
                 string_append(&msg, &placeholder->type->name);
                 set_error_string(result, as_cstring(&msg));
-                topFrame->pc = placeholder->index;
-                parentFrame->pc = finishedTerm->index + i;
+                frame->pc = placeholder->index;
+                parent->pc = finishedTerm->index + i;
                 raise_error(stack);
                 return;
             }
         }
     } else if (as_symbol(outputAction) == sym_OutputsToList) {
-        Term* finishedTerm = parentFrame->block->get(parentFrame->pc);
-        caValue* dest = frame_register(parentFrame, finishedTerm->index);
+        Term* finishedTerm = parent->block->get(parent->pc);
+        caValue* dest = frame_register(parent, finishedTerm->index);
 
         int count = count_output_placeholders(finishedBlock);
         set_list(dest, count);
 
         for (int i=0; i < count; i++) {
-            move(frame_register_from_end(topFrame, i), list_get(dest, i));
+            move(frame_register_from_end(frame, i), list_get(dest, i));
         }
 
     } else {
         Value msg;
         set_string(&msg, "Unrecognized output action: ");
         string_append_quoted(&msg, outputAction);
-        set_error_string(frame_register(parentFrame, parentFrame->pc), as_cstring(&msg));
+        set_error_string(frame_register(parent, parent->pc), as_cstring(&msg));
         raise_error(stack);
         return;
     }
 
-    // Pop frame
+    // Save state.
+    #if 0
+    if (!is_null(&frame->state)) {
+        caValue* container = frame_find_or_create_state_container(parent);
+        Term* caller = frame_current_term(parent);
+        move(&frame->state, hashtable_insert(container, unique_name(caller)));
+    }
+#endif
+
+    // Pop frame.
     pop_frame(stack);
 
     // Advance PC on the above frame.
@@ -1458,18 +1467,22 @@ int get_count_of_caller_inputs_for_error(Stack* stack)
     Frame* parentFrame = top_frame_parent(stack);
     Term* callerTerm = parentFrame->block->get(parentFrame->pc);
     int foundCount = callerTerm->numInputs();
+
     if (callerTerm->function == FUNCS.closure_call)
         foundCount--;
     else if (callerTerm->function == FUNCS.closure_apply) {
         caValue* inputs = stack_find_active_value(parentFrame, callerTerm->input(1));
         foundCount = list_length(inputs);
     }
+
     return foundCount;
 }
 
 void raise_error_not_enough_inputs(Stack* stack)
 {
     Frame* frame = top_frame(stack);
+    Frame* parent = top_frame_parent(stack);
+    Term* caller = parent->block->get(parent->pc);
 
     int expectedCount = count_input_placeholders(frame->block);
     int foundCount = get_count_of_caller_inputs_for_error(stack);
@@ -1482,15 +1495,16 @@ void raise_error_not_enough_inputs(Stack* stack)
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    pop_frame(stack);
-    raise_error_msg(stack, as_cstring(&msg));
+    frame->pc = 0;
+    set_error_string(frame_register(parent, caller), as_cstring(&msg));
+    raise_error(stack);
 }
 
 void raise_error_too_many_inputs(Stack* stack)
 {
     Frame* frame = top_frame(stack);
-    Frame* parentFrame = top_frame_parent(stack);
-    Term* callerTerm = parentFrame->block->get(parentFrame->pc);
+    Frame* parent = top_frame_parent(stack);
+    Term* caller = parent->block->get(parent->pc);
 
     int expectedCount = count_input_placeholders(frame->block);
     int foundCount = get_count_of_caller_inputs_for_error(stack);
@@ -1501,36 +1515,31 @@ void raise_error_too_many_inputs(Stack* stack)
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    pop_frame(stack);
-    raise_error_msg(stack, as_cstring(&msg));
+    frame->pc = 0;
+    set_error_string(frame_register(parent, caller), as_cstring(&msg));
+    raise_error(stack);
 }
 
-// Runtime state
-bool does_frame_use_runtime_state(Frame* frame)
+caValue* frame_find_state_input(Frame* frame)
 {
+    Term* input = find_state_input(frame->block);
+    if (input != NULL)
+        return frame_register(frame, input);
+
     Frame* parent = frame_parent(frame);
     if (parent == NULL)
-        return false;
-    Term* caller = frame_current_term(frame);
-    if (caller->function == FUNCS.closure_call
-            || caller->function == FUNCS.closure_apply)
-        return true;
-
-    return false;
-}
-
-caValue* frame_find_state_container(Frame* frame)
-{
-    if (does_frame_use_runtime_state(frame))
-        return &frame->state;
-    
-    Term* containerTerm = find_state_input(frame->block);
-    if (containerTerm == NULL)
         return NULL;
-    return frame_register(frame, containerTerm);
+
+    caValue* parentContainter = frame_find_state_input(parent);
+
+    if (parentContainter == NULL || !is_hashtable(parentContainter))
+        return NULL;
+
+    caValue* localName = unique_name(frame_current_term(parent));
+    return hashtable_get(parentContainter, localName);
 }
 
-void run_input_instructions(caStack* stack)
+void run_input_instructions(Stack* stack)
 {
     Frame* callerFrame = top_frame_parent(stack);
     Frame* frame = top_frame(stack);
@@ -1604,7 +1613,6 @@ void run_input_instructions(caStack* stack)
         if (!cast(inputRegister, slotType))
             return raise_error_input_type_mismatch(stack);
     }
-
 }
 
 void run(Stack* stack)

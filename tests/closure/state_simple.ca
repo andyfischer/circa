@@ -5,13 +5,15 @@ cl = {
 
     s += i
 
-    output(s)
+    s
 }
 
 def main() -> int
-    state t
+    state t = 1
 
     cl.call(1)
 
 s = null
-assert(main(state = s) == 1)
+result = main(state = s)
+assert(result == 1)
+print('s: ' s)

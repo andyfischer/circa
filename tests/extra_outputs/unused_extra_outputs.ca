@@ -1,0 +1,8 @@
+
+def f() -> int
+  1
+
+
+a,b,c = f()
+
+assert(equals(concat([a b c]), "[1, null, null]"))

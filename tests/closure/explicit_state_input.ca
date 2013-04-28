@@ -1,0 +1,17 @@
+
+cl = {
+    i = input(int)
+
+    state cl_state
+
+    print('cl_state is ' cl_state)
+
+    cl_state = 'state2'
+
+    'out'
+}
+
+s = null
+out = cl.apply([1], state = s)
+print('out is: ' out)
+print('final s is: ' s)

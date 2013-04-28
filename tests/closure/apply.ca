@@ -14,4 +14,4 @@ f = {
 
     :last
 }
-assert(f.apply([]) == [3 2 1 :last])
+assert(f.apply([]) == [:last 3 2 1])

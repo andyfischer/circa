@@ -60,10 +60,34 @@ void preceding_term_nested()
     test_assert(t == NULL);
 }
 
+void test_find_or_create_output_term()
+{
+    Block block;
+    block.compile("def f() -> int { 5 }");
+    Term* x = block.compile("x = f()");
+    int originalLength = block.length();
+
+    test_assert(find_or_create_output_term(x, 0) == x);
+    test_equals(originalLength, block.length());
+
+    Term* output1 = find_or_create_output_term(x, 1);
+    test_assert(get_output_term(x, 1) == output1);
+    test_equals(originalLength + 1, block.length());
+
+    block.compile("def blah()");
+
+    originalLength = block.length();
+    Term* output2 = find_or_create_output_term(x, 2);
+    test_assert(get_output_term(x, 1) == output1);
+    test_assert(get_output_term(x, 2) == output2);
+    test_equals(originalLength + 1, block.length());
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(building_test::test_insert_output_placeholder);
     REGISTER_TEST_CASE(building_test::preceding_term_nested);
+    REGISTER_TEST_CASE(building_test::test_find_or_create_output_term);
 }
 
 }

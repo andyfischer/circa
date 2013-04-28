@@ -65,8 +65,10 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/actors.o \
+	$(OBJDIR)/blob.o \
 	$(OBJDIR)/block.o \
 	$(OBJDIR)/building.o \
+	$(OBJDIR)/bytecode.o \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/closures.o \
 	$(OBJDIR)/code_iterators.o \
@@ -186,10 +188,16 @@ endif
 $(OBJDIR)/actors.o: actors.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/blob.o: blob.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/block.o: block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/building.o: building.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/bytecode.o: bytecode.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_api.o: c_api.cpp

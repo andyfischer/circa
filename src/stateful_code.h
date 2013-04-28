@@ -25,6 +25,8 @@ void block_mark_state_type_dirty(Block* block);
 
 void block_update_pack_state_calls(Block* block);
 
+void list_visible_declared_state(Block* block, TermList* output);
+
 // Runtime calls.
 void unpack_state(caStack* stack);
 void pack_state(caStack* stack);

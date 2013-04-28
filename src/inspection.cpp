@@ -188,35 +188,6 @@ bool is_output_placeholder(Term* term)
     return term->function == FUNCS.output;
 }
 
-Term* get_output_term(Term* term, int index)
-{
-    if (index == 0)
-        return term;
-    else
-        return get_extra_output(term, index - 1);
-}
-
-Term* get_extra_output(Term* term, int index)
-{
-    Term* position = term->owningBlock->getSafe(term->index + index + 1);
-    if (position != NULL && position->function == FUNCS.extra_output)
-        return position;
-    return NULL;
-}
-
-Term* find_extra_output_for_state(Term* term)
-{
-    for (int i=0;; i++) {
-        Term* extra_output = get_extra_output(term, i);
-        if (extra_output == NULL)
-            break;
-
-        if (extra_output->boolProp("state", false))
-            return extra_output;
-    }
-    return NULL;
-}
-
 bool is_input_meta(Block* block, int index)
 {
     Term* placeholder = get_input_placeholder(block, index);

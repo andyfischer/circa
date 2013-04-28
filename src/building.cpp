@@ -772,6 +772,60 @@ void get_output_description(Term* output, caValue* result)
     set_symbol(list_get(result, 0), sym_Anonymous);
 }
 
+Term* get_output_term(Term* term, int index)
+{
+    if (index == 0)
+        return term;
+    else
+        return get_extra_output(term, index - 1);
+}
+
+Term* find_or_create_output_term(Term* term, int index)
+{
+    if (index == 0)
+        return term;
+
+    Block* block = term->owningBlock;
+
+    Term* result = NULL;
+    int extraIndex = index - 1;
+    for (int i=0; i <= extraIndex; i++) {
+        Term* output = block->getSafe(term->index + 1 + i);
+
+        if (output == NULL || output->function != FUNCS.extra_output) {
+            // Insert a new extra_output call.
+            output = apply(block, FUNCS.extra_output, TermList(term));
+            move_to_index(output, term->index + 1 + i);
+        }
+
+        if (i == extraIndex)
+            result = output;
+    }
+
+    return result;
+}
+
+Term* get_extra_output(Term* term, int index)
+{
+    Term* position = term->owningBlock->getSafe(term->index + index + 1);
+    if (position != NULL && position->function == FUNCS.extra_output)
+        return position;
+    return NULL;
+}
+
+Term* find_extra_output_for_state(Term* term)
+{
+    for (int i=0;; i++) {
+        Term* extra_output = get_extra_output(term, i);
+        if (extra_output == NULL)
+            break;
+
+        if (extra_output->boolProp("state", false))
+            return extra_output;
+    }
+    return NULL;
+}
+
 bool term_is_state_input(Term* term, int index)
 {
     if (index >= term->numInputs())

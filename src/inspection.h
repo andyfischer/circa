@@ -59,11 +59,6 @@ int input_placeholder_index(Term* inputPlaceholder);
 bool is_input_placeholder(Term* term);
 bool is_output_placeholder(Term* term);
 
-// Extra outputs
-Term* get_output_term(Term* term, int index);
-Term* get_extra_output(Term* term, int index);
-Term* find_extra_output_for_state(Term* term);
-
 // Other properties on inputs.
 bool is_input_meta(Block* block, int index);
 

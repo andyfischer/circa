@@ -4,7 +4,7 @@
 
 namespace circa {
 
-// Actors v3 (current)
+// Actors v3
 
 struct Actor {
     int id;

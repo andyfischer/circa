@@ -2,7 +2,7 @@
 -- Block1, input is not typed.
 block1 = {
     i = input()
-    output(concat('Value type: ' type(i) ', static type: ' term_ref(i).get_type))
+    concat('Value type: ' type(i) ', static type: ' term_ref(i).get_type)
 }
 
 assert(block1.call(1) == 'Value type: <Type int>, static type: <Type any>')
@@ -10,7 +10,7 @@ assert(block1.call(1) == 'Value type: <Type int>, static type: <Type any>')
 -- Block2, input is typed.
 block2 = {
     i = input(int)
-    output(concat('Value type: ' type(i) ', static type: ' term_ref(i).get_type))
+    concat('Value type: ' type(i) ', static type: ' term_ref(i).get_type)
 }
 
 assert(block2.call(1) == 'Value type: <Type int>, static type: <Type int>')

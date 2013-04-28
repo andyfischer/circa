@@ -1501,7 +1501,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         term->setProp("syntax:nameBinding", &nameBindingSyntax);
 
         for (int i=0; i < list_length(&names); i++) {
-            Term* output = get_output_term(term, i);
+            Term* output = find_or_create_output_term(term, i);
             ca_assert(output != NULL);
             rename(output, list_get(&names, i));
         }
@@ -1812,6 +1812,7 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
             Value trueValue;
             set_bool(&trueValue, true);
             inputHints.set(index, "state", &trueValue);
+            inputHints.set(index, "explicitState", &trueValue);
             inputHints.set(index, "rebindInput", "t");
         }
 
@@ -1902,13 +1903,6 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     if (function == NULL) {
         // Method could not be statically found. Create a dynamic_method call.
         function = FUNCS.dynamic_method;
-    }
-
-    // If the function is known, then check if the function wants to rebind the name,
-    // even if the .@ operator was not used.
-    // DEPRECATED: Context-sensitive-rebind
-    if (function_input_is_extra_output(as_function(function), 0)) {
-        rebindLHS = true;
     }
 
     // Create the term
@@ -2452,13 +2446,15 @@ ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
     int startPosition = tokens.getPosition();
     Term* term = apply(block, FUNCS.closure_block, TermList());
     Block* resultBlock = nested_contents(term);
+
     set_source_location(term, startPosition, tokens);
     consume_block_with_braces(resultBlock, tokens, context, term);
     closure_redirect_outside_references(resultBlock);
     block_finish_changes(resultBlock);
     
     // Primary output
-    append_output_placeholder(resultBlock, find_last_non_comment_expression(resultBlock));
+    insert_output_placeholder(resultBlock,
+        find_last_non_comment_expression(resultBlock), 0);
 
     return ParseResult(term);
 }

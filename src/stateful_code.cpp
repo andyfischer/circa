@@ -7,8 +7,10 @@
 #include "control_flow.h"
 #include "kernel.h"
 #include "function.h"
+#include "hashtable.h"
 #include "if_block.h"
 #include "inspection.h"
+#include "interpreter.h"
 #include "parser.h"
 #include "source_repro.h"
 #include "stateful_code.h"
@@ -233,6 +235,18 @@ void block_update_pack_state_calls(Block* block)
             }
         }
     }
+}
+
+void list_visible_declared_state(Block* block, TermList* output)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (is_declared_state(term))
+            output->append(term);
+    }
+
+    if (is_minor_block(block) && get_parent_block(block) != NULL)
+        list_visible_declared_state(get_parent_block(block), output);
 }
 
 Term* find_active_state_container(Block* block)

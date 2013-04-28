@@ -81,6 +81,12 @@ Term* find_output_placeholder_with_name(Block* block, caValue* name);
 Term* find_output_from_description(Block* block, caValue* description);
 void get_output_description(Term* output, caValue* result);
 
+// Extra outputs
+Term* get_output_term(Term* term, int index);
+Term* get_extra_output(Term* term, int index);
+Term* find_or_create_output_term(Term* term, int index);
+Term* find_extra_output_for_state(Term* term);
+
 // Stateful inputs & outputs
 bool term_is_state_input(Term* term, int index);
 Term* find_state_input(Block* block);

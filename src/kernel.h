@@ -91,6 +91,7 @@ struct BuiltinTypes {
     Type* actor;
     Type* any;
     Type* block;
+    Type* blob;
     Type* bool_type;
     Type* closure;
     Type* color;
