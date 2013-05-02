@@ -193,17 +193,32 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
     return set;
 }
 
-void resolve_rebind_operators_in_inputs(Block* block, Term* result)
+Term* find_or_create_next_unnamed_term_output(Term* term)
 {
-    for (int inputIndex=0; inputIndex < result->numInputs(); inputIndex++) {
-        Term* input = result->input(inputIndex);
+    for (int i=0;; i++) {
+        Term* output = get_output_term(term, i);
+        if (output == NULL)
+            return find_or_create_output_term(term, i);
+
+        if (has_empty_name(output))
+            return output;
+    }
+
+    internal_error("unreachable");
+    return NULL;
+}
+
+void resolve_rebind_operators_in_inputs(Block* block, Term* term)
+{
+    for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+        Term* input = term->input(inputIndex);
 
         if (input == NULL)
             continue;
 
         // Walk upwards on 'input', see if one of the terms uses the @ operator.
         Term* head = input;
-        Term* termBeforeHead = result;
+        Term* termBeforeHead = term;
         while (head->input(0) != NULL && term_is_accessor_traceable(head)) {
             termBeforeHead = head;
             head = head->input(0);
@@ -211,18 +226,23 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* result)
 
         // Ignore term if there isn't a rebind.
         int inputIndexOfInterest = 0;
-        if (termBeforeHead == result)
+        if (termBeforeHead == term)
             inputIndexOfInterest = inputIndex;
 
         caValue* identifierRebindHint = term_get_input_property(termBeforeHead,
                 inputIndexOfInterest, "syntax:identifierRebind");
-        if (head == NULL || has_empty_name(head) || identifierRebindHint == NULL || !as_bool(identifierRebindHint))
+        if (head == NULL || has_empty_name(head)
+                || identifierRebindHint == NULL
+                || !as_bool(identifierRebindHint))
             continue;
+
+        // Find the output term (may be an extra_output or may be 'term')
+        Term* output = find_or_create_next_unnamed_term_output(term);
 
         if (input == head) {
             // No accessor expression, then just do a name rebind.
-            rename(result, &head->nameValue);
-            result->setBoolProp("syntax:implicitName", true);
+            rename(output, &head->nameValue);
+            output->setBoolProp("syntax:implicitName", true);
         } else {
             // Create a set_with_selector expression.
             TermList accessorChain;
@@ -231,7 +251,7 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* result)
             Term* selector = write_selector_for_accessor_chain(block, &accessorChain);
 
             Term* set = apply(block, FUNCS.set_with_selector,
-                    TermList(head, selector, result), &head->nameValue);
+                    TermList(head, selector, output), &head->nameValue);
 
             change_declared_type(set, declared_type(head));
         }

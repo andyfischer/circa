@@ -1,0 +1,13 @@
+
+def f(int a, int b, int c) -> (int, int, int)
+    return (a + 1), (b + 2), (c + 3)
+
+a = 3
+b = 4
+c = 5
+
+f(@a, @b, @c)
+
+assert(a == 4)
+assert(b == 6)
+assert(c == 8)

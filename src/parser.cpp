@@ -2550,8 +2550,6 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
         result = ParseResult(head, id);
 
     if (rebindOperator) {
-        caValue* statementInfo = list_last(&context->statementStack);
-        set_string(dict_insert(statementInfo, "pendingRebind"), result.term->name);
         result.identifierRebind = true;
     }
 
