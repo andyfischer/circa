@@ -149,6 +149,7 @@ void term_move_property(Term* source, Term* dest, const char* propName);
 // Fetches an input property.
 caValue* term_get_input_property(Term* term, int inputIndex, const char* name);
 caValue* term_insert_input_property(Term* term, int inputIndex, const char* name);
+bool term_get_bool_input_prop(Term* term, int inputIndex, const char* name, bool defaultValue);
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue);
 void term_set_int_prop(Term* term, Symbol prop, int value);

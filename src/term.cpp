@@ -266,6 +266,14 @@ caValue* term_insert_input_property(Term* term, int inputIndex, const char* name
     return dict_insert(&term->inputInfo(inputIndex)->properties, name);
 }
 
+bool term_get_bool_input_prop(Term* term, int inputIndex, const char* name, bool defaultValue)
+{
+    caValue* value = term_get_input_property(term, inputIndex, name);
+    if (value == NULL)
+        return defaultValue;
+    return as_bool(value);
+}
+
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue)
 {
     return term->intProp(builtin_symbol_to_string(prop), defaultValue);

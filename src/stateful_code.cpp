@@ -43,9 +43,21 @@ bool does_callsite_have_implicit_state(Term* term)
     return has_state_input(block);
 }
 
+static bool term_has_state_input(Term* term)
+{
+    for (int i=0; i < term->numInputs(); i++) {
+        if (term_get_bool_input_prop(term, i, "state", false))
+            return true;
+    }
+    return false;
+}
+
 void check_to_insert_implicit_state_input(Term* term)
 {
     Block* block = term_get_function_details(term);
+
+    if (term_has_state_input(term))
+        return;
 
     Term* stateInput = find_state_input(block);
 

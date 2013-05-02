@@ -1,5 +1,6 @@
 # submodules:
 /gh-pages
+/improv
 
 # build results:
 /build
@@ -11,9 +12,7 @@
 /docs/nanodoc/index.html
 
 # miscellaneous
-/x.ca
-/y.ca
-/z.ca
+/*.ca
 
 *.swp
 *.pyc
