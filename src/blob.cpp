@@ -3,8 +3,11 @@
 #include "common_headers.h"
 
 #include "blob.h"
+#include "control_flow.h"
 #include "kernel.h"
+#include "string_type.h"
 #include "tagged_value.h"
+#include "type.h"
 
 namespace circa {
 
@@ -38,7 +41,7 @@ BlobData* blob_create(int length)
 
 BlobData* blob_duplicate(BlobData* original)
 {
-    BlobData* dupe = blob_create(dupe->length);
+    BlobData* dupe = blob_create(original->length);
     memcpy(dupe->data, original->data, original->length);
     return dupe;
 }
@@ -94,15 +97,54 @@ void blob_append_char(caValue* blob, char c)
 {
     int size = blob_size(blob);
     blob_resize(blob, size + 1);
-    as_blob(blob)[size - 1] = c;
+    as_blob(blob)[size] = c;
 }
 
-void blob_append_int(caValue* blob, int i)
+void blob_append_int(caValue* blob, unsigned int val)
 {
     int size = blob_size(blob);
     blob_resize(blob, size + 4);
-    int* position = (int*) &as_blob(blob)[size - 4];
-    *position = i;
+
+    unsigned int* position = (unsigned int*) &as_blob(blob)[size];
+
+    // Convert from little-endian to big-endian. TODO, this should not convert when
+    // compiled on big-endian arch.
+    *position = ((val & 0xff000000) >> 24) + ((val & 0x00ff0000) >> 8)
+        + ((val & 0x0000ff00) << 8) + ((val & 0x000000ff) << 24);
+}
+
+char blob_read_char(char* data, int* pos)
+{
+    char c = data[*pos];
+    *pos += 1;
+    return c;
+}
+
+unsigned int blob_read_int(char* data, int* pos)
+{
+    int val = *((unsigned int*) &data[*pos]);
+    *pos += 4;
+    return ((val & 0xff000000) >> 24) + ((val & 0x00ff0000) >> 8)
+        + ((val & 0x0000ff00) << 8) + ((val & 0x000000ff) << 24);
+}
+
+static char to_hex_digit(int i)
+{
+    if (i >= 0 && i < 10)
+        return '0' + i;
+    return 'a' + (i - 10);
+}
+
+void blob_to_hex_string(caValue* blob, caValue* str)
+{
+    set_string(str, "");
+
+    for (int i=0; i < blob_size(blob); i++) {
+        char c = as_blob(blob)[i];
+
+        string_append_char(str, to_hex_digit(c / 16));
+        string_append_char(str, to_hex_digit(c % 16));
+    }
 }
 
 bool is_blob(caValue* value)
@@ -120,6 +162,21 @@ void set_blob(caValue* value, int length)
 {
     change_type(value, TYPES.blob);
     value->value_data.ptr = blob_create(length);
+}
+
+std::string blob_toString(caValue* value)
+{
+    Value asHex;
+    blob_to_hex_string(value, &asHex);
+    return as_cstring(&asHex);
+}
+
+void blob_setup_type(Type* type)
+{
+    reset_type(type);
+    set_string(&type->name, "Blob");
+    type->storageType = sym_StorageTypeString;
+    type->toString = blob_toString;
 }
 
 } // namespace circa

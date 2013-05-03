@@ -4,7 +4,9 @@
 
 #include "actors.h"
 #include "building.h"
+#include "blob.h"
 #include "block.h"
+#include "bytecode.h"
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "dict.h"
@@ -38,6 +40,8 @@ void run(Stack* stack);
 // static void step_interpreter(Stack* stack);
 static void bytecode_write_noop(caValue* op);
 static void bytecode_write_finish_op(caValue* op);
+void write_input_instructions3(caValue* bytecode, Term* caller, Block* block);
+void run_input_instructions3(Stack* stack, caValue* bytecode);
 
 const int BytecodeIndex_Inputs = 1;
 const int BytecodeIndex_Output = 2;
@@ -1539,12 +1543,18 @@ caValue* frame_find_state_input(Frame* frame)
     return hashtable_get(parentContainter, localName);
 }
 
-void run_input_instructions(Stack* stack)
+void run_input_instructions2(Stack* stack)
 {
     Frame* callerFrame = top_frame_parent(stack);
     Frame* frame = top_frame(stack);
     Term* caller = frame_current_term(callerFrame);
 
+    Value bytecode;
+    set_blob(&bytecode, 0);
+    write_input_instructions3(&bytecode, caller, frame->block);
+    run_input_instructions3(stack, &bytecode);
+
+#if 0
     // Pull inputs.
     int inputIndex = 0;
     int inputCount = caller->numInputs();
@@ -1611,6 +1621,179 @@ void run_input_instructions(Stack* stack)
         Type* slotType = declared_type(input);
 
         if (!cast(inputRegister, slotType))
+            return raise_error_input_type_mismatch(stack);
+    }
+#endif
+}
+
+void write_input_instructions3(caValue* bytecode, Term* caller, Block* block)
+{
+    bool inputsFromList = caller->function == FUNCS.closure_apply;
+
+    int callerInputIndex = 0;
+    int applyListIndex = 0;
+    int unboundInputIndex = 0;
+    int incomingStateIndex = -1;
+
+    // Check if the caller has a :state input.
+    for (int i=0; i < caller->numInputs(); i++) {
+        if (term_get_bool_input_prop(caller, i, "state", false)) {
+            incomingStateIndex = i;
+            break;
+        }
+    }
+
+    if (caller->function == FUNCS.closure_call) {
+        callerInputIndex = 1;
+    }
+
+    for (int placeholderIndex=0;; placeholderIndex++) {
+        Term* input = block->get(placeholderIndex);
+
+        if (callerInputIndex == incomingStateIndex)
+            callerInputIndex++;
+
+        if (input == NULL)
+            break;
+
+        if (input->function == FUNCS.input) {
+            if (input->boolProp("multiple", false)) {
+
+                blob_append_char(bytecode, bc_InputVararg);
+                blob_append_int(bytecode, callerInputIndex);
+                callerInputIndex = caller->numInputs();
+
+            } else if (input->boolProp("state", false)) {
+
+                if (incomingStateIndex == -1) {
+                    // Caller has no :state input. TODO: Pull it through magic.
+                    blob_append_char(bytecode, bc_SetNull);
+                } else {
+                    blob_append_char(bytecode, bc_InputFromStack);
+                    blob_append_int(bytecode, incomingStateIndex);
+                }
+
+            } else {
+
+                if (callerInputIndex >= caller->numInputs() && !inputsFromList) {
+                    blob_append_char(bytecode, bc_NotEnoughInputs);
+                    break;
+                }
+
+                if (inputsFromList) {
+                    blob_append_char(bytecode, bc_InputFromApplyList);
+                    blob_append_int(bytecode, applyListIndex);
+                    applyListIndex++;
+                } else if (caller->input(callerInputIndex) == NULL) {
+                    blob_append_char(bytecode, bc_SetNull);
+                    callerInputIndex++;
+                } else {
+                    blob_append_char(bytecode, bc_InputFromStack);
+                    blob_append_int(bytecode, callerInputIndex);
+                    callerInputIndex++;
+                }
+            }
+        } else if (input->function == FUNCS.unbound_input) {
+            blob_append_char(bytecode, bc_InputClosureBinding);
+            blob_append_int(bytecode, unboundInputIndex);
+            unboundInputIndex++;
+        } else {
+            break;
+        }
+    }
+
+    if ((callerInputIndex + 1 < caller->numInputs()) && !inputsFromList)
+        blob_append_char(bytecode, bc_TooManyInputs);
+
+    blob_append_char(bytecode, bc_Done);
+}
+
+void run_input_instructions3(Stack* stack, caValue* bytecode)
+{
+    char* bcData = as_blob(bytecode);
+    int pos = 0;
+
+    Frame* frame = top_frame(stack);
+    Frame* parent = top_frame_parent(stack);
+    Term* caller = frame_current_term(parent);
+
+    caValue* applyList = NULL;
+    caValue* closureBindings = NULL;
+
+    while (true) {
+        switch (blob_read_char(bcData, &pos)) {
+        case bc_Done:
+            goto done_passing_inputs;
+        case bc_InputFromApplyList: {
+            int index = blob_read_int(bcData, &pos);
+            if (applyList == NULL)
+                applyList = stack_find_active_value(parent, caller->input(1));
+
+            if (index >= list_length(applyList))
+                return raise_error_not_enough_inputs(stack);
+            
+            copy(list_get(applyList, index), frame_register(frame, frame->pc));
+            frame->pc++;
+            continue;
+        }
+        case bc_InputFromStack: {
+            int index = blob_read_int(bcData, &pos);
+            caValue* value = stack_find_active_value(parent, caller->input(index));
+            copy(value, frame_register(frame, frame->pc));
+            frame->pc++;
+            continue;
+        }
+        case bc_InputState: {
+            frame->pc++;
+            continue;
+        }
+        case bc_SetNull: {
+            set_null(frame_register(frame, frame->pc));
+            frame->pc++;
+            continue;
+        }
+        case bc_InputVararg: {
+            caValue* dest = frame_register(frame, frame->pc);
+            int startIndex = blob_read_int(bcData, &pos);
+            int count = caller->numInputs() - startIndex;
+            set_list(dest, count);
+            for (int i=0; i < count; i++) {
+                caValue* value = stack_find_active_value(parent, caller->input(startIndex+i));
+                copy(value, list_get(dest, i));
+            }
+
+            frame->pc++;
+            continue;
+        }
+        case bc_InputClosureBinding: {
+            if (closureBindings == NULL) {
+                caValue* closure = stack_find_active_value(parent, caller->input(0));
+                closureBindings = list_get(closure, 1);
+            }
+
+            int index = blob_read_int(bcData, &pos);
+            copy(list_get(closureBindings, index), frame_register(frame, frame->pc));
+            frame->pc++;
+            continue;
+        }
+        case bc_NotEnoughInputs:
+            return raise_error_not_enough_inputs(stack);
+        case bc_TooManyInputs:
+            return raise_error_too_many_inputs(stack);
+        default:
+            internal_error("Unrecognized instruction");
+        }
+    }
+
+done_passing_inputs:
+    
+    // Type check
+    int lastInputPc = frame->pc;
+    for (frame->pc = 0; frame->pc < lastInputPc; frame->pc++) {
+        Term* input = frame->block->get(frame->pc);
+        caValue* value = frame_register(frame, frame->pc);
+        Type* type = declared_type(input);
+        if (!cast(value, type))
             return raise_error_input_type_mismatch(stack);
     }
 }
@@ -1691,7 +1874,7 @@ void run(Stack* stack)
             caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
             frame = push_frame(stack, block);
-            run_input_instructions(stack);
+            run_input_instructions2(stack);
 
             break;
         }
@@ -1701,7 +1884,7 @@ void run(Stack* stack)
             caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
             frame = push_frame(stack, block);
-            run_input_instructions(stack);
+            run_input_instructions2(stack);
 
             break;
         }

@@ -23,12 +23,23 @@
 
 namespace circa {
 
+const char bc_Done = 0;
+
 // pack_state <term index> <frame depth>
 //   term index - index (in the current frame's branch) for the term which has both the
 //                name and the final value for this state value.
 //   frame depth - The depth of the frame to assign this state. Corresponds with the frame
 //                 where this state var was originally declared.
 const char bc_PackState = 1;
+
+const char bc_InputVararg = 0x11;
+const char bc_InputClosureBinding = 0x12;
+const char bc_InputState = 0x13;
+const char bc_InputFromStack = 0x20;
+const char bc_InputFromApplyList = 0x21;
+const char bc_SetNull = 0x22;
+const char bc_NotEnoughInputs = 0x30;
+const char bc_TooManyInputs = 0x31;
 
 void bc_write_pack_state_steps(caValue* bytecode);
 

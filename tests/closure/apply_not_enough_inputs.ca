@@ -1,0 +1,7 @@
+
+cl = {
+    print(input() ', ' input() ', ' input())
+}
+
+
+cl.apply([1 2])

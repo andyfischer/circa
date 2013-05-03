@@ -1,0 +1,8 @@
+
+def f(int a, int b, int c :multiple)
+    print('a = ' a)
+    print('b = ' b)
+    print('c = ' c)
+
+
+f(1 2 3 4 5 6)

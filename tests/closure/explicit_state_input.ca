@@ -2,16 +2,17 @@
 cl = {
     i = input(int)
 
-    state cl_state
+    state t
 
-    print('cl_state is ' cl_state)
+    print('initial t is: ' t)
 
-    cl_state = 'state2'
+    t = 'outgoing'
 
     'out'
 }
 
-s = null
+s = make(Map)
+@s.set('t', 'incoming_state')
 out = cl.apply([1], state = s)
-print('out is: ' out)
-print('final s is: ' s)
+print('output is: ' out)
+print('final state is: ' s)

@@ -6,6 +6,7 @@
 #include "circa/file.h"
 
 #include "actors.h"
+#include "blob.h"
 #include "block.h"
 #include "building.h"
 #include "closures.h"
@@ -762,6 +763,7 @@ void bootstrap_kernel()
 
     // Initialize remaining global types.
     TYPES.any = create_type();
+    TYPES.blob = create_type();
     TYPES.block = create_type();
     TYPES.bool_type = create_type();
     TYPES.error = create_type();
@@ -777,6 +779,7 @@ void bootstrap_kernel()
     TYPES.void_type = create_type();
 
     any_t::setup_type(TYPES.any);
+    blob_setup_type(TYPES.blob);
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
     dict_t::setup_type(TYPES.dict);
@@ -845,6 +848,7 @@ void bootstrap_kernel()
 
     // Initialize primitive types (this requires value() function)
     create_type_value(kernel, TYPES.bool_type, "bool");
+    create_type_value(kernel, TYPES.blob, "blob");
     create_type_value(kernel, TYPES.block, "Block");
     create_type_value(kernel, TYPES.dict, "Dict");
     create_type_value(kernel, TYPES.float_type, "number");
