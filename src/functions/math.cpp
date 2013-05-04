@@ -154,7 +154,7 @@ namespace math_function {
         "'Return the closest integer that is less than n'");
         import_function(kernel, ceil, "ceil(number n) -> int;"
         "'Return the closest integer that is greater than n'");
-        import_function(kernel, average, "average(number vals :multiple) -> number;"
+        import_function(kernel, average, "average(vals :multiple) -> number;"
                 "'Returns the average of all inputs.'");
         import_function(kernel, pow, "pow(int i, int x) -> int; 'Returns i to the power of x'");
         import_function(kernel, sqr, "sqr(number n) -> number; 'Square function'");

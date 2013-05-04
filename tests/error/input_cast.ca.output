@@ -1,4 +1,4 @@
 Error occurred:
 [tests/error/input_cast.ca:3,0] increment()
-(input 0) | Couldn't cast value 'fish' to type int
+(input 0) | Couldn't cast input value 'fish' to type int
 

@@ -1,19 +1,19 @@
 
 cl = {
     i = input(int)
-    state s = 0
+    state cl_state = 0
 
-    s += i
+    cl_state += i
 
-    s
+    cl_state
 }
 
 def main() -> int
-    state t = 1
+    state main_state = 1
 
     cl.call(1)
 
 s = null
 result = main(state = s)
 assert(result == 1)
-print('s: ' s)
+print('state: ' s)

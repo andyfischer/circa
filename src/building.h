@@ -84,6 +84,7 @@ void get_output_description(Term* output, caValue* result);
 // Extra outputs
 Term* get_output_term(Term* term, int index);
 Term* get_extra_output(Term* term, int index);
+int count_outputs(Term* term);
 Term* find_or_create_output_term(Term* term, int index);
 Term* find_extra_output_for_state(Term* term);
 

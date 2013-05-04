@@ -1,4 +1,4 @@
 Error occurred:
 [tests/bugrepro/create_null.ca:2,0] make()
-(input 0) | Couldn't cast value null to type Type
+(input 0) | Couldn't cast input value null to type Type
 

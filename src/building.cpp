@@ -813,6 +813,13 @@ Term* get_extra_output(Term* term, int index)
     return NULL;
 }
 
+int count_outputs(Term* term)
+{
+    for (int i=0;; i++)
+        if (get_output_term(term, i) == NULL)
+            return i;
+}
+
 Term* find_extra_output_for_state(Term* term)
 {
     for (int i=0;; i++) {

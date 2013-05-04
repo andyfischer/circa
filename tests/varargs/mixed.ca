@@ -1,5 +1,5 @@
 
-def f(int a, int b, int c :multiple)
+def f(int a, int b, c :multiple)
     print('a = ' a)
     print('b = ' b)
     print('c = ' c)

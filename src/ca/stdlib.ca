@@ -5,7 +5,7 @@ type Closure {
 }
 def closure_block() -> Closure
 def Closure.call(self, any inputs :multiple) -> any
-def Closure.apply(self, List inputs) -> List
+def Closure.apply(self, List inputs) -> any
 
 -- Builtin functions
 def convert(any value, Type t) -> any
@@ -42,7 +42,7 @@ def has_effects()
 def native_patch(String filename)
     -- Declare that this block should be patched by a native module.
 
-def declared_state(state any val, Type t, Closure initializer) -> any
+def declared_state(state any val, Type t, Closure initializer :optional) -> any
     if val != null
         -- Try to cast to the desired type
         val, cast_success = cast(val, t)
@@ -191,7 +191,7 @@ def Function.to_closure(self) -> Closure
     self.block.to_closure
 
 -- Language defect: out-of-order function definition.
-def Block.call(self, any inputs :multiple) -> List
+def Block.call(self, any inputs :multiple) -> any
     -- Invoke this Block with the given inputs.
     self.to_closure.apply(inputs)
 
@@ -282,22 +282,17 @@ def make_actor(Closure func) -> Actor
 
 def Actor.call(self, any inputs :multiple) -> any
 
-    outs = self.apply(inputs)
-    return outs[0]
+    _state = self.stateVal.get
+    out = self.func.apply(inputs, state = _state)
+    self.stateVal.set(_state)
+    return out
     
 def Actor.apply(self, List inputs) -> any
-    hasState = self.func.block.has_state_input
-    if hasState
-        @inputs.insert(self.func.block.get_state_input_index, self.stateVal.get)
 
-    outs = self.func.apply(inputs)
-
-    if hasState
-        outputIndex = self.func.block.get_state_output_index
-        self.stateVal.set(outs[outputIndex])
-        @outs.remove(outputIndex)
-
-    return outs
+    _state = self.stateVal.get
+    out = self.func.apply(inputs, state = _state)
+    self.stateVal.set(_state)
+    return out
 
 def empty_list(any initialValue, int size) -> List
 def List.append(self, any item) -> List

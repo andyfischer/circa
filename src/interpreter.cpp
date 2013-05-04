@@ -42,6 +42,8 @@ static void bytecode_write_noop(caValue* op);
 static void bytecode_write_finish_op(caValue* op);
 void write_input_instructions3(caValue* bytecode, Term* caller, Block* block);
 void run_input_instructions3(Stack* stack, caValue* bytecode);
+void write_output_instructions(caValue* bytecode, Term* caller, Block* block);
+void run_output_instructions(Stack* stack, caValue* bytecode);
 
 const int BytecodeIndex_Inputs = 1;
 const int BytecodeIndex_Output = 2;
@@ -368,9 +370,16 @@ void finish_frame(Stack* stack)
     }
 
     Frame* parent = top_frame_parent(stack);
+    Term* caller = frame_current_term(parent);
 
     ca_assert(parent->pc < parent->block->length());
 
+    Value tempBytecode;
+    set_blob(&tempBytecode, 0);
+    write_output_instructions(&tempBytecode, caller, frame->block);
+    run_output_instructions(stack, &tempBytecode);
+
+#if 0
     caValue* callerBytecode = list_get(frame_bytecode(parent), parent->pc);
     caValue* outputAction = list_get(callerBytecode, 2);
 
@@ -441,6 +450,7 @@ void finish_frame(Stack* stack)
         raise_error(stack);
         return;
     }
+#endif
 
     // Save state.
     #if 0
@@ -451,12 +461,14 @@ void finish_frame(Stack* stack)
     }
 #endif
 
+#if 0
     // Pop frame.
     pop_frame(stack);
 
     // Advance PC on the above frame.
     Frame* newTop = top_frame(stack);
     newTop->pc = newTop->nextPc;
+#endif
 }
 
 void frame_pc_move_to_end(Frame* frame)
@@ -1458,10 +1470,25 @@ void raise_error_input_type_mismatch(Stack* stack)
     caValue* value = frame_register(frame, frame->pc);
 
     circa::Value msg;
-    set_string(&msg, "Couldn't cast value ");
+    set_string(&msg, "Couldn't cast input value ");
     string_append_quoted(&msg, value);
     string_append(&msg, " to type ");
     string_append(&msg, &declared_type(term)->name);
+    raise_error_msg(stack, as_cstring(&msg));
+    return;
+}
+
+void raise_error_output_type_mismatch(Stack* stack)
+{
+    Frame* parent = top_frame_parent(stack);
+    Term* outputTerm = frame_current_term(parent);
+    caValue* value = frame_register(parent, outputTerm);
+
+    circa::Value msg;
+    set_string(&msg, "Couldn't cast output value ");
+    string_append_quoted(&msg, value);
+    string_append(&msg, " to type ");
+    string_append(&msg, &declared_type(outputTerm)->name);
     raise_error_msg(stack, as_cstring(&msg));
     return;
 }
@@ -1648,13 +1675,13 @@ void write_input_instructions3(caValue* bytecode, Term* caller, Block* block)
     }
 
     for (int placeholderIndex=0;; placeholderIndex++) {
-        Term* input = block->get(placeholderIndex);
-
-        if (callerInputIndex == incomingStateIndex)
-            callerInputIndex++;
+        Term* input = block->getSafe(placeholderIndex);
 
         if (input == NULL)
             break;
+
+        if (callerInputIndex == incomingStateIndex)
+            callerInputIndex++;
 
         if (input->function == FUNCS.input) {
             if (input->boolProp("multiple", false)) {
@@ -1781,7 +1808,7 @@ void run_input_instructions3(Stack* stack, caValue* bytecode)
         case bc_TooManyInputs:
             return raise_error_too_many_inputs(stack);
         default:
-            internal_error("Unrecognized instruction");
+            internal_error("Unrecognized op in run_input_instructions3");
         }
     }
 
@@ -1793,9 +1820,118 @@ done_passing_inputs:
         Term* input = frame->block->get(frame->pc);
         caValue* value = frame_register(frame, frame->pc);
         Type* type = declared_type(input);
-        if (!cast(value, type))
-            return raise_error_input_type_mismatch(stack);
+        if (!cast(value, type)) {
+            if (!input->boolProp("optional", false))
+                return raise_error_input_type_mismatch(stack);
+        }
     }
+}
+
+void write_output_instructions(caValue* bytecode, Term* caller, Block* block)
+{
+    int outgoingStateIndex = -1;
+
+    // Check if the block has a :state output.
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(block, i);
+        if (placeholder == NULL)
+            break;
+        if (placeholder->boolProp("state", false)) {
+            outgoingStateIndex = i;
+            break;
+        }
+    }
+
+    int placeholderIndex = 0;
+
+    for (int outputIndex=0;; outputIndex++) {
+        Term* output = get_output_term(caller, outputIndex);
+        if (output == NULL)
+            break;
+
+        if (output->boolProp("state", false)) {
+            // State output.
+            if (outgoingStateIndex == -1) {
+                blob_append_char(bytecode, bc_SetNull);
+            } else {
+                blob_append_char(bytecode, bc_Output);
+                blob_append_int(bytecode, outgoingStateIndex);
+            }
+
+        } else {
+            // Normal output. Skip over :state placeholder.
+            if (placeholderIndex == outgoingStateIndex)
+                placeholderIndex++;
+
+            Term* placeholder = get_output_placeholder(block, placeholderIndex);
+            if (placeholder == NULL) {
+                blob_append_char(bytecode, bc_SetNull);
+            } else {
+                blob_append_char(bytecode, bc_Output);
+                blob_append_int(bytecode, placeholderIndex);
+            }
+
+            placeholderIndex++;
+        }
+    }
+
+    blob_append_char(bytecode, bc_Done);
+}
+
+void run_output_instructions(Stack* stack, caValue* bytecode)
+{
+    char* bcData = as_blob(bytecode);
+    int pos = 0;
+
+    Frame* frame = top_frame(stack);
+    Frame* parent = top_frame_parent(stack);
+    Term* caller = frame_current_term(parent);
+
+    int outputIndex = 0;
+
+    while (true) {
+        switch (blob_read_char(bcData, &pos)) {
+        case bc_Done:
+            goto done_passing_inputs;
+        case bc_Output: {
+            int placeholderIndex = blob_read_int(bcData, &pos);
+            Term* placeholder = get_output_placeholder(frame->block, placeholderIndex);
+            caValue* value = frame_register(frame, placeholder);
+
+            Term* receiver = get_output_term(caller, outputIndex);
+            caValue* receiverSlot = frame_register(parent, receiver);
+            copy(value, receiverSlot);
+
+            // Type check
+            // Future: should this use receiver's type instead of placeholder?
+            if (!cast(receiverSlot, declared_type(placeholder))) {
+                frame->pc = placeholder->index;
+                return raise_error_output_type_mismatch(stack);
+            }
+
+            outputIndex++;
+            continue;
+        }
+        case bc_SetNull: {
+            Term* receiver = get_output_term(caller, outputIndex);
+            caValue* receiverSlot = frame_register(parent, receiver);
+            set_null(receiverSlot);
+            outputIndex++;
+            continue;
+        }
+        default:
+            internal_error("Unrecognized op in run_output_instructions");
+
+        }
+    }
+done_passing_inputs:
+
+    // Pop frame.
+    pop_frame(stack);
+
+    // Advance PC on the above frame.
+    Frame* newTop = top_frame(stack);
+    newTop->pc = newTop->nextPc;
 }
 
 void run(Stack* stack)
@@ -1828,7 +1964,7 @@ void run(Stack* stack)
             Block* block = as_block(list_get(action, 3));
             caValue* inputActions = list_get(action, 1);
             Frame* frame = push_frame(stack, block);
-            run_input_ins(stack, inputActions, &frame->registers, 1);
+            run_input_instructions2(stack);
             break;
         }
         case op_DynamicMethodCall: {

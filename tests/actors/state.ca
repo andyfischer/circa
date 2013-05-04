@@ -1,5 +1,6 @@
 
-actor = make_actor( { i = input(int); state s = 0; s += i; output(s) } )
+
+actor = make_actor( { i = input(int); state s = 0; s += i; s } )
 
 assert(actor.call(1) == 1)
 assert(actor.call(1) == 2)

@@ -37,6 +37,7 @@ const char bc_InputClosureBinding = 0x12;
 const char bc_InputState = 0x13;
 const char bc_InputFromStack = 0x20;
 const char bc_InputFromApplyList = 0x21;
+const char bc_Output = 0x40;
 const char bc_SetNull = 0x22;
 const char bc_NotEnoughInputs = 0x30;
 const char bc_TooManyInputs = 0x31;

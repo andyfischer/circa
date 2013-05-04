@@ -1524,6 +1524,25 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         result = ParseResult(set);
     }
 
+    // If there is an explicit state input, make sure there's a state output.
+    int explicitStateInput = -1;
+    for (int i=0; i < term->numInputs(); i++) {
+        if (term_get_bool_input_prop(term, i, "explicitState", false)) {
+            explicitStateInput = i;
+            break;
+        }
+    }
+
+    if (explicitStateInput != -1) {
+        Term* existing = find_extra_output_for_state(term);
+        if (existing == NULL) {
+            int outputCount = count_outputs(term);
+            Term* output = find_or_create_output_term(term, outputCount);
+            rename(output, term_name(term->input(explicitStateInput)));
+            output->setBoolProp("state", true);
+        }
+    }
+
     return result;
 }
 

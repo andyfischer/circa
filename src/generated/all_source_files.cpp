@@ -1,6 +1,8 @@
 #include "../actors.cpp"
+#include "../blob.cpp"
 #include "../block.cpp"
 #include "../building.cpp"
+#include "../bytecode.cpp"
 #include "../c_api.cpp"
 #include "../closures.cpp"
 #include "../code_iterators.cpp"

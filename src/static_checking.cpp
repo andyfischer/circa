@@ -76,12 +76,12 @@ void check_term_for_static_error(List* errors, Term* term)
     bool varArgs = term_has_variable_args(term);
     int expectedInputCount = term_count_input_placeholders(term);
 
-    // Check # of inputs
-    if (!varArgs && (term->numInputs() != expectedInputCount))
-        return append_static_error(errors, term, "wrong_input_count");
+    // Checking input count here is disabled. TODO: Look at bytecode instead.
 
+#if 0
     for (int input=0; input < term->numInputs(); input++)
         check_input_for_static_error(errors, term, input);
+#endif
 
     if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
         return append_static_error(errors, term, "not_a_function");
