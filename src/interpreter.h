@@ -184,7 +184,6 @@ Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);
 
 // Functions used by eval functions.
 caValue* get_input(Stack* stack, int index);
-caValue* stack_find_active_value(Stack* stack, Term* term, int stackDelta);
 caValue* stack_find_active_value(Frame* frame, Term* term);
 void consume_input(Stack* stack, Term* term, caValue* dest);
 void consume_input(Stack* stack, int index, caValue* dest);
@@ -224,9 +223,6 @@ void print_error_stack(Stack* stack, std::ostream& out);
 // Update bytecode
 void write_term_bytecode(Term* term, caValue* output);
 void write_block_bytecode(Block* block, caValue* output);
-
-// Internal interpreter steps
-void run_input_ins(Stack* stack, caValue* inputIns, caValue* outputList, int stackDelta);
 
 // Setup the builtin Stack type.
 void eval_context_setup_type(Type* type);
