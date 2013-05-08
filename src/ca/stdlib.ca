@@ -120,7 +120,7 @@ namespace sys
 type FileSignature { String filename, int time_modified }
 type Callable;
 type Color { number r, number g, number b, number a }
-type Interpreter;
+type Stack;
 type Point { number x, number y }
 type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
@@ -232,48 +232,48 @@ def Frame.output(self, int nth) -> any
 
 def Function.block(self) -> Block
 
-def make_interpreter() -> Interpreter
+def make_interpreter() -> Stack
     -- Create a new interpreter
-def capture_stack() -> Interpreter
+def capture_stack() -> Stack
     -- Returns a frozen copy of the currently executing stack.
-def Interpreter.block(self) -> Block
+def Stack.block(self) -> Block
     -- Returns the (topmost) block.
-def Interpreter.dump(self)
+def Stack.dump(self)
     -- Dumps a string representation to stdout.
-def Interpreter.inject(self, String name, any val) -> bool
+def Stack.inject(self, String name, any val) -> bool
     -- Inject a value into the actor's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.
-def Interpreter.inject_context(self, Symbol name, any val)
-def Interpreter.call(self, any inputs :multiple) -> any
-def Interpreter.apply(self, List inputs) -> any
-def Interpreter.push_frame(self, Block b, List inputs)
+def Stack.inject_context(self, Symbol name, any val)
+def Stack.call(self, any inputs :multiple) -> any
+def Stack.apply(self, List inputs) -> any
+def Stack.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
-def Interpreter.pop_frame(self)
+def Stack.pop_frame(self)
     -- Pop the topmost frame.
-def Interpreter.set_state_input(self, any)
-def Interpreter.get_state_output(self) -> any
-def Interpreter.reset(self)
+def Stack.set_state_input(self, any)
+def Stack.get_state_output(self) -> any
+def Stack.reset(self)
     -- Clear this interpreter's state, including stack frames.
-def Interpreter.restart(self)
+def Stack.restart(self)
     -- Restart or "rewind" the stack, so the program counter is returned to the start
     -- of the topmost frame. State is preserved.
-def Interpreter.run(self)
+def Stack.run(self)
     -- Run the interpreter until either the topmost frame is finished, or an error
     -- is raised.
-def Interpreter.frame(self, int depth) -> Frame
+def Stack.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
-def Interpreter.top_frame(self) -> Frame
+def Stack.top_frame(self) -> Frame
     -- Return the topmost Frame.
     self.frame(0)
-def Interpreter.frames(self) -> List
+def Stack.frames(self) -> List
     -- Return the list of Frames.
-def Interpreter.output(self, int index) -> any
+def Stack.output(self, int index) -> any
     -- Fetch the value in the nth output register.
-def Interpreter.errored(self) -> bool
+def Stack.errored(self) -> bool
     -- Returns true if the interpreter has stopped due to error.
-def Interpreter.error_message(self) -> String
+def Stack.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
-def Interpreter.toString(self) -> String
+def Stack.toString(self) -> String
 
 -- Actors
 type Actor {

@@ -2124,19 +2124,19 @@ void capture_stack(caStack* callerStack)
     set_pointer(circa_create_default_output(callerStack, 0), newStack);
 }
 
-void Interpreter__block(caStack* stack)
+void Stack__block(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
     set_block(circa_output(stack, 0), top_frame(actor)->block);
 }
 
-void Interpreter__dump(caStack* stack)
+void Stack__dump(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
     dump(actor);
 }
 
-void Interpreter__inject_state(caStack* stack)
+void Stack__inject_state(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
@@ -2145,7 +2145,7 @@ void Interpreter__inject_state(caStack* stack)
     set_bool(circa_output(stack, 0), success);
 }
 
-void Interpreter__inject_context(caStack* stack)
+void Stack__inject_context(caStack* stack)
 {
     Stack* actor = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
@@ -2153,12 +2153,12 @@ void Interpreter__inject_context(caStack* stack)
     context_inject(actor, name, val);
 }
 
-void Interpreter__call(caStack* stack)
+void Stack__call(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
 
     if (self == NULL)
-        return raise_error_msg(self, "Interpreter is null");
+        return raise_error_msg(self, "Stack is null");
 
     stack_restart(self);
 
@@ -2173,7 +2173,7 @@ void Interpreter__call(caStack* stack)
     copy(circa_output(self, 0), circa_output(stack, 0));
 }
 
-void Interpreter__push_frame(caStack* callerStack)
+void Stack__push_frame(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2184,14 +2184,14 @@ void Interpreter__push_frame(caStack* callerStack)
 
     push_frame_with_inputs(self, block, inputs);
 }
-void Interpreter__pop_frame(caStack* callerStack)
+void Stack__pop_frame(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     pop_frame(self);
 }
 
-void Interpreter__set_state_input(caStack* callerStack)
+void Stack__set_state_input(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2219,7 +2219,7 @@ void Interpreter__set_state_input(caStack* callerStack)
     copy(circa_input(callerStack, 1), stateSlot);
 }
 
-void Interpreter__get_state_output(caStack* callerStack)
+void Stack__get_state_output(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2250,25 +2250,25 @@ void Interpreter__get_state_output(caStack* callerStack)
 }
 
 
-void Interpreter__reset(caStack* callerStack)
+void Stack__reset(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     stack_reset(self);
 }
-void Interpreter__restart(caStack* callerStack)
+void Stack__restart(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     stack_restart(self);
 }
-void Interpreter__run(caStack* callerStack)
+void Stack__run(caStack* callerStack)
 {
     Stack* self = as_stack(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     run_interpreter(self);
 }
-void Interpreter__frame(caStack* callerStack)
+void Stack__frame(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2277,7 +2277,7 @@ void Interpreter__frame(caStack* callerStack)
 
     set_frame_ref(circa_output(callerStack, 0), self, frame);
 }
-void Interpreter__output(caStack* callerStack)
+void Stack__output(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2290,12 +2290,12 @@ void Interpreter__output(caStack* callerStack)
     else
         copy(frame_register(frame, output), circa_output(callerStack, 0));
 }
-void Interpreter__errored(caStack* callerStack)
+void Stack__errored(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     set_bool(circa_output(callerStack, 0), error_occurred(self));
 }
-void Interpreter__error_message(caStack* callerStack)
+void Stack__error_message(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
 
@@ -2313,7 +2313,7 @@ void Interpreter__error_message(caStack* callerStack)
     else
         set_string(circa_output(callerStack, 0), to_string(errorReg).c_str());
 }
-void Interpreter__toString(caStack* callerStack)
+void Stack__toString(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2323,7 +2323,7 @@ void Interpreter__toString(caStack* callerStack)
     set_string(circa_output(callerStack, 0), strm.str().c_str());
 }
 
-void Interpreter__frames(caStack* callerStack)
+void Stack__frames(caStack* callerStack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
@@ -2360,25 +2360,25 @@ void interpreter_install_functions(Block* kernel)
 
         {"make_interpreter", make_interpreter},
         {"capture_stack", capture_stack},
-        {"Interpreter.block", Interpreter__block},
-        {"Interpreter.dump", Interpreter__dump},
-        {"Interpreter.inject", Interpreter__inject_state},
-        {"Interpreter.inject_context", Interpreter__inject_context},
-        {"Interpreter.apply", Interpreter__call},
-        {"Interpreter.call", Interpreter__call},
-        {"Interpreter.push_frame", Interpreter__push_frame},
-        {"Interpreter.pop_frame", Interpreter__pop_frame},
-        {"Interpreter.set_state_input", Interpreter__set_state_input},
-        {"Interpreter.get_state_output", Interpreter__get_state_output},
-        {"Interpreter.reset", Interpreter__reset},
-        {"Interpreter.restart", Interpreter__restart},
-        {"Interpreter.run", Interpreter__run},
-        {"Interpreter.frame", Interpreter__frame},
-        {"Interpreter.frames", Interpreter__frames},
-        {"Interpreter.output", Interpreter__output},
-        {"Interpreter.errored", Interpreter__errored},
-        {"Interpreter.error_message", Interpreter__error_message},
-        {"Interpreter.toString", Interpreter__toString},
+        {"Stack.block", Stack__block},
+        {"Stack.dump", Stack__dump},
+        {"Stack.inject", Stack__inject_state},
+        {"Stack.inject_context", Stack__inject_context},
+        {"Stack.apply", Stack__call},
+        {"Stack.call", Stack__call},
+        {"Stack.push_frame", Stack__push_frame},
+        {"Stack.pop_frame", Stack__pop_frame},
+        {"Stack.set_state_input", Stack__set_state_input},
+        {"Stack.get_state_output", Stack__get_state_output},
+        {"Stack.reset", Stack__reset},
+        {"Stack.restart", Stack__restart},
+        {"Stack.run", Stack__run},
+        {"Stack.frame", Stack__frame},
+        {"Stack.frames", Stack__frames},
+        {"Stack.output", Stack__output},
+        {"Stack.errored", Stack__errored},
+        {"Stack.error_message", Stack__error_message},
+        {"Stack.toString", Stack__toString},
 
         {NULL, NULL}
     };

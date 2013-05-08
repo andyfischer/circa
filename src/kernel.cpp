@@ -1103,7 +1103,7 @@ void bootstrap_kernel()
     TYPES.color = as_type(kernel->get("Color"));
     TYPES.closure = as_type(kernel->get("Closure"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
-    TYPES.stack = as_type(kernel->get("Interpreter"));
+    TYPES.stack = as_type(kernel->get("Stack"));
     callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
