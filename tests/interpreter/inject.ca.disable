@@ -7,7 +7,7 @@ square = {
     output(concat('injected: ' injected))
 }
 
-int = make_interpreter
+int = make_stack
 int.push_frame(square.block)
 
 int.inject('injected', 'a')

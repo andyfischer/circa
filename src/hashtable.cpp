@@ -247,6 +247,19 @@ void remove(Hashtable* data, caValue* key)
     }
 }
 
+bool is_empty(Hashtable* data)
+{
+    if (data == NULL)
+        return true;
+
+    // TODO: Just look at data->count, when count is fixed to be accurate.
+    for (int i=0; i < data->capacity; i++) {
+        if (!is_null(&data->slots[i].key))
+            return false;
+    }
+    return true;
+}
+
 int count(Hashtable* data)
 {
     return data->count;
@@ -353,6 +366,13 @@ void hashtable_remove(caValue* tableTv, caValue* key)
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     remove(table, key);
+}
+
+bool hashtable_is_empty(caValue* value)
+{
+    ca_assert(is_hashtable(value));
+    Hashtable*& table = (Hashtable*&) value->value_data.ptr;
+    return is_empty(table);
 }
 
 void hashtable_setup_type(Type* type)

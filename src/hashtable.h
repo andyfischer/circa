@@ -12,6 +12,7 @@ caValue* hashtable_num_slots(caValue* table);
 caValue* hashtable_insert(caValue* table, caValue* key, bool consumeKey);
 caValue* hashtable_insert(caValue* table, caValue* key);
 void hashtable_remove(caValue* table, caValue* key);
+bool hashtable_is_empty(caValue* table);
 
 void hashtable_setup_type(Type* type);
 

@@ -7,7 +7,7 @@ def b(a)
 
     a + 1
 
-int = make_interpreter()
+int = make_stack()
 int.push_frame(b.block, [1])
 int.run
 print(int.get_state_output)

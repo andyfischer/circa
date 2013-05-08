@@ -12,7 +12,7 @@ def frame1()
 
     call_frame2 = frame2()
 
-int = make_interpreter()
+int = make_stack()
 int.push_frame(block_ref(frame1), [])
 int.run
 

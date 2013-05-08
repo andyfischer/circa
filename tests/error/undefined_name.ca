@@ -3,7 +3,7 @@ f = {
     add(a b c)
 }.block
 
-int = make_interpreter()
+int = make_stack()
 int.push_frame(f [])
 int.run
 assert(int.errored)

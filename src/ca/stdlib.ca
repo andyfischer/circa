@@ -400,6 +400,7 @@ def Map.set(self, any key, any value) -> Map
     -- Sets the value associated with this key.
 def Map.insertPairs(self, List pairs) -> Map
     -- Set multiple key-value pairs.
+def Map.empty(self) -> bool
 
 -- Overloaded functions
 def is_overloaded_func(Block block) -> bool

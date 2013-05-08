@@ -439,6 +439,11 @@ void Map__insertPairs(caStack* stack)
     }
 }
 
+void Map__empty(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
+}
+
 void Mutable__get(caStack* stack)
 {
     caValue* val = (caValue*) circa_object_input(stack, 0);
@@ -1053,6 +1058,7 @@ void bootstrap_kernel()
         {"Map.get", Map__get},
         {"Map.set", Map__set},
         {"Map.insertPairs", Map__insertPairs},
+        {"Map.empty", Map__empty},
 
         {"Mutable.get", Mutable__get},
         {"Mutable.set", Mutable__set},

@@ -1,6 +1,6 @@
 
 
-int = make_interpreter()
+int = make_stack()
 int.push_frame({
 
     cl = {

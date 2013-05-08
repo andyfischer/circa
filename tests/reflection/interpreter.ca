@@ -1,5 +1,5 @@
 
-i = make_interpreter()
+i = make_stack()
 
 def func(String s) -> String
   print('called func with: ' s)

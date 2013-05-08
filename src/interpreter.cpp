@@ -2111,7 +2111,7 @@ void Frame__pc_term(caStack* callerStack)
     set_term_ref(circa_output(callerStack, 0), frame->block->get(frame->pc));
 }
 
-void make_interpreter(caStack* callerStack)
+void make_stack(caStack* callerStack)
 {
     Stack* newStack = new Stack();
     set_pointer(circa_create_default_output(callerStack, 0), newStack);
@@ -2358,7 +2358,7 @@ void interpreter_install_functions(Block* kernel)
         {"Frame.parentPc", Frame__parentPc},
         {"Frame.pc_term", Frame__pc_term},
 
-        {"make_interpreter", make_interpreter},
+        {"make_stack", make_stack},
         {"capture_stack", capture_stack},
         {"Stack.block", Stack__block},
         {"Stack.dump", Stack__dump},

@@ -82,7 +82,7 @@ void stack_value()
 {
     Block version1;
     Term* f1 = version1.compile("def f()");
-    version1.compile("state int = make_interpreter()");
+    version1.compile("state int = make_stack()");
     version1.compile("int.push_frame(f.block, [])");
 
     Block version2;
