@@ -2028,11 +2028,10 @@ Frame* as_frame_ref(caValue* value)
     return frame_by_id(stack, frameId);
 }
 
-// TODO: This only needs the 'frame' argument.
-void set_frame_ref(caValue* value, Stack* stack, Frame* frame)
+void set_frame_ref(caValue* value, Frame* frame)
 {
     set_list(value, 2);
-    set_opaque_pointer(list_get(value, 0), stack);
+    set_opaque_pointer(list_get(value, 0), frame->stack);
     set_int(list_get(value, 1), frame->id);
 }
 
@@ -2081,7 +2080,7 @@ void Frame__parent(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     Frame* parent = frame_parent(frame);
-    set_frame_ref(circa_output(callerStack, 0), frame->stack, parent);
+    set_frame_ref(circa_output(callerStack, 0), parent);
 }
 
 void Frame__register(caStack* callerStack)
@@ -2132,8 +2131,30 @@ void Stack__block(caStack* stack)
 
 void Stack__dump(caStack* stack)
 {
-    Stack* actor = as_stack(circa_input(stack, 0));
-    dump(actor);
+    Stack* self = as_stack(circa_input(stack, 0));
+    dump(self);
+}
+
+void Stack__find_active_frame_for_term(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Term* term = as_term_ref(circa_input(stack, 1));
+
+    Frame* frame = top_frame(self);
+
+    while (true) {
+        if (frame->block == term->owningBlock) {
+            set_frame_ref(circa_output(stack, 0), frame);
+            return;
+        }
+
+        if (frame->parent == 0) {
+            set_null(circa_output(stack, 0));
+            return;
+        }
+
+        frame = frame_by_id(self, frame->parent);
+    }
 }
 
 void Stack__inject_state(caStack* stack)
@@ -2275,7 +2296,7 @@ void Stack__frame(caStack* callerStack)
     int index = circa_int_input(callerStack, 1);
     Frame* frame = frame_by_depth(self, index);
 
-    set_frame_ref(circa_output(callerStack, 0), self, frame);
+    set_frame_ref(circa_output(callerStack, 0), frame);
 }
 void Stack__output(caStack* callerStack)
 {
@@ -2335,7 +2356,7 @@ void Stack__frames(caStack* callerStack)
 
     for (int i=0; i < list_length(&stackTrace); i++) {
         Frame* frame = frame_by_id(self, as_int(list_get(&stackTrace, i)));
-        set_frame_ref(circa_index(out, i), self, frame);
+        set_frame_ref(circa_index(out, i), frame);
     }
 }
 
@@ -2362,6 +2383,7 @@ void interpreter_install_functions(Block* kernel)
         {"capture_stack", capture_stack},
         {"Stack.block", Stack__block},
         {"Stack.dump", Stack__dump},
+        {"Stack.find_active_frame_for_term", Stack__find_active_frame_for_term},
         {"Stack.inject", Stack__inject_state},
         {"Stack.inject_context", Stack__inject_context},
         {"Stack.apply", Stack__call},

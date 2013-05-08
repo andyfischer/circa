@@ -240,8 +240,9 @@ def Stack.block(self) -> Block
     -- Returns the (topmost) block.
 def Stack.dump(self)
     -- Dumps a string representation to stdout.
+def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.inject(self, String name, any val) -> bool
-    -- Inject a value into the actor's state. Must correspond to an existing state definition.
+    -- Inject a value into the stack's state. Must correspond to an existing state definition.
     -- Returns whether the operation was successful.
 def Stack.inject_context(self, Symbol name, any val)
 def Stack.call(self, any inputs :multiple) -> any

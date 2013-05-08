@@ -1,0 +1,16 @@
+
+
+top_level_binding = 1
+
+def func2()
+    stack = capture_stack()
+
+    frame = stack.find_active_frame_for_term(term_ref(top_level_binding))
+    assert(frame != null)
+    assert(stack.top_frame.parent.parent == frame)
+    assert(stack.top_frame != frame)
+
+def func1()
+    func2()
+
+func1()
