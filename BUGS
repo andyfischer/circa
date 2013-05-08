@@ -51,6 +51,9 @@ Code cleanup
   Deprecate API using Term* or Function* to reference functions (prefer Branch*)
   Eliminate C++ Function type, in favor of Branch.
 
+Interpreter
+  Value() terms should just copy their values to the stack. Simplify stack_get_active_value.
+
 Runtime reflection
   Functions have type Function, we should get rid of that and just use Branch everywhere
 

@@ -274,6 +274,8 @@ const char* STDLIB_CA_TEXT =
     "    self.frame(0)\n"
     "def Stack.frames(self) -> List\n"
     "    -- Return the list of Frames.\n"
+    "def Stack.set_active_value(self, Term term, any val)\n"
+    "    self.top_frame.set_active_value(term, val)\n"
     "def Stack.output(self, int index) -> any\n"
     "    -- Fetch the value in the nth output register.\n"
     "def Stack.errored(self) -> bool\n"

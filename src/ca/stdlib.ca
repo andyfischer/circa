@@ -232,8 +232,8 @@ def Frame.output(self, int nth) -> any
 
 def Function.block(self) -> Block
 
-def make_interpreter() -> Stack
-    -- Create a new interpreter
+def make_stack() -> Stack
+    -- Create a new stack
 def capture_stack() -> Stack
     -- Returns a frozen copy of the currently executing stack.
 def Stack.block(self) -> Block
@@ -253,7 +253,7 @@ def Stack.pop_frame(self)
 def Stack.set_state_input(self, any)
 def Stack.get_state_output(self) -> any
 def Stack.reset(self)
-    -- Clear this interpreter's state, including stack frames.
+    -- Clear this stack's state, including all frames.
 def Stack.restart(self)
     -- Restart or "rewind" the stack, so the program counter is returned to the start
     -- of the topmost frame. State is preserved.
@@ -267,6 +267,8 @@ def Stack.top_frame(self) -> Frame
     self.frame(0)
 def Stack.frames(self) -> List
     -- Return the list of Frames.
+def Stack.set_active_value(self, Term term, any val)
+    self.top_frame.set_active_value(term, val)
 def Stack.output(self, int index) -> any
     -- Fetch the value in the nth output register.
 def Stack.errored(self) -> bool
