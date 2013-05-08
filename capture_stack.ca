@@ -1,0 +1,9 @@
+
+one = 1
+stack = capture_stack()
+print('One is ', one)
+
+if context(:you_are_a_clone) == null
+    stack.inject_context(:you_are_a_clone, true)
+    stack.top_frame.set_active_value(term_ref(one), '2')
+    stack.run

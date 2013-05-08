@@ -482,6 +482,40 @@ void stack_restart(Stack* stack)
     stack->step = sym_StackReady;
 }
 
+Stack* stack_duplicate(Stack* stack)
+{
+    Stack* dupe = create_stack(stack->world);
+    resize_frame_list(dupe, stack->framesCapacity);
+
+    for (int i=0; i < stack->framesCapacity; i++) {
+        Frame* sourceFrame = &stack->frames[i];
+        Frame* dupeFrame = &dupe->frames[i];
+
+        dupeFrame->parent = sourceFrame->parent;
+        dupeFrame->parentPc = sourceFrame->parentPc;
+        dupeFrame->role = sourceFrame->role;
+        set_value(&dupeFrame->registers, &sourceFrame->registers);
+        touch(&dupeFrame->registers);
+        dupeFrame->block = sourceFrame->block;
+        set_value(&dupeFrame->customBytecode, &sourceFrame->customBytecode);
+        set_value(&dupeFrame->dynamicScope, &sourceFrame->dynamicScope);
+        dupeFrame->blockVersion = sourceFrame->blockVersion;
+        dupeFrame->pc = sourceFrame->pc;
+        dupeFrame->nextPc = sourceFrame->nextPc;
+        dupeFrame->exitType = sourceFrame->exitType;
+        dupeFrame->stop = sourceFrame->stop;
+    }
+
+    dupe->top = stack->top;
+    dupe->firstFreeFrame = stack->firstFreeFrame;
+    dupe->lastFreeFrame = stack->lastFreeFrame;
+    dupe->step = stack->step;
+    dupe->errorOccurred = stack->errorOccurred;
+    set_value(&dupe->state, &stack->state);
+    set_value(&dupe->context, &stack->context);
+    return dupe;
+}
+
 caValue* stack_get_state(Stack* stack)
 {
     Frame* top = top_frame(stack);
@@ -1994,6 +2028,7 @@ Frame* as_frame_ref(caValue* value)
     return frame_by_id(stack, frameId);
 }
 
+// TODO: This only needs the 'frame' argument.
 void set_frame_ref(caValue* value, Stack* stack, Frame* frame)
 {
     set_list(value, 2);
@@ -2013,11 +2048,40 @@ void Frame__registers(caStack* callerStack)
     touch(out);
 }
 
+void Frame__active_value(caStack* callerStack)
+{
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    Term* term = as_term_ref(circa_input(callerStack, 1));
+    caValue* value = stack_find_active_value(frame, term);
+    if (value == NULL)
+        set_null(circa_output(callerStack, 0));
+    else
+        set_value(circa_output(callerStack, 0), value);
+}
+
+void Frame__set_active_value(caStack* callerStack)
+{
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    Term* term = as_term_ref(circa_input(callerStack, 1));
+    caValue* value = stack_find_active_value(frame, term);
+    if (value == NULL)
+        return raise_error_msg(callerStack, "Value not found");
+
+    set_value(value, circa_input(callerStack, 2));
+}
+
 void Frame__block(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     ca_assert(frame != NULL);
     set_block(circa_output(callerStack, 0), frame->block);
+}
+
+void Frame__parent(caStack* callerStack)
+{
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    Frame* parent = frame_parent(frame);
+    set_frame_ref(circa_output(callerStack, 0), frame->stack, parent);
 }
 
 void Frame__register(caStack* callerStack)
@@ -2049,8 +2113,14 @@ void Frame__pc_term(caStack* callerStack)
 
 void make_interpreter(caStack* callerStack)
 {
-    // TODO: Remove this in favor of make_actor
     Stack* newStack = new Stack();
+    set_pointer(circa_create_default_output(callerStack, 0), newStack);
+}
+
+void capture_stack(caStack* callerStack)
+{
+    Stack* newStack = stack_duplicate(callerStack);
+    pop_frame(newStack);
     set_pointer(circa_create_default_output(callerStack, 0), newStack);
 }
 
@@ -2269,16 +2339,6 @@ void Interpreter__frames(caStack* callerStack)
     }
 }
 
-void make_actor(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-
-    Stack* newStack = create_stack(stack->world);
-    push_frame(newStack, block);
-    set_stack(circa_output(stack, 0), newStack);
-}
-
-
 void eval_context_setup_type(Type* type)
 {
     set_string(&type->name, "Stack");
@@ -2288,7 +2348,10 @@ void eval_context_setup_type(Type* type)
 void interpreter_install_functions(Block* kernel)
 {
     static const ImportRecord records[] = {
+        {"Frame.active_value", Frame__active_value},
+        {"Frame.set_active_value", Frame__set_active_value},
         {"Frame.block", Frame__block},
+        {"Frame.parent", Frame__parent},
         {"Frame.register", Frame__register},
         {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},
@@ -2296,6 +2359,7 @@ void interpreter_install_functions(Block* kernel)
         {"Frame.pc_term", Frame__pc_term},
 
         {"make_interpreter", make_interpreter},
+        {"capture_stack", capture_stack},
         {"Interpreter.block", Interpreter__block},
         {"Interpreter.dump", Interpreter__dump},
         {"Interpreter.inject", Interpreter__inject_state},
@@ -2315,8 +2379,6 @@ void interpreter_install_functions(Block* kernel)
         {"Interpreter.errored", Interpreter__errored},
         {"Interpreter.error_message", Interpreter__error_message},
         {"Interpreter.toString", Interpreter__toString},
-
-        // {"make_actor", make_actor},
 
         {NULL, NULL}
     };

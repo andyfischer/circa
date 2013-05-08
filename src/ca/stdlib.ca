@@ -203,8 +203,12 @@ def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
 
 type Frame;
+def Frame.active_value(self, Term) -> any
+def Frame.set_active_value(self, Term, any)
 def Frame.block(self) -> Block
     -- Return the Block associated with this Frame.
+def Frame.parent(self) -> Frame
+    -- Return this frame's parent.
 def Frame.register(self, int index) -> any
     -- Fetch the value in the given register index.
 def Frame.registers(self) -> List
@@ -230,6 +234,8 @@ def Function.block(self) -> Block
 
 def make_interpreter() -> Interpreter
     -- Create a new interpreter
+def capture_stack() -> Interpreter
+    -- Returns a frozen copy of the currently executing stack.
 def Interpreter.block(self) -> Block
     -- Returns the (topmost) block.
 def Interpreter.dump(self)
