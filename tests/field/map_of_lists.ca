@@ -1,0 +1,31 @@
+
+type MapOfLists {
+    Map map
+}
+
+def MapOfLists.add(@self, any key, any val)
+    if self.map.contains(key)
+        @self.map.map_element(key, { input().append(val) })
+    else
+        @self.map.set(key, [val])
+
+def MapOfLists.remove(@self, any key)
+    @self.map.remove(key)
+
+def MapOfLists.get(self, any key)
+    self.map.get_optional(key, [])
+    
+
+m = make(MapOfLists)
+@m.add(:a 1)
+@m.add(:b 2)
+@m.add(:b 3)
+@m.add(:b 4)
+
+assert(m.get(:a) == [1])
+assert(m.get(:b) == [2, 3, 4])
+assert(m.get(:c) == [])
+
+@m.remove(:b)
+assert(m.get(:a) == [1])
+assert(m.get(:b) == [])

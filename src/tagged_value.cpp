@@ -100,10 +100,8 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     result->success = true;
 
     // Finish early if value already has this exact type.
-    if (value->value_type == type) {
-        result->success = true;
+    if (value->value_type == type)
         return;
-    }
 
     if (type->cast != NULL) {
         INCREMENT_STAT(ValueCastDispatched);

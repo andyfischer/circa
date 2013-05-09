@@ -494,6 +494,16 @@ void Term__asfloat(caStack* stack)
     
     set_float(circa_output(stack, 0), to_float(term_value(t)));
 }
+void Term__index(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL) {
+        circa_output_error(stack, "NULL reference");
+        return;
+    }
+    
+    set_int(circa_output(stack, 0), t->index);
+}
 void Term__input(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
@@ -652,6 +662,7 @@ void reflection_install_functions(Block* kernel)
         {"Term.assign", Term__assign},
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},
+        {"Term.index", Term__index},
         {"Term.format_source", Term__format_source},
         {"Term.format_source_normal", Term__format_source_normal},
         {"Term.function", Term__function},

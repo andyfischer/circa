@@ -20,7 +20,7 @@ int.run
 
 index = 0
 for Frame frame in int.frames
-    print('frame ' index ' name: ' frame.pc_term.name)
+    print('frame ' index ' name: ' frame.current_term.name)
     print('frame ' index ' registers: ' frame.registers)
     print('frame ' index ' pc: ' frame.pc)
     print('frame ' index ' parentPc: ' frame.parentPc)

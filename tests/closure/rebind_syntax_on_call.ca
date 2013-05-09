@@ -1,0 +1,8 @@
+
+plus_1 = { input() + 1 }
+
+
+a = 4
+plus_1.call(@a)
+
+assert(a == 5)

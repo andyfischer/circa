@@ -1619,7 +1619,12 @@ void run_output_instructions(Stack* stack, caValue* bytecode)
 
             // Type check
             // Future: should this use receiver's type instead of placeholder?
-            if (!cast(receiverSlot, declared_type(placeholder))) {
+            bool castSuccess = cast(receiverSlot, declared_type(placeholder));
+                
+            // For now, allow any output value to be null. Will revisit
+            castSuccess = castSuccess || is_null(receiverSlot);
+
+            if (!castSuccess) {
                 frame->pc = placeholder->index;
                 return raise_error_output_type_mismatch(stack);
             }
@@ -2080,7 +2085,10 @@ void Frame__parent(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     Frame* parent = frame_parent(frame);
-    set_frame_ref(circa_output(callerStack, 0), parent);
+    if (parent == NULL)
+        set_null(circa_output(callerStack, 0));
+    else
+        set_frame_ref(circa_output(callerStack, 0), parent);
 }
 
 void Frame__register(caStack* callerStack)
@@ -2103,11 +2111,11 @@ void Frame__parentPc(caStack* callerStack)
     ca_assert(frame != NULL);
     set_int(circa_output(callerStack, 0), frame->parentPc);
 }
-void Frame__pc_term(caStack* callerStack)
+void Frame__current_term(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
     ca_assert(frame != NULL);
-    set_term_ref(circa_output(callerStack, 0), frame->block->get(frame->pc));
+    set_term_ref(circa_output(callerStack, 0), frame_current_term(frame));
 }
 
 void make_stack(caStack* callerStack)
@@ -2139,6 +2147,9 @@ void Stack__find_active_frame_for_term(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
+
+    if (term == NULL)
+        return raise_error_msg(stack, "Term is null");
 
     Frame* frame = top_frame(self);
 
@@ -2377,7 +2388,7 @@ void interpreter_install_functions(Block* kernel)
         {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},
         {"Frame.parentPc", Frame__parentPc},
-        {"Frame.pc_term", Frame__pc_term},
+        {"Frame.current_term", Frame__current_term},
 
         {"make_stack", make_stack},
         {"capture_stack", capture_stack},
