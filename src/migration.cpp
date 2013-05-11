@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "block.h"
+#include "building.h"
 #include "code_iterators.h"
 #include "interpreter.h"
 #include "kernel.h"
@@ -89,10 +90,24 @@ void migrate_stack(Stack* stack, Migration* migration)
     Frame* frame = top_frame(stack);
 
     while (frame != NULL) {
+        // Save state output
+        Value stateOutput;
+        Term* stateOutputTerm = find_state_output(frame->block);
+        if (stateOutputTerm != NULL)
+            move(frame_register(frame, stateOutputTerm), &stateOutput);
+
         frame->block = migrate_block_pointer(frame->block, migration);
 
-        if (frame->block != NULL)
+        if (frame->block != NULL) {
+
             list_resize(frame_registers(frame), block_locals_count(frame->block));
+
+            if (stateOutputTerm != NULL) {
+                Term* newStateOutputTerm = find_state_output(frame->block);
+                if (newStateOutputTerm != NULL)
+                    move(&stateOutput, frame_register(frame, newStateOutputTerm));
+            }
+        }
 
         migrate_value(frame_registers(frame), migration);
 
@@ -102,16 +117,21 @@ void migrate_stack(Stack* stack, Migration* migration)
 
 void migrate_value(caValue* value, Migration* migration)
 {
-    for (ValueIterator it(value); it.unfinished(); it.advance()) {
-        caValue* val = *it;
-        if (is_ref(val)) {
-            set_term_ref(val, migrate_term_pointer(as_term_ref(val), migration));
-            
-        } else if (is_block(val)) {
-            set_block(val, migrate_block_pointer(as_block(val), migration));
-        } else if (is_stack(val)) {
-            migrate_stack(as_stack(val), migration);
+    if (is_list(value)) {
+        for (ValueIterator it(value); it.unfinished(); it.advance()) {
+            caValue* element = *it;
+            migrate_value(element, migration);
         }
+    } else if (is_ref(value)) {
+        set_term_ref(value, migrate_term_pointer(as_term_ref(value), migration));
+        
+    } else if (is_block(value)) {
+        set_block(value, migrate_block_pointer(as_block(value), migration));
+    } else if (is_stack(value)) {
+        migrate_stack(as_stack(value), migration);
+    } else if (value->value_type == TYPES.mutable_type) {
+        caValue* boxedValue = (caValue*) object_get_body(value);
+        migrate_value(boxedValue, migration);
     }
 }
 

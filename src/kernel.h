@@ -105,6 +105,7 @@ struct BuiltinTypes {
     Type* int_type;
     Type* list;
     Type* map;
+    Type* mutable_type;
     Type* null;
     Type* opaque_pointer;
     Type* point;

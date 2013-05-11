@@ -1114,10 +1114,10 @@ void bootstrap_kernel()
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
 
-    Type* mutableType = as_type(kernel->get("Mutable"));
-    circa_setup_object_type(mutableType, sizeof(Value), Mutable_release);
-    mutableType->initialize = Mutable_initialize;
-    mutableType->toString = Mutable_toString;
+    TYPES.mutable_type = as_type(kernel->get("Mutable"));
+    circa_setup_object_type(TYPES.mutable_type, sizeof(Value), Mutable_release);
+    TYPES.mutable_type->initialize = Mutable_initialize;
+    TYPES.mutable_type->toString = Mutable_toString;
 
     color_t::setup_type(TYPES.color);
 

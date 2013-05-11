@@ -12,6 +12,8 @@
 #include "tagged_value.h"
 #include "world.h"
 
+#define FILE_WATCH_DEBUG_LOGGING 0
+
 namespace circa {
 
 struct FileWatch
@@ -50,6 +52,10 @@ FileWatch* add_file_watch(World* world, const char* filename)
     if (existing != NULL)
         return existing;
 
+#if FILE_WATCH_DEBUG_LOGGING
+    printf("add_file_watch: %s\n", filename);
+#endif
+
     FileWatch* newWatch = new FileWatch();
     set_string(&newWatch->filename, filename);
     set_list(&newWatch->onChangeActions, 0);
@@ -87,6 +93,10 @@ static bool file_watch_check_for_update(FileWatch* watch)
 
 void file_watch_trigger_actions(World* world, FileWatch* watch)
 {
+#if FILE_WATCH_DEBUG_LOGGING
+    printf("file_watch_trigger_actions: %s\n", as_cstring(&watch->filename));
+#endif
+
     // Walk through each action and execute it.
     for (int i = 0; i < list_length(&watch->onChangeActions); i++) {
         caValue* action = list_get(&watch->onChangeActions, i);

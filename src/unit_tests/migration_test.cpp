@@ -106,6 +106,42 @@ void stack_value()
     free_stack(stack);
 }
 
+void run_and_migrate_and_run(const char* script1, const char* script2)
+{
+    Block block1;
+    block1.compile(script1);
+
+    Stack stack;
+    push_frame(&stack, &block1);
+    run_interpreter(&stack);
+
+    Block block2;
+    block2.compile(script2);
+
+    migrate_stack(&stack, &block1, &block2);
+
+    stack_restart(&stack);
+    run_interpreter(&stack);
+}
+
+void mutable_value()
+{
+    test_spy_clear();
+
+    run_and_migrate_and_run(
+        "def f() -> int { 5 }\n"
+        "state Mutable val = make(Mutable)\n"
+        "val.set(f.to_closure)\n",
+
+        "def f() -> int { 7 }\n"
+        "state Mutable val\n"
+        "cl = Closure(val.get)\n"
+        "test_spy(cl.call())\n"
+        );
+
+    test_equals(test_spy_get_results(), "[7]");
+}
+
 void translate_terms_type()
 {
     // Setup
@@ -177,6 +213,7 @@ void register_tests()
     REGISTER_TEST_CASE(migration_test::update_references);
     REGISTER_TEST_CASE(migration_test::term_ref_values);
     REGISTER_TEST_CASE(migration_test::stack_value);
+    REGISTER_TEST_CASE(migration_test::mutable_value);
     REGISTER_TEST_CASE(migration_test::translate_terms_type);
     REGISTER_TEST_CASE(migration_test::bug_with_migration_and_stale_pointer);
     REGISTER_TEST_CASE(migration_test::stack_migration_deletes_block);
