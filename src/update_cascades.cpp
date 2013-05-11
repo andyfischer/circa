@@ -42,7 +42,7 @@ void fix_forward_function_references(Block* block)
             // See if we can now find this function
             std::string functionName = term->stringProp("syntax:functionName", "");
 
-            Term* func = find_name(block, functionName.c_str());
+            Term* func = find_name(block, functionName.c_str(), -1, sym_LookupFunction);
             if (func != NULL) {
                 change_function(term, func);
             }

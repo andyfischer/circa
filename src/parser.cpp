@@ -1958,9 +1958,14 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    ParseResult functionParseResult = identifier_no_create(block, tokens, context);
-    Term* function = functionParseResult.term;
-    std::string functionName = functionParseResult.identifierName;
+    std::string functionName = tokens.consumeStr(tok_Identifier);
+
+    Term* function = find_name(block, functionName.c_str(), -1, sym_LookupFunction);
+
+    // If we didn't find anything with LookupFunction, then try to find a type name.
+    // DEPRECATED: Type names as functions.
+    if (function == NULL)
+        function = find_name(block, functionName.c_str(), -1, sym_LookupType);
 
     tokens.consume(tok_LParen);
 
@@ -2573,17 +2578,6 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
     }
 
     return result;
-}
-
-// Consume an IDENTIFIER, but if the name is not found, don't create an
-// unknown_identifier() call. Instead just return a ParseResult with
-// a NULL term.
-ParseResult identifier_no_create(Block* block, TokenStream& tokens, ParserCxt* context)
-{
-    std::string id = tokens.consumeStr(tok_Identifier);
-    Term* term = find_name(block, id.c_str());
-    // term may be NULL
-    return ParseResult(term, id);
 }
 
 // --- More Utility functions ---

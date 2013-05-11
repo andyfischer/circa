@@ -257,6 +257,10 @@ void change_function(Term* term, Term* function)
     if (term->function == function)
         return;
 
+    if (function != NULL) {
+        ca_assert(is_function(function));
+    }
+
     Term* previousFunction = term->function;
 
     term->function = function;

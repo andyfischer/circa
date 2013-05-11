@@ -101,7 +101,6 @@ ParseResult namespace_block(Block* block, TokenStream& tokens, ParserCxt* contex
 ParseResult unknown_identifier(Block* block, std::string const& name);
 ParseResult identifier(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt* context);
-ParseResult identifier_no_create(Block* block, TokenStream& tokens, ParserCxt* context);
 
 // Helper functions:
 void consume_block(Block* block, TokenStream& tokens, ParserCxt* context);

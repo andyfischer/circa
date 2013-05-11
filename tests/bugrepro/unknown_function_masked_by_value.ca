@@ -1,0 +1,14 @@
+
+def main()
+    a = 2
+
+    cl = {
+        return a() 
+    }
+
+    print(cl.call)
+
+stack = make_stack()
+stack.push_frame(main.block, [])
+stack.run
+assert(stack.errored)
