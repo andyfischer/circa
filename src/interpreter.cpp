@@ -307,6 +307,9 @@ Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* _inputs)
 
         copy(input, slot);
 
+#if 0
+        TODO: Remove push_frame_with_inputs, and change Stack.push_frame to not require an input list.
+        
         bool castSuccess = cast(slot, placeholder->type);
 
         if (!castSuccess) {
@@ -321,6 +324,7 @@ Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* _inputs)
             raise_error_msg(stack, as_cstring(&error));
             return frame;
         }
+#endif
     }
 
     return frame;
@@ -1481,7 +1485,10 @@ void run_input_instructions3(Stack* stack, caValue* bytecode)
         case bc_InputFromStack: {
             int index = blob_read_int(bcData, &pos);
             caValue* value = stack_find_active_value(parent, caller->input(index));
-            copy(value, frame_register(frame, frame->pc));
+            if (value == NULL)
+                set_null(frame_register(frame, frame->pc));
+            else
+                copy(value, frame_register(frame, frame->pc));
             frame->pc++;
             continue;
         }
@@ -1702,6 +1709,13 @@ void run(Stack* stack)
             // Lookup method
             Term* caller = frame_current_term(frame);
             caValue* object = stack_find_active_value(frame, caller->input(0));
+            if (object == NULL) {
+                Value msg;
+                set_string(&msg, "Input 0 is null");
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
+
             Term* currentTerm = block->get(frame->pc);
             std::string functionName = currentTerm->stringProp("syntax:functionName", "");
 
@@ -1731,6 +1745,14 @@ void run(Stack* stack)
 
             caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
+
+            if (block == NULL) {
+                Value msg;
+                set_string(&msg, "Block is null");
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
+
             frame = push_frame(stack, block);
             run_input_instructions2(stack);
 
@@ -1741,6 +1763,13 @@ void run(Stack* stack)
             Term* caller = block->get(frame->pc);
             caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
+
+            if (block == NULL) {
+                Value msg;
+                set_string(&msg, "Block is null");
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
             frame = push_frame(stack, block);
             run_input_instructions2(stack);
 
@@ -2091,6 +2120,14 @@ void Frame__parent(caStack* callerStack)
         set_frame_ref(circa_output(callerStack, 0), parent);
 }
 
+void Frame__has_parent(caStack* stack)
+{
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
+    Frame* parent = frame_parent(frame);
+    set_bool(circa_output(stack, 0), parent == NULL);
+}
+
+
 void Frame__register(caStack* callerStack)
 {
     Frame* frame = as_frame_ref(circa_input(callerStack, 0));
@@ -2170,19 +2207,27 @@ void Stack__find_active_frame_for_term(caStack* stack)
 
 void Stack__inject_state(caStack* stack)
 {
-    Stack* actor = as_stack(circa_input(stack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
     caValue* val = circa_input(stack, 2);
-    bool success = state_inject(actor, name, val);
+
+    if (top_frame(self) == NULL)
+        return raise_error_msg(self, "Can't inject onto stack with no frames");
+
+    bool success = state_inject(self, name, val);
     set_bool(circa_output(stack, 0), success);
 }
 
 void Stack__inject_context(caStack* stack)
 {
-    Stack* actor = as_stack(circa_input(stack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
     caValue* val = circa_input(stack, 2);
-    context_inject(actor, name, val);
+
+    if (top_frame(self) == NULL)
+        return raise_error_msg(stack, "Can't inject onto stack with no frames");
+
+    context_inject(self, name, val);
 }
 
 void Stack__call(caStack* stack)
@@ -2384,6 +2429,7 @@ void interpreter_install_functions(Block* kernel)
         {"Frame.set_active_value", Frame__set_active_value},
         {"Frame.block", Frame__block},
         {"Frame.parent", Frame__parent},
+        {"Frame.has_parent", Frame__has_parent},
         {"Frame.register", Frame__register},
         {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},

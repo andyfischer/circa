@@ -118,6 +118,9 @@ void Block__property(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
+    if (block == NULL)
+        return circa_output_error(stack, "null block");
+
     caValue* value = block_get_property(block, as_symbol(circa_input(stack, 1)));
 
     if (value == NULL)
@@ -129,6 +132,9 @@ void Block__properties(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
+    if (block == NULL)
+        return circa_output_error(stack, "null block");
+
     if (is_null(&block->properties))
         set_hashtable(circa_output(stack, 0));
     else
@@ -137,12 +143,20 @@ void Block__properties(caStack* stack)
 
 void Block__to_code_lines(caStack* stack)
 {
-    block_to_code_lines(as_block(circa_input(stack, 0)), circa_output(stack, 0));
+    Block* block = as_block(circa_input(stack, 0));
+
+    if (block == NULL)
+        return circa_output_error(stack, "null block");
+
+    block_to_code_lines(block, circa_output(stack, 0));
 }
 
 void Block__format_source(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
+
+    if (block == NULL)
+        return circa_output_error(stack, "null block");
 
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);

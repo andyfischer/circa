@@ -209,6 +209,7 @@ def Frame.block(self) -> Block
     -- Return the Block associated with this Frame.
 def Frame.parent(self) -> Frame
     -- Return this frame's parent.
+def Frame.has_parent(self) -> bool
 def Frame.register(self, int index) -> any
     -- Fetch the value in the given register index.
 def Frame.registers(self) -> List
@@ -232,8 +233,6 @@ def Frame.output(self, int nth) -> any
 
 def Function.block(self) -> Block
 
-def make_stack() -> Stack
-    -- Create a new stack
 def capture_stack() -> Stack
     -- Returns a frozen copy of the currently executing stack.
 def Stack.block(self) -> Block
@@ -281,6 +280,13 @@ def Stack.errored(self) -> bool
 def Stack.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
 def Stack.toString(self) -> String
+
+def make_stack() -> Stack
+    -- Create a new stack
+def make_stack2(Closure closure) -> Stack
+    stack = make_stack()
+    stack.push_frame(closure.block, [])
+    stack
 
 -- Actors
 type Actor {
