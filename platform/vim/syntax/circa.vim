@@ -20,6 +20,7 @@ syn match circaFloat	"\<\%(0\|[1-9]\d*\%(_\d\+\)*\)\%(\.\d\+\%(_\d\+\)*\)\=\%([e
 syn region circaString   start=+"+ end=+"+ skip=+\\"+
 syn region circaString   start=+'+ end=+'+ skip=+\\'+
 syn region circaString   start=+<<<+ end=+>>>+
+syn match circaSymbol   ":\([A-Z0-9a-z_]\)*"
 syn region circaMultilineComment start="{-" end="-}" contains=circaMultilineComment
 
 " Keywords
@@ -33,7 +34,8 @@ hi def link circaColor          Number
 hi def link circaInteger        Number
 hi def link circaFloat          Number
 hi def link circaString         String
-hi def link circaKeyword        Statement
+hi def link circaSymbol         Constant
+hi def link circaKeyword        Keyword
 hi def link circaLineComment    Comment
 hi def link circaMultilineComment    Comment
 
