@@ -322,6 +322,7 @@ const char* STDLIB_CA_TEXT =
     "    return out\n"
     "\n"
     "def empty_list(any initialValue, int size) -> List\n"
+    "def repeat(any val, int count) -> List\n"
     "def List.append(self, any item) -> List\n"
     "    -- Append an item to the end of this list.\n"
     "def List.concat(self, List rightSide) -> List\n"

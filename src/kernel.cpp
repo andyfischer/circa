@@ -220,6 +220,18 @@ void empty_list(caStack* stack)
     }
 }
 
+void repeat(caStack* stack)
+{
+    caValue* source = circa_input(stack, 0);
+    int repeatCount = circa_int_input(stack, 1);
+
+    caValue* out = circa_output(stack, 0);
+    circa_set_list(out, repeatCount);
+
+    for (int i=0; i < repeatCount; i++)
+        copy(source, circa_index(out, i));
+}
+
 void List__append(caStack* stack)
 {
     caValue* out = circa_output(stack, 0);
@@ -1041,6 +1053,7 @@ void bootstrap_kernel()
         {"Function.block", Function__block},
 
         {"empty_list", empty_list},
+        {"repeat", repeat},
         {"List.append", List__append},
         {"List.concat", List__concat},
         {"List.resize", List__resize},

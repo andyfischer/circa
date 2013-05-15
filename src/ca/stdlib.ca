@@ -315,6 +315,7 @@ def Actor.apply(self, List inputs) -> any
     return out
 
 def empty_list(any initialValue, int size) -> List
+def repeat(any val, int count) -> List
 def List.append(self, any item) -> List
     -- Append an item to the end of this list.
 def List.concat(self, List rightSide) -> List

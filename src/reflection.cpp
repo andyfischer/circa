@@ -151,6 +151,13 @@ void Block__to_code_lines(caStack* stack)
     block_to_code_lines(block, circa_output(stack, 0));
 }
 
+void Block__to_code_lines_descendant_filtered(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    Term* descendant = as_term_ref(circa_input(stack, 1));
+
+}
+
 void Block__format_source(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));

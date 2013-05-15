@@ -14,18 +14,6 @@ namespace list_function {
             circa_set_list(out, 0);
     }
 
-    void repeat(caStack* stack)
-    {
-        caValue* source = circa_input(stack, 0);
-        int repeatCount = circa_int_input(stack, 1);
-
-        caValue* out = circa_output(stack, 0);
-        circa_set_list(out, repeatCount);
-
-        for (int i=0; i < repeatCount; i++)
-            copy(source, circa_index(out, i));
-    }
-
     void blank_list(caStack* stack)
     {
         caValue* out = circa_output(stack, 0);
@@ -38,7 +26,6 @@ namespace list_function {
         FUNCS.list = import_function(kernel, make_list, "list(any vals :multiple) -> List");
         // as_function(FUNCS.list)->specializeType = list_specializeType;
 
-        import_function(kernel, repeat,  "repeat(any val, int count) -> List");
         import_function(kernel, blank_list, "blank_list(int count) -> List");
     }
 }
