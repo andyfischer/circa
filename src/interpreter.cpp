@@ -2422,6 +2422,14 @@ void eval_context_setup_type(Type* type)
     type->gcListReferences = stack_list_references;
 }
 
+void reflect__caller(caStack* stack)
+{
+    Frame* frame = top_frame_parent(stack);
+    Frame* callerFrame = frame_parent(frame);
+    Term* theirCaller = frame_current_term(callerFrame);
+    set_term_ref(circa_output(stack, 0), theirCaller);
+}
+
 void interpreter_install_functions(Block* kernel)
 {
     static const ImportRecord records[] = {
@@ -2458,6 +2466,7 @@ void interpreter_install_functions(Block* kernel)
         {"Stack.errored", Stack__errored},
         {"Stack.error_message", Stack__error_message},
         {"Stack.toString", Stack__toString},
+        {"reflect:caller", reflect__caller},
 
         {NULL, NULL}
     };

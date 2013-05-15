@@ -107,6 +107,7 @@ namespace refactor
 
 namespace reflect
     def this_block() -> Block
+    def caller() -> Term
     def kernel() -> Block
 
 namespace sys

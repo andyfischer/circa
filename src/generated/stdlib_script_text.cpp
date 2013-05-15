@@ -114,6 +114,7 @@ const char* STDLIB_CA_TEXT =
     "\n"
     "namespace reflect\n"
     "    def this_block() -> Block\n"
+    "    def caller() -> Term\n"
     "    def kernel() -> Block\n"
     "\n"
     "namespace sys\n"

@@ -1,0 +1,14 @@
+
+def get_caller_name() -> String
+    caller = reflect:caller()
+    return caller.name
+
+def get_caller() -> Term
+    return reflect:caller()
+
+
+abc = get_caller_name()
+assert(abc == 'abc')
+
+x = get_caller()
+assert(x == term_ref(x))
