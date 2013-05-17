@@ -157,6 +157,21 @@ void bug_restart_dies_after_code_delete()
     stack_restart(&stack);
 }
 
+void test_inject_context()
+{
+    Block block;
+    block.compile("test_spy(context(:a) + 5)");
+
+    test_spy_clear();
+    Stack stack;
+    push_frame(&stack, &block);
+
+    set_int(circa_inject_context(&stack, "a"), 5);
+    run_interpreter(&stack);
+
+    test_equals(test_spy_get_results(), "[10]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
@@ -165,6 +180,7 @@ void register_tests()
     REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);
+    REGISTER_TEST_CASE(interpreter_test::test_inject_context);
 }
 
 } // namespace interpreter_test

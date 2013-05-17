@@ -22,6 +22,7 @@
 #include "reflection.h"
 #include "stateful_code.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"
@@ -2227,7 +2228,7 @@ void Stack__inject_context(caStack* stack)
     if (top_frame(self) == NULL)
         return raise_error_msg(stack, "Can't inject onto stack with no frames");
 
-    context_inject(self, name, val);
+    copy(val, context_inject(self, name));
 }
 
 void Stack__call(caStack* stack)
@@ -2659,6 +2660,14 @@ CIRCA_EXPORT caTerm* circa_caller_term(caStack* stack)
 CIRCA_EXPORT void circa_print_error_to_stdout(caStack* stack)
 {
     print_error_stack(stack, std::cout);
+}
+
+CIRCA_EXPORT caValue* circa_inject_context(caStack* stack, const char* name)
+{
+    Value nameVal;
+    set_symbol_from_string(&nameVal, name);
+
+    return context_inject(stack, &nameVal);
 }
 
 } // namespace circa

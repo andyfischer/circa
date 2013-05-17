@@ -202,6 +202,8 @@ void circa_restart(caStack* stack);
 
 caValue* circa_get_state_field(caStack* stack, const char* name);
 
+caValue* circa_inject_context(caStack* stack, const char* name);
+
 // Print a human-readable description of the stack's error to stdout.
 void circa_print_error_to_stdout(caStack* stack);
 

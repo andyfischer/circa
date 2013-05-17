@@ -1,5 +1,13 @@
 
 Recent
+  divide operator on Point didn't work?
+
+  A superfluous @ symbol caused problems:
+
+      type A { int i }
+      a = make(A)
+      @a.i += 4
+
   Changing a state var in a minor exiting block does not work:
 
       state s = 1
