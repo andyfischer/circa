@@ -1713,12 +1713,11 @@ void run(Stack* stack)
             if (object == NULL) {
                 Value msg;
                 set_string(&msg, "Input 0 is null");
-                circa_output_error(stack, as_cstring(&msg));
-                return;
+                set_error_string(frame_register(frame, caller), as_cstring(&msg));
+                raise_error(stack);
             }
 
-            Term* currentTerm = block->get(frame->pc);
-            std::string functionName = currentTerm->stringProp("syntax:functionName", "");
+            std::string functionName = caller->stringProp("syntax:functionName", "");
 
             // Find and dispatch method
             Term* method = find_method((Block*) block,
@@ -1731,7 +1730,8 @@ void run(Stack* stack)
                 string_append(&msg, functionName.c_str());
                 string_append(&msg, " not found on type ");
                 string_append(&msg, &circa_type_of(object)->name);
-                circa_output_error(stack, as_cstring(&msg));
+                set_error_string(frame_register(frame, caller), as_cstring(&msg));
+                raise_error(stack);
                 return;
             }
 
