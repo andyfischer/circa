@@ -464,6 +464,15 @@ void Term__value(caStack* stack)
     copy(term_value(target), circa_output(stack, 0));
 }
 
+void Term__set_value(caStack* stack)
+{
+    Term* target = as_term_ref(circa_input(stack, 0));
+    if (target == NULL)
+        return circa_output_error(stack, "NULL reference");
+
+    copy(circa_input(stack, 1), term_value(target));
+}
+
 int tweak_round(double a) {
     return int(a + 0.5);
 }
@@ -748,6 +757,7 @@ void reflection_install_functions(Block* kernel)
         {"Term.is_statement", Term__is_statement},
         {"Term.trace_dependents", Term__trace_dependents},
         {"Term.value", Term__value},
+        {"Term.set_value", Term__set_value},
 
         {"is_overloaded_func", is_overloaded_func},
         {"overload_get_contents", overload__get_contents},

@@ -493,6 +493,8 @@ def Term.get_type(self) -> Type
 def Term.is_statement(self) -> bool
 def Term.value(self) -> any
     -- For a value term, this fetches the actual value.
+def Term.set_value(self, any val)
+    -- For a value term, permanently change the value.
 def Term.tweak(self, number steps)
 def Term.input(self, int index) -> Term
     -- Fetch an input term by index.
@@ -585,6 +587,14 @@ def Rect.width(self) -> number
     self.x2 - self.x1
 def Rect.height(self) -> number
     self.y2 - self.y1
+def Rect.left(self) -> number
+    self.x1
+def Rect.top(self) -> number
+    self.y1
+def Rect.right(self) -> number
+    self.x2
+def Rect.bottom(self) -> number
+    self.y2
 def Rect.topleft(self) -> Point
     -- Returns the top-left coordinates as a Point.
     [self.x1 self.y1]

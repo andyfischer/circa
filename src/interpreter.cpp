@@ -2125,7 +2125,7 @@ void Frame__has_parent(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     Frame* parent = frame_parent(frame);
-    set_bool(circa_output(stack, 0), parent == NULL);
+    set_bool(circa_output(stack, 0), parent != NULL);
 }
 
 
