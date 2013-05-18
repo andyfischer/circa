@@ -385,6 +385,11 @@ def List.first(self) -> any
 def List.last(self) -> any
     -- Returns the last element
     self.get(self.length - 1)
+def List.to_set(self) -> Set
+    set = make(Set)
+    for item in self
+        @set.add(item)
+    set
 
 -- def List.pop(self) -> (List, any)
 -- TODO: List.pop, needs proper support for multiple outputs
