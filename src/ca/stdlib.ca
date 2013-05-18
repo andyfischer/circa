@@ -184,7 +184,6 @@ def Block.version(self) -> int
 def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 
-
 def Block.to_closure(self) -> Closure
     Closure([self, []])
 -- Language defect: Functions and closures should be stored with same data type.
@@ -519,6 +518,7 @@ def Term.is_input_placeholder(self) -> bool
     self.function == block_ref(input_placeholder)
 def Term.is_comment(self) -> bool
     self.function == block_ref(comment)
+def Term.trace_dependents(self, Block untilBlock) -> List
 
 -- workaround, these functions currently need to be declared after Term:
 def Block.name(self) -> String

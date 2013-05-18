@@ -3,6 +3,8 @@
 #include "common_headers.h"
 #include "circa/circa.h"
 
+#include <set>
+
 #include "actors.h"
 #include "block.h"
 #include "building.h"
@@ -632,6 +634,46 @@ void Term__property(caStack* stack)
         circa::copy(value, circa_output(stack, 0));
 }
 
+void Term__trace_dependents(caStack* stack)
+{
+    Term* term = as_term_ref(circa_input(stack, 0));
+    Block* untilBlock = as_block(circa_input(stack, 1));
+
+    caValue* out = circa_output(stack, 0);
+    set_list(out, 0);
+    std::set<Term*> included;
+
+    UpwardIterator upwardIterator(term);
+    upwardIterator.stopAt(untilBlock);
+
+    // Look at starting term, because UpwardIterator doesn't yield starting term.
+    // TODO: Should fix UpwardIterator
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+        if (input != NULL) {
+            set_term_ref(list_append(out), input);
+            included.insert(input);
+        }
+    }
+
+    for (; upwardIterator.unfinished(); upwardIterator.advance()) {
+        Term* current = upwardIterator.current();
+        if (current == term || included.find(current) != included.end()) {
+
+            for (int i=0; i < current->numInputs(); i++) {
+                Term* input = current->input(i);
+                if (input != NULL) {
+                    set_term_ref(list_append(out), input);
+                    included.insert(input);
+                }
+            }
+        }
+    }
+
+    // Order results in the same order as the code.
+    list_reverse(out);
+}
+
 void is_overloaded_func(caStack* stack)
 {
     Block* self = (Block*) circa_block(circa_input(stack, 0));
@@ -704,6 +746,7 @@ void reflection_install_functions(Block* kernel)
         {"Term.properties", Term__properties},
         {"Term.property", Term__property},
         {"Term.is_statement", Term__is_statement},
+        {"Term.trace_dependents", Term__trace_dependents},
         {"Term.value", Term__value},
 
         {"is_overloaded_func", is_overloaded_func},

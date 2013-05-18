@@ -1,0 +1,14 @@
+
+
+code = {
+    a = 1
+    b = 2
+    c = a + 1
+    d = 4
+    e = c
+}
+
+e_term = code.block.find_term('e')
+dependents = e_term.trace_dependents(code.block)
+code.block.dump
+print(dependents)
