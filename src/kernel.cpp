@@ -753,6 +753,10 @@ void test_oracle(caStack* stack)
 
 void test_spy(caStack* stack)
 {
+    if (g_spyValues == NULL) {
+        g_spyValues = circa_alloc_value();
+        set_list(g_spyValues);
+    }
     copy(circa_input(stack, 0), list_append(g_spyValues));
 }
 
