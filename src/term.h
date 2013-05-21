@@ -9,7 +9,6 @@
 #include "term_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
-#include "weak_ptrs.h"
 
 namespace circa {
 
@@ -18,9 +17,6 @@ struct Term
     Value value;
 
     int id; // Globally unique ID. This is mainly used for debugging.
-
-    // A WeakPtr to this object, this is lazily initialized.
-    WeakPtr weakPtr;
 
     // A Type that statically describes our type.
     Type* type;

@@ -118,7 +118,6 @@ OBJECTS := \
 	$(OBJDIR)/type.o \
 	$(OBJDIR)/type_inference.o \
 	$(OBJDIR)/update_cascades.o \
-	$(OBJDIR)/weak_ptrs.o \
 	$(OBJDIR)/world.o \
 	$(OBJDIR)/all_builtin_functions.o \
 	$(OBJDIR)/all_builtin_types.o \
@@ -344,9 +343,6 @@ $(OBJDIR)/type_inference.o: type_inference.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/update_cascades.o: update_cascades.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/weak_ptrs.o: weak_ptrs.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/world.o: world.cpp

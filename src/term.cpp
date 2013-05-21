@@ -19,8 +19,7 @@
 namespace circa {
 
 Term::Term()
-  : weakPtr(0),
-    type(NULL),
+  : type(NULL),
     function(NULL),
     uniqueOrdinal(0),
     owningBlock(NULL),
@@ -38,7 +37,6 @@ Term::Term()
 Term::~Term()
 {
     debug_unregister_valid_object(this, TERM_OBJECT);
-    weak_ptr_set_null(weakPtr);
 }
 
 const char*
