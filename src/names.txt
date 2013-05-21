@@ -15,9 +15,9 @@ Maybe
 # Block properties
 EvaluationEmpty
 HasEffects
-Origin
 HasControlFlow
 DirtyStateType
+Filename
 
 # Path expression elements
 Wildcard

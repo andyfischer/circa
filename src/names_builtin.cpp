@@ -25,6 +25,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Yes: return "Yes";
     case sym_No: return "No";
     case sym_Maybe: return "Maybe";
+    case sym_Filename: return "Filename";
     case sym_EvaluationEmpty: return "EvaluationEmpty";
     case sym_HasEffects: return "HasEffects";
     case sym_Origin: return "Origin";
@@ -442,6 +443,10 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     case 0:
             return sym_File;
+    case 'n':
+        if (strcmp(str + 5, "ame") == 0)
+            return sym_Filename;
+        break;
     case 'N':
         if (strcmp(str + 5, "otFound") == 0)
             return sym_FileNotFound;

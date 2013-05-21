@@ -406,12 +406,27 @@ void block_graft_replacement(Block* target, Block* replacement)
 
 caValue* block_get_source_filename(Block* block)
 {
-    caValue* fileOrigin = block_get_file_origin(block);
+    return block_get_property(block, sym_Filename);
+}
 
-    if (fileOrigin == NULL)
-        return NULL;
+std::string get_source_file_location(Block* block)
+{
+    // Search upwards until we find a block that has source-file defined.
+    while (block != NULL && block_get_source_filename(block) == NULL)
+        block = get_parent_block(block);
 
-    return list_get(fileOrigin, 1);
+    if (block == NULL)
+        return "";
+
+    caValue* sourceFilename = block_get_source_filename(block);
+
+    if (sourceFilename == NULL)
+        return "";
+
+    Value directory;
+    get_directory_for_filename(sourceFilename, &directory);
+
+    return as_string(&directory);
 }
 
 Block* get_outer_scope(Block* block)
@@ -601,12 +616,8 @@ void duplicate_block(Block* source, Block* dest)
 
 Symbol load_script(Block* block, const char* filename)
 {
-    // Store the file origin
-    caValue* origin = block_insert_property(block, sym_Origin);
-    set_list(origin, 3);
-    set_symbol(list_get(origin, 0), sym_File);
-    set_string(list_get(origin, 1), filename);
-    set_int(list_get(origin, 2), circa_file_get_version(filename));
+    // Store the filename
+    set_string(block_insert_property(block, sym_Filename), filename);
 
     // Read the text file
     circa::Value contents;
@@ -641,26 +652,6 @@ Block* load_script_term(Block* block, const char* filename)
     Term* filenameTerm = create_string(block, filename);
     Term* includeFunc = apply(block, FUNCS.load_script, TermList(filenameTerm));
     return nested_contents(includeFunc);
-}
-
-std::string get_source_file_location(Block* block)
-{
-    // Search upwards until we find a block that has source-file defined.
-    while (block != NULL && block_get_source_filename(block) == NULL)
-        block = get_parent_block(block);
-
-    if (block == NULL)
-        return "";
-
-    caValue* sourceFilename = block_get_source_filename(block);
-
-    if (sourceFilename == NULL)
-        return "";
-
-    Value directory;
-    get_directory_for_filename(sourceFilename, &directory);
-
-    return as_string(&directory);
 }
 
 caValue* block_get_property(Block* block, Symbol key)
@@ -739,76 +730,6 @@ void block_set_has_effects(Block* block, bool hasEffects)
 int block_locals_count(Block* block)
 {
     return block->length();
-}
-
-caValue* block_get_file_origin(Block* block)
-{
-    caValue* origin = block_get_property(block, sym_Origin);
-    if (origin == NULL)
-        return NULL;
-
-    if (list_length(origin) != 3)
-        return NULL;
-
-    if (as_symbol(list_get(origin, 0)) != sym_File)
-        return NULL;
-
-    return origin;
-}
-
-bool check_and_update_file_origin(Block* block, const char* filename)
-{
-    int version = circa_file_get_version(filename);
-
-    caValue* origin = block_get_file_origin(block);
-
-    if (origin == NULL) {
-        origin = block_insert_property(block, sym_Origin);
-        set_list(origin, 3);
-        set_symbol(list_get(origin, 0), sym_File);
-        set_string(list_get(origin, 1), filename);
-        set_int(list_get(origin, 2), version);
-        return true;
-    }
-
-    if (!equals_string(list_get(origin, 1), filename)) {
-        touch(origin);
-        set_string(list_get(origin, 1), filename);
-        set_int(list_get(origin, 2), version);
-        return true;
-    }
-
-    if (!equals_int(list_get(origin, 2), version)) {
-        touch(origin);
-        set_int(list_get(origin, 2), version);
-        return true;
-    }
-
-    return false;
-}
-
-Block* load_latest_block(Block* block)
-{
-    caValue* fileOrigin = block_get_file_origin(block);
-    if (fileOrigin == NULL)
-        return block;
-
-    std::string filename = as_string(list_get(fileOrigin, 1));
-
-    bool fileChanged = check_and_update_file_origin(block, filename.c_str());
-
-    if (!fileChanged)
-        return block;
-
-    Block* newBlock = alloc_block_gc();
-    load_script(newBlock, filename.c_str());
-
-    update_static_error_list(newBlock);
-
-    // New block starts off with the old block's version, plus 1.
-    newBlock->version = block->version + 1;
-
-    return newBlock;
 }
 
 void append_internal_error(caValue* result, int index, std::string const& message)

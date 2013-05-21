@@ -147,6 +147,7 @@ void remove_nested_contents(Term* term);
 void block_graft_replacement(Block* target, Block* replacement);
 
 caValue* block_get_source_filename(Block* block);
+
 Block* get_outer_scope(Block* block);
 
 // Delete this term and remove it from its owning block.
@@ -191,19 +192,6 @@ void block_set_evaluation_empty(Block* block, bool empty);
 bool block_has_effects(Block* block);
 void block_set_has_effects(Block* block, bool hasEffects);
 int block_locals_count(Block* block);
-
-// Returns a List pointer if the block has a file origin, NULL if not.
-caValue* block_get_file_origin(Block* block);
-
-// Checks Block.origin, and checks the modified time of 'filename'. If the origin
-// does not match the file's modified time, then we return true and update the
-// block's origin. So, if this function true then the block should be reloaded.
-bool check_and_update_file_origin(Block* block, const char* filename);
-
-// Using the block origin, this checks the filesystem to see if there is a new
-// version of this block available. If so, the new version is loaded and returned.
-// If not, the exisiting Block is returned.
-Block* load_latest_block(Block* block);
 
 void block_check_invariants(caValue* result, Block* block);
 bool block_check_invariants_print_result(Block* block, std::ostream& out);

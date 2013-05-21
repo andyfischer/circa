@@ -328,23 +328,6 @@ void Block__functions(caStack* stack)
     }
 }
 
-void Block__file_signature(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    if (block == NULL)
-        return circa_output_error(stack, "NULL block");
-
-    caValue* fileOrigin = block_get_file_origin(block);
-    if (fileOrigin == NULL)
-        set_null(circa_output(stack, 0));
-    else
-    {
-        caValue* output = set_list(circa_output(stack, 0), 2);
-        copy(list_get(fileOrigin, 1), list_get(output, 0));
-        copy(list_get(fileOrigin, 2), list_get(output, 1));
-    }
-}
-
 void Block__find_term(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -705,7 +688,6 @@ void reflection_install_functions(Block* kernel)
         {"block_ref", block_ref},
         {"Block.dump", Block__dump},
         {"Block.find_term", Block__find_term},
-        {"Block.file_signature", Block__file_signature},
         {"Block.functions", Block__functions},
         {"Block.statements", Block__statements},
         {"Block.to_code_lines", Block__to_code_lines},

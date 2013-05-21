@@ -135,8 +135,6 @@ const char* STDLIB_CA_TEXT =
     "    -- Obtain a Block ref from an expression.\n"
     "def Block.dump(self)\n"
     "    -- Dump this block's raw contents to stdout.\n"
-    "def Block.file_signature(self) -> any\n"
-    "    -- Return a 'file signature', which contains the filename and last-modified time.\n"
     "def Block.find_term(self, String name) -> Term\n"
     "    -- Find a term inside this Block with the given name.\n"
     "def Block.to_code_lines(self) -> List\n"

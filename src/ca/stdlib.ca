@@ -128,8 +128,6 @@ def block_ref(any block :ignore_error) -> Block
     -- Obtain a Block ref from an expression.
 def Block.dump(self)
     -- Dump this block's raw contents to stdout.
-def Block.file_signature(self) -> any
-    -- Return a 'file signature', which contains the filename and last-modified time.
 def Block.find_term(self, String name) -> Term
     -- Find a term inside this Block with the given name.
 def Block.to_code_lines(self) -> List

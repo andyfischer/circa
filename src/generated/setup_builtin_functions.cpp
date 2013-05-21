@@ -31,7 +31,6 @@ namespace get_field_function { void setup(Block* kernel); }
 namespace get_index_function { void setup(Block* kernel); }
 namespace if_block_function { void setup(Block* kernel); }
 namespace implicit_state_function { void setup(Block* kernel); }
-namespace include_function { void setup(Block* kernel); }
 namespace increment_function { void setup(Block* kernel); }
 namespace input_explicit_function { void setup(Block* kernel); }
 namespace internal_debug_function { void setup(Block* kernel); }
@@ -87,7 +86,6 @@ void setup_builtin_functions(Block* kernel)
     get_index_function::setup(kernel);
     if_block_function::setup(kernel);
     implicit_state_function::setup(kernel);
-    include_function::setup(kernel);
     increment_function::setup(kernel);
     input_explicit_function::setup(kernel);
     internal_debug_function::setup(kernel);
