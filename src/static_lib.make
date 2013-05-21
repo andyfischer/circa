@@ -77,7 +77,6 @@ OBJECTS := \
 	$(OBJDIR)/dict.o \
 	$(OBJDIR)/dll_loading.o \
 	$(OBJDIR)/fakefs.o \
-	$(OBJDIR)/feedback.o \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/function.o \
@@ -222,9 +221,6 @@ $(OBJDIR)/dll_loading.o: dll_loading.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/fakefs.o: fakefs.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/feedback.o: feedback.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file.o: file.cpp

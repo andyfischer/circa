@@ -26,7 +26,6 @@ namespace div_function { void setup(Block* kernel); }
 namespace equals_function { void setup(Block* kernel); }
 namespace error_function { void setup(Block* kernel); }
 namespace extra_output_function { void setup(Block* kernel); }
-namespace feedback_function { void setup(Block* kernel); }
 namespace for_function { void setup(Block* kernel); }
 namespace get_field_function { void setup(Block* kernel); }
 namespace get_index_function { void setup(Block* kernel); }
@@ -83,7 +82,6 @@ void setup_builtin_functions(Block* kernel)
     equals_function::setup(kernel);
     error_function::setup(kernel);
     extra_output_function::setup(kernel);
-    feedback_function::setup(kernel);
     for_function::setup(kernel);
     get_field_function::setup(kernel);
     get_index_function::setup(kernel);
