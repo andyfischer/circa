@@ -46,9 +46,6 @@ void run_input_instructions3(Stack* stack, caValue* bytecode);
 void write_output_instructions(caValue* bytecode, Term* caller, Block* block);
 void run_output_instructions(Stack* stack, caValue* bytecode);
 
-const int BytecodeIndex_Inputs = 1;
-const int BytecodeIndex_Output = 2;
-
 Stack::Stack()
  : errorOccurred(false),
    world(NULL)
@@ -303,25 +300,6 @@ Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* _inputs)
         caValue* slot = get_top_register(stack, placeholder);
 
         copy(input, slot);
-
-#if 0
-        TODO: Remove push_frame_with_inputs, and change Stack.push_frame to not require an input list.
-        
-        bool castSuccess = cast(slot, placeholder->type);
-
-        if (!castSuccess) {
-            std::stringstream msg;
-            circa::Value error;
-            set_string(&error, "Couldn't cast input value ");
-            string_append_quoted(&error, input);
-            string_append(&error, " (at index ");
-            string_append(&error, placeholderIndex);
-            string_append(&error, ") to type ");
-            string_append(&error, &placeholder->type->name);
-            raise_error_msg(stack, as_cstring(&error));
-            return frame;
-        }
-#endif
     }
 
     return frame;
@@ -961,54 +939,8 @@ void write_term_input_instructions(Term* term, Block* block, caValue* result)
         set_symbol(result, op_ErrorTooManyInputs);
         return;
     }
-    
-    // Now prepare the list of inputs
-    list_resize(result, expectedCount);
-    int inputIndex = 0;
-    for (int placeholderIndex=0;; placeholderIndex++, inputIndex++) {
-        Term* placeholder = get_input_placeholder(block, placeholderIndex);
-        if (placeholder == NULL)
-            break;
 
-        if (placeholder->boolProp("multiple", false)) {
-            // Multiple inputs. Take all remaining inputs and put them into a list.
-            // This list starts with a tag and looks like:
-            //   [:multiple arg0 arg1 ...]
-            
-            caValue* inputsResult = list_get(result, placeholderIndex);
-
-            int packCount = inputCount - inputIndex;
-            set_list(inputsResult, packCount + 1);
-
-            set_symbol(list_get(inputsResult, 0), sym_Multiple);
-
-            for (int i=0; i < packCount; i++)
-                set_term_ref(list_get(inputsResult, i + 1), term->input(i + inputIndex));
-            
-            break;
-        }
-
-        Term* input = term->input(inputIndex);
-        caValue* action = list_get(result, placeholderIndex);
-
-        // Check for no input provided. (this check must be after the check for :multiple).
-        if (input == NULL) {
-            set_null(action);
-        }
-
-        // Check if a cast is necessary
-        else if (input->type != placeholder->type && placeholder->type != TYPES.any) {
-            set_list(action, 3);
-            set_symbol(list_get(action, 0), sym_Cast);
-            set_term_ref(list_get(action, 1), input);
-            set_type(list_get(action, 2), placeholder->type);
-        }
-
-        // Otherwise, plain copy.
-        else {
-            set_term_ref(action, input);
-        }
-    }
+    // There was stuff here, but it was deleted.
 }
 
 static void bytecode_write_noop(caValue* op)

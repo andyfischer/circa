@@ -1378,16 +1378,20 @@ ParseResult return_statement(Block* block, TokenStream& tokens, ParserCxt* conte
 
     TermList outputs;
 
-consume_next_output:
-    if (!is_statement_ending(tokens.nextMatch()) &&
-            tokens.nextMatch() != tok_RBrace) {
+    bool expectAnotherOutput = true;
+    while (expectAnotherOutput) {
 
-        outputs.append(expression(block, tokens, context).term);
+        expectAnotherOutput = false;
+        if (!is_statement_ending(tokens.nextMatch()) &&
+                tokens.nextMatch() != tok_RBrace) {
 
-        if (tokens.nextIs(tok_Comma)) {
-            tokens.consume(tok_Comma);
-            possible_whitespace(tokens);
-            goto consume_next_output;
+            outputs.append(expression(block, tokens, context).term);
+
+            if (tokens.nextIs(tok_Comma)) {
+                tokens.consume(tok_Comma);
+                possible_whitespace(tokens);
+                expectAnotherOutput = true;
+            }
         }
     }
 
@@ -2094,25 +2098,30 @@ static bool lookahead_match_leading_name_binding(TokenStream& tokens)
 {
     int lookahead = 0;
 
-expect_identifier:
+    bool expectIdentifier = true;
 
-    // optional whitespace
-    if (tokens.nextIs(tok_Whitespace, lookahead))
-        lookahead++;
-    
-    // required identifier
-    if (!tokens.nextIs(tok_Identifier, lookahead))
-        return false;
-    lookahead++;
+    while (expectIdentifier) {
 
-    // optional whitespace
-    if (tokens.nextIs(tok_Whitespace, lookahead))
+        // optional whitespace
+        if (tokens.nextIs(tok_Whitespace, lookahead))
+            lookahead++;
+        
+        // required identifier
+        if (!tokens.nextIs(tok_Identifier, lookahead))
+            return false;
         lookahead++;
 
-    // possible comma
-    if (tokens.nextIs(tok_Comma, lookahead)) {
-        lookahead++;
-        goto expect_identifier;
+        // optional whitespace
+        if (tokens.nextIs(tok_Whitespace, lookahead))
+            lookahead++;
+
+        // possible comma
+        if (tokens.nextIs(tok_Comma, lookahead)) {
+            lookahead++;
+            expectIdentifier = true;
+        } else {
+            expectIdentifier = false;
+        }
     }
 
     // equals sign (required if no comma)

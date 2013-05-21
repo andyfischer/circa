@@ -44,22 +44,6 @@ void term_ref(caStack* stack)
     set_term_ref(circa_output(stack, 0), (Term*) term);
 }
 
-void get_dependent_terms(caValue* dependers, Block* topBlock, caValue* result)
-{
-    set_list(result, 0);
-
-    TermMap usedTerms;
-
-#if 0
-    for (int i=0; i < list_length(dependers); i++) {
-        usedTerms[as_term_ref(list_get(dependers, i))] = true;
-    }
-
-    for (int i=0; i < list_length(dependers); i++) {
-    }
-#endif
-}
-
 void Block__dump(caStack* stack)
 {
     dump(as_block(circa_input(stack, 0)));

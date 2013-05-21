@@ -92,13 +92,6 @@ void block_to_code_lines(Block* block, caValue* out)
         if (!should_print_term_source_line(term))
             continue;
 
-#if 0
-        if (newlineNeeded) {
-            append_phrase(source, "\n", NULL, tok_Newline);
-            newlineNeeded = false;
-        }
-#endif
-
         circa::Value phrases;
         set_list(&phrases, 0);
 
