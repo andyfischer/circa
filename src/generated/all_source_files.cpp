@@ -52,7 +52,6 @@
 #include "../type.cpp"
 #include "../type_inference.cpp"
 #include "../update_cascades.cpp"
-#include "../weak_ptrs.cpp"
 #include "../world.cpp"
 #include "../command_line/command_line.cpp"
 #include "../command_line/command_line_main.cpp"

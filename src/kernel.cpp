@@ -42,7 +42,6 @@
 #include "types/bool.h"
 #include "types/color.h"
 #include "types/common.h"
-#include "types/eval_context.h"
 #include "types/int.h"
 #include "types/number.h"
 #include "types/set.h"
@@ -787,7 +786,6 @@ void bootstrap_kernel()
     TYPES.block = create_type();
     TYPES.bool_type = create_type();
     TYPES.error = create_type();
-    TYPES.eval_context = create_type();
     TYPES.float_type = create_type();
     TYPES.function = create_type();
     TYPES.int_type = create_type();
@@ -803,7 +801,6 @@ void bootstrap_kernel()
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
     dict_t::setup_type(TYPES.dict);
-    eval_context_t::setup_type(TYPES.eval_context);
     function_t::setup_type(TYPES.function);
     hashtable_setup_type(TYPES.map);
     int_t::setup_type(TYPES.int_type);

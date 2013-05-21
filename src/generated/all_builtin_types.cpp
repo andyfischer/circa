@@ -2,7 +2,6 @@
 #include "../types/bool.cpp"
 #include "../types/color.cpp"
 #include "../types/common.cpp"
-#include "../types/eval_context.cpp"
 #include "../types/int.cpp"
 #include "../types/null.cpp"
 #include "../types/number.cpp"

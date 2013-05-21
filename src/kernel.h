@@ -97,7 +97,6 @@ struct BuiltinTypes {
     Type* color;
     Type* dict;
     Type* error;
-    Type* eval_context;
     Type* file_signature;
     Type* frame;
     Type* float_type;

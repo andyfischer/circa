@@ -53,8 +53,6 @@ Stack::Stack()
  : errorOccurred(false),
    world(NULL)
 {
-    gc_register_new_object((CircaObject*) this, TYPES.eval_context, true);
-
     id = global_world()->nextStackID++;
 
     step = sym_StackReady;
@@ -86,8 +84,6 @@ Stack::~Stack()
         if (prevRootStack != NULL)
             prevRootStack->nextRootStack = nextRootStack;
     }
-
-    gc_on_object_deleted((CircaObject*) this);
 }
 
 void
