@@ -1,6 +1,0 @@
-
-
-sys:dll_patch()
-
-namespace imagemanip
-    def warp(sdl_img:Image image)

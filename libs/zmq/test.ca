@@ -1,8 +1,0 @@
-
-import zmq
-
-state resp = zmq:create_responder(2222)
-i = resp.read()
-if i != null
-    print("Received " i)
-    resp.reply("There")

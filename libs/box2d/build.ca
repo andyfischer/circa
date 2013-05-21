@@ -1,3 +1,0 @@
-
-name = 'box2d'
-linkflags = '-lbox2d'

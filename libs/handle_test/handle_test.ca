@@ -1,7 +1,0 @@
-
-sys:dll_patch()
-
-type Thing;
-
-def create_thing() -> Thing
-  print("create_thing is unpatched!")

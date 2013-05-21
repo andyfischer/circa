@@ -1,6 +1,0 @@
-
-import zmq
-
-state server = zmq:create_publisher(2222)
-
-server.send('hi')

@@ -1,8 +1,0 @@
-
-import zmq
-
-state listener = zmq:create_subscriber("tcp://127.0.0.1:2222")
-
-msg = listener.poll()
-if msg != null
-    print('received: ' msg)

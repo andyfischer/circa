@@ -1,8 +1,0 @@
-
-import handle_test
-
-def f()
-  things = for i in [1 2 3]
-    create_thing()
-
-f()

@@ -1,5 +1,0 @@
-
-sys:dll_patch()
-
-namespace triangulate
-    def process(List points) -> List

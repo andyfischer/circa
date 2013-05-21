@@ -1,5 +1,0 @@
-
-import('samplelib')
-
-samplelib:sample_a() -> print
-samplelib:ns:sample_b() -> print
