@@ -72,8 +72,10 @@ void closure_block_evaluate(caStack* stack)
             break;
 
         caValue* input = stack_find_active_value(top_frame_parent(stack), unbound->input(0));
-        ca_assert(input != NULL);
-        copy(input, list_append(bindings));
+        if (input == NULL)
+            set_null(list_append(bindings));
+        else
+            copy(input, list_append(bindings));
     }
 }
 

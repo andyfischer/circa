@@ -623,6 +623,9 @@ def Rect.translate(self, Point p) -> Rect
 def Rect.contains(self, Point p) -> bool
     p.x >= self.x1 and p.y >= self.y1 and p.x < self.x2 and p.y < self.y2
 
+def Rect.grow(self, Point size) -> Rect
+    [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
+
 def sum(List numbers) -> number
     result = 0
     for i in numbers
