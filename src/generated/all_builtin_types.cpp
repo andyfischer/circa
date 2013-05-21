@@ -1,6 +1,5 @@
 #include "../types/any.cpp"
 #include "../types/bool.cpp"
-#include "../types/callable.cpp"
 #include "../types/color.cpp"
 #include "../types/common.cpp"
 #include "../types/eval_context.cpp"

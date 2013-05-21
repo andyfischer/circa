@@ -101,10 +101,6 @@ namespace file
         ver = version(filename)
         return changed([filename ver])
 
-namespace refactor
-    def rename(Term r, String s)
-    def change_function(Term r, Callable func)
-
 namespace reflect
     def this_block() -> Block
     def caller() -> Term

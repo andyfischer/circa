@@ -40,7 +40,6 @@
 
 #include "types/any.h"
 #include "types/bool.h"
-#include "types/callable.h"
 #include "types/color.h"
 #include "types/common.h"
 #include "types/eval_context.h"
@@ -1042,8 +1041,6 @@ void bootstrap_kernel()
         {"to_string_repr", to_string_repr},
         {"test_spy", test_spy},
         {"test_oracle", test_oracle},
-        {"refactor:rename", refactor__rename},
-        {"refactor:change_function", refactor__change_function},
         {"reflect:this_block", reflect__this_block},
         {"reflect:kernel", reflect__kernel},
         {"sys:module_search_paths", sys__module_search_paths},
@@ -1127,7 +1124,6 @@ void bootstrap_kernel()
     TYPES.closure = as_type(kernel->get("Closure"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
     TYPES.stack = as_type(kernel->get("Stack"));
-    callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
 
