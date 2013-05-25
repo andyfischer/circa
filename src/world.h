@@ -27,6 +27,8 @@ struct World {
     // Whether the world is currently bootstrapping. Either :Bootstrapping or :Done.
     Symbol bootstrapStatus;
 
+    caLogFunc logFunc;
+
 protected:
     // Disallow C++ construction
     World();
@@ -38,6 +40,5 @@ void world_initialize(World* world);
 World* create_world();
 
 void refresh_all_modules(caWorld* world);
-
 
 } // namespace circa

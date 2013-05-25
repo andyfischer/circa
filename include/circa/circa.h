@@ -128,6 +128,8 @@ typedef void (*caEvaluateFunc)(caStack* stack);
 // be destroyed. This is used for 'handle' values.
 typedef void (*caReleaseFunc)(caValue* value);
 
+typedef void (*caLogFunc)(const char* msg);
+
 // -- Setting up the Circa environment --
 
 // Create a caWorld. This should be done once at the start of the program.
@@ -136,6 +138,8 @@ caWorld* circa_initialize();
 // Uninitialize a caWorld. This call is entirely optional, but using it will make memory-
 // leak checking tools happier.
 void circa_shutdown(caWorld*);
+
+void circa_set_log_handler(caWorld*, caLogFunc func);
 
 // Add a module search path. This is used when processing 'import' statements.
 void circa_add_module_search_path(caWorld* world, const char* path);

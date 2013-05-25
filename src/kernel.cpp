@@ -1195,4 +1195,9 @@ CIRCA_EXPORT caBlock* circa_kernel(caWorld* world)
     return world->root;
 }
 
+CIRCA_EXPORT void circa_set_log_handler(caWorld* world, caLogFunc func)
+{
+    world->logFunc = func;
+}
+
 } // namespace circa

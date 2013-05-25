@@ -7,7 +7,9 @@
 #include "block.h"
 #include "interpreter.h"
 #include "inspection.h"
+#include "kernel.h"
 #include "names_builtin.h"
+#include "world.h"
 
 #include "debug.h"
 
@@ -62,8 +64,12 @@ void dump(Stack* stack)
 void internal_error(const char* message)
 {
     #if CIRCA_ASSERT_ON_ERROR
-        std::cerr << "internal error: " << message << std::endl;
+    {
+        std::string msg("internal_error: ");
+        msg += message;
+        write_log(msg.c_str());
         assert(false);
+    }
     #else
         throw std::runtime_error(message);
     #endif
@@ -183,5 +189,17 @@ void log_msg(int channel, const char* name)
 }
 
 #endif
+
+void write_log(World* world, const char* msg)
+{
+    if (world->logFunc == NULL)
+        printf("%s\n", msg);
+    else
+        world->logFunc(msg);
+}
+void write_log(const char* msg)
+{
+    write_log(global_world(), msg);
+}
 
 } // namespace circa

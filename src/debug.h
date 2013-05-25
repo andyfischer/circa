@@ -71,4 +71,8 @@ void log_msg(int channel, const char* name);
 
 #endif
 
+// Logging v2
+void write_log(World* world, const char* msg);
+void write_log(const char* msg);
+
 } // namespace circa
