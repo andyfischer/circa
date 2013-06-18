@@ -32,9 +32,6 @@ void block_ref(caStack* stack)
 {
     Term* input0 = (Term*) circa_caller_input_term(stack, 0);
     Block* block = input0->nestedContents;
-    if (block != NULL) {
-        gc_mark_object_referenced(&block->header);
-    }
     set_block(circa_output(stack, 0), block);
 }
 

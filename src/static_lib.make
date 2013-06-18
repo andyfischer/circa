@@ -80,7 +80,6 @@ OBJECTS := \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/function.o \
-	$(OBJDIR)/gc.o \
 	$(OBJDIR)/generic.o \
 	$(OBJDIR)/handle.o \
 	$(OBJDIR)/hashtable.o \
@@ -229,9 +228,6 @@ $(OBJDIR)/file_watch.o: file_watch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/function.o: function.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gc.o: gc.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/generic.o: generic.cpp

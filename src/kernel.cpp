@@ -14,7 +14,6 @@
 #include "code_iterators.h"
 #include "dict.h"
 #include "function.h"
-#include "gc.h"
 #include "generic.h"
 #include "hashtable.h"
 #include "importing.h"
@@ -1150,7 +1149,6 @@ void bootstrap_kernel()
 
 CIRCA_EXPORT caWorld* circa_initialize()
 {
-
     bootstrap_kernel();
 
     caWorld* world = global_world();
@@ -1196,9 +1194,7 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
 
     memset(&FUNCS, 0, sizeof(FUNCS));
 
-    gc_collect();
-
-    free(world);
+    dealloc_world(world);
 }
 
 CIRCA_EXPORT caBlock* circa_kernel(caWorld* world)

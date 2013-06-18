@@ -6,7 +6,7 @@
 #include "dict.h"
 #include "list.h"
 #include "loops.h"
-#include "gc.h"
+#include "object.h"
 #include "tagged_value.h"
 #include "term_list.h"
 

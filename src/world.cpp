@@ -38,6 +38,13 @@ World* alloc_world()
     return world;
 }
 
+void dealloc_world(World* world)
+{
+    // delete world->nativePatchWorld;
+    // delete world->fileWatchWorld;
+    free(world);
+}
+
 void world_initialize(World* world)
 {
     set_list(&world->moduleSearchPaths);

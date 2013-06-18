@@ -36,8 +36,6 @@ CircaObject* alloc_object(Type* type, size_t objectSize)
     strcpy(obj->magicalHeader, "caobj");
     obj->refcount = 1;
     obj->type = type;
-    obj->next = NULL;
-    obj->prev = NULL;
     obj->root = true;
     obj->referenced = false;
     obj->gcColor = 0;

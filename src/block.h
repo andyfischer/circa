@@ -7,8 +7,8 @@
 #include "common_headers.h"
 
 #include "names.h"
-#include "gc.h"
 #include "list.h"
+#include "object.h"
 #include "tagged_value.h"
 #include "term_list.h"
 #include "term_namespace.h"

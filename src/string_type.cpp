@@ -32,9 +32,8 @@ void decref(StringData* data)
 {
     ca_assert(data->refCount > 0);
     data->refCount--;
-    if (data->refCount == 0) {
+    if (data->refCount == 0)
         free(data);
-    }
 }
 
 // Create a new blank string with the given length. Starts off with 1 ref.
@@ -177,9 +176,9 @@ bool string_equals(caValue* left, caValue* right)
     // Strings are equal. Sneakily have both values reference the same data.
     // Prefer to preserve the one that has more references.
     if (leftData->refCount >= rightData->refCount)
-        string_copy(NULL, right, left);
-    else
         string_copy(NULL, left, right);
+    else
+        string_copy(NULL, right, left);
 
 
     return true;
@@ -384,11 +383,8 @@ void string_slice(caValue* s, int start, int end, caValue* out)
         end = string_length(s);
 
     int len = end - start;
-    string_resize(out, len);
 
-    StringData* data = (StringData*) s->value_data.ptr;
-
-    set_string(out, data->str + start, len);
+    set_string(out, as_cstring(s) + start, len);
 }
 
 int string_find_char(caValue* s, int start, char c)

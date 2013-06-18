@@ -38,6 +38,7 @@ protected:
 };
 
 World* alloc_world();
+void dealloc_world(World* world);
 void world_initialize(World* world);
 World* create_world();
 

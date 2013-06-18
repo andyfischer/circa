@@ -8,7 +8,7 @@
 
 #include "block.h"
 #include "heap_debugging.h"
-#include "gc.h"
+#include "object.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -53,8 +53,6 @@ struct Type
     typedef void (*VisitHeap)(Type* type, caValue* value,
             VisitHeapCallback callback, caValue* context);
 
-    typedef void (*GCListReferences)(CircaObject* object, GCReferenceList* list, GCColor color);
-    typedef void (*GCRelease)(CircaObject* object);
     typedef int (*ChecksumFunc)(caValue* value);
 
     // CircaObject header, must be the first field.
@@ -86,9 +84,6 @@ struct Type
     HashFunc hashFunc;
     VisitHeap visitHeap;
     ChecksumFunc checksum;
-
-    GCListReferences gcListReferences;
-    GCRelease gcRelease;
 
     // Parent type, may be null.
     Type* parent;

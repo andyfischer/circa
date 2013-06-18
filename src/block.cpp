@@ -48,35 +48,18 @@ Block::Block()
     stateType(NULL)
 {
     id = global_world()->nextBlockID++;
-    gc_register_new_object((CircaObject*) this, TYPES.block, true);
-
     on_block_created(this);
 }
 
 Block::~Block()
 {
     clear_block(this);
-    gc_on_object_deleted((CircaObject*) this);
 }
 
 Block* alloc_block_gc()
 {
     Block* block = new Block();
-    gc_mark_object_referenced(&block->header);
-    gc_set_object_is_root(&block->header, false);
     return block;
-}
-
-void block_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
-{
-    Block* block = (Block*) object;
-
-    // Follow each term
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        gc_mark(list, (CircaObject*) term->type, color);
-        gc_mark(list, (CircaObject*) term->nestedContents, color);
-    }
 }
 
 std::string block_to_string(caValue* val)
@@ -96,7 +79,6 @@ void block_setup_type(Type* type)
 {
     set_string(&type->name, "Block");
     type->toString = block_to_string;
-    type->gcListReferences = block_list_references;
 }
 
 int Block::length()

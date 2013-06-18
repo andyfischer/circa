@@ -34,12 +34,10 @@ Function::Function()
     postInputChange(NULL),
     postCompile(NULL)
 {
-    gc_register_new_object((CircaObject*) this, TYPES.function, true);
 }
 
 Function::~Function()
 {
-    gc_on_object_deleted((CircaObject*) this);
 }
 
 namespace function_t {

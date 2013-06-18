@@ -39,7 +39,6 @@ static Block* find_pushed_block_for_action(caValue* action);
 static void update_stack_for_possibly_changed_blocks(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 void run(Stack* stack);
-// static void step_interpreter(Stack* stack);
 static void bytecode_write_noop(caValue* op);
 static void bytecode_write_finish_op(caValue* op);
 void write_input_instructions3(caValue* bytecode, Term* caller, Term* function, Block* block);
@@ -113,11 +112,6 @@ Stack* create_stack(World* world)
 void free_stack(Stack* stack)
 {
     delete stack;
-}
-
-void stack_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
-{
-    // TODO for garbage collection
 }
 
 static Frame* frame_by_id(Stack* stack, int id)
@@ -994,18 +988,9 @@ void write_term_bytecode(Term* term, caValue* result)
     }
 
     if (term->function == FUNCS.output) {
-        // Output function usually results in either SetNull or InlineCopy.
+        // Output function results in either SetNull or InlineCopy.
         Term* input = term->input(0);
 
-        // Special case: don't use InlineCopy for an accumulatingOutput (this is used
-        // in for-loop).
-#if 0
-        if (term->boolProp("accumulatingOutput", false)) {
-            bytecode_write_noop(result);
-            return;
-
-        } else
-#endif
         if (input == NULL) {
             set_symbol(outputTag, op_SetNull);
             list_resize(result, 1);
@@ -1606,7 +1591,6 @@ void run_output_instructions(Stack* stack, caValue* bytecode)
         }
         default:
             internal_error("Unrecognized op in run_output_instructions");
-
         }
     }
 done_passing_inputs:
@@ -2229,31 +2213,35 @@ void Stack__call(caStack* stack)
     copy(circa_output(self, 0), circa_output(stack, 0));
 }
 
-void Stack__push_frame(caStack* callerStack)
+void Stack__push_frame(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
 
-    Block* block = as_block(circa_input(callerStack, 1));
+    Block* block = as_block(circa_input(stack, 1));
+
+    if (block == NULL)
+        return circa_output_error(stack, "Null block for input 1");
+
     ca_assert(block != NULL);
-    caValue* inputs = circa_input(callerStack, 2);
+    caValue* inputs = circa_input(stack, 2);
 
     push_frame_with_inputs(self, block, inputs);
 }
-void Stack__pop_frame(caStack* callerStack)
+void Stack__pop_frame(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     pop_frame(self);
 }
 
-void Stack__set_state_input(caStack* callerStack)
+void Stack__set_state_input(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
 
     if (top_frame(self) == NULL)
-        return circa_output_error(callerStack, "No stack frame");
+        return circa_output_error(stack, "No stack frame");
 
     // find state input
     Block* block = top_frame(self)->block;
@@ -2272,16 +2260,16 @@ void Stack__set_state_input(caStack* callerStack)
         // No-op if block doesn't expect state
         return;
 
-    copy(circa_input(callerStack, 1), stateSlot);
+    copy(circa_input(stack, 1), stateSlot);
 }
 
-void Stack__get_state_output(caStack* callerStack)
+void Stack__get_state_output(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
 
     if (top_frame(self) == NULL)
-        return circa_output_error(callerStack, "No stack frame");
+        return circa_output_error(stack, "No stack frame");
 
     // find state output
     Block* block = top_frame(self)->block;
@@ -2298,53 +2286,53 @@ void Stack__get_state_output(caStack* callerStack)
 
     if (stateSlot == NULL) {
         // Couldn't find outgoing state
-        set_null(circa_output(callerStack, 0));
+        set_null(circa_output(stack, 0));
         return;
     }
 
-    copy(stateSlot, circa_output(callerStack, 0));
+    copy(stateSlot, circa_output(stack, 0));
 }
 
 
-void Stack__reset(caStack* callerStack)
+void Stack__reset(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     stack_reset(self);
 }
-void Stack__restart(caStack* callerStack)
+void Stack__restart(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     stack_restart(self);
 }
-void Stack__run(caStack* callerStack)
+void Stack__run(caStack* stack)
 {
-    Stack* self = as_stack(circa_input(callerStack, 0));
+    Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     run_interpreter(self);
 }
-void Stack__frame(caStack* callerStack)
+void Stack__frame(caStack* stack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
-    int index = circa_int_input(callerStack, 1);
+    int index = circa_int_input(stack, 1);
     Frame* frame = frame_by_depth(self, index);
 
-    set_frame_ref(circa_output(callerStack, 0), frame);
+    set_frame_ref(circa_output(stack, 0), frame);
 }
-void Stack__output(caStack* callerStack)
+void Stack__output(caStack* stack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
-    int index = circa_int_input(callerStack, 1);
+    int index = circa_int_input(stack, 1);
 
     Frame* frame = top_frame(self);
     Term* output = get_output_placeholder(frame->block, index);
     if (output == NULL)
-        set_null(circa_output(callerStack, 0));
+        set_null(circa_output(stack, 0));
     else
-        copy(frame_register(frame, output), circa_output(callerStack, 0));
+        copy(frame_register(frame, output), circa_output(stack, 0));
 }
 void Stack__errored(caStack* stack)
 {
@@ -2396,7 +2384,6 @@ void Stack__frames(caStack* stack)
 void eval_context_setup_type(Type* type)
 {
     set_string(&type->name, "Stack");
-    type->gcListReferences = stack_list_references;
 }
 
 void reflect__caller(caStack* stack)

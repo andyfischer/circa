@@ -39,12 +39,6 @@ namespace type_t {
         dest->value_data = source->value_data;
     }
 
-    void type_gc_release(CircaObject* obj)
-    {
-        Type* type = (Type*) obj;
-        delete type;
-    }
-
     void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "type ", term, sym_Keyword);
@@ -98,7 +92,6 @@ namespace type_t {
         type->storageType = sym_StorageTypeType;
         type->initialize = type_t::initialize;
         type->copy = copy;
-        type->gcRelease = type_gc_release;
         type->formatSource = formatSource;
         type->toString = toString;
     }
@@ -113,7 +106,6 @@ Type::Type()
 
 Type::~Type()
 {
-    gc_on_object_deleted((CircaObject*) this);
 }
 
 const char*
@@ -186,15 +178,12 @@ void initialize_type(Type* t)
     initialize_null(&t->parameter);
     initialize_null(&t->name);
     set_string(&t->name, "");
-
-    gc_register_new_object((CircaObject*) t, TYPES.type, true);
 }
 
 Type* create_type()
 {
     Type* t = create_type_uninitialized();
     initialize_type(t);
-    gc_set_object_is_root((CircaObject*) t, false);
     return t;
 }
 
