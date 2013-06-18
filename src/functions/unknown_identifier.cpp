@@ -5,7 +5,7 @@
 namespace circa {
 namespace unknown_identifier_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
     }
 

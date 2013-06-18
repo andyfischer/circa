@@ -7,25 +7,25 @@ namespace implicit_state_function {
     
     // Unpack a value from a list. The index is given as a static property. This call
     // is used inside if-blocks.
-    CA_FUNCTION(unpack_state_from_list)
+    void unpack_state_from_list(caStack* stack)
     {
-        caValue* container = INPUT(0);
-        int index = CALLER->intProp("index", 0);
+        caValue* container = circa_input(stack, 0);
+        int index = circa_caller_term(stack)->intProp("index", 0);
         if (!is_list(container) || index >= list_length(container))
-            set_null(OUTPUT);
+            set_null(circa_output(stack, 0));
         else
-            copy(list_get(container, index), OUTPUT);
+            copy(list_get(container, index), circa_output(stack, 0));
     }
 
     // Pack a value to a list. The index is given as a static property. This call
     // is used inside if-blocks.
-    CA_FUNCTION(pack_state_to_list)
+    void pack_state_to_list(caStack* stack)
     {
-        copy(INPUT(0), OUTPUT);
-        caValue* container = OUTPUT;
-        caValue* value = INPUT(1);
+        caValue* container = circa_output(stack, 0);
+        copy(circa_input(stack, 0), container);
+        caValue* value = circa_input(stack, 1);
 
-        int index = CALLER->intProp("index", 0);
+        int index = circa_caller_term(stack)->intProp("index", 0);
 
         list_touch(container);
 
@@ -40,23 +40,23 @@ namespace implicit_state_function {
     }
 
     // Unpack a state value from a list. This call is used in for-loops.
-    CA_FUNCTION(unpack_state_list_n)
+    void unpack_state_list_n(caStack* stack)
     {
-        caValue* container = INPUT(0);
-        int index = INT_INPUT(1);
+        caValue* container = circa_input(stack, 0);
+        int index = circa_int_input(stack, 1);
         if (!is_list(container) || index >= list_length(container))
-            set_null(OUTPUT);
+            set_null(circa_output(stack, 0));
         else
-            copy(list_get(container, index), OUTPUT);
+            copy(list_get(container, index), circa_output(stack, 0));
     }
 
     // Pack a state value to a list. This call is used in for-loops.
-    CA_FUNCTION(pack_state_list_n)
+    void pack_state_list_n(caStack* stack)
     {
-        copy(INPUT(0), OUTPUT);
-        caValue* container = OUTPUT;
-        caValue* value = INPUT(1);
-        int index = INT_INPUT(2);
+        caValue* container = circa_output(stack, 0);
+        copy(circa_input(stack, 0), container);
+        caValue* value = circa_input(stack, 1);
+        int index = circa_int_input(stack, 2);
         list_touch(container);
 
         if (!is_list(container))

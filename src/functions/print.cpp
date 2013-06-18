@@ -5,9 +5,9 @@
 namespace circa {
 namespace print_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        caValue* args = circa_input(_stack, 0);
+        caValue* args = circa_input(stack, 0);
 
         std::stringstream out;
 
@@ -21,7 +21,7 @@ namespace print_function {
 
         write_log(out.str().c_str());
 
-        set_null(circa_output(_stack, 0));
+        set_null(circa_output(stack, 0));
     }
 
     void setup(Block* kernel)

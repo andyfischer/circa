@@ -13,7 +13,6 @@
 #include "file.h"
 #include "function.h"
 #include "hashtable.h"
-#include "importing_macros.h"
 #include "inspection.h"
 #include "list.h"
 #include "names.h"

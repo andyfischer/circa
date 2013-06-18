@@ -5,10 +5,10 @@
 namespace circa {
 namespace term_to_source_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        Term* term = INPUT_TERM(0);
-        set_string(OUTPUT, get_term_source_text(term));
+        Term* term = circa_caller_input_term(stack, 0);
+        set_string(circa_output(stack, 0), get_term_source_text(term));
     }
 
     void setup(Block* kernel)

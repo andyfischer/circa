@@ -5,10 +5,10 @@
 namespace circa {
 namespace to_string_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        caValue* in = circa_input(_stack, 0);
-        caValue* out = circa_output(_stack, 0);
+        caValue* in = circa_input(stack, 0);
+        caValue* out = circa_output(stack, 0);
         if (is_string(in))
             copy(in, out);
         else

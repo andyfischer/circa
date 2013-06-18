@@ -5,9 +5,9 @@
 namespace circa {
 namespace copy_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        CONSUME_INPUT(0, OUTPUT);
+        copy(circa_input(stack, 0), circa_output(stack, 0));
     }
 
     Type* specializeType(Term* caller)

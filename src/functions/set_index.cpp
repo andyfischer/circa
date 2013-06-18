@@ -5,14 +5,15 @@
 namespace circa {
 namespace set_index_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
         INCREMENT_STAT(SetIndex);
 
-        copy(INPUT(0), OUTPUT);
-        touch(OUTPUT);
-        int index = INT_INPUT(1);
-        copy(INPUT(2), list_get(OUTPUT,index));
+        caValue* output = circa_output(stack, 0);
+        copy(circa_input(stack, 0), output);
+        touch(output);
+        int index = circa_int_input(stack, 1);
+        copy(circa_input(stack, 2), list_get(output, index));
     }
 
     Type* specializeType(Term* caller)

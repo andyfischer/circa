@@ -8,44 +8,44 @@ namespace trig_function {
     float radians_to_degrees(float radians) { return radians * 180.0f / M_PI; }
     float degrees_to_radians(float unit) { return unit * M_PI / 180.0f; }
 
-    CA_FUNCTION(evaluate_sin)
+    void evaluate_sin(caStack* stack)
     {
-        float input = FLOAT_INPUT(0);
+        float input = circa_float_input(stack, 0);
 
-        set_float(OUTPUT, sin(degrees_to_radians(input)));
+        set_float(circa_output(stack, 0), sin(degrees_to_radians(input)));
     }
-    CA_FUNCTION(evaluate_cos)
+    void evaluate_cos(caStack* stack)
     {
-        float input = FLOAT_INPUT(0);
+        float input = circa_float_input(stack, 0);
 
-        set_float(OUTPUT, cos(degrees_to_radians(input)));
+        set_float(circa_output(stack, 0), cos(degrees_to_radians(input)));
     }
-    CA_FUNCTION(evaluate_tan)
+    void evaluate_tan(caStack* stack)
     {
-        float input = FLOAT_INPUT(0);
+        float input = circa_float_input(stack, 0);
 
-        set_float(OUTPUT, tan(degrees_to_radians(input)));
+        set_float(circa_output(stack, 0), tan(degrees_to_radians(input)));
     }
-    CA_FUNCTION(evaluate_arcsin)
+    void evaluate_arcsin(caStack* stack)
     {
-        float result = asin(FLOAT_INPUT(0));
-        set_float(OUTPUT, radians_to_degrees(result));
+        float result = asin(circa_float_input(stack, 0));
+        set_float(circa_output(stack, 0), radians_to_degrees(result));
     }
-    CA_FUNCTION(evaluate_arccos)
+    void evaluate_arccos(caStack* stack)
     {
-        float result = acos(FLOAT_INPUT(0));
-        set_float(OUTPUT, radians_to_degrees(result));
+        float result = acos(circa_float_input(stack, 0));
+        set_float(circa_output(stack, 0), radians_to_degrees(result));
     }
-    CA_FUNCTION(evaluate_arctan)
+    void evaluate_arctan(caStack* stack)
     {
-        float result = atan(FLOAT_INPUT(0));
-        set_float(OUTPUT, radians_to_degrees(result));
+        float result = atan(circa_float_input(stack, 0));
+        set_float(circa_output(stack, 0), radians_to_degrees(result));
     }
 
-    CA_FUNCTION(feedback_evaluate_sin)
+    void feedback_evaluate_sin(caStack* stack)
     {
         // Term* target = INPUT(0);
-        float desired = FLOAT_INPUT(1);
+        float desired = circa_float_input(stack, 1);
 
         // restrict input to -1..1
         if (desired > 1)
@@ -55,13 +55,13 @@ namespace trig_function {
 
         float result = std::asin(desired);
 
-        set_float(OUTPUT, radians_to_degrees(result));
+        set_float(circa_output(stack, 0), radians_to_degrees(result));
     }
 
-    CA_FUNCTION(feedback_evaluate_cos)
+    void feedback_evaluate_cos(caStack* stack)
     {
         // Term* target = INPUT(0);
-        float desired = FLOAT_INPUT(1);
+        float desired = circa_float_input(stack, 1);
 
         // restrict input to -1..1
         if (desired > 1)
@@ -71,7 +71,7 @@ namespace trig_function {
 
         float result = std::acos(desired);
 
-        set_float(OUTPUT, radians_to_degrees(result));
+        set_float(circa_output(stack, 0), radians_to_degrees(result));
     }
 
     void setup(Block* kernel)

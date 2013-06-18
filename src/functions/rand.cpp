@@ -17,10 +17,10 @@ namespace rand_function {
         }
     }
 
-    CA_FUNCTION(evaluate_f)
+    void evaluate_f(caStack* stack)
     {
         seed_if_needed();
-        set_float(OUTPUT, (float) rand() / RAND_MAX);
+        set_float(circa_output(stack, 0), (float) rand() / RAND_MAX);
     }
 
     void evaluate_f_range(caStack* stack)
@@ -38,13 +38,13 @@ namespace rand_function {
         set_float(circa_output(stack, 0), min + r * (max - min));
     }
 
-    CA_FUNCTION(evaluate_i)
+    void evaluate_i(caStack* stack)
     {
         seed_if_needed();
-        int range = as_int(INPUT(0));
+        int range = as_int(circa_input(stack, 0));
 
         // TODO: replace this, builtin rand() does not have good randomness in lower bits.
-        set_int(OUTPUT, rand() % range);
+        set_int(circa_output(stack, 0), rand() % range);
     }
 
     void setup(Block* kernel)

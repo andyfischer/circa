@@ -5,16 +5,16 @@
 namespace circa {
 namespace div_function {
 
-    CA_FUNCTION(div_f)
+    void div_f(caStack* stack)
     {
-        set_float(OUTPUT, FLOAT_INPUT(0) / FLOAT_INPUT(1));
+        set_float(circa_output(stack, 0), circa_float_input(stack, 0) / circa_float_input(stack, 1));
     }
 
-    CA_FUNCTION(div_i)
+    void div_i(caStack* stack)
     {
-        int a = to_int(circa_input(_stack, 0));
-        int b = to_int(circa_input(_stack, 1));
-        set_int(circa_output(_stack, 0), a / b);
+        int a = to_int(circa_input(stack, 0));
+        int b = to_int(circa_input(stack, 1));
+        set_int(circa_output(stack, 0), a / b);
     }
 
     void setup(Block* kernel)

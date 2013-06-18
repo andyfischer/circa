@@ -6,7 +6,6 @@
 #include "building.h"
 #include "kernel.h"
 #include "if_block.h"
-#include "importing_macros.h"
 #include "term.h"
 #include "type.h"
 
@@ -19,7 +18,7 @@ void switch_block_post_compile(Term* term)
     finish_if_block(term);
 }
 
-CA_FUNCTION(evaluate_switch)
+void evaluate_switch(caStack* stack)
 {
 #if 0
     Stack* context = CONTEXT;

@@ -5,14 +5,14 @@
 namespace circa {
 namespace neg_function  {
 
-    CA_FUNCTION(evaluate_f)
+    void evaluate_f(caStack* stack)
     {
-        set_float(OUTPUT, -FLOAT_INPUT(0));
+        set_float(circa_output(stack, 0), -circa_float_input(stack, 0));
     }
 
-    CA_FUNCTION(evaluate_i)
+    void evaluate_i(caStack* stack)
     {
-        set_int(OUTPUT, -INT_INPUT(0));
+        set_int(circa_output(stack, 0), -circa_int_input(stack, 0));
     }
 
     void formatSource(caValue* source, Term* term)

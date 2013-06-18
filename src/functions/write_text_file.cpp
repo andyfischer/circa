@@ -7,9 +7,9 @@
 namespace circa {
 namespace write_text_file_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        write_text_file(STRING_INPUT(0), STRING_INPUT(1));
+        write_text_file(circa_string_input(stack, 0), circa_string_input(stack, 1));
     }
 
     void setup(Block* kernel)

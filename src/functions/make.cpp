@@ -5,9 +5,9 @@
 namespace circa {
 namespace make_function {
 
-    CA_FUNCTION(make_func)
+    void make_func(caStack* stack)
     {
-        make(as_type(INPUT(0)), OUTPUT);
+        make(as_type(circa_input(stack, 0)), circa_output(stack, 0));
     }
 
     Type* specializeType(Term* caller)

@@ -134,7 +134,7 @@ namespace assign_function {
 }
 
 namespace copy_function {
-    CA_FUNCTION(evaluate);
+    void evaluate(caStack* stack);
 }
 
 namespace file_changed_function {
@@ -159,7 +159,7 @@ namespace return_function {
 }
 
 namespace value_function {
-    CA_FUNCTION(evaluate);
+    void evaluate(caStack* stack);
 }
 
 // Interact with special debugging functions test_spy() and test_oracle()

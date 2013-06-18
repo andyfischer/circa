@@ -7,7 +7,6 @@
 #include "kernel.h"
 #include "function.h"
 #include "importing.h"
-#include "importing_macros.h"
 #include "interpreter.h"
 #include "parser.h"
 #include "names.h"

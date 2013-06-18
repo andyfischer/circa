@@ -5,9 +5,9 @@
 namespace circa {
 namespace error_function {
 
-    CA_FUNCTION(error)
+    void error(caStack* stack)
     {
-        RAISE_ERROR(STRING_INPUT(0));
+        circa_output_error(stack, circa_string_input(stack, 0));
     }
 
     void setup(Block* kernel)

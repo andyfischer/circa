@@ -5,10 +5,10 @@
 namespace circa {
 namespace unique_id_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
         static int nextId = 1;
-        set_int(OUTPUT, nextId++);
+        set_int(circa_output(stack, 0), nextId++);
     }
 
     void setup(Block* kernel)

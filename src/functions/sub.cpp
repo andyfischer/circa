@@ -5,14 +5,14 @@
 namespace circa {
 namespace sub_function {
 
-    CA_FUNCTION(evaluate_i)
+    void evaluate_i(caStack* stack)
     {
-        set_int(OUTPUT, INT_INPUT(0) - INT_INPUT(1));
+        set_int(circa_output(stack, 0), circa_int_input(stack, 0) - circa_int_input(stack, 1));
     }
 
-    CA_FUNCTION(evaluate_f)
+    void evaluate_f(caStack* stack)
     {
-        set_float(OUTPUT, FLOAT_INPUT(0) - FLOAT_INPUT(1));
+        set_float(circa_output(stack, 0), circa_float_input(stack, 0) - circa_float_input(stack, 1));
     }
 
     void setup(Block* kernel)

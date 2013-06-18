@@ -5,7 +5,6 @@
 #include "block.h"
 #include "building.h"
 #include "function.h"
-#include "importing_macros.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "parser.h"

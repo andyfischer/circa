@@ -7,12 +7,12 @@
 namespace circa {
 namespace set_union_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        caValue* result = circa_output(STACK, 0);
+        caValue* result = circa_output(stack, 0);
         set_list(result, 0);
 
-        caValue* args = circa_input(STACK, 0);
+        caValue* args = circa_input(stack, 0);
         for (int inputIndex=0; inputIndex < circa_count(args); inputIndex++) {
             caValue* input = circa_index(args, inputIndex);
             int numElements = circa_count(input);

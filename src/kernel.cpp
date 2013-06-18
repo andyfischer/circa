@@ -65,8 +65,6 @@ BuiltinTypes TYPES;
 caValue* g_oracleValues;
 caValue* g_spyValues;
 
-namespace cppbuild_function { void build_module(caStack*); }
-
 Type* output_placeholder_specializeType(Term* caller)
 {
     // Special case: if we're an accumulatingOutput then the output type is List.
@@ -1028,7 +1026,6 @@ void bootstrap_kernel()
     static const ImportRecord records[] = {
         {"assert", hosted_assert},
         {"context", get_context},
-        {"cppbuild:build_module", cppbuild_function::build_module},
         {"file:version", file__version},
         {"file:exists", file__exists},
         {"file:read_text", file__read_text},

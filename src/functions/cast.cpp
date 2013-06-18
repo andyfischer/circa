@@ -5,27 +5,27 @@
 namespace circa {
 namespace cast_function {
 
-    CA_FUNCTION(cast1_evaluate)
+    void cast1_evaluate(caStack* stack)
     {
-        caValue* source = INPUT(0);
+        caValue* source = circa_input(stack, 0);
 
-        if (CALLER->type == TYPES.any)
-            return copy(source, OUTPUT);
+        if (circa_caller_term(stack)->type == TYPES.any)
+            return copy(source, circa_output(stack, 0));
 
-        Type* type = CALLER->type;
+        Type* type = circa_caller_term(stack)->type;
         if (!cast_possible(source, type)) {
             std::stringstream message;
             message << "Can't cast value " << to_string(source)
                 << " to type " << as_cstring(&type->name);
-            return RAISE_ERROR(message.str().c_str());
+            return circa_output_error(stack, message.str().c_str());
         }
 
-        //change_type(OUTPUT, type);
-        copy(source, OUTPUT);
-        bool success = cast(OUTPUT, type);
+        caValue* output = circa_output(stack, 0);
+        copy(source, output);
+        bool success = cast(output, type);
 
         if (!success)
-            return RAISE_ERROR("cast failed");
+            return circa_output_error(stack, "cast failed");
     }
 
     void cast_evaluate(caStack* stack)

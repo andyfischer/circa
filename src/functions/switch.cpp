@@ -5,8 +5,8 @@
 namespace circa {
 namespace switch_function {
 
-    CA_FUNCTION(evaluate_case) { }
-    CA_FUNCTION(evaluate_default_case) { }
+    void evaluate_case(caStack* stack) { }
+    void evaluate_default_case(caStack* stack) { }
 
     void switch_formatSource(caValue* source, Term* term)
     {

@@ -67,8 +67,6 @@ typedef int Symbol;
 
 // Function-related typedefs:
 
-#define CA_FUNCTION(fname) void fname(caStack* _stack)
-
 typedef void (*EvaluateFunc)(caStack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(caValue* source, Term* term);

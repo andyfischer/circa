@@ -7,12 +7,12 @@
 namespace circa {
 namespace container_set_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        caValue* result = OUTPUT;
+        caValue* result = circa_output(stack, 0);
         set_list(result, 0);
 
-        caValue* args = circa_input(STACK, 0);
+        caValue* args = circa_input(stack, 0);
 
         for (int index=0; index < circa_count(args); index++)
             set_t::add(result, circa_index(args, index));

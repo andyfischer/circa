@@ -5,16 +5,16 @@
 namespace circa {
 namespace mult_function {
 
-    CA_FUNCTION(evaluate_f)
+    void evaluate_f(caStack* stack)
     {
-        float product = circa_float_input(STACK, 0) * circa_float_input(STACK, 1);
-        set_float(circa_output(STACK, 0), product);
+        float product = circa_float_input(stack, 0) * circa_float_input(stack, 1);
+        set_float(circa_output(stack, 0), product);
     }
 
-    CA_FUNCTION(evaluate_i)
+    void evaluate_i(caStack* stack)
     {
-        int product = circa_int_input(STACK, 0) * circa_int_input(STACK, 1);
-        set_int(circa_output(STACK, 0), product);
+        int product = circa_int_input(stack, 0) * circa_int_input(stack, 1);
+        set_int(circa_output(stack, 0), product);
     }
 
     void setup(Block* kernel)
