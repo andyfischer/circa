@@ -6,10 +6,11 @@
 
 namespace circa {
 
+// -- Search paths --
 caValue* module_search_paths(World* world);
-
 void module_add_search_path(World* world, const char* str);
 
+// -- Filenames --
 void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut);
 
 // Add a top-level with the given name, or return an existing one if it exists.
@@ -30,9 +31,19 @@ Block* load_module_by_name(World* world, const char* module_name);
 // rearrange the global module order so that the module is located before the term.
 void module_on_loaded_by_term(Block* module, Term* loadCall);
 
+// Deprecated: does not reference World or Block.
 Block* find_loaded_module(const char* name);
-
 Block* find_module_from_filename(const char* filename);
+
+// Prefered:
+Block* find_module_by_name(Block* root, const char* name);
+
+// -- Bundles --
+Block* module_create_empty_bundle(World* world, const char* name);
+
+#if CIRCA_ZIP_SUPPORT
+Block* module_load_from_zip_data(char* data, size_t data);
+#endif
 
 // Install builtin modules functions.
 void modules_install_functions(Block* kernel);

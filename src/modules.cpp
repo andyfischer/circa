@@ -271,7 +271,7 @@ void modules_install_functions(Block* kernel)
     Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
     as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
 
-    FUNCS.module = import_function(kernel, NULL, "module() -> Block");
+    FUNCS.module = import_function(kernel, NULL, "module()");
 
     Term* load_module = install_function(kernel, "load_module", load_module_eval);
 }
