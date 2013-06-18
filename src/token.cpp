@@ -111,15 +111,17 @@ int Token::length() const
 
 struct TokenizeContext
 {
-    std::string const &input;
+    const char* input;
+    size_t inputSize;
     int nextIndex;
     int linePosition;
     int charPosition;
     int precedingIndent;
     std::vector<Token> *results;
 
-    TokenizeContext(std::string const &_input, std::vector<Token> *_results)
+    TokenizeContext(const char* _input, size_t _inputSize, std::vector<Token> *_results)
         : input(_input),
+          inputSize(_inputSize),
           nextIndex(0),
           linePosition(1),
           charPosition(0),
@@ -130,7 +132,7 @@ struct TokenizeContext
     char next(int lookahead=0) const
     {
         unsigned int index = nextIndex + lookahead;
-        if (index >= input.length())
+        if (index >= inputSize)
             return 0;
         return input[index];
     }
@@ -153,11 +155,11 @@ struct TokenizeContext
     }
 
     bool finished() const {
-        return nextIndex >= (int) input.length();
+        return nextIndex >= (int) inputSize;
     }
 
     bool withinRange(int lookahead) const {
-        return nextIndex + lookahead < (int) input.length();
+        return nextIndex + lookahead < (int) inputSize;
     }
 
     void consume(int match, int len) {
@@ -222,7 +224,7 @@ void consume_color_literal(TokenizeContext &context);
 
 void tokenize(std::string const &input, TokenList* results)
 {
-    TokenizeContext context(input, results);
+    TokenizeContext context(input.c_str(), input.size(), results);
 
     while (!context.finished()) {
         top_level_consume_token(context);
