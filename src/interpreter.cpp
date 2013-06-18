@@ -749,6 +749,12 @@ void stack_to_string(Stack* stack, caValue* out)
         if (block == NULL)
             continue;
 
+        // indent
+        for (int x = 0; x < frameIndex+2; x++)
+            strm << " ";
+
+        strm << "context: " << to_string(&frame->dynamicScope) << std::endl;
+
         for (int i=0; i < frame->block->length(); i++) {
             Term* term = block->get(i);
 

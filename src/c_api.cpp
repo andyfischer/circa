@@ -203,6 +203,15 @@ caType* circa_term_declared_type(caTerm* term)
     return (caType*) ((Term*) term)->type;
 }
 
+caBlock* circa_term_get_function(caTerm* term)
+{
+    return function_contents(term->function);
+}
+
+caValue* circa_function_get_name(caBlock* func)
+{
+    return term_name(func->owningTerm);
+}
 
 caTerm* circa_get_term(caBlock* block, int index)
 {

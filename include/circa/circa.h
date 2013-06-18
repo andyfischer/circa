@@ -472,6 +472,9 @@ caTerm* circa_term_get_input(caTerm* term, int index);
 // Fetch the Term's declared type.
 caType* circa_term_declared_type(caTerm* term);
 
+caBlock* circa_term_get_function(caTerm* term);
+caValue* circa_function_get_name(caBlock* func);
+
 // -- Code Building --
 
 // Install an evaluation function to the given named function. Returns the container Term.
@@ -509,18 +512,6 @@ void circa_setup_pointer_type(caType* type);
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
 void circa_finish_native_patch(caNativePatch* module);
-
-// -- Actors --
-// (Disabled as of actors v3)
-#if 0
-caActorSpace* circa_create_actor_space(caWorld* world);
-caActor* circa_create_actor(caActorSpace* space);
-void circa_actor_bind_name(caActorSpace* space, caActor* actor, const char* name);
-bool circa_actor_consume_incoming(caActor* actor, caValue* messageOut);
-void circa_actors_run_iteration(caActorSpace* space);
-caValue* circa_actor_post(caActor* actor);
-caValue* circa_post(caActorSpace* space, caValue* address);
-#endif
 
 // -- File IO --
 
