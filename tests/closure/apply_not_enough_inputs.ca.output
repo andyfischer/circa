@@ -1,4 +1,4 @@
 Error occurred:
-[tests/closure/apply_not_enough_inputs.ca:7,0] Closure.apply() | Too few inputs, expected 3, received 2
+[tests/closure/apply_not_enough_inputs.ca:7,0] Func.apply() | Too few inputs, expected 3, received 2
 (input 0) | 1
 

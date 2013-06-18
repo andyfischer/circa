@@ -47,7 +47,6 @@ struct Stack;
 struct FeedbackOperation;
 struct FileWatch;
 struct FileWatchWorld;
-struct Function;
 struct GCReferenceList;
 struct List;
 struct ListData;
@@ -69,9 +68,9 @@ typedef int Symbol;
 
 typedef void (*EvaluateFunc)(caStack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
-typedef void (*FormatSource)(caValue* source, Term* term);
-typedef bool (*CheckInvariants)(Term* term, std::string* output);
+typedef void (*FormatSourceFunc)(caValue* source, Term* term);
 typedef void (*ReleaseFunc)(caValue* value);
+typedef void (*PostCompileFunc)(Term*);
 
 // Garbage collection
 typedef char GCColor;

@@ -54,12 +54,12 @@ namespace cast_function {
     {
         // 'cast1' is used internally. The type is passed as the term's type.
         // Deprecated in favor of the other version.
-        FUNCS.cast = import_function(kernel, cast1_evaluate, "cast1 :throws (any val) -> any");
+        FUNCS.cast = import_function(kernel, cast1_evaluate, "cast1 (any val) -> any");
 
         // 'cast' is used by scripts. In this version, the type is passed via the 2nd param
         Term* cast = import_function(kernel, cast_evaluate, "cast(any val, Type t) -> (any, bool)");
         
-        block_set_specialize_type_func(as_function2(cast), cast_specializeType);
+        block_set_specialize_type_func(function_contents(cast), cast_specializeType);
     }
 }
 }

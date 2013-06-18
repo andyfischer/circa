@@ -13,7 +13,7 @@ namespace comment_function {
     void setup(Block* kernel)
     {
         FUNCS.comment = import_function(kernel, NULL, "comment()");
-        as_function(FUNCS.comment)->formatSource = formatSource;
+        block_set_format_source_func(function_contents(FUNCS.comment), formatSource);
         block_set_evaluation_empty(function_contents(FUNCS.comment), true);
     }
 }

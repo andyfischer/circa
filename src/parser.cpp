@@ -557,9 +557,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     Term* result = create_function(block, as_cstring(&functionName));
 
-    Function* attrs = as_function(result);
     set_starting_source_location(result, startPosition, tokens);
-    attrs->name = as_string(&functionName);
 
     if (methodType != NULL)
         result->setBoolProp("syntax:methodDecl", true);
@@ -570,7 +568,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     while (tokens.nextIs(tok_ColonString)) {
         std::string symbolText = tokens.consumeStr(tok_ColonString);
         if (symbolText == ":throws")
-            attrs->throws = true;
+            internal_error(":throws has been removed");
         else
             return compile_error_for_line(block, tokens, startPosition,
                     "Unrecognized symbol: "+symbolText);
@@ -778,7 +776,6 @@ consume_next_output: {
         }
     }
 
-    ca_assert(is_value(result));
     ca_assert(is_function(result));
 
     // Consume contents, if there are still tokens left. It's okay to reach EOF here.
@@ -788,7 +785,6 @@ consume_next_output: {
     // Finish up
     finish_building_function(contents);
 
-    ca_assert(is_value(result));
     ca_assert(is_function(result));
 
     set_source_location(result, startPosition, tokens);
@@ -798,8 +794,8 @@ consume_next_output: {
         FUNCS.declared_state = result;
     if (FUNCS.closure_block == NULL && string_eq(&functionName, "closure_block"))
         FUNCS.closure_block = result;
-    if (FUNCS.closure_call == NULL && string_eq(&functionName, "Closure.call"))
-        FUNCS.closure_call = result;
+    if (FUNCS.func_call == NULL && string_eq(&functionName, "Func.call"))
+        FUNCS.func_call = result;
     if (FUNCS.unbound_input == NULL && string_eq(&functionName, "unbound_input"))
         FUNCS.unbound_input = result;
 

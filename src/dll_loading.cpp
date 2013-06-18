@@ -144,7 +144,7 @@ void patch_block_recr(Dll* dll, Block* block, std::string namespacePrefix)
 
             // Patch in this function and record the affected term
             if (newEvaluateFunc != NULL) {
-                function_set_evaluate_func(as_function2(term), (EvaluateFunc) newEvaluateFunc);
+                function_set_evaluate_func(function_contents(term), (EvaluateFunc) newEvaluateFunc);
                 dll->affectedTerms.append(term);
                 dll->loadedFunctions.insert(newEvaluateFunc);
             }

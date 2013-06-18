@@ -36,10 +36,10 @@ namespace input_explicit_function {
     {
         FUNCS.input_explicit = import_function(kernel, input_explicit,
                 "input(Type t :optional, any _) -> any");
-        as_function(FUNCS.input_explicit)->postCompile = input_postCompile;
+        block_set_post_compile_func(function_contents(FUNCS.input_explicit), input_postCompile);
         
         FUNCS.output_explicit = import_function(kernel, NULL, "output(any _)");
-        as_function(FUNCS.output_explicit)->postCompile = output_postCompile;
+        block_set_post_compile_func(function_contents(FUNCS.output_explicit), output_postCompile);
     }
 }
 }

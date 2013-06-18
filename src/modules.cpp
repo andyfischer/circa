@@ -281,15 +281,15 @@ Block* find_module(Block* root, caValue* name)
 void modules_install_functions(Block* kernel)
 {
     FUNCS.require = install_function(kernel, "require", NULL);
-    as_function(FUNCS.require)->postCompile = require_func_postCompile;
+    block_set_post_compile_func(function_contents(FUNCS.require), require_func_postCompile);
 
     FUNCS.package = install_function(kernel, "package", NULL);
 
     Term* import_file = install_function(kernel, "import_file", NULL);
-    as_function(import_file)->postCompile = import_file_func_postCompile;
+    block_set_post_compile_func(function_contents(import_file), import_file_func_postCompile);
 
     Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
-    as_function(native_patch_this)->postCompile = native_patch_this_postCompile;
+    block_set_post_compile_func(function_contents(native_patch_this), native_patch_this_postCompile);
 
     FUNCS.module = import_function(kernel, NULL, "module()");
 

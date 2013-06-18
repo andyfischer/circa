@@ -159,14 +159,13 @@ void format_term_source(caValue* source, Term* term)
     ca_assert(term != NULL);
 
     // If the function has a formatSource function, use that.
-    if (is_function(term->function) &&
-            as_function(term->function)->formatSource != NULL) {
-        as_function(term->function)->formatSource(source, term);
+    if (term_function(term)->overrides.formatSource != NULL) {
+        term_function(term)->overrides.formatSource(source, term);
 
     // Or, check if this is a value term.
     } else if (is_value(term)) {
         // for certain types, don't write "name =" in front
-        if (term->type != TYPES.function && term->type != TYPES.type)
+        if (term->type != TYPES.func && term->type != TYPES.type)
             format_name_binding(source, term);
 
         format_value_term(source, term);

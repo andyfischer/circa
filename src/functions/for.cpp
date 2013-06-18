@@ -32,7 +32,7 @@ namespace for_function {
     void setup(Block* kernel)
     {
         FUNCS.for_func = import_function(kernel, NULL, "for(List list) -> List");
-        as_function(FUNCS.for_func)->formatSource = formatSource;
+        block_set_format_source_func(function_contents(FUNCS.for_func), formatSource);
 
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any _, any _) -> int");

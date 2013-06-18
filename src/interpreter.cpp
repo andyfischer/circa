@@ -1049,15 +1049,15 @@ void write_term_bytecode(Term* term, caValue* result)
         return;
     }
 
-    if (term->function == FUNCS.closure_call) {
+    if (term->function == FUNCS.func_call) {
         list_resize(result, 3);
-        set_symbol(list_get(result, 0), op_ClosureCall);
+        set_symbol(list_get(result, 0), op_FuncCall);
         return;
     }
 
-    if (term->function == FUNCS.closure_apply) {
+    if (term->function == FUNCS.func_apply) {
         list_resize(result, 3);
-        set_symbol(list_get(result, 0), op_ClosureApply);
+        set_symbol(list_get(result, 0), op_FuncApply);
         set_symbol(list_get(result, 2), sym_OutputsToList);
         return;
     }
@@ -1078,7 +1078,7 @@ void write_term_bytecode(Term* term, caValue* result)
     } else if (term->function == FUNCS.if_block) {
         block = term->nestedContents;
         tag = op_CaseBlock;
-    } else if (term->function == FUNCS.closure_block) {
+    } else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
         // Call the function, not nested contents.
         block = function_contents(term->function);
         tag = op_CallBlock;
@@ -1220,9 +1220,9 @@ int get_count_of_caller_inputs_for_error(Stack* stack)
     Term* callerTerm = parentFrame->block->get(parentFrame->pc);
     int foundCount = callerTerm->numInputs();
 
-    if (callerTerm->function == FUNCS.closure_call)
+    if (callerTerm->function == FUNCS.func_call)
         foundCount--;
-    else if (callerTerm->function == FUNCS.closure_apply) {
+    else if (callerTerm->function == FUNCS.func_apply) {
         caValue* inputs = stack_find_active_value(parentFrame, callerTerm->input(1));
         foundCount = list_length(inputs);
     }
@@ -1317,7 +1317,7 @@ void run_input_instructions_with_function(Stack* stack, Term* function)
 
 void write_input_instructions3(caValue* bytecode, Term* caller, Term* function, Block* block)
 {
-    bool inputsFromList = function == FUNCS.closure_apply;
+    bool inputsFromList = function == FUNCS.func_apply;
 
     int callerInputIndex = 0;
     int applyListIndex = 0;
@@ -1332,7 +1332,7 @@ void write_input_instructions3(caValue* bytecode, Term* caller, Term* function, 
         }
     }
 
-    if (function == FUNCS.closure_call) {
+    if (function == FUNCS.func_call) {
         callerInputIndex = 1;
     }
 
@@ -1670,10 +1670,10 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             }
             
             // Check for methods that are normally handled with different bytecode.
-            if (method == FUNCS.closure_call)
-                goto do_closure_call;
-            else if (method == FUNCS.closure_apply)
-                goto do_closure_apply;
+            if (method == FUNCS.func_call)
+                goto do_func_call;
+            else if (method == FUNCS.func_apply)
+                goto do_func_apply;
 
             Block* block = nested_contents(method);
             frame = push_frame(stack, block);
@@ -1682,8 +1682,8 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             break;
         }
 
-do_closure_call:
-        case op_ClosureCall: {
+do_func_call:
+        case op_FuncCall: {
             Term* caller = block->get(frame->pc);
 
             caValue* closure = stack_find_active_value(frame, caller->input(0));
@@ -1698,12 +1698,12 @@ do_closure_call:
 
             frame = push_frame(stack, block);
             bytecode = frame_bytecode(frame);
-            run_input_instructions_with_function(stack, FUNCS.closure_call);
+            run_input_instructions_with_function(stack, FUNCS.func_call);
             break;
         }
 
-do_closure_apply:
-        case op_ClosureApply: {
+do_func_apply:
+        case op_FuncApply: {
             Term* caller = block->get(frame->pc);
             caValue* closure = stack_find_active_value(frame, caller->input(0));
             Block* block = as_block(list_get(closure, 0));
@@ -1716,7 +1716,7 @@ do_closure_apply:
             }
             frame = push_frame(stack, block);
             bytecode = frame_bytecode(frame);
-            run_input_instructions_with_function(stack, FUNCS.closure_apply);
+            run_input_instructions_with_function(stack, FUNCS.func_apply);
             break;
         }
 
@@ -2468,24 +2468,6 @@ CIRCA_EXPORT void circa_clear_stack(caStack* stack)
 CIRCA_EXPORT void circa_restart(caStack* stack)
 {
     stack_restart(stack);
-}
-
-CIRCA_EXPORT void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
-{
-    Block* block = function_contents((Function*) func);
-    
-    block_finish_changes(block);
-    
-    push_frame_with_inputs(stack, block, inputs);
-    
-    run_interpreter(stack);
-    
-    // Save outputs to the user's list.
-    fetch_stack_outputs(stack, inputs);
-    
-    if (!error_occurred(stack)) {
-        pop_frame(stack);
-    }
 }
 
 CIRCA_EXPORT bool circa_push_function_by_name(caStack* stack, const char* name)

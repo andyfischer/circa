@@ -144,7 +144,7 @@ Term* statically_specialize_overload_for_call(Term* call)
             if (call->input(inputIndex) == NULL)
                 continue;
 
-            Type* inputType = get_input_type(as_function2(func), inputIndex);
+            Type* inputType = get_input_type(function_contents(func), inputIndex);
 
             if (inputType == NULL) {
                 allInputsFit = false;

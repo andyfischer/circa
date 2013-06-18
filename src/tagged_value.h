@@ -91,8 +91,7 @@ bool is_bool(caValue* value);
 bool is_block(caValue* value);
 bool is_error(caValue* value);
 bool is_float(caValue* value);
-bool is_function(caValue* value);
-bool is_function_pointer(caValue* value);
+bool is_func(caValue* value);
 bool is_int(caValue* value);
 bool is_stack(caValue* value);
 bool is_list(caValue* value);
@@ -110,8 +109,6 @@ bool        as_bool(caValue* value);
 Block*     as_block(caValue* value);
 const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
-Function*   as_function(caValue* value);
-Block*      as_function2(caValue* value);
 int         as_int(caValue* value);
 Symbol      as_symbol(caValue* value);
 void*       as_opaque_pointer(caValue* value);
@@ -136,7 +133,7 @@ void set_string(caValue* value, std::string const& s);
 void set_symbol(caValue* value, Symbol val);
 void set_term_ref(caValue* val, Term* term);
 void set_type(caValue* value, Type* type);
-void set_function(caValue* value, Function* function);
+//void set_function(caValue* value, Function* function);
 
 // Complex unboxing functions.
 float to_float(caValue* value);

@@ -14,9 +14,6 @@ void mark_static_errors_invalid(Block* block);
 void finish_update_cascade(Block* block);
 void recursively_finish_update_cascade(Block* block);
 
-// Events that may cause update cascades
-void on_create_call(Term* term);
-
 void on_block_inputs_changed(Block* block);
 
 void fix_forward_function_references(Block* block);

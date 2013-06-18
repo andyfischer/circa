@@ -44,7 +44,7 @@ def Layout.addNode(self, int cursor, data) -> Layout
 
     return self
 
-def Layout.modifyCurrentNode(self, Closure f) -> Layout
+def Layout.modifyCurrentNode(self, Func f) -> Layout
     @self.nodes.mapItem(self.cursor, f)
     self
 

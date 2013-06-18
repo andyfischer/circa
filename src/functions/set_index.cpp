@@ -18,7 +18,7 @@ namespace set_index_function {
 
     Type* specializeType(Term* caller)
     {
-        //FIXME
+        // TODO: Fix type inference on set_index.
         return TYPES.list;
         //return caller->input(0)->type;
     }
@@ -27,7 +27,7 @@ namespace set_index_function {
     {
         FUNCS.set_index = import_function(kernel, evaluate,
                 "set_index(any list, int index, any val) -> List");
-        block_set_specialize_type_func(as_function2(FUNCS.set_index), specializeType);
+        block_set_specialize_type_func(function_contents(FUNCS.set_index), specializeType);
     }
 }
 }

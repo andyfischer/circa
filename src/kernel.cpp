@@ -198,12 +198,6 @@ void Dict__get(caStack* stack)
     copy(dict_get(dict, key), circa_output(stack, 0));
 }
 
-void Function__block(caStack* stack)
-{
-    Function* function = as_function(circa_input(stack, 0));
-    set_block(circa_output(stack, 0), function_get_contents(function));
-}
-
 void empty_list(caStack* stack)
 {
     caValue* out = circa_output(stack, 0);
@@ -792,7 +786,6 @@ void bootstrap_kernel()
     TYPES.bool_type = create_type();
     TYPES.error = create_type();
     TYPES.float_type = create_type();
-    TYPES.function = create_type();
     TYPES.int_type = create_type();
     TYPES.list = create_type();
     TYPES.map = create_type();
@@ -806,7 +799,6 @@ void bootstrap_kernel()
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
     dict_t::setup_type(TYPES.dict);
-    function_t::setup_type(TYPES.function);
     hashtable_setup_type(TYPES.map);
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
@@ -819,7 +811,7 @@ void bootstrap_kernel()
     type_t::setup_type(TYPES.type);
     void_t::setup_type(TYPES.void_type);
 
-    // Start building World
+    // Start building World.
     g_world = alloc_world();
     g_world->bootstrapStatus = sym_Bootstrapping;
 
@@ -831,6 +823,13 @@ void bootstrap_kernel()
     rename(builtinsTerm, "builtins");
     Block* builtins = make_nested_contents(builtinsTerm);
     g_world->builtins = builtins;
+
+    // Create function_decl function.
+    Term* functionDeclFunction = builtins->appendNew();
+    rename(functionDeclFunction, "function_decl");
+    FUNCS.function_decl = functionDeclFunction;
+    FUNCS.function_decl->function = FUNCS.function_decl;
+    function_contents(FUNCS.function_decl)->overrides.formatSource = function_format_source;
 
     // Create value function
     Term* valueFunc = builtins->appendNew();
@@ -855,22 +854,9 @@ void bootstrap_kernel()
     TYPES.any->declaringTerm = anyType;
     rename(anyType, "any");
 
-    // Create Function type
-    Term* functionType = builtins->appendNew();
-    functionType->function = valueFunc;
-    functionType->type = TYPES.type;
-    TYPES.function->declaringTerm = functionType;
-    term_value(functionType)->value_type = TYPES.type;
-    term_value(functionType)->value_data.ptr = TYPES.function;
-    rename(functionType, "Function");
-
     // Initialize value() func
-    valueFunc->type = TYPES.function;
-    valueFunc->function = valueFunc;
-    make(TYPES.function, term_value(valueFunc));
-    term_value(valueFunc)->value_data.ptr = new Function();
-    initialize_function(valueFunc);
-    as_function(valueFunc)->name = "value";
+    valueFunc->type = TYPES.any;
+    valueFunc->function = FUNCS.function_decl;
     block_set_evaluation_empty(function_contents(valueFunc), true);
 
     // Initialize primitive types (this requires value() function)
@@ -895,30 +881,26 @@ void bootstrap_kernel()
     symbol_initialize_global_table();
 
     // Setup output_placeholder() function, needed to declare functions properly.
-    FUNCS.output = create_value(builtins, TYPES.function, "output_placeholder");
-    term_value(FUNCS.output)->value_data.ptr = new Function();
-    initialize_function(FUNCS.output);
-    as_function(FUNCS.output)->name = "output_placeholder";
-    as_function2(FUNCS.output)->overrides.evaluate = NULL;
-    as_function2(FUNCS.output)->overrides.specializeType = output_placeholder_specializeType;
-    ca_assert(get_output_type(as_function2(FUNCS.output), 0) == TYPES.any);
+    FUNCS.output = apply(builtins, FUNCS.function_decl, TermList(), "output_placeholder");
+    function_contents(FUNCS.output)->overrides.evaluate = NULL;
+    function_contents(FUNCS.output)->overrides.specializeType = output_placeholder_specializeType;
+    ca_assert(get_output_type(function_contents(FUNCS.output), 0) == TYPES.any);
 
     // Now that output_placeholder is created, fix the value() function.
     {
-        Function* attrs = as_function(valueFunc);
-        Term* output = append_output_placeholder(function_contents(attrs), NULL);
+        Term* output = append_output_placeholder(function_contents(valueFunc), NULL);
         change_declared_type(output, TYPES.any);
-        finish_building_function(function_contents(attrs));
+        finish_building_function(function_contents(valueFunc));
     }
 
-    ca_assert(get_output_type(as_function2(valueFunc), 0) == TYPES.any);
+    ca_assert(get_output_type(function_contents(valueFunc), 0) == TYPES.any);
 
     // input_placeholder() is needed before we can declare a function with inputs
     FUNCS.input = import_function(builtins, NULL, "input_placeholder() -> any");
     block_set_evaluation_empty(function_contents(FUNCS.input), true);
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
-    apply(function_contents(as_function(FUNCS.output)),
+    apply(function_contents(FUNCS.output),
         FUNCS.input, TermList())->setBoolProp("optional", true);
 
     namespace_function::early_setup(builtins);
@@ -941,7 +923,7 @@ void bootstrap_kernel()
     setup_builtin_functions(builtins);
 
     FUNCS.section_block = import_function(builtins, NULL, "def section_block() -> any");
-    as_function(FUNCS.section_block)->formatSource = section_block_formatSource;
+    block_set_format_source_func(function_contents(FUNCS.section_block), section_block_formatSource);
 
     // Create IMPLICIT_TYPES (deprecated)
     type_initialize_kernel(builtins);
@@ -992,7 +974,7 @@ void bootstrap_kernel()
     FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
-    as_function(FUNCS.neg)->formatSource = neg_function::formatSource;
+    block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
 
     FUNCS.sub = create_overloaded_function(builtins, "sub(any a,any b) -> any");
     append_to_overloaded_function(FUNCS.sub, builtins->get("sub_i"));
@@ -1056,8 +1038,6 @@ void bootstrap_kernel()
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},
         {"Dict.set", Dict__set},
-
-        {"Function.block", Function__block},
 
         {"empty_list", empty_list},
         {"repeat", repeat},
@@ -1125,17 +1105,24 @@ void bootstrap_kernel()
     FUNCS.output_explicit = builtins->get("output");
     FUNCS.type = builtins->get("type");
 
-    as_function(FUNCS.declared_state)->formatSource = declared_state_format_source;
+    block_set_format_source_func(function_contents(FUNCS.declared_state), declared_state_format_source);
 
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));
-    TYPES.closure = as_type(builtins->get("Closure"));
     TYPES.file_signature = as_type(builtins->get("FileSignature"));
+    TYPES.func = as_type(builtins->get("Func"));
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
     TYPES.point = as_type(builtins->get("Point"));
+
+    // Fix function_decl now that Func type is available.
+    {
+        change_declared_type(append_output_placeholder(function_contents(FUNCS.function_decl), NULL),
+            TYPES.func);
+        finish_building_function(function_contents(FUNCS.function_decl));
+    }
 
     TYPES.mutable_type = as_type(builtins->get("Mutable"));
     circa_setup_object_type(TYPES.mutable_type, sizeof(Value), Mutable_release);
@@ -1144,7 +1131,7 @@ void bootstrap_kernel()
 
     color_t::setup_type(TYPES.color);
 
-    as_function2(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
+    function_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

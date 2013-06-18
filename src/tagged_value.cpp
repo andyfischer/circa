@@ -432,12 +432,14 @@ void set_type(caValue* value, Type* type)
     value->value_data.ptr = type;
 }
 
+#if 0
 void set_function(caValue* value, Function* function)
 {
     set_null(value);
     value->value_type = TYPES.function;
     value->value_data.ptr = function;
 }
+#endif
 
 void set_opaque_pointer(caValue* value, void* addr)
 {
@@ -472,17 +474,6 @@ float as_float(caValue* value)
 {
     ca_assert(is_float(value));
     return value->value_data.asfloat;
-}
-Function* as_function(caValue* value)
-{
-    ca_assert(is_function(value));
-    return (Function*) value->value_data.ptr;
-}
-
-Block* as_function2(caValue* value)
-{
-    ca_assert(is_function(value));
-    return function_contents((Function*) value->value_data.ptr);
 }
 
 bool as_bool(caValue* value)
@@ -554,8 +545,7 @@ bool is_bool(caValue* value) { return value->value_type->storageType == sym_Stor
 bool is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
-bool is_function(caValue* value) { return value->value_type == TYPES.function; }
-bool is_function_pointer(caValue* value) { return value->value_type == TYPES.function; }
+bool is_func(caValue* value) { return value->value_type == TYPES.func; }
 bool is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
 bool is_stack(caValue* value) { return value->value_type == TYPES.stack; }
 bool is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
@@ -613,7 +603,7 @@ bool circa_is_bool(caValue* value) { return value->value_type->storageType == sy
 bool circa_is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool circa_is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool circa_is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
-bool circa_is_function(caValue* value) { return value->value_type == TYPES.function; }
+bool circa_is_func(caValue* value) { return value->value_type == TYPES.func; }
 bool circa_is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
 bool circa_is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
@@ -633,10 +623,6 @@ caBlock* circa_block(caValue* value) {
 float circa_float(caValue* value) {
     ca_assert(circa_is_float(value));
     return value->value_data.asfloat;
-}
-caFunction* circa_function(caValue* value) {
-    ca_assert(circa_is_function(value));
-    return (caFunction*) value->value_data.ptr;
 }
 int circa_int(caValue* value) {
     ca_assert(circa_is_int(value));

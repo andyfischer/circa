@@ -23,63 +23,12 @@
 
 namespace circa {
 
-Function::Function()
-  : declaringTerm(NULL),
-    contents(NULL),
-    feedbackFunc(NULL),
-    throws(false),
-    formatSource(NULL),
-    checkInvariants(NULL),
-    onCreateCall(NULL),
-    postInputChange(NULL),
-    postCompile(NULL)
-{
-}
-
-Function::~Function()
-{
-}
-
-namespace function_t {
-
-    void setup_type(Type* type)
-    {
-        set_string(&type->name, "Function");
-        type->formatSource = function_format_source;
-    }
-
-} // namespace function_t
-
-Block* function_contents(Term* func)
-{
-    return nested_contents(func);
-}
-
-Block* function_contents(Function* func)
-{
-    return nested_contents(func->declaringTerm);
-}
-
-Function* get_function_from_block(Block* block)
-{
-    return as_function(block->owningTerm);
-}
-
 Term* create_function(Block* block, const char* name)
 {
     ca_assert(name != NULL);
-    Term* term = create_value(block, TYPES.function, name);
-    term_value(term)->value_data.ptr = new Function();
-    initialize_function(term);
+    Term* term = apply(block, FUNCS.function_decl, TermList(), name);
     initialize_subroutine(term);
     return term;
-}
-
-void initialize_function(Term* func)
-{
-    term_value(func)->value_type = TYPES.function;
-    as_function(func)->declaringTerm = func;
-    as_function(func)->contents = nested_contents(func);
 }
 
 void finish_building_function(Block* contents)
@@ -149,8 +98,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (!is_function(function))
         return TYPES.any;
 
-    Function* attrs = as_function(function);
-    Block* contents = as_function2(function);
+    Block* contents = function_contents(function);
     Type* outputType = get_output_type(contents, 0);
 
     if (contents->overrides.specializeType != NULL)
@@ -161,7 +109,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (function->boolProp("preferSpecialize", false)) {
         Term* specialized = statically_specialize_overload_for_call(call);
         if (specialized != NULL)
-            return get_output_type(as_function2(specialized), 0);
+            return get_output_type(function_contents(specialized), 0);
     }
     return outputType;
 }
@@ -170,72 +118,6 @@ bool function_call_rebinds_input(Term* term, int index)
 {
     return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";
 }
-
-Block* function_get_contents(Function* func)
-{
-    return func->contents;
-}
-
-#if 0
-std::string function_get_input_name(Function* func, int index)
-{
-    Term* placeholder = function_get_input_placeholder(func, index);
-    if (placeholder == NULL)
-        return "";
-    return placeholder->name;
-}
-
-bool function_input_is_extra_output(Function* func, int index)
-{
-    return function_get_input_placeholder(func, index)->boolProp("output", false);
-}
-
-std::string function_get_documentation_string(Function* func)
-{
-    // A function can optionally have a documentation string. If present,
-    // it will be the first thing defined in the function, and it'll be
-    // anonymous and be a statement.
-    Block* contents = function_get_contents(func);
-    int expected_index = count_input_placeholders(contents);
-
-    if (expected_index >= contents->length()) return "";
-    Term* possibleDocString = contents->get(expected_index);
-    if (possibleDocString->name != "") return "";
-    if (!is_statement(possibleDocString)) return "";
-    if (!is_value(possibleDocString)) return "";
-
-    caValue* val = term_value(possibleDocString);
-    if (!is_string(val)) return "";
-    return as_string(val);
-}
-
-const char* get_output_name(Term* term, int outputIndex)
-{
-    if (outputIndex == 0)
-        return term->name.c_str();
-
-    Term* function = term->function;
-    Function* attrs = NULL;
-
-    if (function != NULL)
-        attrs = as_function(function);
-
-    if (attrs == NULL)
-        return "";
-
-    // If the call is rebinding an input name, then use that name.
-    Term* outputPlaceholder = function_get_output_placeholder(attrs, outputIndex);
-    int rebindsInput = outputPlaceholder->intProp("rebindsInput", -1);
-    
-    if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
-        Term* input = term->input(rebindsInput);
-        if (input != NULL)
-            return input->name.c_str();
-    }
-
-    return "";
-}
-#endif
 
 void function_format_header_source(caValue* source, Block* function)
 {
@@ -370,7 +252,7 @@ bool is_subroutine(Term* term)
 {
     if (!is_function(term))
         return false;
-    return as_function2(term)->overrides.evaluate == evaluate_subroutine;
+    return function_contents(term)->overrides.evaluate == evaluate_subroutine;
 }
 
 bool is_subroutine(Block* block)
@@ -381,7 +263,7 @@ bool is_subroutine(Block* block)
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
-    as_function2(sub)->overrides.evaluate = evaluate_subroutine;
+    function_contents(sub)->overrides.evaluate = evaluate_subroutine;
 }
 
 } // namespace circa

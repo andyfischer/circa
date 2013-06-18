@@ -368,6 +368,11 @@ Block* nested_contents(Term* term)
     return make_nested_contents(term);
 }
 
+Block* function_contents(Term* func)
+{
+    return nested_contents(func);
+}
+
 void remove_nested_contents(Term* term)
 {
     if (term->nestedContents == NULL)
@@ -426,14 +431,10 @@ Block* get_outer_scope(Block* block)
 
 void pre_erase_term(Term* term)
 {
-    // If this term declares a Type, then clear the Type.declaringTerm pointer
+    // If this term declares a Type, then clear the Type.declaringTerm pointer,
     // before it becomes invalid.
     if (is_type(term) && as_type(term_value(term))->declaringTerm == term)
         as_type(term_value(term))->declaringTerm = NULL;
-
-    // Ditto for Function
-    if (is_function(term) && as_function(term_value(term))->declaringTerm == term)
-        as_function(term_value(term))->declaringTerm = NULL;
 }
 
 void erase_term(Term* term)
@@ -750,6 +751,15 @@ void block_set_evaluate_func(Block* block, EvaluateFunc eval)
 void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc)
 {
     block->overrides.specializeType = specializeFunc;
+}
+
+void block_set_format_source_func(Block* block, FormatSourceFunc formatSource)
+{
+    block->overrides.formatSource = formatSource;
+}
+void block_set_post_compile_func(Block* block, PostCompileFunc postCompile)
+{
+    block->overrides.postCompile = postCompile;
 }
 
 void append_internal_error(caValue* result, int index, std::string const& message)

@@ -16,8 +16,6 @@ struct BuiltinFuncs {
     Term* case_func;
     Term* cast;
     Term* closure_block;
-    Term* closure_apply;
-    Term* closure_call;
     Term* comment;
     Term* cond;
     Term* continue_func;
@@ -33,6 +31,9 @@ struct BuiltinFuncs {
     Term* extra_output;
     Term* feedback;
     Term* for_func;
+    Term* func_apply;
+    Term* func_call;
+    Term* function_decl;
     Term* get_field;
     Term* get_index;
     Term* get_with_selector;
@@ -93,14 +94,13 @@ struct BuiltinTypes {
     Type* block;
     Type* blob;
     Type* bool_type;
-    Type* closure;
     Type* color;
     Type* dict;
     Type* error;
     Type* file_signature;
     Type* frame;
     Type* float_type;
-    Type* function;
+    Type* func;
     Type* int_type;
     Type* list;
     Type* map;

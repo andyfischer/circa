@@ -23,7 +23,7 @@ namespace namespace_function {
     void early_setup(Block* kernel)
     {
         FUNCS.namespace_func = import_function(kernel, evaluate, "namespace()");
-        as_function(FUNCS.namespace_func)->formatSource = format_source;
+        block_set_format_source_func(function_contents(FUNCS.namespace_func), format_source);
     }
     void setup(Block* kernel) {}
 }

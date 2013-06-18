@@ -13,13 +13,13 @@ namespace block_function {
 
     void setup(Block* kernel)
     {
-        // deprecated
+        // TODO: delete
         FUNCS.block_unevaluated = import_function(kernel, NULL, "block_unevaluated()");
         block_set_evaluation_empty(function_contents(FUNCS.block_unevaluated), true);
 
-        // deprecated
+        // TODO: delete
         FUNCS.lambda = import_function(kernel, NULL, "lambda(any inputs :multiple) -> Block");
-        as_function(FUNCS.lambda)->formatSource = format_source;
+        block_set_format_source_func(function_contents(FUNCS.lambda), format_source);
     }
 }
 }

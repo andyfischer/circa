@@ -19,17 +19,6 @@ void mark_static_errors_invalid(Block* block)
     set_null(&block->staticErrors);
 }
 
-void on_create_call(Term* term)
-{
-    if (!is_function(term->function))
-        return;
-
-    Function::OnCreateCall func = as_function(term->function)->onCreateCall;
-
-    if (func)
-        func(term);
-}
-
 void on_block_inputs_changed(Block* block)
 {
 }

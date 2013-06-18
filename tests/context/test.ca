@@ -9,10 +9,10 @@ def f()
 def g()
   print('inside g, context(a) = ' context(:a))
 
-def with_context_5(Closure cl)
+def with_context_5(Func func)
   print('started with_context_5')
   set_context(:a 5)
-  cl.call()
+  func.call()
   print('finished with_context_5')
 
 set_context(:a 1)

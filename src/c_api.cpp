@@ -249,11 +249,6 @@ caTerm* circa_owning_term(caBlock* block)
 // Get the owning Term for a given Block
 caTerm* circa_owning_term(caBlock*);
 
-caBlock* circa_function_contents(caFunction* func)
-{
-    return (caBlock*) function_contents((Function*) func);
-}
-
 // Access the fixed value of the given Term.
 caValue* circa_term_value(caTerm* term)
 {
@@ -264,11 +259,6 @@ caValue* circa_term_value(caTerm* term)
 int circa_term_get_index(caTerm* term)
 {
     return ((Term*)term)->index;
-}
-
-caFunction* circa_declare_function(caBlock* block, const char* name)
-{
-    return (caFunction*) as_function(term_value(create_function((Block*) block, name)));
 }
 
 caValue* circa_declare_value(caBlock* block, const char* name)

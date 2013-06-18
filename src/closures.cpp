@@ -82,12 +82,14 @@ void closure_block_evaluate(caStack* stack)
 void closures_install_functions(Block* kernel)
 {
     FUNCS.closure_block = install_function(kernel, "closure_block", closure_block_evaluate);
-    as_function(FUNCS.closure_block)->formatSource = closure_block_formatSource;
+    block_set_format_source_func(function_contents(FUNCS.closure_block), closure_block_formatSource);
+
+    FUNCS.function_decl = install_function(kernel, "function_decl", closure_block_evaluate);
 
     FUNCS.unbound_input = install_function(kernel, "unbound_input", NULL);
     block_set_evaluation_empty(function_contents(FUNCS.unbound_input), true);
 
-    FUNCS.closure_apply = kernel->get("Closure.apply");
+    FUNCS.func_apply = kernel->get("Func.apply");
 }
 
 } // namespace circa

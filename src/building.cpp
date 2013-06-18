@@ -98,7 +98,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 
     // Possibly run the function's postCompile handler
     if (is_function(function)) {
-        Function::PostCompile func = as_function(term_value(function))->postCompile;
+        PostCompileFunc func = function_contents(function)->overrides.postCompile;
 
         if (func != NULL)
             func(term);
@@ -267,8 +267,6 @@ void change_function(Term* term, Term* function)
 
     possibly_prune_user_list(term, previousFunction);
 
-    on_create_call(term);
-
     respecialize_type(term);
 
     // Don't append user for certain functions. Need to make this more robust.
@@ -421,11 +419,9 @@ Term* create_duplicate(Block* block, Term* original, caValue* name)
     term->sourceLoc = original->sourceLoc;
     copy(&original->properties, &term->properties);
 
-    // Special case for certain types, update declaringTerm
+    // Special case for certain types, update declaringTerm.
     if (is_type(term))
         as_type(term_value(term))->declaringTerm = term;
-    if (is_function(term))
-        as_function(term_value(term))->declaringTerm = term;
 
     return term;
 }
@@ -1306,10 +1302,9 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
-    Type* outputType = get_output_type(as_function2(function), 0);
+    Type* outputType = get_output_type(function_contents(function), 0);
 
-    Function* attrs = as_function(function);
-    Block* contents = as_function2(function);
+    Block* contents = function_contents(function);
 
     if (contents->overrides.specializeType != NULL)
         outputType = contents->overrides.specializeType(term);

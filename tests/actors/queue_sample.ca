@@ -11,7 +11,7 @@ def simple_queue_actor(any msg)
 
     return out
 
-state actor = make_actor(simple_queue_actor.to_closure)
+state actor = make_actor(simple_queue_actor)
 
 actor.call(1)
 actor.call(2)

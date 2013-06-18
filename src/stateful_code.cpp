@@ -35,12 +35,9 @@ bool does_callsite_have_implicit_state(Term* term)
 
     if (!is_function(func))
         return false;
-    Function* attrs = as_function(func);
-    if (attrs == NULL)
-        return false;
 
-    Block* block = function_contents(func);
-    return has_state_input(block);
+    Block* contents = function_contents(func);
+    return has_state_input(contents);
 }
 
 static bool term_has_state_input(Term* term)

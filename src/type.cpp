@@ -71,7 +71,7 @@ namespace type_t {
             append_phrase(source, field->stringProp("syntax:preWhitespace",""),
                     term, tok_Whitespace);
 
-            Type* fieldType = get_output_type(as_function2(field), 0);
+            Type* fieldType = get_output_type(function_contents(field), 0);
             append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
             append_phrase(source, field->stringProp("syntax:postNameWs"," "),
                     term, tok_Whitespace);

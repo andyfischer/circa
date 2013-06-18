@@ -18,3 +18,4 @@ state/recursion_and_for.ca
 state/recursion_and_if.ca
 state/state_arg_recr.ca
 closure/state_simple.ca
+parser/omitted_closing_bracket.ca

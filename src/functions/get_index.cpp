@@ -30,7 +30,7 @@ namespace get_index_function {
         return infer_type_of_get_index(term->input(0));
     }
 
-    void formatSource(caValue* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         if (term->boolProp("syntax:brackets", false)) {
             format_name_binding(source, term);
@@ -47,8 +47,8 @@ namespace get_index_function {
     {
         FUNCS.get_index = import_function(kernel, hosted_get_index,
                 "get_index(List list, int index) -> any");
-        block_set_specialize_type_func(as_function2(FUNCS.get_index), specializeType);
-        as_function(FUNCS.get_index)->formatSource = formatSource;
+        block_set_specialize_type_func(function_contents(FUNCS.get_index), specializeType);
+        block_set_format_source_func(function_contents(FUNCS.get_index), format_source);
     }
 }
 }

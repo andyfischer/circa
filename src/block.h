@@ -19,8 +19,15 @@ struct BlockOverrides
 {
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
+    FormatSourceFunc formatSource;
+    PostCompileFunc postCompile;
 
-    BlockOverrides() : evaluate(NULL), specializeType(NULL) {}
+    BlockOverrides() :
+      evaluate(NULL),
+      specializeType(NULL),
+      formatSource(NULL),
+      postCompile(NULL)
+    {}
 };
 
 struct Block
@@ -152,7 +159,11 @@ caValue* block_bytecode(Block* block);
 bool has_nested_contents(Term* term);
 Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);
+
 void remove_nested_contents(Term* term);
+
+// Exactly the same as 'nested_contents' but conventionally used for functions:
+Block* function_contents(Term* func);
 
 // Insert this existing block as the nested contents for this term.
 void block_graft_replacement(Block* target, Block* replacement);
@@ -210,6 +221,8 @@ Type* get_output_type(Block* block, int index);
 
 void block_set_evaluate_func(Block* block, EvaluateFunc eval);
 void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc);
+void block_set_format_source_func(Block* block, FormatSourceFunc formatSource);
+void block_set_post_compile_func(Block* block, PostCompileFunc postCompile);
 
 void block_check_invariants(caValue* result, Block* block);
 bool block_check_invariants_print_result(Block* block, std::ostream& out);

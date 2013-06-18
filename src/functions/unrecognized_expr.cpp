@@ -22,7 +22,7 @@ namespace unrecognized_expr_function {
     {
         FUNCS.unrecognized_expression = import_function(kernel, evaluate,
                 "unrecognized_expr(any ins :multiple)");
-        as_function(FUNCS.unrecognized_expression)->formatSource = formatSource;
+        block_set_format_source_func(function_contents(FUNCS.unrecognized_expression), formatSource);
     }
 }
 }

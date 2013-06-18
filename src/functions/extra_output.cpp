@@ -15,7 +15,7 @@ namespace extra_output_function {
     void setup(Block* kernel)
     {
         FUNCS.extra_output = import_function(kernel, NULL, "extra_output(any _) -> any");
-        block_set_specialize_type_func(as_function2(FUNCS.extra_output), specializeType);
+        block_set_specialize_type_func(function_contents(FUNCS.extra_output), specializeType);
         block_set_evaluation_empty(function_contents(FUNCS.extra_output), true);
     }
 }

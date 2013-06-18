@@ -53,7 +53,7 @@ namespace if_block_function {
     void setup(Block* kernel)
     {
         FUNCS.if_block = import_function(kernel, NULL, "if_block() -> any");
-        as_function(FUNCS.if_block)->formatSource = formatSource;
+        block_set_format_source_func(function_contents(FUNCS.if_block), formatSource);
 
         FUNCS.case_func = import_function(kernel, NULL, "case(bool b :optional)");
     }

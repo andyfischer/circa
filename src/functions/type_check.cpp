@@ -31,7 +31,7 @@ namespace type_check_function {
     }
     void hosted_is_function(caStack* stack)
     {
-        set_bool(circa_output(stack, 0), is_function(circa_input(stack, 0)));
+        set_bool(circa_output(stack, 0), is_func(circa_input(stack, 0)));
     }
     void hosted_is_type(caStack* stack)
     {
@@ -40,21 +40,21 @@ namespace type_check_function {
     void inputs_fit_function(caStack* stack)
     {
         caValue* inputs = circa_input(stack, 0);
-        Function* function = as_function(circa_input(stack, 1));
-        Block* block = function_contents(function);
+        Term* function = circa_caller_input_term(stack, 1);
+        Block* functionContents = function_contents(function);
         caValue* result = circa_output(stack, 0);
 
-        bool varArgs = has_variable_args(block);
+        bool varArgs = has_variable_args(functionContents);
 
         // Fail if wrong # of inputs
-        if (!varArgs && (count_input_placeholders(block) != circa_count(inputs))) {
+        if (!varArgs && (count_input_placeholders(functionContents) != circa_count(inputs))) {
             set_bool(result, false);
             return;
         }
 
         // Check each input
         for (int i=0; i < circa_count(inputs); i++) {
-            Term* placeholder = get_effective_input_placeholder(block, i);
+            Term* placeholder = get_effective_input_placeholder(functionContents, i);
             caValue* value = circa_index(inputs, i);
             if (value == NULL)
                 continue;

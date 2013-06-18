@@ -362,12 +362,14 @@ void selector_setup_funcs(Block* kernel)
     FUNCS.get_with_selector = 
         import_function(kernel, get_with_selector_evaluate,
             "get_with_selector(any object, Selector selector) -> any");
-    as_function(FUNCS.get_with_selector)->formatSource = get_with_selector__formatSource;
+    block_set_format_source_func(function_contents(FUNCS.get_with_selector),
+        get_with_selector__formatSource);
 
     FUNCS.set_with_selector =
         import_function(kernel, set_with_selector_evaluate,
             "set_with_selector(any object, Selector selector, any newValue) -> any");
-    as_function(FUNCS.set_with_selector)->formatSource = set_with_selector__formatSource;
+    block_set_format_source_func(function_contents(FUNCS.set_with_selector),
+        set_with_selector__formatSource);
 }
 
 } // namespace circa

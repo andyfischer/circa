@@ -111,11 +111,6 @@ struct Value : caValue
 
 #endif // __cplusplus
 
-// a Function holds data for a single Circa function, including a name, the function's
-// definition (stored as a Block), and various other metadata. Each Function has an
-// EvaluateFunc which is triggered when the function is called.
-typedef struct caFunction caFunction;
-
 // a Symbol is an alias for an integer, used to reference an interned string.
 typedef int caName;
 
@@ -312,7 +307,6 @@ bool circa_is_type(caValue* value);
 bool        circa_bool(caValue* value);
 caBlock*    circa_block(caValue* value);
 float       circa_float(caValue* value);
-caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
 void*       circa_object(caValue* value);
 caStack*    circa_stack(caValue* value);
@@ -454,9 +448,6 @@ caBlock* circa_parent_block(caTerm* term);
 // Get the owning Term for a given Block
 caTerm* circa_owning_term(caBlock* block);
 
-// Get the Block contents for a function
-caBlock* circa_function_contents(caFunction* func);
-
 // Access the fixed value of a value() Term. Returns NULL if Term is not a value.
 caValue* circa_term_value(caTerm* term);
 
@@ -490,9 +481,6 @@ typedef struct caFunctionBinding
 // Install a series of C function bindings. This will treat 'bindingList' as an array
 // that is terminanted with a NULL caFunctionBinding.
 void circa_install_function_list(caBlock* block, const caFunctionBinding* bindingList);
-
-// Create a new Function value with the given name. Returns the created Function.
-caFunction* circa_declare_function(caBlock* block, const char* name);
 
 // Create a new value() term with the given name. Returns the term's value, which is safe
 // to modify.

@@ -205,8 +205,8 @@ op_SetNull
 op_InlineCopy
 op_CallBlock
 op_DynamicMethodCall
-op_ClosureCall
-op_ClosureApply
+op_FuncCall
+op_FuncApply
 op_FireNative
 op_CaseBlock
 op_ForLoop

@@ -186,8 +186,8 @@ const char* builtin_symbol_to_string(int name)
     case op_InlineCopy: return "op_InlineCopy";
     case op_CallBlock: return "op_CallBlock";
     case op_DynamicMethodCall: return "op_DynamicMethodCall";
-    case op_ClosureCall: return "op_ClosureCall";
-    case op_ClosureApply: return "op_ClosureApply";
+    case op_FuncCall: return "op_FuncCall";
+    case op_FuncApply: return "op_FuncApply";
     case op_FireNative: return "op_FireNative";
     case op_CaseBlock: return "op_CaseBlock";
     case op_ForLoop: return "op_ForLoop";
@@ -987,38 +987,6 @@ int builtin_symbol_from_string(const char* str)
             return op_CallBlock;
         break;
     }
-    case 'l':
-    switch (str[5]) {
-    default: return -1;
-    case 'o':
-    switch (str[6]) {
-    default: return -1;
-    case 's':
-    switch (str[7]) {
-    default: return -1;
-    case 'u':
-    switch (str[8]) {
-    default: return -1;
-    case 'r':
-    switch (str[9]) {
-    default: return -1;
-    case 'e':
-    switch (str[10]) {
-    default: return -1;
-    case 'A':
-        if (strcmp(str + 11, "pply") == 0)
-            return op_ClosureApply;
-        break;
-    case 'C':
-        if (strcmp(str + 11, "all") == 0)
-            return op_ClosureCall;
-        break;
-    }
-    }
-    }
-    }
-    }
-    }
     case 'o':
         if (strcmp(str + 5, "ntinue") == 0)
             return op_Continue;
@@ -1104,6 +1072,26 @@ int builtin_symbol_from_string(const char* str)
         break;
     }
     }
+    }
+    }
+    }
+    case 'u':
+    switch (str[5]) {
+    default: return -1;
+    case 'n':
+    switch (str[6]) {
+    default: return -1;
+    case 'c':
+    switch (str[7]) {
+    default: return -1;
+    case 'A':
+        if (strcmp(str + 8, "pply") == 0)
+            return op_FuncApply;
+        break;
+    case 'C':
+        if (strcmp(str + 8, "all") == 0)
+            return op_FuncCall;
+        break;
     }
     }
     }

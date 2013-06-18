@@ -304,7 +304,7 @@ void Block__functions(caStack* stack)
     for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (is_function(term)) {
-            set_block(list_append(output), function_contents(as_function(term)));
+            set_block(list_append(output), function_contents(term));
         }
     }
 }
@@ -387,7 +387,7 @@ void Term__function(caStack* stack)
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
-    set_block(circa_output(stack, 0), function_contents(as_function(t->function)));
+    set_block(circa_output(stack, 0), term_function(t));
 }
 void Term__type(caStack* stack)
 {

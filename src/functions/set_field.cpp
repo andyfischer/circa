@@ -52,8 +52,8 @@ namespace set_field_function {
     {
         FUNCS.set_field = import_function(kernel, set_field,
                 "set_field(any obj, String key, any val) -> any");
-        block_set_specialize_type_func(as_function2(FUNCS.set_field), specializeType);
-        as_function(FUNCS.set_field)->formatSource = formatSource;
+        block_set_specialize_type_func(function_contents(FUNCS.set_field), specializeType);
+        block_set_format_source_func(function_contents(FUNCS.set_field), formatSource);
     }
 }
 }

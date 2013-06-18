@@ -322,7 +322,7 @@ caValue* term_value(Term* term)
 }
 Block* term_function(Term* term)
 {
-    return as_function2(term_value(term->function));
+    return nested_contents(term->function);
 }
 
 bool is_type(Term* term)
@@ -333,15 +333,7 @@ bool is_function(Term* term)
 {
     if (term == NULL)
         return false;
-    return is_value(term) && is_function(&term->value);
-}
-Function* as_function(Term* term)
-{
-    return as_function(term_value(term));
-}
-Block* as_function2(Term* term)
-{
-    return as_function2(term_value(term));
+    return term->function == FUNCS.function_decl;
 }
 
 Type* as_type(Term* term)

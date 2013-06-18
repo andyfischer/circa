@@ -49,7 +49,7 @@ namespace get_field_function {
         return head;
     }
 
-    void formatSource(caValue* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         format_name_binding(source, term);
         //append_phrase(source, get_relative_name(term, term->input(0)),
@@ -66,8 +66,8 @@ namespace get_field_function {
     {
         FUNCS.get_field = import_function(kernel, evaluate,
                 "get_field(any obj, String key) -> any");
-        block_set_specialize_type_func(as_function2(FUNCS.get_field), specializeType);
-        as_function(FUNCS.get_field)->formatSource = formatSource;
+        block_set_specialize_type_func(function_contents(FUNCS.get_field), specializeType);
+        block_set_format_source_func(function_contents(FUNCS.get_field), format_source);
     }
 }
 }

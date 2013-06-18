@@ -454,7 +454,7 @@ void evaluate_index_func(caStack* stack)
 void loop_setup_functions(Block* kernel)
 {
     Term* index_func = import_function(kernel, evaluate_index_func, "index(int i :optional) -> int");
-    as_function(index_func)->postCompile = index_func_postCompile;
+    block_set_post_compile_func(function_contents(index_func), index_func_postCompile);
 }
 
 } // namespace circa

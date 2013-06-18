@@ -1,11 +1,12 @@
 
-type Closure {
+type Func {
     Block block
     List bindings
 }
-def closure_block() -> Closure
-def Closure.call(self, any inputs :multiple) -> any
-def Closure.apply(self, List inputs) -> any
+
+def closure_block() -> Func
+def Func.call(self, any inputs :multiple) -> any
+def Func.apply(self, List inputs) -> any
 
 -- Builtin functions
 def convert(any value, Type t) -> any
@@ -42,7 +43,7 @@ def has_effects()
 def native_patch(String filename)
     -- Declare that this block should be patched by a native module.
 
-def declared_state(state any val, Type t, Closure initializer :optional) -> any
+def declared_state(state any val, Type t, Func initializer :optional) -> any
     if val != null
         -- Try to cast to the desired type
         val, cast_success = cast(val, t)
@@ -182,16 +183,13 @@ def Block.version(self) -> int
 def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 
-def Block.to_closure(self) -> Closure
-    Closure([self, []])
--- Language defect: Functions and closures should be stored with same data type.
-def Function.to_closure(self) -> Closure
-    self.block.to_closure
+def Block.to_func(self) -> Func
+    Func([self, []])
 
 -- Language defect: out-of-order function definition.
 def Block.call(self, any inputs :multiple) -> any
     -- Invoke this Block with the given inputs.
-    self.to_closure.apply(inputs)
+    self.to_func.apply(inputs)
 
 def Dict.count(self) -> int
     -- Return the number of elements
@@ -228,8 +226,6 @@ def Frame.outputs(self) -> List
     -- Returns a list of output register values
 def Frame.output(self, int nth) -> any
     -- Returns the nth output register value
-
-def Function.block(self) -> Block
 
 def capture_stack() -> Stack
     -- Returns a frozen copy of the currently executing stack.
@@ -281,18 +277,18 @@ def Stack.toString(self) -> String
 
 def make_stack() -> Stack
     -- Create a new stack
-def make_stack2(Closure closure) -> Stack
+def make_stack2(Func func) -> Stack
     stack = make_stack()
-    stack.push_frame(closure.block, [])
+    stack.push_frame(func.block, [])
     stack
 
 -- Actors
 type Actor {
-    Closure func
+    Func func
     Mutable stateVal
 }
 
-def make_actor(Closure func) -> Actor
+def make_actor(Func func) -> Actor
     actor = make(Actor)
     actor.func = func
     actor
@@ -391,18 +387,18 @@ def List.to_set(self) -> Set
 -- def List.pop(self) -> (List, any)
 -- TODO: List.pop, needs proper support for multiple outputs
 
-def List.filter(self, Closure func) -> List
+def List.filter(self, Func func) -> List
     result = []
     for i in self
         if func.call(i)
             result.append(i)
     result
 
-def List.map(self, Closure func) -> List
+def List.map(self, Func func) -> List
     for i in self
         func.call(i)
 
-def List.mapItem(self, int index, Closure func) -> List
+def List.mapItem(self, int index, Func func) -> List
     self.set(index, func.call(self[index]))
 
 def Map.contains(self, any key) -> bool
@@ -421,7 +417,7 @@ def Map.set(self, any key, any value) -> Map
 def Map.insertPairs(self, List pairs) -> Map
     -- Set multiple key-value pairs.
 def Map.empty(self) -> bool
-def Map.map_element(@self, any key, Closure func)
+def Map.map_element(@self, any key, Func func)
     @self.set(key, func.call(self.get(key)))
 
 -- Overloaded functions

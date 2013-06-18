@@ -26,7 +26,7 @@ namespace switch_function {
     void setup(Block* kernel)
     {
         FUNCS.switch_func = import_function(kernel, evaluate_switch, "switch(any input) -> any");
-        as_function(FUNCS.switch_func)->formatSource = switch_formatSource;
+        block_set_format_source_func(function_contents(FUNCS.switch_func), switch_formatSource);
 
         //FUNCS.case_func = import_function(kernel, evaluate_case, "case(any input)");
         //as_function(FUNCS.case_func)->formatSource = case_formatSource;

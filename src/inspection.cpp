@@ -211,11 +211,7 @@ Block* term_get_function_details(Term* call)
     if (is_type(call->function))
         return function_contents(FUNCS.cast);
 
-    caValue* value = term_value(call->function);
-    if (!is_function(value))
-        return NULL;
-
-    return function_get_contents(as_function(value));
+    return term_function(call);
 }
 
 Term* term_get_input_placeholder(Term* call, int index)

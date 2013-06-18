@@ -21,7 +21,7 @@ namespace unknown_identifier_function {
     void setup(Block* kernel)
     {
         FUNCS.unknown_identifier = import_function(kernel, evaluate, "unknown_identifier() -> any");
-        as_function(FUNCS.unknown_identifier)->formatSource = formatSource;
+        block_set_format_source_func(function_contents(FUNCS.unknown_identifier), formatSource);
     }
 }
 }

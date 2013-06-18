@@ -283,23 +283,23 @@ void control_flow_setup_funcs(Block* kernel)
 {
     FUNCS.return_func = import_function(kernel, NULL, "return(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.return_func), true);
-    as_function(FUNCS.return_func)->formatSource = return_formatSource;
-    as_function(FUNCS.return_func)->postCompile = controlFlow_postCompile;
+    block_set_format_source_func(function_contents(FUNCS.return_func), return_formatSource);
+    block_set_post_compile_func(function_contents(FUNCS.return_func), controlFlow_postCompile);
 
     FUNCS.discard = import_function(kernel, NULL, "discard(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.discard), true);
-    as_function(FUNCS.discard)->formatSource = discard_formatSource;
-    as_function(FUNCS.discard)->postCompile = controlFlow_postCompile;
+    block_set_format_source_func(function_contents(FUNCS.discard), discard_formatSource);
+    block_set_post_compile_func(function_contents(FUNCS.discard), controlFlow_postCompile);
 
     FUNCS.break_func = import_function(kernel, NULL, "break(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.break_func), true);
-    as_function(FUNCS.break_func)->formatSource = break_formatSource;
-    as_function(FUNCS.break_func)->postCompile = controlFlow_postCompile;
+    block_set_format_source_func(function_contents(FUNCS.break_func), break_formatSource);
+    block_set_post_compile_func(function_contents(FUNCS.break_func), controlFlow_postCompile);
 
     FUNCS.continue_func = import_function(kernel, NULL, "continue(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.continue_func), true);
-    as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
-    as_function(FUNCS.continue_func)->postCompile = controlFlow_postCompile;
+    block_set_format_source_func(function_contents(FUNCS.continue_func), continue_formatSource);
+    block_set_post_compile_func(function_contents(FUNCS.continue_func), controlFlow_postCompile);
 }
 
 } // namespace circa
