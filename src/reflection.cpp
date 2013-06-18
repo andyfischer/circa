@@ -5,7 +5,6 @@
 
 #include <set>
 
-#include "actors.h"
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"

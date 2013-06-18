@@ -2,7 +2,6 @@
 
 #include "common_headers.h"
 
-#include "actors.h"
 #include "building.h"
 #include "blob.h"
 #include "block.h"
@@ -641,6 +640,34 @@ caValue* frame_bytecode(Frame* frame)
 Block* frame_block(Frame* frame)
 {
     return frame->block;
+}
+
+bool state_inject(Stack* stack, caValue* name, caValue* value)
+{
+    caValue* state = stack_get_state(stack);
+    Block* block = top_frame(stack)->block;
+
+    // Initialize stateValue if it's currently null.
+    if (is_null(state))
+        make(block->stateType, state);
+
+    caValue* slot = get_field(state, name, NULL);
+    if (slot == NULL)
+        return false;
+
+    touch(state);
+    copy(value, get_field(state, name, NULL));
+    return true;
+}
+
+caValue* context_inject(Stack* stack, caValue* name)
+{
+    Frame* frame = top_frame(stack);
+
+    if (is_null(&frame->dynamicScope))
+        set_hashtable(&frame->dynamicScope);
+
+    return hashtable_insert(&frame->dynamicScope, name);
 }
 
 caValue* frame_register_from_end(Frame* frame, int index)

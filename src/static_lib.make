@@ -64,7 +64,6 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/actors.o \
 	$(OBJDIR)/blob.o \
 	$(OBJDIR)/block.o \
 	$(OBJDIR)/building.o \
@@ -181,9 +180,6 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/actors.o: actors.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/blob.o: blob.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"

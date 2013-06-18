@@ -2,7 +2,6 @@
 
 #include "unit_test_common.h"
 
-#include "actors.h"
 #include "kernel.h"
 
 namespace actor_test {

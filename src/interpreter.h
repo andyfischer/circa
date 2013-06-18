@@ -209,6 +209,10 @@ caValue* get_top_register(Stack* stack, Term* term);
 caValue* frame_bytecode(Frame* frame);
 Block* frame_block(Frame* frame);
 
+// Miscellaneous stack access & manipulation.
+bool state_inject(Stack* stack, caValue* name, caValue* value);
+caValue* context_inject(Stack* stack, caValue* name);
+
 // Create an output value for the current term, using the declared type's
 // initialize function.
 void create_output(Stack* stack);

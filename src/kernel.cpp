@@ -5,7 +5,6 @@
 #include "circa/circa.h"
 #include "circa/file.h"
 
-#include "actors.h"
 #include "blob.h"
 #include "block.h"
 #include "building.h"
