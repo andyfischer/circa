@@ -74,25 +74,18 @@ Type* get_value_type(caValue* v)
 
 void set_null(caValue* value)
 {
-    if (value->value_type == NULL)
+    if (value->value_type == NULL || value->value_type == TYPES.null)
         return;
 
     if (value->value_type->release != NULL)
         value->value_type->release(value);
 
+    Type* type = value->value_type;
+
     value->value_type = TYPES.null;
     value->value_data.ptr = NULL;
-}
 
-void release(caValue* value)
-{
-    if (value->value_type != NULL) {
-        ReleaseFunc release = value->value_type->release;
-        if (release != NULL)
-            release(value);
-    }
-    value->value_type = TYPES.null;
-    value->value_data.ptr = 0;
+    type_decref(type);
 }
 
 void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)

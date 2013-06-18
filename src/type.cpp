@@ -101,18 +101,30 @@ namespace type_t {
 
 void type_incref(Type* type)
 {
-    ca_assert(type->refcount >= 1);
-    type->refcount++;
+    if (type->header.root)
+        return;
+    ca_assert(type->header.refcount >= 1);
+    type->header.refcount++;
 }
 
 void type_decref(Type* type)
 {
-    ca_assert(type->refcount >= 1);
-    type->refcount--;
-    if (type->refcount == 0) {
-        predelete_type(type);
-        dealloc_type(type);
-    }
+    if (type->header.root)
+        return;
+    ca_assert(type->header.refcount >= 1);
+    type->header.refcount--;
+    if (type->header.refcount == 0)
+        delete_type(type);
+}
+
+bool type_is_root(Type* type)
+{
+    return type->header.root;
+}
+
+void type_set_root(Type* type)
+{
+    type->header.root = true;
 }
 
 const char*
@@ -173,7 +185,7 @@ Type* create_type_unconstructed()
     Type* t = (Type*) malloc(sizeof(Type));
     memset(t, 0, sizeof(Type));
     t->storageType = sym_StorageTypeNull;
-    t->refcount = 1;
+    t->header.refcount = 1;
     t->inUse = false;
     return t;
 }
@@ -193,6 +205,12 @@ Type* create_type()
     Type* type = create_type_unconstructed();
     type_finish_construction(type);
     return type;
+}
+
+void delete_type(Type* type)
+{
+    predelete_type(type);
+    dealloc_type(type);
 }
 
 void predelete_type(Type* type)

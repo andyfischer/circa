@@ -94,8 +94,6 @@ struct Type
     Value parameter;
     int objectSize;
 
-    // Memory tracking.
-    int refcount;
     bool inUse;
 
     const char* nameStr();
@@ -132,6 +130,7 @@ struct StaticTypeQuery
     // Outputs
     Result result;
 
+
     StaticTypeQuery() : type(NULL), subject(NULL), subjectType(NULL),
         result(NULL_RESULT) {}
 
@@ -156,10 +155,13 @@ void type_finish_construction(Type* type);
 
 // Create a Type object.
 Type* create_type();
+void delete_type(Type* type);
 void predelete_type(Type* type);
 
 void type_incref(Type* type);
 void type_decref(Type* type);
+bool type_is_root(Type* type);
+void type_set_root(Type* type);
 
 Type* unbox_type(Term* type);
 Type* unbox_type(caValue* val);

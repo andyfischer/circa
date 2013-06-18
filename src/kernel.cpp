@@ -797,6 +797,9 @@ void bootstrap_kernel()
     TYPES.term = create_type();
     TYPES.void_type = create_type();
 
+    type_set_root(TYPES.string);
+    type_set_root(TYPES.null);
+
     any_t::setup_type(TYPES.any);
     blob_setup_type(TYPES.blob);
     block_setup_type(TYPES.block);
@@ -873,6 +876,7 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.term, "Term");
     create_type_value(builtins, TYPES.void_type, "void");
     create_type_value(builtins, TYPES.map, "Map");
+
 
     // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
