@@ -166,33 +166,21 @@ void translate_terms_type()
 
 void bug_with_migration_and_stale_pointer()
 {
-    FakeFilesystem fs;
-    fs.set("lib.ca", "type T { int a }\n"
-            "def make_t() -> T { make(T) }\n"
-            "def inc_t(T t) -> T { t.a += 1 }");
-    load_module_file(global_world(), "bug_with_migration_and_stale_pointer", "lib.ca");
-
-    Block* block = fetch_module(global_world(), "bug_with_migration_and_stale_pointer_2");
-    block->compile("test_spy(inc_t(make_t()))");
-
-    Stack stack;
-    push_frame(&stack, block);
-
     test_spy_clear();
-    run_interpreter(&stack);
-    test_assert(&stack);
-    test_equals(test_spy_get_results(), "[{a: 1}]");
 
-    fs.set("lib.ca", "type T { int a }\n"
-            "def make_t() -> T { make(T) }\n"
-            "def inc_t(T t) -> T { t.a += 2}");
-    load_module_file(global_world(), "bug_with_migration_and_stale_pointer", "lib.ca");
+    run_and_migrate_and_run(
+        "type T { int a }\n"
+        "def make_t() -> T { make(T) }\n"
+        "def inc_t(T t) -> T { t.a += 1 }\n"
+        "test_spy(inc_t(make_t()))",
 
-    stack_restart(&stack);
-    test_spy_clear();
-    run_interpreter(&stack);
-    test_assert(&stack);
-    test_equals(test_spy_get_results(), "[{a: 2}]");
+        "type T { int a }\n"
+        "def make_t() -> T { make(T) }\n"
+        "def inc_t(T t) -> T { t.a += 2}"
+        "test_spy(inc_t(make_t()))"
+    );
+
+    test_equals(test_spy_get_results(), "[{a: 1}, {a: 2}]");
 }
 
 void stack_migration_deletes_block()

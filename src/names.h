@@ -11,10 +11,10 @@ struct NameSearch
     // Search name.
     Value name;
 
-    // Search position; the name search will look for bindings at this block index and
-    // above.
-    // If this is -1, it means the search position should be the end of the block.
-    int position;
+    // Position to start the name search, this can either be:
+    //   integer - a term index.
+    //   :Last   - last term in the block.
+    Value position;
 
     // Unique ordinal value. The name search will only match terms with this ordinal
     // (the ordinal is used to distinguish terms that have the same name).
@@ -32,26 +32,24 @@ struct NameSearch
 // Finds a name in this block or a visible parent block.
 Term* find_name(Block* block,
                 caValue* name,
-                int position = -1,
                 Symbol lookupType = sym_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       caValue* name,
-                      int position = -1,
                       Symbol lookupType = sym_LookupAny);
 
 // Convenient overloads for using a string as a name
 Term* find_name(Block* block,
                 const char* name,
-                int position = -1,
                 Symbol lookupType = sym_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       const char* name,
-                      int position = -1,
                       Symbol lookupType = sym_LookupAny);
+
+Term* find_local_name_at_position(Block* block, caValue* name, caValue* position);
 
 Term* find_name_at(Term* term, const char* name);
 Term* find_name_at(Term* term, caValue* name);
@@ -100,7 +98,6 @@ Type* find_type(World* world, const char* name);
 Type* find_type_local(Block* block, const char* name);
 Block* find_function(World* world, const char* name);
 Block* find_function_local(Block* block, const char* name);
-Block* find_module(World* world, const char* name);
 
 void qualified_name_get_first_section(caValue* name, caValue* prefixResult);
 void qualified_name_get_remainder_after_first_section(caValue* name, caValue* suffixResult);

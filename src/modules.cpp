@@ -63,7 +63,9 @@ Block* find_loaded_module(const char* name)
 
 Block* fetch_module(World* world, const char* name)
 {
-    Block* existing = find_module(world, name);
+    Value nameStr;
+    set_string(&nameStr, name);
+    Block* existing = find_module(world->root, &nameStr);
     if (existing != NULL)
         return existing;
 
@@ -114,7 +116,9 @@ static bool find_module_file(World* world, const char* moduleName, caValue* file
 
 Block* load_module_file(World* world, const char* moduleName, const char* filename)
 {
-    Block* existing = find_module(world, moduleName);
+    Value moduleNameStr;
+    set_string(&moduleNameStr, moduleName);
+    Block* existing = find_module(world->root, &moduleNameStr);
 
     if (existing == NULL) {
         Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
@@ -256,6 +260,22 @@ void load_module_eval(caStack* stack)
     caValue* moduleName = circa_input(stack, 0);
     Block* module = load_module_by_name(global_world(), as_cstring(moduleName));
     set_block(circa_output(stack, 0), module);
+}
+
+Block* find_module(Block* root, caValue* name)
+{
+    Block* moduleLevel = global_world()->root;
+
+    for (int i=0; i < moduleLevel->length(); i++) {
+        Term* term = moduleLevel->get(i);
+        if (term->function != FUNCS.module)
+            continue;
+
+        if (equals(term_name(term), name))
+            return nested_contents(term);
+    }
+
+    return NULL;
 }
 
 void modules_install_functions(Block* kernel)

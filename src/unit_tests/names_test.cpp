@@ -152,7 +152,7 @@ void bug_with_lookup_type_and_qualified_name()
     Block* module = create_block(&block, "module");
     Term* T = create_type(module, "T");
 
-    test_assert(T == find_name(&block, "module:T", -1, sym_LookupType));
+    test_assert(T == find_name(&block, "module:T", sym_LookupType));
 }
 
 void type_name_visible_from_module()

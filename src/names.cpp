@@ -9,6 +9,7 @@
 #include "heap_debugging.h"
 #include "if_block.h"
 #include "inspection.h"
+#include "modules.h"
 #include "names_builtin.h"
 #include "source_repro.h"
 #include "string_type.h"
@@ -42,6 +43,27 @@ bool fits_lookup_type(Term* term, Symbol type)
     return false;
 }
 
+bool is_module(Block* block)
+{
+    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.module;
+}
+
+Block* find_module_for_require_statement(Term* term)
+{
+    if (term->input(0) == NULL)
+        return NULL;
+
+    caValue* moduleName = term_value(term->input(0));
+
+    return find_module(term->owningBlock, moduleName);
+}
+
+Block* find_builtins_block(Block* block)
+{
+    Block* builtins = global_world()->builtins;
+    return builtins;
+}
+
 Term* run_name_search(NameSearch* params)
 {
     if (is_null(&params->name) || string_eq(&params->name, ""))
@@ -52,10 +74,12 @@ Term* run_name_search(NameSearch* params)
     if (block == NULL)
         return NULL;
 
-    // position can be -1, meaning 'last term'
-    int position = params->position;
-    if (position == -1)
+    int position = 0;
+    
+    if (is_symbol(&params->position) && as_symbol(&params->position) == sym_Last)
         position = block->length();
+    else
+        position = as_int(&params->position);
 
     if (position > block->length())
         position = block->length();
@@ -72,17 +96,35 @@ Term* run_name_search(NameSearch* params)
             return term;
 
         // If this term exposes its names, then search inside the nested block.
+        // (Deprecated, I think).
         if (term->nestedContents != NULL && exposes_nested_names(term)) {
             NameSearch nestedSearch;
             nestedSearch.block = term->nestedContents;
-            nestedSearch.name = params->name;
-            nestedSearch.position = -1;
+            set_value(&nestedSearch.name, &params->name);
+            set_symbol(&nestedSearch.position, sym_Last);
             nestedSearch.ordinal = -1;
             nestedSearch.lookupType = params->lookupType;
             nestedSearch.searchParent = false;
-            Term* nested = run_name_search(&nestedSearch);
-            if (nested != NULL)
-                return nested;
+            Term* found = run_name_search(&nestedSearch);
+            if (found != NULL)
+                return found;
+        }
+
+        // Check for a 'require' statement. If found, continue this search in the designated module.
+        if (term->function == FUNCS.require) {
+            Block* module = find_module_for_require_statement(term);
+            if (module != NULL) {
+                NameSearch moduleSearch;
+                moduleSearch.block = module;
+                set_value(&moduleSearch.name, &params->name);
+                set_symbol(&moduleSearch.position, sym_Last);
+                moduleSearch.ordinal = -1;
+                moduleSearch.lookupType = params->lookupType;
+                moduleSearch.searchParent = false;
+                Term* found = run_name_search(&moduleSearch);
+                if (found != NULL)
+                    return found;
+            }
         }
     }
 
@@ -90,12 +132,31 @@ Term* run_name_search(NameSearch* params)
     Value namespacePrefix;
     qualified_name_get_first_section(&params->name, &namespacePrefix);
 
+    // See if the prefix is a module name.
+    if (!is_null(&namespacePrefix)) {
+        Block* module = find_module(params->block, &namespacePrefix);
+        if (module != NULL) {
+
+            NameSearch moduleSearch;
+            moduleSearch.block = module;
+            qualified_name_get_remainder_after_first_section(&params->name, &moduleSearch.name);
+            set_symbol(&moduleSearch.position, sym_Last);
+            moduleSearch.ordinal = params->ordinal;
+            moduleSearch.lookupType = params->lookupType;
+            moduleSearch.searchParent = false;
+            Term* found = run_name_search(&moduleSearch);
+            if (found != NULL)
+                return found;
+        }
+    }
+
     // If it's a qualified name, search for the first prefix.
+    // (Deprecated)
     if (!is_null(&namespacePrefix)) {
         NameSearch nsSearch;
         nsSearch.block = params->block;
         nsSearch.name = namespacePrefix;
-        nsSearch.position = params->position;
+        set_value(&nsSearch.position, &params->position);
         nsSearch.ordinal = params->ordinal;
         nsSearch.lookupType = sym_LookupAny;
         nsSearch.searchParent = false;
@@ -106,7 +167,7 @@ Term* run_name_search(NameSearch* params)
             NameSearch nestedSearch;
             nestedSearch.block = nested_contents(nsPrefixTerm);
             qualified_name_get_remainder_after_first_section(&params->name, &nestedSearch.name);
-            nestedSearch.position = -1;
+            set_symbol(&nestedSearch.position, sym_Last);
             nestedSearch.ordinal = params->ordinal;
             nestedSearch.lookupType = params->lookupType;
             nestedSearch.searchParent = false;
@@ -114,99 +175,117 @@ Term* run_name_search(NameSearch* params)
         }
     }
 
-    // Possibly continue search to parent block.
-    if (params->searchParent) {
+    // Did not find in the local block. Possibly continue this search upwards.
+    
+    if (!params->searchParent)
+        return NULL;
 
-        // Don't continue the search if we just searched the root.
-        if (block == global_root_block())
-            return NULL;
-
-        // Search parent
-
-        // the position is our parent's position plus one, so that we do look
-        // at the parent's block (in case our name has a namespace prefix
-        // that refers back to the inside of this block).
-        //
-        // TODO: This has an issue where, if we do have a qualified name that
-        // refers back to this block as a namespace, the search location will
-        // be wrong later.
-        //
-        // Say we have block:
-        // namespace ns {
-        //   a = 1
-        //   b = 2  <-- search location
-        //   c = 3
-        // }
-        //
-        // We start at location 'b' and search for ns:c. This will fail at first, then
-        // go to the parent block which finds 'ns', which searches inside 'ns' to find 'c'.
-        // However, ns:c is not visible at location 'b'.
-        
-        NameSearch parentSearch;
-
-        Term* parentTerm = block->owningTerm;
-        if (parentTerm != NULL) {
-            parentSearch.block = parentTerm->owningBlock;
-            parentSearch.position = parentTerm->index + 1;
-        } else {
-            parentSearch.block = global_root_block();
-            parentSearch.position = -1;
-        }
-        copy(&params->name, &parentSearch.name);
-        parentSearch.name = params->name;
-        parentSearch.lookupType = params->lookupType;
-        parentSearch.ordinal = -1;
-        parentSearch.searchParent = true;
-        return run_name_search(&parentSearch);
+    // Possibly take this search to the builtins block.
+    if ((get_parent_block(block) == NULL) || is_module(block)) {
+        NameSearch builtinsSearch;
+        builtinsSearch.block = find_builtins_block(block);
+        set_value(&builtinsSearch.name, &params->name);
+        set_symbol(&builtinsSearch.position, sym_Last);
+        builtinsSearch.lookupType = params->lookupType;
+        builtinsSearch.ordinal = -1;
+        builtinsSearch.searchParent = false;
+        return run_name_search(&builtinsSearch);
     }
 
-    return NULL;
+    // Search parent
+
+    // the position is our parent's position plus one, so that we do look
+    // at the parent's block (in case our name has a namespace prefix
+    // that refers back to the inside of this block).
+    //
+    // TODO: This has an issue where, if we do have a qualified name that
+    // refers back to this block as a namespace, the search location will
+    // be wrong later.
+    //
+    // Say we have block:
+    // namespace ns {
+    //   a = 1
+    //   b = 2  <-- search location
+    //   c = 3
+    // }
+    //
+    // We start at location 'b' and search for ns:c. This will fail at first, then
+    // go to the parent block which finds 'ns', which searches inside 'ns' to find 'c'.
+    // However, ns:c is not visible at location 'b'.
+    
+    NameSearch parentSearch;
+
+    Term* parentTerm = block->owningTerm;
+    if (parentTerm != NULL) {
+        parentSearch.block = parentTerm->owningBlock;
+        set_int(&parentSearch.position, parentTerm->index + 1);
+    } else {
+        parentSearch.block = global_root_block();
+        set_symbol(&parentSearch.position, sym_Last);
+    }
+    set_value(&parentSearch.name, &params->name);
+    parentSearch.lookupType = params->lookupType;
+    parentSearch.ordinal = -1;
+    parentSearch.searchParent = true;
+    return run_name_search(&parentSearch);
 }
 
-Term* find_name(Block* block, caValue* name, int position, Symbol lookupType)
+Term* find_name(Block* block, caValue* name, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
     copy(name, &nameSearch.name);
-    nameSearch.position = position;
+    set_symbol(&nameSearch.position, sym_Last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Block* block, caValue* name, int position, Symbol lookupType)
+Term* find_local_name(Block* block, caValue* name, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
     copy(name, &nameSearch.name);
-    nameSearch.position = position;
+    set_symbol(&nameSearch.position, sym_Last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = false;
     return run_name_search(&nameSearch);
 }
 
-Term* find_name(Block* block, const char* nameStr, int position, Symbol lookupType)
+Term* find_name(Block* block, const char* nameStr, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
     set_string(&nameSearch.name, nameStr);
-    nameSearch.position = position;
+    set_symbol(&nameSearch.position, sym_Last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Block* block, const char* nameStr, int position, Symbol lookupType)
+Term* find_local_name(Block* block, const char* nameStr, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
     set_string(&nameSearch.name, nameStr);
-    nameSearch.position = position;
+    set_symbol(&nameSearch.position, sym_Last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
+    nameSearch.searchParent = false;
+    return run_name_search(&nameSearch);
+}
+
+Term* find_local_name_at_position(Block* block, caValue* name, caValue* position)
+{
+    NameSearch nameSearch;
+    nameSearch.block = block;
+    set_value(&nameSearch.name, name);
+    set_value(&nameSearch.position, position);
+    nameSearch.ordinal = -1;
+    nameSearch.lookupType = sym_LookupAny;
     nameSearch.searchParent = false;
     return run_name_search(&nameSearch);
 }
@@ -286,7 +365,7 @@ Term* find_from_global_name(World* world, const char* globalNameStr)
         NameSearch nameSearch;
         string_slice(&globalName, 0, nameEnd, &nameSearch.name);
         nameSearch.block = block;
-        nameSearch.position = -1;
+        set_symbol(&nameSearch.position, sym_Last);
         nameSearch.ordinal = ordinal;
         nameSearch.lookupType = sym_LookupAny;
         nameSearch.searchParent = false;
@@ -312,7 +391,7 @@ Term* find_name_at(Term* term, const char* name)
     NameSearch nameSearch;
     nameSearch.block = term->owningBlock;
     set_string(&nameSearch.name, name);
-    nameSearch.position = term->index;
+    set_int(&nameSearch.position, term->index);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = sym_LookupAny;
     nameSearch.searchParent = true;
@@ -324,7 +403,7 @@ Term* find_name_at(Term* term, caValue* name)
     NameSearch nameSearch;
     nameSearch.block = term->owningBlock;
     copy(name, &nameSearch.name);
-    nameSearch.position = term->index;
+    set_int(&nameSearch.position, term->index);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = sym_LookupAny;
     nameSearch.searchParent = true;
@@ -686,39 +765,42 @@ Term* find_from_unique_name(Block* block, const char* name)
 
 Type* find_type(World* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, sym_LookupType);
+    caTerm* term = find_name(world->root, name, sym_LookupType);
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
 }
 Type* find_type_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(block, name, -1, sym_LookupType);
+    caTerm* term = find_name(block, name, sym_LookupType);
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
 }
 Block* find_function(World* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, sym_LookupFunction);
+    caTerm* term = find_name(world->root, name, sym_LookupFunction);
     if (term == NULL)
         return NULL;
     return function_contents(term);
 }
 Block* find_function_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(block, name, -1, sym_LookupFunction);
+    caTerm* term = find_name(block, name, sym_LookupFunction);
     if (term == NULL)
         return NULL;
     return function_contents(term);
 }
+
+#if 0
 Block* find_module(World* world, const char* name)
 {
-    caTerm* term = find_name(world->root, name, -1, sym_LookupModule);
+    caTerm* term = find_name(world->root, name, sym_LookupModule);
     if (term == NULL)
         return NULL;
     return nested_contents(term);
 }
+#endif
 
 void qualified_name_get_first_section(caValue* name, caValue* prefixResult)
 {

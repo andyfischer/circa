@@ -26,8 +26,11 @@ void test_require()
 {
     FakeFilesystem fs;
 
-    fs.set("module.ca", "def f()->int { 5 }");
-    fs.set("user.ca", "require module; test_spy(module:f())");
+    fs.set("module.ca", "def f(String s)->int { test_spy(concat('f: ' s)) }");
+    fs.set("user.ca", "require module\n"
+      "f('without prefix')\n"
+      "module:f('with prefix')"
+      );
 
     load_module_file(global_world(), "module", "module.ca");
     Block* block = load_module_file(global_world(), "test_require", "user.ca");
@@ -39,7 +42,7 @@ void test_require()
     run_interpreter(&stack);
 
     test_assert(&stack);
-    test_equals(test_spy_get_results(), "[5]");
+    test_equals(test_spy_get_results(), "['f: without prefix', 'f: with prefix']");
 }
 
 void test_explicit_output()

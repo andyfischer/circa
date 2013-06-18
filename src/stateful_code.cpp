@@ -21,7 +21,7 @@
 
 namespace circa {
 
-static void list_inputs_to_pack_state(Block* block, int position, TermList* output);
+static void list_inputs_to_pack_state(Block* block, caValue* position, TermList* output);
 static Term* append_final_pack_state(Block* block);
 
 bool is_declared_state(Term* term)
@@ -148,21 +148,22 @@ void block_mark_state_type_dirty(Block* block)
 static Term* append_final_pack_state(Block* block)
 {
     TermList inputs;
-    list_inputs_to_pack_state(block, block->length(), &inputs);
+    Value position;
+    set_symbol(&position, sym_Last);
+    list_inputs_to_pack_state(block, &position, &inputs);
     Term* term = apply(block, FUNCS.pack_state, inputs);
     term->setBoolProp("final", true);
     return term;
 }
 
 // For the given field name
-static Term* find_output_term_for_state_field(Block* block, const char* fieldName, int position)
+static Term* find_output_term_for_state_field(Block* block, const char* fieldName, caValue* position)
 {
     Term* result = find_from_unique_name(block, fieldName);
 
     // For declared state, the result is the last term with the given name
-    if (result->function == FUNCS.declared_state) {
-        return find_local_name(block, result->name.c_str(), position);
-    }
+    if (result->function == FUNCS.declared_state)
+        return find_local_name_at_position(block, term_name(result), position);
 
     ca_assert(result != NULL);
 
@@ -181,7 +182,7 @@ static Term* find_output_term_for_state_field(Block* block, const char* fieldNam
     return result;
 }
 
-static void list_inputs_to_pack_state(Block* block, int position, TermList* output)
+static void list_inputs_to_pack_state(Block* block, caValue* position, TermList* output)
 {
     output->clear();
 
@@ -216,10 +217,13 @@ void block_update_pack_state_calls(Block* block)
         if (term == NULL)
             continue;
 
+        Value position;
+        set_int(&position, i);
+
         if (term->function == FUNCS.pack_state) {
             // Update the inputs for this pack_state call
             TermList inputs;
-            list_inputs_to_pack_state(block, i, &inputs);
+            list_inputs_to_pack_state(block, &position, &inputs);
             set_inputs(term, inputs);
         }
 
@@ -229,7 +233,7 @@ void block_update_pack_state_calls(Block* block)
 
             if (existing == NULL || existing->function != FUNCS.pack_state) {
                 TermList inputs;
-                list_inputs_to_pack_state(block, i, &inputs);
+                list_inputs_to_pack_state(block, &position, &inputs);
                 if (inputs.length() != 0) {
                     Term* pack_state = apply(block, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
@@ -302,7 +306,9 @@ Term* find_or_create_default_state_input(Block* block)
 Term* block_add_pack_state(Block* block)
 {
     TermList inputs;
-    list_inputs_to_pack_state(block, block->length(), &inputs);
+    Value position;
+    set_symbol(&position, sym_Last);
+    list_inputs_to_pack_state(block, &position, &inputs);
 
     // Don't create anything if there are no state outputs
     if (inputs.length() == 0)

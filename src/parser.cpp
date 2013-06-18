@@ -483,7 +483,7 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
 
     std::string typeName = tokens.consumeStr();
 
-    Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
+    Term* typeTerm = find_name(block, typeName.c_str(), sym_LookupType);
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
@@ -742,7 +742,7 @@ consume_next_output: {
             }
 
             std::string typeName = tokens.consumeStr();
-            Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
+            Term* typeTerm = find_name(block, typeName.c_str(), sym_LookupType);
 
             if (typeTerm == NULL) {
                 std::string msg;
@@ -1261,7 +1261,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
 
     bool unknownType = false;
     if (typeName != "") {
-        Term* typeTerm = find_name(block, typeName.c_str(), -1, sym_LookupType);
+        Term* typeTerm = find_name(block, typeName.c_str(), sym_LookupType);
 
         if (typeTerm == NULL) {
             unknownType = true;
@@ -1964,12 +1964,12 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
 
     std::string functionName = tokens.consumeStr(tok_Identifier);
 
-    Term* function = find_name(block, functionName.c_str(), -1, sym_LookupFunction);
+    Term* function = find_name(block, functionName.c_str(), sym_LookupFunction);
 
     // If we didn't find anything with LookupFunction, then try to find a type name.
     // DEPRECATED: Type names as functions.
     if (function == NULL)
-        function = find_name(block, functionName.c_str(), -1, sym_LookupType);
+        function = find_name(block, functionName.c_str(), sym_LookupType);
 
     tokens.consume(tok_LParen);
 

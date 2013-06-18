@@ -18,6 +18,7 @@
 #include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
+#include "modules.h"
 #include "parser.h"
 #include "reflection.h"
 #include "stateful_code.h"
@@ -2489,7 +2490,9 @@ CIRCA_EXPORT void circa_push_function(caStack* stack, caBlock* func)
 
 CIRCA_EXPORT void circa_push_module(caStack* stack, const char* name)
 {
-    Block* block = find_module(stack->world, name);
+    Value nameStr;
+    set_string(&nameStr, name);
+    Block* block = find_module(stack->world->root, &nameStr);
     if (block == NULL) {
         // TODO: Save this error on the stack instead of stdout
         std::cout << "in circa_push_module, module not found: " << name << std::endl;

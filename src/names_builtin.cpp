@@ -25,6 +25,8 @@ const char* builtin_symbol_to_string(int name)
     case sym_Yes: return "Yes";
     case sym_No: return "No";
     case sym_Maybe: return "Maybe";
+    case sym_Index: return "Index";
+    case sym_Last: return "Last";
     case sym_EvaluationEmpty: return "EvaluationEmpty";
     case sym_HasEffects: return "HasEffects";
     case sym_HasControlFlow: return "HasControlFlow";
@@ -515,6 +517,10 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 3, "alid") == 0)
             return sym_Invalid;
         break;
+    case 'd':
+        if (strcmp(str + 3, "ex") == 0)
+            return sym_Index;
+        break;
     case 'f':
         if (strcmp(str + 3, "ixOperator") == 0)
             return sym_InfixOperator;
@@ -573,6 +579,8 @@ int builtin_symbol_from_string(const char* str)
     case 't':
     switch (str[4]) {
     default: return -1;
+    case 0:
+            return sym_Last;
     case 'S':
         if (strcmp(str + 5, "tatIndex") == 0)
             return sym_LastStatIndex;

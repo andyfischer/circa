@@ -11,6 +11,8 @@ Failure
 Yes
 No
 Maybe
+Index
+Last
 
 # Block properties
 EvaluationEmpty

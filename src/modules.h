@@ -36,7 +36,7 @@ Block* find_loaded_module(const char* name);
 Block* find_module_from_filename(const char* filename);
 
 // Prefered:
-Block* find_module_by_name(Block* root, const char* name);
+Block* find_module(Block* root, caValue* name);
 
 // -- Bundles --
 Block* module_create_empty_bundle(World* world, const char* name);

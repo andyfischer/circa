@@ -685,7 +685,7 @@ Block* global_root_block()
 
 Block* global_builtins_block()
 {
-    return nested_contents(global_root_block()->get(0));
+    return global_world()->builtins;
 }
 
 std::string term_toString(caValue* val)
@@ -831,6 +831,7 @@ void bootstrap_kernel()
     Term* builtinsTerm = g_world->root->appendNew();
     rename(builtinsTerm, "builtins");
     Block* builtins = make_nested_contents(builtinsTerm);
+    g_world->builtins = builtins;
 
     // Create value function
     Term* valueFunc = builtins->appendNew();
