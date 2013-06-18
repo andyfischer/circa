@@ -599,6 +599,8 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
     
     if (term->type == NULL)
         out << "<NULL type>";
+    else if (!is_string(&term->type->name))
+        out << "<Anon type>";
     else
         out << as_cstring(&term->type->name);
 

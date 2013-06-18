@@ -217,14 +217,14 @@ Type* create_type()
 void delete_type(Type* type)
 {
     predelete_type(type);
-    dealloc_type(type);
+    //FIXME dealloc_type(type);
 }
 
 void predelete_type(Type* type)
 {
     set_null(&type->properties);
     set_null(&type->parameter);
-    set_null(&type->name);
+    //FIXME set_null(&type->name);
 }
 
 static void dealloc_type(Type* type)
