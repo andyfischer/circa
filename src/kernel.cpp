@@ -766,16 +766,20 @@ void bootstrap_kernel()
     memset(&FUNCS, 0, sizeof(FUNCS));
     memset(&TYPES, 0, sizeof(TYPES));
 
-    // First, instanciate the types that are used by Type.
-    TYPES.dict = create_type_uninitialized();
-    TYPES.null = create_type_uninitialized();
-    TYPES.string = create_type_uninitialized();
-    TYPES.type = create_type_uninitialized();
+    // Allocate a World object.
+    g_world = alloc_world();
+    g_world->bootstrapStatus = sym_Bootstrapping;
 
-    initialize_type(TYPES.dict);
-    initialize_type(TYPES.null);
-    initialize_type(TYPES.string);
-    initialize_type(TYPES.type);
+    // Instanciate the types that are used by Type.
+    TYPES.dict = create_type_unconstructed();
+    TYPES.null = create_type_unconstructed();
+    TYPES.string = create_type_unconstructed();
+    TYPES.type = create_type_unconstructed();
+
+    type_finish_construction(TYPES.dict);
+    type_finish_construction(TYPES.null);
+    type_finish_construction(TYPES.string);
+    type_finish_construction(TYPES.type);
     string_setup_type(TYPES.string);
 
     // Initialize remaining global types.
@@ -810,9 +814,6 @@ void bootstrap_kernel()
     type_t::setup_type(TYPES.type);
     void_t::setup_type(TYPES.void_type);
 
-    // Start building World.
-    g_world = alloc_world();
-    g_world->bootstrapStatus = sym_Bootstrapping;
 
     // Create root Block.
     g_world->root = new Block();
@@ -923,9 +924,6 @@ void bootstrap_kernel()
 
     FUNCS.section_block = import_function(builtins, NULL, "def section_block() -> any");
     block_set_format_source_func(function_contents(FUNCS.section_block), section_block_formatSource);
-
-    // Create IMPLICIT_TYPES (deprecated)
-    type_initialize_kernel(builtins);
 
     // Now we can build derived functions
 

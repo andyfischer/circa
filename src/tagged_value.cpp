@@ -58,6 +58,7 @@ void make(Type* type, caValue* value)
         type->initialize(type, value);
 
     type->inUse = true;
+    type_incref(type);
 }
 
 void change_type(caValue* v, Type* t)

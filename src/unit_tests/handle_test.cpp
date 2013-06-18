@@ -12,13 +12,13 @@ namespace handle_test {
 
 void test_value_is_shared()
 {
-    Type type;
-    setup_handle_type(&type);
+    Type* type = create_type();
+    setup_handle_type(type);
 
     Value handle1;
     Value handle2;
 
-    make(&type, &handle1);
+    make(type, &handle1);
     copy(&handle1, &handle2);
 
     test_assert(is_null(handle_get_value(&handle1)));
@@ -31,6 +31,7 @@ void test_value_is_shared()
     set_null(&handle1);
 
     test_equals(handle_get_value(&handle2), "777");
+    type_decref(type);
 }
 
 int gTimesReleaseCalled = 0;

@@ -486,12 +486,6 @@ void circa_install_function_list(caBlock* block, const caFunctionBinding* bindin
 // to modify.
 caValue* circa_declare_value(caBlock* block, const char* name);
 
-// Configure a Circa type so that each value holds an integer.
-void circa_setup_int_type(caType* type);
-
-// Configure a Circa type so that each value holds an opaque pointer.
-void circa_setup_pointer_type(caType* type);
-
 // -- Native module support --
 
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);

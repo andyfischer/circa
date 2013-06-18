@@ -94,19 +94,20 @@ struct Type
     Value parameter;
     int objectSize;
 
-    // Flag, if true then at least one value has been created using this type.
+    // Memory tracking.
+    int refcount;
     bool inUse;
-
-    Type();
-    ~Type();
 
     const char* nameStr();
 
 private:
-    // Disallow copy constructor.
+    // Disallow C++ stuff.
+    Type() { internal_error(""); }
+    ~Type() { internal_error(""); }
     Type(Type const&) { internal_error(""); }
     Type& operator=(Type const&) { internal_error(""); return *this; }
 };
+
 
 struct StaticTypeQuery
 {
@@ -149,11 +150,16 @@ namespace type_t {
     void setup_type(Type* type);
 } // namespace type_t
 
-Type* create_type_uninitialized();
-void initialize_type(Type* t);
+// Create a Type that isn't finished being built. Only appropriate during bootstrapping.
+Type* create_type_unconstructed();
+void type_finish_construction(Type* type);
 
-// Create a collectable type instance.
+// Create a Type object.
 Type* create_type();
+void predelete_type(Type* type);
+
+void type_incref(Type* type);
+void type_decref(Type* type);
 
 Type* unbox_type(Term* type);
 Type* unbox_type(caValue* val);
@@ -177,8 +183,6 @@ void clear_type_contents(Type* type);
 
 void initialize_simple_pointer_type(Type* type);
 
-void type_initialize_kernel(Block* kernel);
-Term* create_tuple_type(caValue* types);
 Term* find_method(Block* block, Type* type, const char* name);
 
 // Change the type value for an existing type. 'term' should be a value of

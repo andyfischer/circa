@@ -19,6 +19,9 @@ struct World {
     int nextBlockID;
     int nextStackID;
 
+    Type* firstPermanentType;
+    Type* lastPermanentType;
+
     // Module information.
     List moduleSearchPaths;
 

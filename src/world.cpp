@@ -34,6 +34,8 @@ World* alloc_world()
     world->nextStackID = 1;
     world->firstRootStack = NULL;
     world->lastRootStack = NULL;
+    world->firstPermanentType = NULL;
+    world->lastPermanentType = NULL;
 
     return world;
 }

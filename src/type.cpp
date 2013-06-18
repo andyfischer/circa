@@ -16,13 +16,14 @@
 #include "term.h"
 #include "token.h"
 #include "type.h"
+#include "world.h"
 
 #include "types/int.h"
 #include "types/common.h"
 
 namespace circa {
 
-Term* IMPLICIT_TYPES = NULL;
+static void dealloc_type(Type* type);
 
 namespace type_t {
 
@@ -98,14 +99,20 @@ namespace type_t {
 
 } // namespace type_t
 
-Type::Type()
+void type_incref(Type* type)
 {
-    memset(this, 0, sizeof(*this));
-    initialize_type(this);
+    ca_assert(type->refcount >= 1);
+    type->refcount++;
 }
 
-Type::~Type()
+void type_decref(Type* type)
 {
+    ca_assert(type->refcount >= 1);
+    type->refcount--;
+    if (type->refcount == 0) {
+        predelete_type(type);
+        dealloc_type(type);
+    }
 }
 
 const char*
@@ -161,17 +168,18 @@ Block* type_declaration_block(Type* type)
     return type->declaringTerm->nestedContents;
 }
 
-Type* create_type_uninitialized()
+Type* create_type_unconstructed()
 {
     Type* t = (Type*) malloc(sizeof(Type));
     memset(t, 0, sizeof(Type));
+    t->storageType = sym_StorageTypeNull;
+    t->refcount = 1;
+    t->inUse = false;
     return t;
 }
 
-void initialize_type(Type* t)
+void type_finish_construction(Type* t)
 {
-    t->storageType = sym_StorageTypeNull;
-
     initialize_null(&t->properties);
     set_dict(&t->properties);
 
@@ -182,9 +190,21 @@ void initialize_type(Type* t)
 
 Type* create_type()
 {
-    Type* t = create_type_uninitialized();
-    initialize_type(t);
-    return t;
+    Type* type = create_type_unconstructed();
+    type_finish_construction(type);
+    return type;
+}
+
+void predelete_type(Type* type)
+{
+    set_null(&type->properties);
+    set_null(&type->parameter);
+    set_null(&type->name);
+}
+
+static void dealloc_type(Type* type)
+{
+    free(type);
 }
 
 Type* unbox_type(Term* term)
@@ -311,36 +331,6 @@ void initialize_simple_pointer_type(Type* type)
     reset_type(type);
 }
 
-void type_initialize_kernel(Block* kernel)
-{
-    IMPLICIT_TYPES = create_block(kernel, "#implicit_types")->owningTerm;
-}
-
-Term* create_tuple_type(caValue* types)
-{
-    std::stringstream typeName;
-    typeName << "Tuple<";
-    for (int i=0; i < list_length(types); i++) {
-        if (i != 0) typeName << ",";
-        typeName << as_cstring(&as_type(list_get(types,i))->name);
-    }
-    typeName << ">";
-
-    Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str().c_str());
-    list_t::setup_type(unbox_type(result));
-
-    unbox_type(result)->parent = TYPES.list;
-
-    caValue* parameter = set_list(&unbox_type(result)->parameter, list_length(types));
-
-    for (int i=0; i < list_length(types); i++) {
-        ca_assert(is_type(list_get(types,i)));
-        set_type(list_get(parameter,i), as_type(list_get(types,i)));
-    }
-    
-    return result;
-}
-
 std::string get_base_type_name(std::string const& typeName)
 {
     size_t pos = typeName.find_first_of("<");
@@ -447,15 +437,3 @@ void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3)
 }
 
 } // namespace circa
-
-void circa_setup_int_type(caType* type)
-{
-    ca_assert(!type->inUse);
-    circa::int_t::setup_type(type);
-}
-
-void circa_setup_pointer_type(caType* type)
-{
-    ca_assert(!type->inUse);
-    circa::opaque_pointer_t::setup_type(type);
-}
