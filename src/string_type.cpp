@@ -118,11 +118,11 @@ void string_release(caValue* value)
 
 void string_copy(Type* type, caValue* source, caValue* dest)
 {
-    set_null(dest);
     StringData* data = (StringData*) source->value_data.ptr;
     if (data != NULL)
         incref(data);
-    dest->value_type = source->value_type;
+
+    make_no_initialize(source->value_type, dest);
     dest->value_data.ptr = data;
 
     INCREMENT_STAT(StringSoftCopy);

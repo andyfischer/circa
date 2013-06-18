@@ -78,7 +78,7 @@ void handle_copy(Type* type, caValue* source, caValue* dest)
     set_null(dest);
 
     as_handle(source)->refcount++;
-    dest->value_type = source->value_type;
+    make(source->value_type, dest);
     dest->value_data.ptr = source->value_data.ptr;
 }
 

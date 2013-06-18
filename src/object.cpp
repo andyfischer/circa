@@ -80,8 +80,8 @@ void object_copy(Type* type, caValue* source, caValue* dest)
     CircaObject* object = (CircaObject*) source->value_data.ptr;
     ca_assert(object->refcount > 0);
     object->refcount++;
+    make(source->value_type, dest);
     dest->value_data.ptr = object;
-    dest->value_type = source->value_type;
 }
 
 void* object_get_body(caValue* value)
