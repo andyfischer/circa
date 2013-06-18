@@ -19,8 +19,6 @@ Recent
             return [0 0]
       
     
-  dynamic_method on Closure.call! Arg!
-
   having a missing ) or ] or } symbol will *really* mess things up. Ditto for an extra ),},]
 
   divide operator on Point didn't work?
@@ -50,16 +48,11 @@ Recent
                 contextMenu.call(:term_details [line.term pos])
             ])
 
-  Calling a Closure; if you forget the exact number of inputs, then it can easily mix
-  up the explicit & unbound inputs.
-
-  Calling Closure.call on an 'any' type didn't work and didn't even error.
-
   Migration failure
     Module Cairo defined type Context
     Another module CodeView used Context as a function argument, like:
       def CodeView.draw(@self, cairo:Context canvas, Rect rect)
-    After reloading Cairo, the CodeView module kept a reference to the old type
+    After reloading Cairo, the CodeView module kept a reference to the old type?
 
   Delete create_type (use create_type_value instead)
 

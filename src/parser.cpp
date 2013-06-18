@@ -777,8 +777,7 @@ consume_next_output: {
     ca_assert(is_value(result));
     ca_assert(is_function(result));
 
-    // Consume contents, if there are still tokens left. It's okay to reach EOF here (this
-    // behavior is used when declaring some builtins).
+    // Consume contents, if there are still tokens left. It's okay to reach EOF here.
     if (!tokens.finished() && lookahead_next_non_whitespace(tokens, false) != tok_Semicolon)
         consume_block(contents, tokens, context);
 
@@ -790,7 +789,7 @@ consume_next_output: {
 
     set_source_location(result, startPosition, tokens);
 
-    // Catch certain builtin functions as soon as they are defined.
+    // Superhack. Catch certain builtin functions as soon as they are defined.
     if (FUNCS.declared_state == NULL && string_eq(&functionName, "declared_state"))
         FUNCS.declared_state = result;
     if (FUNCS.closure_block == NULL && string_eq(&functionName, "closure_block"))

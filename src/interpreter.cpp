@@ -42,7 +42,7 @@ void run(Stack* stack);
 // static void step_interpreter(Stack* stack);
 static void bytecode_write_noop(caValue* op);
 static void bytecode_write_finish_op(caValue* op);
-void write_input_instructions3(caValue* bytecode, Term* caller, Block* block);
+void write_input_instructions3(caValue* bytecode, Term* caller, Term* function, Block* block);
 void run_input_instructions3(Stack* stack, caValue* bytecode);
 void write_output_instructions(caValue* bytecode, Term* caller, Block* block);
 void run_output_instructions(Stack* stack, caValue* bytecode);
@@ -1314,13 +1314,25 @@ void run_input_instructions2(Stack* stack)
 
     Value bytecode;
     set_blob(&bytecode, 0);
-    write_input_instructions3(&bytecode, caller, frame->block);
+    write_input_instructions3(&bytecode, caller, caller->function, frame->block);
     run_input_instructions3(stack, &bytecode);
 }
 
-void write_input_instructions3(caValue* bytecode, Term* caller, Block* block)
+void run_input_instructions_with_function(Stack* stack, Term* function)
 {
-    bool inputsFromList = caller->function == FUNCS.closure_apply;
+    Frame* callerFrame = top_frame_parent(stack);
+    Frame* frame = top_frame(stack);
+    Term* caller = frame_current_term(callerFrame);
+
+    Value bytecode;
+    set_blob(&bytecode, 0);
+    write_input_instructions3(&bytecode, caller, function, frame->block);
+    run_input_instructions3(stack, &bytecode);
+}
+
+void write_input_instructions3(caValue* bytecode, Term* caller, Term* function, Block* block)
+{
+    bool inputsFromList = function == FUNCS.closure_apply;
 
     int callerInputIndex = 0;
     int applyListIndex = 0;
@@ -1335,7 +1347,7 @@ void write_input_instructions3(caValue* bytecode, Term* caller, Block* block)
         }
     }
 
-    if (caller->function == FUNCS.closure_call) {
+    if (function == FUNCS.closure_call) {
         callerInputIndex = 1;
     }
 
@@ -1605,18 +1617,9 @@ done_passing_inputs:
     // Advance PC on the above frame.
     Frame* newTop = top_frame(stack);
     newTop->pc = newTop->nextPc;
-
-    // Save state.
-    #if 0
-    if (!is_null(&frame->state)) {
-        caValue* container = frame_find_or_create_state_container(parent);
-        Term* caller = frame_current_term(parent);
-        move(&frame->state, hashtable_insert(container, unique_name(caller)));
-    }
-#endif
 }
 
-void run(Stack* stack)
+void run_bytecode(Stack* stack, caValue* bytecode)
 {
     while (true) {
 
@@ -1635,7 +1638,7 @@ void run(Stack* stack)
         ca_assert(frame->pc <= block->length());
 
         // Grab action
-        caValue* action = list_get(frame_bytecode(frame), frame->pc);
+        caValue* action = list_get(bytecode, frame->pc);
         int op = as_int(list_get(action, 0));
 
         // Dispatch op
@@ -1645,15 +1648,17 @@ void run(Stack* stack)
         case op_CallBlock: {
             Block* block = as_block(list_get(action, 3));
             caValue* inputActions = list_get(action, 1);
-            Frame* frame = push_frame(stack, block);
+            frame = push_frame(stack, block);
+            bytecode = frame_bytecode(frame);
             run_input_instructions2(stack);
             break;
         }
         case op_DynamicMethodCall: {
             INCREMENT_STAT(DynamicMethodCall);
 
-            // Lookup method
             Term* caller = frame_current_term(frame);
+
+            // Lookup method
             caValue* object = stack_find_active_value(frame, caller->input(0));
             if (object == NULL) {
                 Value msg;
@@ -1679,13 +1684,21 @@ void run(Stack* stack)
                 raise_error(stack);
                 return;
             }
+            
+            // Check for methods that are normally handled with different bytecode.
+            if (method == FUNCS.closure_call)
+                goto do_closure_call;
+            else if (method == FUNCS.closure_apply)
+                goto do_closure_apply;
 
             Block* block = nested_contents(method);
-            push_frame(stack, block);
+            frame = push_frame(stack, block);
+            bytecode = frame_bytecode(frame);
             run_input_instructions2(stack);
             break;
         }
 
+do_closure_call:
         case op_ClosureCall: {
             Term* caller = block->get(frame->pc);
 
@@ -1700,11 +1713,12 @@ void run(Stack* stack)
             }
 
             frame = push_frame(stack, block);
-            run_input_instructions2(stack);
-
+            bytecode = frame_bytecode(frame);
+            run_input_instructions_with_function(stack, FUNCS.closure_call);
             break;
         }
 
+do_closure_apply:
         case op_ClosureApply: {
             Term* caller = block->get(frame->pc);
             caValue* closure = stack_find_active_value(frame, caller->input(0));
@@ -1717,8 +1731,8 @@ void run(Stack* stack)
                 return;
             }
             frame = push_frame(stack, block);
-            run_input_instructions2(stack);
-
+            bytecode = frame_bytecode(frame);
+            run_input_instructions_with_function(stack, FUNCS.closure_apply);
             break;
         }
 
@@ -1727,7 +1741,8 @@ void run(Stack* stack)
             Block* block = case_block_choose_block(stack, caller);
             if (block == NULL)
                 return;
-            Frame* frame = push_frame(stack, block);
+            frame = push_frame(stack, block);
+            bytecode = frame_bytecode(frame);
             run_input_instructions2(stack);
             break;
         }
@@ -1743,7 +1758,9 @@ void run(Stack* stack)
             else
                 block = caller->nestedContents;
 
-            Frame* frame = push_frame(stack, block);
+            frame = push_frame(stack, block);
+            bytecode = frame_bytecode(frame);
+
             run_input_instructions2(stack);
             bool enableLoopOutput = as_symbol(list_get(action, 3)) == sym_LoopProduceOutput;
             start_for_loop(stack, enableLoopOutput);
@@ -1776,6 +1793,7 @@ void run(Stack* stack)
             // Call override
             override(stack);
 
+            // Assert that top frame has not changed.
             ca_assert(snapshotNextPc == frame->nextPc);
             ca_assert(snapshotFrame == frame);
 
@@ -1804,6 +1822,9 @@ void run(Stack* stack)
                 pop_frame(stack);
 
             finish_frame(stack);
+
+            frame = top_frame(stack);
+            bytecode = frame_bytecode(frame);
             break;
         }
         case op_Continue:
@@ -1840,15 +1861,22 @@ void run(Stack* stack)
 
             // Jump to for loop finish op.
             toFrame->nextPc = list_length(frame_bytecode(toFrame)) - 1;
+
+            frame = top_frame(stack);
+            bytecode = frame_bytecode(frame);
             break;
         }
         case op_FinishFrame: {
             finish_frame(stack);
+            frame = top_frame(stack);
+            bytecode = frame_bytecode(frame);
             break;
         }
         case op_FinishLoop: {
             bool enableLoopOutput = as_symbol(list_get(action, 1)) == sym_LoopProduceOutput;
             for_loop_finish_iteration(stack, enableLoopOutput);
+            frame = top_frame(stack);
+            bytecode = frame_bytecode(frame);
             break;
         }
 
@@ -1888,6 +1916,11 @@ void run(Stack* stack)
             ca_assert(false);
         }
     }
+}
+
+void run(Stack* stack)
+{
+    run_bytecode(stack, frame_bytecode(top_frame(stack)));
 }
 
 void evaluate_range(Stack* stack, Block* block, int start, int end)

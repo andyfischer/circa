@@ -1,0 +1,13 @@
+
+cl = {
+    i = input()
+    print('Called cl: ' i)
+}
+
+cl.call('call normal')
+cl.apply(['apply normal'])
+
+cld = cl -> any
+
+cld.call('call dynamic')
+cld.apply(['apply dynamic'])
