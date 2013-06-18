@@ -28,7 +28,6 @@
 #include "circa/file.h"
 #include "debugger_repl.h"
 #include "exporting_parser.h"
-#include "generate_cpp.h"
 #include "file_checker.h"
 
 #ifdef CIRCA_USE_LINENOISE

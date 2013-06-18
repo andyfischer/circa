@@ -40,7 +40,6 @@ solution "Circa"
             "src/command_line/debugger_repl.cpp",
             "src/command_line/exporting_parser.cpp",
             "src/command_line/file_checker.cpp",
-            "src/command_line/generate_cpp.cpp",
             "3rdparty/linenoise/linenoise.c"
         }
         links {"static_lib","dl"}

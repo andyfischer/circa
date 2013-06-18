@@ -69,7 +69,6 @@ OBJECTS := \
 	$(OBJDIR)/debugger_repl.o \
 	$(OBJDIR)/exporting_parser.o \
 	$(OBJDIR)/file_checker.o \
-	$(OBJDIR)/generate_cpp.o \
 	$(OBJDIR)/linenoise.o \
 
 RESOURCES := \
@@ -144,9 +143,6 @@ $(OBJDIR)/exporting_parser.o: command_line/exporting_parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_checker.o: command_line/file_checker.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/generate_cpp.o: command_line/generate_cpp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/linenoise.o: ../3rdparty/linenoise/linenoise.c
