@@ -53,4 +53,10 @@ World* create_world()
     return world;
 }
 
+CIRCA_EXPORT void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)
+{
+    world->logContext = context;
+    world->logFunc = func;
+}
+
 } // namespace circa

@@ -86,7 +86,7 @@ Stack::~Stack()
 void
 Stack::dump()
 {
-    print_stack(this, std::cout);
+    circa::dump(this);
 }
 
 Stack* create_stack(World* world)
@@ -723,21 +723,23 @@ static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
     list_reverse(output);
 }
 
-void print_stack(Stack* stack, std::ostream& out)
+void stack_to_string(Stack* stack, caValue* out)
 {
     circa::Value stackTrace;
     get_stack_trace(stack, top_frame(stack), &stackTrace);
 
     int topId = top_frame(stack) == NULL ? 0 : top_frame(stack)->id;
 
-    out << "[Stack #" << stack->id
+    std::stringstream strm;
+
+    strm << "[Stack #" << stack->id
         << ", topFrame = #" << topId
         << "]" << std::endl;
     for (int frameIndex = 0; frameIndex < list_length(&stackTrace); frameIndex++) {
         Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, frameIndex)));
         int depth = list_length(&stackTrace) - frameIndex - 1;
         Block* block = frame->block;
-        out << " [Frame #" << frame->id
+        strm << " [Frame #" << frame->id
              << ", depth = " << depth
              << ", block = #" << block->id
              << ", pc = " << frame->pc
@@ -752,14 +754,14 @@ void print_stack(Stack* stack, std::ostream& out)
 
             // indent
             for (int x = 0; x < frameIndex+1; x++)
-                out << " ";
+                strm << " ";
 
             if (frame->pc == i)
-                out << ">";
+                strm << ">";
             else
-                out << " ";
+                strm << " ";
 
-            print_term(term, out);
+            print_term(term, strm);
 
             // current value
             if (term != NULL && !is_value(term)) {
@@ -769,14 +771,62 @@ void print_stack(Stack* stack, std::ostream& out)
                     value = frame_register(frame, term->index);
 
                 if (value == NULL)
-                    out << " <register OOB>";
+                    strm << " <register OOB>";
                 else
-                    out << " = " << to_string(value);
+                    strm << " = " << to_string(value);
             }
-            out << std::endl;
+            strm << std::endl;
         }
     }
+
+    set_string(out, strm.str().c_str());
 }
+
+void stack_trace_to_string(Stack* stack, caValue* out)
+{
+    circa::Value stackTrace;
+    get_stack_trace(stack, top_frame(stack), &stackTrace);
+
+    std::stringstream strm;
+
+    for (int i = 0; i < list_length(&stackTrace); i++) {
+        Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, i)));
+
+        bool lastFrame = i == list_length(&stackTrace) - 1;
+
+        if (frame->pc >= frame->block->length()) {
+            strm << "(end of frame)" << std::endl;
+            continue;
+        }
+
+        Term* term = frame->block->get(frame->pc);
+
+        // Print a short location label
+        if (term->function == FUNCS.input) {
+            strm << "(input " << term->index << ")";
+        } else {
+            strm << get_short_location(term) << " ";
+            if (term->name != "")
+                strm << term->name << " = ";
+            strm << term->function->name;
+            strm << "()";
+        }
+
+        // Print the error value
+        caValue* reg = frame_register(frame, frame->pc);
+        if (lastFrame || is_error(reg)) {
+            strm << " | ";
+            if (is_string(reg))
+                strm << as_cstring(reg);
+            else
+                strm << to_string(reg);
+        }
+        strm << std::endl;
+    }
+
+    set_string(out, strm.str().c_str());
+}
+
 
 void dump_frames_raw(Stack* stack)
 {
@@ -793,46 +843,6 @@ void dump_frames_raw(Stack* stack)
     }
 }
 
-void print_error_stack(Stack* stack, std::ostream& out)
-{
-    circa::Value stackTrace;
-    get_stack_trace(stack, top_frame(stack), &stackTrace);
-
-    for (int i = 0; i < list_length(&stackTrace); i++) {
-        Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, i)));
-
-        bool lastFrame = i == list_length(&stackTrace) - 1;
-
-        if (frame->pc >= frame->block->length()) {
-            std::cout << "(end of frame)" << std::endl;
-            continue;
-        }
-
-        Term* term = frame->block->get(frame->pc);
-
-        // Print a short location label
-        if (term->function == FUNCS.input) {
-            out << "(input " << term->index << ")";
-        } else {
-            out << get_short_location(term) << " ";
-            if (term->name != "")
-                out << term->name << " = ";
-            out << term->function->name;
-            out << "()";
-        }
-
-        // Print the error value
-        caValue* reg = frame_register(frame, frame->pc);
-        if (lastFrame || is_error(reg)) {
-            out << " | ";
-            if (is_string(reg))
-                out << as_cstring(reg);
-            else
-                out << to_string(reg);
-        }
-        std::cout << std::endl;
-    }
-}
 
 static void update_stack_for_possibly_changed_blocks(Stack* stack)
 {
@@ -2296,44 +2306,42 @@ void Stack__output(caStack* callerStack)
     else
         copy(frame_register(frame, output), circa_output(callerStack, 0));
 }
-void Stack__errored(caStack* callerStack)
+void Stack__errored(caStack* stack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
-    set_bool(circa_output(callerStack, 0), error_occurred(self));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), error_occurred(self));
 }
-void Stack__error_message(caStack* callerStack)
+void Stack__error_message(caStack* stack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
 
     Frame* frame = top_frame(self);
 
     if (frame->pc >= frame_register_count(frame)) {
-        set_string(circa_output(callerStack, 0), "");
+        set_string(circa_output(stack, 0), "");
         return;
     }
 
     caValue* errorReg = frame_register(frame, frame->pc);
 
     if (is_string(errorReg))
-        set_string(circa_output(callerStack, 0), as_cstring(errorReg));
+        set_string(circa_output(stack, 0), as_cstring(errorReg));
     else
-        set_string(circa_output(callerStack, 0), to_string(errorReg).c_str());
+        set_string(circa_output(stack, 0), to_string(errorReg).c_str());
 }
-void Stack__toString(caStack* callerStack)
+void Stack__toString(caStack* stack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
 
-    std::stringstream strm;
-    print_stack(self, strm);
-    set_string(circa_output(callerStack, 0), strm.str().c_str());
+    stack_to_string(self, circa_output(stack, 0));
 }
 
-void Stack__frames(caStack* callerStack)
+void Stack__frames(caStack* stack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
-    caValue* out = circa_output(callerStack, 0);
+    caValue* out = circa_output(stack, 0);
 
     circa::Value stackTrace;
     get_stack_trace(self, top_frame(self), &stackTrace);
@@ -2585,9 +2593,11 @@ CIRCA_EXPORT caTerm* circa_caller_term(caStack* stack)
     return frame->block->get(frame->pc);
 }
 
-CIRCA_EXPORT void circa_print_error_to_stdout(caStack* stack)
+CIRCA_EXPORT void circa_dump_stack_trace(caStack* stack)
 {
-    print_error_stack(stack, std::cout);
+    Value str;
+    stack_trace_to_string(stack, &str);
+    write_log(as_cstring(&str));
 }
 
 CIRCA_EXPORT caValue* circa_inject_context(caStack* stack, const char* name)

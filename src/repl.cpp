@@ -61,7 +61,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
         return;
     }
     if (string_eq(line, "/stack")) {
-        print_stack(stack, std::cout);
+        stack_to_string(stack, list_append(output));
         return;
     }
 
@@ -103,8 +103,8 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     run_interpreter(stack);
 
     if (error_occurred(stack)) {
-        std::cout << "error: ";
-        print_error_stack(stack, std::cout);
+        set_string(list_append(output), "error: ");
+        stack_trace_to_string(stack, list_append(output));
         return;
     }
 

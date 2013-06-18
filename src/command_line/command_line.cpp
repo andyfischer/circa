@@ -194,7 +194,9 @@ void do_file_command(caWorld* world, List* args, caValue* reply)
 
     if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";
-        print_error_stack(stack, std::cout);
+        Value str;
+        stack_trace_to_string(stack, &str);
+        std::cout << as_cstring(&str);
         std::cout << std::endl;
     }
 
@@ -519,9 +521,8 @@ int run_command_line(caWorld* world, caValue* args)
 
         circa_run(stack);
 
-        if (circa_has_error(stack)) {
-            circa_print_error_to_stdout(stack);
-        }
+        if (circa_has_error(stack))
+            circa_dump_stack_trace(stack);
 
         // Print outputs
         for (int i=0;; i++) {
@@ -604,7 +605,7 @@ int run_command_line(caWorld* world, caValue* args)
 
     if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";
-        print_error_stack(stack, std::cout);
+        circa_dump_stack_trace(stack);
         std::cout << std::endl;
         std::cout << "Stack:\n";
         dump(stack);

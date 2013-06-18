@@ -128,7 +128,7 @@ typedef void (*caEvaluateFunc)(caStack* stack);
 // be destroyed. This is used for 'handle' values.
 typedef void (*caReleaseFunc)(caValue* value);
 
-typedef void (*caLogFunc)(const char* msg);
+typedef void (*caLogFunc)(void* context, const char* msg);
 
 // -- Setting up the Circa environment --
 
@@ -139,7 +139,7 @@ caWorld* circa_initialize();
 // leak checking tools happier.
 void circa_shutdown(caWorld*);
 
-void circa_set_log_handler(caWorld*, caLogFunc func);
+void circa_set_log_handler(caWorld*, void* context, caLogFunc func);
 
 // Add a module search path. This is used when processing 'import' statements.
 void circa_add_module_search_path(caWorld* world, const char* path);
@@ -188,6 +188,7 @@ void circa_update_changed_files(caWorld* world);
 // Run the current stack.
 void circa_run(caStack* stack);
 
+// Pop the top stack frame.
 void circa_pop(caStack* stack);
 
 void circa_call_method(caStack* stack, const char* funcName, caValue* object, caValue* ins, caValue* outs);
@@ -208,8 +209,7 @@ caValue* circa_get_state_field(caStack* stack, const char* name);
 
 caValue* circa_inject_context(caStack* stack, const char* name);
 
-// Print a human-readable description of the stack's error to stdout.
-void circa_print_error_to_stdout(caStack* stack);
+void circa_dump_stack_trace(caStack* stack);
 
 // -- Fetching Inputs & Outputs --
 

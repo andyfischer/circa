@@ -65,7 +65,7 @@ void test_assert_function(Stack& context, int line, const char* file)
 {
     if (context.errorOccurred) {
         std::cout << "Runtime error at " << file << ", line " << line << std::endl;
-        print_error_stack(&context, std::cout);
+        circa_dump_stack_trace(&context);
         declare_current_test_failed();
     }
 }
@@ -155,7 +155,7 @@ bool test_fail_on_runtime_error(Stack& context)
 {
     if (context.errorOccurred) {
         std::cout << "Runtime error in " << get_current_test_name() << std::endl;
-        print_error_stack(&context, std::cout);
+        circa_dump_stack_trace(&context);
         std::cout << std::endl;
         declare_current_test_failed();
         return true;
@@ -304,7 +304,7 @@ void test_block_as_assertions_list(Block* block, std::string const& contextStr)
 
     if (context.errorOccurred) {
         std::cout << "Runtime error " << contextStr << std::endl;
-        print_error_stack(&context, std::cout);
+        circa_dump_stack_trace(&context);
         declare_current_test_failed();
         return;
     }

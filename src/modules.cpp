@@ -89,6 +89,9 @@ static bool find_module_file(World* world, const char* moduleName, caValue* file
         join_path(&computedPath, &module);
         string_append(&computedPath, ".ca");
 
+        write_log("looking for module at");
+        write_log(as_cstring(&computedPath));
+
         if (circa_file_exists(as_cstring(&computedPath))) {
             move(&computedPath, filenameOut);
             return true;

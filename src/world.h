@@ -28,6 +28,7 @@ struct World {
     Symbol bootstrapStatus;
 
     caLogFunc logFunc;
+    void* logContext;
 
 protected:
     // Disallow C++ construction

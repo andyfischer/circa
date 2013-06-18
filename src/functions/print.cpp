@@ -9,14 +9,17 @@ namespace print_function {
     {
         caValue* args = circa_input(_stack, 0);
 
+        std::stringstream out;
+
         for (int i = 0; i < circa_count(args); i++) {
             caValue* val = circa_index(args, i);
             if (is_string(val))
-                std::cout << as_string(val);
+                out << as_string(val);
             else
-                std::cout << to_string(val);
+                out << to_string(val);
         }
-        std::cout << std::endl;
+
+        write_log(out.str().c_str());
 
         set_null(circa_output(_stack, 0));
     }

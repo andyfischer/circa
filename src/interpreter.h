@@ -217,8 +217,8 @@ void create_output(Stack* stack);
 void raise_error(Stack* stack);
 void raise_error_msg(Stack* stack, const char* msg);
 
-void print_stack(Stack* stack, std::ostream& out);
-void print_error_stack(Stack* stack, std::ostream& out);
+void stack_to_string(Stack* stack, caValue* out);
+void stack_trace_to_string(Stack* stack, caValue* out);
 
 // Update bytecode
 void write_term_bytecode(Term* term, caValue* output);

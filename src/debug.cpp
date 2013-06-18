@@ -58,7 +58,9 @@ void dump(caValue* value)
 
 void dump(Stack* stack)
 {
-    print_stack(stack, std::cout);
+    Value str;
+    stack_to_string(stack, &str);
+    write_log(as_cstring(&str));
 }
 
 void internal_error(const char* message)
@@ -195,7 +197,7 @@ void write_log(World* world, const char* msg)
     if (world->logFunc == NULL)
         printf("%s\n", msg);
     else
-        world->logFunc(msg);
+        world->logFunc(world->logContext, msg);
 }
 void write_log(const char* msg)
 {
