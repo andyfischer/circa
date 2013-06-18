@@ -61,9 +61,6 @@ Recent
       def CodeView.draw(@self, cairo:Context canvas, Rect rect)
     After reloading Cairo, the CodeView module kept a reference to the old type
 
-  It is wayyy too easy to crash by running a script that has static errors, especially references to
-  nonexistant names.
-
   Delete create_type (use create_type_value instead)
 
   Move output casting to a different spot. Currently it happens twice - once when a value

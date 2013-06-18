@@ -451,6 +451,10 @@ void append_phrase(caValue* source, const char* str, Term* term, Symbol type)
     set_symbol((*list)[2], type);
 }
 
+void append_phrase(caValue* source, caValue* str, Term* term, Symbol type)
+{
+    return append_phrase(source, as_cstring(str), term, type);
+}
 void append_phrase(caValue* source, std::string const& str, Term* term, Symbol type)
 {
     return append_phrase(source, str.c_str(), term, type);

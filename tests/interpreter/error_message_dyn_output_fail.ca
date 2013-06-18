@@ -4,12 +4,12 @@ int = make_stack()
 testBlock = {
 
     type T {}
-
+    t = make(T)
     t.hello()
 }
 
 int.push_frame(block_ref(testBlock), [])
 int.run
 
-print(int.error_message)
+assert(int.error_message == "Method hello not found on type T")
 

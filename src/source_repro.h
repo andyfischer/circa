@@ -22,7 +22,8 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
 void format_name_binding(caValue* source, Term* term);
 
 void append_phrase(caValue* source, const char* str, Term* term, Symbol type);
-// Convenient overload:
+// Convenient overloads:
+void append_phrase(caValue* source, caValue* str, Term* term, Symbol type);
 void append_phrase(caValue* source, std::string const& str, Term* term, Symbol type);
 
 std::string get_block_source_text(Block* block);

@@ -1,0 +1,13 @@
+int = make_stack()
+
+testBlock = {
+
+    print(a)
+}
+
+int.push_frame(block_ref(testBlock), [])
+int.run
+
+assert(int.error_message == "Unknown identifier: a")
+
+

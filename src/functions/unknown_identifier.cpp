@@ -7,11 +7,15 @@ namespace unknown_identifier_function {
 
     void evaluate(caStack* stack)
     {
+        Value msg;
+        set_string(&msg, "Unknown identifier: ");
+        string_append(&msg, term_name(circa_caller_term(stack)));
+        circa_output_error(stack, as_cstring(&msg));
     }
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, term->name, term, sym_UnknownIdentifier);
+        append_phrase(source, term_name(term), term, sym_UnknownIdentifier);
     }
 
     void setup(Block* kernel)
