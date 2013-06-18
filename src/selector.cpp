@@ -129,6 +129,9 @@ void trace_accessor_chain(Term* accessor, TermList* chainResult)
         if (!term_is_accessor_traceable(accessor))
             break;
 
+        if (accessor->input(0) == NULL)
+            break;
+
         // Continue the trace upward.
         accessor = accessor->input(0);
     }

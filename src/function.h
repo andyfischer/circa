@@ -20,16 +20,10 @@ Type* derive_specialized_output_type(Term* function, Term* call);
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);
 
-const char* get_output_name(Term* term, int outputIndex);
-
 void function_format_header_source(caValue* source, Block* func);
 void function_format_source(caValue* source, Term* term);
 
-void evaluate_subroutine(caStack*);
 bool is_subroutine(Term* term);
 bool is_subroutine(Block* block);
-
-// Perform various steps to finish creating a subroutine
-void initialize_subroutine(Term* sub);
 
 } // namespace circa

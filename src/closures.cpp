@@ -39,7 +39,8 @@ void closure_redirect_outside_references(Block* block)
 
                 } else {
                     // Create a new unbound_input term.
-                    Term* unbound = apply(block, FUNCS.unbound_input, TermList(input), &input->nameValue);
+                    Term* unbound = apply(block, FUNCS.unbound_input,
+                        TermList(input), &input->nameValue);
                     change_declared_type(unbound, input->type);
                     block->move(unbound, nextInsertPosition++);
                     remap_pointers_quick(innerTerm, input, unbound);

@@ -537,10 +537,6 @@ void remove_nulls(Block* block)
 
 EvaluateFunc get_override_for_block(Block* block)
 {
-    // Subroutine no longer acts as an override
-    if (block->overrides.evaluate == evaluate_subroutine)
-        return NULL;
-
     return block->overrides.evaluate;
 }
 

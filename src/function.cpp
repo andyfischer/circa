@@ -27,7 +27,6 @@ Term* create_function(Block* block, const char* name)
 {
     ca_assert(name != NULL);
     Term* term = apply(block, FUNCS.function_decl, TermList(), name);
-    initialize_subroutine(term);
     return term;
 }
 
@@ -252,18 +251,12 @@ bool is_subroutine(Term* term)
 {
     if (!is_function(term))
         return false;
-    return function_contents(term)->overrides.evaluate == evaluate_subroutine;
+    return function_contents(term)->overrides.evaluate == NULL;
 }
 
 bool is_subroutine(Block* block)
 {
     return block->owningTerm != NULL && is_subroutine(block->owningTerm);
-}
-
-void initialize_subroutine(Term* sub)
-{
-    // Install evaluate function
-    function_contents(sub)->overrides.evaluate = evaluate_subroutine;
 }
 
 } // namespace circa
