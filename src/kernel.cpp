@@ -1096,7 +1096,6 @@ void bootstrap_kernel()
 
     // Fetch refereneces to certain stdlib funcs.
     FUNCS.declared_state = builtins->get("declared_state");
-    FUNCS.dll_patch = builtins->get("sys:dll_patch");
     FUNCS.has_effects = builtins->get("has_effects");
     FUNCS.length = builtins->get("length");
     FUNCS.list_append = builtins->get("List.append");

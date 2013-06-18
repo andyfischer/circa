@@ -25,7 +25,6 @@ struct BuiltinFuncs {
     Term* default_case;
     Term* discard;
     Term* div;
-    Term* dll_patch;
     Term* dynamic_method;
     Term* error;
     Term* extra_output;

@@ -75,7 +75,6 @@ OBJECTS := \
 	$(OBJDIR)/control_flow.o \
 	$(OBJDIR)/debug.o \
 	$(OBJDIR)/dict.o \
-	$(OBJDIR)/dll_loading.o \
 	$(OBJDIR)/fakefs.o \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
@@ -213,9 +212,6 @@ $(OBJDIR)/debug.o: debug.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/dict.o: dict.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/dll_loading.o: dll_loading.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/fakefs.o: fakefs.cpp

@@ -113,7 +113,6 @@ namespace reflect
 
 namespace sys
     def arg(int index) -> String
-    def dll_patch()
     def module_search_paths() -> List
     def perf_stats_reset()
     def perf_stats_dump() -> List
