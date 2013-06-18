@@ -77,12 +77,26 @@ void module_always_has_primary_output()
     test_assert(get_output_placeholder(&block, 0)->input(0) == NULL);
 }
 
+void non_required_module_is_not_visible()
+{
+    World* world = global_world();
+
+    FakeFilesystem fs;
+    fs.set("module_a.ca", "a = 1");
+    fs.set("module_b.ca", "b = 1");
+    Block* module_a = load_module_file(world, "module_a", "module_a.ca");
+    Block* module_b = load_module_file(world, "module_b", "module_b.ca");
+    test_assert(find_name(module_a, "a") != NULL);
+    test_assert(find_name(module_b, "a") == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(modules_test::source_file_location);
     REGISTER_TEST_CASE(modules_test::test_require);
     REGISTER_TEST_CASE(modules_test::test_explicit_output);
     REGISTER_TEST_CASE(modules_test::module_always_has_primary_output);
+    REGISTER_TEST_CASE(modules_test::non_required_module_is_not_visible);
 }
 
 } // namespace modules_test
