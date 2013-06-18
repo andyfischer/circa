@@ -38,6 +38,7 @@ namespace circa {
 struct FileWatchWorld;
 
 FileWatchWorld* create_file_watch_world();
+void dealloc_file_watch_world(FileWatchWorld* world);
 
 // Add a file watch on the given file.
 FileWatch* add_file_watch_action(World* world, const char* filename, Value* action);

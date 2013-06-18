@@ -24,6 +24,14 @@ struct CircaObject
 
     // The object's body will be contiguous in memory.
     char body[0];
+
+    CircaObject()
+      : type(NULL),
+        referenced(false),
+        root(false),
+        refcount(0),
+        gcColor(0)
+    {}
 };
 
 bool is_object(caValue* value);

@@ -10,6 +10,7 @@ struct NativePatchWorld;
 struct NativePatch;
 
 NativePatchWorld* create_native_patch_world();
+void dealloc_native_patch_world(NativePatchWorld* world);
 
 NativePatch* get_existing_native_patch(World* world, const char* name);
 

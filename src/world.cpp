@@ -40,8 +40,8 @@ World* alloc_world()
 
 void dealloc_world(World* world)
 {
-    // delete world->nativePatchWorld;
-    // delete world->fileWatchWorld;
+    dealloc_native_patch_world(world->nativePatchWorld);
+    dealloc_file_watch_world(world->fileWatchWorld);
     free(world);
 }
 

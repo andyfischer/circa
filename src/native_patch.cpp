@@ -54,6 +54,11 @@ NativePatchWorld* create_native_patch_world()
     return world;
 }
 
+void dealloc_native_patch_world(NativePatchWorld* world)
+{
+    delete world;
+}
+
 static NativePatch* create_native_patch(World* world)
 {
     NativePatch* patch = new NativePatch();

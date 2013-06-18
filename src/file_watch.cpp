@@ -34,6 +34,11 @@ FileWatchWorld* create_file_watch_world()
     return world;
 }
 
+void dealloc_file_watch_world(FileWatchWorld* world)
+{
+    delete world;
+}
+
 FileWatch* find_file_watch(World* world, const char* filename)
 {
     std::map<std::string, FileWatch*>::const_iterator it =
