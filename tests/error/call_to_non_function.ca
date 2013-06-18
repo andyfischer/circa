@@ -1,3 +1,12 @@
-namespace ns
 
-ns()
+def main()
+    namespace ns
+
+    ns()
+
+stack = make_stack()
+stack.push_frame(main.block, [])
+stack.run
+
+assert(stack.errored)
+assert(stack.error_message == 'Unknown function: ns')

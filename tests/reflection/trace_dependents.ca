@@ -12,3 +12,6 @@ e_term = code.block.find_term('e')
 dependents = e_term.trace_dependents(code.block)
 code.block.dump
 print(dependents)
+
+names = {
+}

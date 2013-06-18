@@ -1,4 +1,0 @@
-Error occurred:
-[tests/error/call_to_non_function.ca:3,0] unknown_function()
-[#479] output_placeholder() | Unknown function: ns
-
