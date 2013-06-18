@@ -12,13 +12,8 @@ namespace circa {
 
 struct Function
 {
-    typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
     typedef void (*OnCreateCall)(Term*);
     typedef void (*PostInputChange)(Term*);
-    typedef int (*GetOutputCount)(Term*);
-    typedef const char* (*GetOutputName)(Term*, int index);
-    typedef Type* (*GetOutputType)(Term*, int index);
-    typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
 
     CircaObject header;
@@ -33,12 +28,8 @@ struct Function
     bool throws;
 
     // Functions
-    EvaluateFunc evaluate;
-    
-    SpecializeTypeFunc specializeType;
     FormatSource formatSource;
     CheckInvariants checkInvariants;
-    StaticTypeQueryFunc staticTypeQuery;
     OnCreateCall onCreateCall;
     PostInputChange postInputChange;
     PostCompile postCompile;
@@ -71,14 +62,6 @@ Type* derive_specialized_output_type(Term* function, Term* call);
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);
 
-Type* function_get_input_type(Term* function, int index);
-Type* function_get_output_type(Term* function, int index);
-Type* function_get_input_type(Function* func, int index);
-Type* function_get_output_type(Function* func, int index);
-
-Term* function_get_input_placeholder(Function* func, int index);
-Term* function_get_output_placeholder(Function* func, int index);
-
 Block* function_get_contents(Function* func);
 std::string function_get_input_name(Function* func, int index);
 
@@ -86,11 +69,6 @@ bool function_input_is_extra_output(Function* func, int index);
 std::string function_get_documentation_string(Function* func);
 
 const char* get_output_name(Term* term, int outputIndex);
-
-void function_set_evaluate_func(Term* func, EvaluateFunc eval);
-
-// Change the function's EvaluateFunc, and update any terms that are using it.
-void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeType);
 
 void function_format_header_source(caValue* source, Block* func);
 void function_format_source(caValue* source, Term* term);

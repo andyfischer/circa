@@ -58,7 +58,8 @@ namespace cast_function {
 
         // 'cast' is used by scripts. In this version, the type is passed via the 2nd param
         Term* cast = import_function(kernel, cast_evaluate, "cast(any val, Type t) -> (any, bool)");
-        as_function(cast)->specializeType = cast_specializeType;
+        
+        block_set_specialize_type_func(as_function2(cast), cast_specializeType);
     }
 }
 }

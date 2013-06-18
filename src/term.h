@@ -162,9 +162,11 @@ void set_input_hidden(Term* term, int inputIndex, bool hidden);
 
 caValue* term_name(Term* term);
 caValue* term_value(Term* term);
+Block* term_function(Term* term);
 bool is_type(Term* term);
 bool is_function(Term* term);
 Function* as_function(Term* term);
+Block* as_function2(Term* term);
 Type* as_type(Term* term);
 int term_line_number(Term* term);
 

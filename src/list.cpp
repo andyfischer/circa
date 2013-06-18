@@ -613,7 +613,7 @@ void list_initialize_parameter_from_type_decl(Block* typeDecl, caValue* paramete
         if (!is_function(term))
             continue;
 
-        Type* type = function_get_output_type(term, 0);
+        Type* type = get_output_type(as_function2(term), 0);
 
         set_type(list_append(types), type);
         set_string(list_append(names), term->name);

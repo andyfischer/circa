@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "debug.h"
+#include "function.h"
 #include "hashtable.h"
 #include "kernel.h"
 #include "names.h"
@@ -476,6 +477,12 @@ Function* as_function(caValue* value)
 {
     ca_assert(is_function(value));
     return (Function*) value->value_data.ptr;
+}
+
+Block* as_function2(caValue* value)
+{
+    ca_assert(is_function(value));
+    return function_contents((Function*) value->value_data.ptr);
 }
 
 bool as_bool(caValue* value)

@@ -15,6 +15,14 @@
 
 namespace circa {
 
+struct BlockOverrides
+{
+    EvaluateFunc evaluate;
+    SpecializeTypeFunc specializeType;
+
+    BlockOverrides() : evaluate(NULL), specializeType(NULL) {}
+};
+
 struct Block
 {
     CircaObject header;
@@ -54,6 +62,8 @@ struct Block
 
     // Compiled interpreter instructions.
     Value bytecode;
+
+    BlockOverrides overrides;
 
     Block();
     ~Block();
@@ -194,6 +204,12 @@ void block_set_evaluation_empty(Block* block, bool empty);
 bool block_has_effects(Block* block);
 void block_set_has_effects(Block* block, bool hasEffects);
 int block_locals_count(Block* block);
+
+Type* get_input_type(Block* block, int index);
+Type* get_output_type(Block* block, int index);
+
+void block_set_evaluate_func(Block* block, EvaluateFunc eval);
+void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc);
 
 void block_check_invariants(caValue* result, Block* block);
 bool block_check_invariants_print_result(Block* block, std::ostream& out);

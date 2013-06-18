@@ -111,6 +111,7 @@ Block*     as_block(caValue* value);
 const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
 Function*   as_function(caValue* value);
+Block*      as_function2(caValue* value);
 int         as_int(caValue* value);
 Symbol      as_symbol(caValue* value);
 void*       as_opaque_pointer(caValue* value);

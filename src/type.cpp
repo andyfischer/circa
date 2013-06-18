@@ -77,7 +77,7 @@ namespace type_t {
             append_phrase(source, field->stringProp("syntax:preWhitespace",""),
                     term, tok_Whitespace);
 
-            Type* fieldType = function_get_output_type(field, 0);
+            Type* fieldType = get_output_type(as_function2(field), 0);
             append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
             append_phrase(source, field->stringProp("syntax:postNameWs"," "),
                     term, tok_Whitespace);
@@ -130,7 +130,7 @@ Type* get_output_type(Term* term, int outputIndex)
     if (term->function == NULL)
         return TYPES.any;
 
-    return function_get_output_type(term->function, outputIndex);
+    return get_output_type(term_function(term), outputIndex);
 }
 
 Type* get_output_type(Term* term)

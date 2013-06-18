@@ -491,9 +491,6 @@ typedef struct caFunctionBinding
 // that is terminanted with a NULL caFunctionBinding.
 void circa_install_function_list(caBlock* block, const caFunctionBinding* bindingList);
 
-// Install an evaluation function to the given Function.
-void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate);
-
 // Create a new Function value with the given name. Returns the created Function.
 caFunction* circa_declare_function(caBlock* block, const char* name);
 

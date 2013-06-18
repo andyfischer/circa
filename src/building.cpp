@@ -1306,12 +1306,13 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
-    Type* outputType = function_get_output_type(function, 0);
+    Type* outputType = get_output_type(as_function2(function), 0);
 
-    Function* attrs = as_function(term_value(function));
+    Function* attrs = as_function(function);
+    Block* contents = as_function2(function);
 
-    if (attrs->specializeType != NULL)
-        outputType = attrs->specializeType(term);
+    if (contents->overrides.specializeType != NULL)
+        outputType = contents->overrides.specializeType(term);
 
     change_declared_type(term, outputType);
 }

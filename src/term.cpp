@@ -320,6 +320,10 @@ caValue* term_value(Term* term)
 {
     return &term->value;
 }
+Block* term_function(Term* term)
+{
+    return as_function2(term_value(term->function));
+}
 
 bool is_type(Term* term)
 {
@@ -335,6 +339,11 @@ Function* as_function(Term* term)
 {
     return as_function(term_value(term));
 }
+Block* as_function2(Term* term)
+{
+    return as_function2(term_value(term));
+}
+
 Type* as_type(Term* term)
 {
     return as_type(term_value(term));

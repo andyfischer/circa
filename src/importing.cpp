@@ -20,7 +20,7 @@ Term* import_function(Block* block, EvaluateFunc evaluate, std::string const& he
 {
     Term* result = parser::compile(block, parser::function_decl, header);
 
-    as_function(result)->evaluate = evaluate;
+    as_function2(result)->overrides.evaluate = evaluate;
     dirty_bytecode(function_contents(as_function(result)));
     return result;
 }
@@ -28,7 +28,7 @@ Term* import_function(Block* block, EvaluateFunc evaluate, std::string const& he
 void install_function(Term* function, EvaluateFunc evaluate)
 {
     ca_assert(is_function(function));
-    as_function(function)->evaluate = evaluate;
+    as_function2(function)->overrides.evaluate = evaluate;
     dirty_bytecode(function_contents(function));
 }
 
@@ -40,7 +40,7 @@ Term* install_function(Block* block, const char* name, EvaluateFunc evaluate)
         msg += name;
         internal_error(msg.c_str());
     }
-    as_function(term)->evaluate = evaluate;
+    as_function2(term)->overrides.evaluate = evaluate;
     dirty_bytecode(function_contents(as_function(term)));
     return term;
 }

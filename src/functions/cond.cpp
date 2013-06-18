@@ -23,7 +23,7 @@ namespace cond_function {
         FUNCS.cond = import_function(kernel, cond_evaluate,
                 "cond(bool condition, any pos, any neg) -> any"
                 "-- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.");
-        function_set_specialize_type_func(FUNCS.cond, specializeType);
+        block_set_specialize_type_func(as_function2(FUNCS.cond), specializeType);
     }
 }
 }

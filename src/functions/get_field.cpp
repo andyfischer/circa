@@ -66,7 +66,7 @@ namespace get_field_function {
     {
         FUNCS.get_field = import_function(kernel, evaluate,
                 "get_field(any obj, String key) -> any");
-        as_function(FUNCS.get_field)->specializeType = specializeType;
+        block_set_specialize_type_func(as_function2(FUNCS.get_field), specializeType);
         as_function(FUNCS.get_field)->formatSource = formatSource;
     }
 }

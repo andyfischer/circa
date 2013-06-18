@@ -385,7 +385,7 @@ static bool has_implicit_name_binding(Term* term)
         return true;
 
     if (is_method_call(term)) {
-        return function_get_input_placeholder(as_function(term->function), 0)
+        return get_input_placeholder(term_function(term), 0)
             ->boolProp("rebind", false);
     }
 

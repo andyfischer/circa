@@ -47,7 +47,7 @@ namespace get_index_function {
     {
         FUNCS.get_index = import_function(kernel, hosted_get_index,
                 "get_index(List list, int index) -> any");
-        as_function(FUNCS.get_index)->specializeType = specializeType;
+        block_set_specialize_type_func(as_function2(FUNCS.get_index), specializeType);
         as_function(FUNCS.get_index)->formatSource = formatSource;
     }
 }

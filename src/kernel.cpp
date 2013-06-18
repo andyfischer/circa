@@ -900,9 +900,9 @@ void bootstrap_kernel()
     term_value(FUNCS.output)->value_data.ptr = new Function();
     initialize_function(FUNCS.output);
     as_function(FUNCS.output)->name = "output_placeholder";
-    as_function(FUNCS.output)->evaluate = NULL;
-    as_function(FUNCS.output)->specializeType = output_placeholder_specializeType;
-    ca_assert(function_get_output_type(FUNCS.output, 0) == TYPES.any);
+    as_function2(FUNCS.output)->overrides.evaluate = NULL;
+    as_function2(FUNCS.output)->overrides.specializeType = output_placeholder_specializeType;
+    ca_assert(get_output_type(as_function2(FUNCS.output), 0) == TYPES.any);
 
     // Now that output_placeholder is created, fix the value() function.
     {
@@ -912,7 +912,7 @@ void bootstrap_kernel()
         finish_building_function(function_contents(attrs));
     }
 
-    ca_assert(function_get_output_type(valueFunc, 0) == TYPES.any);
+    ca_assert(get_output_type(as_function2(valueFunc), 0) == TYPES.any);
 
     // input_placeholder() is needed before we can declare a function with inputs
     FUNCS.input = import_function(builtins, NULL, "input_placeholder() -> any");
@@ -1145,7 +1145,7 @@ void bootstrap_kernel()
 
     color_t::setup_type(TYPES.color);
 
-    as_function(FUNCS.list_append)->specializeType = List__append_specializeType;
+    as_function2(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

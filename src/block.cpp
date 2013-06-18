@@ -555,21 +555,11 @@ void remove_nulls(Block* block)
 
 EvaluateFunc get_override_for_block(Block* block)
 {
-    // This relationship should be simplified.
-    Term* owner = block->owningTerm;
-    if (owner == NULL)
-        return NULL;
-
-    if (!is_function(owner))
-        return NULL;
-
-    Function* func = as_function(owner);
-
     // Subroutine no longer acts as an override
-    if (func->evaluate == evaluate_subroutine)
+    if (block->overrides.evaluate == evaluate_subroutine)
         return NULL;
 
-    return func->evaluate;
+    return block->overrides.evaluate;
 }
 
 Term* find_term_by_id(Block* block, int id)
@@ -741,6 +731,43 @@ void block_set_has_effects(Block* block, bool hasEffects)
 int block_locals_count(Block* block)
 {
     return block->length();
+}
+
+Type* get_input_type(Block* block, int index)
+{
+    bool varArgs = has_variable_args(block);
+    if (varArgs)
+        index = 0;
+
+    Term* placeholder = get_input_placeholder(block, index);
+    if (placeholder == NULL)
+        return NULL;
+
+    return placeholder->type;
+}
+
+Type* get_output_type(Block* block, int index)
+{
+    if (block == NULL)
+        return TYPES.any;
+
+    // If there's no output_placeholder, then we are probably still building this
+    // function.
+    Term* placeholder = get_output_placeholder(block, index);
+    if (placeholder == NULL)
+        return TYPES.any;
+
+    return placeholder->type;
+}
+
+void block_set_evaluate_func(Block* block, EvaluateFunc eval)
+{
+    block->overrides.evaluate = eval;
+}
+
+void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc)
+{
+    block->overrides.specializeType = specializeFunc;
 }
 
 void append_internal_error(caValue* result, int index, std::string const& message)

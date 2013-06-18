@@ -144,13 +144,12 @@ Term* statically_specialize_overload_for_call(Term* call)
             if (call->input(inputIndex) == NULL)
                 continue;
 
-            Type* inputType = function_get_input_type(func, inputIndex);
+            Type* inputType = get_input_type(as_function2(func), inputIndex);
 
             if (inputType == NULL) {
                 allInputsFit = false;
                 break;
             }
-
 
             if (!term_output_always_satisfies_type(call->input(inputIndex), inputType)) {
                 allInputsFit = false;

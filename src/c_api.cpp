@@ -277,11 +277,6 @@ caValue* circa_declare_value(caBlock* block, const char* name)
     return term_value(term);
 }
 
-void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate)
-{
-    ((Function*) func)->evaluate = (EvaluateFunc) evaluate;
-}
-
 void circa_dump_s(caStack* stack)
 {
     dump((Stack*) stack);

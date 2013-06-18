@@ -28,11 +28,8 @@ Function::Function()
     contents(NULL),
     feedbackFunc(NULL),
     throws(false),
-    evaluate(NULL),
-    specializeType(NULL),
     formatSource(NULL),
     checkInvariants(NULL),
-    staticTypeQuery(NULL),
     onCreateCall(NULL),
     postInputChange(NULL),
     postCompile(NULL)
@@ -155,17 +152,18 @@ Type* derive_specialized_output_type(Term* function, Term* call)
         return TYPES.any;
 
     Function* attrs = as_function(function);
-    Type* outputType = function_get_output_type(attrs, 0);
+    Block* contents = as_function2(function);
+    Type* outputType = get_output_type(contents, 0);
 
-    if (attrs->specializeType != NULL)
-        outputType = attrs->specializeType(call);
+    if (contents->overrides.specializeType != NULL)
+        outputType = contents->overrides.specializeType(call);
     if (outputType == NULL)
         outputType = TYPES.any;
 
     if (function->boolProp("preferSpecialize", false)) {
         Term* specialized = statically_specialize_overload_for_call(call);
         if (specialized != NULL)
-            return function_get_output_type(specialized, 0);
+            return get_output_type(as_function2(specialized), 0);
     }
     return outputType;
 }
@@ -175,62 +173,12 @@ bool function_call_rebinds_input(Term* term, int index)
     return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";
 }
 
-Type* function_get_input_type(Term* func, int index)
-{
-    return function_get_input_type(as_function(func), index);
-}
-Type* function_get_input_type(Function* func, int index)
-{
-    bool varArgs = has_variable_args(function_contents(func));
-    if (varArgs)
-        index = 0;
-
-    Term* placeholder = function_get_input_placeholder(func, index);
-    if (placeholder == NULL)
-        return NULL;
-
-    return placeholder->type;
-}
-
-Type* function_get_output_type(Term* function, int index)
-{
-    return function_get_output_type(as_function(function), index);
-}
-
-Type* function_get_output_type(Function* func, int index)
-{
-    if (func == NULL)
-        return TYPES.any;
-
-    // If there's no output_placeholder, then we are probably still building this
-    // function.
-    Term* placeholder = function_get_output_placeholder(func, index);
-    if (placeholder == NULL)
-        return TYPES.any;
-
-    return placeholder->type;
-}
-
-Term* function_get_input_placeholder(Function* func, int index)
-{
-    Block* contents = function_get_contents(func);
-    if (contents == NULL)
-        return NULL;
-    return get_input_placeholder(contents, index);
-}
-
-Term* function_get_output_placeholder(Function* func, int index)
-{
-    Block* contents = function_get_contents(func);
-    if (contents == NULL)
-        return NULL;
-    return get_output_placeholder(contents, index);
-}
 Block* function_get_contents(Function* func)
 {
     return func->contents;
 }
 
+#if 0
 std::string function_get_input_name(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
@@ -289,16 +237,7 @@ const char* get_output_name(Term* term, int outputIndex)
 
     return "";
 }
-
-void function_set_evaluate_func(Term* function, EvaluateFunc evaluate)
-{
-    as_function(function)->evaluate = evaluate;
-}
-
-void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specializeFunc)
-{
-    as_function(func)->specializeType = specializeFunc;
-}
+#endif
 
 void function_format_header_source(caValue* source, Block* function)
 {
@@ -433,7 +372,7 @@ bool is_subroutine(Term* term)
 {
     if (!is_function(term))
         return false;
-    return as_function(term)->evaluate == evaluate_subroutine;
+    return as_function2(term)->overrides.evaluate == evaluate_subroutine;
 }
 
 bool is_subroutine(Block* block)
@@ -444,7 +383,7 @@ bool is_subroutine(Block* block)
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
-    as_function(sub)->evaluate = evaluate_subroutine;
+    as_function2(sub)->overrides.evaluate = evaluate_subroutine;
 }
 
 } // namespace circa

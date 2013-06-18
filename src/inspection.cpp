@@ -564,7 +564,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
 
     out << global_id(term);
 
-    out << " " << as_cstring(unique_name(term));
+    out << " " << to_string(unique_name(term));
 
     if (term->name != "")
         out << " '" << term->name << "'";

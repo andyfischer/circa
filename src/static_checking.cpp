@@ -182,7 +182,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
             out << "The input expression";
         out << " has type " << as_cstring(&input->type->name) << ", but function "
             << term->function->name << " expects type "
-            << as_cstring(&function_get_input_type(term->function, inputIndex)->name);
+            << as_cstring(&get_input_type(term_function(term), inputIndex)->name);
     }
     else if (term->function == FUNCS.static_error)
         out << to_string(term_value(term->input(0)));
