@@ -521,7 +521,11 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     if (tokens.finished()
             || (!tokens.nextIs(tok_Identifier)
             && !token_is_allowed_as_function_name(tokens.next().match))) {
-        return compile_error_for_line(block, tokens, startPosition, "Expected identifier");
+
+        Value msg;
+        set_string(&msg, "Expected identifier after def, found: ");
+        string_append(&msg, tokens.nextStr().c_str());
+        return compile_error_for_line(block, tokens, startPosition, as_cstring(&msg));
     }
 
     // Function name
@@ -2649,7 +2653,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
     std::stringstream line;
     while (!tokens.finished()) {
 
-        // If we've passed our originalPosition and reached a newline, then stop
+        // If we've passed our originalPosition and reached a newline, then stop.
         if (tokens.getPosition() > originalPosition
                 && (tokens.nextIs(tok_Newline) || tokens.nextIs(tok_Semicolon)))
             break;
@@ -2657,26 +2661,13 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
         line << tokens.consumeStr();
     }
 
-    // throw out trailing newline
-    if (!tokens.finished())
-        tokens.consume();
-
-    // make sure we passed our original position
+    // Make sure we passed our original position.
     ca_assert(tokens.getPosition() >= originalPosition);
 
     if (positionRecepient != NULL)
         set_source_location(positionRecepient, start, tokens);
 
     return line.str();
-}
-
-Term* insert_compile_error(Block* block, TokenStream& tokens,
-        std::string const& message)
-{
-    Term* result = apply(block, FUNCS.unrecognized_expression, TermList());
-    result->setStringProp("message", message);
-    set_source_location(result, tokens.getPosition(), tokens);
-    return result;
 }
 
 ParseResult compile_error_for_line(Block* block, TokenStream& tokens, int start,
