@@ -320,7 +320,7 @@ namespace tagged_value_wrappers {
     }
     void copy(Type* type, caValue* source, caValue* dest)
     {
-        change_type(dest, type);
+        make_no_initialize(type, dest);
         dest->value_data.ptr = duplicate((Hashtable*) source->value_data.ptr);
     }
     std::string to_string(caValue* value)

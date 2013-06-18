@@ -307,8 +307,7 @@ void list_copy(caValue* source, caValue* dest)
 
     ca_assert(source->value_type->storageType == sym_StorageTypeList);
 
-    // prepare 'dest'
-    change_type(dest, source->value_type);
+    make(source->value_type, dest);
 
     ListData* sourceData = (ListData*) source->value_data.ptr;
 

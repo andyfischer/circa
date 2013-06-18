@@ -12,7 +12,9 @@ void initialize_null(caValue* value);
 // Initialize 'value' to a new instance of type 'type'.
 void make(Type* type, caValue* value);
 
-void change_type(caValue* v, Type* t);
+// Initialize 'value' so that value_type is correct, and value_data is not yet initialized.
+// Only valid for permanent types. When in doubt, use make() instead of this.
+void make_no_initialize(Type* type, caValue* value);
 
 Type* get_value_type(caValue* v);
 

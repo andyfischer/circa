@@ -32,12 +32,18 @@ namespace type_t {
         Type* type = create_type();
         set_pointer(value, type);
     }
-    void copy(Type* type, caValue* source, caValue* dest)
+    void release(caValue* value)
     {
-        // Shallow copy
+        Type* type = as_type(value);
+        // FIXME type_decref(type);
+    }
+    void copy(Type*, caValue* source, caValue* dest)
+    {
         ca_assert(is_type(source));
-        change_type(dest, type);
-        dest->value_data = source->value_data;
+        make_no_initialize(source->value_type, dest);
+        Type* type = as_type(source);
+        type_incref(type);
+        dest->value_data.ptr = type;
     }
 
     void formatSource(caValue* source, Term* term)
@@ -92,7 +98,8 @@ namespace type_t {
         set_string(&type->name, "Type");
         type->storageType = sym_StorageTypeType;
         type->initialize = type_t::initialize;
-        type->copy = copy;
+        type->release = type_t::release;
+        type->copy = type_t::copy;
         type->formatSource = formatSource;
         type->toString = toString;
     }

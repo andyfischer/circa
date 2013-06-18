@@ -68,8 +68,8 @@ void test_custom_object()
     circa_install_function(&block, "create_object", create_object);
     circa_install_function(&block, "check_object", check_object);
 
-    circa_setup_object_type(circa_find_type_local(&block, "MyType"),
-            sizeof(CustomObject), CustomObjectRelease);
+    Type* type = circa_find_type_local(&block, "MyType");
+    circa_setup_object_type(type, sizeof(CustomObject), CustomObjectRelease);
 
     // Shouldn't allocate any objects before running.
     test_equals(g_currentlyAllocated, 0);

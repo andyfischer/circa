@@ -160,7 +160,7 @@ char* as_blob(caValue* value)
 
 void set_blob(caValue* value, int length)
 {
-    change_type(value, TYPES.blob);
+    make_no_initialize(TYPES.blob, value);
     value->value_data.ptr = blob_create(length);
 }
 

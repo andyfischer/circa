@@ -61,10 +61,15 @@ void make(Type* type, caValue* value)
     type_incref(type);
 }
 
-void change_type(caValue* v, Type* t)
+void make_no_initialize(Type* type, caValue* value)
 {
-    set_null(v);
-    v->value_type = t;
+#if DEBUG
+    if (!type->header.root)
+        internal_error("Can only call make_no_initialize on a root Type");
+#endif
+
+    set_null(value);
+    value->value_type = type;
 }
 
 Type* get_value_type(caValue* v)
@@ -82,6 +87,7 @@ void set_null(caValue* value)
 
     Type* type = value->value_type;
 
+    type_decref(value->value_type);
     value->value_type = TYPES.null;
     value->value_data.ptr = NULL;
 
@@ -134,17 +140,20 @@ void copy(caValue* source, caValue* dest)
         return;
 
     Type::Copy copyFunc = source->value_type->copy;
+    Type* oldDestType = dest->value_type;
 
     if (copyFunc != NULL) {
         copyFunc(source->value_type, source, dest);
         ca_assert(dest->value_type == source->value_type);
-        return;
+    } else {
+        // Default behavior, shallow assign.
+        set_null(dest);
+        dest->value_type = source->value_type;
+        dest->value_data = source->value_data;
+        type_incref(source->value_type);
     }
 
-    // Default behavior, shallow assign.
-    set_null(dest);
-    dest->value_type = source->value_type;
-    dest->value_data = source->value_data;
+    type_decref(oldDestType);
 }
 
 void swap(caValue* left, caValue* right)
@@ -360,7 +369,7 @@ void set_value(caValue* target, caValue* value)
 
 void set_bool(caValue* value, bool b)
 {
-    change_type(value, TYPES.bool_type);
+    make_no_initialize(TYPES.bool_type, value);
     value->value_data.asbool = b;
 }
 
@@ -378,13 +387,13 @@ void set_error_string(caValue* value, const char* s)
 
 void set_int(caValue* value, int i)
 {
-    change_type(value, TYPES.int_type);
+    make_no_initialize(TYPES.int_type, value);
     value->value_data.asint = i;
 }
 
 void set_float(caValue* value, float f)
 {
-    change_type(value, TYPES.float_type);
+    make_no_initialize(TYPES.float_type, value);
     value->value_data.asfloat = f;
 }
 
@@ -415,7 +424,7 @@ caValue* set_list(caValue* value, int size)
 
 void set_term_ref(caValue* val, Term* term)
 {
-    change_type(val, TYPES.term);
+    make_no_initialize(TYPES.term, val);
     val->value_data.ptr = term;
 }
 
@@ -424,32 +433,24 @@ void set_type(caValue* value, Type* type)
     set_null(value);
     value->value_type = TYPES.type;
     value->value_data.ptr = type;
+    type_incref(type);
 }
-
-#if 0
-void set_function(caValue* value, Function* function)
-{
-    set_null(value);
-    value->value_type = TYPES.function;
-    value->value_data.ptr = function;
-}
-#endif
 
 void set_opaque_pointer(caValue* value, void* addr)
 {
-    change_type(value, TYPES.opaque_pointer);
+    make_no_initialize(TYPES.opaque_pointer, value);
     value->value_data.ptr = addr;
 }
 
 void set_stack(caValue* value, Stack* stack)
 {
-    change_type(value, TYPES.stack);
+    make_no_initialize(TYPES.stack, value);
     value->value_data.ptr = stack;
 }
 
 void set_block(caValue* value, Block* block)
 {
-    change_type(value, TYPES.block);
+    make_no_initialize(TYPES.block, value);
     value->value_data.ptr = block;
 }
 
@@ -698,7 +699,7 @@ caType* circa_type_of(caValue* value)
 
 void circa_set_bool(caValue* container, bool b)
 {
-    change_type(container, TYPES.bool_type);
+    make_no_initialize(TYPES.bool_type, container);
     container->value_data.asbool = b;
 }
 void circa_set_error(caValue* container, const char* msg)
@@ -707,12 +708,12 @@ void circa_set_error(caValue* container, const char* msg)
 }
 void circa_set_float(caValue* container, float f)
 {
-    change_type(container, TYPES.float_type);
+    make_no_initialize(TYPES.float_type, container);
     container->value_data.asfloat = f;
 }
 void circa_set_int(caValue* container, int i)
 {
-    change_type(container, TYPES.int_type);
+    make_no_initialize(TYPES.int_type, container);
     container->value_data.asint = i;
 }
 void circa_set_null(caValue* container)
@@ -736,7 +737,7 @@ void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)
 {
     if (type == NULL)
         type = TYPES.any;
-    change_type(container, (Type*) type);
+    make(type, container);
     container->value_data.ptr = ptr;
 }
 void circa_set_vec2(caValue* container, float x, float y)

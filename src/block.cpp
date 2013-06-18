@@ -381,8 +381,9 @@ void remove_nested_contents(Term* term)
     clear_block(term->nestedContents);
 
     // Delete this Block immediately, if it's not referenced.
-    if (!block->header.referenced)
-        delete term->nestedContents;
+    // FIXME
+    //if (!block->header.referenced)
+    //    delete term->nestedContents;
 
     term->nestedContents = NULL;
 }

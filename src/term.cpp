@@ -216,7 +216,10 @@ Term* alloc_term()
 void dealloc_term(Term* term)
 {
     term->inputs.clear();
-    term->type = NULL;
+    if (term->type != NULL) {
+        type_decref(term->type);
+        term->type = NULL;
+    }
     term->function = NULL;
 
     delete term;

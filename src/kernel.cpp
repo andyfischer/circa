@@ -761,6 +761,25 @@ void section_block_formatSource(caValue* source, Term* term)
     format_block_source(source, nested_contents(term), term);
 }
 
+void for_each_root_type(void (*callback)(Type* type))
+{
+    (*callback)(TYPES.any);
+    (*callback)(TYPES.blob);
+    (*callback)(TYPES.block);
+    (*callback)(TYPES.bool_type);
+    (*callback)(TYPES.dict);
+    (*callback)(TYPES.float_type);
+    (*callback)(TYPES.int_type);
+    (*callback)(TYPES.list);
+    (*callback)(TYPES.map);
+    (*callback)(TYPES.opaque_pointer);
+    (*callback)(TYPES.null);
+    (*callback)(TYPES.string);
+    (*callback)(TYPES.symbol);
+    (*callback)(TYPES.term);
+    (*callback)(TYPES.type);
+}
+
 void bootstrap_kernel()
 {
     memset(&FUNCS, 0, sizeof(FUNCS));
@@ -797,8 +816,7 @@ void bootstrap_kernel()
     TYPES.term = create_type();
     TYPES.void_type = create_type();
 
-    type_set_root(TYPES.string);
-    type_set_root(TYPES.null);
+    for_each_root_type(type_set_root);
 
     any_t::setup_type(TYPES.any);
     blob_setup_type(TYPES.blob);
@@ -816,7 +834,6 @@ void bootstrap_kernel()
     string_setup_type(TYPES.error); // errors are just stored as strings for now
     type_t::setup_type(TYPES.type);
     void_t::setup_type(TYPES.void_type);
-
 
     // Create root Block.
     g_world->root = new Block();

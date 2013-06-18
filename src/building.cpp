@@ -295,6 +295,11 @@ void change_declared_type(Term *term, Type *newType)
     if (term->type == newType)
         return;
 
+    if (newType != NULL)
+        type_incref(newType);
+    if (term->type != NULL)
+        type_decref(term->type);
+
     term->type = newType;
 
     set_null(term_value(term));
