@@ -85,13 +85,9 @@ void set_null(caValue* value)
     if (value->value_type->release != NULL)
         value->value_type->release(value);
 
-    Type* type = value->value_type;
-
     type_decref(value->value_type);
     value->value_type = TYPES.null;
     value->value_data.ptr = NULL;
-
-    type_decref(type);
 }
 
 void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
@@ -152,8 +148,6 @@ void copy(caValue* source, caValue* dest)
         dest->value_data = source->value_data;
         type_incref(source->value_type);
     }
-
-    type_decref(oldDestType);
 }
 
 void swap(caValue* left, caValue* right)

@@ -35,7 +35,7 @@ namespace type_t {
     void release(caValue* value)
     {
         Type* type = as_type(value);
-        // FIXME type_decref(type);
+        type_decref(type);
     }
     void copy(Type*, caValue* source, caValue* dest)
     {

@@ -359,9 +359,11 @@ namespace stateful_code_test { void register_tests(); }
 namespace string_test { void register_tests(); }
 namespace symbol_test { void register_tests(); }
 namespace tokenizer_test { void register_tests(); }
+namespace type_test { void register_tests(); }
 
 int main(int argc, char** argv)
 {
+#if 0 // supertemp
     actor_test::register_tests();
     block_test::register_tests();
     building_test::register_tests();
@@ -386,6 +388,8 @@ int main(int argc, char** argv)
     string_test::register_tests();
     symbol_test::register_tests();
     tokenizer_test::register_tests();
+#endif
+    type_test::register_tests();
 
     caWorld* world = circa_initialize();
 

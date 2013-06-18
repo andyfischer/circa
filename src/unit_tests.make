@@ -90,6 +90,7 @@ OBJECTS := \
 	$(OBJDIR)/string_test.o \
 	$(OBJDIR)/symbol_test.o \
 	$(OBJDIR)/tokenizer_test.o \
+	$(OBJDIR)/type_test.o \
 
 RESOURCES := \
 
@@ -226,6 +227,9 @@ $(OBJDIR)/symbol_test.o: unit_tests/symbol_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tokenizer_test.o: unit_tests/tokenizer_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/type_test.o: unit_tests/type_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
