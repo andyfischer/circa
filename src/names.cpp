@@ -504,20 +504,26 @@ bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& ou
     if (parentTerm == NULL)
         return false;
 
-    // Don't include the names of hidden blocks
+    // Don't include the names of hidden or builtin blocks.
     if (is_hidden(parentTerm)) {
+        output << term->name;
+        return true;
+    }
+    
+    if (parentTerm->nestedContents != NULL &&
+        block_get_bool_prop(parentTerm->nestedContents, sym_Builtins, false))
+    {
         output << term->name;
         return true;
     }
 
     bool success = get_relative_name_recursive(block, parentTerm, output);
 
-    if (success) {
-        output << ":" << term->name;
-        return true;
-    } else {
+    if (!success)
         return false;
-    }
+
+    output << ":" << term->name;
+    return true;
 }
 
 std::string get_relative_name(Block* block, Term* term)

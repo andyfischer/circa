@@ -25,12 +25,12 @@ const char* builtin_symbol_to_string(int name)
     case sym_Yes: return "Yes";
     case sym_No: return "No";
     case sym_Maybe: return "Maybe";
-    case sym_Filename: return "Filename";
     case sym_EvaluationEmpty: return "EvaluationEmpty";
     case sym_HasEffects: return "HasEffects";
-    case sym_Origin: return "Origin";
     case sym_HasControlFlow: return "HasControlFlow";
     case sym_DirtyStateType: return "DirtyStateType";
+    case sym_Filename: return "Filename";
+    case sym_Builtins: return "Builtins";
     case sym_Wildcard: return "Wildcard";
     case sym_RecursiveWildcard: return "RecursiveWildcard";
     case sym_Function: return "Function";
@@ -323,6 +323,10 @@ int builtin_symbol_from_string(const char* str)
     case 'r':
         if (strcmp(str + 2, "eak") == 0)
             return sym_Break;
+        break;
+    case 'u':
+        if (strcmp(str + 2, "iltins") == 0)
+            return sym_Builtins;
         break;
     case 'o':
         if (strcmp(str + 2, "otstrapping") == 0)
@@ -628,10 +632,6 @@ int builtin_symbol_from_string(const char* str)
     case 'O':
     switch (str[1]) {
     default: return -1;
-    case 'r':
-        if (strcmp(str + 2, "igin") == 0)
-            return sym_Origin;
-        break;
     case 'u':
     switch (str[2]) {
     default: return -1;

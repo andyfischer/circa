@@ -103,7 +103,7 @@ void pack_any_open_state_vars(Block* block)
 void block_update_state_type(Block* block)
 {
     // Only run if state is dirty.
-    if (!block_get_bool_property(block, sym_DirtyStateType, false))
+    if (!block_get_bool_prop(block, sym_DirtyStateType, false))
         return;
 
     // Recreate the state type

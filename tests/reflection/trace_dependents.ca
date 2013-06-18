@@ -3,15 +3,13 @@
 code = {
     a = 1
     b = 2
-    c = a + 1
-    d = 4
-    e = c
+    c = 3
+    d = a + c
+    e = 4
+    f = d
 }
 
-e_term = code.block.find_term('e')
-dependents = e_term.trace_dependents(code.block)
-code.block.dump
-print(dependents)
+f_term = code.block.find_term('f')
+dependents = f_term.trace_dependents(code.block)
 
-names = {
-}
+assert(equals(for dep in dependents { dep.name }, ['c','a','d']))

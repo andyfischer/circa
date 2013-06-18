@@ -18,6 +18,7 @@ HasEffects
 HasControlFlow
 DirtyStateType
 Filename
+Builtins
 
 # Path expression elements
 Wildcard

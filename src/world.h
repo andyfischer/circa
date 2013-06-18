@@ -7,6 +7,7 @@ namespace circa {
 struct World {
 
     Block* root;
+    Block* builtins;
 
     // Private data.
     NativePatchWorld* nativePatchWorld;

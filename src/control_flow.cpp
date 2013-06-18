@@ -197,7 +197,7 @@ void update_derived_inputs_for_exit_point(Term* term)
 
 void update_for_control_flow(Block* block)
 {
-    if (!block_get_bool_property(block, sym_HasControlFlow, false))
+    if (!block_get_bool_prop(block, sym_HasControlFlow, false))
         return;
 
     for (int i=0; i < block->length(); i++) {

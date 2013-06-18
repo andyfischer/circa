@@ -70,6 +70,10 @@ def first_symbol(any val) -> Symbol
         if length(val) > 0
             first_symbol(val[0])
 
+type Mutable;
+def Mutable.set(self, any val)
+def Mutable.get(self) -> any
+
 -- Modules
 def require(String moduleName)
 def package(String moduleName)
@@ -77,6 +81,13 @@ def import_file(String moduleName, String filename)
 def native_patch_this(String filename)
 def load_module(String moduleName) -> Block
 
+-- Packages
+type Package {
+    String name
+    Map files
+}
+
+-- Test helpers
 def test_oracle() -> any
     -- For internal testing. This function will output values that are manually
     -- inserted with the C++ function oracle_send.
@@ -84,13 +95,6 @@ def test_oracle() -> any
 def test_spy(any val)
     -- For internal testing. This function will save inputs to a global list which
     -- can be easily examined from C++ with test_spy_get_results().
-
-type Mutable;
-def Mutable.set(self, any val)
-def Mutable.get(self) -> any
-
-namespace cppbuild
-    def build_module(String baseFilename)
 
 namespace file
     def exists(String filename) -> bool

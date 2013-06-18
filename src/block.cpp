@@ -367,16 +367,23 @@ bool has_nested_contents(Term* term)
     return term->nestedContents != NULL;
 }
 
+Block* make_nested_contents(Term* term)
+{
+    if (term->nestedContents != NULL)
+        return term->nestedContents;
+
+    term->nestedContents = new Block();
+    term->nestedContents->owningTerm = term;
+    return term->nestedContents;
+}
+
 Block* nested_contents(Term* term)
 {
     if (term == NULL)
         return NULL;
 
-    if (term->nestedContents == NULL) {
-        term->nestedContents = new Block();
-        term->nestedContents->owningTerm = term;
-    }
-    return term->nestedContents;
+    // Future: nested_contents() should not create the block if it doesn't exist.
+    return make_nested_contents(term);
 }
 
 void remove_nested_contents(Term* term)
@@ -683,13 +690,18 @@ void block_remove_property(Block* block, Symbol key)
     hashtable_remove(&block->properties, &keyVal);
 }
 
-bool block_get_bool_property(Block* block, Symbol key, bool defaultValue)
+bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue)
 {
-    caValue* propVal = block_get_property(block, key);
+    caValue* propVal = block_get_property(block, name);
     if (propVal == NULL)
         return defaultValue;
 
     return as_bool(propVal);
+}
+
+void block_set_bool_prop(Block* block, Symbol name, bool value)
+{
+    set_bool(block_insert_property(block, name), value);
 }
 
 bool block_is_evaluation_empty(Block* block)

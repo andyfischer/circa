@@ -665,7 +665,7 @@ void overload__get_contents(caStack* stack)
     list_overload_contents(self, out);
 }
 
-void reflection_install_functions(Block* kernel)
+void reflection_install_functions(Block* builtins)
 {
     static const ImportRecord records[] = {
         {"term_ref", term_ref},
@@ -731,7 +731,7 @@ void reflection_install_functions(Block* kernel)
         {NULL, NULL}
     };
 
-    install_function_list(kernel, records);
+    install_function_list(builtins, records);
 }
 
 } // namespace circa

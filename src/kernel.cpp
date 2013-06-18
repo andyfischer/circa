@@ -683,6 +683,11 @@ Block* global_root_block()
     return global_world()->root;
 }
 
+Block* global_builtins_block()
+{
+    return nested_contents(global_root_block()->get(0));
+}
+
 std::string term_toString(caValue* val)
 {
     Term* t = as_term_ref(val);
@@ -766,6 +771,9 @@ void section_block_formatSource(caValue* source, Term* term)
 
 void bootstrap_kernel()
 {
+    memset(&FUNCS, 0, sizeof(FUNCS));
+    memset(&TYPES, 0, sizeof(TYPES));
+
     // First, instanciate the types that are used by Type.
     TYPES.dict = create_type_uninitialized();
     TYPES.null = create_type_uninitialized();
@@ -818,15 +826,19 @@ void bootstrap_kernel()
 
     // Create root Block.
     g_world->root = new Block();
-    Block* kernel = g_world->root;
+
+    // Create builtins block.
+    Term* builtinsTerm = g_world->root->appendNew();
+    rename(builtinsTerm, "builtins");
+    Block* builtins = make_nested_contents(builtinsTerm);
 
     // Create value function
-    Term* valueFunc = kernel->appendNew();
+    Term* valueFunc = builtins->appendNew();
     rename(valueFunc, "value");
     FUNCS.value = valueFunc;
 
     // Create Type type
-    Term* typeType = kernel->appendNew();
+    Term* typeType = builtins->appendNew();
     typeType->function = FUNCS.value;
     typeType->type = TYPES.type;
     term_value(typeType)->value_type = TYPES.type;
@@ -835,7 +847,7 @@ void bootstrap_kernel()
     rename(typeType, "Type");
 
     // Create Any type
-    Term* anyType = kernel->appendNew();
+    Term* anyType = builtins->appendNew();
     anyType->function = valueFunc;
     anyType->type = TYPES.type;
     term_value(anyType)->value_type = TYPES.type;
@@ -844,7 +856,7 @@ void bootstrap_kernel()
     rename(anyType, "any");
 
     // Create Function type
-    Term* functionType = kernel->appendNew();
+    Term* functionType = builtins->appendNew();
     functionType->function = valueFunc;
     functionType->type = TYPES.type;
     TYPES.function->declaringTerm = functionType;
@@ -862,19 +874,19 @@ void bootstrap_kernel()
     block_set_evaluation_empty(function_contents(valueFunc), true);
 
     // Initialize primitive types (this requires value() function)
-    create_type_value(kernel, TYPES.bool_type, "bool");
-    create_type_value(kernel, TYPES.blob, "blob");
-    create_type_value(kernel, TYPES.block, "Block");
-    create_type_value(kernel, TYPES.dict, "Dict");
-    create_type_value(kernel, TYPES.float_type, "number");
-    create_type_value(kernel, TYPES.int_type, "int");
-    create_type_value(kernel, TYPES.list, "List");
-    create_type_value(kernel, TYPES.opaque_pointer, "opaque_pointer");
-    create_type_value(kernel, TYPES.string, "String");
-    create_type_value(kernel, TYPES.symbol, "Symbol");
-    create_type_value(kernel, TYPES.term, "Term");
-    create_type_value(kernel, TYPES.void_type, "void");
-    create_type_value(kernel, TYPES.map, "Map");
+    create_type_value(builtins, TYPES.bool_type, "bool");
+    create_type_value(builtins, TYPES.blob, "blob");
+    create_type_value(builtins, TYPES.block, "Block");
+    create_type_value(builtins, TYPES.dict, "Dict");
+    create_type_value(builtins, TYPES.float_type, "number");
+    create_type_value(builtins, TYPES.int_type, "int");
+    create_type_value(builtins, TYPES.list, "List");
+    create_type_value(builtins, TYPES.opaque_pointer, "opaque_pointer");
+    create_type_value(builtins, TYPES.string, "String");
+    create_type_value(builtins, TYPES.symbol, "Symbol");
+    create_type_value(builtins, TYPES.term, "Term");
+    create_type_value(builtins, TYPES.void_type, "void");
+    create_type_value(builtins, TYPES.map, "Map");
 
     // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
@@ -883,7 +895,7 @@ void bootstrap_kernel()
     symbol_initialize_global_table();
 
     // Setup output_placeholder() function, needed to declare functions properly.
-    FUNCS.output = create_value(kernel, TYPES.function, "output_placeholder");
+    FUNCS.output = create_value(builtins, TYPES.function, "output_placeholder");
     term_value(FUNCS.output)->value_data.ptr = new Function();
     initialize_function(FUNCS.output);
     as_function(FUNCS.output)->name = "output_placeholder";
@@ -891,7 +903,7 @@ void bootstrap_kernel()
     as_function(FUNCS.output)->specializeType = output_placeholder_specializeType;
     ca_assert(function_get_output_type(FUNCS.output, 0) == TYPES.any);
 
-    // Fix some holes in value() function
+    // Now that output_placeholder is created, fix the value() function.
     {
         Function* attrs = as_function(valueFunc);
         Term* output = append_output_placeholder(function_contents(attrs), NULL);
@@ -902,125 +914,125 @@ void bootstrap_kernel()
     ca_assert(function_get_output_type(valueFunc, 0) == TYPES.any);
 
     // input_placeholder() is needed before we can declare a function with inputs
-    FUNCS.input = import_function(kernel, NULL, "input_placeholder() -> any");
+    FUNCS.input = import_function(builtins, NULL, "input_placeholder() -> any");
     block_set_evaluation_empty(function_contents(FUNCS.input), true);
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
     apply(function_contents(as_function(FUNCS.output)),
         FUNCS.input, TermList())->setBoolProp("optional", true);
 
-    namespace_function::early_setup(kernel);
+    namespace_function::early_setup(builtins);
 
     // Setup declare_field() function, needed to represent compound types.
-    FUNCS.declare_field = import_function(kernel, NULL, "declare_field() -> any");
+    FUNCS.declare_field = import_function(builtins, NULL, "declare_field() -> any");
 
     // Initialize a few more types
-    Term* set_type = create_value(kernel, TYPES.type, "Set");
+    Term* set_type = create_value(builtins, TYPES.type, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-    TYPES.selector = unbox_type(create_value(kernel, TYPES.type, "Selector"));
+    TYPES.selector = unbox_type(create_value(builtins, TYPES.type, "Selector"));
     list_t::setup_type(TYPES.selector);
 
-    control_flow_setup_funcs(kernel);
-    selector_setup_funcs(kernel);
-    loop_setup_functions(kernel);
+    control_flow_setup_funcs(builtins);
+    selector_setup_funcs(builtins);
+    loop_setup_functions(builtins);
 
     // Setup all the builtin functions defined in src/functions
-    setup_builtin_functions(kernel);
+    setup_builtin_functions(builtins);
 
-    FUNCS.section_block = import_function(kernel, NULL, "def section_block() -> any");
+    FUNCS.section_block = import_function(builtins, NULL, "def section_block() -> any");
     as_function(FUNCS.section_block)->formatSource = section_block_formatSource;
 
     // Create IMPLICIT_TYPES (deprecated)
-    type_initialize_kernel(kernel);
+    type_initialize_kernel(builtins);
 
     // Now we can build derived functions
 
     // Create overloaded functions
-    FUNCS.add = create_overloaded_function(kernel, "add(any a,any b) -> any");
+    FUNCS.add = create_overloaded_function(builtins, "add(any a,any b) -> any");
     append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
     append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
 
-    Term* less_than = create_overloaded_function(kernel, "less_than(any a,any b) -> bool");
-    append_to_overloaded_function(less_than, kernel->get("less_than_i"));
-    append_to_overloaded_function(less_than, kernel->get("less_than_f"));
+    Term* less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
+    append_to_overloaded_function(less_than, builtins->get("less_than_i"));
+    append_to_overloaded_function(less_than, builtins->get("less_than_f"));
 
-    Term* less_than_eq = create_overloaded_function(kernel, "less_than_eq(any a,any b) -> bool");
-    append_to_overloaded_function(less_than_eq, kernel->get("less_than_eq_i"));
-    append_to_overloaded_function(less_than_eq, kernel->get("less_than_eq_f"));
+    Term* less_than_eq = create_overloaded_function(builtins, "less_than_eq(any a,any b) -> bool");
+    append_to_overloaded_function(less_than_eq, builtins->get("less_than_eq_i"));
+    append_to_overloaded_function(less_than_eq, builtins->get("less_than_eq_f"));
 
-    Term* greater_than = create_overloaded_function(kernel, "greater_than(any a,any b) -> bool");
-    append_to_overloaded_function(greater_than, kernel->get("greater_than_i"));
-    append_to_overloaded_function(greater_than, kernel->get("greater_than_f"));
+    Term* greater_than = create_overloaded_function(builtins, "greater_than(any a,any b) -> bool");
+    append_to_overloaded_function(greater_than, builtins->get("greater_than_i"));
+    append_to_overloaded_function(greater_than, builtins->get("greater_than_f"));
 
-    Term* greater_than_eq = create_overloaded_function(kernel, "greater_than_eq(any a,any b) -> bool");
-    append_to_overloaded_function(greater_than_eq, kernel->get("greater_than_eq_i"));
-    append_to_overloaded_function(greater_than_eq, kernel->get("greater_than_eq_f"));
+    Term* greater_than_eq = create_overloaded_function(builtins, "greater_than_eq(any a,any b) -> bool");
+    append_to_overloaded_function(greater_than_eq, builtins->get("greater_than_eq_i"));
+    append_to_overloaded_function(greater_than_eq, builtins->get("greater_than_eq_f"));
 
-    Term* max_func = create_overloaded_function(kernel, "max(any a,any b) -> any");
-    append_to_overloaded_function(max_func, kernel->get("max_i"));
-    append_to_overloaded_function(max_func, kernel->get("max_f"));
+    Term* max_func = create_overloaded_function(builtins, "max(any a,any b) -> any");
+    append_to_overloaded_function(max_func, builtins->get("max_i"));
+    append_to_overloaded_function(max_func, builtins->get("max_f"));
 
-    Term* min_func = create_overloaded_function(kernel, "min(any a,any b) -> any");
-    append_to_overloaded_function(min_func, kernel->get("min_i"));
-    append_to_overloaded_function(min_func, kernel->get("min_f"));
+    Term* min_func = create_overloaded_function(builtins, "min(any a,any b) -> any");
+    append_to_overloaded_function(min_func, builtins->get("min_i"));
+    append_to_overloaded_function(min_func, builtins->get("min_f"));
 
-    Term* remainder_func = create_overloaded_function(kernel, "remainder(any a,any b) -> any");
-    append_to_overloaded_function(remainder_func, kernel->get("remainder_i"));
-    append_to_overloaded_function(remainder_func, kernel->get("remainder_f"));
+    Term* remainder_func = create_overloaded_function(builtins, "remainder(any a,any b) -> any");
+    append_to_overloaded_function(remainder_func, builtins->get("remainder_i"));
+    append_to_overloaded_function(remainder_func, builtins->get("remainder_f"));
 
-    Term* mod_func = create_overloaded_function(kernel, "mod(any a,any b) -> any");
-    append_to_overloaded_function(mod_func, kernel->get("mod_i"));
-    append_to_overloaded_function(mod_func, kernel->get("mod_f"));
+    Term* mod_func = create_overloaded_function(builtins, "mod(any a,any b) -> any");
+    append_to_overloaded_function(mod_func, builtins->get("mod_i"));
+    append_to_overloaded_function(mod_func, builtins->get("mod_f"));
 
-    FUNCS.mult = create_overloaded_function(kernel, "mult(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.mult, kernel->get("mult_i"));
-    append_to_overloaded_function(FUNCS.mult, kernel->get("mult_f"));
+    FUNCS.mult = create_overloaded_function(builtins, "mult(any a,any b) -> any");
+    append_to_overloaded_function(FUNCS.mult, builtins->get("mult_i"));
+    append_to_overloaded_function(FUNCS.mult, builtins->get("mult_f"));
 
-    FUNCS.neg = create_overloaded_function(kernel, "neg(any n) -> any");
-    append_to_overloaded_function(FUNCS.neg, kernel->get("neg_i"));
-    append_to_overloaded_function(FUNCS.neg, kernel->get("neg_f"));
+    FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
+    append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
+    append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
     as_function(FUNCS.neg)->formatSource = neg_function::formatSource;
 
-    FUNCS.sub = create_overloaded_function(kernel, "sub(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.sub, kernel->get("sub_i"));
-    append_to_overloaded_function(FUNCS.sub, kernel->get("sub_f"));
+    FUNCS.sub = create_overloaded_function(builtins, "sub(any a,any b) -> any");
+    append_to_overloaded_function(FUNCS.sub, builtins->get("sub_i"));
+    append_to_overloaded_function(FUNCS.sub, builtins->get("sub_f"));
 
     // Create vectorized functions
-    Term* add_v = create_function(kernel, "add_v");
+    Term* add_v = create_function(builtins, "add_v");
     create_function_vectorized_vv(function_contents(add_v), FUNCS.add, TYPES.list, TYPES.list);
-    Term* add_s = create_function(kernel, "add_s");
+    Term* add_s = create_function(builtins, "add_s");
     create_function_vectorized_vs(function_contents(add_s), FUNCS.add, TYPES.list, TYPES.any);
 
     append_to_overloaded_function(FUNCS.add, add_v);
     append_to_overloaded_function(FUNCS.add, add_s);
 
-    Term* sub_v = create_function(kernel, "sub_v");
+    Term* sub_v = create_function(builtins, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, TYPES.list, TYPES.list);
-    Term* sub_s = create_function(kernel, "sub_s");
+    Term* sub_s = create_function(builtins, "sub_s");
     create_function_vectorized_vs(function_contents(sub_s), FUNCS.sub, TYPES.list, TYPES.any);
     
     append_to_overloaded_function(FUNCS.sub, sub_v);
     append_to_overloaded_function(FUNCS.sub, sub_s);
 
     // Create vectorized mult() functions
-    Term* mult_v = create_function(kernel, "mult_v");
+    Term* mult_v = create_function(builtins, "mult_v");
     create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, TYPES.list, TYPES.list);
-    Term* mult_s = create_function(kernel, "mult_s");
+    Term* mult_s = create_function(builtins, "mult_s");
     create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, TYPES.list, TYPES.any);
 
     append_to_overloaded_function(FUNCS.mult, mult_v);
     append_to_overloaded_function(FUNCS.mult, mult_s);
 
-    Term* div_s = create_function(kernel, "div_s");
+    Term* div_s = create_function(builtins, "div_s");
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
 
     // Need dynamic_method before any hosted functions
-    FUNCS.dynamic_method = import_function(kernel, NULL,
+    FUNCS.dynamic_method = import_function(builtins, NULL,
             "def dynamic_method(any inputs :multiple) -> any");
 
     // Load the standard library from stdlib.ca
-    parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
+    parser::compile(builtins, parser::statement_list, STDLIB_CA_TEXT);
 
     // Install C functions
     static const ImportRecord records[] = {
@@ -1091,37 +1103,41 @@ void bootstrap_kernel()
         {NULL, NULL}
     };
 
-    install_function_list(kernel, records);
+    install_function_list(builtins, records);
 
-    closures_install_functions(kernel);
-    modules_install_functions(kernel);
-    reflection_install_functions(kernel);
-    interpreter_install_functions(kernel);
+    closures_install_functions(builtins);
+    modules_install_functions(builtins);
+    reflection_install_functions(builtins);
+    interpreter_install_functions(builtins);
+
+    // Fix 'builtins' module now that the module() function is created.
+    change_function(builtinsTerm, FUNCS.module);
+    block_set_bool_prop(builtins, sym_Builtins, true);
 
     // Fetch refereneces to certain stdlib funcs.
-    FUNCS.declared_state = kernel->get("declared_state");
-    FUNCS.dll_patch = kernel->get("sys:dll_patch");
-    FUNCS.has_effects = kernel->get("has_effects");
-    FUNCS.length = kernel->get("length");
-    FUNCS.list_append = kernel->get("List.append");
-    FUNCS.native_patch = kernel->get("native_patch");
-    FUNCS.not_func = kernel->get("not");
-    FUNCS.output_explicit = kernel->get("output");
-    FUNCS.type = kernel->get("type");
+    FUNCS.declared_state = builtins->get("declared_state");
+    FUNCS.dll_patch = builtins->get("sys:dll_patch");
+    FUNCS.has_effects = builtins->get("has_effects");
+    FUNCS.length = builtins->get("length");
+    FUNCS.list_append = builtins->get("List.append");
+    FUNCS.native_patch = builtins->get("native_patch");
+    FUNCS.not_func = builtins->get("not");
+    FUNCS.output_explicit = builtins->get("output");
+    FUNCS.type = builtins->get("type");
 
     as_function(FUNCS.declared_state)->formatSource = declared_state_format_source;
 
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
     // Finish setting up types that are declared in stdlib.ca.
-    TYPES.color = as_type(kernel->get("Color"));
-    TYPES.closure = as_type(kernel->get("Closure"));
-    TYPES.file_signature = as_type(kernel->get("FileSignature"));
-    TYPES.stack = as_type(kernel->get("Stack"));
-    TYPES.frame = as_type(kernel->get("Frame"));
-    TYPES.point = as_type(kernel->get("Point"));
+    TYPES.color = as_type(builtins->get("Color"));
+    TYPES.closure = as_type(builtins->get("Closure"));
+    TYPES.file_signature = as_type(builtins->get("FileSignature"));
+    TYPES.stack = as_type(builtins->get("Stack"));
+    TYPES.frame = as_type(builtins->get("Frame"));
+    TYPES.point = as_type(builtins->get("Point"));
 
-    TYPES.mutable_type = as_type(kernel->get("Mutable"));
+    TYPES.mutable_type = as_type(builtins->get("Mutable"));
     circa_setup_object_type(TYPES.mutable_type, sizeof(Value), Mutable_release);
     TYPES.mutable_type->initialize = Mutable_initialize;
     TYPES.mutable_type->toString = Mutable_toString;
@@ -1133,20 +1149,17 @@ void bootstrap_kernel()
 
 CIRCA_EXPORT caWorld* circa_initialize()
 {
-    memset(&FUNCS, 0, sizeof(FUNCS));
-    memset(&TYPES, 0, sizeof(TYPES));
 
     bootstrap_kernel();
 
     caWorld* world = global_world();
 
-    Block* kernel = global_root_block();
+    Block* builtins = global_builtins_block();
 
-    // Make sure there are no static errors in the kernel. This shouldn't happen.
-    if (has_static_errors(kernel)) {
+    // Make sure there are no static errors in builtins. This shouldn't happen.
+    if (has_static_errors(builtins)) {
         std::cout << "Static errors found in kernel:" << std::endl;
-        print_static_errors_formatted(kernel, std::cout);
-        internal_error("circa fatal: static errors found in kernel");
+        print_static_errors_formatted(builtins, std::cout);
     }
 
     // Load library paths from CIRCA_LIB_PATH

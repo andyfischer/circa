@@ -33,19 +33,19 @@ void has_control_flow_prop()
     Term* f_def = block.compile("def f() { if true { return } }");
 
     // Top-level block has no control flow, it shouldn't escape f().
-    test_assert(block_get_bool_property(&block, sym_HasControlFlow, false) == false);
+    test_assert(block_get_bool_prop(&block, sym_HasControlFlow, false) == false);
 
     // Inside "f" does have control flow.
-    test_assert(true == block_get_bool_property(
+    test_assert(true == block_get_bool_prop(
                 find_block_from_path_expression(&block, "f"), sym_HasControlFlow, false));
 
     // Inside if-block does too.
-    test_assert(true == block_get_bool_property(
+    test_assert(true == block_get_bool_prop(
                 find_block_from_path_expression(&block, "f / function=if_block"),
                 sym_HasControlFlow, false));
 
     Term* returnCall = find_term_from_path_expression(&block, "**/function=return");
-    test_assert(block_get_bool_property(returnCall->owningBlock, sym_HasControlFlow, true));
+    test_assert(block_get_bool_prop(returnCall->owningBlock, sym_HasControlFlow, true));
 }
 
 void test_find_block_that_exit_point_will_reach()

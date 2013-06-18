@@ -126,6 +126,7 @@ extern BuiltinTypes TYPES;
 
 World* global_world();
 Block* global_root_block();
+Block* global_builtins_block();
 
 void empty_evaluate_function(Term* caller);
 

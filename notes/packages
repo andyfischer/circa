@@ -1,0 +1,117 @@
+
+A *package* contains scripts and assets.
+
+Any script file that can be pulled in with a 'require' statement is a *module*.
+
+One script file can be a module.
+
+One folder can be a module, if it has a 'main.ca' file which declares all public exports.
+
+Additionally a zip package can be one module, similar to a folder-based module.
+
+During module lookup (which happens when resolving a 'require' statement), we will
+first look for neighboring submodules that are in the same encompassing module.
+
+Thoughts
+  This design is similar to local subnets in IP addresses. A user can look at the 172.xx
+  block to see their neighbors, or 198.xxx (or whatever) to see more neighbors, and the
+  scope keeps expanding until they can see the whole world.
+
+  Similarly, 'require abc' will look in the local module for 'abc', if not found then it
+  will look in the enclosing package's neighbors, etc until it reaches the global
+  namespace.
+
+  Further thinking: this is a bad idea, one module should not be affected by the
+  enclosing package's neighbors.
+
+-- An earlier draft (v2) is below --
+
+In this scheme, we have *packages*, *modules*, *libraries*, *scripts* and *assets*.
+
+A *package* is just a mechanism for bundling and transporting code files. One
+zip file is one package. A package contains libraries, scripts, and assets.
+
+The package format is only relevant for code transport. Once the code is loaded,
+the original package is not important information. The important unit of organization
+is the *module*.
+
+A *module* is a logical unit of code organization. Each module has a name.
+Each module exports a set of public symbols, including functions and types.
+
+The module contains a set of scripts and asset files. Some scripts are 'library'
+scripts which are only used to provide reusable functions and types. Some scripts
+are meant to be loaded as an actor and executed.
+
+Top-level hierarchy
+
+Root
+  Module x
+    Library script a
+      Script contents
+    Library script b
+    Actor script b
+  Module2
+  Module3
+
+
+Task list
+
+  1) Move builtins to their own module
+  2) Support the unpacking of a zip file into a new module
+  3) Fix name lookup to eliminate the global namespace problem
+
+
+
+-- An earlier draft (v1) is below --
+
+A "package" is the smallest unit of a program that can be downloaded or shared.
+
+One package can contain 1 or more source files, as well as asset files. It
+can be considered a "bundle".
+
+Currently we have "modules" which are one source file each; I think this pattern
+needs to be deprecated in favor of packages.
+
+Every source file belongs to some package. If a source file isn't in an explicitly
+named package then it can be in an implicit package. For implicit packages, generally
+one folder = one package.
+
+It's expected that source files within a package will be interdependent. When a source
+file uses 'require', then it will first look in the file's package.
+
+  (Should we allow for packages to implicitly find names that are in the package? I think
+  so, this style works well for prototyping).
+
+There is also a "library". A library is one block (and possibly one source file). But not
+all blocks should be treated as a library. A library contains functions that are meant to
+be reused. The library shouldn't have anything other than type and function declarations in
+its top level.
+
+A package can contain N libraries.
+
+The 'require' statement takes a *library name* as its input.
+
+To declare a library, we should probably have a "library" keyword that is added to the top
+of the file. But I think this can be optional.
+
+Can we have a library that isn't a top-level block? Maybe support this later. Would be
+nice to support mocking.
+
+The require() function can load a library in another package, which I think should work?
+Library name lookup is then a two step process:
+ - Look in the nearby package
+ - Look in the global space
+
+Future: Allow user to hack this lookup, to support dependency injection.
+
+How should the global branch structure look?
+
+Version 1
+
+  top-level
+    package
+      library
+      library
+      other block
+    package
+    package

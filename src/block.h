@@ -140,6 +140,7 @@ bool is_namespace(Block* block);
 
 caValue* block_bytecode(Block* block);
 bool has_nested_contents(Term* term);
+Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);
 void remove_nested_contents(Term* term);
 
@@ -184,7 +185,8 @@ caValue* block_get_property(Block* block, Symbol name);
 caValue* block_insert_property(Block* block, Symbol name);
 void block_remove_property(Block* block, Symbol name);
 
-bool block_get_bool_property(Block* block, Symbol name, bool defaultValue);
+bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue);
+void block_set_bool_prop(Block* block, Symbol name, bool value);
 
 // Convenience functions for accessing block properties.
 bool block_is_evaluation_empty(Block* block);
