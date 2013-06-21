@@ -51,7 +51,6 @@ void make(Type* type, caValue* value)
     INCREMENT_STAT(ValueCreates);
 
     set_null(value);
-
     value->value_type = type;
 
     if (type->initialize != NULL)
@@ -63,13 +62,10 @@ void make(Type* type, caValue* value)
 
 void make_no_initialize(Type* type, caValue* value)
 {
-#if DEBUG
-    if (!type->header.root)
-        internal_error("Can only call make_no_initialize on a root Type");
-#endif
-
     set_null(value);
     value->value_type = type;
+    type->inUse = true;
+    type_incref(type);
 }
 
 Type* get_value_type(caValue* v)

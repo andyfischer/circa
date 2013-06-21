@@ -56,6 +56,11 @@ NativePatchWorld* create_native_patch_world()
 
 void dealloc_native_patch_world(NativePatchWorld* world)
 {
+    std::map<std::string, NativePatch*>::const_iterator it;
+    for (it = world->nativeModules.begin(); it != world->nativeModules.end(); ++it) {
+        NativePatch* patch = it->second;
+        delete patch;
+    }
     delete world;
 }
 

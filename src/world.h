@@ -43,6 +43,7 @@ protected:
 World* alloc_world();
 void dealloc_world(World* world);
 void world_initialize(World* world);
+void world_uninitialize(World* world);
 World* create_world();
 
 void refresh_all_modules(caWorld* world);

@@ -381,9 +381,8 @@ void remove_nested_contents(Term* term)
     clear_block(term->nestedContents);
 
     // Delete this Block immediately, if it's not referenced.
-    // FIXME
-    //if (!block->header.referenced)
-    //    delete term->nestedContents;
+    if (!block->header.referenced)
+        delete term->nestedContents;
 
     term->nestedContents = NULL;
 }
@@ -472,7 +471,11 @@ void clear_block(Block* block)
 {
     assert_valid_block(block);
     set_null(&block->staticErrors);
-    block->stateType = NULL;
+
+    if (block->stateType != NULL) {
+        type_decref(block->stateType);
+        block->stateType = NULL;
+    }
 
     block->names.clear();
     block->inProgress = false;

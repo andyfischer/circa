@@ -463,6 +463,12 @@ void Mutable_initialize(Type* type, caValue* value)
     initialize_null(val);
 }
 
+void Mutable_release(caValue* value)
+{
+    caValue* val = (caValue*) object_get_body(value);
+    set_null(val);
+}
+
 std::string Mutable_toString(caValue* value)
 {
     return "Mutable[" + to_string((caValue*) object_get_body(value)) + "]";
@@ -779,6 +785,7 @@ void for_each_root_type(void (*callback)(Type* type))
     (*callback)(TYPES.symbol);
     (*callback)(TYPES.term);
     (*callback)(TYPES.type);
+    (*callback)(TYPES.void_type);
 }
 
 void bootstrap_kernel()
@@ -894,7 +901,6 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.term, "Term");
     create_type_value(builtins, TYPES.void_type, "void");
     create_type_value(builtins, TYPES.map, "Map");
-
 
     // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
@@ -1194,10 +1200,16 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
 {
     symbol_deinitialize_global_table();
 
+    world_uninitialize(world);
+
     delete world->root;
     world->root = NULL;
 
+    for_each_root_type(predelete_type);
+    for_each_root_type(delete_type);
+
     memset(&FUNCS, 0, sizeof(FUNCS));
+    memset(&TYPES, 0, sizeof(TYPES));
 
     dealloc_world(world);
 }

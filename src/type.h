@@ -158,11 +158,12 @@ Type* create_type();
 void delete_type(Type* type);
 void predelete_type(Type* type);
 
+void type_start_at_zero_refs(Type* type);
+
 void type_incref(Type* type);
 void type_decref(Type* type);
 bool type_is_root(Type* type);
 void type_set_root(Type* type);
-
 
 Type* unbox_type(Term* type);
 Type* unbox_type(caValue* val);

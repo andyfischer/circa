@@ -14,7 +14,7 @@ namespace circa {
 
 struct HandleData
 {
-    int refcount;
+    int refCount;
     caValue value;
 };
 
@@ -38,7 +38,7 @@ caValue* handle_get_value(caValue* handle)
 void handle_initialize(Type* type, caValue* value)
 {
     HandleData* c = (HandleData*) malloc(sizeof(HandleData));
-    c->refcount = 1;
+    c->refCount = 1;
     initialize_null(&c->value);
     value->value_data.ptr = c;
 }
@@ -47,11 +47,12 @@ void handle_release(caValue* value)
 {
     HandleData* container = as_handle(value);
     ca_assert(container != NULL);
+    ca_assert(container->refCount > 0);
 
-    container->refcount--;
+    container->refCount--;
 
     // Release data, if this is the last reference.
-    if (container->refcount <= 0) {
+    if (container->refCount == 0) {
 
         // Find the type's release function (if any), and call it.
         Term* releaseMethod = find_method(NULL, value->value_type, "release");
@@ -73,12 +74,12 @@ void handle_release(caValue* value)
     }
 }
 
-void handle_copy(Type* type, caValue* source, caValue* dest)
+void handle_copy(Type*, caValue* source, caValue* dest)
 {
     set_null(dest);
 
-    as_handle(source)->refcount++;
-    make(source->value_type, dest);
+    as_handle(source)->refCount++;
+    make_no_initialize(source->value_type, dest);
     dest->value_data.ptr = source->value_data.ptr;
 }
 

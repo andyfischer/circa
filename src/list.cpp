@@ -739,8 +739,9 @@ namespace list_t {
         // the input data is fine as-is.
         if (!list_type_has_specific_size(&type->parameter)) {
             if (!checkOnly) {
-                value->value_type = type;
                 type_incref(type);
+                type_decref(value->value_type);
+                value->value_type = type;
             }
             return;
         }
@@ -756,8 +757,9 @@ namespace list_t {
         if (!checkOnly) {
             INCREMENT_STAT(Touch_ListCast);
             list_touch(value);
-            value->value_type = type;
             type_incref(type);
+            type_decref(value->value_type);
+            value->value_type = type;
         }
 
         for (int i=0; i < sourceLength; i++) {

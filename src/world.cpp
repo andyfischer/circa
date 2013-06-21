@@ -42,8 +42,6 @@ World* alloc_world()
 
 void dealloc_world(World* world)
 {
-    dealloc_native_patch_world(world->nativePatchWorld);
-    dealloc_file_watch_world(world->fileWatchWorld);
     free(world);
 }
 
@@ -53,6 +51,13 @@ void world_initialize(World* world)
 
     world->nativePatchWorld = create_native_patch_world();
     world->fileWatchWorld = create_file_watch_world();
+}
+
+void world_uninitialize(World* world)
+{
+    set_null(&world->moduleSearchPaths);
+    dealloc_native_patch_world(world->nativePatchWorld);
+    dealloc_file_watch_world(world->fileWatchWorld);
 }
 
 World* create_world()

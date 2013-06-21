@@ -24,8 +24,9 @@ namespace range_function {
 
     Type* specializeType(Term* term)
     {
-        // TODO: Should reuse existing type object
-        return create_typed_unsized_list_type(TYPES.int_type);
+        Type* type = create_typed_unsized_list_type(TYPES.int_type);
+        type_start_at_zero_refs(type);
+        return type;
     }
 
     void setup(Block* kernel)

@@ -88,7 +88,6 @@ struct BuiltinFuncs {
 };
 
 struct BuiltinTypes {
-    Type* actor;
     Type* any;
     Type* block;
     Type* blob;

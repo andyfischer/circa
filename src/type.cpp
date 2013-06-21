@@ -110,7 +110,7 @@ void type_incref(Type* type)
 {
     if (type->header.root)
         return;
-    ca_assert(type->header.refcount >= 1);
+    ca_assert(type->header.refcount >= 0);
     type->header.refcount++;
 }
 
@@ -217,14 +217,28 @@ Type* create_type()
 void delete_type(Type* type)
 {
     predelete_type(type);
-    //FIXME dealloc_type(type);
+    dealloc_type(type);
+}
+
+Type* create_type_refed()
+{
+    Type* type = create_type();
+    type_incref(type);
+    return type;
 }
 
 void predelete_type(Type* type)
 {
     set_null(&type->properties);
     set_null(&type->parameter);
-    //FIXME set_null(&type->name);
+    set_null(&type->name);
+}
+
+void type_start_at_zero_refs(Type* type)
+{
+    ca_assert(type->header.refcount == 1);
+    ca_assert(type->inUse == false);
+    type->header.refcount = 0;
 }
 
 static void dealloc_type(Type* type)

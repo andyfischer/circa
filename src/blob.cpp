@@ -19,6 +19,7 @@ struct BlobData {
 
 void incref(BlobData* data)
 {
+    ca_assert(data->refCount >= 0);
     data->refCount++;
 }
 
@@ -26,9 +27,8 @@ void decref(BlobData* data)
 {
     ca_assert(data->refCount > 0);
     data->refCount--;
-    if (data->refCount == 0) {
+    if (data->refCount == 0)
         free(data);
-    }
 }
 
 BlobData* blob_create(int length)
@@ -164,6 +164,16 @@ void set_blob(caValue* value, int length)
     value->value_data.ptr = blob_create(length);
 }
 
+void blob_initialize(Type* type, caValue* value)
+{
+    set_blob(value, 0);
+}
+
+void blob_release(caValue* value)
+{
+    decref((BlobData*) value->value_data.ptr);
+}
+
 std::string blob_toString(caValue* value)
 {
     Value asHex;
@@ -175,6 +185,8 @@ void blob_setup_type(Type* type)
 {
     reset_type(type);
     set_string(&type->name, "Blob");
+    type->initialize = blob_initialize;
+    type->release = blob_release;
     type->storageType = sym_StorageTypeString;
     type->toString = blob_toString;
 }
