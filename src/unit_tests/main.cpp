@@ -9,8 +9,8 @@
 #include "string_type.h"
 
 std::vector<TestCase> gTestCases;
-
 TestCase gCurrentTestCase;
+Value* gTempValue = NULL;
 
 void post_test_sanity_check();
 
@@ -163,6 +163,14 @@ bool test_fail_on_runtime_error(Stack& context)
     return false;
 }
 
+caValue* temp_string(const char* str)
+{
+    if (gTempValue == NULL)
+        gTempValue = new Value();
+    set_string(gTempValue, str);
+    return gTempValue;
+}
+
 bool run_test(TestCase& testCase, bool catch_exceptions)
 {
     gCurrentTestCase = testCase;
@@ -253,7 +261,8 @@ bool run_all_tests()
 
 void post_test_sanity_check()
 {
-    // this once did something
+    if (gTempValue != NULL)
+        set_null(gTempValue);
 }
 
 std::vector<std::string> list_all_test_names()

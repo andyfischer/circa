@@ -936,7 +936,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     tokens.consume(closingToken);
 
-    list_initialize_parameter_from_type_decl(contents, &as_type(result)->parameter);
+    list_type_initialize_from_decl(as_type(result), contents);
 
     return ParseResult(result);
 }

@@ -112,12 +112,14 @@ bool list_contains(caValue* list, caValue* element);
 // a specific size.
 Symbol list_get_parameter_type(caValue* parameter);
 bool list_type_has_specific_size(caValue* parameter);
-void list_initialize_parameter_from_type_decl(Block* typeDecl, caValue* parameter);
+void list_type_initialize_from_decl(Type* type, Block* decl);
 
-// Create a new compound type (sized and named)
+// Create a new compound type (also called a struct type)
 Type* create_compound_type();
 
-void compound_type_append_field(Type* type, Type* fieldType, const char* fieldName);
+void setup_compound_type(Type* type);
+
+void compound_type_append_field(Type* type, Type* fieldType, caValue* fieldName);
 
 // For a List-based type, this returns the number of elements.
 int compound_type_get_field_count(Type* type);

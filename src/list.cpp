@@ -538,16 +538,20 @@ bool list_type_has_specific_size(caValue* parameter)
 Type* create_compound_type()
 {
     Type* type = create_type();
+    setup_compound_type(type);
+    return type;
+}
 
+void setup_compound_type(Type* type)
+{
     list_t::setup_type(type);
     caValue* param = &type->parameter;
     set_list(param, 2);
     set_list(list_get(param, 0), 0);
     set_list(list_get(param, 1), 0);
-    return type;
 }
 
-void compound_type_append_field(Type* type, Type* fieldType, const char* fieldName)
+void compound_type_append_field(Type* type, Type* fieldType, caValue* fieldName)
 {
     ca_assert(list_get_parameter_type(&type->parameter) == sym_StructType);
 
@@ -556,7 +560,7 @@ void compound_type_append_field(Type* type, Type* fieldType, const char* fieldNa
     caValue* names = list_get(&type->parameter, 1);
 
     set_type(list_append(types), fieldType);
-    set_string(list_append(names), fieldName);
+    set_value(list_append(names), fieldName);
 }
 
 int compound_type_get_field_count(Type* type)
@@ -599,23 +603,20 @@ std::string compound_type_to_string(caValue* value)
     return out.str();
 }
 
-void list_initialize_parameter_from_type_decl(Block* typeDecl, caValue* parameter)
+void list_type_initialize_from_decl(Type* type, Block* decl)
 {
-    set_list(parameter, 2);
-    caValue* types = set_list(list_get(parameter, 0), 0);
-    caValue* names = set_list(list_get(parameter, 1), 0);
+    setup_compound_type(type);
 
     // Iterate through the type definition.
-    for (int i=0; i < typeDecl->length(); i++) {
-        Term* term = typeDecl->get(i);
+    for (int i=0; i < decl->length(); i++) {
+        Term* term = decl->get(i);
 
         if (!is_function(term))
             continue;
 
-        Type* type = get_output_type(function_contents(term), 0);
+        Type* fieldType = get_output_type(function_contents(term), 0);
 
-        set_type(list_append(types), type);
-        set_string(list_append(names), term->name);
+        compound_type_append_field(type, fieldType, &term->nameValue);
     }
 }
 
@@ -725,6 +726,8 @@ namespace list_t {
 
     void tv_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     {
+        ca_assert(value->value_type != type);
+
         if (!is_list(value)) {
             result->success = false;
             return;
@@ -735,15 +738,17 @@ namespace list_t {
         // If the requested type doesn't have a specific size restriction, then
         // the input data is fine as-is.
         if (!list_type_has_specific_size(&type->parameter)) {
-            if (!checkOnly)
+            if (!checkOnly) {
                 value->value_type = type;
+                type_incref(type);
+            }
             return;
         }
 
-        List& destTypes = *List::checkCast(list_get_type_list_from_type(type));
+        caValue* destTypes = list_get_type_list_from_type(type);
 
         // Check for correct number of elements.
-        if (sourceLength != destTypes.length()) {
+        if (sourceLength != list_length(destTypes)) {
             result->success = false;
             return;
         }
@@ -751,15 +756,13 @@ namespace list_t {
         if (!checkOnly) {
             INCREMENT_STAT(Touch_ListCast);
             list_touch(value);
-            if (value->value_type != type) {
-                value->value_type = type;
-                type_incref(type);
-            }
+            value->value_type = type;
+            type_incref(type);
         }
 
         for (int i=0; i < sourceLength; i++) {
             caValue* sourceElement = list_get(value, i);
-            Type* expectedType = as_type(destTypes[i]);
+            Type* expectedType = as_type(list_get(destTypes,i));
 
             INCREMENT_STAT(Cast_ListCastElement);
             cast(result, sourceElement, expectedType, checkOnly);

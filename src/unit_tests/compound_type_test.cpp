@@ -14,11 +14,11 @@ void build_compound_type()
 
     test_equals(&type->parameter, "[[], []]");
 
-    compound_type_append_field(type, TYPES.string, "abc");
+    compound_type_append_field(type, TYPES.string, temp_string("abc"));
 
     test_equals(&type->parameter, "[[<Type String>], ['abc']]");
 
-    compound_type_append_field(type, TYPES.int_type, "def");
+    compound_type_append_field(type, TYPES.int_type, temp_string("def"));
 
     test_equals(&type->parameter, "[[<Type String>, <Type int>], ['abc', 'def']]");
 

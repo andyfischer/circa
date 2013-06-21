@@ -122,7 +122,7 @@ void block_update_state_type(Block* block)
         ca_assert(is_string(fieldName));
         ca_assert(!string_eq(fieldName, ""));
 
-        compound_type_append_field(type, declared_type(term), as_cstring(fieldName));
+        compound_type_append_field(type, declared_type(term), fieldName);
     }
 
     block->stateType = type;

@@ -41,6 +41,8 @@ bool test_fail_on_static_error(Block* block);
 // there was no error.
 bool test_fail_on_runtime_error(Stack& context);
 
+caValue* temp_string(const char* str);
+
 struct TestCase {
     typedef void (*TestExecuteFunction)();
 
@@ -69,3 +71,4 @@ void declare_current_test_failed();
 bool current_test_has_failed();
 
 void test_block_as_assertions_list(Block* block, std::string const& contextStr);
+

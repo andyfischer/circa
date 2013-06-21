@@ -768,6 +768,7 @@ void for_each_root_type(void (*callback)(Type* type))
     (*callback)(TYPES.block);
     (*callback)(TYPES.bool_type);
     (*callback)(TYPES.dict);
+    (*callback)(TYPES.error);
     (*callback)(TYPES.float_type);
     (*callback)(TYPES.int_type);
     (*callback)(TYPES.list);
