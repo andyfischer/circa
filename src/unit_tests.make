@@ -75,6 +75,7 @@ OBJECTS := \
 	$(OBJDIR)/fakefs_test.o \
 	$(OBJDIR)/file_test.o \
 	$(OBJDIR)/file_watch_test.o \
+	$(OBJDIR)/function_test.o \
 	$(OBJDIR)/handle_test.o \
 	$(OBJDIR)/importing_test.o \
 	$(OBJDIR)/interpreter_test.o \
@@ -182,6 +183,9 @@ $(OBJDIR)/file_test.o: unit_tests/file_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_watch_test.o: unit_tests/file_watch_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/function_test.o: unit_tests/function_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/handle_test.o: unit_tests/handle_test.cpp

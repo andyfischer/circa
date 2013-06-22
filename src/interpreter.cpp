@@ -6,6 +6,7 @@
 #include "blob.h"
 #include "block.h"
 #include "bytecode.h"
+#include "closures.h"
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "dict.h"
@@ -532,10 +533,20 @@ caValue* stack_find_active_value(Frame* frame, Term* term)
             return frame_register(frame, term);
 
         if (frame->parent == 0)
-            return NULL;
+            break;
 
         frame = frame_by_id(stack, frame->parent);
     }
+
+    // Special case for function values that aren't on the stack: allow these
+    // to be accessed as a term value.
+    if (term->function == FUNCS.function_decl) {
+        if (is_null(term_value(term)))
+            set_closure(term_value(term), term->nestedContents, NULL);
+        return term_value(term);
+    }
+
+    return NULL;
 }
 
 int num_inputs(Stack* stack)

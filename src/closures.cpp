@@ -80,6 +80,32 @@ void closure_block_evaluate(caStack* stack)
     }
 }
 
+bool is_closure(caValue* value)
+{
+    return value->value_type == TYPES.func;
+}
+
+caValue* closure_get_block(caValue* value)
+{
+    ca_assert(is_closure(value));
+    return list_get(value, 0);
+}
+
+caValue* closure_get_bindings(caValue* value)
+{
+    ca_assert(is_closure(value));
+    return list_get(value, 1);
+}
+
+void set_closure(caValue* value, Block* block, caValue* bindings)
+{
+    make(TYPES.func, value);
+    touch(value);
+    set_block(closure_get_block(value), block);
+    if (bindings != NULL)
+        set_value(closure_get_bindings(value), bindings);
+}
+
 void closures_install_functions(Block* kernel)
 {
     FUNCS.closure_block = install_function(kernel, "closure_block", closure_block_evaluate);

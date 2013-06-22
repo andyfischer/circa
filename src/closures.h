@@ -9,6 +9,9 @@ void closures_install_functions(Block* kernel);
 
 void closure_block_evaluate(caStack* stack);
 
-Block* get_block_of_callable(caValue* value);
+bool is_closure(caValue* value);
+void set_closure(caValue* value, Block* block, caValue* bindings);
+caValue* closure_get_block(caValue* value);
+caValue* closure_get_bindings(caValue* value);
 
 } // namespace circa

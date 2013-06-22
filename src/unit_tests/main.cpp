@@ -354,6 +354,7 @@ namespace control_flow_test { void register_tests(); }
 namespace fakefs_test { void register_tests(); }
 namespace file_test { void register_tests(); }
 namespace file_watch_test { void register_tests(); }
+namespace function_test { void register_tests(); }
 namespace handle_test { void register_tests(); }
 namespace importing_test { void register_tests(); }
 namespace interpreter_test { void register_tests(); }
@@ -382,6 +383,7 @@ int main(int argc, char** argv)
     fakefs_test::register_tests();
     file_test::register_tests();
     file_watch_test::register_tests();
+    function_test::register_tests();
     handle_test::register_tests();
     importing_test::register_tests();
     interpreter_test::register_tests();
