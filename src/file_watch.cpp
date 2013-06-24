@@ -36,6 +36,13 @@ FileWatchWorld* create_file_watch_world()
 
 void dealloc_file_watch_world(FileWatchWorld* world)
 {
+    std::map<std::string, FileWatch*>::const_iterator it;
+    for (it = world->watches.begin();
+         it != world->watches.end();
+         ++it) {
+        FileWatch* watch = it->second;
+        delete watch;
+    }
     delete world;
 }
 
