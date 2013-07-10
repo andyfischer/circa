@@ -6,14 +6,14 @@ namespace circa {
 
 // Initialize this caValue to a null value. This should only be used if the caValue
 // contains invalid data, or has a type that does not have a destructor. Calling this
-// on a caValue that has a valid value may cause a memory leak.
+// on a caValue that has a valid value will cause a memory leak.
 void initialize_null(caValue* value);
 
-// Initialize 'value' to a new instance of type 'type'.
+// Initialize 'value' to a new instance of type 'type'. Uses the type's 'initialize' handler.
 void make(Type* type, caValue* value);
 
-// Initialize 'value' so that value_type is correct, and value_data is not yet initialized.
-// Only valid for permanent types. When in doubt, use make() instead of this.
+// Initialize 'value' to have the given type, but does not call the type's 'initialize' handler.
+// The value_data is left NULL, and the caller is expected to fill in value_data.
 void make_no_initialize(Type* type, caValue* value);
 
 Type* get_value_type(caValue* v);
@@ -31,27 +31,22 @@ void reset(caValue* value);
 // return whether the operation would have succeeded.
 void cast(CastResult* result, caValue* source, Type* type, bool checkOnly);
 
-// Attempts to cast the value to the given type, returns whether it was successful.
+// Shorthand 'cast'. Returns whether the cast was successful.
 bool cast(caValue* source, Type* type);
 
-// Returns whether this value can be cast to the given type.
+// Shorthand 'cast'. Returns whether a cast will succeed, does not perform the cast.
 bool cast_possible(caValue* value, Type* type);
 
 // Copy 'source' to 'dest'.
 void copy(caValue* source, caValue* dest);
 
-// Swap values between 'left' and 'right'. This is cheaper than copy(), because nothing
-// special needs to happen. (In comparison, copy() will cause some types to allocate a
-// new piece of memory).
+// Swap values between 'left' and 'right'.
 void swap(caValue* left, caValue* right);
 
-// Move the contents of 'source' to 'dest', and set 'source' to null. The previous value
-// of 'dest' will be destroyed.
+// Move the value in 'source' to 'dest', destroying the value previously in 'dest'.
 void move(caValue* source, caValue* dest);
 
-// touch() is called immediately before modifying a value. If the type implements a
-// persistent data structure, then calling this function will ensure that 'value' owns a
-// mutable copy of the data. This is only necessary for some types.
+// Obtain a deep-write-safe reference to 'value'.
 void touch(caValue* value);
 
 // Return a string representation of the value.
@@ -135,7 +130,6 @@ void set_string(caValue* value, std::string const& s);
 void set_symbol(caValue* value, Symbol val);
 void set_term_ref(caValue* val, Term* term);
 void set_type(caValue* value, Type* type);
-//void set_function(caValue* value, Function* function);
 
 // Complex unboxing functions.
 float to_float(caValue* value);

@@ -22,7 +22,7 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = ../build/obj/Debug/unit_tests
   TARGETDIR  = ../build
-  TARGET     = $(TARGETDIR)/unit_tests
+  TARGET     = $(TARGETDIR)/circa_test
   DEFINES   += -DDEBUG
   INCLUDES  += -I../include -I.
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -44,7 +44,7 @@ endif
 ifeq ($(config),release)
   OBJDIR     = ../build/obj/Release/unit_tests
   TARGETDIR  = ../build
-  TARGET     = $(TARGETDIR)/unit_tests
+  TARGET     = $(TARGETDIR)/circa_test_r
   DEFINES   += 
   INCLUDES  += -I../include -I.
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)

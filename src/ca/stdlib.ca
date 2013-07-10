@@ -625,7 +625,6 @@ def sum(List numbers) -> number
         result += i
     result
     
-
 def zip(List left, List right) -> List
     for l in left
         [l, right.get_optional(index(), null)]

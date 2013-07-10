@@ -145,18 +145,7 @@ caBlock* circa_load_module_from_file(caWorld* world,
                                       const char* filename);
 caBlock* circa_load_module(caWorld* world, const char* moduleName);
 
-// -- Controlling Actors --
-#if 0 // disabled as of actors v3
-void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename);
-caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName);
-void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message);
-void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message);
-int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages);
-int circa_actor_run_all_queues(caWorld* world, int maxMessages);
-void circa_actor_clear_all(caWorld* world);
-#endif
-
-// -- Controlling the Interpreter --
+// -- Interpreter --
 
 // Allocate a new Stack object.
 caStack* circa_create_stack(caWorld* world);
@@ -250,6 +239,38 @@ caBlock* circa_caller_block(caStack* stack);
 caBlock* circa_top_block(caStack* stack);
 
 // -- Tagged Values --
+//
+// General documentation: Safely using container values.
+//
+//     When using a container (such as a list or map), you will commonly need to access or
+//   modify the contents of the container (such as accessing a list's element). This is
+//   done through the use of *deep pointers*. An accessor function, such as circa_index,
+//   will return a deep pointer into the list.
+//
+//     Since Circa uses persistent data structures (two caValues may share the same 
+//   underlying data), there are rules on safely using deep pointers. The rules are:
+//
+//   If you are only reading from the deep pointer:
+//     - Many operations on the container value will invalidate all deep pointers. It's advised that
+//       you don't touch the container at all while accessing the deep pointer.
+//     - When in doubt, use circa_copy to copy a deep pointer to a new caValue. The caValue
+//       copy is now safe to use, even if its container is touched.
+//
+//   If you are also *writing* to a deep pointer:
+//     - The above warnings on reading are applicable.
+//     - Additionally, you can only write to a deep pointer if its container is deep-write-safe.
+//       Check the documentation, each relevant call will describe whether its result is
+//       deep-write-safe.
+//     - When in doubt, use circa_touch to ensure that a container is deep-write-safe.
+//
+//   Terminology
+//     - deep-write-safe - A description applied to a container caValue, indicating that the
+//       value's contents can be safely modified. A newly created value is deep-write-safe,
+//       and circa_touch will ensure that a value is deep-write-safe. Sharing a value's data
+//       with other values will make that value not deep-write-safe.
+//
+//     - deep pointer - A (caValue*) that points to the contents of a container. These pointers
+//       can easily be made invalid by operations on the owning container.
 
 // Allocate a new caValue container on the heap. This will call circa_init_value for you.
 caValue* circa_alloc_value();
@@ -257,35 +278,40 @@ caValue* circa_alloc_value();
 // Deallocate a caValue that was created with circa_alloc_value.
 void circa_dealloc_value(caValue* value);
 
-// Initialize a newly allocated caValue container. This must be called if you allocate
-// the caValue yourself. (such as putting it on the stack).
+// Initialize a newly allocated caValue container to a null value. If you allocated the
+// caValue container yourself, then this function must be called before using the value.
+// Do not call circa_init_value on an already allocated value, doing so will cause a
+// memory leak.
 void circa_init_value(caValue* value);
 
-// Copy a value. Some types may implement this as a lightweight copy, so you will need
-// to follow the rules for circa_touch when using the copy.
+// Create a Value using the type's default initializer.
+//   Effect on safety: The result is deep-write-safe.
+void circa_make(caValue* value, caType* type);
+
+// Copy a value from 'source' to 'dest'.
+//   Effect on safety: 'source' and 'dest' are no longer deep-write-safe.
 void circa_copy(caValue* source, caValue* dest);
 
 // Swap values between caValue containers. This is a very cheap operation.
+//   Effect on safety: none.
 void circa_swap(caValue* left, caValue* right);
 
 // Move a value from 'source' to 'dest'. The existing value at 'dest' will be deallocated,
 // and 'source' will contain null.
+//   Effect on safety: none.
 void circa_move(caValue* source, caValue* dest);
 
-// "Touch" a value, indicating that you are about to start modifying its contents. This
-// is only necessary when modifying the elements of a container type (such as a List).
+// Obtain a deep-write-safe reference to 'value'.
+//   Effect on safety: 'value' is now deep-write-safe. Existing deep pointers are invalid.
 void circa_touch(caValue* value);
 
 // Check two values for equality.
+//   Effect on safety: 'source' and 'dest' are no longer deep-write-safe. Existing deep pointers
+//   are invalid.
 bool circa_equals(caValue* left, caValue* right);
 
-// Allocate a new list value, with the given initial size.
-caValue* circa_alloc_list(int size);
-
+// Fetch the value's type.
 caType* circa_type_of(caValue* value);
-
-// Assign a Value using the Type's default create() handler.
-void circa_make(caValue* value, caType* type);
 
 // -- Accessors --
 
@@ -323,17 +349,22 @@ void*       circa_get_pointer(caValue* value);
 // Fetch a caValue as a float (converting it from an int if necessary)
 float circa_to_float(caValue* value);
 
-// Access an element by index. There are certain rules for using this result:
-//   - The element must not be modified, unless you know that you have a writable copy
-//     of the container. (Use circa_touch to obtain a writeable copy)
-//   - The element pointer becomes invalid when the owning container is resized.
-//
-// When in doubt, make a copy (circa_copy) of the returned value and use that.
-//
-caValue* circa_index(caValue* value, int index);
-
-// Number of elements in a list value.
+// Returns the number of elements in a list value.
+//   Effect on safety: none.
 int circa_count(caValue* container);
+
+// Allocate a new list value, with the given initial size.
+caValue* circa_alloc_list(int size);
+
+// Access a list's element by index. The result is a deep pointer. See the above section titled
+// "Safely using container values".
+//   Effect on safety: none.
+caValue* circa_index(caValue* container, int index);
+
+// Access a map's element by key. Returns NULL if the key is not found. The result is a deep
+// pointer. See the above section titled "Safely using container values". 
+//   Effect on safety: none.
+caValue* circa_map_get(caValue* map, caValue* key);
 
 // -- Writing to a caValue --
 
@@ -352,6 +383,9 @@ void circa_set_vec2(caValue* container, float x, float y);
 void circa_set_vec3(caValue* container, float x, float y, float z);
 void circa_set_vec4(caValue* container, float x, float y, float z, float w);
 
+// Set a value to a Point with the given (x,y).
+void circa_set_point(caValue* point, float x, float y);
+
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated.
 void circa_set_string_size(caValue* container, const char* str, int size);
 
@@ -365,25 +399,21 @@ bool circa_string_equals(caValue* container, const char* str);
 // be NULL.
 void circa_set_list(caValue* container, int numElements);
 
-// Append a value to a list and return the newly appended value. This return value may be
-// modified.
+// Append a value to a list and return the newly appended value. The result is a deep pointer.
+// See the above section titled "Safely using container values".
+//   Effect on safety: 'list' is now deep-write-safe, and existing deep pointers are invalid.
 caValue* circa_append(caValue* list);
 
 // Resize a list.
+//   Effect on safety: Existing deep pointers are invalid.
 void circa_resize(caValue* list, int count);
-
-// Assign a point.
-void circa_set_point(caValue* point, float x, float y);
 
 // Initialize a value with an empty Map.
 void circa_set_map(caValue* map);
 
-// Find a value in a Map. The result may not be modified, unless you have a writeable
-// copy of the map. Returns NULL if the map doesn't contain the key.
-caValue* circa_map_get(caValue* map, caValue* key);
-
-// Insert a key into a map, returning the associated value container. The result value
-// may be modified.
+// Access a map's element by key. If the map doesn't contain the key, it is inserted.
+// The result is a deep pointer. See the above section titled "Safely using container values".
+//   Effect on safety: Existing deep pointers are invalid.
 caValue* circa_map_insert(caValue* map, caValue* key);
 
 // -- Handle Values --
@@ -482,18 +512,16 @@ typedef struct caFunctionBinding
 // that is terminanted with a NULL caFunctionBinding.
 void circa_install_function_list(caBlock* block, const caFunctionBinding* bindingList);
 
-// Create a new value() term with the given name. Returns the term's value, which is safe
-// to modify.
+// Create a new value() term with the given name. Returns the term's value. The value
+// is deep-write-safe.
 caValue* circa_declare_value(caBlock* block, const char* name);
 
 // -- Native module support --
-
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
 void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --
-
 void circa_read_file(const char* filename, caValue* contentsOut);
 bool circa_file_exists(const char* filename);
 int circa_file_get_version(const char* filename);
@@ -506,7 +534,7 @@ void circa_cwd(caValue* cwd);
 void circa_repl_start(caStack* stack);
 void circa_repl_run_line(caStack* stack, caValue* input, caValue* output);
 
-// -- Debugging Helpers --
+// -- Debugging --
 
 // 'dump' commands will print a representation to stdout
 void circa_dump_s(caStack* stack);

@@ -10,25 +10,27 @@ Run: make <optional config> <optional target>
   The configuration can be:
 
     config=debug
-     - Assertions enabled and optimizations disabled (this is the default)
+     - Assertions enabled and optimizations disabled (this is the default).
 
     config=relase
-     - Assertions disabled and optimizations enabled
+     - Assertions disabled and optimizations enabled.
 
   The target can be:
 
     static_lib
-     - Static library, found at: build/libcirca.a
-       Debug filename ends with _d, as in: libcirca_d.a
-       On Windows the suffix is .lib, as in: circa.lib
+     - Static library
+     - Found at: build/libcirca.a (debug) or build/libcirca_d.a
+     - (On Windows the suffix is .lib, as in: circa.lib)
 
     command_line
-     - Command-line tool with REPL. Found at: build/circa
-       Debug filename ends with _d, as in: circa_d
-       On Windows the suffix is .exe, as in: circa.exe
+     - Command-line tool with REPL.
+     - Found at: build/circa_d (debug) or build/circa
+     - (On Windows the suffix is .exe, as in: circa.exe)
 
     unit_tests
-     - App that runs C++-based unit tests. Creates: build/unit_tests
+     - App that runs C++-based unit tests.
+     - Found at: build/circa_test or build/circa_test_r (release)
+     - Not recommended to use config=release for unit tests.
 
 Example commands:
 
@@ -40,7 +42,7 @@ Example commands:
   0. Build everything with 'debug' config.
   1. Run build/circa_d and verify the help text is shown
   2. Run tools/ca-tests.py
-  3. Run build/unit_tests
+  3. Run build/circa_test
 
 # Advanced building #
 
@@ -50,7 +52,7 @@ code or doing alternative builds.
   Prebuild
     The python script at tools/ca-prebuild.py serves to create some generated C++
     files located at src/generated. The resulting files are checked in to source
-    control, so the project can be built without running this script.
+    control, so that folks can build straight from a clone.
 
     This script needs to be rerun whenever a cpp file is added or removed from
     /src/functions or /src/types. It also needs to be run when /src/ca/stdlib.ca
@@ -61,10 +63,11 @@ code or doing alternative builds.
         http://industriousone.com/premake
 
     The resulting generated makefiles are checked in to source control, so
-    that users can build without needing premake4.
+    that users can build straight straight from a clone.
 
-    Makefiles need to be regenerated whenever a cpp file is added or removed from /src
-    To regenerate the makefiles, run "premake4 gmake".
+    Makefiles need to be regenerated whenever a cpp file is added or removed. To
+    regenerate the makefiles, run "premake4 gmake".
 
-    Premake4 is pretty awesome and supports lots of project types (like visual
-    studio or Xcode projects), if you are interested in something other than makefiles.
+    Premake4 is pretty awesome and supports lots of project types (like Visual
+    Studio or Xcode projects), if you are interested in targeting a different
+    platform.

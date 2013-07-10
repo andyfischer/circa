@@ -50,7 +50,11 @@ solution "Circa"
 
     project "unit_tests"
         kind "ConsoleApp"
+        targetname "circa_test"
         location "src"
         files {"src/unit_tests/*.cpp"}
         includedirs {"src"}
         links {"static_lib","dl"}
+
+        configuration "Release"
+            targetname "circa_test_r"
