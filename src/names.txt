@@ -89,6 +89,9 @@ StructType
 NativePatch
 PatchBlock
 
+# Filepack types
+Filesystem
+
 # Bootstrap status
 Bootstrapping
 Done

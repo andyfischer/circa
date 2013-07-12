@@ -522,11 +522,15 @@ void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFun
 void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --
-void circa_read_file(const char* filename, caValue* contentsOut);
-bool circa_file_exists(const char* filename);
-int circa_file_get_version(const char* filename);
+void circa_read_file(caWorld* world, const char* filename, caValue* contentsOut);
+bool circa_file_exists(caWorld* world, const char* filename);
+int circa_file_get_version(caWorld* world, const char* filename);
+
+// -- Path tools --
 void circa_get_directory_for_filename(caValue* filename, caValue* result);
 void circa_get_parent_directory(caValue* filename, caValue* result);
+
+// Deprecated:
 void circa_chdir(caValue* dir);
 void circa_cwd(caValue* cwd);
 

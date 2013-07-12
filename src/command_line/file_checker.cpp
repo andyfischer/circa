@@ -5,15 +5,16 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include "../common_headers.h"
+#include "common_headers.h"
 
 #include "circa/file.h"
 
-#include "../block.h"
-#include "../list.h"
-#include "../source_repro.h"
-#include "../static_checking.h"
-#include "../tagged_value.h"
+#include "block.h"
+#include "kernel.h"
+#include "list.h"
+#include "source_repro.h"
+#include "static_checking.h"
+#include "tagged_value.h"
 
 #include "file_checker.h"
 
@@ -40,7 +41,7 @@ void run_file_checker(const char* filename, List* errors)
         Value fileContents;
         Value fileReadError;
 
-        circa_read_file(filename, &fileContents);
+        circa_read_file(global_world(), filename, &fileContents);
         if (is_null(&fileContents)) {
             std::stringstream msg;
             msg << "File not found: " << filename;

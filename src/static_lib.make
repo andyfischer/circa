@@ -77,6 +77,7 @@ OBJECTS := \
 	$(OBJDIR)/fakefs.o \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
+	$(OBJDIR)/filepack.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/generic.o \
 	$(OBJDIR)/handle.o \
@@ -217,6 +218,9 @@ $(OBJDIR)/file.o: file.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_watch.o: file_watch.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/filepack.o: filepack.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/function.o: function.cpp

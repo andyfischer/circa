@@ -117,15 +117,17 @@ void set_context(caStack* stack)
 
 void file__exists(caStack* stack)
 {
-    set_bool(circa_output(stack, 0), circa_file_exists( circa_string_input(stack, 0)));
+    set_bool(circa_output(stack, 0),
+        circa_file_exists(stack->world, circa_string_input(stack, 0)));
 }
 void file__version(caStack* stack)
 {
-    set_int(circa_output(stack, 0), circa_file_get_version(circa_string_input(stack, 0)));
+    set_int(circa_output(stack, 0),
+        circa_file_get_version(stack->world, circa_string_input(stack, 0)));
 }
 void file__read_text(caStack* stack)
 {
-    circa_read_file(circa_string_input(stack, 0), circa_output(stack, 0));
+    circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
 }
 
 void from_string(caStack* stack)

@@ -35,7 +35,7 @@ caValue* module_search_paths(World* world)
 
 void module_add_search_path(World* world, const char* str)
 {
-    set_string(world->moduleSearchPaths.append(), str);
+    set_string(list_append(&world->moduleSearchPaths), str);
 }
 
 void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut)
@@ -94,7 +94,7 @@ static bool find_module_file(World* world, const char* moduleName, caValue* file
         write_log("looking for module at");
         write_log(as_cstring(&computedPath));
 
-        if (circa_file_exists(as_cstring(&computedPath))) {
+        if (circa_file_exists(world, as_cstring(&computedPath))) {
             move(&computedPath, filenameOut);
             return true;
         }
@@ -106,7 +106,7 @@ static bool find_module_file(World* world, const char* moduleName, caValue* file
         join_path(&computedPath, &module);
         string_append(&computedPath, ".ca");
 
-        if (circa_file_exists(as_cstring(&computedPath))) {
+        if (circa_file_exists(world, as_cstring(&computedPath))) {
             move(&computedPath, filenameOut);
             return true;
         }

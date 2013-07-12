@@ -194,7 +194,7 @@ void log_msg(int channel, const char* name)
 
 void write_log(World* world, const char* msg)
 {
-    if (world->logFunc == NULL)
+    if (world == NULL || world->logFunc == NULL)
         printf("%s\n", msg);
     else
         world->logFunc(world->logContext, msg);

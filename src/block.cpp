@@ -599,7 +599,7 @@ Symbol load_script(Block* block, const char* filename)
 
     // Read the text file
     circa::Value contents;
-    circa_read_file(filename, &contents);
+    circa_read_file(global_world(), filename, &contents);
 
     if (is_null(&contents)) {
         Term* msg = create_string(block, "file not found");

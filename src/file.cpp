@@ -33,6 +33,17 @@ int file_get_mtime(const char* filename)
     return (int) s.st_mtime;
 }
 
+bool file_exists(const char* filename)
+{
+    FILE* fp = fopen(filename, "r");
+
+    if (fp == NULL)
+        return false;
+
+    fclose(fp);
+    return true;
+}
+
 bool is_absolute_path(caValue* path)
 {
     int len = string_length(path);
@@ -197,29 +208,6 @@ void read_text_file(const char* filename, caValue* contentsOut)
     contentsData[bytesRead] = 0;
 
     fclose(fp);
-}
-
-CIRCA_EXPORT void circa_read_file(const char* filename, caValue* contentsOut)
-{
-    read_text_file(filename, contentsOut);
-}
-
-CIRCA_EXPORT bool circa_file_exists(const char* filename)
-{
-    if (fakefs_enabled())
-        return fakefs_file_exists(filename);
-
-    FILE* fp = fopen(filename, "r");
-    if (fp == NULL)
-        return false;
-
-    fclose(fp);
-    return true;
-}
-
-CIRCA_EXPORT int circa_file_get_version(const char* filename)
-{
-    return file_get_mtime(filename);
 }
 
 } // namespace "circa"

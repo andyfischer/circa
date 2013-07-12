@@ -10,7 +10,11 @@
 
 std::vector<TestCase> gTestCases;
 TestCase gCurrentTestCase;
+
+// gTempValue is used for the temp_string convenience function.
 Value* gTempValue = NULL;
+
+Value* gFakeFileMap = NULL;
 
 void post_test_sanity_check();
 
@@ -169,6 +173,17 @@ caValue* temp_string(const char* str)
         gTempValue = new Value();
     set_string(gTempValue, str);
     return gTempValue;
+}
+
+void before_each_test()
+{
+    if (gFakeFileMap == NULL)
+        gFakeFileMap = new Value();
+    set_hashtable(gFakeFileMap);
+
+    caWorld* world = global_world();
+    world_clear_file_sources();
+    world_append_file_source(
 }
 
 bool run_test(TestCase& testCase, bool catch_exceptions)

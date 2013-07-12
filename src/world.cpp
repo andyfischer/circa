@@ -34,8 +34,6 @@ World* alloc_world()
     world->nextStackID = 1;
     world->firstRootStack = NULL;
     world->lastRootStack = NULL;
-    world->firstPermanentType = NULL;
-    world->lastPermanentType = NULL;
 
     return world;
 }
@@ -47,7 +45,11 @@ void dealloc_world(World* world)
 
 void world_initialize(World* world)
 {
+    initialize_null(&world->fileSources);
+    initialize_null(&world->moduleSearchPaths);
+
     set_list(&world->moduleSearchPaths);
+    set_list(&world->fileSources);
 
     world->nativePatchWorld = create_native_patch_world();
     world->fileWatchWorld = create_file_watch_world();
@@ -65,6 +67,16 @@ World* create_world()
     World* world = alloc_world();
     world_initialize(world);
     return world;
+}
+
+void world_clear_file_sources(World* world)
+{
+    set_list(&world->fileSources, 0);
+}
+
+void world_append_file_source(World* world, caValue* fileSource)
+{
+    copy(fileSource, list_append(&world->fileSources));
 }
 
 CIRCA_EXPORT void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)

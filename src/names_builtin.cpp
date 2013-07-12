@@ -80,6 +80,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_StructType: return "StructType";
     case sym_NativePatch: return "NativePatch";
     case sym_PatchBlock: return "PatchBlock";
+    case sym_Filesystem: return "Filesystem";
     case sym_Bootstrapping: return "Bootstrapping";
     case sym_Done: return "Done";
     case sym_StorageTypeNull: return "StorageTypeNull";
@@ -449,6 +450,10 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     case 0:
             return sym_File;
+    case 's':
+        if (strcmp(str + 5, "ystem") == 0)
+            return sym_Filesystem;
+        break;
     case 'n':
         if (strcmp(str + 5, "ame") == 0)
             return sym_Filename;

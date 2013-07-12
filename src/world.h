@@ -19,11 +19,11 @@ struct World {
     int nextBlockID;
     int nextStackID;
 
-    Type* firstPermanentType;
-    Type* lastPermanentType;
+    // Active file sources.
+    Value fileSources;
 
     // Module information.
-    List moduleSearchPaths;
+    Value moduleSearchPaths;
 
     Stack* firstRootStack;
     Stack* lastRootStack;
@@ -45,6 +45,9 @@ void dealloc_world(World* world);
 void world_initialize(World* world);
 void world_uninitialize(World* world);
 World* create_world();
+
+void world_clear_file_sources(World* world);
+void world_append_file_source(World* world, caValue* fileSource);
 
 void refresh_all_modules(caWorld* world);
 

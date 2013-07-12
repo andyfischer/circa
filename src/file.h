@@ -7,6 +7,7 @@ namespace circa {
 // File reading
 void read_text_file(const char* filename, caValue* contentsOut);
 int file_get_mtime(const char* filename);
+bool file_exists(const char* filename);
 
 // File writing
 void write_text_file(const char* filename, const char* contents);

@@ -5,6 +5,7 @@
 #include "block.h"
 #include "debug.h"
 #include "file.h"
+#include "kernel.h"
 #include "list.h"
 #include "modules.h"
 #include "names.h"
@@ -20,7 +21,7 @@ struct FileWatch
 {
     Value filename;
     Value onChangeActions;
-    int lastObservedMtime;
+    int lastObservedVersion;
 };
 
 struct FileWatchWorld
@@ -71,7 +72,7 @@ FileWatch* add_file_watch(World* world, const char* filename)
     FileWatch* newWatch = new FileWatch();
     set_string(&newWatch->filename, filename);
     set_list(&newWatch->onChangeActions, 0);
-    newWatch->lastObservedMtime = 0;
+    newWatch->lastObservedVersion = 0;
 
     world->fileWatchWorld->watches[filename] = newWatch;
     return newWatch;
@@ -94,9 +95,9 @@ FileWatch* add_file_watch_action(World* world, const char* filename, Value* acti
 
 static bool file_watch_check_for_update(FileWatch* watch)
 {
-    int latestMtime = file_get_mtime(as_cstring(&watch->filename));
-    if (latestMtime != watch->lastObservedMtime) {
-        watch->lastObservedMtime = latestMtime;
+    int latestVersion = circa_file_get_version(global_world(), as_cstring(&watch->filename));
+    if (latestVersion != watch->lastObservedVersion) {
+        watch->lastObservedVersion = latestVersion;
         return true;
     }
 
