@@ -2,11 +2,14 @@
 
 #include "unit_test_common.h"
 
+#include "hashtable.h"
 #include "interpreter.h"
 #include "inspection.h"
+#include "kernel.h"
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
+#include "world.h"
 
 std::vector<TestCase> gTestCases;
 TestCase gCurrentTestCase;
@@ -182,8 +185,9 @@ void before_each_test()
     set_hashtable(gFakeFileMap);
 
     caWorld* world = global_world();
-    world_clear_file_sources();
-    world_append_file_source(
+    world_clear_file_sources(world);
+    // world_append_file_source()
+    // TODO
 }
 
 bool run_test(TestCase& testCase, bool catch_exceptions)
@@ -193,6 +197,9 @@ bool run_test(TestCase& testCase, bool catch_exceptions)
     if (catch_exceptions) {
         try {
             gCurrentTestCase = testCase;
+
+            before_each_test();
+
             testCase.execute();
 
             // the test code may declare itself failed
@@ -371,6 +378,7 @@ namespace file_test { void register_tests(); }
 namespace file_watch_test { void register_tests(); }
 namespace function_test { void register_tests(); }
 namespace handle_test { void register_tests(); }
+namespace hashtable_test { void register_tests(); }
 namespace importing_test { void register_tests(); }
 namespace interpreter_test { void register_tests(); }
 namespace migration_test { void register_tests(); }
@@ -388,6 +396,8 @@ namespace type_test { void register_tests(); }
 
 int main(int argc, char** argv)
 {
+    hashtable_test::register_tests();
+
     actor_test::register_tests();
     block_test::register_tests();
     building_test::register_tests();
@@ -395,6 +405,7 @@ int main(int argc, char** argv)
     code_iterator_test::register_tests();
     compound_type_test::register_tests();
     control_flow_test::register_tests();
+#if 0 // SUPERTEMP
     fakefs_test::register_tests();
     file_test::register_tests();
     file_watch_test::register_tests();
@@ -406,6 +417,7 @@ int main(int argc, char** argv)
     modules_test::register_tests();
     names_test::register_tests();
     native_patch_test::register_tests();
+#endif
     parser_test::register_tests();
     path_expression_test::register_tests();
     source_repro_test::register_tests();

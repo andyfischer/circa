@@ -14,6 +14,8 @@ struct Slot {
 };
 
 struct Hashtable {
+    int refCount;
+    bool mut;
     int capacity;
     int count;
     Slot slots[0];
@@ -37,6 +39,8 @@ Hashtable* create_table(int capacity)
 {
     ca_assert(capacity > 0);
     Hashtable* result = (Hashtable*) malloc(sizeof(Hashtable) + capacity * sizeof(Slot));
+    result->refCount = 1;
+    result->mut = false;
     result->capacity = capacity;
     result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
@@ -64,9 +68,25 @@ void free_table(Hashtable* data)
     free(data);
 }
 
+void hashtable_decref(Hashtable* data)
+{
+    ca_assert(data->refCount > 0);
+    data->refCount--;
+
+    if (data->refCount == 0)
+        free_table(data);
+}
+
+void hashtable_incref(Hashtable* data)
+{
+    ca_assert(data->refCount > 0);
+    data->refCount++;
+}
+
 Hashtable* grow(Hashtable* data, int new_capacity)
 {
     Hashtable* new_data = create_table(new_capacity);
+    new_data->mut = data->mut;
 
     int existingCapacity = 0;
     if (data != NULL)
@@ -106,6 +126,8 @@ Hashtable* duplicate(Hashtable* original)
 
     Hashtable* dupe = create_table(new_capacity);
 
+    dupe->mut = original->mut;
+
     // Copy all items
     for (int i=0; i < original->capacity; i++) {
         Slot* slot = &original->slots[i];
@@ -117,6 +139,29 @@ Hashtable* duplicate(Hashtable* original)
         copy(&slot->value, &dupe->slots[index].value);
     }
     return dupe;
+}
+
+void hashtable_copy(Type*, caValue* sourceVal, caValue* destVal)
+{
+    Hashtable* source = (Hashtable*) sourceVal->value_data.ptr;
+
+    make_no_initialize(sourceVal->value_type, destVal);
+
+    if (source != NULL)
+        hashtable_incref(source);
+
+    destVal->value_data.ptr = source;
+}
+
+void hashtable_touch(caValue* value)
+{
+    Hashtable* table = (Hashtable*) value->value_data.ptr;
+    if (table == NULL || table->mut || table->refCount == 1)
+        return;
+
+    Hashtable* copy = duplicate(table);
+    hashtable_decref(table);
+    value->value_data.ptr = copy;
 }
 
 // Get the 'ideal' slot index, the place we would put this key if there is no
@@ -316,12 +361,11 @@ namespace tagged_value_wrappers {
     }
     void release(caValue* value)
     {
-        free_table((Hashtable*) value->value_data.ptr);
-    }
-    void copy(Type* type, caValue* source, caValue* dest)
-    {
-        make_no_initialize(type, dest);
-        dest->value_data.ptr = duplicate((Hashtable*) source->value_data.ptr);
+        Hashtable* table = (Hashtable*) value->value_data.ptr;
+        if (table == NULL)
+            return;
+
+        hashtable_decref(table);
     }
     std::string to_string(caValue* value)
     {
@@ -338,6 +382,14 @@ bool is_hashtable(caValue* value)
 void set_hashtable(caValue* value)
 {
     make(TYPES.map, value);
+}
+
+void set_mutable_hashtable(caValue* value)
+{
+    make_no_initialize(TYPES.map, value);
+    Hashtable* table = create_table();
+    table->mut = true;
+    value->value_data.ptr = table;
 }
 
 caValue* hashtable_get(caValue* table, caValue* key)
@@ -380,7 +432,8 @@ void hashtable_setup_type(Type* type)
     set_string(&type->name, "Map");
     type->initialize = tagged_value_wrappers::initialize;
     type->release = tagged_value_wrappers::release;
-    type->copy = tagged_value_wrappers::copy;
+    type->copy = hashtable_copy;
+    type->touch = hashtable_touch;
     type->toString = tagged_value_wrappers::to_string;
     type->storageType = sym_StorageTypeHashtable;
 }

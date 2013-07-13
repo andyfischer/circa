@@ -6,6 +6,7 @@ namespace circa {
 
 bool is_hashtable(caValue* value);
 void set_hashtable(caValue* value);
+void set_mutable_hashtable(caValue* value);
 caValue* hashtable_get(caValue* table, caValue* key);
 caValue* hashtable_get_slot(caValue* table, int slot);
 caValue* hashtable_num_slots(caValue* table);
