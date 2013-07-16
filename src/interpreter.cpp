@@ -2158,7 +2158,7 @@ void Frame__current_term(caStack* callerStack)
 
 void make_stack(caStack* callerStack)
 {
-    Stack* newStack = new Stack();
+    Stack* newStack = create_stack(callerStack->world);
     set_pointer(circa_create_default_output(callerStack, 0), newStack);
 }
 

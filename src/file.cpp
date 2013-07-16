@@ -7,7 +7,6 @@
 #include <fstream>
 #include <sys/stat.h>
 
-#include "fakefs.h"
 #include "list.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -23,9 +22,6 @@ static bool is_path_seperator(char c)
 
 int file_get_mtime(const char* filename)
 {
-    if (fakefs_enabled())
-        return fakefs_get_mtime(filename);
-
     struct stat s;
     s.st_mtime = 0;
 
@@ -152,6 +148,14 @@ void join_path(caValue* left, caValue* right)
     int left_len = (int) strlen(leftStr);
     int right_len = (int) strlen(leftStr);
 
+    if (string_eq(left, "") || string_eq(left, ".")) {
+        copy(right, left);
+        return;
+    }
+
+    if (string_eq(right, ""))
+        return;
+
     int seperatorCount = 0;
     if (left_len > 0 && is_path_seperator(leftStr[left_len-1]))
         seperatorCount++;
@@ -186,9 +190,6 @@ void write_text_file(const char* filename, const char* contents)
 
 void read_text_file(const char* filename, caValue* contentsOut)
 {
-    if (fakefs_enabled())
-        return fakefs_read_file(filename, contentsOut);
-
     FILE* fp = fopen(filename, "r");
     if (fp == NULL) {
         set_null(contentsOut);
@@ -202,7 +203,7 @@ void read_text_file(const char* filename, caValue* contentsOut)
 
     // Read raw data.
     touch(contentsOut);
-    char* contentsData = string_initialize(contentsOut, int(file_size + 1));
+    char* contentsData = string_initialize(contentsOut, int(file_size));
     size_t bytesRead = fread(contentsData, 1, file_size, fp);
 
     contentsData[bytesRead] = 0;

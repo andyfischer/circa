@@ -69,6 +69,7 @@ Some design thoughts:
 #include "file.h"
 #include "filepack.h"
 #include "hashtable.h"
+#include "interpreter.h"
 #include "list.h"
 #include "names.h"
 #include "string.h"
@@ -183,6 +184,11 @@ CIRCA_EXPORT void circa_read_file(caWorld* world, const char* filename, caValue*
     }
 
     set_null(contentsOut);
+}
+
+CIRCA_EXPORT void circa_read_file_with_stack(caStack* stack, const char* filename, caValue* contentsOut)
+{
+    return ::circa_read_file(stack->world, filename, contentsOut);
 }
 
 CIRCA_EXPORT bool circa_file_exists(caWorld* world, const char* filename)

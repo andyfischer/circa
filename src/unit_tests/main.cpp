@@ -178,31 +178,40 @@ caValue* temp_string(const char* str)
     return gTempValue;
 }
 
+void test_write_fake_file(const char* filename, int version, const char* contents)
+{
+    Value key;
+    set_string(&key, filename);
+    caValue* entry = hashtable_insert(gFakeFileMap, &key);
+    set_list(entry, 2);
+    set_int(list_get(entry, 0), version);
+    set_string(list_get(entry, 1), contents);
+}
+
 void before_each_test()
 {
     if (gFakeFileMap == NULL)
         gFakeFileMap = new Value();
-    set_hashtable(gFakeFileMap);
+    set_mutable_hashtable(gFakeFileMap);
 
     caWorld* world = global_world();
     world_clear_file_sources(world);
-    // world_append_file_source()
-    // TODO
+    world_append_file_source(world, gFakeFileMap);
 }
 
 bool run_test(TestCase& testCase, bool catch_exceptions)
 {
     gCurrentTestCase = testCase;
 
+    before_each_test();
+
     if (catch_exceptions) {
         try {
             gCurrentTestCase = testCase;
 
-            before_each_test();
-
             testCase.execute();
 
-            // the test code may declare itself failed
+            // The test code may declare itself failed.
             bool result = !gCurrentTestCase.failed;
 
             post_test_sanity_check();
@@ -405,7 +414,6 @@ int main(int argc, char** argv)
     code_iterator_test::register_tests();
     compound_type_test::register_tests();
     control_flow_test::register_tests();
-#if 0 // SUPERTEMP
     fakefs_test::register_tests();
     file_test::register_tests();
     file_watch_test::register_tests();
@@ -417,7 +425,6 @@ int main(int argc, char** argv)
     modules_test::register_tests();
     names_test::register_tests();
     native_patch_test::register_tests();
-#endif
     parser_test::register_tests();
     path_expression_test::register_tests();
     source_repro_test::register_tests();

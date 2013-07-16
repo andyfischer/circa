@@ -389,6 +389,8 @@ void circa_set_point(caValue* point, float x, float y);
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated.
 void circa_set_string_size(caValue* container, const char* str, int size);
 
+int circa_string_length(caValue* string);
+
 // Append to a string
 void circa_string_append(caValue* container, const char* str);
 void circa_string_append_char(caValue* container, char c);
@@ -523,8 +525,10 @@ void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --
 void circa_read_file(caWorld* world, const char* filename, caValue* contentsOut);
+void circa_read_file_with_stack(caStack* stack, const char* filename, caValue* contentsOut);
 bool circa_file_exists(caWorld* world, const char* filename);
 int circa_file_get_version(caWorld* world, const char* filename);
+void circa_use_local_filesystem(caWorld* world, const char* rootDir);
 
 // -- Path tools --
 void circa_get_directory_for_filename(caValue* filename, caValue* result);

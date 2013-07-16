@@ -4,7 +4,7 @@
 
 #include "circa/file.h"
 
-#include "fakefs.h"
+#include "filepack.h"
 #include "kernel.h"
 
 namespace fakefs_test {
@@ -12,10 +12,9 @@ namespace fakefs_test {
 void test_simple()
 {
     caWorld* world = global_world();
-    FakeFilesystem files;
 
-    files.set("a", "hello");
-    files.set("b", "goodbye");
+    test_write_fake_file("a", 1, "hello");
+    test_write_fake_file("b", 1, "goodbye");
 
     Value contents;
 
@@ -25,7 +24,7 @@ void test_simple()
     circa_read_file(world, "b", &contents);
     test_equals(&contents, "goodbye");
 
-    files.set("a", "hello again");
+    test_write_fake_file("a", 1, "hello again");
 
     circa_read_file(world, "a", &contents);
     test_equals(&contents, "hello again");
@@ -33,9 +32,7 @@ void test_simple()
 
 void register_tests()
 {
-#if 0 // TEST_DISABLED
     REGISTER_TEST_CASE(fakefs_test::test_simple);
-#endif
 }
 
 } // namespace fakefs_test

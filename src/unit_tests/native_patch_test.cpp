@@ -3,7 +3,6 @@
 #include "unit_test_common.h"
 
 #include "interpreter.h"
-#include "fakefs.h"
 #include "kernel.h"
 #include "modules.h"
 #include "native_patch.h"
@@ -146,8 +145,7 @@ void new_function_patched_by_world()
 
 void patch_manually_public_api()
 {
-    FakeFilesystem fs;
-    fs.set("Module.ca", "def my_5() -> int; my_5() -> output");
+    test_write_fake_file("Module.ca", 1, "def my_5() -> int; my_5() -> output");
 
     caWorld* world = global_world();
     caBlock* module = circa_load_module_from_file(world, "Module", "Module.ca");
@@ -175,4 +173,4 @@ void register_tests()
     REGISTER_TEST_CASE(native_patch_test::patch_manually_public_api);
 }
 
-}
+} // namespace native_patch_test

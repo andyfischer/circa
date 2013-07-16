@@ -79,6 +79,15 @@ void world_append_file_source(World* world, caValue* fileSource)
     copy(fileSource, list_append(&world->fileSources));
 }
 
+CIRCA_EXPORT void circa_use_local_filesystem(caWorld* world, const char* rootDir)
+{
+    Value fileSource;
+    set_list(&fileSource, 2);
+    set_symbol(list_get(&fileSource, 0), sym_Filesystem);
+    set_string(list_get(&fileSource, 1), rootDir);
+    world_append_file_source(world, &fileSource);
+}
+
 CIRCA_EXPORT void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)
 {
     world->logContext = context;

@@ -9,6 +9,8 @@ int main(int argc, const char * args[])
 {
     caWorld* world = circa_initialize();
 
+    circa_use_local_filesystem(world, "");
+
     int result = 0;
     result = run_command_line(world, argc, args);
 

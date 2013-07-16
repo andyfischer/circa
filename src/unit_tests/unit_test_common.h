@@ -42,6 +42,7 @@ bool test_fail_on_static_error(Block* block);
 bool test_fail_on_runtime_error(Stack& context);
 
 caValue* temp_string(const char* str);
+void test_write_fake_file(const char* filename, int version, const char* contents);
 
 struct TestCase {
     typedef void (*TestExecuteFunction)();

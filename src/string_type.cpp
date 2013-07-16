@@ -100,7 +100,7 @@ void string_resize(StringData** data, int newLength)
 
 int string_length(StringData* data)
 {
-    return (int) strlen(data->str);
+    return data->length;
 }
 
 // Tagged-value wrappers
@@ -459,6 +459,11 @@ char* circa_strdup(const char* s)
     char* out = (char*) malloc(length + 1);
     memcpy(out, s, length + 1);
     return out;
+}
+
+CIRCA_EXPORT int circa_string_length(caValue* string)
+{
+    return string_length(string);
 }
 
 } // namespace circa

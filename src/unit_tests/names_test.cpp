@@ -5,7 +5,6 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "interpreter.h"
-#include "fakefs.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "modules.h"
@@ -157,11 +156,10 @@ void bug_with_lookup_type_and_qualified_name()
 
 void type_name_visible_from_module()
 {
-    FakeFilesystem fs;
-    fs.set("a", "type A { int i }");
+    test_write_fake_file("a", 1, "type A { int i }");
     load_module_file(global_world(), "a", "a");
 
-    fs.set("b", "require a\ntest_spy(make(A))");
+    test_write_fake_file("b", 1, "require a\ntest_spy(make(A))");
     Block* b = load_module_file(global_world(), "b", "b");
 
     Stack stack;

@@ -7,7 +7,6 @@
 #include "inspection.h"
 #include "interpreter.h"
 #include "kernel.h"
-#include "fakefs.h"
 #include "function.h"
 #include "importing.h"
 #include "migration.h"
@@ -74,10 +73,8 @@ void run_block_after_additions()
 
 void test_evaluate_minimum()
 {
-    // Test that rpath works in evaluate minimum.
-
-    FakeFilesystem fs;
-    fs.set("dir/block.ca", "x = rpath('path'); y = concat(x, '/more_path')");
+    // Test that rpath works in evaluate_minimum.
+    test_write_fake_file("dir/block.ca", 1, "x = rpath('path'); y = concat(x, '/more_path')");
 
     Block* block = load_module_file(global_world(), "test_evaluate_minimum", "dir/block.ca");
     Term* y = find_local_name(block, "y");
