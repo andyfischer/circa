@@ -1,5 +1,7 @@
 
 Recent
+  load_module should return Func for consistency
+
   Error trace for dynamic_method: should have the actual method name, when possible.
   
   This caused a crash: (a 'self' arg when not needed)
@@ -19,9 +21,9 @@ Recent
             return [0 0]
       
     
-  having a missing ) or ] or } symbol will *really* mess things up. Ditto for an extra ),},]
+  Having a missing ) or ] or } symbol will *really* mess things up. Ditto for an extra ),},]
 
-  divide operator on Point didn't work?
+  Divide operator on Point didn't work?
 
   A superfluous @ symbol caused problems:
 
@@ -36,7 +38,6 @@ Recent
           s = 2
           return
           -- 's' will stay 1
-
 
   Got unrecognized expression on this string (missing '}'). Worst part is, no error reported.
 
@@ -54,8 +55,6 @@ Recent
       def CodeView.draw(@self, cairo:Context canvas, Rect rect)
     After reloading Cairo, the CodeView module kept a reference to the old type?
 
-  Delete create_type (use create_type_value instead)
-
   Move output casting to a different spot. Currently it happens twice - once when a value
     is copied by output_placeholder (this is the correct spot), and again in finish_frame.
     It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
@@ -67,7 +66,6 @@ Recent
   (where width & height both returned null)
 
 Deprecated code to delete
-  FileOrigin on branch (and the code that reloads based on file origins)
   Unique names (replaced with global names and uniqueOrdinal)
   
 Source repro
@@ -77,15 +75,10 @@ Code reload
   Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay.
 
 Code cleanup
-  Remove importing_macros.h
   Deprecate API using Term* or Function* to reference functions (prefer Branch*)
-  Eliminate C++ Function type, in favor of Branch.
 
 Interpreter
   Value() terms should just copy their values to the stack. Simplify stack_get_active_value.
-
-Runtime reflection
-  Functions have type Function, we should get rid of that and just use Branch everywhere
 
 State
   Inlined state doesn't work in a recursive function
@@ -100,15 +93,9 @@ Types
     type T { int i }
     T.make(1)
 
-
 Code modification
   Code modification should go through a more controlled path.
     Add a CodeModification class that stores a modification in progress
     Add a global apply_modification() function that invokes it.
     Alternately, require that modifications must be passed through message-send
       One goal is that modifications should be able to be sent remotely
-
-Big Features
-  Proper module system
-  Possibly get rid of separate 'int' type, and just use numbers. Replace with some other
-    system that can detect when an expression will always be an integer.
