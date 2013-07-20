@@ -35,6 +35,7 @@ def static_type(any term :meta) -> Type
     -- Returns the static type of a value
 
 def context(Symbol name) -> any
+def context_opt(Symbol name, any default) -> any
 def set_context(Symbol name, any value)
 
 def has_effects()

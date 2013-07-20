@@ -81,7 +81,7 @@ void hosted_assert(caStack* stack)
         circa_output_error(stack, "Assert failed");
 }
 
-void get_context(caStack* stack)
+caValue* find_context_value(caStack* stack, caValue* key)
 {
     Frame* frame = top_frame(stack);
 
@@ -90,16 +90,32 @@ void get_context(caStack* stack)
     while (frame != NULL) {
         if (!is_null(&frame->dynamicScope)) {
             caValue* value = hashtable_get(&frame->dynamicScope, key);
-            if (value != NULL) {
-                copy(value, circa_output(stack, 0));
-                return;
-            }
+            if (value != NULL)
+                return value;
         }
 
         frame = frame_parent(frame);
     }
 
-    set_null(circa_output(stack, 0));
+    return NULL;
+}
+
+void get_context(caStack* stack)
+{
+    caValue* value = find_context_value(stack, circa_input(stack, 0));
+    if (value != NULL)
+        copy(value, circa_output(stack, 0));
+    else
+        set_null(circa_output(stack, 0));
+}
+
+void get_context_opt(caStack* stack)
+{
+    caValue* value = find_context_value(stack, circa_input(stack, 0));
+    if (value != NULL)
+        copy(value, circa_output(stack, 0));
+    else
+        copy(circa_input(stack, 1), circa_output(stack, 0));
 }
 
 void set_context(caStack* stack)
