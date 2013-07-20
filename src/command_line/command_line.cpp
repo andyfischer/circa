@@ -188,8 +188,13 @@ void do_file_command(caWorld* world, List* args, caValue* reply)
     Stack* stack = create_stack(world);
     evaluate_block(stack, &block);
 
-    if (printState)
-        std::cout << to_string(&stack->state) << std::endl;
+    if (printState) {
+        caValue* state = stack_get_state(stack);
+        if (state == NULL)
+            std::cout << "state = null";
+        else
+            std::cout << to_string(state) << std::endl;
+    }
 
     if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";
@@ -599,8 +604,13 @@ int run_command_line(caWorld* world, caValue* args)
 
     run_interpreter(stack);
 
-    if (printState)
-        std::cout << to_string(&stack->state) << std::endl;
+    if (printState) {
+        caValue* state = stack_get_state(stack);
+        if (state == NULL)
+            std::cout << "state = null";
+        else
+            std::cout << to_string(state) << std::endl;
+    }
 
     if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";

@@ -1,0 +1,31 @@
+
+When starting a new frame
+
+  Bytecode may have a flag - enable memoization check
+
+  If memoization-check is on
+    When populating inputs
+      equals-check each incoming input
+      If all are equal
+        Restore the saved frame
+      If any inputs are inequal
+        Trash the saved frame
+
+When evaluating a function
+  Function may include the MemoizeFrame bytecode.
+  For 1st pass, this will only occur with a FireNative op.
+
+On MemoizeFrame
+  Interpreter saves current frame (modifies parent frame's saved-expansion list)
+  Walk up entire stack, modify calling bytecode for each frame to enable the memoization-check
+
+When finishing a frame
+  A memoized frame should not be deleted.
+
+The following instructions can push a frame, and thus need a memoization-check flag.
+  CallBlock
+  DynamicMethodCall
+  CaseBlock
+  ForLoop
+  FuncCall
+  FuncApply

@@ -20,9 +20,3 @@ t.f
 assert(t.m.get == 1)
 t.f
 assert(t.m.get == 2)
-
--- Circular reference, this isn't really useful but it's funny.
-a = make(Mutable)
-a.set(a)
-assert(a.get == a)
-assert(a.get.get.get.get == a)

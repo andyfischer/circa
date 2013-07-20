@@ -34,7 +34,6 @@ const char bc_PackState = 1;
 
 const char bc_InputVararg = 0x11;
 const char bc_InputClosureBinding = 0x12;
-const char bc_InputState = 0x13;
 const char bc_InputFromStack = 0x20;
 const char bc_InputFromApplyList = 0x21;
 const char bc_Output = 0x40;

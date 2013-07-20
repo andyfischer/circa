@@ -47,14 +47,9 @@ struct Frame
 
     // Current program counter
     int pc;
-    int nextPc;
 
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
-    
-    // If true, the interpreter should stop after completing this frame. The frame
-    // will be left on the stack.
-    bool stop;
 };
 
 struct Stack
@@ -81,9 +76,6 @@ struct Stack
 
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
-
-    // Top-level state (deprecated)
-    Value state;
 
     // Linked list of all root stacks across this world.
     Stack* prevRootStack;
@@ -164,9 +156,6 @@ Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* inputs);
 // outputs or update PC. You might want to call finish_frame() instead of this.
 void pop_frame(Stack* stack);
 
-// Flag this frame to stop the interpreter when finished.
-void frame_set_stop_when_finished(Frame* frame);
-
 // Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
 // - you call it when the block is finished evaluating. But instead of passing outputs
 // to the parent frame (like finish_frame does), this copies them to your list.
@@ -175,9 +164,6 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs);
 // Pop the topmost frame and copy all outputs to the next frame on the stack. This is the
 // standard way to finish a frame, such as when 'return' is called.
 void finish_frame(Stack* stack);
-
-// Move the PC to the end of the frame.
-void frame_pc_move_to_end(Frame* frame);
 
 // Stack expansions. These are frames which aren't on the current trace.
 Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);

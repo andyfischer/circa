@@ -85,8 +85,6 @@ caValue* find_context_value(caStack* stack, caValue* key)
 {
     Frame* frame = top_frame(stack);
 
-    caValue* key = circa_input(stack, 0);
-
     while (frame != NULL) {
         if (!is_null(&frame->dynamicScope)) {
             caValue* value = hashtable_get(&frame->dynamicScope, key);

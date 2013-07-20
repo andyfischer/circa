@@ -8,6 +8,7 @@ namespace circa {
 
 const char* for_loop_get_iterator_name(Term* forTerm);
 Term* for_loop_find_index(Block* contents);
+Term* for_loop_find_output_index(Block* contents);
 
 
 // Initialize the contents of a for-loop for a new term. 'iteratorType' is the type to use
@@ -24,7 +25,6 @@ Block* for_loop_get_zero_block(Block* forContents);
 void for_loop_remake_zero_block(Block* forContents);
 
 void start_for_loop(Stack* stack, bool enableLoopOutput);
-void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput);
 
 void finish_while_loop(Term* whileTerm);
 void evaluate_unbounded_loop(caStack*);
