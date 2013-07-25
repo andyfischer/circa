@@ -107,6 +107,8 @@ void list_reverse(caValue* list);
 // Return true if any of the elements of the list are equal to this element.
 bool list_contains(caValue* list, caValue* element);
 
+bool list_strict_equals(caValue* left, caValue* right);
+
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.

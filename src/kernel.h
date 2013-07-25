@@ -52,6 +52,7 @@ struct BuiltinFuncs {
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output_index;
+    Term* memoize;
     Term* module;
     Term* mult;
     Term* namespace_func;

@@ -121,7 +121,6 @@ void reference_counting_and_cast()
     type_decref(type);
 }
 
-
 void register_tests()
 {
     REGISTER_TEST_CASE(type_test::manually_create_compound_type);

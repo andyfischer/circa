@@ -64,6 +64,8 @@ bool equals(caValue* lhs, caValue* rhs);
 bool equals_string(caValue* value, const char* s);
 bool equals_int(caValue* value, int i);
 
+bool strict_equals(caValue* left, caValue* right);
+
 // Get an element by index. Dispatched on type, the default behavior is to return NULL.
 caValue* get_index(caValue* value, int index);
 

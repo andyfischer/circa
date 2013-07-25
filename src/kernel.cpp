@@ -979,34 +979,42 @@ void bootstrap_kernel()
     Term* less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
     append_to_overloaded_function(less_than, builtins->get("less_than_i"));
     append_to_overloaded_function(less_than, builtins->get("less_than_f"));
+    finish_building_overloaded_function(less_than);
 
     Term* less_than_eq = create_overloaded_function(builtins, "less_than_eq(any a,any b) -> bool");
     append_to_overloaded_function(less_than_eq, builtins->get("less_than_eq_i"));
     append_to_overloaded_function(less_than_eq, builtins->get("less_than_eq_f"));
+    finish_building_overloaded_function(less_than_eq);
 
     Term* greater_than = create_overloaded_function(builtins, "greater_than(any a,any b) -> bool");
     append_to_overloaded_function(greater_than, builtins->get("greater_than_i"));
     append_to_overloaded_function(greater_than, builtins->get("greater_than_f"));
+    finish_building_overloaded_function(greater_than);
 
     Term* greater_than_eq = create_overloaded_function(builtins, "greater_than_eq(any a,any b) -> bool");
     append_to_overloaded_function(greater_than_eq, builtins->get("greater_than_eq_i"));
     append_to_overloaded_function(greater_than_eq, builtins->get("greater_than_eq_f"));
+    finish_building_overloaded_function(greater_than_eq);
 
     Term* max_func = create_overloaded_function(builtins, "max(any a,any b) -> any");
     append_to_overloaded_function(max_func, builtins->get("max_i"));
     append_to_overloaded_function(max_func, builtins->get("max_f"));
+    finish_building_overloaded_function(max_func);
 
     Term* min_func = create_overloaded_function(builtins, "min(any a,any b) -> any");
     append_to_overloaded_function(min_func, builtins->get("min_i"));
     append_to_overloaded_function(min_func, builtins->get("min_f"));
+    finish_building_overloaded_function(min_func);
 
     Term* remainder_func = create_overloaded_function(builtins, "remainder(any a,any b) -> any");
     append_to_overloaded_function(remainder_func, builtins->get("remainder_i"));
     append_to_overloaded_function(remainder_func, builtins->get("remainder_f"));
+    finish_building_overloaded_function(remainder_func);
 
     Term* mod_func = create_overloaded_function(builtins, "mod(any a,any b) -> any");
     append_to_overloaded_function(mod_func, builtins->get("mod_i"));
     append_to_overloaded_function(mod_func, builtins->get("mod_f"));
+    finish_building_overloaded_function(mod_func);
 
     FUNCS.mult = create_overloaded_function(builtins, "mult(any a,any b) -> any");
     append_to_overloaded_function(FUNCS.mult, builtins->get("mult_i"));
@@ -1015,6 +1023,7 @@ void bootstrap_kernel()
     FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
+    finish_building_overloaded_function(FUNCS.neg);
     block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
 
     FUNCS.sub = create_overloaded_function(builtins, "sub(any a,any b) -> any");
@@ -1029,6 +1038,7 @@ void bootstrap_kernel()
 
     append_to_overloaded_function(FUNCS.add, add_v);
     append_to_overloaded_function(FUNCS.add, add_s);
+    finish_building_overloaded_function(FUNCS.add);
 
     Term* sub_v = create_function(builtins, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, TYPES.list, TYPES.list);
@@ -1037,6 +1047,7 @@ void bootstrap_kernel()
     
     append_to_overloaded_function(FUNCS.sub, sub_v);
     append_to_overloaded_function(FUNCS.sub, sub_s);
+    finish_building_overloaded_function(FUNCS.sub);
 
     // Create vectorized mult() functions
     Term* mult_v = create_function(builtins, "mult_v");
@@ -1046,6 +1057,7 @@ void bootstrap_kernel()
 
     append_to_overloaded_function(FUNCS.mult, mult_v);
     append_to_overloaded_function(FUNCS.mult, mult_s);
+    finish_building_overloaded_function(FUNCS.mult);
 
     Term* div_s = create_function(builtins, "div_s");
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
@@ -1137,7 +1149,12 @@ void bootstrap_kernel()
 
     // Fetch refereneces to certain stdlib funcs.
     FUNCS.declared_state = builtins->get("declared_state");
+    block_set_format_source_func(function_contents(FUNCS.declared_state),
+        declared_state_format_source);
+
     FUNCS.has_effects = builtins->get("has_effects");
+    block_set_has_effects(nested_contents(FUNCS.has_effects), true);
+
     FUNCS.length = builtins->get("length");
     FUNCS.list_append = builtins->get("List.append");
     FUNCS.native_patch = builtins->get("native_patch");
@@ -1145,9 +1162,8 @@ void bootstrap_kernel()
     FUNCS.output_explicit = builtins->get("output");
     FUNCS.type = builtins->get("type");
 
-    block_set_format_source_func(function_contents(FUNCS.declared_state), declared_state_format_source);
-
-    block_set_has_effects(nested_contents(FUNCS.has_effects), true);
+    FUNCS.memoize = builtins->get("memoize");
+    block_set_evaluation_empty(function_contents(FUNCS.memoize), true);
 
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));

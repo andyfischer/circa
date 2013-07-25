@@ -41,9 +41,9 @@ void run(Stack* stack);
 static void bytecode_write_noop(caValue* op);
 static void bytecode_write_finish_op(caValue* op);
 void write_input_instructions(caValue* bytecode, Term* caller, Term* function, Block* block);
-void run_input_instructions3(Stack* stack, caValue* bytecode);
 void write_output_instructions(caValue* bytecode, Term* caller, Block* block);
 void run_output_instructions(Stack* stack, caValue* bytecode);
+void run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bcData, int pos);
 
 Stack::Stack()
  : errorOccurred(false),
@@ -196,7 +196,10 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
     frame->block = block;
     frame->blockVersion = block->version;
     frame->pc = 0;
+    frame->pos = 0;
     frame->exitType = sym_None;
+    frame->expansions = NULL;
+    frame->retain = false;
 
     // Associate with parent
     frame->parent = parent;
@@ -208,8 +211,13 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Block
     return frame;
 }
 
-static void release_frame(Stack* stack, Frame* frame)
+static void release_frame(Frame* frame)
 {
+    Stack* stack = frame->stack;
+
+    if (stack->top == frame->id)
+        stack->top = frame->parent;
+
     set_null(&frame->customBytecode);
     set_null(&frame->dynamicScope);
 
@@ -224,6 +232,43 @@ static void release_frame(Stack* stack, Frame* frame)
     }
 }
 
+void release_frame_expansion(Frame* existing)
+{
+    frame_parent(existing)->expansions[existing->parentPc] = NULL;
+    release_frame(existing);
+}
+
+Frame* expand_frame(Frame* parent, int parentPc, Block* block)
+{
+    if (parent->expansions != NULL && parent->expansions[parentPc] != 0) {
+        Frame* existing = frame_by_id(parent->stack, parent->expansions[parentPc]);
+        if (existing->block != block)
+            // Block is different, release this expansion and make a new one.
+            release_frame_expansion(existing);
+        else {
+            // Will revisit: we shouldn't need to mess with 'top' all the time.
+            parent->stack->top = existing->id;
+            return existing;
+        }
+    }
+
+    return initialize_frame(parent->stack, parent->id, parentPc, block);
+}
+
+Frame* push_frame(Stack* stack, Block* block, FrameId parent, int parentPc)
+{
+    INCREMENT_STAT(PushFrame);
+
+    Frame* frame = initialize_frame(stack, parent, parentPc, block);
+
+    // Update 'top'
+    stack->top = frame->id;
+    
+    refresh_bytecode(block);
+
+    return frame;
+}
+
 Frame* push_frame(Stack* stack, Block* block)
 {
     INCREMENT_STAT(PushFrame);
@@ -232,14 +277,15 @@ Frame* push_frame(Stack* stack, Block* block)
     if (stack->top != 0)
         parentPc = top_frame(stack)->pc;
 
-    Frame* frame = initialize_frame(stack, stack->top, parentPc, block);
+    return push_frame(stack, block, stack->top, parentPc);
+}
 
-    // Update 'top'
-    stack->top = frame->id;
-    
-    refresh_bytecode(block);
+void setup_stack(Stack* stack, Block* block)
+{
+    while (top_frame(stack) != NULL)
+        pop_frame(stack);
 
-    return frame;
+    push_frame(stack, block);
 }
 
 void pop_frame(Stack* stack)
@@ -252,10 +298,12 @@ void pop_frame(Stack* stack)
     else
         stack->top = top->parent;
 
-    release_frame(stack, top);
+    release_frame(top);
+}
 
-    // TODO: orphan all expansions?
-    // TODO: add a 'retention' flag?
+void retain_frame(Frame* frame)
+{
+    frame->retain = true;
 }
 
 Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* _inputs)
@@ -352,6 +400,10 @@ Term* frame_current_term(Frame* frame)
 {
     return frame->block->get(frame->pc);
 }
+Term* frame_term(Frame* frame, int index)
+{
+    return frame->block->get(index);
+}
 Block* top_block(Stack* stack)
 {
     Frame* frame = top_frame(stack);
@@ -396,6 +448,7 @@ void stack_restart(Stack* stack)
     Frame* top = top_frame(stack);
     Block* block = top->block;
     top->pc = 0;
+    top->pos = 0;
 
     // Clear registers
     for (int i=0; i < list_length(&top->registers); i++) {
@@ -443,6 +496,7 @@ Stack* stack_duplicate(Stack* stack)
         set_value(&dupeFrame->dynamicScope, &sourceFrame->dynamicScope);
         dupeFrame->blockVersion = sourceFrame->blockVersion;
         dupeFrame->pc = sourceFrame->pc;
+        dupeFrame->pos = sourceFrame->pos;
         dupeFrame->exitType = sourceFrame->exitType;
     }
 
@@ -728,6 +782,7 @@ void stack_to_string(Stack* stack, caValue* out)
              << ", depth = " << depth
              << ", block = #" << block->id
              << ", pc = " << frame->pc
+             << ", pos = " << frame->pos
              << "]" << std::endl;
 
         if (block == NULL)
@@ -920,6 +975,7 @@ static void start_interpreter_session(Stack* stack)
 
 void write_term_input_instructions(Term* term, Block* block, caValue* result)
 {
+#if 0
     // Check the input count
     int inputCount = term->numInputs();
     int expectedCount = count_input_placeholders(block);
@@ -941,6 +997,7 @@ void write_term_input_instructions(Term* term, Block* block, caValue* result)
     }
 
     // There was stuff here, but it was deleted.
+#endif
 }
 
 static void bytecode_write_noop(caValue* op)
@@ -1121,6 +1178,8 @@ void write_term_bytecode(Term* term, caValue* result)
 
 void write_block_bytecode(Block* block, caValue* output)
 {
+    bytecode_write_block(output, block);
+#if 0
     // Block bytecode is a list with length + 1 elements.
     // The first 'length' elements are operations that correspond with Terms
     // with matching index.
@@ -1151,6 +1210,7 @@ void write_block_bytecode(Block* block, caValue* output)
         // Normal finish op.
         bytecode_write_finish_op(finishOp);
     }
+#endif
 }
 
 void run_interpreter(Stack* stack)
@@ -1270,8 +1330,9 @@ caValue* frame_find_state_input(Frame* frame)
     return hashtable_get(parentContainter, localName);
 }
 
-void run_input_instructions2(Stack* stack)
+void run_input_instructions_dynamic(Stack* stack)
 {
+#if 0
     Frame* callerFrame = top_frame_parent(stack);
     Frame* frame = top_frame(stack);
     Term* caller = frame_current_term(callerFrame);
@@ -1279,11 +1340,13 @@ void run_input_instructions2(Stack* stack)
     Value bytecode;
     set_blob(&bytecode, 0);
     write_input_instructions(&bytecode, caller, caller->function, frame->block);
-    run_input_instructions3(stack, &bytecode);
+    run_input_instructions(stack, &bytecode);
+#endif
 }
 
 void run_input_instructions_with_function(Stack* stack, Term* function)
 {
+#if 0
     Frame* callerFrame = top_frame_parent(stack);
     Frame* frame = top_frame(stack);
     Term* caller = frame_current_term(callerFrame);
@@ -1291,11 +1354,13 @@ void run_input_instructions_with_function(Stack* stack, Term* function)
     Value bytecode;
     set_blob(&bytecode, 0);
     write_input_instructions(&bytecode, caller, function, frame->block);
-    run_input_instructions3(stack, &bytecode);
+    run_input_instructions(stack, &bytecode);
+#endif
 }
 
 void write_input_instructions(caValue* bytecode, Term* caller, Term* function, Block* block)
 {
+#if 0
     bool inputsFromList = function == FUNCS.func_apply;
 
     int callerInputIndex = 0;
@@ -1327,7 +1392,7 @@ void write_input_instructions(caValue* bytecode, Term* caller, Term* function, B
         if (input->function == FUNCS.input) {
             if (input->boolProp("multiple", false)) {
 
-                blob_append_char(bytecode, bc_InputVararg);
+                blob_append_char(bytecode, bc_PushVarargList);
                 blob_append_int(bytecode, callerInputIndex);
                 callerInputIndex = caller->numInputs();
 
@@ -1336,8 +1401,9 @@ void write_input_instructions(caValue* bytecode, Term* caller, Term* function, B
                 if (incomingStateIndex == -1) {
                     // Caller has no :state input. TODO: Pull it through magic.
                     blob_append_char(bytecode, bc_SetNull);
+                    blob_append_char(bytecode, term->index);
                 } else {
-                    blob_append_char(bytecode, bc_InputFromStack);
+                    blob_append_char(bytecode, bc_PushInputFromStack);
                     blob_append_int(bytecode, incomingStateIndex);
                 }
 
@@ -1349,20 +1415,20 @@ void write_input_instructions(caValue* bytecode, Term* caller, Term* function, B
                 }
 
                 if (inputsFromList) {
-                    blob_append_char(bytecode, bc_InputFromApplyList);
+                    blob_append_char(bytecode, bc_PushInputFromApplyList);
                     blob_append_int(bytecode, applyListIndex);
                     applyListIndex++;
                 } else if (caller->input(callerInputIndex) == NULL) {
                     blob_append_char(bytecode, bc_SetNull);
                     callerInputIndex++;
                 } else {
-                    blob_append_char(bytecode, bc_InputFromStack);
+                    blob_append_char(bytecode, bc_PushInputFromStack);
                     blob_append_int(bytecode, callerInputIndex);
                     callerInputIndex++;
                 }
             }
         } else if (input->function == FUNCS.unbound_input) {
-            blob_append_char(bytecode, bc_InputClosureBinding);
+            blob_append_char(bytecode, bc_PushInputFromClosure);
             blob_append_int(bytecode, unboundInputIndex);
             unboundInputIndex++;
         } else {
@@ -1374,9 +1440,11 @@ void write_input_instructions(caValue* bytecode, Term* caller, Term* function, B
         blob_append_char(bytecode, bc_TooManyInputs);
 
     blob_append_char(bytecode, bc_Done);
+#endif
 }
 
-void run_input_instructions3(Stack* stack, caValue* bytecode)
+#if 0
+void run_input_instructions(Stack* stack, caValue* bytecode)
 {
     char* bcData = as_blob(bytecode);
     int pos = 0;
@@ -1404,7 +1472,7 @@ void run_input_instructions3(Stack* stack, caValue* bytecode)
             frame->pc++;
             continue;
         }
-        case bc_InputFromStack: {
+        case bc_PushInputFromStack: {
             int index = blob_read_int(bcData, &pos);
             caValue* value = stack_find_active_value(parent, caller->input(index));
             ca_assert(value != NULL);
@@ -1417,7 +1485,7 @@ void run_input_instructions3(Stack* stack, caValue* bytecode)
             frame->pc++;
             continue;
         }
-        case bc_InputVararg: {
+        case bc_PushVarargList: {
             caValue* dest = frame_register(frame, frame->pc);
             int startIndex = blob_read_int(bcData, &pos);
             int count = caller->numInputs() - startIndex;
@@ -1430,7 +1498,7 @@ void run_input_instructions3(Stack* stack, caValue* bytecode)
             frame->pc++;
             continue;
         }
-        case bc_InputClosureBinding: {
+        case bc_PushInputFromClosure: {
             if (closureBindings == NULL) {
                 caValue* closure = stack_find_active_value(parent, caller->input(0));
                 closureBindings = list_get(closure, 1);
@@ -1446,7 +1514,7 @@ void run_input_instructions3(Stack* stack, caValue* bytecode)
         case bc_TooManyInputs:
             return raise_error_too_many_inputs(stack);
         default:
-            internal_error("Unrecognized op in run_input_instructions3");
+            internal_error("Unrecognized op in run_input_instructions");
         }
     }
 
@@ -1463,10 +1531,8 @@ done_passing_inputs:
                 return raise_error_input_type_mismatch(stack);
         }
     }
-
-    // Rewind 'pc' so that we can hit a possible FireNative op.
-    frame->pc = 0;
 }
+#endif
 
 void write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 {
@@ -1493,9 +1559,11 @@ void write_output_instructions(caValue* bytecode, Term* caller, Block* block)
         if (output->boolProp("state", false)) {
             // State output.
             if (outgoingStateIndex == -1) {
-                blob_append_char(bytecode, bc_SetNull);
+                blob_append_char(bytecode, bc_PopOutputNull);
+                blob_append_int(bytecode, outgoingStateIndex);
             } else {
-                blob_append_char(bytecode, bc_Output);
+                blob_append_char(bytecode, bc_PopOutput);
+                blob_append_int(bytecode, output->index);
                 blob_append_int(bytecode, outgoingStateIndex);
             }
 
@@ -1508,7 +1576,7 @@ void write_output_instructions(caValue* bytecode, Term* caller, Block* block)
             if (placeholder == NULL) {
                 blob_append_char(bytecode, bc_SetNull);
             } else {
-                blob_append_char(bytecode, bc_Output);
+                blob_append_char(bytecode, bc_PopOutput);
                 blob_append_int(bytecode, placeholderIndex);
             }
 
@@ -1521,6 +1589,7 @@ void write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 
 void run_output_instructions(Stack* stack, caValue* bytecode)
 {
+#if 0
     char* bcData = as_blob(bytecode);
     int pos = 0;
 
@@ -1534,9 +1603,10 @@ void run_output_instructions(Stack* stack, caValue* bytecode)
         switch (blob_read_char(bcData, &pos)) {
         case bc_Done:
             goto done_passing_inputs;
-        case bc_Output: {
+        case bc_PopOutput: {
             int placeholderIndex = blob_read_int(bcData, &pos);
             Term* placeholder = get_output_placeholder(frame->block, placeholderIndex);
+
             caValue* value = frame_register(frame, placeholder);
 
             Term* receiver = get_output_term(caller, outputIndex);
@@ -1574,6 +1644,7 @@ done_passing_inputs:
     // Pop frame, advance parent PC.
     pop_frame(stack);
     top_frame(stack)->pc++;
+#endif
 }
 
 void run_bytecode(Stack* stack, caValue* bytecode)
@@ -1604,7 +1675,7 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             caValue* inputActions = list_get(action, 1);
             frame = push_frame(stack, block);
             bytecode = frame_bytecode(frame);
-            run_input_instructions2(stack);
+            run_input_instructions_dynamic(stack);
             break;
         }
         case op_DynamicMethodCall: {
@@ -1648,7 +1719,7 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             Block* block = nested_contents(method);
             frame = push_frame(stack, block);
             bytecode = frame_bytecode(frame);
-            run_input_instructions2(stack);
+            run_input_instructions_dynamic(stack);
             break;
         }
 
@@ -1697,7 +1768,7 @@ do_func_apply:
                 return;
             frame = push_frame(stack, block);
             bytecode = frame_bytecode(frame);
-            run_input_instructions2(stack);
+            run_input_instructions_dynamic(stack);
             break;
         }
         case op_ForLoop: {
@@ -1718,8 +1789,8 @@ do_func_apply:
             frame = push_frame(stack, block);
             bytecode = frame_bytecode(frame);
 
-            run_input_instructions2(stack);
-            bool enableLoopOutput = as_symbol(list_get(action, 3)) == sym_LoopProduceOutput;
+            run_input_instructions_dynamic(stack);
+            bool loopEnableOutput = as_symbol(list_get(action, 3)) == sym_LoopProduceOutput;
 
             Block* contents = frame->block;
 
@@ -1729,7 +1800,7 @@ do_func_apply:
                 // Initialize the loop index
                 set_int(frame_register(frame, for_loop_find_index(contents)), 0);
 
-                if (enableLoopOutput) {
+                if (loopEnableOutput) {
                     // Initialize output index.
                     set_int(frame_register(frame, for_loop_find_output_index(contents)), 0);
 
@@ -1838,7 +1909,9 @@ do_func_apply:
 
             frame = top_frame(stack);
             bytecode = frame_bytecode(frame);
-            goto do_finish_loop;
+            // goto do_finish_loop;
+            // TODO
+            break;
         }
 
 do_finish_frame:
@@ -1851,7 +1924,7 @@ do_finish_frame:
 
 do_finish_loop:
         case op_FinishLoop: {
-            bool enableLoopOutput = as_symbol(list_get(action, 1)) == sym_LoopProduceOutput;
+            bool loopEnableOutput = false; //blob_read_char(bcData, &pos) != 0;
 
             Block* contents = frame->block;
 
@@ -1863,7 +1936,7 @@ do_finish_loop:
             set_int(index, as_int(index) + 1);
 
             // Preserve list output.
-            if (enableLoopOutput && frame->exitType != sym_Discard) {
+            if (loopEnableOutput && frame->exitType != sym_Discard) {
                 caValue* outputIndex = frame_register(frame, for_loop_find_output_index(contents));
 
                 caValue* resultValue = frame_register_from_end(frame, 0);
@@ -1884,7 +1957,7 @@ do_finish_loop:
 
                 // Silly code- move the output list (in the parent frame) to our frame's output,
                 // where it will get copied back to parent in finish_frame.
-                if (enableLoopOutput) {
+                if (loopEnableOutput) {
                     caValue* outputList = stack_find_active_value(frame, contents->owningTerm);
                     move(outputList, frame_register_from_end(frame, 0));
                 } else {
@@ -1950,9 +2023,664 @@ do_finish_loop:
     }
 }
 
+struct InterpreterTransientState {
+    char* bcData;
+    Frame* frame;
+    int pos;
+
+    bool loopEnableOutput;
+};
+
+void run_bytecode2(Stack* stack, caValue* bytecode)
+{
+    InterpreterTransientState s;
+
+    s.bcData = as_blob(bytecode);
+    s.frame = top_frame(stack);
+    s.pos = s.frame->pos;
+    s.loopEnableOutput = false;
+
+    // TEMP
+    // std::cout << "Starting run on block#" << frame->block->id << std::endl;
+
+    while (true) {
+
+        if (stack->step != sym_StackRunning)
+            return;
+
+        INCREMENT_STAT(StepInterpreter);
+
+        // bytecode_dump_next_op(frame_bytecode(s.frame), s.frame->block, s.pos);
+
+        // Dispatch op
+        char op = blob_read_char(s.bcData, &s.pos);
+        switch (op) {
+        case bc_NoOp:
+            continue;
+        case bc_PushFunction: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+            Block* block = function_contents(caller->function);
+
+            Frame* newFrame = push_frame(stack, block);
+            newFrame->parentPc = index;
+            s.frame = top_frame_parent(stack);
+
+            continue;
+        }
+        case bc_PushNested: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+            Block* block = caller->nestedContents;
+
+            Frame* newFrame = push_frame(stack, block);
+            newFrame->parentPc = index;
+            s.frame = top_frame_parent(stack);
+            continue;
+        }
+        case bc_PushInputFromStack: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            Frame* top = top_frame(stack);
+            Frame* parent = top_frame_parent(stack);
+            Term* caller = frame_term(parent, top->parentPc);
+
+            int inputIndex = blob_read_int(s.bcData, &s.pos);
+            int destSlot = blob_read_int(s.bcData, &s.pos);
+
+            caValue* value = stack_find_active_value(parent, caller->input(inputIndex));
+            ca_assert(value != NULL);
+            caValue* slot = frame_register(top, destSlot);
+            copy(value, slot);
+            continue;
+        }
+        case bc_PushVarargList: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            Frame* top = top_frame(stack);
+            Frame* parent = top_frame_parent(stack);
+            Term* caller = frame_term(parent, top->parentPc);
+
+            int startIndex = blob_read_int(s.bcData, &s.pos);
+            int destSlot = blob_read_int(s.bcData, &s.pos);
+
+            caValue* dest = frame_register(top, destSlot);
+            int count = caller->numInputs() - startIndex;
+            set_list(dest, count);
+            for (int i=0; i < count; i++) {
+                caValue* value = stack_find_active_value(parent, caller->input(startIndex+i));
+                copy(value, list_get(dest, i));
+            }
+
+            continue;
+        }
+        case bc_PushInputFromApplyList: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+
+            Frame* top = top_frame(stack);
+            Frame* parent = top_frame_parent(stack);
+            Term* caller = frame_term(parent, top->parentPc);
+
+            caValue* applyList = stack_find_active_value(parent, caller->input(1));
+
+            if (index >= list_length(applyList))
+                return raise_error_not_enough_inputs(stack);
+            
+            copy(list_get(applyList, index), frame_register(top, index));
+            continue;
+        }
+        case bc_PushInputFromClosure: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            Frame* top = top_frame(stack);
+            Frame* parent = top_frame_parent(stack);
+            Term* caller = frame_term(parent, top->parentPc);
+
+            caValue* closure = stack_find_active_value(parent, caller->input(0));
+            caValue* closureBindings = list_get(closure, 1);
+
+            int index = blob_read_int(s.bcData, &s.pos);
+            copy(list_get(closureBindings, index), frame_register(top, index));
+            continue;
+        }
+        case bc_PushInputNull: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            int inputIndex = blob_read_int(s.bcData, &s.pos);
+
+            Frame* top = top_frame(stack);
+
+            set_null(frame_register(top, inputIndex));
+            continue;
+        }
+        
+        case bc_EnterFrame: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            s.frame->pos = s.pos;
+            s.frame = top_frame(stack);
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            s.frame->pos = 0;
+            s.pos = 0;
+            continue;
+        }
+do_done_insn:
+        case bc_Done: {
+            ca_assert(s.frame == top_frame(stack));
+
+            // Exit if we have finished the topmost block
+            if (s.frame->parent == 0) {
+                s.frame->pos = s.pos;
+                stack->step = sym_StackFinished;
+                return;
+            }
+
+            s.frame = top_frame_parent(stack);
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            s.pos = s.frame->pos;
+            continue;
+        }
+        case bc_LoopDone: {
+            ca_assert(s.frame == top_frame(stack));
+            
+            s.loopEnableOutput = blob_read_char(s.bcData, &s.pos);
+
+do_loop_done_insn:
+
+            Block* contents = s.frame->block;
+
+            // Find list length.
+            caValue* listInput = frame_register(s.frame, 0);
+
+            // Increment the loop index. TODO: Use frame_register instead of get_top_register.
+            caValue* index = get_top_register(stack, for_loop_find_index(contents));
+            set_int(index, as_int(index) + 1);
+
+            // Preserve list output.
+            if (s.loopEnableOutput && s.frame->exitType != sym_Discard) {
+                caValue* outputIndex = frame_register(s.frame, for_loop_find_output_index(contents));
+
+                caValue* resultValue = frame_register_from_end(s.frame, 0);
+                caValue* outputList = stack_find_active_value(s.frame, contents->owningTerm);
+
+                copy(resultValue, list_append(outputList));
+
+                INCREMENT_STAT(LoopWriteOutput);
+
+                // Advance output index
+                set_int(outputIndex, as_int(outputIndex) + 1);
+            }
+
+            // Check if we are finished
+            if (as_int(index) >= list_length(listInput)
+                    || s.frame->exitType == sym_Break
+                    || s.frame->exitType == sym_Return) {
+
+                // Silly code- move the output list (in the parent frame) to our frame's output,
+                // where it will get copied back to parent in finish_frame.
+                if (s.loopEnableOutput) {
+                    caValue* outputList = stack_find_active_value(s.frame, contents->owningTerm);
+                    move(outputList, frame_register_from_end(s.frame, 0));
+                } else {
+                    set_list(frame_register_from_end(s.frame, 0), 0);
+                }
+                
+                goto do_done_insn;
+            }
+
+            // If we're not finished yet, copy rebound outputs back to inputs.
+            for (int i=1;; i++) {
+                Term* input = get_input_placeholder(contents, i);
+                if (input == NULL)
+                    break;
+                Term* output = get_output_placeholder(contents, i);
+                copy(frame_register(s.frame, output),
+                    frame_register(s.frame, input));
+
+                INCREMENT_STAT(Copy_LoopCopyRebound);
+            }
+
+            // Return to start of the loop.
+            s.frame->pc = 0;
+            s.pos = 0;
+            s.frame->exitType = sym_None;
+            continue;
+        }
+        
+        case bc_PopOutput: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            int placeholderIndex = blob_read_int(s.bcData, &s.pos);
+            int outputIndex = blob_read_int(s.bcData, &s.pos);
+
+            Frame* top = top_frame(stack);
+            Frame* parent = top_frame_parent(stack);
+            Term* caller = frame_term(parent, top->parentPc);
+
+            Term* placeholder = get_output_placeholder(top->block, placeholderIndex);
+            caValue* value = frame_register(top, placeholder);
+
+            Term* receiver = get_output_term(caller, outputIndex);
+            caValue* receiverSlot = frame_register(parent, receiver);
+            copy(value, receiverSlot);
+
+            // Type check
+            // Future: should this use receiver's type instead of placeholder?
+            bool castSuccess = cast(receiverSlot, declared_type(placeholder));
+                
+            // For now, allow any output value to be null. Will revisit.
+            castSuccess = castSuccess || is_null(receiverSlot);
+
+            if (!castSuccess) {
+                return raise_error_output_type_mismatch(stack);
+            }
+
+            continue;
+        }
+        case bc_PopOutputNull: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            int outputIndex = blob_read_int(s.bcData, &s.pos);
+            Frame* parent = top_frame_parent(stack);
+            Term* caller = frame_current_term(parent);
+
+            Term* receiver = get_output_term(caller, outputIndex);
+            caValue* receiverSlot = frame_register(parent, receiver);
+            set_null(receiverSlot);
+            continue;
+        }
+        case bc_PopFrame: {
+            ca_assert(s.frame == top_frame_parent(stack));
+
+            pop_frame(stack);
+
+            s.frame = top_frame(stack);
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            continue;
+        }
+        case bc_SetNull: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+            set_null(frame_register(s.frame, index));
+            continue;
+        }
+        
+        case bc_DynamicMethodCall: {
+            int index = blob_read_int(s.bcData, &s.pos);
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+
+            INCREMENT_STAT(DynamicMethodCall);
+
+            // Lookup method
+            caValue* object = stack_find_active_value(s.frame, caller->input(0));
+            if (object == NULL) {
+                Value msg;
+                set_string(&msg, "Input 0 is null");
+                set_error_string(frame_register(s.frame, caller), as_cstring(&msg));
+                raise_error(stack);
+            }
+
+            std::string functionName = caller->stringProp("syntax:functionName", "");
+
+            // Find and dispatch method
+            Term* method = find_method(s.frame->block,
+                (Type*) circa_type_of(object), functionName.c_str());
+
+            // Method not found. Raise error.
+            if (method == NULL) {
+                Value msg;
+                set_string(&msg, "Method ");
+                string_append(&msg, functionName.c_str());
+                string_append(&msg, " not found on type ");
+                string_append(&msg, &circa_type_of(object)->name);
+                set_error_string(frame_register(s.frame, caller), as_cstring(&msg));
+                raise_error(stack);
+                return;
+            }
+            
+            // Check for methods that are normally handled with different bytecode.
+            if (method == FUNCS.func_call)
+                goto do_func_call;
+            else if (method == FUNCS.func_apply)
+                goto do_func_apply;
+
+            Block* block = nested_contents(method);
+
+            s.frame = push_frame(stack, block);
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            s.pos = 0;
+
+            continue;
+        }
+
+do_func_call:
+        case bc_FuncCall: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+
+            caValue* closure = stack_find_active_value(s.frame, caller->input(0));
+            Block* block = as_block(list_get(closure, 0));
+
+            if (block == NULL) {
+                Value msg;
+                set_string(&msg, "Block is null");
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
+
+            Frame* newFrame = push_frame(stack, block);
+            newFrame->parentPc = index;
+            s.frame = top_frame_parent(stack);
+
+            continue;
+        }
+
+do_func_apply:
+        case bc_FuncApply: {
+            int index = blob_read_int(s.bcData, &s.pos);
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+            caValue* closure = stack_find_active_value(s.frame, caller->input(0));
+            Block* block = as_block(list_get(closure, 0));
+
+            if (block == NULL) {
+                Value msg;
+                set_string(&msg, "Block is null");
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
+            s.frame = push_frame(stack, block);
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            run_input_instructions_with_function(stack, FUNCS.func_apply);
+            continue;
+        }
+
+        case bc_PushCase: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+
+            Block* block = case_block_choose_block(stack, caller);
+            ca_assert(block != NULL);
+
+            Frame* newFrame = push_frame(stack, block);
+            newFrame->parentPc = index;
+            s.frame = top_frame_parent(stack);
+            continue;
+        }
+        case bc_ForLoop: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+            bool loopEnableOutput = blob_read_char(s.bcData, &s.pos) != 0;
+
+            s.frame->pc = index;
+            s.frame->pos = s.pos;
+            Term* caller = frame_term(s.frame, index);
+            
+            caValue* input = stack_find_active_value(s.frame, caller->input(0));
+
+            // If there are zero inputs, use the #zero block.
+            Block* block = NULL;
+            bool zeroBlock = false;
+            if (is_list(input) && list_length(input) == 0) {
+                block = for_loop_get_zero_block(caller->nestedContents);
+                zeroBlock = true;
+            } else {
+                block = caller->nestedContents;
+            }
+
+            Frame* newFrame = push_frame(stack, block);
+            newFrame->parentPc = index;
+
+            // Check if top frame actually contains a for-loop (it might be using the #zero block)
+            if (is_for_loop(block)) {
+
+                // Initialize the loop index
+                set_int(frame_register(newFrame, for_loop_find_index(block)), 0);
+
+                if (loopEnableOutput) {
+                    // Initialize output index.
+                    set_int(frame_register(newFrame, for_loop_find_output_index(block)), 0);
+
+                    // Initialize output value.
+                    caValue* outputList = stack_find_active_value(newFrame, block->owningTerm);
+                    set_list(outputList, 0);
+                }
+            }
+
+            continue;
+        }
+        case bc_InlineCopy: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+            Term* caller = frame_term(s.frame, index);
+
+            caValue* source = stack_find_active_value(s.frame, caller->input(0));
+            caValue* dest = frame_register(s.frame, caller);
+            copy(source, dest);
+
+            continue;
+        }
+        case bc_FireNative: {
+            ca_assert(s.frame == top_frame(stack));
+
+            EvaluateFunc override = get_override_for_block(s.frame->block);
+            ca_assert(override != NULL);
+
+            // Override functions may not push/pop frames or change PC.
+            int snapshotPc = s.frame->pc;
+            Frame* snapshotFrame = s.frame;
+
+            // Call override
+            override(stack);
+
+            // Assert that top frame has not changed.
+            ca_assert(snapshotPc == s.frame->pc);
+            ca_assert(snapshotFrame == s.frame);
+
+            if (error_occurred(stack)) {
+                s.frame->pc = s.frame->block->length() - 1;
+                return;
+            }
+
+            continue;
+        }
+        case bc_Return: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+            Term* caller = frame_term(s.frame, index);
+
+            Frame* toFrame = s.frame;
+
+            // Find destination frame, the first parent major block.
+            while (!is_major_block(toFrame->block) && frame_parent(toFrame) != NULL)
+                toFrame = frame_parent(toFrame);
+
+            // Copy outputs to destination frame.
+            for (int i=0; i < caller->numInputs(); i++) {
+                caValue* dest = frame_register_from_end(toFrame, i);
+                if (caller->input(i) == NULL)
+                    set_null(dest);
+                else
+                    copy(stack_find_active_value(s.frame, caller->input(i)), dest);
+            }
+
+            // Throw away intermediate frames.
+            while (top_frame(stack) != toFrame)
+                pop_frame(stack);
+
+            s.frame = top_frame(stack);
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            s.loopEnableOutput = false;
+            goto do_done_insn;
+        }
+        case bc_Continue:
+        case bc_Break:
+        case bc_Discard: {
+            ca_assert(s.frame == top_frame(stack));
+
+            int index = blob_read_int(s.bcData, &s.pos);
+            Term* caller = frame_term(s.frame, index);
+
+            Frame* toFrame = s.frame;
+
+            // Find destination frame, the parent for-loop block.
+            while (!is_for_loop(toFrame->block) && frame_parent(toFrame) != NULL)
+                toFrame = frame_parent(toFrame);
+
+            // Copy outputs to destination frame.
+            for (int i=0; i < caller->numInputs(); i++) {
+                caValue* dest = frame_register_from_end(toFrame, i);
+                if (caller->input(i) == NULL)
+                    set_null(dest);
+                else
+                    copy(stack_find_active_value(s.frame, caller->input(i)), dest);
+            }
+
+            // Throw away intermediate frames.
+            while (top_frame(stack) != toFrame)
+                pop_frame(stack);
+
+            // Save exit type
+            if (op == bc_Continue)
+                toFrame->exitType = sym_Continue;
+            else if (op == bc_Break)
+                toFrame->exitType = sym_Break;
+            else if (op == bc_Discard)
+                toFrame->exitType = sym_Discard;
+
+            s.frame = top_frame(stack);
+            s.pos = s.frame->pos;
+            s.bcData = as_blob(frame_bytecode(s.frame));
+            s.loopEnableOutput = false;
+            goto do_loop_done_insn;
+        }
+
+        case bc_NotEnoughInputs:
+            return raise_error_not_enough_inputs(stack);
+        case bc_TooManyInputs:
+            return raise_error_too_many_inputs(stack);
+        case bc_ErrorNotEnoughInputs: {
+            Term* currentTerm = frame_current_term(s.frame);
+            circa::Value msg;
+            Block* func = function_contents(currentTerm->function);
+            int expectedCount = count_input_placeholders(func);
+            if (has_variable_args(func))
+                expectedCount--;
+            int foundCount = currentTerm->numInputs();
+            set_string(&msg, "Too few inputs, expected ");
+            string_append(&msg, expectedCount);
+            if (has_variable_args(func))
+                string_append(&msg, " (or more)");
+            string_append(&msg, ", received ");
+            string_append(&msg, foundCount);
+            raise_error_msg(stack, as_cstring(&msg));
+            return;
+        }
+        case bc_ErrorTooManyInputs: {
+            Term* currentTerm = frame_current_term(s.frame);
+            circa::Value msg;
+            Block* func = function_contents(currentTerm->function);
+            int expectedCount = count_input_placeholders(func);
+            int foundCount = currentTerm->numInputs();
+            set_string(&msg, "Too many inputs, expected ");
+            string_append(&msg, expectedCount);
+            string_append(&msg, ", received ");
+            string_append(&msg, foundCount);
+
+            raise_error_msg(stack, as_cstring(&msg));
+            return;
+        }
+
+        case bc_MemoizeFrame: {
+            retain_frame(s.frame);
+            continue;
+        }
+
+        case bc_UseMemoizedOnEqualInputs: {
+            s.frame->pos = s.pos;
+            run_memoization_lookahead_check(s.frame, top_frame(stack), s.bcData, s.pos);
+            continue;
+        }
+        
+        default:
+            std::cout << "Op not recognized: " << int(s.bcData[s.pos - 1]) << std::endl;
+            ca_assert(false);
+        }
+    }
+}
+
+void run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bcData, int pos)
+{
+    while (true) {
+        switch (blob_read_char(bcData, &pos)) {
+        case bc_PushInputFromStack: {
+            int inputIndex = blob_read_int(bcData, &pos);
+            int destSlot = blob_read_int(bcData, &pos);
+
+            Term* caller = frame_term(frame, top->parentPc);
+            caValue* value = stack_find_active_value(frame, caller->input(inputIndex));
+            caValue* slot = frame_register(top, destSlot);
+
+            // equals_strict
+
+            continue;
+        }
+        case bc_PushVarargList:
+            continue;
+        case bc_PushInputFromApplyList:
+            continue;
+        case bc_PushInputFromClosure:
+            continue;
+        case bc_PushInputNull: {
+            int inputIndex = blob_read_int(bcData, &pos);
+
+            if (!is_null(frame_register(top, inputIndex)))
+                return;
+
+            continue;
+        }
+        case bc_EnterFrame:
+            continue;
+        default:
+            std::cout << "Unexpected op in run_memoization_lookahead_check:";
+            std::cout << int(bcData[pos - 1]) << std::endl;
+            ca_assert(false);
+        }
+    }
+}
+
 void run(Stack* stack)
 {
-    run_bytecode(stack, frame_bytecode(top_frame(stack)));
+    run_bytecode2(stack, frame_bytecode(top_frame(stack)));
 }
 
 void evaluate_range(Stack* stack, Block* block, int start, int end)

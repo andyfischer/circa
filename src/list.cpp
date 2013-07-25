@@ -385,6 +385,29 @@ bool list_contains(caValue* list, caValue* element)
     return false;
 }
 
+bool list_strict_equals(caValue* left, caValue* right)
+{
+    if (left->value_type != TYPES.list || right->value_type != TYPES.list)
+        return false;
+
+    if (left->value_data.ptr == right->value_data.ptr)
+        return true;
+
+    int count = list_length(left);
+    if (count != list_length(right))
+        return false;
+
+    for (int i=0; i < count; i++)
+        if (!strict_equals(list_get(left, i), list_get(right, i)))
+            return false;
+
+    // Lists are equal. Perform sneaky-equals optimization.
+    set_null(right);
+    list_copy(left, right);
+
+    return true;
+}
+
 caValue* list_get(caValue* value, int index)
 {
     ca_assert(value->value_type->storageType == sym_StorageTypeList);

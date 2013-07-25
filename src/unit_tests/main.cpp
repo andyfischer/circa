@@ -400,6 +400,7 @@ namespace source_repro_test { void register_tests(); }
 namespace stateful_code_test { void register_tests(); }
 namespace string_test { void register_tests(); }
 namespace symbol_test { void register_tests(); }
+namespace tagged_value_test { void register_tests(); }
 namespace tokenizer_test { void register_tests(); }
 namespace type_test { void register_tests(); }
 
@@ -407,6 +408,10 @@ int main(int argc, char** argv)
 {
     hashtable_test::register_tests();
 
+    // TEMP
+    interpreter_test::register_tests();
+    tagged_value_test::register_tests();
+#if 0
     actor_test::register_tests();
     block_test::register_tests();
     building_test::register_tests();
@@ -433,6 +438,7 @@ int main(int argc, char** argv)
     symbol_test::register_tests();
     tokenizer_test::register_tests();
     type_test::register_tests();
+#endif
 
     caWorld* world = circa_initialize();
 

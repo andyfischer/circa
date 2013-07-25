@@ -35,6 +35,9 @@ struct Frame
     // Register values.
     List registers;
 
+    // List of expansions, each corresponds to a term.
+    FrameId* expansions;
+
     // Source block
     Block* block;
 
@@ -43,13 +46,19 @@ struct Frame
     Value dynamicScope;
 
     // Which version of the block we are using.
+    // TODO: Remove. (instead, code changes should create different blocks)
     int blockVersion;
 
-    // Current program counter
+    // Current program counter (term index)
     int pc;
+
+    // Program counter (bytecode position)
+    int pos;
 
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
+
+    bool retain;
 };
 
 struct Stack
@@ -152,9 +161,11 @@ caValue* stack_get_state(Stack* stack);
 Frame* push_frame(Stack* stack, Block* block);
 Frame* push_frame_with_inputs(Stack* stack, Block* block, caValue* inputs);
 
-// Pop the topmost frame and throw it away. This call doesn't preserve the frame's
-// outputs or update PC. You might want to call finish_frame() instead of this.
 void pop_frame(Stack* stack);
+
+void retain_frame(Frame* frame);
+
+void setup_stack(Stack* stack, Block* block);
 
 // Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
 // - you call it when the block is finished evaluating. But instead of passing outputs
@@ -213,6 +224,7 @@ void stack_trace_to_string(Stack* stack, caValue* out);
 // Update bytecode
 void write_term_bytecode(Term* term, caValue* output);
 void write_block_bytecode(Block* block, caValue* output);
+void write_input_instructions(caValue* bytecode, Term* caller, Term* function, Block* block);
 
 // Setup the builtin Stack type.
 void eval_context_setup_type(Type* type);

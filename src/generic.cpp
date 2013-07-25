@@ -113,6 +113,12 @@ void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
     return append_to_overloaded_function(nested_contents(overloadedFunc), specializedFunc);
 }
 
+void finish_building_overloaded_function(Term* overloadedFunc)
+{
+    Term* ifBlock = find_term_with_function(nested_contents(overloadedFunc), FUNCS.if_block);
+    finish_if_block(ifBlock);
+}
+
 Term* statically_specialize_overload_for_call(Term* call)
 {
     Block* original = function_contents(call->function);

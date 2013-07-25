@@ -352,6 +352,29 @@ bool equals_int(caValue* value, int i)
     return as_int(value) == i;
 }
 
+bool strict_equals(caValue* left, caValue* right)
+{
+    if (left->value_type != right->value_type)
+        return false;
+
+    // Try a shallow compare first.
+    if (left->value_data.ptr == right->value_data.ptr)
+        return true;
+
+    // Check builtin container types.
+    if (left->value_type == TYPES.string)
+        return string_equals(left, right);
+
+    if (left->value_type == TYPES.list)
+        return list_strict_equals(left, right);
+
+    // TODO: hashtable strict equals
+    //if (left->value_type == TYPES.hashtable)
+    //    return hashtable_strict_equals(left, right);
+
+    return false;
+}
+
 void set_value(caValue* target, caValue* value)
 {
     copy(value, target);

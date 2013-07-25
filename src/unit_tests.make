@@ -91,6 +91,7 @@ OBJECTS := \
 	$(OBJDIR)/stateful_code_test.o \
 	$(OBJDIR)/string_test.o \
 	$(OBJDIR)/symbol_test.o \
+	$(OBJDIR)/tagged_value_test.o \
 	$(OBJDIR)/tokenizer_test.o \
 	$(OBJDIR)/type_test.o \
 
@@ -232,6 +233,9 @@ $(OBJDIR)/string_test.o: unit_tests/string_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/symbol_test.o: unit_tests/symbol_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/tagged_value_test.o: unit_tests/tagged_value_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tokenizer_test.o: unit_tests/tokenizer_test.cpp

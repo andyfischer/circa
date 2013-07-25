@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "bytecode.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "function.h"
@@ -16,6 +17,7 @@
 #include "term_list.h"
 #include "token.h"
 #include "type.h"
+#include "update_cascades.h"
 
 namespace circa {
 
@@ -385,22 +387,33 @@ std::string block_namespace_to_string(Block* block)
     return out.str();
 }
 
+void print_indent(RawOutputPrefs* prefs, std::ostream& out)
+{
+    for (int i=0; i < prefs->indentLevel; i++)
+        out << " ";
+}
+
 void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out)
 {
     int prevIndent = prefs->indentLevel;
 
+    print_indent(prefs, out);
+
     out << "[Block#" << block->id << "]" << std::endl;
-    for (BlockIterator it(block); !it.finished(); it.advance()) {
-        Term* term = it.current();
-
-        int indent = it.depth();
-
-        prefs->indentLevel = indent;
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
 
         print_term(term, prefs, out);
         out << std::endl;
 
+        if (term->nestedContents != NULL) {
+            prefs->indentLevel += 2;
+            print_block(term->nestedContents, prefs, out);
+            prefs->indentLevel -= 2;
+        }
+
         // Possibly print the closing bytecode op.
+        #if 0
         if (prefs->showBytecode
                 && term->index == (term->owningBlock->length() - 1)
                 && term->owningBlock != NULL
@@ -413,6 +426,17 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out)
                 out << " ";
 
             out << to_string(list_get(&nested->bytecode, nested->length())) << std::endl;
+        }
+        #endif
+    }
+
+    if (prefs->showBytecode) {
+        circa::Value lines;
+        refresh_bytecode(block);
+        bytecode_to_string_lines(block_bytecode(block), &lines);
+        for (int i=0; i < list_length(&lines); i++) {
+            print_indent(prefs, out);
+            std::cout << as_cstring(list_get(&lines, i)) << std::endl;
         }
     }
 
@@ -610,6 +634,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
     if (prefs->showProperties)
         out << " " << term->properties.toString();
 
+#if 0
     if (prefs->showBytecode) {
         out << std::endl;
         for (int i=0; i < prefs->indentLevel + 2; i++)
@@ -622,6 +647,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
         else
             out << to_string(op);
     }
+#endif
 }
 
 void print_term(Term* term, std::ostream& out)

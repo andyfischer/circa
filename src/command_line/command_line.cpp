@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "bytecode.h"
 #include "debug.h"
 #include "file.h"
 #include "file_watch.h"

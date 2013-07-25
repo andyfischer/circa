@@ -26,6 +26,7 @@ void string_append_qualified_name(caValue* left, caValue* right);
 void string_resize(caValue* s, int length);
 bool string_eq(caValue* s, const char* str);
 bool string_eq(caValue* s, caValue* rhs);
+bool string_equals(caValue* left, caValue* right);
 
 // Return true if s equals the empty string, or is a null value.
 bool string_empty(caValue* s);

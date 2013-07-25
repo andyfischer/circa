@@ -113,14 +113,14 @@ void blob_append_int(caValue* blob, unsigned int val)
         + ((val & 0x0000ff00) << 8) + ((val & 0x000000ff) << 24);
 }
 
-char blob_read_char(char* data, int* pos)
+char blob_read_char(const char* data, int* pos)
 {
     char c = data[*pos];
     *pos += 1;
     return c;
 }
 
-unsigned int blob_read_int(char* data, int* pos)
+unsigned int blob_read_int(const char* data, int* pos)
 {
     int val = *((unsigned int*) &data[*pos]);
     *pos += 4;

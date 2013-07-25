@@ -1,31 +1,53 @@
 
-When starting a new frame
+During compilation
+  Potentially add CheckToUseMemoizedFrame after a Push insn.
+  Potentially add MemoizeFrame right before Done insn.
 
-  Bytecode may have a flag - enable memoization check
+During bytecode
+  CheckToUseMemoizedFrame
+    This op will lookahead in a special mode - only looking at Input instructions.
+      If there is no memoized frame
+        Check fails immediately.
+      Check branch pointer, if it doens't match then fail.
+      For each instruction, do strict_equals
+        If any fail, check fails.
+      If memoize check fails, dealloc the saved frame (if any), and continue.
+      If memoize check passes
+        Skip ahead and run Output instructions in special mode.
+        Pull outputs from memoized frame instead of real frame.
+        (Alternately could just push memoized frame and then proceed, but this would
+         be impure on frame.parentPc and frame.pos, etc)
+        Control continues as normal starting from the PopFrame insn.
 
-  If memoization-check is on
-    When populating inputs
-      equals-check each incoming input
-      If all are equal
-        Restore the saved frame
-      If any inputs are inequal
-        Trash the saved frame
+  MemoizeFrame
+    Save the top frame in parent's retained list.
+      Just set Frame.retain to true and allow the rest of the work to happen in finish_frame?
 
-When evaluating a function
-  Function may include the MemoizeFrame bytecode.
-  For 1st pass, this will only occur with a FireNative op.
+  push_frame - Must always check for a retained frame.
 
-On MemoizeFrame
-  Interpreter saves current frame (modifies parent frame's saved-expansion list)
-  Walk up entire stack, modify calling bytecode for each frame to enable the memoization-check
+frame A
+  frame B
+    frame C
+      frame D
 
-When finishing a frame
-  A memoized frame should not be deleted.
+1) frame D activates MemoizeFrame
+2) stores a link to memo(D) inside C.retained
+3) when C finishes, store a link on B?
 
-The following instructions can push a frame, and thus need a memoization-check flag.
-  CallBlock
-  DynamicMethodCall
-  CaseBlock
-  ForLoop
-  FuncCall
-  FuncApply
+Frame
+  List retained
+  bool retain
+
+-- Retain support --
+
+Make sure that intermediate registers are deleted
+
+-- TODO items --
+
+Create equals_strict() function, used during memoization check.
+  Q of whether to have a slot on Type? Thinking probably not; equals_strict can just
+    switch over known builtin types.
+
+Cleanup: deprecate frame_current_term and frame.pc
+
+Add retain support on Frame

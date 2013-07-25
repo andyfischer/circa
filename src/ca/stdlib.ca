@@ -44,6 +44,9 @@ def has_effects()
 def native_patch(String filename)
     -- Declare that this block should be patched by a native module.
 
+def memoize()
+    -- Instruct the VM to memoize the current frame.
+
 def declared_state(state any val, Type t, Func initializer :optional) -> any
     if val != null
         -- Try to cast to the desired type
@@ -244,6 +247,8 @@ def Stack.call(self, any inputs :multiple) -> any
 def Stack.apply(self, List inputs) -> any
 def Stack.push_frame(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
+def Stack.push_frame2(self, Func func)
+    self.push_frame(func.block, [])
 def Stack.pop_frame(self)
     -- Pop the topmost frame.
 def Stack.set_state_input(self, any)

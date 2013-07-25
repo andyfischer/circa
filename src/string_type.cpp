@@ -180,7 +180,6 @@ bool string_equals(caValue* left, caValue* right)
     else
         string_copy(NULL, right, left);
 
-
     return true;
 }
 
