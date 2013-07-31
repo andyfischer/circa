@@ -8,7 +8,7 @@ namespace actor_test {
 
 void inject()
 {
-
+    // There was once stuff here.
 }
 
 void register_tests()

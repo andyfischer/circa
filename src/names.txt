@@ -201,7 +201,7 @@ tok_Comment
 tok_Eof
 tok_Unrecognized
 
-# Bytecode ops
+# Bytecode ops (deprecated)
 op_NoOp
 op_Pause
 op_SetNull
@@ -230,6 +230,11 @@ OutputsToList
 Multiple
 Cast
 DynamicMethodOutput
+
+# Frame call types
+NormalCall
+FuncApply
+FuncCall
 
 # Performance stats
 FirstStatIndex

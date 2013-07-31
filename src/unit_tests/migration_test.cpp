@@ -199,6 +199,7 @@ void stack_migration_deletes_block()
 
 void register_tests()
 {
+#if 0 // Old migration DISABLED
     REGISTER_TEST_CASE(migration_test::translate_terms);
     REGISTER_TEST_CASE(migration_test::update_references);
     REGISTER_TEST_CASE(migration_test::term_ref_values);
@@ -207,6 +208,7 @@ void register_tests()
     REGISTER_TEST_CASE(migration_test::translate_terms_type);
     REGISTER_TEST_CASE(migration_test::bug_with_migration_and_stale_pointer);
     REGISTER_TEST_CASE(migration_test::stack_migration_deletes_block);
+#endif
 }
 
 }

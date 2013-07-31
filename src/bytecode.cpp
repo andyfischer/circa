@@ -62,15 +62,16 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "push_nested ");
         string_append(string, blob_read_int(bcData, pos));
         break;
-    case bc_DynamicMethodCall:
-        set_string(string, "dyn_method");
-        break;
-    case bc_FuncCall:
-        set_string(string, "func_call ");
+    case bc_PushDynamicMethod:
+        set_string(string, "push_dyn_method ");
         string_append(string, blob_read_int(bcData, pos));
         break;
-    case bc_FuncApply:
-        set_string(string, "func_apply ");
+    case bc_PushFuncCall:
+        set_string(string, "push_func_call ");
+        string_append(string, blob_read_int(bcData, pos));
+        break;
+    case bc_PushFuncApply:
+        set_string(string, "push_func_apply ");
         string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_FireNative:
@@ -140,6 +141,9 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "push_input_from_apply_list ");
         string_append(string, blob_read_int(bcData, pos));
         break;
+    case bc_PushInputsDynamic:
+        set_string(string, "push_inputs_dynamic");
+        break;
     case bc_NotEnoughInputs:
         set_string(string, "not_enough_inputs");
         break;
@@ -155,6 +159,9 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
     case bc_PopOutputNull:
         set_string(string, "pop_output_null ");
         string_append(string, blob_read_int(bcData, pos));
+        break;
+    case bc_PopOutputsDynamic:
+        set_string(string, "pop_outputs_dynamic");
         break;
     case bc_UseMemoizedOnEqualInputs:
         set_string(string, "use_memoized_on_equal_inputs");
@@ -291,24 +298,25 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     // 'referenceTargetBlock' is a block that describes the expected inputs & outputs.
     // It might be the exact block that will actually be pushed (such as for PushNested),
     // or it might just be a block that resembles what will be pushed at runtime (such as
-    // for PushCase).
+    // for PushCase). It also might not be known at all, in the case of dynamic dispatch
+    // (Closure calls and dynamic_method), in which case it will remain NULL.
     Block* referenceTargetBlock = NULL;
 
     if (term->function == FUNCS.func_call) {
-        referenceTargetBlock = function_contents(term->function);
-        blob_append_char(bytecode, bc_FuncCall);
+        referenceTargetBlock = NULL;
+        blob_append_char(bytecode, bc_PushFuncCall);
         blob_append_int(bytecode, term->index);
     }
 
     else if (term->function == FUNCS.func_apply) {
-        referenceTargetBlock = function_contents(term->function);
-        blob_append_char(bytecode, bc_FuncApply);
+        referenceTargetBlock = NULL;
+        blob_append_char(bytecode, bc_PushFuncApply);
         blob_append_int(bytecode, term->index);
     }
     
     else if (term->function == FUNCS.dynamic_method) {
-        referenceTargetBlock = function_contents(term->function);
-        blob_append_char(bytecode, bc_DynamicMethodCall);
+        referenceTargetBlock = NULL;
+        blob_append_char(bytecode, bc_PushDynamicMethod);
         blob_append_int(bytecode, term->index);
     }
 
@@ -353,9 +361,6 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
     bytecode_write_input_instructions(bytecode, term, term->function, referenceTargetBlock);
 
-    if (block_contains_memoize(referenceTargetBlock))
-        blob_append_char(bytecode, bc_UseMemoizedOnEqualInputs);
-
     blob_append_char(bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(bytecode, term, referenceTargetBlock);
     blob_append_char(bytecode, bc_PopFrame);
@@ -384,6 +389,17 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
 void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Term* function, Block* block)
 {
+    if (!is_blob(bytecode))
+        set_blob(bytecode, 0);
+
+    if (block != NULL && block_contains_memoize(block))
+        blob_append_char(bytecode, bc_UseMemoizedOnEqualInputs);
+
+    if (block == NULL) {
+        return blob_append_char(bytecode, bc_PushInputsDynamic);
+        return;
+    }
+
     if (function == FUNCS.func_call) {
         // TODO: Add bc that does dynamic inputs.
         return;
@@ -394,24 +410,7 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Term* fu
         return;
     }
 
-    // TODO: remove inputsFromList
-    bool inputsFromList = function == FUNCS.func_apply;
-
     int callerInputIndex = 0;
-    int applyListIndex = 0;
-    int unboundInputIndex = 0;
-    int incomingStateIndex = -1;
-
-    // Check if the caller has a :state input.
-    for (int i=0; i < caller->numInputs(); i++) {
-        if (term_get_bool_input_prop(caller, i, "state", false)) {
-            incomingStateIndex = i;
-            break;
-        }
-    }
-
-    if (function == FUNCS.func_call)
-        callerInputIndex = 1;
 
     for (int placeholderIndex=0;; placeholderIndex++) {
         Term* input = block->getSafe(placeholderIndex);
@@ -419,41 +418,24 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Term* fu
         if (input == NULL)
             break;
 
-        if (callerInputIndex == incomingStateIndex)
-            callerInputIndex++;
-
         if (input->function == FUNCS.input) {
             if (input->boolProp("multiple", false)) {
+
+                // Consume remaining arguments into a vararg list.
 
                 blob_append_char(bytecode, bc_PushVarargList);
                 blob_append_int(bytecode, callerInputIndex);
                 blob_append_int(bytecode, placeholderIndex);
                 callerInputIndex = caller->numInputs();
 
-            } else if (input->boolProp("state", false)) {
-
-                if (incomingStateIndex == -1) {
-                    // Caller has no :state input. TODO: Pull it through magic.
-                    blob_append_char(bytecode, bc_PushInputNull);
-                    blob_append_int(bytecode, input->index);
-                } else {
-                    blob_append_char(bytecode, bc_PushInputFromStack);
-                    blob_append_int(bytecode, incomingStateIndex);
-                    blob_append_int(bytecode, placeholderIndex);
-                }
-
             } else {
 
-                if (callerInputIndex >= caller->numInputs() && !inputsFromList) {
+                if (callerInputIndex >= caller->numInputs()) {
                     blob_append_char(bytecode, bc_NotEnoughInputs);
                     break;
                 }
 
-                if (inputsFromList) {
-                    blob_append_char(bytecode, bc_PushInputFromApplyList);
-                    blob_append_int(bytecode, applyListIndex);
-                    applyListIndex++;
-                } else if (caller->input(callerInputIndex) == NULL) {
+                if (caller->input(callerInputIndex) == NULL) {
                     blob_append_char(bytecode, bc_PushInputNull);
                     blob_append_int(bytecode, input->index);
                     callerInputIndex++;
@@ -464,21 +446,22 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Term* fu
                     callerInputIndex++;
                 }
             }
-        } else if (input->function == FUNCS.unbound_input) {
-            blob_append_char(bytecode, bc_PushInputFromClosure);
-            blob_append_int(bytecode, unboundInputIndex);
-            unboundInputIndex++;
         } else {
             break;
         }
     }
 
-    if ((callerInputIndex + 1 < caller->numInputs()) && !inputsFromList)
+    if ((callerInputIndex + 1 < caller->numInputs()))
         blob_append_char(bytecode, bc_TooManyInputs);
 }
 
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 {
+    if (block == NULL) {
+        blob_append_char(bytecode, bc_PopOutputsDynamic);
+        return;
+    }
+
     int outgoingStateIndex = -1;
 
     // Check if the block has a :state output.
@@ -529,7 +512,6 @@ void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* 
         }
     }
 }
-
 
 void bytecode_write_block(caValue* bytecode, Block* block)
 {

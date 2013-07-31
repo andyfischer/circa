@@ -48,8 +48,10 @@ void find_open_state_result_for_nested_return()
 
 void register_tests()
 {
+#if 0 // Old state disabled
     REGISTER_TEST_CASE(stateful_code_test::state_output_routing);
     REGISTER_TEST_CASE(stateful_code_test::find_open_state_result_for_nested_return);
+#endif
 }
 
 }

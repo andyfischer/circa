@@ -408,17 +408,13 @@ int main(int argc, char** argv)
 {
     hashtable_test::register_tests();
 
-    // TEMP
-    interpreter_test::register_tests();
-    tagged_value_test::register_tests();
-#if 0
     actor_test::register_tests();
     block_test::register_tests();
     building_test::register_tests();
     c_objects_test::register_tests();
     code_iterator_test::register_tests();
-    compound_type_test::register_tests();
     control_flow_test::register_tests();
+    compound_type_test::register_tests();
     fakefs_test::register_tests();
     file_test::register_tests();
     file_watch_test::register_tests();
@@ -434,11 +430,11 @@ int main(int argc, char** argv)
     path_expression_test::register_tests();
     source_repro_test::register_tests();
     stateful_code_test::register_tests();
-    string_test::register_tests();
     symbol_test::register_tests();
+    tagged_value_test::register_tests();
+    string_test::register_tests();
     tokenizer_test::register_tests();
     type_test::register_tests();
-#endif
 
     caWorld* world = circa_initialize();
 

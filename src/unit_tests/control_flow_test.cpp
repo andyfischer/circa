@@ -92,7 +92,7 @@ void register_tests()
     REGISTER_TEST_CASE(control_flow_test::simple_get_exit_rank);
     REGISTER_TEST_CASE(control_flow_test::has_control_flow_prop);
     REGISTER_TEST_CASE(control_flow_test::test_find_block_that_exit_point_will_reach);
-    REGISTER_TEST_CASE(control_flow_test::test_recursion_with_state);
+    //REGISTER_TEST_CASE(control_flow_test::test_recursion_with_state);
 }
 
 }

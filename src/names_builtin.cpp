@@ -207,6 +207,9 @@ const char* builtin_symbol_to_string(int name)
     case sym_Multiple: return "Multiple";
     case sym_Cast: return "Cast";
     case sym_DynamicMethodOutput: return "DynamicMethodOutput";
+    case sym_NormalCall: return "NormalCall";
+    case sym_FuncApply: return "FuncApply";
+    case sym_FuncCall: return "FuncCall";
     case sym_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";
@@ -478,6 +481,14 @@ int builtin_symbol_from_string(const char* str)
     case 'c':
     switch (str[4]) {
     default: return -1;
+    case 'A':
+        if (strcmp(str + 5, "pply") == 0)
+            return sym_FuncApply;
+        break;
+    case 'C':
+        if (strcmp(str + 5, "all") == 0)
+            return sym_FuncCall;
+        break;
     case 't':
     switch (str[5]) {
     default: return -1;
@@ -684,6 +695,10 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     case 0:
             return sym_No;
+    case 'r':
+        if (strcmp(str + 3, "malCall") == 0)
+            return sym_NormalCall;
+        break;
     case 't':
         if (strcmp(str + 3, "EnoughInputs") == 0)
             return sym_NotEnoughInputs;

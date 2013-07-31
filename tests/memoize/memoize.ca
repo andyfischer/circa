@@ -1,0 +1,18 @@
+
+def f(int i)
+    print('called f(' i ')')
+    memoize()
+
+def g()
+    print('called g()')
+    f(3)
+
+int = make_stack()
+int.push_frame2(g)
+
+print('pass 1: ')
+int.run
+
+print('pass 2: ')
+int.restart
+int.run

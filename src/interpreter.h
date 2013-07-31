@@ -37,6 +37,7 @@ struct Frame
 
     // List of expansions, each corresponds to a term.
     FrameId* expansions;
+    int expansionsSize;
 
     // Source block
     Block* block;
@@ -54,6 +55,9 @@ struct Frame
 
     // Program counter (bytecode position)
     int pos;
+
+    // Whether this frame was pushed from a normal call, or Func.apply/Func.call.
+    Symbol callType;
 
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
