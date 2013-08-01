@@ -10,7 +10,6 @@ const char* for_loop_get_iterator_name(Term* forTerm);
 Term* for_loop_find_index(Block* contents);
 Term* for_loop_find_output_index(Block* contents);
 
-
 // Initialize the contents of a for-loop for a new term. 'iteratorType' is the type to use
 // for the iterator. If it's NULL then we'll infer a type from the term's input.
 Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType);
@@ -26,9 +25,11 @@ void for_loop_remake_zero_block(Block* forContents);
 
 void start_for_loop(Stack* stack, bool enableLoopOutput);
 
+#if 0
 void finish_while_loop(Term* whileTerm);
 void evaluate_unbounded_loop(caStack*);
 void evaluate_unbounded_loop_finish(caStack*);
+#endif
 
 void loop_setup_functions(Block* kernel);
 

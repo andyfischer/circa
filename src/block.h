@@ -178,9 +178,15 @@ void erase_term(Term* term);
 // Delete the contents of 'block'.
 void clear_block(Block* block);
 
+// Deep copy of a block. Handles the migration of inner term references.
 void duplicate_block(Block* source, Block* dest);
 
+// Compile the string as a statement list. Appends new terms to the block and
+// returns the last new term.
+Term* compile(Block* block, const char* str);
+
 Symbol load_script(Block* block, const char* filename);
+
 void post_module_load(Block* block);
 
 // Create an include() call that loads the given file. Returns the included

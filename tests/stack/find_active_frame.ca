@@ -7,8 +7,8 @@ def func2()
 
     frame = stack.find_active_frame_for_term(term_ref(top_level_binding))
     assert(frame != null)
-    assert(stack.top_frame.parent.parent == frame)
-    assert(stack.top_frame != frame)
+    assert(stack.stack_top.parent.parent == frame)
+    assert(stack.stack_top != frame)
 
 def func1()
     func2()

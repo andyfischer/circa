@@ -10,7 +10,9 @@
 #include "building.h"
 #include "interpreter.h"
 #include "inspection.h"
+#if 0
 #include "stateful_code.h"
+#endif
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -74,6 +76,23 @@ int if_block_count_cases(Block* block)
         if (block->get(i) != NULL && block->get(i)->function == FUNCS.case_func)
             result++;
     return result;
+}
+
+int case_block_get_index(Block* caseBlock)
+{
+    Block* if_block = get_block_for_case_block(caseBlock);
+
+    int index = 0;
+    for (int i=0; i < if_block->length(); i++) {
+        if (if_block->get(i)->nestedContents == caseBlock)
+            return index;
+
+        if (if_block->get(i)->function == FUNCS.case_func)
+            index++;
+    }
+
+    internal_error("case not found in case_block_get_index");
+    return -1;
 }
 
 Term* if_block_add_input(Term* ifBlock, Term* input)
@@ -233,14 +252,17 @@ void if_block_finish_appended_case(Block* block, Term* caseTerm)
 
 void append_state_placeholders_if_needed(Block* block)
 {
+#if 0
     if (!has_state_input(block))
         append_state_input(block);
     if (!has_state_output(block))
         append_state_output(block);
+#endif
 }
 
 void if_block_normalize_state_inputs(Term* ifBlock)
 {
+#if 0
     Block* contents = nested_contents(ifBlock);
 
     // Check if any blocks have a state input
@@ -256,6 +278,7 @@ void if_block_normalize_state_inputs(Term* ifBlock)
     append_state_placeholders_if_needed(contents);
     for (CaseIterator it(contents); it.unfinished(); it.advance())
         append_state_placeholders_if_needed(nested_contents(it.current()));
+#endif
 }
 
 bool if_block_is_name_bound_in_every_case(Block* contents, const char* name)
@@ -415,6 +438,7 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
 
 void modify_block_so_that_state_access_is_indexed(Block* block, int index)
 {
+#if 0
     Term* stateInput = find_state_input(block);
     if (stateInput == NULL)
         return;
@@ -460,6 +484,7 @@ void modify_block_so_that_state_access_is_indexed(Block* block, int index)
     packList->setBoolProp("final", true);
     set_input(stateOutput, 0, packList);
     move_after(packList, stateResult);
+#endif
 }
 
 void finish_if_block(Term* ifBlock)
@@ -479,12 +504,14 @@ void finish_if_block(Term* ifBlock)
     }
 
     // Fix state in each case.
+    #if 0
     int caseIndex = 0;
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         modify_block_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
         caseIndex++;
     }
+    #endif
 
     if_block_turn_common_rebinds_into_outputs(ifBlock);
 

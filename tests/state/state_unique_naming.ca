@@ -12,5 +12,5 @@ def g()
 
 s = null
 g(state = s)
-print(s)
+print(s.extract_state)
   

@@ -68,11 +68,11 @@ void test_assert_function(Block* block, int line, const char* file)
     }
 }
 
-void test_assert_function(Stack& context, int line, const char* file)
+void test_assert_function(Stack* stack, int line, const char* file)
 {
-    if (context.errorOccurred) {
-        std::cout << "Runtime error at " << file << ", line " << line << std::endl;
-        circa_dump_stack_trace(&context);
+    if (stack_errored(stack)) {
+        std::cout << "Stack error caught at " << file << ", line " << line << std::endl;
+        circa_dump_stack_trace(stack);
         declare_current_test_failed();
     }
 }
@@ -397,7 +397,7 @@ namespace native_patch_test { void register_tests(); }
 namespace parser_test { void register_tests(); }
 namespace path_expression_test { void register_tests(); }
 namespace source_repro_test { void register_tests(); }
-namespace stateful_code_test { void register_tests(); }
+namespace state_test { void register_tests(); }
 namespace string_test { void register_tests(); }
 namespace symbol_test { void register_tests(); }
 namespace tagged_value_test { void register_tests(); }
@@ -429,7 +429,7 @@ int main(int argc, char** argv)
     parser_test::register_tests();
     path_expression_test::register_tests();
     source_repro_test::register_tests();
-    stateful_code_test::register_tests();
+    state_test::register_tests();
     symbol_test::register_tests();
     tagged_value_test::register_tests();
     string_test::register_tests();

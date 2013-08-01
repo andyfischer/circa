@@ -1,0 +1,44 @@
+
+Notes on how to reimplement inlined state using saved-frames.
+
+The basic outline:
+
+  There is a special function 'declared_state' whose results are always retained
+    as inlined state.
+  This function is actually a Circa function; there is some logic around using
+    the initializer. But I think it will continue to work.
+  Treating this as a memoized function should work pretty well.
+  Some differences with existing memoize() calls
+    Retention policy is different. If the initializer or type is changed, the existing
+    state should be migrated. (as opposed to memoize frames, which should be reevaluated).
+
+  State is not retained when the codepath becomes inactive (as in a failed if-block check,
+  or an unused for-loop iteration).
+    Considering also doing this for memoize blocks, but not yet implemented.
+    Existing memoize blocks only store 1 frame per for-loop, not N.
+
+  Need to support migration
+    Also a need for memoize blocks (but less important there)
+
+
+Value boxing/unboxing
+  In the current language, there's a useful ability where you can call a function
+  with f(state = s), which captures the function's state as a first-class value.
+  So, you have more control over how the state is being used.
+
+  With the saved-frame approach, we have two choices:
+
+    1) User receives a copy of the frame
+      Pros
+        Less complexity?
+      Cons
+        There isn't much precedent for passing around frames as values.
+          (But, this doesn't sound like a bad thing)
+        Harder to manipulate frame values.
+        Somewhat surprising for newcomers (?)
+    2) We turn the frame into a different representation (maybe a dictionary) and
+         give them that.
+       Pros
+         Easier for newcomers
+       Cones
+         Information loss, such as loss of branch pointer, which will hurt migration.

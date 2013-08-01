@@ -5,7 +5,7 @@ testBlock = {
     def 1
 }
 
-int.push_frame(block_ref(testBlock), [])
+int.stack_push(block_ref(testBlock), [])
 int.run
 
 assert(int.error_message == "Expected identifier after def, found: 1")

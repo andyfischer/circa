@@ -62,7 +62,7 @@ void term_ref_values()
 
     Stack* stack = create_stack(global_world());
 
-    push_frame(stack, &version1);
+    stack_init(stack, &version1);
     run_interpreter(stack);
     stack_restart(stack);
 
@@ -85,25 +85,25 @@ void stack_value()
     Block version1;
     Term* f1 = version1.compile("def f()");
     version1.compile("state int = make_stack()");
-    version1.compile("int.push_frame(f.block, [])");
+    version1.compile("int.stack_push(f.block, [])");
 
     Block version2;
     Term* f2 = version2.compile("def f()");
 
     Stack* stack = create_stack(global_world());
-    push_frame(stack, &version1);
+    stack_init(stack, &version1);
     run_interpreter(stack);
     stack_restart(stack);
 
     caValue* state = stack_find_state_input_register(stack);
 
     Stack* runtimeStack = as_stack(get_field(state, "int"));
-    test_assert(frame_block(top_frame(runtimeStack)) == f1->nestedContents);
+    test_assert(frame_block(stack_top(runtimeStack)) == f1->nestedContents);
 
     migrate_value(state, &version1, &version2);
 
     runtimeStack = as_stack(get_field(state, "int"));
-    test_assert(frame_block(top_frame(runtimeStack)) == f2->nestedContents);
+    test_assert(frame_block(stack_top(runtimeStack)) == f2->nestedContents);
 
     free_stack(stack);
     #endif
@@ -115,7 +115,7 @@ void run_and_migrate_and_run(const char* script1, const char* script2)
     block1.compile(script1);
 
     Stack stack;
-    push_frame(&stack, &block1);
+    stack_init(&stack, &block1);
     run_interpreter(&stack);
 
     Block block2;
@@ -191,7 +191,7 @@ void stack_migration_deletes_block()
     block.compile("a = 1 + 2");
 
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
 
     // This once crashed:
     migrate_stack(&stack, &block, NULL);

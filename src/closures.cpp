@@ -72,7 +72,7 @@ void closure_block_evaluate(caStack* stack)
         if (unbound->function != FUNCS.unbound_input)
             break;
 
-        caValue* input = stack_find_active_value(top_frame_parent(stack), unbound->input(0));
+        caValue* input = stack_find_active_value(stack_top_parent(stack), unbound->input(0));
         if (input == NULL)
             set_null(list_append(bindings));
         else

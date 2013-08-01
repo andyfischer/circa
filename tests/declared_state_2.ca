@@ -4,4 +4,4 @@ def main()
 
 s = null
 main(state = s)
-print(s)
+print(s.extract_state)

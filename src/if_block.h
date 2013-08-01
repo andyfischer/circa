@@ -8,6 +8,7 @@ namespace circa {
 
 // Inspection
 int if_block_count_cases(Block* block);
+int case_block_get_index(Block* block);
 Term* if_block_get_case(Block* block, int index);
 bool is_case_block(Block* block);
 bool is_if_block(Block* block);

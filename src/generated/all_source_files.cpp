@@ -34,6 +34,7 @@
 #include "../repl.cpp"
 #include "../selector.cpp"
 #include "../source_repro.cpp"
+#include "../stack.cpp"
 #include "../stateful_code.cpp"
 #include "../static_checking.cpp"
 #include "../string_repr.cpp"

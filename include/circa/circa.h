@@ -236,7 +236,7 @@ caTerm* circa_caller_term(caStack* stack);
 // Fetch the Block that holds the caller Term.
 caBlock* circa_caller_block(caStack* stack);
 
-caBlock* circa_top_block(caStack* stack);
+caBlock* circa_stack_top_block(caStack* stack);
 
 // -- Tagged Values --
 //

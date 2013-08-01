@@ -252,6 +252,7 @@ caValue* hashtable_get(Hashtable* data, caValue* key)
     return &data->slots[index].value;
 }
 
+
 caValue* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);
@@ -336,8 +337,15 @@ std::string to_string(Hashtable* data)
             strm << ", ";
         first = false;
 
-        strm << circa::to_string(&data->slots[i].key);
-        strm << ": " << circa::to_string(&data->slots[i].value);
+        caValue* key = &data->slots[i].key;
+        caValue* value = &data->slots[i].value;
+
+        if (is_string(key))
+            strm << circa::as_string(key);
+        else
+            strm << circa::to_string(key);
+
+        strm << ": " << circa::to_string(value);
     }
     strm << "}";
     return strm.str();
@@ -396,6 +404,13 @@ caValue* hashtable_get(caValue* table, caValue* key)
 {
     ca_assert(is_hashtable(table));
     return hashtable_get((Hashtable*) table->value_data.ptr, key);
+}
+
+caValue* hashtable_get(caValue* table, const char* keystr)
+{
+    Value str;
+    set_string(&str, keystr);
+    return hashtable_get(table, &str);
 }
 
 caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)

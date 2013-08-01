@@ -9,7 +9,7 @@ testBlock = {
     f()
 }
 
-int.push_frame(block_ref(testBlock), [])
+int.stack_push(block_ref(testBlock), [])
 int.run
 
 print(int.error_message)

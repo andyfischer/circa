@@ -2,6 +2,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "bytecode.h"
 #include "code_iterators.h"
 #include "interpreter.h"
 #include "function.h"
@@ -50,7 +51,7 @@ void refresh_bytecode(Block* block)
         return;
 
     if (is_null(&block->bytecode))
-        write_block_bytecode(block, &block->bytecode);
+        bytecode_write_block(&block->bytecode, block);
 }
 
 } // namespace circa

@@ -9,6 +9,6 @@ def main()
     print(cl.call)
 
 stack = make_stack()
-stack.push_frame(main.block, [])
+stack.stack_push(main.block, [])
 stack.run
 assert(stack.errored)

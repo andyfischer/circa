@@ -76,7 +76,7 @@ void test_custom_object()
     test_equals(g_totalAllocated, 0);
 
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
     run_interpreter(&stack);
     test_assert(&stack);
     circa_clear_stack(&stack);

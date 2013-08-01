@@ -4,6 +4,6 @@ f = {
 }.block
 
 int = make_stack()
-int.push_frame(f [])
+int.stack_push(f [])
 int.run
 assert(int.errored)

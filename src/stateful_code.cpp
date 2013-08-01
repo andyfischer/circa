@@ -51,6 +51,7 @@ static bool term_has_state_input(Term* term)
 
 void check_to_insert_implicit_state_input(Term* term)
 {
+#if 0
     Block* block = term_get_function_details(term);
 
     if (term_has_state_input(term))
@@ -74,6 +75,7 @@ void check_to_insert_implicit_state_input(Term* term)
     insert_input(term, inputIndex, unpack);
     set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
     set_input_hidden(term, inputIndex, true);
+    #endif
 }
 
 void pack_any_open_state_vars(Block* block)
@@ -194,13 +196,16 @@ static void list_inputs_to_pack_state(Block* block, caValue* position, TermList*
     }
 }
 
+#if 0
 static bool should_have_preceeding_pack_state(Term* term)
 {
     return has_escaping_control_flow(term);
 }
+#endif
 
 void block_update_pack_state_calls(Block* block)
 {
+#if 0
     if (block->stateType == NULL) {
         // No state type, make sure there's no pack_state call.
         // TODO: Handle this case properly (should search and destroy an existing pack_state call)
@@ -248,6 +253,7 @@ void block_update_pack_state_calls(Block* block)
             }
         }
     }
+#endif
 }
 
 void list_visible_declared_state(Block* block, TermList* output)
@@ -357,9 +363,8 @@ void pack_state(caStack* stack)
 
 void declared_state_format_source(caValue* source, Term* term)
 {
-    if (!term->boolProp("syntax:stateKeyword", false)) {
+    if (!term->boolProp("syntax:stateKeyword", false))
         return format_term_source_default_formatting(source, term);
-    }
 
     append_phrase(source, "state ", term, tok_State);
 
@@ -374,8 +379,10 @@ void declared_state_format_source(caValue* source, Term* term)
     Term* defaultValue = NULL;
     Block* initializer = NULL;
 
-    if (term->input(2) != NULL)
-        initializer = term->input(2)->nestedContents;
+    Term* initializerInput = term->input(1);
+
+    if (initializerInput != NULL)
+        initializer = initializerInput->nestedContents;
 
     if (initializer != NULL) {
         defaultValue = initializer->getFromEnd(0)->input(0);

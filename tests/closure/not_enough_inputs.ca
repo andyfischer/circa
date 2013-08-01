@@ -1,6 +1,6 @@
 
 int = make_stack()
-int.push_frame({
+int.stack_push({
 
     cl = {
         output([input() input() input()])

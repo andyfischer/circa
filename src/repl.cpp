@@ -22,17 +22,17 @@ void repl_start(Stack* stack)
 {
     Block* block = fetch_module(stack->world, "main");
     set_bool(&stack->context, false);
-    push_frame(stack, block);
+    stack_init(stack, block);
 }
 
 void repl_run_line(Stack* stack, caValue* line, caValue* output)
 {
-    Block* block = top_block(stack);
+    Block* block = stack_top_block(stack);
     set_list(output, 0);
     caValue* displayRaw = &stack->context;
 
     if (string_eq(line, "exit") || string_eq(line, "/exit")) {
-        pop_frame(stack);
+        stack_pop(stack);
         return;
     }
 
@@ -102,7 +102,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
 
     run_interpreter(stack);
 
-    if (error_occurred(stack)) {
+    if (stack_errored(stack)) {
         set_string(list_append(output), "error: ");
         stack_trace_to_string(stack, list_append(output));
         return;
@@ -111,7 +111,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     // Print results of the last expression
     Term* result = block->get(block->length() - 1);
     if (result->type != TYPES.void_type) {
-        Frame* frame = top_frame(stack);
+        Frame* frame = stack_top(stack);
         std::string s = to_string(stack_find_active_value(frame, result));
         set_string(list_append(output), s.c_str());
     }

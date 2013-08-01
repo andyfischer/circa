@@ -25,6 +25,7 @@
 #include "reflection.h"
 #include "selector.h"
 #include "source_repro.h"
+#include "stack.h"
 #include "stateful_code.h"
 #include "static_checking.h"
 #include "string_repr.h"
@@ -83,7 +84,7 @@ void hosted_assert(caStack* stack)
 
 caValue* find_context_value(caStack* stack, caValue* key)
 {
-    Frame* frame = top_frame(stack);
+    Frame* frame = stack_top(stack);
 
     while (frame != NULL) {
         if (!is_null(&frame->dynamicScope)) {
@@ -121,7 +122,7 @@ void set_context(caStack* stack)
     caValue* key = circa_input(stack, 0);
     caValue* value = circa_input(stack, 1);
 
-    Frame* frame = top_frame_parent(stack);
+    Frame* frame = stack_top_parent(stack);
 
     if (!is_hashtable(&frame->dynamicScope))
         set_hashtable(&frame->dynamicScope);
@@ -752,6 +753,10 @@ void test_oracle_send(caValue* value)
 {
     copy(value, list_append(g_oracleValues));
 }
+caValue* test_oracle_append()
+{
+    return list_append(g_oracleValues);
+}
 void test_oracle_send(int i)
 {
     set_int(list_append(g_oracleValues), i);
@@ -1165,12 +1170,15 @@ void bootstrap_kernel()
     FUNCS.memoize = builtins->get("memoize");
     block_set_evaluation_empty(function_contents(FUNCS.memoize), true);
 
+    // FUNCS.unpack_state = builtins->get("unpack_state");
+
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));
     TYPES.file_signature = as_type(builtins->get("FileSignature"));
     TYPES.func = as_type(builtins->get("Func"));
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
+    frame_setup_type(TYPES.frame);
     TYPES.point = as_type(builtins->get("Point"));
 
     // Fix function_decl now that Func type is available.

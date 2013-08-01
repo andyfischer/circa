@@ -10,6 +10,7 @@ namespace block_test {
 
 void test_state_type()
 {
+#if 0
     Block block;
 
     block.compile("a = 1; b = 2; c = 3");
@@ -23,6 +24,7 @@ void test_state_type()
 
     //test_equals(&block.stateType->parameter, "[[<Type int>, <Type number>], ['a', 'b']]");
     test_equals(&block.stateType->parameter, "[[<Type any>, <Type any>], ['a', 'b']]");
+#endif
 }
 
 void test_erase_term()

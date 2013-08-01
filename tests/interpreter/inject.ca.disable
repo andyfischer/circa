@@ -8,7 +8,7 @@ square = {
 }
 
 int = make_stack
-int.push_frame(square.block)
+int.stack_push(square.block)
 
 int.inject('injected', 'a')
 assert(int.call(null) == 'injected: a')

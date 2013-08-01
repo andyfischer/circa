@@ -1,7 +1,7 @@
 # Prerequisites #
 
- - For just building, GCC and GNU make are required.
- - For testing and development, Python2.6 and Premake4 are required.
+ - For just building, GCC and GNU Make are required.
+ - For testing and development, Python3 and Premake4 are required.
 
 # Build Instructions #
 
@@ -23,16 +23,16 @@ Run: make <optional config> <optional target>
      - (On Windows the suffix is .lib, as in: circa.lib)
 
     command_line
-     - Command-line tool with REPL.
+     - Command-line tool with a REPL.
      - Found at: build/circa_d (debug) or build/circa
      - (On Windows the suffix is .exe, as in: circa.exe)
 
     unit_tests
      - App that runs C++-based unit tests.
      - Found at: build/circa_test or build/circa_test_r (release)
-     - Not recommended to use config=release for unit tests.
+     - Should only be built using config=debug.
 
-Example commands:
+Example command:
 
   make static_lib config=release 
    - Build static library in release mode
@@ -52,18 +52,19 @@ code or doing alternative builds.
   Prebuild
     The python script at tools/ca-prebuild.py serves to create some generated C++
     files located at src/generated. The resulting files are checked in to source
-    control, so that folks can build straight from a clone.
+    control (so that users can build straight from a clone).
 
-    This script needs to be rerun whenever a cpp file is added or removed from
-    /src/functions or /src/types. It also needs to be run when /src/ca/stdlib.ca
-    is changed.
+    This script needs to be rerun whenever:
+      A .cpp file is added or removed from src/functions or src/types
+      Or src/ca/stdlib.ca is changed
+      Or src/names.txt is changed
 
   Makefiles
     The makefiles are generated using premake4. More info on this tool at:
         http://industriousone.com/premake
 
-    The resulting generated makefiles are checked in to source control, so
-    that users can build straight straight from a clone.
+    The resulting generated makefiles are checked in to source control (also
+    so that users can build straight straight from a clone).
 
     Makefiles need to be regenerated whenever a cpp file is added or removed. To
     regenerate the makefiles, run "premake4 gmake".

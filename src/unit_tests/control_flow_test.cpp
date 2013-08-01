@@ -41,7 +41,7 @@ void has_control_flow_prop()
 
     // Inside if-block does too.
     test_assert(true == block_get_bool_prop(
-                find_block_from_path_expression(&block, "f / function=if_block"),
+                find_block_from_path_expression(&block, "f / function=if"),
                 sym_HasControlFlow, false));
 
     Term* returnCall = find_term_from_path_expression(&block, "**/function=return");
@@ -78,12 +78,12 @@ void test_recursion_with_state()
     test_assert(find_block_that_exit_point_will_reach(returnCall) == f);
 
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
 
     run_interpreter(&stack);
 
     Term* stateOutput = find_state_output(&block);
-    caValue* stateValue = frame_register(top_frame(&stack), stateOutput);
+    caValue* stateValue = frame_register(stack_top(&stack), stateOutput);
     test_equals(stateValue, "{_f: {s: 3, _f: {s: 2, _f: {s: 1, _f: {s: 0, _f: null}}}}}");
 }
 

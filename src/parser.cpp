@@ -77,6 +77,7 @@ Term* evaluate(Block* block, ParsingStep step, std::string const& input)
 // This structure stores the syntax hints for list-like syntax. It exists because
 // you usually don't have a comprehension term while you are parsing the list
 // arguments, so you need to temporarily store syntax hints until you create one.
+
 struct ListSyntaxHints {
     List inputs;
 
@@ -133,11 +134,10 @@ void consume_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     Term* parentTerm = block->owningTerm;
 
-    if (tok_LBrace == lookahead_next_non_whitespace(tokens, false)) {
+    if (tok_LBrace == lookahead_next_non_whitespace(tokens, false))
         consume_block_with_braces(block, tokens, context, parentTerm);
-    } else {
+    else
         consume_block_with_significant_indentation(block, tokens, context, parentTerm);
-    }
 
     return;
 }
@@ -1212,6 +1212,7 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(forTerm);
 }
 
+#if 0
 ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -1231,6 +1232,7 @@ ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
     set_source_location(whileTerm, startPosition, tokens);
     return ParseResult(whileTerm);
 }
+#endif
 
 ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 {
@@ -1306,11 +1308,9 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     // Create the declared_state() term.
     Term* result = apply(block, FUNCS.declared_state, TermList(), name.c_str());
 
-    // TODO: Would be better to find this input before apply.
-    check_to_insert_implicit_inputs(result);
     change_declared_type(result, type);
-    set_input(result, 1, type->declaringTerm);
-    set_input(result, 2, initializer);
+    set_input(result, 0, type->declaringTerm);
+    set_input(result, 1, initializer);
     
     result->setBoolProp("syntax:stateKeyword", true);
     if (unknownType)

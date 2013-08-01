@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os,subprocess,sys,re
 import itertools
@@ -29,13 +29,13 @@ class CircaProcess:
 
             (self.stdin, self.stdout) = (self.proc.stdin, self.proc.stdout)
             
-        self.stdin.write(cmd + "\n")
+        self.stdin.write((cmd + "\n").encode('utf-8'))
 
         while True:
             line = self.stdout.readline()
-            if not line or line == ":done\n":
+            if not line or line == b":done\n":
                 return
-            yield line[:-1]
+            yield line.decode('utf-8')[:-1]
 
     def kill(self):
         if self.proc is not None:
@@ -59,14 +59,6 @@ def read_text_file(filename):
     contents = f.read()
     return contents
 
-def read_text_file_as_lines(filename):
-    f = open(filename)
-    while True:
-        line = f.readline()
-        if not line:
-            return
-        yield line[:-1]
-
 def diff_command_against_file(process, command, filename):
     """
     Run the command 'command' as a separate process, and read from stdin. Also,
@@ -78,25 +70,25 @@ def diff_command_against_file(process, command, filename):
     """
 
     if OnlyPrintCommands:
-        print command
+        print(command)
         return
 
     if not os.path.exists(filename):
         expectedOutput = []
     else:
-        expectedOutput = read_text_file_as_lines(filename)
+        expectedOutput = (line[:-1] for line in open(filename))
 
     numLines = 0
 
     try:
         actualOutput = list(process.run(command))
-    except Exception,e:
+    except Exception as e:
         process.kill()
         raise e
 
-    for actualLine,expectedLine in itertools.izip_longest(actualOutput,expectedOutput, fillvalue=""):
+    for actualLine,expectedLine in itertools.zip_longest(actualOutput,expectedOutput, fillvalue=""):
         if expectedLine != actualLine:
-            print "\n".join(actualOutput)
+            print("\n".join(actualOutput))
             return OutputDifference(actualLine, expectedLine, numLines+1)
         numLines += 1
 
@@ -108,7 +100,7 @@ def test_file(process, filename):
     # Diff test
     try:
         diff = diff_command_against_file(process, "file "+filename, filename + ".output")
-    except Exception,e:
+    except Exception as e:
         traceback.print_exc()
         process.kill()
         failures.append(TestFailure(["Exception running file"], filename))
@@ -124,7 +116,7 @@ def test_file(process, filename):
     # Source repro test
     try:
         diff = diff_command_against_file(process, "source_repro "+filename, filename)
-    except Exception,e:
+    except Exception as e:
         traceback.print_exc()
         process.kill()
         failures.append(TestFailure(["Exception running source repro"], filename))
@@ -147,20 +139,39 @@ def list_files_recr(dir):
 def list_directory_contents(dir):
     return [os.path.join(dir, f) for f in os.listdir(dir)]
 
-def run_all_tests():
+class Suite(object):
+    def __init__(self):
+        self.totalCount = 0
+        self.failedTests = []
+        self.totalDisabled = 0
+        self.process = CircaProcess()
 
-    if 'CIRCA_HOME' in os.environ:
-        os.chdir(os.environ['CIRCA_HOME'])
+def run_one_test(suite, file):
+    suite.totalCount += 1
 
-    process = CircaProcess()
+    failed = False
+    try:
+        failures = test_file(suite.process, file)
+        if failures:
+            failed = True
+            print(str(len(failures)) + " failure(s) in "+file+":")
+        for failure in failures:
+            for line in failure.description:
+                print(" "+line)
+    except Exception as e:
+        print("Exception occurred during test:", file)
+        import traceback
+        traceback.print_exc()
+        failed = True
 
-    totalTestCount = 0
-    failedTests = []
-    totalDisabledTests = 0
+    if failed:
+        suite.failedTests.append(file)
+
+def run_all_tests(suite):
 
     # Fetch list of disabled tests
     disabled_test_patterns = []
-    for line in read_text_file_as_lines(TestRoot+'/_disabled_tests'):
+    for line in open(TestRoot+'/_disabled_tests'):
         line = os.path.join(TestRoot, line)
         # print "skip pattern:", line
         disabled_test_patterns.append(re.compile(line))
@@ -174,59 +185,27 @@ def run_all_tests():
         for pat in disabled_test_patterns:
             if pat.match(file):
                 # print 'skipping:', file
-                totalDisabledTests += 1
+                suite.totalDisabled += 1
                 skip = True
                 break
 
         if skip:
             continue
 
-        totalTestCount += 1
-
         if not Quiet:
-            print file
+            print(file)
 
-        failed = False
-        try:
-            failures = test_file(process, file)
-            if failures:
-                failed = True
-                print str(len(failures)) + " failure(s) in "+file+":"
-            for failure in failures:
-                for line in failure.description:
-                    print " "+line
-        except Exception,e:
-            print "Exception occurred during test:", file
-            import traceback
-            traceback.print_exc()
-            failed = True
-
-        if failed:
-            failedTests.append(file)
+        run_one_test(suite, file)
 
     if OnlyPrintCommands:
         return
 
-    print "Ran",totalTestCount,"tests,",len(failedTests),"failed,",totalDisabledTests,"disabled."
-
-    if DumpStats:
-        for line in process.run("dump_stats"):
-            print line
-    
-    if failedTests:
-        print "Failed tests:"
-        for test in failedTests:
-            print "  ", test
-
-        exit(-1)
-
 def accept_output_for_test(file):
-
     outfile = file + '.output'
     command = "file " + file
 
-    print 'Running: '+command
-    print 'Saving results to: '+outfile
+    print('Running: '+command)
+    print('Saving results to: '+outfile)
 
     out = open(outfile, 'w')
 
@@ -234,8 +213,8 @@ def accept_output_for_test(file):
     
     for line in process.run(command):
         if not Quiet:
-            print line
-        out.write(line + '\n')
+            print(line)
+        out.write((line + '\n').encode('utf-8'))
 
 if __name__ == '__main__':
     import optparse
@@ -263,4 +242,26 @@ if __name__ == '__main__':
         accept_output_for_test(options.accept)
         exit(0)
 
-    run_all_tests()
+    if 'CIRCA_HOME' in os.environ:
+        os.chdir(os.environ['CIRCA_HOME'])
+
+    suite = Suite()
+
+    if args:
+        for arg in args:
+            run_one_test(suite, arg)
+    else:
+        run_all_tests(suite)
+
+    print("Ran",suite.totalCount,"tests,",len(suite.failedTests),"failed,",suite.totalDisabled,"disabled.")
+
+    if DumpStats:
+        for line in process.run("dump_stats"):
+            print(line)
+    
+    if suite.failedTests:
+        print("Failed tests:")
+        for test in suite.failedTests:
+            print("  ", test)
+
+        exit(-1)

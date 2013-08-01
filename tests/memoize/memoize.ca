@@ -8,7 +8,7 @@ def g()
     f(3)
 
 int = make_stack()
-int.push_frame2(g)
+int.stack_push2(g)
 
 print('pass 1: ')
 int.run

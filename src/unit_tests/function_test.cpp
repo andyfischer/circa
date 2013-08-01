@@ -23,7 +23,7 @@ void access_function_as_value()
     test_spy_clear();
 
     Stack stack;
-    push_frame(&stack, &block2);
+    stack_init(&stack, &block2);
     run_interpreter(&stack);
 
     caValue* funcValue = list_get(test_spy_get_results(), 0);

@@ -37,7 +37,7 @@ void patch_manually()
     block.compile("test_spy(my_add(1 2))");
 
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -48,8 +48,7 @@ void patch_manually()
     module_patch_function(patch, "my_add", my_add);
     native_patch_apply_patch(patch, &block);
 
-    stack_reset(&stack);
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -77,7 +76,7 @@ void patch_manually_ns()
     native_patch_apply_patch(patch, &block);
 
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -98,7 +97,7 @@ void trigger_change()
     NativePatch* patch = add_native_patch(world, "trigger_change_test");
 
     Stack stack;
-    push_frame(&stack, block);
+    stack_init(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -109,8 +108,7 @@ void trigger_change()
     module_patch_function(patch, "f", my_5);
     native_patch_finish_change(patch);
 
-    stack_reset(&stack);
-    push_frame(&stack, block);
+    stack_init(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -134,7 +132,7 @@ void new_function_patched_by_world()
     block->compile("test_spy(my_add(1 2))");
 
     Stack stack;
-    push_frame(&stack, block);
+    stack_init(&stack, block);
     test_spy_clear();
     run_interpreter(&stack);
 

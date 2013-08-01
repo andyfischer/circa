@@ -321,7 +321,7 @@ void for_loop_fix_state_input(Block* contents)
 
 void start_for_loop(caStack* stack, bool enableLoopOutput)
 {
-    Frame* frame = top_frame(stack);
+    Frame* frame = stack_top(stack);
     Block* contents = frame->block;
 
     // Check if top frame actually contains a for-loop (it might be using the #zero block)
@@ -343,6 +343,7 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
     // Interpreter will run the contents of the block
 }
 
+#if 0
 void finish_while_loop(Term* whileTerm)
 {
     Block* block = nested_contents(whileTerm);
@@ -362,12 +363,13 @@ void evaluate_unbounded_loop(caStack* stack)
         return;
     }
 
-    push_frame(stack, contents);
+    stack_push(stack, contents);
 }
 
 void evaluate_unbounded_loop_finish(caStack* stack)
 {
 }
+#endif
 
 void index_func_postCompile(Term* term)
 {

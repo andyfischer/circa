@@ -28,7 +28,7 @@ void test_cast_first_inputs()
     Term* f = block.compile("def f(T t) -> int { return t.i }");
 
     Stack stack;
-    push_frame(&stack, function_contents(f));
+    stack_init(&stack, function_contents(f));
 
     caValue* in = circa_input((caStack*) &stack, 0);
     circa_set_list(in, 1);
@@ -52,7 +52,7 @@ void run_block_after_additions()
     test_spy_clear();
 
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
 
     run_interpreter(&stack);
 
@@ -100,7 +100,7 @@ void test_directly_call_native_override()
     install_function(&block, "my_func", my_func_override);
 
     Stack stack;
-    push_frame(&stack, function_contents(my_func));
+    stack_init(&stack, function_contents(my_func));
 
     set_int(circa_input(&stack, 0), 5);
     run_interpreter(&stack);
@@ -112,15 +112,14 @@ void bug_stale_bytecode_after_migrate()
     // There was a bug where Stack was holding on to stale bytecode, which caused
     // problems when the Block was migrated.
 
-    Stack stack;
-
     Block version1;
     version1.compile("test_spy(1)");
 
     Block version2;
     version2.compile("test_spy(2)");
 
-    push_frame(&stack, &version1);
+    Stack stack;
+    stack_init(&stack, &version1);
 
     test_spy_clear();
     run_interpreter(&stack);
@@ -145,7 +144,7 @@ void bug_restart_dies_after_code_delete()
     version1.compile("1");
 
     Stack stack;
-    push_frame(&stack, &version1);
+    stack_init(&stack, &version1);
     run_interpreter(&stack);
 
     migrate_stack(&stack, &version1, &version2);
@@ -159,11 +158,11 @@ void test_inject_context()
     Block block;
     block.compile("test_spy(context(:a) + 5)");
 
-    test_spy_clear();
     Stack stack;
-    push_frame(&stack, &block);
+    stack_init(&stack, &block);
 
     set_int(circa_inject_context(&stack, "a"), 5);
+    test_spy_clear();
     run_interpreter(&stack);
 
     test_equals(test_spy_get_results(), "[10]");
@@ -174,14 +173,14 @@ bool g_retainFrameCalledStep2 = false;
 
 void retain_frame_test_thunk_1(caStack* stack)
 {
-    g_retainFrameSaved = top_frame(stack);
-    retain_frame(top_frame(stack));
+    g_retainFrameSaved = stack_top(stack);
+    frame_retain(stack_top(stack));
 }
 
 void retain_frame_test_thunk_2(caStack* stack)
 {
     g_retainFrameCalledStep2 = true;
-    test_assert(top_frame(stack) == g_retainFrameSaved);
+    test_assert(stack_top(stack) == g_retainFrameSaved);
 }
 
 void test_retain_frame()
@@ -197,7 +196,7 @@ void test_retain_frame()
     install_function(&block, "thunk", retain_frame_test_thunk_1);
 
     Stack stack;
-    setup_stack(&stack, &block);
+    stack_init(&stack, &block);
 
     run_interpreter(&stack);
 
@@ -214,6 +213,27 @@ void test_retain_frame()
     run_interpreter(&stack);
 }
 
+void test_that_stack_is_implicitly_restarted_in_run_interpreter()
+{
+    Block block;
+    compile(&block, "test_spy(1)");
+
+    test_spy_clear();
+
+    Stack stack;
+    stack_init(&stack, &block);
+
+    run_interpreter(&stack);
+
+    test_equals(test_spy_get_results(), "[1]");
+
+    run_interpreter(&stack);
+    run_interpreter(&stack);
+    run_interpreter(&stack);
+
+    test_equals(test_spy_get_results(), "[1, 1, 1, 1]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
@@ -224,6 +244,7 @@ void register_tests()
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);
     REGISTER_TEST_CASE(interpreter_test::test_inject_context);
     REGISTER_TEST_CASE(interpreter_test::test_retain_frame);
+    REGISTER_TEST_CASE(interpreter_test::test_that_stack_is_implicitly_restarted_in_run_interpreter);
 }
 
 } // namespace interpreter_test

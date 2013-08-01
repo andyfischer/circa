@@ -33,7 +33,7 @@ void test_require()
     test_spy_clear();
 
     Stack stack;
-    push_frame(&stack, block);
+    stack_init(&stack, block);
     run_interpreter(&stack);
 
     test_assert(&stack);

@@ -8,6 +8,6 @@ def b(a)
     a + 1
 
 int = make_stack()
-int.push_frame(b.block, [1])
+int.stack_push(b.block, [1])
 int.run
 print(int.get_state_output)

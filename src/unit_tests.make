@@ -88,7 +88,7 @@ OBJECTS := \
 	$(OBJDIR)/parser_test.o \
 	$(OBJDIR)/path_expression_test.o \
 	$(OBJDIR)/source_repro_test.o \
-	$(OBJDIR)/stateful_code_test.o \
+	$(OBJDIR)/state_test.o \
 	$(OBJDIR)/string_test.o \
 	$(OBJDIR)/symbol_test.o \
 	$(OBJDIR)/tagged_value_test.o \
@@ -226,7 +226,7 @@ $(OBJDIR)/path_expression_test.o: unit_tests/path_expression_test.cpp
 $(OBJDIR)/source_repro_test.o: unit_tests/source_repro_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/stateful_code_test.o: unit_tests/stateful_code_test.cpp
+$(OBJDIR)/state_test.o: unit_tests/state_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_test.o: unit_tests/string_test.cpp

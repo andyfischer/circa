@@ -69,8 +69,10 @@ namespace implicit_state_function {
 
     void setup(Block* kernel)
     {
+#if 0
         FUNCS.unpack_state = import_function(kernel, (EvaluateFunc) unpack_state,
             "unpack_state(any container, any identifier :meta) -> any");
+#endif
         FUNCS.pack_state = import_function(kernel, (EvaluateFunc) pack_state,
             "pack_state(any val :optional :multiple) -> any");
 

@@ -13,7 +13,7 @@ def frame1()
     call_frame2 = frame2()
 
 int = make_stack()
-int.push_frame(block_ref(frame1), [])
+int.stack_push(block_ref(frame1), [])
 int.run
 
 -- interpreter should now have 'frame1' and 'frame2'
@@ -26,4 +26,4 @@ for Frame frame in int.frames
     print('frame ' index ' parentPc: ' frame.parentPc)
     index += 1
 
-top_frame = int.top_frame
+stack_top = int.stack_top

@@ -100,6 +100,7 @@ OBJECTS := \
 	$(OBJDIR)/repl.o \
 	$(OBJDIR)/selector.o \
 	$(OBJDIR)/source_repro.o \
+	$(OBJDIR)/stack.o \
 	$(OBJDIR)/stateful_code.o \
 	$(OBJDIR)/static_checking.o \
 	$(OBJDIR)/string_repr.o \
@@ -286,6 +287,9 @@ $(OBJDIR)/selector.o: selector.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/source_repro.o: source_repro.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/stack.o: stack.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/stateful_code.o: stateful_code.cpp

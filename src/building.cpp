@@ -1002,6 +1002,19 @@ void update_extra_outputs(Term* term)
 
         if (is_state_input(placeholder))
             extra_output->setBoolProp("state", true);
+
+#if 0
+        if (rebindsInput >= 0) {
+            Term* input = term->input(rebindsInput);
+
+            if (input != NULL) {
+
+                if (input->boolProp("explicitState", false))
+                    extra_output->setBoolProp("explicitState", true);
+
+            }
+        }
+#endif
     }
 
     if (needToUpdatePackState)
@@ -1082,8 +1095,10 @@ void block_finish_changes(Block* block)
     block_update_state_type(block);
 
     // Create an output_placeholder for state, if necessary.
+    #if 0
     if (block_has_inline_state(block))
         append_state_output(block);
+    #endif
 
     // After we are finished creating outputs, update any nested control flow operators.
     update_for_control_flow(block);

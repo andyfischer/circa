@@ -592,6 +592,11 @@ void duplicate_block(Block* source, Block* dest)
     dest->names.remapPointers(newTermMap);
 }
 
+Term* compile(Block* block, const char* str)
+{
+    return parser::compile(block, parser::statement_list, str);
+}
+
 Symbol load_script(Block* block, const char* filename)
 {
     // Store the filename

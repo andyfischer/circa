@@ -166,6 +166,7 @@ namespace value_function {
 void test_spy_clear();
 caValue* test_spy_get_results();
 void test_oracle_clear();
+caValue* test_oracle_append();
 void test_oracle_send(caValue* value);
 void test_oracle_send(int i);
 

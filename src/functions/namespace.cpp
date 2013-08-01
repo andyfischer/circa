@@ -8,7 +8,7 @@ namespace namespace_function {
     void evaluate(caStack* stack)
     {
         Term* caller = (Term*) circa_caller_term(stack);
-        push_frame(stack, nested_contents(caller));
+        stack_push(stack, nested_contents(caller));
     }
 
     void format_source(caValue* source, Term* term)

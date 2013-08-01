@@ -20,11 +20,11 @@ enum BlockSyntax {
 
 struct ParserCxt {
 
-    // Number of open parenthesis on the current expression. This affects whether we'll
+    // Number of open parenthesis in the current expression. (This affects whether we'll
     // consume newlines as part of an expression).
     int openParens;
 
-    // Information about statements in progress.
+    // Stack where each element has information about the statement(s) currently being parsed.
     Value statementStack;
 
     ParserCxt()
@@ -150,5 +150,4 @@ void unquote_and_unescape_string(const char* input, caValue* out);
 void quote_and_escape_string(const char* input, caValue* out);
 
 } // namespace parser
-
 } // namespace circa

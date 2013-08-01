@@ -163,7 +163,7 @@ void type_name_visible_from_module()
     Block* b = load_module_file(global_world(), "b", "b");
 
     Stack stack;
-    push_frame(&stack, b);
+    stack_init(&stack, b);
     test_spy_clear();
     run_interpreter(&stack);
     test_assert(&stack);

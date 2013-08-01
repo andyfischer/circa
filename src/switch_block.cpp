@@ -41,12 +41,12 @@ void evaluate_switch(caStack* stack)
 
         if (succeeds) {
             Block* caseContents = nested_contents(caseTerm);
-            push_frame(context, caseContents);
+            stack_push(context, caseContents);
 
             for (int i=0; i < caseContents->length(); i++) {
                 evaluate_single_term(context, caseContents->get(i));
 
-                  if (error_occurred(context))
+                  if (stack_errored(context))
                       break;
             }
 
@@ -62,7 +62,7 @@ void evaluate_switch(caStack* stack)
                 copy(value, EXTRA_OUTPUT(i));
             }
 
-            pop_frame(context);
+            stack_pop(context);
             break;
         }
     }

@@ -53,7 +53,7 @@ void builtin_symbol_used_in_code()
     Block* f = function_contents(block.compile("def f() -> Symbol { :Unknown }"));
 
     Stack stack;
-    push_frame(&stack, f);
+    stack_init(&stack, f);
     run_interpreter(&stack);
 
     test_equals(circa_output(&stack, 0), ":Unknown");

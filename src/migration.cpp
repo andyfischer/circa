@@ -87,7 +87,7 @@ Block* migrate_block_pointer(Block* block, Migration* migration)
 
 void migrate_stack(Stack* stack, Migration* migration)
 {
-    Frame* frame = top_frame(stack);
+    Frame* frame = stack_top(stack);
 
     while (frame != NULL) {
         // Save state output

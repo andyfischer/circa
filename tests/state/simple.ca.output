@@ -1,0 +1,6 @@
+existing s = 0
+new s = 1
+existing s = 1
+new s = 2
+existing s = 2
+new s = 3
