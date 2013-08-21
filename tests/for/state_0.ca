@@ -5,7 +5,7 @@ def g()
         print('i: ' i)
 
         state s = 0
-        print('  s: ' i)
+        print('  s: ' s)
 
         s += 1
 

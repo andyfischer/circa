@@ -1,5 +1,9 @@
 
 Recent
+  Explicit state didn't work in a function to left of arrow
+
+    f(state = s) -> print
+
   Declared a function called 'add', and the + operator started using it?
 
   load_module should return Func for consistency

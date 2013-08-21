@@ -169,14 +169,14 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
     case bc_MemoizeFrame:
         set_string(string, "memoize_frame");
         break;
-    case bc_UnpackState:
-        set_string(string, "unpack_state");
-        break;
     case bc_PackState:
         set_string(string, "pack_state ");
         string_append(string, blob_read_int(bcData, pos));
         string_append(string, " ");
         string_append(string, blob_read_int(bcData, pos));
+        break;
+    case bc_MaybeNullifyState:
+        set_string(string, "maybe_nullify_state");
         break;
     default:
         set_string(string, "*unrecognized op: ");
@@ -519,41 +519,64 @@ void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* 
     }
 }
 
+void bytecode_write_block_pre_exit(caValue* bytecode, Block* block)
+{
+    bool anyPackState = false;
+
+    // Add a PackState op for each declared_state term.
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term == NULL)
+            continue;
+        if (term->function == FUNCS.declared_state) {
+            Term* stateResult = find_local_name(block, &term->nameValue);
+            ca_assert(stateResult->owningBlock == block);
+            blob_append_char(bytecode, bc_PackState);
+            blob_append_int(bytecode, term->index);
+            blob_append_int(bytecode, stateResult->index);
+            anyPackState = true;
+        }
+    }
+
+    if (!anyPackState && block_get_function_term(block) == FUNCS.case_func)
+        blob_append_char(bytecode, bc_MaybeNullifyState);
+
+    if (block_contains_memoize(block))
+        blob_append_char(bytecode, bc_MemoizeFrame);
+}
+
 void bytecode_write_block(caValue* bytecode, Block* block)
 {
     if (!is_blob(bytecode))
         set_blob(bytecode, 0);
+
+    bool exitAdded = false;
 
     // Check to just trigger a C override.
     if (get_override_for_block(block) != NULL) {
         blob_append_char(bytecode, bc_FireNative);
 
     } else {
+        
         for (int i=0; i < block->length(); i++) {
             Term* term = block->get(i);
             if (term == NULL)
                 continue;
+
+            if (is_exit_point(term)) {
+                bytecode_write_block_pre_exit(bytecode, block);
+                bytecode_write_term_call(bytecode, term);
+                exitAdded = true;
+                break;
+            }
 
             bytecode_write_term_call(bytecode, term);
         }
-
-        // PackState ops for declared_state terms.
-        for (int i=0; i < block->length(); i++) {
-            Term* term = block->get(i);
-            if (term == NULL)
-                continue;
-            if (term->function == FUNCS.declared_state) {
-                Term* stateResult = find_local_name(block, &term->nameValue);
-                ca_assert(stateResult->owningBlock == block);
-                blob_append_char(bytecode, bc_PackState);
-                blob_append_int(bytecode, term->index);
-                blob_append_int(bytecode, stateResult->index);
-            }
-        }
     }
 
-    if (block_contains_memoize(block))
-        blob_append_char(bytecode, bc_MemoizeFrame);
+    if (!exitAdded)
+        bytecode_write_block_pre_exit(bytecode, block);
+
 
     if (is_for_loop(block)) {
         blob_append_char(bytecode, bc_LoopDone);

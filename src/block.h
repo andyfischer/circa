@@ -159,6 +159,7 @@ caValue* block_bytecode(Block* block);
 bool has_nested_contents(Term* term);
 Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);
+Term* block_get_function_term(Block* block);
 
 void remove_nested_contents(Term* term);
 

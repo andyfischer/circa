@@ -15,8 +15,8 @@ t.i = 2
 
 s = null
 t.f(1, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)
 t.f(2, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)
 t.f(3, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)

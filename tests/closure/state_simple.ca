@@ -10,10 +10,15 @@ cl = {
 
 def main() -> int
     state main_state = 1
+    main_state += 1
 
     cl.call(1)
 
 s = null
 result = main(state = s)
 assert(result == 1)
-print('state: ' s)
+print('state = ' s.extract_state)
+
+result = main(state = s)
+assert(result == 2)
+print('state = ' s.extract_state)

@@ -11,7 +11,7 @@ def f() -> List
 
 s = null
 result = f(state = s)
-print('step1, result = ' result ', s = ' s)
+print('step1, result = ' result ', s = ' s.extract_state)
 
 result = f(state = s)
-print('step2, result = ' result ', s = ' s)
+print('step2, result = ' result ', s = ' s.extract_state)

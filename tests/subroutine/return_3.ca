@@ -6,4 +6,5 @@ def f() -> int
 
 s = null
 f(state = s) -> print
-s -> print
+print('s = ' s)
+s.extract_state -> print

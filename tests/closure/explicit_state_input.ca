@@ -2,17 +2,20 @@
 cl = {
     i = input(int)
 
+    print('called cl with: ' i)
+
     state t
 
-    print('initial t is: ' t)
+    print('t is: ' t)
 
     t = 'outgoing'
 
-    'out'
+    return i + 1
 }
 
-s = make(Map)
-@s.set('t', 'incoming_state')
+s = null
 out = cl.apply([1], state = s)
-print('output is: ' out)
-print('final state is: ' s)
+assert(out == 2)
+
+out = cl.apply([2], state = s)
+assert(out == 3)

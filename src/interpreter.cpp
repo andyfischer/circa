@@ -255,6 +255,8 @@ static void retain_stack_top(Stack* stack)
     if (is_null(&parent->state))
         set_list(&parent->state, parent->block->length());
 
+    touch(&parent->state);
+
     caValue* slot = list_get(&parent->state, top->parentPc);
 
     if (top->block->owningTerm->function == FUNCS.case_func) {
@@ -975,7 +977,7 @@ void raise_error_not_enough_inputs(Stack* stack)
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    frame->pc = 0;
+    frame->pc = foundCount;
     set_error_string(frame_register(parent, caller), as_cstring(&msg));
     raise_error(stack);
 }
@@ -1622,8 +1624,10 @@ do_func_apply:
                 toFrame->exitType = sym_Continue;
             else if (op == bc_Break)
                 toFrame->exitType = sym_Break;
-            else if (op == bc_Discard)
+            else if (op == bc_Discard) {
                 toFrame->exitType = sym_Discard;
+                s.frame->retain = false;
+            }
 
             s.frame = stack_top(stack);
             s.pos = s.frame->pos;
@@ -1687,9 +1691,20 @@ do_func_apply:
 
             if (is_null(frameState))
                 set_list(frameState, s.frame->block->length());
+            touch(frameState);
 
             copy(result, list_get(frameState, declaredIndex));
             frame_retain(s.frame);
+            continue;
+        }
+
+        case bc_MaybeNullifyState: {
+            Frame* top = stack_top(stack);
+            Frame* parent = stack_top_parent(stack);
+            if (!top->retain && !is_null(&parent->state)) {
+                caValue* slot = list_get(&parent->state, top->parentPc);
+                set_null(slot);
+            }
             continue;
         }
 
@@ -1707,8 +1722,8 @@ static void push_inputs_dynamic(Stack* stack)
     Term* caller = frame_caller(top);
 
     // If it's a closure call, handle it here.
-    if (caller->function == FUNCS.func_call
-            || caller->function == FUNCS.func_apply) {
+    if (top->callType == sym_FuncCall
+            || top->callType == sym_FuncApply) {
 
         Value copiedInputs;
         caValue* inputs;
@@ -1716,7 +1731,7 @@ static void push_inputs_dynamic(Stack* stack)
         caValue* func = stack_find_active_value(callerFrame, caller->input(0));
         caValue* bindings = list_get(func, 1);
 
-        if (caller->function == FUNCS.func_apply) {
+        if (top->callType == sym_FuncApply) {
             inputs = stack_find_active_value(callerFrame, caller->input(1));
         } else {
             set_list(&copiedInputs, caller->numInputs() - 1);
@@ -1726,7 +1741,6 @@ static void push_inputs_dynamic(Stack* stack)
                 copy(active, list_get(&copiedInputs, i));
             }
         }
-
 
         int placeholderIndex = 0;
 

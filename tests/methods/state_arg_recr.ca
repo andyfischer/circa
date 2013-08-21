@@ -12,8 +12,9 @@ def T.f(self, int i)
 
     if i == 0
         print('doing recursive call..')
-        state nested
-        self.f(5, state = nested)
+        s2 = null
+        self.f(5, state = s2)
+        state nested = s2.extract_state
         print('finished recursive call, nested = ' nested)
 
 
@@ -22,6 +23,6 @@ t.i = 2
 
 s = null
 t.f(0, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)
 t.f(1, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)

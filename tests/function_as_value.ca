@@ -1,7 +1,0 @@
-
-def f() -> int
-  return 5
-
-x = f
-
-print("x() = " x())

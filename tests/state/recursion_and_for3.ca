@@ -17,8 +17,8 @@ def recr(int depth)
 
 s = null
 recr(3, state = s)
-print('after 1st iter: ' s)
+print('after 1st iter: ' s.extract_state)
 recr(3, state = s)
-print('after 2nd iter: ' s)
+print('after 2nd iter: ' s.extract_state)
 recr(3, state = s)
-print('after 3rd iter: ' s)
+print('after 3rd iter: ' s.extract_state)

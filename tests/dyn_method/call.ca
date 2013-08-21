@@ -1,0 +1,7 @@
+
+def func(a, b) -> int
+    return a + b
+
+f = func -> any
+
+assert(f.call(1 2) == 3)

@@ -8,7 +8,7 @@ def check1()
 
 s = null
 check1(state = s)
-print(s)
+print(s.extract_state)
 
 -- Test a function that uses a return value
 def g(int i) -> int
@@ -20,7 +20,7 @@ def check2()
 
 s = null
 check2(state = s)
-print(s)
+print(s.extract_state)
 
 -- Test a function with a returned value and a stateful call
 def h(int i) -> int
@@ -32,4 +32,4 @@ def check3()
 
 s = null
 check3(state = s)
-print(s)
+print(s.extract_state)

@@ -367,6 +367,13 @@ Block* nested_contents(Term* term)
     return make_nested_contents(term);
 }
 
+Term* block_get_function_term(Block* block)
+{
+    if (block->owningTerm == NULL)
+        return NULL;
+    return block->owningTerm->function;
+}
+
 Block* function_contents(Term* func)
 {
     return nested_contents(func);

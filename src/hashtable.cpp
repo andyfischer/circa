@@ -326,8 +326,13 @@ void clear(Hashtable* data)
 std::string to_string(Hashtable* data)
 {
     std::stringstream strm;
-    strm << "{";
     int count = data == NULL ? 0 : data->capacity;
+
+    if (count == 0)
+        return "{}";
+
+    strm << "{";
+
     bool first = true;
     for (int i=0; i < count; i++) {
         if (is_null(&data->slots[i].key))

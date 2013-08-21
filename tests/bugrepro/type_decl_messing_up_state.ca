@@ -12,4 +12,4 @@ def f()
 
 s = null
 f(state = s)
-print(s)
+print(s.extract_state)

@@ -8,8 +8,7 @@ def check1()
 
 s = null
 check1(state = s)
-print(s)
-
+print(s.extract_state)
 
 -- Use state as a predicate to 'if'
 def sbool() -> bool
@@ -22,4 +21,4 @@ def check2()
 
 s = null
 check2(state = s)
-print(s)
+print(s.extract_state)

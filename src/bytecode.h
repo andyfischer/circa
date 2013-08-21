@@ -54,8 +54,8 @@ const char bc_UseMemoizedOnEqualInputs = 0x40;
 const char bc_MemoizeFrame = 0x41;
 
 // Inline state.
-const char bc_UnpackState = 0x50;
 const char bc_PackState = 0x51;
+const char bc_MaybeNullifyState = 0x52;
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);

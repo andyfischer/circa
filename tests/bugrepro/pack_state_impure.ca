@@ -10,8 +10,8 @@ f(state = s)
 
 -- t is a copy of s, it should remain unchanged
 t = s
-print('t (pre)  = ' t)
+print('t (pre)  = ' t.extract_state)
 f(state = s)
 f(state = s)
 f(state = s)
-print('t (post) = ' t)
+print('t (post) = ' t.extract_state)

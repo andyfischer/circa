@@ -105,7 +105,7 @@ bool is_type(caValue* value);
 
 // Unboxing using builtin types.
 bool        as_bool(caValue* value);
-Block*     as_block(caValue* value);
+Block*      as_block(caValue* value);
 const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
 int         as_int(caValue* value);

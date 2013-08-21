@@ -1,0 +1,17 @@
+calling g
+starting loop
+i: 0
+  s: 0
+i: 1
+  s: 0
+i: 2
+  s: 0
+st: {_for: [{s: 1}, {s: 1}, {s: 1}]}
+starting loop
+i: 0
+  s: 1
+i: 1
+  s: 1
+i: 2
+  s: 1
+st: {_for: [{s: 2}, {s: 2}, {s: 2}]}

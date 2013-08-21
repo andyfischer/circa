@@ -172,9 +172,11 @@ def run_all_tests(suite):
     # Fetch list of disabled tests
     disabled_test_patterns = []
     for line in open(TestRoot+'/_disabled_tests'):
+        line = line.strip()
         line = os.path.join(TestRoot, line)
-        # print "skip pattern:", line
+        #print("skip pattern:", line)
         disabled_test_patterns.append(re.compile(line))
+
 
     # Iterate through each test file
     for file in list_files_recr(TestRoot):
@@ -184,7 +186,7 @@ def run_all_tests(suite):
         skip = False
         for pat in disabled_test_patterns:
             if pat.match(file):
-                # print 'skipping:', file
+                #print('skipping:', file)
                 suite.totalDisabled += 1
                 skip = True
                 break
@@ -214,7 +216,7 @@ def accept_output_for_test(file):
     for line in process.run(command):
         if not Quiet:
             print(line)
-        out.write((line + '\n').encode('utf-8'))
+        out.write(line + '\n')
 
 if __name__ == '__main__':
     import optparse
