@@ -323,33 +323,72 @@ void clear(Hashtable* data)
     data->count = 0;
 }
 
+struct HashtableToStringEntry {
+    caValue* key;
+    int valueIndex;
+
+    bool operator<(const HashtableToStringEntry& rhs) const {
+        return string_less_than(key, rhs.key);
+    }
+};
+
 std::string to_string(Hashtable* data)
 {
-    std::stringstream strm;
-    int count = data == NULL ? 0 : data->capacity;
-
-    if (count == 0)
+    if (data == NULL || data->capacity == 0)
         return "{}";
+
+    std::stringstream strm;
+
+    int count = data->capacity;
+    Value keyStrings;
+    set_list(&keyStrings, count);
+
+    for (int i=0; i < count; i++) {
+        caValue* originalKey = &data->slots[i].key;
+        if (is_null(originalKey))
+            continue;
+        
+        caValue* str = list_get(&keyStrings, i);
+
+        if (is_string(originalKey))
+            copy(originalKey, str);
+        else
+            set_string(str, circa::to_string(originalKey));
+    }
+
+    // Short-term solution: use std library for sorting.
+
+    std::vector<HashtableToStringEntry> entryList;
+
+    for (int i=0; i < count; i++) {
+        caValue* str = list_get(&keyStrings, i);
+        if (is_null(str))
+            continue;
+
+        HashtableToStringEntry entry;
+        entry.key = str;
+        entry.valueIndex = i;
+        entryList.push_back(entry);
+    }
+
+    std::sort(entryList.begin(), entryList.end());
 
     strm << "{";
 
     bool first = true;
-    for (int i=0; i < count; i++) {
-        if (is_null(&data->slots[i].key))
+    for (int i=0; i < (int) entryList.size(); i++) {
+        caValue* key = entryList[i].key;
+
+        if (is_null(key))
             continue;
 
         if (!first)
             strm << ", ";
         first = false;
 
-        caValue* key = &data->slots[i].key;
-        caValue* value = &data->slots[i].value;
+        caValue* value = &data->slots[entryList[i].valueIndex].value;
 
-        if (is_string(key))
-            strm << circa::as_string(key);
-        else
-            strm << circa::to_string(key);
-
+        strm << circa::as_string(key);
         strm << ": " << circa::to_string(value);
     }
     strm << "}";
@@ -420,6 +459,7 @@ caValue* hashtable_get(caValue* table, const char* keystr)
 
 caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
 {
+    hashtable_touch(tableTv);
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     int index = hashtable_insert(&table, key, consumeKey);
@@ -430,12 +470,14 @@ caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
 
 caValue* hashtable_insert(caValue* table, caValue* key)
 {
+    hashtable_touch(table);
     return hashtable_insert(table, key, false);
 }
 
 void hashtable_remove(caValue* tableTv, caValue* key)
 {
     ca_assert(is_hashtable(tableTv));
+    hashtable_touch(tableTv);
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     remove(table, key);
 }

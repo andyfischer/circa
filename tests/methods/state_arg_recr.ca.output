@@ -2,6 +2,6 @@ called T.f with: {i: 0}, 0, 0
 doing recursive call..
 called T.f with: {i: 5}, 5, 5
 finished recursive call, nested = {s: 5}
-s = {s: 0, _if: [{nested: {s: 5}, _T.f: {s: 5}}]}
+s = {_if: [{_T.f: {s: 5}, nested: {s: 5}}], s: 0}
 called T.f with: {i: 1}, 1, 1
 s = {s: 1}

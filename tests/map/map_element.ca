@@ -3,8 +3,8 @@ m = make(Map)
 @m.set('a' 1)
 @m.set('b' 2)
 
-assert(to_string(m) == "{'a': 1, 'b': 2}")
+assert(to_string(m) == "{a: 1, b: 2}")
 
 @m.map_element('a', { input() + 5 })
 
-assert(to_string(m) == "{'a': 6, 'b': 2}")
+assert(to_string(m) == "{a: 6, b: 2}")

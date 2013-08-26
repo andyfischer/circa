@@ -355,6 +355,11 @@ int string_length(caValue* s)
     return string_length((StringData*) s->value_data.ptr);
 }
 
+bool string_less_than(caValue* left, caValue* right)
+{
+    return strcmp(as_cstring(left), as_cstring(right)) < 0;
+}
+
 void string_prepend(caValue* result, caValue* prefix)
 {
     Value output;

@@ -7,6 +7,6 @@ def f(int a, int b) -> (int, int)
 
 s = null
 f(4, 5, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)
 f(6, 7, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)

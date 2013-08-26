@@ -2,14 +2,14 @@ reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 1st iter: {s: 6, _for: [{t: 6, _recr: {s: 4, _for: [{t: 4, _recr: {s: 2, _for: [{t: 2, _recr: {s: 0, _for: null}}]}}]}}]}
+after 1st iter: {_for: [{_recr: {_for: [{_recr: {_for: [{t: 2}], s: 2}, t: 4}], s: 4}, t: 6}], s: 6}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 2nd iter: {s: 12, _for: [{t: 12, _recr: {s: 8, _for: [{t: 8, _recr: {s: 4, _for: [{t: 4, _recr: {s: 0, _for: null}}]}}]}}]}
+after 2nd iter: {_for: [{_recr: {_for: [{_recr: {_for: [{t: 4}], s: 4}, t: 8}], s: 8}, t: 12}], s: 12}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 3rd iter: {s: 24, _for: [{t: 24, _recr: {s: 16, _for: [{t: 16, _recr: {s: 8, _for: [{t: 8, _recr: {s: 0, _for: null}}]}}]}}]}
+after 3rd iter: {_for: [{_recr: {_for: [{_recr: {_for: [{t: 8}], s: 8}, t: 16}], s: 16}, t: 24}], s: 24}

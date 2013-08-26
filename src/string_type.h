@@ -36,6 +36,7 @@ bool string_ends_with(caValue* s, const char* str);
 void string_remove_suffix(caValue* s, const char* str);
 char string_get(caValue* s, int index);
 int string_length(caValue* s);
+bool string_less_than(caValue* left, caValue* right);
 void string_prepend(caValue* result, caValue* prefix);
 void string_prepend(caValue* result, const char* prefix);
 void string_slice(caValue* s, int start, int end, caValue* out);

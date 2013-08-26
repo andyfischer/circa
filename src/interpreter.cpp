@@ -229,12 +229,9 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
     return top;
 }
 
-void stack_pop(Stack* stack)
+void stack_pop_no_retain(Stack* stack)
 {
     Frame* frame = stack_top(stack);
-
-    if (frame->retain)
-        retain_stack_top(stack);
 
     set_null(&frame->registers);
     set_null(&frame->customBytecode);
@@ -242,6 +239,16 @@ void stack_pop(Stack* stack)
     set_null(&frame->state);
 
     stack->framesCount--;
+}
+
+void stack_pop(Stack* stack)
+{
+    Frame* frame = stack_top(stack);
+
+    if (frame->retain)
+        retain_stack_top(stack);
+
+    stack_pop_no_retain(stack);
 }
 
 static void retain_stack_top(Stack* stack)
@@ -970,15 +977,17 @@ void raise_error_not_enough_inputs(Stack* stack)
     int foundCount = get_count_of_caller_inputs_for_error(stack);
 
     Value msg;
-    set_string(&msg, "Too few inputs, expected ");
+    set_string(&msg, "Too few inputs: expected ");
     string_append(&msg, expectedCount);
     if (has_variable_args(frame->block))
         string_append(&msg, " (or more)");
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    frame->pc = foundCount;
-    set_error_string(frame_register(parent, caller), as_cstring(&msg));
+    // Discard the top branch.
+    stack_pop_no_retain(stack);
+
+    set_error_string(frame_register(stack_top(stack), caller), as_cstring(&msg));
     raise_error(stack);
 }
 
@@ -992,13 +1001,15 @@ void raise_error_too_many_inputs(Stack* stack)
     int foundCount = get_count_of_caller_inputs_for_error(stack);
 
     Value msg;
-    set_string(&msg, "Too many inputs, expected ");
+    set_string(&msg, "Too many inputs: expected ");
     string_append(&msg, expectedCount);
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    frame->pc = 0;
-    set_error_string(frame_register(parent, caller), as_cstring(&msg));
+    // Discard the top branch.
+    stack_pop_no_retain(stack);
+
+    set_error_string(frame_register(stack_top(stack), caller), as_cstring(&msg));
     raise_error(stack);
 }
 

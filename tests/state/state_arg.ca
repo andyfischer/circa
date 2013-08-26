@@ -5,4 +5,4 @@ def f(int i)
 
 s = null
 f(4, state = s)
-print('s = ' s)
+print('s = ' s.extract_state)
