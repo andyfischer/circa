@@ -71,21 +71,6 @@ void run_block_after_additions()
     test_equals(test_spy_get_results(), "[4, 8]");
 }
 
-void test_evaluate_minimum()
-{
-    // Test that rpath works in evaluate_minimum.
-    test_write_fake_file("dir/block.ca", 1, "x = rpath('path'); y = concat(x, '/more_path')");
-
-    Block* block = load_module_file(global_world(), "test_evaluate_minimum", "dir/block.ca");
-    Term* y = find_local_name(block, "y");
-    test_assert(y != NULL);
-
-    Value value;
-    evaluate_minimum2(y, &value);
-
-    test_equals(&value, "dir/path/more_path");
-}
-
 void my_func_override(caStack* stack)
 {
     set_int(circa_output(stack, 0), circa_int_input(stack, 0) + 10);
@@ -234,11 +219,36 @@ void test_that_stack_is_implicitly_restarted_in_run_interpreter()
     test_equals(test_spy_get_results(), "[1, 1, 1, 1]");
 }
 
+void test_run_section()
+{
+#if 0
+    Block block;
+    Term* a = compile(&block, "test_spy(:a)");
+    Term* b = compile(&block, "test_spy(:b)");
+    Term* c = compile(&block, "test_spy(:c)");
+    Term* d = compile(&block, "test_spy(:d)");
+
+    Stack stack;
+    stack_init(&stack, &block);
+
+    test_spy_clear();
+    stack_run_section(&stack, a->index, b->index);
+    test_equals(test_spy_get_results(), "[:a]");
+
+    test_spy_clear();
+    stack_run_section(&stack, a->index, c->index);
+    test_equals(test_spy_get_results(), "[:a, :b]");
+
+    test_spy_clear();
+    stack_run_section(&stack, c->index, block.length());
+    test_equals(test_spy_get_results(), "[:c, :d]");
+#endif
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
     //REGISTER_TEST_CASE(interpreter_test::run_block_after_additions);
-    //REGISTER_TEST_CASE(interpreter_test::test_evaluate_minimum);
     REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);

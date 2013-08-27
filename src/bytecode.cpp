@@ -238,9 +238,12 @@ void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
 
 void bytecode_dump(caValue* bytecode)
 {
-    circa::Value str;
-    bytecode_to_string(bytecode, &str);
-    printf("%s\n", as_cstring(&str));
+    circa::Value lines;
+    bytecode_to_string_lines(bytecode, &lines);
+
+    for (int i=0; i < list_length(&lines); i++) {
+        std::cout << as_cstring(list_get(&lines, i)) << std::endl;
+    }
 }
 
 void bytecode_dump_next_op(caValue* bytecode, Block* block, int pos)
@@ -576,7 +579,6 @@ void bytecode_write_block(caValue* bytecode, Block* block)
 
     if (!exitAdded)
         bytecode_write_block_pre_exit(bytecode, block);
-
 
     if (is_for_loop(block)) {
         blob_append_char(bytecode, bc_LoopDone);

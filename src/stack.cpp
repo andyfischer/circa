@@ -46,9 +46,8 @@ void frame_copy(Frame* left, Frame* right)
     copy(&left->customBytecode, &right->customBytecode);
     copy(&left->dynamicScope, &right->dynamicScope);
     right->block = left->block;
-    right->blockVersion = left->blockVersion;
+    right->pcIndex = left->pcIndex;
     right->pc = left->pc;
-    right->pos = left->pos;
     right->callType = left->callType;
     right->exitType = left->exitType;
     right->retain = left->retain;

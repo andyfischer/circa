@@ -53,9 +53,6 @@ struct ParseResult {
 typedef ParseResult (*ParsingStep)(Block* block, TokenStream& tokens, ParserCxt* context);
 
 Term* compile(Block* block, ParsingStep step, std::string const& input);
-Term* evaluate(Block* block, ParsingStep step, std::string const& input);
-
-Term* evaluate(Block* block, std::string const& input);
 
 // Parsing steps:
 ParseResult statement_list(Block* block, TokenStream& tokens, ParserCxt* context);

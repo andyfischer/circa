@@ -2,14 +2,14 @@ reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 1st iter: {s: 6, _if_block_1: [{t: 6, _recr: {s: 4, _if_block_1: [{t: 4, _recr: {s: 2, _if_block_1: [{t: 2, _recr: {s: 0, _if_block_1: null}}]}}]}}]}
+after 1st iter: {_if_1: [{_recr: {_if_1: [{_recr: {_if_1: [{t: 2}], s: 2}, t: 4}], s: 4}, t: 6}], s: 6}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 2nd iter: {s: 12, _if_block_1: [{t: 12, _recr: {s: 8, _if_block_1: [{t: 8, _recr: {s: 4, _if_block_1: [{t: 4, _recr: {s: 0, _if_block_1: null}}]}}]}}]}
+after 2nd iter: {_if_1: [{_recr: {_if_1: [{_recr: {_if_1: [{t: 4}], s: 4}, t: 8}], s: 8}, t: 12}], s: 12}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 3rd iter: {s: 24, _if_block_1: [{t: 24, _recr: {s: 16, _if_block_1: [{t: 16, _recr: {s: 8, _if_block_1: [{t: 8, _recr: {s: 0, _if_block_1: null}}]}}]}}]}
+after 3rd iter: {_if_1: [{_recr: {_if_1: [{_recr: {_if_1: [{t: 8}], s: 8}, t: 16}], s: 16}, t: 24}], s: 24}

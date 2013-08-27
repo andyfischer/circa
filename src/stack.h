@@ -33,10 +33,10 @@ struct Frame
     Value dynamicScope;
 
     // Current program counter (term index)
-    int pc;
+    int pcIndex;
 
     // Program counter (bytecode position)
-    int pos;
+    int pc;
 
     // Whether this frame was pushed from a normal call, or Func.apply/Func.call.
     Symbol callType;

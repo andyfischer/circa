@@ -1,4 +1,3 @@
 Error occurred:
-[tests/closure/apply_not_enough_inputs.ca:7,0] Func.apply() | Too few inputs, expected 3, received 2
-(input 2) | null
+[tests/closure/apply_not_enough_inputs.ca:7,9] list() | [1, 2]
 

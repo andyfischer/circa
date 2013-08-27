@@ -411,23 +411,6 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out)
             print_block(term->nestedContents, prefs, out);
             prefs->indentLevel -= 2;
         }
-
-        // Possibly print the closing bytecode op.
-        #if 0
-        if (prefs->showBytecode
-                && term->index == (term->owningBlock->length() - 1)
-                && term->owningBlock != NULL
-                && !is_null(&term->owningBlock->bytecode)
-                ) {
-
-            Block* nested = term->owningBlock;
-
-            for (int i=0; i < prefs->indentLevel; i++)
-                out << " ";
-
-            out << to_string(list_get(&nested->bytecode, nested->length())) << std::endl;
-        }
-        #endif
     }
 
     if (prefs->showBytecode) {

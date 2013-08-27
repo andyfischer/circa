@@ -477,6 +477,7 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Eval mode
     if (string_eq(list_get(args, 0), "-e")) {
+#if 0
         list_remove_index(args, 0);
 
         Value command;
@@ -493,6 +494,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         caValue* result = term_value(mainBlock->eval(as_cstring(&command)));
         std::cout << to_string(result) << std::endl;
+#endif
         return 0;
     }
 

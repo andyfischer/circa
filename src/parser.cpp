@@ -59,19 +59,6 @@ Term* compile(Block* block, ParsingStep step, std::string const& input)
     return result;
 }
 
-Term* evaluate(Block* block, ParsingStep step, std::string const& input)
-{
-    int prevHead = block->length();
-
-    Term* result = compile(block, step, input);
-
-    Stack context;
-
-    evaluate_range(&context, block, prevHead, block->length() - 1);
-
-    return result;
-}
-
 // -------------------------- Utility functions -------------------------------
 
 // This structure stores the syntax hints for list-like syntax. It exists because

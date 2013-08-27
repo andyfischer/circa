@@ -77,6 +77,8 @@ void stack_reset(Stack* stack);
 // values. If there is a state register, feed the output back into its input.
 void stack_restart(Stack* stack);
 
+void stack_restart_at(Stack* stack, int termIndex);
+
 // Clear the error flag, but leave the stack as-is. See also stack_clear_error.
 void stack_ignore_error(Stack* stack);
 
@@ -122,9 +124,6 @@ void run_bytecode(Stack* stack, caValue* bytecode);
 
 // Deprecated
 void evaluate_block(Stack* stack, Block* block);
-
-// Evaluate only the terms between 'start' and 'end'.
-void evaluate_range(Stack* stack, Block* block, int start, int end);
 
 // Evaluate 'term' and every term that it depends on. 
 void evaluate_minimum(Stack* stack, Term* term, caValue* result);

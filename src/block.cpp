@@ -322,12 +322,6 @@ Block::compile(std::string const& code)
     return parser::compile(this, parser::statement_list, code);
 }
 
-Term*
-Block::eval(std::string const& code)
-{
-    return parser::evaluate(this, parser::statement_list, code);
-}
-
 bool is_namespace(Term* term)
 {
     return term->function == FUNCS.namespace_func;
