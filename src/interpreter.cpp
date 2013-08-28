@@ -41,7 +41,6 @@ static Frame* frame_by_index(Stack* stack, int id);
 static Frame* expand_frame(Frame* parent, Frame* top);
 static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index);
 static void retain_stack_top(Stack* stack);
-static void update_stack_for_possibly_changed_blocks(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 static void push_inputs_dynamic(Stack* stack);
 void run(Stack* stack);
@@ -802,31 +801,6 @@ bool stack_errored(Stack* stack)
     return stack->errorOccurred;
 }
 
-static void update_stack_for_possibly_changed_blocks(Stack* stack)
-{
-#if 0
-    for (int frameIndex=0; frameIndex < stack->framesCount; frameIndex++) {
-        
-        Frame* frame = frame_by_index(stack, frameIndex);
-
-        if (frame->block == NULL)
-            continue;
-
-        if (frame->blockVersion == frame->block->version) {
-            // Same version.
-
-            if (frame_register_count(frame) != block_locals_count(frame->block))
-                internal_error("locals count has changed, but version didn't change");
-
-        } else {
-
-            // Resize frame->registers if needed.
-            list_resize(&frame->registers, block_locals_count(frame->block));
-        }
-    }
-#endif
-}
-
 static Block* case_block_choose_block(Stack* stack, Term* term)
 {
     // Find the accepted case
@@ -876,9 +850,6 @@ static void start_interpreter_session(Stack* stack)
 
     // Make sure there are no pending code updates.
     block_finish_changes(topBlock);
-
-    // Check if our stack needs to be updated following block modification
-    update_stack_for_possibly_changed_blocks(stack);
 
     // Cast all inputs, in case they were passed in uncast.
     for (int i=0;; i++) {
