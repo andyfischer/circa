@@ -1,7 +1,7 @@
 
-First-Class Change Events
+### First-Class Change Events ###
 
-8/28/2013
+Plan written on 8/28/2013
 
 OVERVIEW
 
@@ -14,7 +14,7 @@ runtime state.
 Change events should support distributed development, where several clients can work together
 on a shared piece of code by exchanging change messages.
 
-Change events might also be used for an undo system.
+Change events can also be used for an undo system.
 
 MOTIVATION
 
@@ -46,17 +46,25 @@ does not use change events.
 
 CHANGE EVENT DETAILS
 
-There's a variety of change event types. As time goes on we may add more. Here are a few example
-types:
+A ChangeEvent contains the following fields:
+
+ - Change type
+ - Change details
+ - Code target (Block or Term)
+  - Possibly included inside 'change details' because the format of the target may vary per change type.
+ - Optional metadata depending on use case:
+   - Timestamp
+   - Client id (in a multi-user case)
+
+There's a variety of change event types. As time goes on we may add more. Here are a few example change types:
 
   - Rename a single term
   - Replace a block's content using a string expression.
   - Append a string expression to the end of a block
   - A compound list of change events
-    (Should this have different options for transactionality?)
+    - The compound list case introduces some tricky issues, such as how do we validate the Nth event without committing the (N-1)th event, and if an event fails to validate, how do we cleanly rollback the previous events? (needs more spec)
 
-Each change event has a 'target' (such as a Term or a Block), which may be a direct pointer, or
-it may be a name.
+Each change event has a 'target' (such as a Term or a Block), which may be a direct pointer, or it may be a name.
 
 OPERATIONAL TRANSFORM
 
@@ -80,13 +88,14 @@ Applying a change event is a two step process:
 
  1) Validate:
    (world, changeEvent) -> (bool success, validationSummary)
+
  2) Commit:
-   (world, changeEvent, validationSummary, bool generateInverse) -> (inverseChangeEvent?)
+   (world, changeEvent, validationSummary, bool generateInverse) -> (modified world, maybe inverseChangeEvent)
 
 When invoking the validate/commit process, the caller must follow these rules:
 
- 1) No changes to code data may occur after Validate and before Commit. Ideally the Commit
-    step occurs immediately after.
+ 1) No changes to code data may occur after Validate and before Commit. Ideally the Commit step occurs immediately after.
+
  2) The caller may call Validate and then decide never to Commit (even if it passed validation).
 
 The Validate handler is dispatched by the change event type. In this step, the change event is
@@ -101,6 +110,7 @@ data. Some reasons for this restriction are:
  1) In a client-server model, the server is responsible for vetting incoming changes,
     and sending a stream of guaranteed-valid changes to each client. However the server
     might not actually be running the code, so it has no Stack to validate against.
+
  2) In general, to have a sane & predictable system, it's good if the change submission
     process can't error as a result of what stacks may happen to be in progress.
     Creating a Stack should be a private concern.
@@ -117,12 +127,17 @@ performing duplicate work.
 If Validate doesn't fail, Commit immediately follows. The Commit step isn't allowed to fail.
 
 The Commit step is also dispatched by the change event type. It consists of these steps:
-  1) Modify the relevant Blocks and Terms
-    Also perform cascading changes (such as regenerating bytecode)
-  2) Iterate on every allocated Stack to migrate across the change (see 'updating stack data')
 
-Additionally, Commit receives a shouldProduceInverse flag. If enabled, the Commit action
+ 1. Modify the relevant Blocks and Terms
+   - Also perform cascading changes (such as regenerating bytecode)
+ 2. Iterate on every allocated Stack to migrate across the change (see 'updating stack data')
+
+Additionally, Commit receives a generateInverse flag. If enabled, the Commit action
 should output a new change event which is the inverse of the change just performed.
+
+ Q: Will it be a problem for every change event type to know how to generate an inverse?
+
+ A: Probably not; in the easy case, the inverse can simply be a snapshot of affected block(s).
 
 UPDATING STACK DATA
 
@@ -150,9 +165,10 @@ changes must be made.
 
 The first implementation will not support in-progress migration, only migration of finished
 stacks, so we have the following guarantees:
-      - Stacks don't have a PC
-      - Each Stack only has the one top-level frame
-      - Stacks *may* have a tree of saved 'state' frames (for inline state and memoized frames)
+
+ - Stacks don't have a PC
+ - Each Stack only has the one top-level frame
+ - Stacks *may* have a tree of saved 'state' frames (for inline state and memoized frames)
 
 DISTRIBUTED CHANGE EVENTS
 
@@ -168,22 +184,22 @@ any change events that don't come directly from the server.
 
 Pseudocode:
 
- 0) Server has a monotonically-increasing version which all clients know.
- 1) Client creates change event, and validates it locally.
- 2) Client uploads change event to server, with version number attached.
- 3) Server receives change event
- 4) Server possibly transforms event, if it is made against an old version.
+0. Server has a monotonically-increasing version which all clients know.
+1. Client creates change event, and validates it locally.
+2. Client uploads change event to server, with version number attached.
+3. Server receives change event
+4. Server possibly transforms event, if it is made against an old version.
     - Server should maintain a recent history of change events in order to OT changes made
       against older versions.
     - History doesn't need to be very long, the primary purpose is to support changes that
       are received at roughly the same time.
     - The transform step may fail.
- 5) Server validates change event
- 6) If the event fails during OT step or validation step, server informs client that the
+5. Server validates change event
+6. If the event fails during OT step or validation step, server informs client that the
     event is rejected. Client should handle gracefully.
- 7) If accepted, submit event to server's copy of the world, and broadcast the event to all
+7. If accepted, submit event to server's copy of the world, and broadcast the event to all
     listeners.
- 8) Clients receive an event stream directly from server, and apply change events as they
+8. Clients receive an event stream directly from server, and apply change events as they
     are received. These events are (hopefully) guaranteed to always be valid, because the
     server has already vetted them. A validation error here should probably be handled by
     a disconnect/reconnect.
@@ -191,32 +207,45 @@ Pseudocode:
 Model 2 - Client-side prediction
 
 In this model, client immediately submits the change event when it is generated, in order
-to see the effect immediately. The client might need to rollback if the server rejects
-the event.
+to see the effect immediately. It is then submitted to the server as in model 1. The client might need to rollback if the server rejects the event. Additionally, some sort of transform will need to take place if the client receives other events before their event is confirmed. (needs spec)
 
-UNDO-REDO
+UNDO/REDO
 
 Through change events, we can also build an undo/redo system suitable for an editor.
 Here is the outline:
 
  1) When submitting an event, enable the generateInverse flag, and save the inverse
-    event in the undo-list
+    event in the undo-list.
+
  2) When the user hits Undo, pick the event from the top of the undo-list, submit it,
     and save its inverse in the redo-list.
+
+In a more ambitious case, we might be able to have undo/redo in combination with an external
+source of events, such as a remote server. Pseudocode:
+
+ 1. Client does a few actions, which generates an undo list, U = [C1, C2, C3]
+ 2. Client receives a foreign change event from server
+   Q: How does client tell which events came from themselves?
+ 3. Client inserts the foreign event F1 into its history: [F1, C1, C2, C3]
+   (As in, we have one external event at the top of the stack, and then three locally-
+    generated events).
+ 4. Client hits undo key. We now want to apply C1 to the world.
+ 5. Use OT on C1 to bring it across F1, then submit the transformed event.
+
+(Needs more spec)
+
+Notes:
+
+ - In distributed world, each client needs an id so that they can recognize their own events.
+ - Each server-submitted event should also have a client-unique id?
  
 
-C API
+### API ###
 
-// Create specific change events.
-void change_event_make_append(caValue* event, Block* target, const char* str);
+    // Create specific change events:
+    void change_event_make_rename(Value* event, Term* target, const char* newName);
+    void change_event_make_append(Value* event, Block* target, const char* str);
 
-void change_event_submit(caWorld* world, caValue* event, caValue* result);
-
---
-
-Failure?
-  Must have a way of handling event failure
-  Events are transactional. Clean up all changes on failure.
-
---
+    bool change_event_validate(World* world, Value* event, Value* summaryOut);
+    void change_event_commit(World* world, Value* event, Value* summary, Value* inverseOut);
 
