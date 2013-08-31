@@ -25,8 +25,8 @@ struct World {
     // Module information.
     Value moduleSearchPaths;
 
-    Stack* firstRootStack;
-    Stack* lastRootStack;
+    Stack* firstStack;
+    Stack* lastStack;
 
     // Whether the world is currently bootstrapping. Either :Bootstrapping or :Done.
     Symbol bootstrapStatus;

@@ -129,9 +129,6 @@ Block* load_module_file(World* world, const char* moduleName, const char* filena
     update_static_error_list(newBlock);
 
     if (existing != NULL) {
-        // New block starts off with the old block's version, plus 1.
-        newBlock->version = existing->version + 1;
-
         Migration migration;
         migration.oldBlock = existing;
         migration.newBlock = newBlock;

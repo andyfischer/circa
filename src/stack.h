@@ -24,10 +24,6 @@ struct Frame
     // Source block
     Block* block;
 
-    // Which version of the block we are using.
-    // TODO: Remove. (instead, code changes should create different blocks)
-    int blockVersion;
-
     Value customBytecode;
 
     Value dynamicScope;

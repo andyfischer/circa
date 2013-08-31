@@ -37,7 +37,6 @@ namespace circa {
 static Frame* stack_push_blank(Stack* stack);
 static void stack_resize_frame_list(Stack* stack, int newCapacity);
 static Term* frame_current_term(Frame* frame);
-static Frame* frame_by_index(Stack* stack, int id);
 static Frame* expand_frame(Frame* parent, Frame* top);
 static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index);
 static void retain_stack_top(Stack* stack);
@@ -57,8 +56,8 @@ Stack::Stack()
     framesCapacity = 0;
     framesCount = 0;
     frames = NULL;
-    nextRootStack = NULL;
-    prevRootStack = NULL;
+    nextStack = NULL;
+    prevStack = NULL;
 }
 
 Stack::~Stack()
@@ -71,14 +70,14 @@ Stack::~Stack()
     free(frames);
 
     if (world != NULL) {
-        if (world->firstRootStack == this)
-            world->firstRootStack = world->firstRootStack->nextRootStack;
-        if (world->lastRootStack == this)
-            world->lastRootStack = world->lastRootStack->prevRootStack;
-        if (nextRootStack != NULL)
-            nextRootStack->prevRootStack = prevRootStack;
-        if (prevRootStack != NULL)
-            prevRootStack->nextRootStack = nextRootStack;
+        if (world->firstStack == this)
+            world->firstStack = world->firstStack->nextStack;
+        if (world->lastStack == this)
+            world->lastStack = world->lastStack->prevStack;
+        if (nextStack != NULL)
+            nextStack->prevStack = prevStack;
+        if (prevStack != NULL)
+            prevStack->nextStack = nextStack;
     }
 }
 
@@ -93,16 +92,15 @@ Stack* create_stack(World* world)
     Stack* stack = new Stack();
     stack->world = world;
     
-    // Add this Stack as a root stack. TODO for garbage collection, is the ability to
-    // create non-root stacks.
+    // Add to list of stacks in World.
     if (world != NULL) {
-        if (world->firstRootStack == NULL)
-            world->firstRootStack = stack;
-        if (world->lastRootStack != NULL)
-            world->lastRootStack->nextRootStack = stack;
-        stack->prevRootStack = world->lastRootStack;
-        stack->nextRootStack = NULL;
-        world->lastRootStack = stack;
+        if (world->firstStack == NULL)
+            world->firstStack = stack;
+        if (world->lastStack != NULL)
+            world->lastStack->nextStack = stack;
+        stack->prevStack = world->lastStack;
+        stack->nextStack = NULL;
+        world->lastStack = stack;
     }
 
     return stack;
@@ -597,7 +595,12 @@ Term* frame_term(Frame* frame, int index)
     return frame->block->get(index);
 }
 
-static Frame* frame_by_index(Stack* stack, int index)
+int stack_frame_count(Stack* stack)
+{
+    return stack->framesCount;
+}
+
+Frame* frame_by_index(Stack* stack, int index)
 {
     ca_assert(index >= 0);
     ca_assert(index < stack->framesCount);
@@ -875,6 +878,11 @@ void evaluate_block(Stack* stack, Block* block)
 }
 
 void run_interpreter(Stack* stack)
+{
+    stack_run(stack);
+}
+
+void stack_run(Stack* stack)
 {
     if (stack->step == sym_StackFinished)
         stack_restart(stack);
@@ -1844,28 +1852,6 @@ bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, i
 
     return false;
 }
-
-#if 0
-void stack_run_section(Stack* stack, int termStart, int termEnd)
-{
-    start_interpreter_session(stack);
-
-    Value bytecode;
-    set_blob(&bytecode, 0);
-
-    Block* block = stack_top(stack)->block;
-
-    for (int i=termStart; i < termEnd; i++) {
-        Term* term = block->get(i);
-        
-        bytecode_write_term_call(&bytecode, term);
-    }
-
-    blob_append_char(&bytecode, bc_Done);
-
-    run_bytecode(stack, &bytecode);
-}
-#endif
 
 void evaluate_range(Stack* stack, Block* block, int start, int end)
 {

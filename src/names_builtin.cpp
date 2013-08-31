@@ -96,6 +96,8 @@ const char* builtin_symbol_to_string(int name)
     case sym_StorageTypeHandle: return "StorageTypeHandle";
     case sym_StorageTypeHashtable: return "StorageTypeHashtable";
     case sym_StorageTypeObject: return "StorageTypeObject";
+    case sym_ChangeAppend: return "ChangeAppend";
+    case sym_ChangeRename: return "ChangeRename";
     case tok_Identifier: return "tok_Identifier";
     case tok_ColonString: return "tok_ColonString";
     case tok_Integer: return "tok_Integer";
@@ -181,32 +183,6 @@ const char* builtin_symbol_to_string(int name)
     case tok_Comment: return "tok_Comment";
     case tok_Eof: return "tok_Eof";
     case tok_Unrecognized: return "tok_Unrecognized";
-    case op_NoOp: return "op_NoOp";
-    case op_Pause: return "op_Pause";
-    case op_SetNull: return "op_SetNull";
-    case op_InlineCopy: return "op_InlineCopy";
-    case op_CallBlock: return "op_CallBlock";
-    case op_DynamicMethodCall: return "op_DynamicMethodCall";
-    case op_FuncCall: return "op_FuncCall";
-    case op_FuncApply: return "op_FuncApply";
-    case op_FireNative: return "op_FireNative";
-    case op_CaseBlock: return "op_CaseBlock";
-    case op_ForLoop: return "op_ForLoop";
-    case op_ExitPoint: return "op_ExitPoint";
-    case op_Return: return "op_Return";
-    case op_Continue: return "op_Continue";
-    case op_Break: return "op_Break";
-    case op_Discard: return "op_Discard";
-    case op_FinishFrame: return "op_FinishFrame";
-    case op_FinishLoop: return "op_FinishLoop";
-    case op_ErrorNotEnoughInputs: return "op_ErrorNotEnoughInputs";
-    case op_ErrorTooManyInputs: return "op_ErrorTooManyInputs";
-    case sym_LoopProduceOutput: return "LoopProduceOutput";
-    case sym_FlatOutputs: return "FlatOutputs";
-    case sym_OutputsToList: return "OutputsToList";
-    case sym_Multiple: return "Multiple";
-    case sym_Cast: return "Cast";
-    case sym_DynamicMethodOutput: return "DynamicMethodOutput";
     case sym_NormalCall: return "NormalCall";
     case sym_FuncApply: return "FuncApply";
     case sym_FuncCall: return "FuncCall";
@@ -290,10 +266,34 @@ int builtin_symbol_from_string(const char* str)
     case 'C':
     switch (str[1]) {
     default: return -1;
+    case 'h':
+    switch (str[2]) {
+    default: return -1;
     case 'a':
-        if (strcmp(str + 2, "st") == 0)
-            return sym_Cast;
+    switch (str[3]) {
+    default: return -1;
+    case 'n':
+    switch (str[4]) {
+    default: return -1;
+    case 'g':
+    switch (str[5]) {
+    default: return -1;
+    case 'e':
+    switch (str[6]) {
+    default: return -1;
+    case 'A':
+        if (strcmp(str + 7, "ppend") == 0)
+            return sym_ChangeAppend;
         break;
+    case 'R':
+        if (strcmp(str + 7, "ename") == 0)
+            return sym_ChangeRename;
+        break;
+    }
+    }
+    }
+    }
+    }
     case 'o':
     switch (str[2]) {
     default: return -1;
@@ -422,10 +422,6 @@ int builtin_symbol_from_string(const char* str)
             return sym_DirtyStateType;
         break;
     }
-    case 'y':
-        if (strcmp(str + 2, "namicMethodOutput") == 0)
-            return sym_DynamicMethodOutput;
-        break;
     case 'e':
         if (strcmp(str + 2, "fault") == 0)
             return sym_Default;
@@ -514,10 +510,6 @@ int builtin_symbol_from_string(const char* str)
     }
     }
     }
-    case 'l':
-        if (strcmp(str + 2, "atOutputs") == 0)
-            return sym_FlatOutputs;
-        break;
     }
     case 'I':
     switch (str[1]) {
@@ -572,17 +564,9 @@ int builtin_symbol_from_string(const char* str)
             return sym_Keyword;
         break;
     case 'M':
-    switch (str[1]) {
-    default: return -1;
-    case 'a':
-        if (strcmp(str + 2, "ybe") == 0)
+        if (strcmp(str + 1, "aybe") == 0)
             return sym_Maybe;
         break;
-    case 'u':
-        if (strcmp(str + 2, "ltiple") == 0)
-            return sym_Multiple;
-        break;
-    }
     case 'L':
     switch (str[1]) {
     default: return -1;
@@ -618,10 +602,6 @@ int builtin_symbol_from_string(const char* str)
     case 'o':
     switch (str[3]) {
     default: return -1;
-    case 'p':
-        if (strcmp(str + 4, "ProduceOutput") == 0)
-            return sym_LoopProduceOutput;
-        break;
     case 'k':
     switch (str[4]) {
     default: return -1;
@@ -654,23 +634,9 @@ int builtin_symbol_from_string(const char* str)
     }
     }
     case 'O':
-    switch (str[1]) {
-    default: return -1;
-    case 'u':
-    switch (str[2]) {
-    default: return -1;
-    case 't':
-    switch (str[3]) {
-    default: return -1;
-    case 0:
+        if (strcmp(str + 1, "ut") == 0)
             return sym_Out;
-    case 'p':
-        if (strcmp(str + 4, "utsToList") == 0)
-            return sym_OutputsToList;
         break;
-    }
-    }
-    }
     case 'N':
     switch (str[1]) {
     default: return -1;
@@ -983,166 +949,6 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 1, "es") == 0)
             return sym_Yes;
         break;
-    case 'o':
-    switch (str[1]) {
-    default: return -1;
-    case 'p':
-    switch (str[2]) {
-    default: return -1;
-    case '_':
-    switch (str[3]) {
-    default: return -1;
-    case 'C':
-    switch (str[4]) {
-    default: return -1;
-    case 'a':
-    switch (str[5]) {
-    default: return -1;
-    case 's':
-        if (strcmp(str + 6, "eBlock") == 0)
-            return op_CaseBlock;
-        break;
-    case 'l':
-        if (strcmp(str + 6, "lBlock") == 0)
-            return op_CallBlock;
-        break;
-    }
-    case 'o':
-        if (strcmp(str + 5, "ntinue") == 0)
-            return op_Continue;
-        break;
-    }
-    case 'B':
-        if (strcmp(str + 4, "reak") == 0)
-            return op_Break;
-        break;
-    case 'E':
-    switch (str[4]) {
-    default: return -1;
-    case 'x':
-        if (strcmp(str + 5, "itPoint") == 0)
-            return op_ExitPoint;
-        break;
-    case 'r':
-    switch (str[5]) {
-    default: return -1;
-    case 'r':
-    switch (str[6]) {
-    default: return -1;
-    case 'o':
-    switch (str[7]) {
-    default: return -1;
-    case 'r':
-    switch (str[8]) {
-    default: return -1;
-    case 'T':
-        if (strcmp(str + 9, "ooManyInputs") == 0)
-            return op_ErrorTooManyInputs;
-        break;
-    case 'N':
-        if (strcmp(str + 9, "otEnoughInputs") == 0)
-            return op_ErrorNotEnoughInputs;
-        break;
-    }
-    }
-    }
-    }
-    }
-    case 'D':
-    switch (str[4]) {
-    default: return -1;
-    case 'y':
-        if (strcmp(str + 5, "namicMethodCall") == 0)
-            return op_DynamicMethodCall;
-        break;
-    case 'i':
-        if (strcmp(str + 5, "scard") == 0)
-            return op_Discard;
-        break;
-    }
-    case 'F':
-    switch (str[4]) {
-    default: return -1;
-    case 'i':
-    switch (str[5]) {
-    default: return -1;
-    case 'r':
-        if (strcmp(str + 6, "eNative") == 0)
-            return op_FireNative;
-        break;
-    case 'n':
-    switch (str[6]) {
-    default: return -1;
-    case 'i':
-    switch (str[7]) {
-    default: return -1;
-    case 's':
-    switch (str[8]) {
-    default: return -1;
-    case 'h':
-    switch (str[9]) {
-    default: return -1;
-    case 'L':
-        if (strcmp(str + 10, "oop") == 0)
-            return op_FinishLoop;
-        break;
-    case 'F':
-        if (strcmp(str + 10, "rame") == 0)
-            return op_FinishFrame;
-        break;
-    }
-    }
-    }
-    }
-    }
-    case 'u':
-    switch (str[5]) {
-    default: return -1;
-    case 'n':
-    switch (str[6]) {
-    default: return -1;
-    case 'c':
-    switch (str[7]) {
-    default: return -1;
-    case 'A':
-        if (strcmp(str + 8, "pply") == 0)
-            return op_FuncApply;
-        break;
-    case 'C':
-        if (strcmp(str + 8, "all") == 0)
-            return op_FuncCall;
-        break;
-    }
-    }
-    }
-    case 'o':
-        if (strcmp(str + 5, "rLoop") == 0)
-            return op_ForLoop;
-        break;
-    }
-    case 'I':
-        if (strcmp(str + 4, "nlineCopy") == 0)
-            return op_InlineCopy;
-        break;
-    case 'N':
-        if (strcmp(str + 4, "oOp") == 0)
-            return op_NoOp;
-        break;
-    case 'P':
-        if (strcmp(str + 4, "ause") == 0)
-            return op_Pause;
-        break;
-    case 'S':
-        if (strcmp(str + 4, "etNull") == 0)
-            return op_SetNull;
-        break;
-    case 'R':
-        if (strcmp(str + 4, "eturn") == 0)
-            return op_Return;
-        break;
-    }
-    }
-    }
     case 's':
     switch (str[1]) {
     default: return -1;

@@ -1122,7 +1122,6 @@ void block_finish_changes(Block* block)
     refresh_bytecode(block);
 
     block->inProgress = false;
-    block->version++;
 }
 
 Term* find_user_with_function(Term* term, const char* funcName)

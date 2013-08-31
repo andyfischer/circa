@@ -186,9 +186,6 @@ def Block.statements(self) -> List
     -- Return a list of Terms that are statements.
 def Block.terms(self) -> List
     -- Return a list of this block's terms.
-def Block.version(self) -> int
-    -- Return the 'version', which is a monotonically increasing number that is
-    -- incremented whenever the block is modified. Useful for change tracking.
 def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 

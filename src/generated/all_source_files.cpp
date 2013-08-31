@@ -3,6 +3,7 @@
 #include "../building.cpp"
 #include "../bytecode.cpp"
 #include "../c_api.cpp"
+#include "../change_events.cpp"
 #include "../closures.cpp"
 #include "../code_iterators.cpp"
 #include "../control_flow.cpp"

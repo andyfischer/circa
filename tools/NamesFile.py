@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script generates the contents of src/names_builtin.h and src/names_builtin.cpp, using
@@ -8,6 +8,8 @@ In Circa land, a 'name' is an integer that has a human-readable string name. Eac
 converted to and from a string. (these conversion functions are part of what gets
 auto-generated).
 """
+
+import os
 
 SymbolList = 'src/names.txt'
 
@@ -143,18 +145,26 @@ def write_impl(lines):
     lines.append('}')
     lines.append('} // namespace circa')
 
+def read_text_file(path):
+    if not os.path.exists(path):
+        return ""
+    f = open(path, 'r')
+    return f.read()[:-1]
+
 def save(lines, filename):
+    newContents = '\n'.join(lines)
+    if newContents == read_text_file(filename):
+        return
     f = open(filename, 'w')
-    for line in lines:
-        f.write(line + '\n')
-    f.close()
+    f.write(newContents)
+    f.write("\n")
 
-l = []
-write_header(l)
-save(l, GeneratedHeader)
+def regenerate_file():
+    l = []
+    write_header(l)
+    save(l, GeneratedHeader)
 
-l = []
-write_impl(l)
-save(l, GeneratedImpl)
-
+    l = []
+    write_impl(l)
+    save(l, GeneratedImpl)
 

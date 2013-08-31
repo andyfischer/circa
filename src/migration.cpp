@@ -144,11 +144,11 @@ void migrate_world(World* world, Migration* migration)
             migrate_block(term->nestedContents, migration);
     }
 
-    // Update references in every root stack.
-    Stack* rootStack = world->firstRootStack;
+    // Update references in every stack.
+    Stack* rootStack = world->firstStack;
     while (rootStack != NULL) {
         migrate_stack(rootStack, migration);
-        rootStack = rootStack->nextRootStack;
+        rootStack = rootStack->nextStack;
     }
 }
 

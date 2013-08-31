@@ -69,6 +69,7 @@ OBJECTS := \
 	$(OBJDIR)/building.o \
 	$(OBJDIR)/bytecode.o \
 	$(OBJDIR)/c_api.o \
+	$(OBJDIR)/change_events.o \
 	$(OBJDIR)/closures.o \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/control_flow.o \
@@ -194,6 +195,9 @@ $(OBJDIR)/bytecode.o: bytecode.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_api.o: c_api.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/change_events.o: change_events.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/closures.o: closures.cpp

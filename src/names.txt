@@ -111,6 +111,10 @@ StorageTypeHandle
 StorageTypeHashtable
 StorageTypeObject
 
+# Change types
+ChangeAppend
+ChangeRename
+
 # Tokens
 tok_Identifier
 tok_ColonString
@@ -200,36 +204,6 @@ tok_Newline
 tok_Comment
 tok_Eof
 tok_Unrecognized
-
-# Bytecode ops (deprecated)
-op_NoOp
-op_Pause
-op_SetNull
-op_InlineCopy
-op_CallBlock
-op_DynamicMethodCall
-op_FuncCall
-op_FuncApply
-op_FireNative
-op_CaseBlock
-op_ForLoop
-op_ExitPoint
-op_Return
-op_Continue
-op_Break
-op_Discard
-op_FinishFrame
-op_FinishLoop
-op_ErrorNotEnoughInputs
-op_ErrorTooManyInputs
-
-# Other names used in bytecode
-LoopProduceOutput
-FlatOutputs
-OutputsToList
-Multiple
-Cast
-DynamicMethodOutput
 
 # Frame call types
 NormalCall

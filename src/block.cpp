@@ -42,7 +42,6 @@ void assert_valid_block(Block const* obj)
 
 Block::Block()
   : owningTerm(NULL),
-    version(0),
     inProgress(false),
     stateType(NULL)
 {

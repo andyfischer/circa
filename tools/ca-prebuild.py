@@ -1,6 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
+
+import NamesFile
 
 def mkdir(dir):
     if os.path.exists(dir):
@@ -192,3 +194,5 @@ def all_source_files():
 
 write_text_file('src/generated/all_source_files.cpp',
     include_list(all_source_files()))
+
+NamesFile.regenerate_file()

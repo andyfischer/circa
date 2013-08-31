@@ -30,9 +30,9 @@ struct Stack
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
 
-    // Linked list of all root stacks across this world.
-    Stack* prevRootStack;
-    Stack* nextRootStack;
+    // Linked list of all stacks across this world.
+    Stack* prevStack;
+    Stack* nextStack;
 
     // Owning world
     caWorld* world;
@@ -114,11 +114,16 @@ void frame_retain(Frame* frame);
 
 void frame_extract_state(Frame* frame, caValue* output);
 
+Frame* frame_by_index(Stack* stack, int index);
+int stack_frame_count(Stack* stack);
+
 // Retrieve the frame with the given depth.
 Frame* frame_by_depth(Stack* stack, int depth);
 
 // Run the interpreter.
 void run_interpreter(Stack* stack);
+
+void stack_run(Stack* stack);
 
 void run_bytecode(Stack* stack, caValue* bytecode);
 

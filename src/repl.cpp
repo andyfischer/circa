@@ -3,6 +3,8 @@
 #include "common_headers.h"
 
 #include "block.h"
+#include "bytecode.h"
+#include "change_events.h"
 #include "debug.h"
 #include "interpreter.h"
 #include "file_watch.h"
@@ -60,6 +62,10 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
         print_block(block, std::cout);
         return;
     }
+    if (string_eq(line, "/dumpbc")) {
+        bytecode_dump(block_bytecode(block));
+        return;
+    }
     if (string_eq(line, "/stack")) {
         stack_to_string(stack, list_append(output));
         return;
@@ -90,14 +96,16 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     // Append a newline for the benefit of source repro.
     string_append(&expressionText, "\n");
 
-    int previousHead = block->length();
+    int previousBlockLength = block->length();
 
-    parser::compile(block, parser::statement_list, as_cstring(&expressionText));
-    
+    Value changeEvent;
+    Value changeResult;
+    change_event_make_append(&changeEvent, block, &expressionText);
+    change_event_commit(stack->world, &changeEvent, false, &changeResult);
+
     // Run the stack to the new end of the block.
-
     stack_restart(stack);
-    // stack_run_section(stack, previousHead, block->length());
+    stack_run(stack);
 
     if (stack_errored(stack)) {
         set_string(list_append(output), "error: ");
@@ -114,10 +122,8 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     }
 
     if (as_bool(displayRaw)) {
-        for (int i=previousHead; i < block->length(); i++) {
+        for (int i=previousBlockLength; i < block->length(); i++) {
             std::cout << get_term_to_string_extended(block->get(i)) << std::endl;
-            if (nested_contents(block->get(i))->length() > 0)
-                print_block(nested_contents(block->get(i)), std::cout);
         }
     }
 }

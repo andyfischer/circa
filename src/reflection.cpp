@@ -233,14 +233,6 @@ void Block__terms(caStack* stack)
         set_term_ref(circa_index(out, i), block->get(i));
 }
 
-void Block__version(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    if (block == NULL)
-        return circa_output_error(stack, "NULL block");
-    set_int(circa_output(stack, 0), block->version);
-}
-
 void Block__walk_terms(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -691,7 +683,6 @@ void reflection_install_functions(Block* builtins)
         {"Block.property", Block__property},
         {"Block.properties", Block__properties},
         {"Block.terms", Block__terms},
-        {"Block.version", Block__version},
         {"Block.walk_terms", Block__walk_terms},
         {"Term.assign", Term__assign},
         {"Term.asint", Term__asint},

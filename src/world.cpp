@@ -32,8 +32,8 @@ World* alloc_world()
     world->nextTermID = 1;
     world->nextBlockID = 1;
     world->nextStackID = 1;
-    world->firstRootStack = NULL;
-    world->lastRootStack = NULL;
+    world->firstStack = NULL;
+    world->lastStack = NULL;
 
     return world;
 }

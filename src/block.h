@@ -46,9 +46,6 @@ struct Block
     // Points to the Term which owns this block as a value.
     Term* owningTerm;
 
-    // Monotonically increasing version number.
-    int version;
-
     // Whether this block is "in progress". Certain cleanup actions are suspended
     // while in this state.
     bool inProgress;
