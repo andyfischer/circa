@@ -101,11 +101,12 @@ struct BuiltinTypes {
     Type* null;
     Type* opaque_pointer;
     Type* point;
-    Type* term;
+    Type* retained_frame;
     Type* selector;
     Type* stack;
     Type* string;
     Type* symbol;
+    Type* term;
     Type* type;
     Type* void_type;
 };

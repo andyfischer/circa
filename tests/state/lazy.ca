@@ -3,10 +3,11 @@ def lazyCall() -> int
   print('called lazyCall')
   return 0
 
-def run()
+def main()
+  print('called main')
   state s = lazyCall()
 
-s = null
-run(state = s)
-run(state = s)
-run(state = s)
+int = make_stack(main)
+int.run
+int.run
+int.run

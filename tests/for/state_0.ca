@@ -9,9 +9,9 @@ def g()
 
         s += 1
 
-st = null
 print('calling g')
-g(state = st)
-print('st: ' st.extract_state)
-g(state = st)
-print('st: ' st.extract_state)
+int = make_stack(g)
+int.call
+print('state: ' int.extract_state)
+int.call
+print('state: ' int.extract_state)

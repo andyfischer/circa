@@ -1,7 +1,5 @@
 
-int = make_stack()
-
-testBlock = {
+main = {
 
     def f() -> int
         return "hi"
@@ -9,7 +7,7 @@ testBlock = {
     f()
 }
 
-int.stack_push(block_ref(testBlock), [])
+int = make_stack(main)
 int.run
 
 print(int.error_message)

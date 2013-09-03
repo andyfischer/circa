@@ -6,9 +6,9 @@ def f(int i)
 def check1()
   f(3)
 
-s = null
-check1(state = s)
-print(s.extract_state)
+int = make_stack(check1)
+int.call
+print(int.extract_state)
 
 -- Test a function that uses a return value
 def g(int i) -> int
@@ -18,9 +18,9 @@ def g(int i) -> int
 def check2()
   g(8)
 
-s = null
-check2(state = s)
-print(s.extract_state)
+int = make_stack(check2)
+int.call
+print(int.extract_state)
 
 -- Test a function with a returned value and a stateful call
 def h(int i) -> int
@@ -30,6 +30,6 @@ def h(int i) -> int
 def check3()
   h(14)
 
-s = null
-check3(state = s)
-print(s.extract_state)
+int = make_stack(check3)
+int.call
+print(int.extract_state)

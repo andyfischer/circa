@@ -3,6 +3,6 @@ def f()
     if true
         state a = 1
 
-s = null
-f(state = s)
-print('f state: ' s.extract_state)
+int = make_stack(f)
+int.call
+print('f state: ' int.extract_state)

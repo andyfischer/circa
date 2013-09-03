@@ -3,6 +3,6 @@ def f(int i)
   state a = i
   print('a = ' a)
 
-s = null
-f(4, state = s)
-print('s = ' s.extract_state)
+int = make_stack(f)
+int.call(4)
+print('s = ' int.extract_state)

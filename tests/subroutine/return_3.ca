@@ -1,10 +1,9 @@
 
-def f() -> int
+def main() -> int
   state s
   s = 2
   return 3
 
-s = null
-f(state = s) -> print
-print('s = ' s)
-s.extract_state -> print
+int = make_stack(main)
+int.call -> print
+int.extract_state -> print

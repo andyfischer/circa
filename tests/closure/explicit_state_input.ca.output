@@ -1,3 +1,0 @@
-initial t is: incoming_state
-output is: out
-final state is: {t: 'outgoing'}

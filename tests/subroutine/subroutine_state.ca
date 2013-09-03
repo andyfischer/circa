@@ -1,18 +1,18 @@
 
-def f() -> int
+def main() -> int
   state s = 0
   s += 1
   return s
   
-f_state = null
-result = f(state = f_state)
+int = make_stack(main)
+result = int.call
 print('should be 1: ' result)
-print('should be {s: 1}: ' f_state.extract_state)
+print('should be {s: 1}: ' int.extract_state)
 
-result = f(state = f_state)
+result = int.call
 print('should be 2: ' result)
-print('should be {s: 2}: ' f_state.extract_state)
+print('should be {s: 2}: ' int.extract_state)
 
-result = f(state = f_state)
+result = int.call
 print('should be 3: ' result)
-print('should be {s: 3}: ' f_state.extract_state)
+print('should be {s: 3}: ' int.extract_state)

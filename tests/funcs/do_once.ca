@@ -11,9 +11,10 @@ def f()
   if once()
       print("check 2")
 
-s = null
-f(state = s)
-f(state = s)
-f(state = s)
-f(state = s)
-print(s.extract_state)
+int = make_stack(f)
+int.call
+int.call
+int.call
+int.call
+int.call
+print('final state: ' int.extract_state)

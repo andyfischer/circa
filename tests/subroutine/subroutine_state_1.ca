@@ -3,11 +3,11 @@ def f() -> int
   s += 1
   return s
   
-f_state = null
-f(state = f_state)
-result = f(state = f_state)
+int = make_stack(f)
+int.call
+result = int.call
 print('should be 2: ' result)
-result = f(state = f_state)
+result = int.call
 print('should be 3: ' result)
-result = f(state = f_state)
+result = int.call
 print('should be 4: ' result)

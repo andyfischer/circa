@@ -4,6 +4,6 @@
 def f()
   for i in [1 2 3] { state s = i }
 
-s = null
-f(state = s)
-print(s.extract_state)
+int = make_stack(f)
+int.call
+print(int.extract_state)

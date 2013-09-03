@@ -3,22 +3,22 @@ def main()
     s = declared_state(any, { 0 })
     s += 1
 
-s = null
-main(state = s)
-assert(to_string(s) == "{s: 1}")
-main(state = s)
-assert(to_string(s) == "{s: 2}")
-main(state = s)
-assert(to_string(s) == "{s: 3}")
+int = make_stack(main)
+int.call
+assert(to_string(int.extract_state) == "{s: 1}")
+int.call
+assert(to_string(int.extract_state) == "{s: 2}")
+int.call
+assert(to_string(int.extract_state) == "{s: 3}")
 
 def main()
     state s = 0
     s += 1
 
-s = null
-main(state = s)
-assert(to_string(s) == "{s: 1}")
-main(state = s)
-assert(to_string(s) == "{s: 2}")
-main(state = s)
-assert(to_string(s) == "{s: 3}")
+int = make_stack(main)
+int.call
+assert(to_string(int.extract_state) == "{s: 1}")
+int.call
+assert(to_string(int.extract_state) == "{s: 2}")
+int.call
+assert(to_string(int.extract_state) == "{s: 3}")

@@ -204,7 +204,9 @@ def Dict.set(self, String key, any value) -> Dict
 def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
 
-type Frame;
+type Frame { Stack stack, int index }
+type RetainedFrame { Stack stack, Block block, any _state }
+
 def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)
 def Frame.block(self) -> Block
@@ -243,6 +245,7 @@ def Stack.current_term(self) -> Term
     self.stack_top.current_term
 def Stack.dump(self)
     -- Dumps a string representation to stdout.
+def Stack.extract_state(self) -> Map
 def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.inject_context(self, Symbol name, any val)
 def Stack.call(self, any inputs :multiple) -> any

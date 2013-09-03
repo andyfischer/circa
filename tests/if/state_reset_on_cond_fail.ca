@@ -4,12 +4,12 @@ def f(bool b)
         state int i = 0
         i += 1
 
-s = null
-f(true, state = s)
-print(s.extract_state)
-f(true, state = s)
-print(s.extract_state)
-f(false, state = s)
-print(s.extract_state)
-f(true, state = s)
-print(s.extract_state)
+int = make_stack(f)
+int.call(true)
+print(int.extract_state)
+int.call(true)
+print(int.extract_state)
+int.call(false)
+print(int.extract_state)
+int.call(true)
+print(int.extract_state)

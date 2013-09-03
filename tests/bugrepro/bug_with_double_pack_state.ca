@@ -7,8 +7,9 @@ def main()
 
     -- There was a bug where this call would generate an extra pack_state()
     -- call for 'a', causing 'a' to go back to 'first value'.
+    -- (Update 9/2013: Disregard above comment, pack_state was factored out)
     b = g(a)
 
-s = null
-main(state = s)
-print(s.extract_state)
+int = make_stack(main)
+int.run
+print(int.extract_state)

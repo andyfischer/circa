@@ -1,11 +1,10 @@
 
-int = make_stack()
 
 testBlock = {
     def 1
 }
 
-int.stack_push(block_ref(testBlock), [])
+int = make_stack(testBlock)
 int.run
 
 assert(int.error_message == "Expected identifier after def, found: 1")

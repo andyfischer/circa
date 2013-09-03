@@ -66,8 +66,8 @@ def f()
     root.base_loc = [300 300]
     root.step()
 
-s = null
-f(state = s)
-f(state = s)
-f(state = s)
-f(state = s)
+int = make_stack(f)
+int.call
+int.call
+int.call
+int.call

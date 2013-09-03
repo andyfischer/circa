@@ -7,6 +7,6 @@ def f()
 
     state b = 2
 
-s = null
-f(state = s)
-print(s.extract_state)
+int = make_stack(f)
+int.call
+print(int.extract_state)

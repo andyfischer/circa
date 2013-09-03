@@ -1,6 +1,7 @@
 
 -- This repros a bug where the if_block call was messing up the position of the
 -- final 'pack_state' call.
+-- (Update 9/2013: Disregard above comment, pack_state was factored out)
 
 def main()
   state a = 1
@@ -10,6 +11,6 @@ def main()
 
   state b = 3
 
-s = null
-main(state = s)
-print(s.extract_state)
+int = make_stack(main)
+int.run
+print(int.extract_state)

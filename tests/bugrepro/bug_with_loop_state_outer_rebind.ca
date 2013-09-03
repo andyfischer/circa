@@ -9,8 +9,8 @@ def main()
         state s = a
         s += 1
 
-s = null
-main(state = s)
-print(s.extract_state)
-main(state = s)
-print(s.extract_state)
+int = make_stack(main)
+int.run
+print(int.extract_state)
+int.run
+print(int.extract_state)

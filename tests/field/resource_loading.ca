@@ -220,9 +220,8 @@ def main()
       l2 = label(highTempFont highTemp [x + 10, y + 80])
       l3 = label(lowTempFont lowTemp [x + 20, y + 120])
 
-s = null
-
 -- Run three times
-main(state = s)
-main(state = s)
-main(state = s)
+int = make_stack(main)
+int.call
+int.call
+int.call

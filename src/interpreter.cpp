@@ -45,6 +45,8 @@ static void push_inputs_dynamic(Stack* stack);
 void run(Stack* stack);
 bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, int* pc);
 static int for_loop_find_index_value(Frame* frame);
+void extract_state(Block* block, caValue* state, caValue* output);
+static void retained_frame_extract_state(caValue* frame, caValue* output);
 
 Stack::Stack()
  : errorOccurred(false),
@@ -152,11 +154,15 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
     int nextIncomingClosure = 0;
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        if (term->function == FUNCS.unbound_input) {
-            copy(list_get(closedValues, nextIncomingClosure),
-                frame_register(stack_top(stack), term));
-            nextIncomingClosure++;
-        }
+        if (term->function != FUNCS.unbound_input)
+            continue;
+
+        if (nextIncomingClosure >= list_length(closedValues))
+            break;
+
+        copy(list_get(closedValues, nextIncomingClosure),
+            frame_register(stack_top(stack), term));
+        nextIncomingClosure++;
     }
 }
 
@@ -204,13 +210,12 @@ static Frame* expand_frame(Frame* parent, Frame* top)
         // Found non-null state for this parentPc.
         caValue* state = list_get(&parent->state, top->parentPc);
 
-        if (is_frame(state)
+        if (is_retained_frame(state)
                 // Don't expand state on calls from within declared_state.
                 && (parent->block->owningTerm != FUNCS.declared_state)) {
 
-            Frame* savedFrame = as_frame(state);
-            if (savedFrame->block == top->block)
-                copy(&savedFrame->state, &top->state);
+            if (retained_frame_get_block(state) == top->block)
+                copy(retained_frame_get_state(state), &top->state);
         }
     }
 
@@ -228,13 +233,12 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
         if (is_list(state) && index < list_length(state)) {
             caValue* element = list_get(state, index);
 
-            if (is_frame(element)
+            if (is_retained_frame(element)
                     // Don't expand state on calls from within declared_state.
                     && (parent->block->owningTerm != FUNCS.declared_state)) {
 
-                Frame* savedFrame = as_frame(element);
-                if (savedFrame->block == top->block)
-                    copy(&savedFrame->state, &top->state);
+                if (retained_frame_get_block(element) == top->block)
+                    copy(retained_frame_get_state(element), &top->state);
             }
         }
     }
@@ -321,7 +325,7 @@ static void retain_stack_top(Stack* stack)
         slot = list_get(slot, loopIndex);
     }
 
-    copy_stack_frame_to_boxed(top, slot);
+    copy_stack_frame_to_retained(top, slot);
 
     parent->retain = true;
 }
@@ -586,7 +590,8 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 
 void stack_extract_state(Stack* stack, caValue* output)
 {
-    frame_extract_state(frame_by_index(stack, 0), output);
+    Frame* frame = frame_by_index(stack, 0);
+    extract_state(frame->block, &frame->state, output);
 }
 
 Frame* frame_parent(Frame* frame)
@@ -634,6 +639,12 @@ Frame* frame_by_depth(Stack* stack, int depth)
 void frame_retain(Frame* frame)
 {
     frame->retain = true;
+}
+
+int frame_get_index(Frame* frame)
+{
+    Stack* stack = frame->stack;
+    return frame - stack->frames;
 }
 
 static void stack_resize_frame_list(Stack* stack, int newCapacity)
@@ -1141,6 +1152,8 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             continue;
         }
         case bc_PushExplicitState: {
+            internal_error("push explicit state is disabled");
+#if 0
             int inputIndex = blob_read_int(s.bc, &s.pc);
 
             Frame* top = stack_top(stack);
@@ -1157,6 +1170,7 @@ void run_bytecode(Stack* stack, caValue* bytecode)
                 // TODO: Raise error if the value is not null and not a Frame?
             }
 
+#endif
             continue;
         }
         
@@ -1309,6 +1323,8 @@ do_loop_done_insn:
             continue;
         }
         case bc_PopExplicitState: {
+            internal_error("pop explicit state is disabled");
+#if 0
             ca_assert(s.frame == stack_top_parent(stack));
             int outputIndex = blob_read_int(s.bc, &s.pc);
 
@@ -1319,7 +1335,7 @@ do_loop_done_insn:
             caValue* receiverSlot = frame_register(parent, receiver);
 
             copy_stack_frame_to_boxed(top, receiverSlot);
-
+#endif
             continue;
         }
         case bc_PopFrame: {
@@ -1783,8 +1799,8 @@ bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, i
 {
     int pc = *interpreterPos;
 
-    // Lookahead at PushInput instructions, and check to see if the existing values strictly
-    // match the incoming values.
+    // Lookahead at PushInput instructions, and check to see if the existing values are strictly
+    // equal to the incoming values.
     
     while (true) {
         switch (blob_read_char(bc, &pc)) {
@@ -1853,6 +1869,7 @@ bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, i
     return false;
 }
 
+// TODO: delete this
 void evaluate_range(Stack* stack, Block* block, int start, int end)
 {
 #if 0
@@ -1885,6 +1902,7 @@ void evaluate_range(Stack* stack, Block* block, int start, int end)
 #endif
 }
 
+// TODO: delete this
 void evaluate_minimum(Stack* stack, Term* term, caValue* result)
 {
 #if 0
@@ -1955,6 +1973,7 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
 #endif
 }
 
+// TODO: delete this
 void evaluate_minimum2(Term* term, caValue* output)
 {
     // Check if 'term' is just a value; don't need to create a Stack if so.
@@ -1967,7 +1986,7 @@ void evaluate_minimum2(Term* term, caValue* output)
 
 void Frame__registers(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
 
     caValue* out = circa_output(stack, 0);
@@ -1979,7 +1998,7 @@ void Frame__registers(caStack* stack)
 
 void Frame__active_value(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
     caValue* value = stack_find_active_value(frame, term);
     if (value == NULL)
@@ -1990,7 +2009,7 @@ void Frame__active_value(caStack* stack)
 
 void Frame__set_active_value(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
     caValue* value = stack_find_active_value(frame, term);
     if (value == NULL)
@@ -2001,31 +2020,31 @@ void Frame__set_active_value(caStack* stack)
 
 void Frame__block(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_block(circa_output(stack, 0), frame->block);
 }
 
 void Frame__parent(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     Frame* parent = frame_parent(frame);
     if (parent == NULL)
         set_null(circa_output(stack, 0));
     else
-        copy_stack_frame_to_boxed(parent, circa_output(stack, 0));
+        set_frame_ref(circa_output(stack, 0), parent);
 }
 
 void Frame__has_parent(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     Frame* parent = frame_parent(frame);
     set_bool(circa_output(stack, 0), parent != NULL);
 }
 
 void Frame__register(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     int index = circa_int_input(stack, 1);
     copy(frame_register(frame, index), circa_output(stack, 0));
@@ -2033,62 +2052,66 @@ void Frame__register(caStack* stack)
 
 void Frame__pc(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_int(circa_output(stack, 0), frame->pcIndex);
 }
 
 void Frame__parentPc(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_int(circa_output(stack, 0), frame->parentPc);
 }
 
 void Frame__current_term(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_term_ref(circa_output(stack, 0), frame_current_term(frame));
 }
 
-void frame_extract_state(Frame* frame, caValue* output)
+void extract_state(Block* block, caValue* state, caValue* output)
 {
-    Block* block = frame->block;
-
     set_hashtable(output);
-    if (!is_list(&frame->state))
+    if (!is_list(state))
         return;
 
-    for (int i=0; i < list_length(&frame->state); i++) {
+    for (int i=0; i < list_length(state); i++) {
         Term* term = block->get(i);
-        caValue* element = list_get(&frame->state, i);
+        caValue* element = list_get(state, i);
         caValue* name = unique_name(term);
 
         if (term->function == FUNCS.declared_state) {
             copy(element, hashtable_insert(output, name));
-        } else if (is_frame(element)) {
-            frame_extract_state(as_frame(element), hashtable_insert(output, name));
+        } else if (is_retained_frame(element)) {
+            retained_frame_extract_state(element, hashtable_insert(output, name));
         } else if (is_list(element)) {
             caValue* listOutput = hashtable_insert(output, name);
             set_list(listOutput, list_length(element));
             for (int i=0; i < list_length(element); i++) {
                 caValue* indexedState = list_get(element, i);
                 // indexedState is either null or a Frame
-                if (is_frame(indexedState)) {
-                    Frame* indexedFrame = as_frame(indexedState);
-                    frame_extract_state(indexedFrame, list_get(listOutput, i));
+                if (is_retained_frame(indexedState)) {
+                    retained_frame_extract_state(indexedState, list_get(listOutput, i));
                 }
             }
         }
     }
 }
 
+static void retained_frame_extract_state(caValue* frame, caValue* output)
+{
+    Block* block = retained_frame_get_block(frame);
+    caValue* state = retained_frame_get_state(frame);
+    extract_state(block, state, output);
+}
+
 void Frame__extract_state(caStack* stack)
 {
-    Frame* frame = as_frame(circa_input(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
-    frame_extract_state(frame, output);
+    extract_state(frame->block, &frame->state, output);
 }
 
 void make_stack(caStack* stack)
@@ -2154,6 +2177,12 @@ void Stack__dump(caStack* stack)
     dump(self);
 }
 
+void Stack__extract_state(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    stack_extract_state(self, circa_output(stack, 0));
+}
+
 void Stack__find_active_frame_for_term(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2166,7 +2195,7 @@ void Stack__find_active_frame_for_term(caStack* stack)
 
     while (true) {
         if (frame->block == term->owningBlock) {
-            copy_stack_frame_to_boxed(frame, circa_output(stack, 0));
+            set_frame_ref(circa_output(stack, 0), frame);
             return;
         }
 
@@ -2326,7 +2355,7 @@ void Stack__frame(caStack* stack)
     int index = circa_int_input(stack, 1);
     Frame* frame = frame_by_depth(self, index);
 
-    copy_stack_frame_to_boxed(frame, circa_output(stack, 0));
+    set_frame_ref(circa_output(stack, 0), frame);
 }
 
 void Stack__output(caStack* stack)
@@ -2414,6 +2443,7 @@ void interpreter_install_functions(Block* kernel)
         {"capture_stack", capture_stack},
         {"Stack.block", Stack__block},
         {"Stack.dump", Stack__dump},
+        {"Stack.extract_state", Stack__extract_state},
         {"Stack.find_active_frame_for_term", Stack__find_active_frame_for_term},
         {"Stack.inject_context", Stack__inject_context},
         {"Stack.apply", Stack__call},

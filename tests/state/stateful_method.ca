@@ -12,10 +12,10 @@ def main()
 
   t.f()
 
-s = null
-main(state = s)
-print(s.extract_state)
-main(state = s)
-print(s.extract_state)
-main(state = s)
-print(s.extract_state)
+int = make_stack(main)
+int.call
+print(int.extract_state)
+int.call
+print(int.extract_state)
+int.call
+print(int.extract_state)

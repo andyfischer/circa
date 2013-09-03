@@ -1,17 +1,14 @@
 
 
-def g()
+def main()
     state s = 0
     print('existing s = ' s)
     s += 1
     print('new s = ' s)
 
-stack = make_stack()
-stack.stack_push2(g)
+stack = make_stack(main)
 stack.run
-stack.restart
 stack.run
-stack.restart
 stack.run
 if stack.errored
     stack.dump

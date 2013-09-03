@@ -10,6 +10,6 @@ def g()
   f(5)
   f(6)
 
-s = null
-g(state = s)
-print(s.extract_state)
+int = make_stack(g)
+int.call
+print(int.extract_state)

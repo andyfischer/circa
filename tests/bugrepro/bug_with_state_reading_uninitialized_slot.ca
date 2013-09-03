@@ -5,8 +5,9 @@ def f()
 
     -- Declare 'u' with type 'any'. (by using type 'any', we won't allow the unpack_state to
     -- tell that the value was uninitialized by looking at the type)
+    -- (Update 9/13 - Disregard above comment, unpack_state was factored out)
     state any u = 2
 
-s = null
-f(state = s)
-print(s.extract_state)
+int = make_stack(f)
+int.call
+print(int.extract_state)

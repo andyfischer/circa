@@ -1,7 +1,6 @@
 
 
-int = make_stack()
-int.stack_push({
+int = make_stack({
 
     cl = {
         i = input(number)
@@ -9,7 +8,7 @@ int.stack_push({
     }
 
     cl.call('hello')
-}.block, [])
+})
 
 int.run
 assert(int.errored)

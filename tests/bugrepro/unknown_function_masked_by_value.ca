@@ -8,7 +8,6 @@ def main()
 
     print(cl.call)
 
-stack = make_stack()
-stack.stack_push(main.block, [])
+stack = make_stack(main)
 stack.run
 assert(stack.errored)

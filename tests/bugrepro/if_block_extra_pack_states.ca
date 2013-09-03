@@ -22,6 +22,6 @@ def f()
     elif true
     elif true
 
-s = null
-f(state = s)
-print(s.extract_state)
+int = make_stack(f)
+int.run
+print(int.extract_state)

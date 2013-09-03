@@ -1,9 +1,8 @@
 
 f = {
     add(a b c)
-}.block
+}
 
-int = make_stack()
-int.stack_push(f [])
+int = make_stack(f)
 int.run
 assert(int.errored)

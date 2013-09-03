@@ -7,7 +7,6 @@ def b(a)
 
     a + 1
 
-int = make_stack()
-int.stack_push(b.block, [1])
-int.run
-print(int.get_state_output)
+int = make_stack(b)
+int.call(1)
+print(int.extract_state)

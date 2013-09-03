@@ -44,13 +44,20 @@ struct Frame
     bool retain;
 };
 
-Frame* as_frame(caValue* value);
-bool is_frame(caValue* value);
-void set_frame(caValue* value);
+Frame* as_frame_ref(caValue* value);
+bool is_frame_ref(caValue* value);
+void set_frame_ref(caValue* value, Frame* frame);
+
+void set_retained_frame(caValue* frame);
+bool is_retained_frame(caValue* frame);
+Block* retained_frame_get_block(caValue* frame);
+caValue* retained_frame_get_state(caValue* frame);
+
+void copy_stack_frame_to_retained(Frame* source, caValue* retainedFrame);
 
 void frame_copy(Frame* left, Frame* right);
-void copy_stack_frame_to_boxed(Frame* frame, caValue* value);
+// void copy_stack_frame_to_boxed(Frame* frame, caValue* value);
 
-void frame_setup_type(Type* type);
+// void frame_setup_type(Type* type);
 
 } // namespace circa

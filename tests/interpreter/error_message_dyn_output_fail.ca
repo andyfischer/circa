@@ -1,14 +1,13 @@
 
-int = make_stack()
 
-testBlock = {
+main = {
 
     type T {}
     t = make(T)
     t.hello()
 }
 
-int.stack_push(block_ref(testBlock), [])
+int = make_stack(main)
 int.run
 
 assert(int.error_message == "Method hello not found on type T")

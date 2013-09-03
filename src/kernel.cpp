@@ -1179,7 +1179,7 @@ void bootstrap_kernel()
     TYPES.func = as_type(builtins->get("Func"));
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
-    frame_setup_type(TYPES.frame);
+    TYPES.retained_frame = as_type(builtins->get("RetainedFrame"));
     TYPES.point = as_type(builtins->get("Point"));
 
     // Fix function_decl now that Func type is available.
