@@ -10,9 +10,6 @@
 #include "building.h"
 #include "interpreter.h"
 #include "inspection.h"
-#if 0
-#include "stateful_code.h"
-#endif
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -250,37 +247,6 @@ void if_block_finish_appended_case(Block* block, Term* caseTerm)
         TermList(find_last_non_comment_expression(nested_contents(caseTerm))));
 }
 
-void append_state_placeholders_if_needed(Block* block)
-{
-#if 0
-    if (!has_state_input(block))
-        append_state_input(block);
-    if (!has_state_output(block))
-        append_state_output(block);
-#endif
-}
-
-void if_block_normalize_state_inputs(Term* ifBlock)
-{
-#if 0
-    Block* contents = nested_contents(ifBlock);
-
-    // Check if any blocks have a state input
-    bool anyState = false;
-    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
-        if (has_state_input(nested_contents(it.current())))
-            anyState = true;
-    }
-
-    if (!anyState)
-        return;
-
-    append_state_placeholders_if_needed(contents);
-    for (CaseIterator it(contents); it.unfinished(); it.advance())
-        append_state_placeholders_if_needed(nested_contents(it.current()));
-#endif
-}
-
 bool if_block_is_name_bound_in_every_case(Block* contents, const char* name)
 {
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
@@ -436,57 +402,6 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
     }
 }
 
-void modify_block_so_that_state_access_is_indexed(Block* block, int index)
-{
-#if 0
-    Term* stateInput = find_state_input(block);
-    if (stateInput == NULL)
-        return;
-
-    // Create terms for unpack_state_from_list and pack_state_to_list, if needed.
-
-    Term* stateOutput = find_state_output(block);
-
-    // If state output is directly connected to input, then we don't need to create
-    // an unpack_state_from_list call.
-    if (stateOutput->input(0) == stateInput) {
-        // State output is directly connected to input. In this case, the block should
-        // null out the state field.
-        Term* stateResult = create_value(block, TYPES.null);
-        Term* packList = apply(block, FUNCS.pack_state_to_list,
-            TermList(stateInput, stateResult));
-        packList->setIntProp("index", index);
-        set_input(stateOutput, 0, packList);
-        return;
-    }
-
-    // There are terms between state input & output, bracket them with calls to
-    // unpack_state_from_list and pack_state_to_list.
-    Term* unpackList = apply(block, FUNCS.unpack_state_from_list, TermList(stateInput));
-    unpackList->setIntProp("index", index);
-    move_after_inputs(unpackList);
-
-    // Grab a copy of stateInput's users (before it's modified)
-    TermList stateInputUsers = stateInput->users;
-    for (int i=0; i < stateInputUsers.length(); i++) {
-        Term* term = stateInputUsers[i];
-        if (term == unpackList)
-            continue;
-        remap_pointers_quick(term, stateInput, unpackList);
-    }
-
-    Term* stateResult = stateOutput->input(0);
-    ca_assert(stateResult != NULL);
-
-    Term* packList = apply(block, FUNCS.pack_state_to_list,
-        TermList(stateInput, stateResult));
-    packList->setIntProp("index", index);
-    packList->setBoolProp("final", true);
-    set_input(stateOutput, 0, packList);
-    move_after(packList, stateResult);
-#endif
-}
-
 void finish_if_block(Term* ifBlock)
 {
     Block* contents = nested_contents(ifBlock);
@@ -495,28 +410,15 @@ void finish_if_block(Term* ifBlock)
     if (get_output_placeholder(contents, 0) == NULL)
         if_block_prepend_primary_output(ifBlock);
 
-    if_block_normalize_state_inputs(ifBlock);
-
     // Turn name rebinds into outer name rebinds.
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if_block_turn_outer_name_rebinds_into_outputs(ifBlock, nested_contents(term));
     }
 
-    // Fix state in each case.
-    #if 0
-    int caseIndex = 0;
-    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        modify_block_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
-        caseIndex++;
-    }
-    #endif
-
     if_block_turn_common_rebinds_into_outputs(ifBlock);
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);
-    check_to_insert_implicit_inputs(ifBlock);
     update_extra_outputs(ifBlock);
 }
 

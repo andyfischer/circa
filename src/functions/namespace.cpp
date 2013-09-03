@@ -24,6 +24,7 @@ namespace namespace_function {
     {
         FUNCS.namespace_func = import_function(kernel, evaluate, "namespace()");
         block_set_format_source_func(function_contents(FUNCS.namespace_func), format_source);
+        block_set_function_has_nested(function_contents(FUNCS.namespace_func), true);
     }
     void setup(Block* kernel) {}
 }

@@ -20,8 +20,6 @@
 
 namespace circa {
 
-void for_loop_fix_state_input(Block* contents);
-
 Term* for_loop_get_iterator(Block* contents)
 {
     for (int i=0; i < contents->length(); i++)
@@ -185,14 +183,9 @@ void finish_for_loop(Term* forTerm)
     primaryOutput->setBoolProp("accumulatingOutput", true);
     respecialize_type(primaryOutput);
 
-    // pack_any_open_state_vars(contents);
-    for_loop_fix_state_input(contents);
-    check_to_add_state_output_placeholder(contents);
-
     add_implicit_placeholders(forTerm);
     repoint_terms_to_use_input_placeholders(contents);
 
-    check_to_insert_implicit_inputs(forTerm);
     update_extra_outputs(forTerm);
 
     block_finish_changes(contents);
@@ -266,57 +259,6 @@ void for_loop_remake_zero_block(Block* forContents)
     }
 
     block_finish_changes(zero);
-}
-
-void for_loop_fix_state_input(Block* contents)
-{
-    // This function will look at the state access inside for-loop contents.
-    // If there's state, the default building functions will have created
-    // terms that look like this:
-    //
-    // input() :state -> unpack_state -> pack_state -> output() :state
-    //
-    // We want each loop iteration to have its own state container. So we'll
-    // insert pack/unpack_state_list_n terms so that each iteration accesses
-    // state from a list. The result will look like:
-    //
-    // input() :state -> unpack_state_list_n(index) -> unpack_state -> pack_state
-    // -> pack_state_list_n(index) -> output() :state
-    
-    // First insert the unpack_state_list_n call
-    Term* stateInput = find_state_input(contents);
-
-    // Nothing to do if there's no state input
-    if (stateInput == NULL)
-        return;
-
-    // Nothing to do if unpack_state_list_n term already exists
-    if (find_user_with_function(stateInput, FUNCS.unpack_state_list_n) != NULL)
-        return;
-
-    Term* unpackState = find_user_with_function(stateInput, FUNCS.unpack_state);
-    ca_assert(unpackState != NULL);
-
-    Term* index = for_loop_find_index(contents);
-
-    Term* unpackStateList = apply(contents, FUNCS.unpack_state_list_n,
-        TermList(stateInput, index));
-    transfer_users(stateInput, unpackStateList);
-
-    move_before(unpackStateList, unpackState);
-    set_input(unpackState, 0, unpackStateList);
-
-    // Now insert the pack_state_list_n call
-    Term* stateResult = find_open_state_result(contents);
-
-    Term* packStateList = apply(contents, FUNCS.pack_state_list_n,
-        TermList(stateInput, stateResult, index));
-    packStateList->setBoolProp("final", true);
-    move_after(packStateList, stateResult);
-
-    // Make sure the state output uses this result
-    Term* stateOutput = append_state_output(contents);
-    set_input(stateOutput, 0, packStateList);
 }
 
 void start_for_loop(caStack* stack, bool enableLoopOutput)

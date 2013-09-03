@@ -1306,7 +1306,6 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         result->setStringProp("syntax:explicitType", typeName);
 
     set_source_location(result, startPosition, tokens);
-    block_mark_state_type_dirty(block);
 
     return ParseResult(result);
 }
@@ -1383,8 +1382,6 @@ ParseResult return_statement(Block* block, TokenStream& tokens, ParserCxt* conte
 
     if (outputs.length() == 0)
         outputs.append(NULL);
-
-    block_add_pack_state(block);
 
     Term* result = apply(block, FUNCS.return_func, outputs);
 
@@ -1930,7 +1927,6 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     }
 
     inputHints.apply(term);
-    check_to_insert_implicit_inputs(term);
     apply_hints_from_parsed_input(term, 0, root);
     term->setStringProp("syntax:functionName", as_cstring(&functionName));
     term->setStringProp("syntax:declarationStyle", "method-call");
@@ -1972,7 +1968,6 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
     if (function != NULL && !is_function(function) && !is_type(function)) {
         Term* result = apply(block, FUNCS.unknown_function, inputs);
         result->setStringProp("syntax:functionName", functionName);
-        check_to_insert_implicit_inputs(result);
         return ParseResult(result);
     }
 
@@ -1984,7 +1979,6 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
         result->setStringProp("syntax:functionName", functionName);
 
     inputHints.apply(result);
-    check_to_insert_implicit_inputs(result);
 
     return ParseResult(result);
 }
@@ -2435,7 +2429,6 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
 
     Term* term = apply(block, FUNCS.list, inputs);
     listHints.apply(term);
-    check_to_insert_implicit_inputs(term);
 
     term->setBoolProp("syntax:literal-list", true);
     term->setStringProp("syntax:declarationStyle", "bracket-list");

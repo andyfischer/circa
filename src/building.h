@@ -74,7 +74,6 @@ Term* append_output_placeholder_with_description(Block* block, caValue* descript
 Term* prepend_output_placeholder(Block* block, Term* result);
 Term* insert_output_placeholder(Block* block, Term* result, int location);
 Term* append_state_input(Block* block);
-Term* append_state_output(Block* block);
 
 void get_input_description(Term* input, caValue* result);
 Term* find_output_placeholder_with_name(Block* block, caValue* name);
@@ -107,15 +106,6 @@ int count_anonymous_outputs(Block* block);
 // Extra outputs
 void update_extra_outputs(Term* term);
 
-Term* find_open_state_result(Term* location);
-Term* find_open_state_result(Block* block);
-
-// Check the term's inputs to see if it's missing an implicit input (such as the state
-// input). If one is missing, it will be inserted. This should be called after creating
-// a term and updating the input properties.
-void check_to_insert_implicit_inputs(Term* term);
-void update_implicit_pack_call(Term* term);
-
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
@@ -140,7 +130,6 @@ void input_placeholders_to_list(Block* block, TermList* list);
 void list_outer_pointers(Block* block, TermList* list);
 int find_input_index_for_pointer(Term* call, Term* input);
 void check_to_add_primary_output_placeholder(Block* block);
-void check_to_add_state_output_placeholder(Block* block);
 
 // Refactoring
 

@@ -142,6 +142,24 @@ void stack_init(Stack* stack, Block* block)
     stack_push(stack, block);
 }
 
+void stack_init_with_closure(Stack* stack, caValue* closure)
+{
+    Block* block = as_block(list_get(closure, 0));
+    caValue* closedValues = list_get(closure, 1);
+    stack_init(stack, block);
+
+    // Copy closed values.
+    int nextIncomingClosure = 0;
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.unbound_input) {
+            copy(list_get(closedValues, nextIncomingClosure),
+                frame_register(stack_top(stack), term));
+            nextIncomingClosure++;
+        }
+    }
+}
+
 Frame* stack_push(Stack* stack, Block* block, int parentPc)
 {
     INCREMENT_STAT(PushFrame);
@@ -738,24 +756,6 @@ caValue* frame_bytecode(Frame* frame)
 Block* frame_block(Frame* frame)
 {
     return frame->block;
-}
-
-bool state_inject(Stack* stack, caValue* name, caValue* value)
-{
-    caValue* state = stack_get_state(stack);
-    Block* block = stack_top(stack)->block;
-
-    // Initialize stateValue if it's currently null.
-    if (is_null(state))
-        make(block->stateType, state);
-
-    caValue* slot = get_field(state, name, NULL);
-    if (slot == NULL)
-        return false;
-
-    touch(state);
-    copy(value, get_field(state, name, NULL));
-    return true;
 }
 
 caValue* context_inject(Stack* stack, caValue* name)
@@ -2094,6 +2094,8 @@ void Frame__extract_state(caStack* stack)
 void make_stack(caStack* stack)
 {
     Stack* newStack = create_stack(stack->world);
+    caValue* func = circa_input(stack, 0);
+    stack_init_with_closure(newStack, func);
     set_pointer(circa_create_default_output(stack, 0), newStack);
 }
 
@@ -2177,19 +2179,6 @@ void Stack__find_active_frame_for_term(caStack* stack)
     set_null(circa_output(stack, 0));
 }
 
-void Stack__inject_state(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    caValue* name = circa_input(stack, 1);
-    caValue* val = circa_input(stack, 2);
-
-    if (stack_top(self) == NULL)
-        return raise_error_msg(self, "Can't inject onto stack with no frames");
-
-    bool success = state_inject(self, name, val);
-    set_bool(circa_output(stack, 0), success);
-}
-
 void Stack__inject_context(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2212,12 +2201,11 @@ void Stack__call(caStack* stack)
     stack_restart(self);
 
     // Populate inputs.
-    caValue* ins = circa_input(self, 1);
+    caValue* inputs = circa_input(stack, 1);
+    for (int i=0; i < list_length(inputs); i++)
+        copy(list_get(inputs, i), circa_input(self, i));
 
-    for (int i=0; i < list_length(ins); i++)
-        copy(list_get(ins, i), circa_input(self, i));
-
-    run_interpreter(self);
+    stack_run(self);
 
     copy(circa_output(self, 0), circa_output(stack, 0));
 }
@@ -2427,7 +2415,6 @@ void interpreter_install_functions(Block* kernel)
         {"Stack.block", Stack__block},
         {"Stack.dump", Stack__dump},
         {"Stack.find_active_frame_for_term", Stack__find_active_frame_for_term},
-        {"Stack.inject", Stack__inject_state},
         {"Stack.inject_context", Stack__inject_context},
         {"Stack.apply", Stack__call},
         {"Stack.call", Stack__call},

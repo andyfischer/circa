@@ -42,8 +42,7 @@ void assert_valid_block(Block const* obj)
 
 Block::Block()
   : owningTerm(NULL),
-    inProgress(false),
-    stateType(NULL)
+    inProgress(false)
 {
     id = global_world()->nextBlockID++;
     on_block_created(this);
@@ -356,6 +355,8 @@ Block* nested_contents(Term* term)
     if (term == NULL)
         return NULL;
 
+    // ca_assert(term->nestedContents != NULL);
+
     // Future: nested_contents() should not create the block if it doesn't exist.
     return make_nested_contents(term);
 }
@@ -471,11 +472,6 @@ void clear_block(Block* block)
 {
     assert_valid_block(block);
     set_null(&block->staticErrors);
-
-    if (block->stateType != NULL) {
-        type_decref(block->stateType);
-        block->stateType = NULL;
-    }
 
     block->names.clear();
     block->inProgress = false;
@@ -764,6 +760,11 @@ void block_set_format_source_func(Block* block, FormatSourceFunc formatSource)
 void block_set_post_compile_func(Block* block, PostCompileFunc postCompile)
 {
     block->overrides.postCompile = postCompile;
+}
+
+void block_set_function_has_nested(Block* block, bool hasNestedContents)
+{
+    block->functionAttrs.hasNestedContents = hasNestedContents;
 }
 
 void append_internal_error(caValue* result, int index, std::string const& message)

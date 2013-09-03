@@ -155,7 +155,6 @@ Block* current_block(Stack* stack);
 caValue* get_top_register(Stack* stack, Term* term);
 
 // Miscellaneous stack access & manipulation.
-bool state_inject(Stack* stack, caValue* name, caValue* value);
 caValue* context_inject(Stack* stack, caValue* name);
 
 // Create an output value for the current term, using the declared type's

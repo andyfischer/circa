@@ -51,12 +51,6 @@ void finish_building_function(Block* contents)
 
         if (input->boolProp("output", false)) {
 
-            if (is_state_input(input)) {
-                Term* term = append_state_output(contents);
-                term->setIntProp("rebindsInput", i);
-                continue;
-            }
-
             Term* result = find_name(contents, input->name.c_str());
             
             Term* output = append_output_placeholder(contents, result);
@@ -74,14 +68,8 @@ void finish_building_function(Block* contents)
         if (function_contents(term->function) != contents)
             continue;
 
-        // Check if we need to insert a state input
-        check_to_insert_implicit_inputs(term);
-
         // Update extra outputs
         update_extra_outputs(term);
-
-        // Update cascade, might need to fix pack_state() calls.
-        block_update_pack_state_calls(term->owningBlock);
     }
 
     update_for_control_flow(contents);

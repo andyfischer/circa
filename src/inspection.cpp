@@ -288,9 +288,7 @@ Term* find_last_non_comment_expression(Block* block)
         // Skip certain special functions
         Term* func = block->get(i)->function;
         if (func == FUNCS.output
-                || func == FUNCS.input 
-                || func == FUNCS.pack_state
-                || func == FUNCS.pack_state_list_n)
+                || func == FUNCS.input)
             continue;
 
         if (block->get(i)->name == "#outer_rebinds")

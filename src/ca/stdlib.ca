@@ -244,9 +244,6 @@ def Stack.current_term(self) -> Term
 def Stack.dump(self)
     -- Dumps a string representation to stdout.
 def Stack.find_active_frame_for_term(self, Term term) -> Frame
-def Stack.inject(self, String name, any val) -> bool
-    -- Inject a value into the stack's state. Must correspond to an existing state definition.
-    -- Returns whether the operation was successful.
 def Stack.inject_context(self, Symbol name, any val)
 def Stack.call(self, any inputs :multiple) -> any
 def Stack.apply(self, List inputs) -> any
@@ -283,37 +280,11 @@ def Stack.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
 def Stack.toString(self) -> String
 
-def make_stack() -> Stack
+def make_stack(Func func) -> Stack
     -- Create a new stack
-def make_stack2(Func func) -> Stack
-    stack = make_stack()
-    stack.stack_push(func.block, [])
-    stack
 
--- Actors
-type Actor {
-    Func func
-    Mutable stateVal
-}
-
-def make_actor(Func func) -> Actor
-    actor = make(Actor)
-    actor.func = func
-    actor
-
-def Actor.call(self, any inputs :multiple) -> any
-
-    _state = self.stateVal.get
-    out = self.func.apply(inputs, state = _state)
-    self.stateVal.set(_state)
-    return out
-    
-def Actor.apply(self, List inputs) -> any
-
-    _state = self.stateVal.get
-    out = self.func.apply(inputs, state = _state)
-    self.stateVal.set(_state)
-    return out
+def make_actor(Func func) -> Stack
+    make_stack(func)
 
 def empty_list(any initialValue, int size) -> List
 def repeat(any val, int count) -> List

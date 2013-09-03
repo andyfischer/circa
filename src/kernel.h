@@ -61,9 +61,6 @@ struct BuiltinFuncs {
     Term* output;
     Term* output_explicit;
     Term* overload_error_no_match;
-    Term* pack_state;
-    Term* pack_state_to_list;
-    Term* pack_state_list_n;
     Term* package;
     Term* range;
     Term* return_func;
@@ -81,9 +78,6 @@ struct BuiltinFuncs {
     Term* unbounded_loop_finish;
     Term* unknown_function;
     Term* unknown_identifier;
-    Term* unpack_state;
-    Term* unpack_state_from_list;
-    Term* unpack_state_list_n;
     Term* unrecognized_expression;
     Term* value;
 };

@@ -62,13 +62,6 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
                 continue;
             }
 
-            // Position before a pack_state() call that is 'final'
-            if (preceding->function == FUNCS.pack_state
-                    && preceding->boolProp("final", false)) {
-                position--;
-                continue;
-            }
-
             break;
         }
     }
@@ -276,9 +269,12 @@ void change_function(Term* term, Term* function)
         append_user(term, function);
     }
 
-    // Possibly insert a state input for the enclosing subroutine.
-    if (does_callsite_have_implicit_state(term))
-        find_or_create_default_state_input(term->owningBlock);
+    if (function != NULL && (function_contents(function)->functionAttrs.hasNestedContents))
+        make_nested_contents(term);
+#if 0
+    else
+        remove_nested_contents(term);
+#endif
 
     dirty_bytecode(term->owningBlock);
 }
@@ -644,19 +640,6 @@ Term* append_state_input(Block* block)
     return term;
 }
 
-Term* append_state_output(Block* block)
-{
-    // Make sure that a state input doesn't already exist
-    Term* existing = find_state_output(block);
-    if (existing != NULL)
-        return existing;
-
-    Term* term = append_output_placeholder(block, find_open_state_result(block));
-    term->setBoolProp("state", true);
-    hide_from_source(term);
-    return term;
-}
-
 void get_input_description(Term* input, caValue* result)
 {
     // state input
@@ -913,10 +896,6 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
             && result->index < location->index)
         return result;
 
-    // State output
-    if (is_state_input(output))
-        return find_open_state_result(location);
-
     // Nearest with same name
     if (output->name != "")
         return find_name_at(location, output->name.c_str());
@@ -945,8 +924,6 @@ void update_extra_outputs(Term* term)
 
     if (function == NULL)
         return;
-
-    bool needToUpdatePackState = false;
 
     for (int index=1; ; index++) {
         Term* placeholder = get_output_placeholder(function, index);
@@ -993,55 +970,13 @@ void update_extra_outputs(Term* term)
 
             if (rebindsInput >= 0)
                 extra_output->setIntProp("rebindsInput", rebindsInput);
-
-            if (is_state_input(placeholder))
-                needToUpdatePackState = true;
         }
 
         change_declared_type(extra_output, placeholder->type);
 
         if (is_state_input(placeholder))
             extra_output->setBoolProp("state", true);
-
-#if 0
-        if (rebindsInput >= 0) {
-            Term* input = term->input(rebindsInput);
-
-            if (input != NULL) {
-
-                if (input->boolProp("explicitState", false))
-                    extra_output->setBoolProp("explicitState", true);
-
-            }
-        }
-#endif
     }
-
-    if (needToUpdatePackState)
-        block_update_pack_state_calls(block);
-}
-
-Term* find_open_state_result(Term* term)
-{
-    for (; term != NULL; term = preceding_term_recr_minor(term)) {
-        if (term->function == FUNCS.input && is_state_input(term))
-            return term;
-        if (term->function == FUNCS.pack_state
-                || term->function == FUNCS.pack_state_list_n)
-            return term;
-    }
-
-    return NULL;
-}
-
-Term* find_open_state_result(Block* block)
-{
-    return find_open_state_result(block->last());
-}
-
-void check_to_insert_implicit_inputs(Term* term)
-{
-    check_to_insert_implicit_state_input(term);
 }
 
 void set_step(Term* term, float step)
@@ -1090,15 +1025,6 @@ void block_finish_changes(Block* block)
     }
 
     fix_forward_function_references(block);
-
-    // Update block's state type
-    block_update_state_type(block);
-
-    // Create an output_placeholder for state, if necessary.
-    #if 0
-    if (block_has_inline_state(block))
-        append_state_output(block);
-    #endif
 
     // After we are finished creating outputs, update any nested control flow operators.
     update_for_control_flow(block);
@@ -1298,22 +1224,6 @@ void check_to_add_primary_output_placeholder(Block* block)
 
     if (output == NULL || is_state_input(output))
         prepend_output_placeholder(block, find_last_non_comment_expression(block));
-}
-
-void check_to_add_state_output_placeholder(Block* block)
-{
-    // No-op if a state output placeholder already exists
-    if (find_state_output(block) != NULL)
-        return;
-
-    Term* result = find_open_state_result(block);
-
-    // No-op if no state is being used
-    if (result == NULL)
-        return;
-
-    Term* output = append_output_placeholder(block, NULL);
-    output->setBoolProp("state", true);
 }
 
 void rewrite(Term* term, Term* function, TermList const& inputs)

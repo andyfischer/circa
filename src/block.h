@@ -30,6 +30,16 @@ struct BlockOverrides
     {}
 };
 
+struct FunctionAttrs
+{
+    // Whether a term that uses this Block as its function should have a nestedContents block.
+    bool hasNestedContents;
+
+    FunctionAttrs() :
+      hasNestedContents(false)
+    {}
+};
+
 struct Block
 {
     CircaObject header;
@@ -58,9 +68,6 @@ struct Block
     //  [2] int inputIndex (only used for errors related to inputs)
     Value staticErrors;
 
-    // Compound type object describing our inlined state. May be NULL.
-    Type* stateType;
-
     // Dictionary with additional metadata.
     Value properties;
 
@@ -68,6 +75,7 @@ struct Block
     Value bytecode;
 
     BlockOverrides overrides;
+    FunctionAttrs functionAttrs;
 
     Block();
     ~Block();
@@ -224,6 +232,7 @@ void block_set_evaluate_func(Block* block, EvaluateFunc eval);
 void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc);
 void block_set_format_source_func(Block* block, FormatSourceFunc formatSource);
 void block_set_post_compile_func(Block* block, PostCompileFunc postCompile);
+void block_set_function_has_nested(Block* block, bool hasNestedContents);
 
 void block_check_invariants(caValue* result, Block* block);
 bool block_check_invariants_print_result(Block* block, std::ostream& out);

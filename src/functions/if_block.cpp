@@ -56,6 +56,9 @@ namespace if_block_function {
         block_set_format_source_func(function_contents(FUNCS.if_block), formatSource);
 
         FUNCS.case_func = import_function(kernel, NULL, "case(bool b :optional)");
+
+        block_set_function_has_nested(function_contents(FUNCS.if_block), true);
+        block_set_function_has_nested(function_contents(FUNCS.case_func), true);
     }
 }
 }

@@ -878,7 +878,9 @@ void bootstrap_kernel()
     rename(functionDeclFunction, "function_decl");
     FUNCS.function_decl = functionDeclFunction;
     FUNCS.function_decl->function = FUNCS.function_decl;
+    make_nested_contents(FUNCS.function_decl);
     function_contents(FUNCS.function_decl)->overrides.formatSource = function_format_source;
+    block_set_function_has_nested(function_contents(FUNCS.function_decl), true);
 
     // Create value function
     Term* valueFunc = builtins->appendNew();
@@ -906,6 +908,7 @@ void bootstrap_kernel()
     // Initialize value() func
     valueFunc->type = TYPES.any;
     valueFunc->function = FUNCS.function_decl;
+    make_nested_contents(valueFunc);
     block_set_evaluation_empty(function_contents(valueFunc), true);
 
     // Initialize primitive types (this requires value() function)
@@ -1169,8 +1172,6 @@ void bootstrap_kernel()
 
     FUNCS.memoize = builtins->get("memoize");
     block_set_evaluation_empty(function_contents(FUNCS.memoize), true);
-
-    // FUNCS.unpack_state = builtins->get("unpack_state");
 
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));

@@ -5,32 +5,6 @@
 namespace circa {
 
 bool is_declared_state(Term* term);
-bool does_callsite_have_implicit_state(Term* term);
-
-void check_to_insert_implicit_state_input(Term* term);
-
-Term* find_active_state_container(Block* block);
-Term* find_or_create_default_state_input(Block* block);
-
-// If the block has state, this adds a pack_state call that captures state
-// values at the current position. If the block has no state then this
-// returns NULL.
-Term* block_add_pack_state(Block* block);
-
-// Update the block's stateType. Should be called after the code is changed in a way
-// that could add/remove declared state.
-void block_update_state_type(Block* block);
-bool block_has_inline_state(Block* block);
-void block_mark_state_type_dirty(Block* block);
-
-void block_update_pack_state_calls(Block* block);
-
-void list_visible_declared_state(Block* block, TermList* output);
-
-// Runtime calls.
-void unpack_state(caStack* stack);
-void pack_state(caStack* stack);
-
 void declared_state_format_source(caValue* source, Term* term);
 
 } // namespace circa

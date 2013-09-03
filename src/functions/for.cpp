@@ -42,12 +42,7 @@ namespace for_function {
         FUNCS.loop_output_index = import_function(kernel, NULL, "loop_output_index() -> any");
         block_set_evaluation_empty(function_contents(FUNCS.loop_output_index), true);
 
-#if 0
-        FUNCS.unbounded_loop = import_function(kernel, evaluate_unbounded_loop,
-            "loop(bool condition)");
-        FUNCS.unbounded_loop_finish = import_function(kernel, evaluate_unbounded_loop_finish,
-            "unbounded_loop_finish()");
-#endif
+        block_set_function_has_nested(function_contents(FUNCS.for_func), true);
     }
 }
 } // namespace circa
