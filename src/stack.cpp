@@ -26,6 +26,9 @@ Frame* as_frame_ref(caValue* value)
 
     Stack* stack = frame_ref_get_stack(value);
     int index = frame_ref_get_index(value);
+    if (index >= stack->framesCount)
+        return NULL;
+
     return frame_by_index(stack, index);
 }
 

@@ -771,7 +771,7 @@ Block* frame_block(Frame* frame)
 
 caValue* context_inject(Stack* stack, caValue* name)
 {
-    Frame* frame = stack_top(stack);
+    Frame* frame = frame_by_index(stack, 0);
 
     if (is_null(&frame->dynamicScope))
         set_hashtable(&frame->dynamicScope);
@@ -2010,6 +2010,9 @@ void Frame__active_value(caStack* stack)
 void Frame__set_active_value(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
+    if (frame == NULL)
+        return raise_error_msg(stack, "Bad frame reference");
+
     Term* term = as_term_ref(circa_input(stack, 1));
     caValue* value = stack_find_active_value(frame, term);
     if (value == NULL)
@@ -2353,8 +2356,10 @@ void Stack__frame(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
-    Frame* frame = frame_by_depth(self, index);
+    if (index >= self->framesCount)
+        return circa_output_error(stack, "Index out of range");
 
+    Frame* frame = frame_by_depth(self, index);
     set_frame_ref(circa_output(stack, 0), frame);
 }
 

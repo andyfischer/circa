@@ -1,0 +1,12 @@
+
+def main() -> String
+    return context(:key)
+
+int = make_stack(main)
+assert(int.call == null)
+
+int.inject_context(:key 'value')
+assert(int.call == 'value')
+assert(int.call == 'value')
+
+-- Make sure that 

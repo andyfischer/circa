@@ -15,5 +15,5 @@ print('Finished calling f, one = ' one)
 if context(:you_are_a_clone) == null
     stack = cast(captured_stack.get, Stack)
     stack.inject_context(:you_are_a_clone, true)
-    stack.stack_top.set_active_value(term_ref(one), 'two')
+    stack.top.set_active_value(term_ref(one), 'two')
     stack.run

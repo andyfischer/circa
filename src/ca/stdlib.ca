@@ -242,7 +242,7 @@ def capture_stack() -> Stack
 def Stack.block(self) -> Block
     -- Returns the (topmost) block.
 def Stack.current_term(self) -> Term
-    self.stack_top.current_term
+    self.top.current_term
 def Stack.dump(self)
     -- Dumps a string representation to stdout.
 def Stack.extract_state(self) -> Map
@@ -268,13 +268,13 @@ def Stack.run(self)
     -- is raised.
 def Stack.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
-def Stack.stack_top(self) -> Frame
+def Stack.top(self) -> Frame
     -- Return the topmost Frame.
     self.frame(0)
 def Stack.active_value(self, Term term) -> any
-    self.stack_top.active_value(term)
+    self.top.active_value(term)
 def Stack.set_active_value(self, Term term, any val)
-    self.stack_top.set_active_value(term, val)
+    self.top.set_active_value(term, val)
 def Stack.output(self, int index) -> any
     -- Fetch the value in the nth output register.
 def Stack.errored(self) -> bool
