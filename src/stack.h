@@ -9,16 +9,13 @@ struct Frame
     // Pointer to owning Stack.
     Stack* stack;
 
-    // PC (in the parent frame) that this frame was expanded from. Invalid for bottom frame.
+    // PC (in the parent frame) that this frame was expanded from. Invalid for the first frame.
     int parentPc;
-
-    // The role or state of this frame.
-    Symbol role;
 
     // Register values.
     Value registers;
 
-    // Stored frame state.
+    // Stack state: data saved between invocations.
     Value state;
 
     // Source block
@@ -41,7 +38,7 @@ struct Frame
     Symbol exitType;
 
     // Whether to save this frame on completion.
-    bool retain;
+    bool shouldRetain;
 };
 
 Frame* as_frame_ref(caValue* value);
@@ -52,12 +49,11 @@ void set_retained_frame(caValue* frame);
 bool is_retained_frame(caValue* frame);
 Block* retained_frame_get_block(caValue* frame);
 caValue* retained_frame_get_state(caValue* frame);
+caValue* retained_frame_get_registers(caValue* frame);
 
 void copy_stack_frame_to_retained(Frame* source, caValue* retainedFrame);
+void copy_stack_frame_registers_to_retained(Frame* source, caValue* retainedFrame);
 
 void frame_copy(Frame* left, Frame* right);
-// void copy_stack_frame_to_boxed(Frame* frame, caValue* value);
-
-// void frame_setup_type(Type* type);
 
 } // namespace circa

@@ -7,12 +7,10 @@ def g()
     print('called g()')
     f(3)
 
-int = make_stack()
-int.stack_push2(g)
+int = make_stack(g)
 
 print('pass 1: ')
 int.run
 
 print('pass 2: ')
-int.restart
 int.run

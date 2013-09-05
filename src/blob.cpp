@@ -100,17 +100,20 @@ void blob_append_char(caValue* blob, char c)
     as_blob(blob)[size] = c;
 }
 
+void blob_append_u16(caValue* blob, u16 val)
+{
+    int size = blob_size(blob);
+    blob_resize(blob, size + 2);
+    u16* position = (u16*) &as_blob(blob)[size];
+    *position = val;
+}
+
 void blob_append_int(caValue* blob, unsigned int val)
 {
     int size = blob_size(blob);
     blob_resize(blob, size + 4);
-
     unsigned int* position = (unsigned int*) &as_blob(blob)[size];
-
-    // Convert from little-endian to big-endian. TODO, this should not convert when
-    // compiled on big-endian arch.
-    *position = ((val & 0xff000000) >> 24) + ((val & 0x00ff0000) >> 8)
-        + ((val & 0x0000ff00) << 8) + ((val & 0x000000ff) << 24);
+    *position = val;
 }
 
 char blob_read_char(const char* data, int* pos)
@@ -120,12 +123,18 @@ char blob_read_char(const char* data, int* pos)
     return c;
 }
 
+u16 blob_read_u16(const char* data, int* pos)
+{
+    u16 val = *((u16*) &data[*pos]);
+    *pos += 2;
+    return val;
+}
+
 unsigned int blob_read_int(const char* data, int* pos)
 {
     int val = *((unsigned int*) &data[*pos]);
     *pos += 4;
-    return ((val & 0xff000000) >> 24) + ((val & 0x00ff0000) >> 8)
-        + ((val & 0x0000ff00) << 8) + ((val & 0x000000ff) << 24);
+    return val;
 }
 
 static char to_hex_digit(int i)

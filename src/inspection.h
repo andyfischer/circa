@@ -36,8 +36,7 @@ bool is_copying_call(Term* term);
 
 bool is_an_unknown_identifier(Term* term);
 
-// Checks if term->nestedContents is a major block. A 'major' block has its own stack
-// frame when executed.
+// Checks if term->nestedContents is a major block.
 bool is_major_block(Term* term);
 bool is_major_block(Block* block);
 bool is_minor_block(Block* block);

@@ -1,0 +1,30 @@
+
+-- Try changing inputs to verify that the function is recalculated
+
+def f(int i)
+    print('called f(' i ')')
+    memoize()
+
+def g(int i)
+    print('called g(' i ')')
+    f(i)
+
+int = make_stack(g)
+
+print('pass 1: ')
+int.call(1)
+
+print('pass 2: ')
+int.call(1)
+
+print('pass 3: ')
+int.call(2)
+
+print('pass 4: ')
+int.call(2)
+
+print('pass 5: ')
+int.call(2)
+
+print('pass 6: ')
+int.call(1)

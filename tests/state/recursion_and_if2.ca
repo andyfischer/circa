@@ -5,17 +5,19 @@
 -- known to be stateful when the recursive call is encountered.
 
 def recr(int depth)
-    state s = depth
-    s = s * 2
+    state called_with = depth
+    state top = depth
+    top = top * 2
 
     print('reached depth = ' depth)
     if depth == 0
         return
 
     if true
-        state t = depth
+        state inside_if = depth
         recr(depth - 1)
-        t = t * 2
+        top = top + 1
+        inside_if = inside_if * 2
 
 int = make_stack(recr)
 int.call(3)

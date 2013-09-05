@@ -1,0 +1,5 @@
+pass 1: 
+called g()
+called f([1, 2, 3])
+pass 2: 
+called g()

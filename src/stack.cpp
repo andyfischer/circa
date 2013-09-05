@@ -62,13 +62,33 @@ caValue* retained_frame_get_state(caValue* frame)
     ca_assert(is_retained_frame(frame));
     return list_get(frame, 2);
 }
+caValue* retained_frame_get_registers(caValue* frame)
+{
+    ca_assert(is_retained_frame(frame));
+    return list_get(frame, 3);
+}
 
 void copy_stack_frame_to_retained(Frame* source, caValue* retainedFrame)
 {
-    set_retained_frame(retainedFrame);
+    if (!is_retained_frame(retainedFrame))
+        set_retained_frame(retainedFrame);
+    touch(retainedFrame);
+
     set_stack(list_get(retainedFrame, 0), source->stack);
     set_block(list_get(retainedFrame, 1), source->block);
     set_value(list_get(retainedFrame, 2), &source->state);
+}
+
+void copy_stack_frame_registers_to_retained(Frame* source, caValue* retainedFrame)
+{
+    if (!is_retained_frame(retainedFrame))
+        set_retained_frame(retainedFrame);
+    touch(retainedFrame);
+
+    set_stack(list_get(retainedFrame, 0), source->stack);
+    set_block(list_get(retainedFrame, 1), source->block);
+    set_value(list_get(retainedFrame, 3), &source->registers);
+    touch(list_get(retainedFrame, 3));
 }
 
 #if 0
@@ -92,7 +112,6 @@ void frame_release(caValue* value)
 void frame_copy(Frame* left, Frame* right)
 {
     right->parentPc = left->parentPc;
-    right->role = left->role;
     copy(&left->registers, &right->registers);
     copy(&left->state, &right->state);
     copy(&left->customBytecode, &right->customBytecode);
@@ -102,7 +121,7 @@ void frame_copy(Frame* left, Frame* right)
     right->pc = left->pc;
     right->callType = left->callType;
     right->exitType = left->exitType;
-    right->retain = left->retain;
+    right->shouldRetain = left->shouldRetain;
 }
 
 #if 0

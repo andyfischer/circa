@@ -1,13 +1,10 @@
 
-
 def main()
-  state a = 1
-
+  state s = 1
   if true
-      a = 2
-
-  state b = 3
+    s = 2
+    return
 
 int = make_stack(main)
-int.run
+int.call
 print(int.extract_state)

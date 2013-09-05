@@ -5,8 +5,10 @@
 #include "blob.h"
 #include "building.h"
 #include "bytecode.h"
+#include "code_iterators.h"
 #include "control_flow.h"
 #include "kernel.h"
+#include "if_block.h"
 #include "inspection.h"
 #include "interpreter.h"
 #include "loops.h"
@@ -171,9 +173,11 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_PackState:
         set_string(string, "pack_state ");
-        string_append(string, blob_read_int(bcData, pos));
-        string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        for (int i=0; i < 4; i++) {
+            if (i > 0)
+                string_append(string, " ");
+            string_append(string, blob_read_u16(bcData, pos));
+        }
         break;
     case bc_MaybeNullifyState:
         set_string(string, "maybe_nullify_state");
@@ -522,21 +526,72 @@ void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* 
     }
 }
 
-void bytecode_write_block_pre_exit(caValue* bytecode, Block* block)
+static int get_expected_stack_distance(Block* from, Block* to)
+{
+    int distance = 0;
+
+    while (from != to) {
+        // The one case where the block distance doesn't match the stack frame distance
+        // is with an if-block. The if-block has a 'parent' block (that contains each
+        // condition) which itself does not get a stack frame.
+        if (!is_if_block(from))
+            distance++;
+
+        from = get_parent_block(from);
+        ca_assert(from != NULL);
+    }
+    return distance;
+}
+
+static void bytecode_write_local_reference(caValue* bytecode, Block* callingBlock, Term* term)
+{
+    blob_append_u16(bytecode, get_expected_stack_distance(callingBlock, term->owningBlock));
+    blob_append_u16(bytecode, term->index);
+}
+
+#if 0
+static bool write_pack_states_for_block(caValue* bytecode, Block* block, Block* callingBlock)
 {
     bool anyPackState = false;
 
-    // Add a PackState op for each declared_state term.
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
         if (term == NULL)
             continue;
         if (term->function == FUNCS.declared_state) {
-            Term* stateResult = find_local_name(block, &term->nameValue);
-            ca_assert(stateResult->owningBlock == block);
+            Term* stateResult = find_name(callingBlock, &term->nameValue);
             blob_append_char(bytecode, bc_PackState);
-            blob_append_int(bytecode, term->index);
-            blob_append_int(bytecode, stateResult->index);
+            bytecode_write_local_reference(bytecode, callingBlock, term);
+            bytecode_write_local_reference(bytecode, callingBlock, stateResult);
+            anyPackState = true;
+        }
+    }
+
+    return anyPackState;
+}
+#endif
+
+static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)
+{
+    // Add PackState ops for each minor block.
+    bool anyPackState = false;
+
+    UpwardIterator2 packStateSearch(block);
+    packStateSearch.stopAt(find_nearest_major_block(block));
+
+    for (; packStateSearch; ++packStateSearch) {
+        Term* term = packStateSearch.current();
+
+        if (term->function == FUNCS.declared_state) {
+            Term* stateResult = NULL;
+            if (exitPoint != NULL)
+                stateResult = find_name_at(exitPoint, &term->nameValue);
+            else
+                stateResult = find_name(block, &term->nameValue);
+
+            blob_append_char(bytecode, bc_PackState);
+            bytecode_write_local_reference(bytecode, block, term);
+            bytecode_write_local_reference(bytecode, block, stateResult);
             anyPackState = true;
         }
     }
@@ -567,7 +622,7 @@ void bytecode_write_block(caValue* bytecode, Block* block)
                 continue;
 
             if (is_exit_point(term)) {
-                bytecode_write_block_pre_exit(bytecode, block);
+                write_block_pre_exit(bytecode, block, term);
                 bytecode_write_term_call(bytecode, term);
                 exitAdded = true;
                 break;
@@ -578,7 +633,7 @@ void bytecode_write_block(caValue* bytecode, Block* block)
     }
 
     if (!exitAdded)
-        bytecode_write_block_pre_exit(bytecode, block);
+        write_block_pre_exit(bytecode, block, NULL);
 
     if (is_for_loop(block)) {
         blob_append_char(bytecode, bc_LoopDone);

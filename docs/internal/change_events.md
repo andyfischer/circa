@@ -1,5 +1,5 @@
 
-### First-Class Change Events ###
+## First-Class Change Events ##
 
 Plan written on 8/28/2013
 

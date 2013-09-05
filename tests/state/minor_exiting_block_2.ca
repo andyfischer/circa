@@ -1,0 +1,15 @@
+
+def main()
+  state s = 1
+  if true
+   if true
+    if true
+     for i in [1]
+      if false
+      else
+        s = 2
+        return
+
+int = make_stack(main)
+int.call
+print(int.extract_state)

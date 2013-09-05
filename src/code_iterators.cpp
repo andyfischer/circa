@@ -138,6 +138,71 @@ void UpwardIterator::advance()
     } while (unfinished() && current() == NULL);
 }
 
+UpwardIterator2::UpwardIterator2(Term* firstTerm)
+  : lastBlock(NULL)
+{
+    block = firstTerm->owningBlock;
+    index = firstTerm->index;
+}
+
+UpwardIterator2::UpwardIterator2(Block* startingBlock)
+  : lastBlock(NULL)
+{
+    block = startingBlock;
+    index = block->length() - 1;
+    advanceWhileInvalid();
+}
+
+void UpwardIterator2::stopAt(Block* _lastBlock)
+{
+    lastBlock = _lastBlock;
+}
+
+bool UpwardIterator2::finished()
+{
+    return block == NULL;
+}
+
+Term* UpwardIterator2::current()
+{
+    ca_assert(!finished());
+    return block->get(index);
+}
+
+void UpwardIterator2::advance()
+{
+    index--;
+    advanceWhileInvalid();
+}
+
+void UpwardIterator2::advanceWhileInvalid()
+{
+possibly_invalid:
+    if (finished())
+        return;
+
+    if (index < 0) {
+        // Stop if we've finished the lastBlock.
+        if (block == lastBlock) {
+            block = NULL;
+            return;
+        }
+
+        Block* previousBlock = block;
+        block = get_parent_block(block);
+        Term* parentTerm = get_parent_term(previousBlock);
+
+        if (block == NULL || parentTerm == NULL) {
+            block = NULL;
+            return;
+        }
+
+        index = parentTerm->index - 1;
+
+        goto possibly_invalid;
+    }
+}
+
 BlockIteratorFlat::BlockIteratorFlat(Block* blockIn)
  : block(blockIn), index(0)
 {

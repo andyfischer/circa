@@ -485,6 +485,7 @@ Block* get_parent_block(Block* block)
     if (block == global_root_block())
         return NULL;
 
+    // TODO: Revisit this. Should the global block always be considered a parent?
     if (block->owningTerm == NULL)
         return global_root_block();
 
@@ -519,7 +520,7 @@ Term* get_parent_term(Term* term, int levels)
     return term;
 }
 
-bool sym_is_reachable_from(Term* term, Block* block)
+bool name_is_reachable_from(Term* term, Block* block)
 {
     if (term->owningBlock == block)
         return true;
@@ -529,7 +530,16 @@ bool sym_is_reachable_from(Term* term, Block* block)
     if (parent == NULL)
         return false;
 
-    return sym_is_reachable_from(term, parent);
+    return name_is_reachable_from(term, parent);
+}
+
+Block* find_nearest_major_block(Block* block)
+{
+    while (true) {
+        if (block == NULL || is_major_block(block))
+            return block;
+        block = get_parent_block(block);
+    }
 }
 
 Block* find_first_common_block(Term* left, Term* right)
@@ -573,7 +583,7 @@ bool term_is_child_of_block(Term* term, Block* block)
 // Returns whether or not we succeeded
 bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& output)
 {
-    if (sym_is_reachable_from(term, block)) {
+    if (name_is_reachable_from(term, block)) {
         output << term->name;
         return true;
     }
@@ -609,7 +619,7 @@ std::string get_relative_name(Block* block, Term* term)
 {
     ca_assert(term != NULL);
 
-    if (sym_is_reachable_from(term, block))
+    if (name_is_reachable_from(term, block))
         return term->name;
 
     // Build a dot-separated name

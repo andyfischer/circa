@@ -1,0 +1,11 @@
+
+-- In this test, we declare 'state s' but never change its value.
+
+def main()
+  state s = 1
+  if true
+    return
+
+int = make_stack(main)
+int.call
+print(int.extract_state)

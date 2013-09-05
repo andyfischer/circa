@@ -205,7 +205,7 @@ def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
 
 type Frame { Stack stack, int index }
-type RetainedFrame { Stack stack, Block block, any _state }
+type RetainedFrame { Stack stack, Block block, any _state, any registers }
 
 def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)

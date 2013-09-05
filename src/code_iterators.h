@@ -60,6 +60,23 @@ struct UpwardIterator
     void operator++() { advance(); }
 };
 
+struct UpwardIterator2
+{
+    Block* block;
+    int index;
+    Block* lastBlock;
+
+    UpwardIterator2(Term* firstTerm);
+    UpwardIterator2(Block* startingBlock);
+    void stopAt(Block* _lastBlock);
+    bool finished();
+    Term* current();
+    void advance();
+    void advanceWhileInvalid();
+    operator bool() { return !finished(); }
+    void operator++() { advance(); }
+};
+
 struct BlockIteratorFlat
 {
     Block* block;

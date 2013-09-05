@@ -212,7 +212,7 @@ const char* STDLIB_CA_TEXT =
     "    -- Retrieve the value for a given key.\n"
     "\n"
     "type Frame { Stack stack, int index }\n"
-    "type RetainedFrame { Stack stack, Block block, any _state }\n"
+    "type RetainedFrame { Stack stack, Block block, any _state, any registers }\n"
     "\n"
     "def Frame.active_value(self, Term) -> any\n"
     "def Frame.set_active_value(self, Term, any)\n"

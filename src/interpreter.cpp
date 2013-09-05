@@ -44,6 +44,7 @@ static void start_interpreter_session(Stack* stack);
 static void push_inputs_dynamic(Stack* stack);
 void run(Stack* stack);
 bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, int* pc);
+static caValue* bc_read_local_position(Stack* stack, const char* data, int* pc);
 static int for_loop_find_index_value(Frame* frame);
 void extract_state(Block* block, caValue* state, caValue* output);
 static void retained_frame_extract_state(caValue* frame, caValue* output);
@@ -204,18 +205,23 @@ static Frame* stack_push3(Stack* stack, Frame* parent, int parentPc, Block* bloc
 
 static Frame* expand_frame(Frame* parent, Frame* top)
 {
-    // Look for frame state to carry over from parent.
+    // Look for a retained frame to carry over from parent.
     if (is_list(&parent->state) && !is_null(list_get(&parent->state, top->parentPc))) {
 
         // Found non-null state for this parentPc.
-        caValue* state = list_get(&parent->state, top->parentPc);
+        caValue* retainedFrame = list_get(&parent->state, top->parentPc);
 
-        if (is_retained_frame(state)
+        if (is_retained_frame(retainedFrame)
                 // Don't expand state on calls from within declared_state.
-                && (parent->block->owningTerm != FUNCS.declared_state)) {
+                && (parent->block->owningTerm != FUNCS.declared_state)
+                && (retained_frame_get_block(retainedFrame) == top->block)) {
 
-            if (retained_frame_get_block(state) == top->block)
-                copy(retained_frame_get_state(state), &top->state);
+            // Copy 'retained', even if the retained frame has none.
+            copy(retained_frame_get_state(retainedFrame), &top->state);
+
+            // Copy saved registers, used for memoized frames.
+            if (!is_null(retained_frame_get_registers(retainedFrame)))
+                copy(retained_frame_get_registers(retainedFrame), &top->registers);
         }
     }
 
@@ -228,17 +234,17 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
     if (is_list(&parent->state) && !is_null(list_get(&parent->state, top->parentPc))) {
 
         // Found non-null state for this parentPc.
-        caValue* state = list_get(&parent->state, top->parentPc);
+        caValue* retainedList = list_get(&parent->state, top->parentPc);
 
-        if (is_list(state) && index < list_length(state)) {
-            caValue* element = list_get(state, index);
+        if (is_list(retainedList) && index < list_length(retainedList)) {
+            caValue* retainedFrame = list_get(retainedList, index);
 
-            if (is_retained_frame(element)
+            if (is_retained_frame(retainedFrame)
                     // Don't expand state on calls from within declared_state.
                     && (parent->block->owningTerm != FUNCS.declared_state)) {
 
-                if (retained_frame_get_block(element) == top->block)
-                    copy(retained_frame_get_state(element), &top->state);
+                if (retained_frame_get_block(retainedFrame) == top->block)
+                    copy(retained_frame_get_state(retainedFrame), &top->state);
             }
         }
     }
@@ -262,23 +268,25 @@ void stack_pop(Stack* stack)
 {
     Frame* frame = stack_top(stack);
 
-    if (frame->retain)
+    if (frame->shouldRetain)
         retain_stack_top(stack);
 
     stack_pop_no_retain(stack);
 }
 
-static void retain_stack_top(Stack* stack)
+static caValue* prepare_retained_slot_for_parent(Stack* stack)
 {
+    // Create a slot in the parent frame's stack that is suitable for storing the
+    // top stack frame. Handles the creation of lists for iteration/condition state.
+
     Frame* top = stack_top(stack);
     Frame* parent = frame_parent(top);
     if (parent == NULL)
-        return;
+        return NULL;
 
     // Expand parent->state if needed.
     if (is_null(&parent->state))
         set_list(&parent->state, parent->block->length());
-
     touch(&parent->state);
 
     caValue* slot = list_get(&parent->state, top->parentPc);
@@ -325,9 +333,27 @@ static void retain_stack_top(Stack* stack)
         slot = list_get(slot, loopIndex);
     }
 
-    copy_stack_frame_to_retained(top, slot);
+    return slot;
+}
 
-    parent->retain = true;
+static void retain_stack_top(Stack* stack)
+{
+    if (stack_top_parent(stack) == NULL)
+        return;
+
+    caValue* slot = prepare_retained_slot_for_parent(stack);
+    copy_stack_frame_to_retained(stack_top(stack), slot);
+    stack_top_parent(stack)->shouldRetain = true;
+}
+
+static void retain_stack_top_registers(Stack* stack)
+{
+    if (stack_top_parent(stack) == NULL)
+        return;
+
+    caValue* slot = prepare_retained_slot_for_parent(stack);
+    copy_stack_frame_registers_to_retained(stack_top(stack), slot);
+    stack_top_parent(stack)->shouldRetain = true;
 }
 
 static Frame* stack_push_blank(Stack* stack)
@@ -345,7 +371,7 @@ static Frame* stack_push_blank(Stack* stack)
     frame->pc = 0;
     frame->exitType = sym_None;
     frame->callType = sym_NormalCall;
-    frame->retain = false;
+    frame->shouldRetain = false;
     frame->block = NULL;
 
     return frame;
@@ -496,7 +522,7 @@ void stack_to_string(Stack* stack, caValue* out)
              << ", block = #" << block->id
              << ", pcIndex = " << frame->pcIndex
              << ", pc = " << frame->pc
-             << ", retain = " << (frame->retain ? "true" : "false")
+             << ", shouldRetain = " << (frame->shouldRetain ? "true" : "false")
              << "]" << std::endl;
 
         if (block == NULL)
@@ -638,7 +664,7 @@ Frame* frame_by_depth(Stack* stack, int depth)
 
 void frame_retain(Frame* frame)
 {
-    frame->retain = true;
+    frame->shouldRetain = true;
 }
 
 int frame_get_index(Frame* frame)
@@ -1025,7 +1051,6 @@ void pop_outputs_dynamic(Stack* stack, Frame* frame, Frame* top)
     }
 }
 
-
 void run_bytecode(Stack* stack, caValue* bytecode)
 {
     struct InterpreterTransientState {
@@ -1210,7 +1235,7 @@ do_loop_done_insn:
             Block* contents = s.frame->block;
 
             // Possibly save state.
-            if (s.frame->retain)
+            if (s.frame->shouldRetain)
                 retain_stack_top(stack);
 
             caValue* index = frame_register(s.frame, for_loop_find_index(contents));
@@ -1246,9 +1271,9 @@ do_loop_done_insn:
                     set_list(frame_register_from_end(s.frame, 0), 0);
                 }
 
-                // Erase the retain flag - we've already saved each iteration, and we don't want
+                // Erase the shouldRetain flag - we've already saved each iteration, and we don't want
                 // stack_pop to save anything else.
-                s.frame->retain = false;
+                s.frame->shouldRetain = false;
                 
                 goto do_done_insn;
             }
@@ -1623,7 +1648,7 @@ do_func_apply:
                 toFrame->exitType = sym_Break;
             else if (op == bc_Discard) {
                 toFrame->exitType = sym_Discard;
-                s.frame->retain = false;
+                s.frame->shouldRetain = false;
             }
 
             s.frame = stack_top(stack);
@@ -1670,7 +1695,7 @@ do_func_apply:
         }
 
         case bc_MemoizeFrame: {
-            frame_retain(s.frame);
+            retain_stack_top_registers(stack);
             continue;
         }
 
@@ -1680,25 +1705,27 @@ do_func_apply:
         }
 
         case bc_PackState: {
-            int declaredIndex = blob_read_int(s.bc, &s.pc);
-            int resultIndex = blob_read_int(s.bc, &s.pc);
+            u16 declaredStackDistance = blob_read_u16(s.bc, &s.pc);
+            u16 declaredIndex = blob_read_u16(s.bc, &s.pc);
+            caValue* result = bc_read_local_position(stack, s.bc, &s.pc);
 
-            caValue* result = stack_find_active_value(s.frame, frame_term(s.frame, resultIndex));
-            caValue* frameState = &s.frame->state;
+            Frame* declaredFrame = frame_by_depth(stack, declaredStackDistance);
+            caValue* retainedList = &declaredFrame->state;
 
-            if (is_null(frameState))
-                set_list(frameState, s.frame->block->length());
-            touch(frameState);
+            // Expand state if necessary.
+            if (is_null(retainedList))
+                set_list(retainedList, declaredFrame->block->length());
+            touch(retainedList);
 
-            copy(result, list_get(frameState, declaredIndex));
-            frame_retain(s.frame);
+            copy(result, list_get(retainedList, declaredIndex));
+            frame_retain(declaredFrame);
             continue;
         }
 
         case bc_MaybeNullifyState: {
             Frame* top = stack_top(stack);
             Frame* parent = stack_top_parent(stack);
-            if (!top->retain && !is_null(&parent->state)) {
+            if (!top->shouldRetain && !is_null(&parent->state)) {
                 caValue* slot = list_get(&parent->state, top->parentPc);
                 set_null(slot);
             }
@@ -1867,6 +1894,18 @@ bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, i
     }
 
     return false;
+}
+
+static caValue* bc_read_local_position(Stack* stack, const char* data, int* pc)
+{
+    u16 stackDistance = blob_read_u16(data, pc);
+    u16 index = blob_read_u16(data, pc);
+
+    Frame* frame = frame_by_depth(stack, stackDistance);
+    Term* term = frame->block->get(index);
+    if (is_value(term))
+        return term_value(term);
+    return frame_register(frame, index);
 }
 
 // TODO: delete this

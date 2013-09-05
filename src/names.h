@@ -71,7 +71,11 @@ Block* get_parent_block(Block* block);
 Term* get_parent_term(Term* term);
 Term* get_parent_term(Block* block);
 Term* get_parent_term(Term* term, int levels);
-bool sym_is_reachable_from(Term* term, Block* block);
+bool name_is_reachable_from(Term* term, Block* block);
+
+// Find the nearest (parent) block that is a major block. May return the 'block' itself.
+Block* find_nearest_major_block(Block* block);
+
 Block* find_first_common_block(Term* left, Term* right);
 bool term_is_child_of_block(Term* term, Block* block);
 
