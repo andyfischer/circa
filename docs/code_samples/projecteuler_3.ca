@@ -1,0 +1,37 @@
+{-
+http://projecteuler.net/problem=3
+
+The prime factors of 13195 are 5, 7, 13 and 29.
+
+What is the largest prime factor of the number 600851475143 ?
+-}
+
+def possible_factor(msg) -> int
+    case 
+
+def list_factors(int num) -> List
+
+    possibleFactor = 2
+    factors = []
+    for i in range(0, 10000000)
+        if possibleFactor > num
+            break
+
+        if (num / possibleFactor) % 1 == 0
+            print(possibleFactor ' is a factor of ' num)
+            num = num // possibleFactor
+            @factors.append(possibleFactor)
+        else
+            possibleFactor += 1
+
+    print(factors)
+    factors
+
+def max(List list)
+    result = list[0]
+    for item in list
+        if item > result
+            result = item
+    result
+
+list_factors(600851475143) -> max -> print

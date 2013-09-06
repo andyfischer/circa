@@ -1,0 +1,13 @@
+def draggable(self, Rect rect) -> Point
+    state is_dragging = false
+    state Point drag_start_loc
+    if context(:userInput).leftMouseDown and rect.contains(mousePos())
+        is_dragging = true
+        drag_start_loc = self.mousePos
+    elif not context(:userInput).leftMouseDown
+        is_dragging = false
+
+    if is_dragging
+        return mousePos() - drag_start_loc
+    else
+        return [0 0]

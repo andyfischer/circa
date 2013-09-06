@@ -25,7 +25,6 @@ syn region circaMultilineComment start="{-" end="-}" contains=circaMultilineComm
 
 " Keywords
 syn keyword circaKeyword def type if elif else for state return in true false namespace discard break continue while not and or require package section
-syn match circaKeyword "\<do\ once\>"
 
 " Comments
 syn region circaLineComment start="--" skip="\\$" end="$"

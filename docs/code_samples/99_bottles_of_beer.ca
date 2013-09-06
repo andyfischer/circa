@@ -1,6 +1,6 @@
 
-def plural(int count) -> string
-    return cond(count == 1, "", "s")
+def plural(int count) -> String
+    cond(count == 1, "", "s")
 
 for count in 99..0
     print(concat(count ' bottle' plural(count) ' of beer on the wall'))
