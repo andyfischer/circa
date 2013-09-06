@@ -229,7 +229,7 @@ void native_patch_this_postCompile(Term* term)
     // Fetch the native module's filename, this might require parse-time eval.
     Term* filenameInput = term->input(0);
     Value filename;
-    evaluate_minimum2(filenameInput, &filename);
+    copy(term_value(filenameInput), &filename);
 
     if (!is_string(&filename)) {
         std::cout << "input is not a string value in native_patch_this_postCompile"

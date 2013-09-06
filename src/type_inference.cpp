@@ -123,37 +123,6 @@ Term* statically_infer_length_func(Block* block, Term* term)
     return create_symbol_value(block, sym_Unknown);
 }
 
-Term* statically_infer_result(Block* block, Term* term)
-{
-    if (term->function == FUNCS.length)
-        return statically_infer_length_func(block, term);
-
-#if 0
-    Disabled, this approach might be flawed
-    if (term->function == TYPE_FUNC)
-        return statically_infer_type(block, term->input(0));
-#endif
-
-    // Function not recognized
-    std::cout << "statically_infer_result didn't recognize: "
-        << term->function->name << std::endl;
-    return create_symbol_value(block, sym_Unknown);
-}
-
-void statically_infer_result(Term* term, caValue* result)
-{
-    Block scratch;
-
-    Term* resultTerm = statically_infer_result(&scratch, term);
-
-    if (is_value(resultTerm))
-        copy(term_value(resultTerm), result);
-    else {
-        Stack context;
-        evaluate_minimum(&context, resultTerm, result);
-    }
-}
-
 Type* create_typed_unsized_list_type(Type* elementType)
 {
     Type* type = create_type();

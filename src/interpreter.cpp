@@ -1877,9 +1877,6 @@ bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, i
         }
         case bc_EnterFrame: {
             // Memoization check succeeded.
-
-            // Reuse saved frame if possible.
-            // TODO
             
             // Advance the interpreter past the EnterFrame insn.
             *interpreterPos = pc;
@@ -1906,121 +1903,6 @@ static caValue* bc_read_local_position(Stack* stack, const char* data, int* pc)
     if (is_value(term))
         return term_value(term);
     return frame_register(frame, index);
-}
-
-// TODO: delete this
-void evaluate_range(Stack* stack, Block* block, int start, int end)
-{
-#if 0
-    start_interpreter_session(stack);
-
-    block_finish_changes(block);
-    stack_push(stack, block);
-
-    Value bytecode;
-    set_list(&bytecode, block->length() + 1);
-
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-
-        caValue* op = list_get(&bytecode, i);
-        if (i < start || i >= end)
-            bytecode_write_noop(op);
-        else
-            write_term_bytecode(term, op);
-    }
-
-    move(&bytecode, &stack_top(stack)->customBytecode);
-
-    run_interpreter(stack);
-
-    if (stack_errored(stack))
-        return;
-
-    stack_pop(stack);
-#endif
-}
-
-// TODO: delete this
-void evaluate_minimum(Stack* stack, Term* term, caValue* result)
-{
-#if 0
-    // Get a list of every term that this term depends on. Also, limit this
-    // search to terms inside the current block.
-    
-    Block* block = term->owningBlock;
-    block_finish_changes(block);
-
-    bool *marked = new bool[block->length()];
-    memset(marked, false, sizeof(bool)*block->length());
-
-    marked[term->index] = true;
-
-    // Walk up the block, marking terms.
-    for (int i=term->index; i >= 0; i--) {
-        Term* checkTerm = block->get(i);
-        if (checkTerm == NULL)
-            continue;
-
-        if (marked[i]) {
-            for (int inputIndex=0; inputIndex < checkTerm->numInputs(); inputIndex++) {
-                Term* input = checkTerm->input(inputIndex);
-                if (input == NULL)
-                    continue;
-
-                // don't compile stuff outside this block.
-                if (input->owningBlock != block)
-                    continue;
-
-                // don't follow :meta inputs.
-                if (is_input_meta(nested_contents(checkTerm->function), inputIndex))
-                    continue;
-
-                marked[input->index] = true;
-            }
-        }
-    }
-
-    // Construct a bytecode fragment that only includes marked terms.
-    Value bytecode;
-    set_list(&bytecode, block->length() + 1);
-
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-
-        caValue* op = list_get(&bytecode, i);
-        if (!marked[i])
-            bytecode_write_noop(op);
-        else
-            write_term_bytecode(term, op);
-    }
-    
-    bytecode_write_finish_op(list_get(&bytecode, block->length()));
-    delete[] marked;
-
-    // Push frame, use our custom bytecode.
-    stack_push(stack, block);
-    move(&bytecode, &stack_top(stack)->customBytecode);
-
-    run_interpreter(stack);
-
-    // Possibly save output
-    if (result != NULL)
-        copy(get_top_register(stack, term), result);
-
-    stack_pop(stack);
-#endif
-}
-
-// TODO: delete this
-void evaluate_minimum2(Term* term, caValue* output)
-{
-    // Check if 'term' is just a value; don't need to create a Stack if so.
-    if (is_value(term))
-        copy(term_value(term), output);
-
-    Stack stack;
-    evaluate_minimum(&stack, term, output);
 }
 
 void Frame__registers(caStack* stack)

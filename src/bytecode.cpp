@@ -549,28 +549,6 @@ static void bytecode_write_local_reference(caValue* bytecode, Block* callingBloc
     blob_append_u16(bytecode, term->index);
 }
 
-#if 0
-static bool write_pack_states_for_block(caValue* bytecode, Block* block, Block* callingBlock)
-{
-    bool anyPackState = false;
-
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (term == NULL)
-            continue;
-        if (term->function == FUNCS.declared_state) {
-            Term* stateResult = find_name(callingBlock, &term->nameValue);
-            blob_append_char(bytecode, bc_PackState);
-            bytecode_write_local_reference(bytecode, callingBlock, term);
-            bytecode_write_local_reference(bytecode, callingBlock, stateResult);
-            anyPackState = true;
-        }
-    }
-
-    return anyPackState;
-}
-#endif
-
 static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)
 {
     // Add PackState ops for each minor block.

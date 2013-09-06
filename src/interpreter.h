@@ -131,10 +131,6 @@ void run_bytecode(Stack* stack, caValue* bytecode);
 // Deprecated
 void evaluate_block(Stack* stack, Block* block);
 
-// Evaluate 'term' and every term that it depends on. 
-void evaluate_minimum(Stack* stack, Term* term, caValue* result);
-void evaluate_minimum2(Term* term, caValue* output);
-
 // Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
 // - you call it when the block is finished evaluating. But instead of passing outputs
 // to the parent frame (like finish_frame does), this copies them to your list.

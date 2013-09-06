@@ -1556,7 +1556,6 @@ int get_infix_precedence(int match)
     switch(match) {
         case tok_TwoDots:
         case tok_RightArrow:
-        case tok_LeftArrow:
             return 8;
         case tok_Star:
         case tok_Slash:
@@ -1676,26 +1675,6 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
             // Can't use preWhitespace of input 1 here, because there is no input 1
             term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
-
-            result = ParseResult(term);
-
-        // Left-arrow
-        } else if (operatorMatch == tok_LeftArrow) {
-            ParseResult rightExpr = infix_expression(block, tokens, context, operatorPrecedence+1);
-
-            if (!is_function(left.term))
-                throw std::runtime_error("Left side of <- must be a function");
-
-            Stack evalStack;
-            evaluate_minimum(&evalStack, left.term, NULL);
-
-            Term* function = left.term;
-
-            Term* term = apply(block, function, TermList(rightExpr.term));
-
-            term->setStringProp("syntax:declarationStyle", "left-arrow");
-            term->setStringProp("syntax:preOperatorWs", preOperatorWhitespace);
-            set_input_syntax_hint(term, 0, "preWhitespace", postOperatorWhitespace);
 
             result = ParseResult(term);
 
