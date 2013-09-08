@@ -1,0 +1,14 @@
+
+def f() -> bool
+  state s = 1
+  print('Called f with state: ' s)
+  s += 1
+  true
+
+def main()
+  if f()
+    return
+
+int = make_stack(main)
+int.call
+int.call

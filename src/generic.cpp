@@ -78,7 +78,8 @@ Term* create_overloaded_function(Block* block, const char* header)
     // Cases are added with append_to_overloaded_function()
 
     // Setup the fallback case
-    Term* elseTerm = if_block_append_case(nested_contents(ifBlock), NULL);
+    Term* elseTerm = if_block_append_case(nested_contents(ifBlock));
+    rename(elseTerm, "else");
     Block* elseBlock = nested_contents(elseTerm);
     apply(elseBlock, FUNCS.overload_error_no_match, TermList(inputsAsList));
     if_block_finish_appended_case(elseBlock, elseTerm);
@@ -98,12 +99,13 @@ void append_to_overloaded_function(Block* overloadedFunc, Term* specializedFunc)
     Term* inputsAsList = find_term_with_function(overloadedFunc, FUNCS.list);
     Term* ifBlock = find_term_with_function(overloadedFunc, FUNCS.if_block);
 
-    Term* condition = apply(overloadedFunc, FUNCS.inputs_fit_function,
-        TermList(inputsAsList, specializedFunc));
-    move_before(condition, ifBlock);
+    Term* caseTerm = if_block_append_case(nested_contents(ifBlock));
 
-    Term* caseTerm = if_block_append_case(nested_contents(ifBlock), condition);
     Block* caseBlock = nested_contents(caseTerm);
+    Term* condition = apply(nested_contents(caseTerm), FUNCS.inputs_fit_function,
+        TermList(inputsAsList, specializedFunc));
+    case_add_condition_check(caseBlock, condition);
+
     apply(caseBlock, specializedFunc, inputPlaceholders);
     if_block_finish_appended_case(caseBlock, caseTerm);
 }
@@ -138,11 +140,11 @@ Term* statically_specialize_overload_for_call(Term* call)
             continue;
 
         // Stop if we have reached the fallback case.
-        if (caseTerm->input(0) == NULL)
+        Term* condition = case_find_condition(nested_contents(caseTerm));
+        if (condition == NULL)
             break;
 
-        Term* caseCondition = caseTerm->input(0);
-        Term* func = caseCondition->input(1);
+        Term* func = condition->input(1);
 
         // Check if this function statically fits
         bool allInputsFit = true;
@@ -188,11 +190,9 @@ void list_overload_contents(Block* block, caValue* output)
 
     // iterate across cases
     for (int caseIndex=0;; caseIndex++) {
-        Term* caseTerm = if_block_get_case(ifContents, caseIndex);
-        if (caseTerm == NULL)
+        Block* caseContents = if_block_get_case(ifContents, caseIndex);
+        if (caseContents == NULL)
             break;
-
-        Block* caseContents = nested_contents(caseTerm);
 
         Term* call = find_last_non_comment_expression(caseContents);
         Term* func = call->function;

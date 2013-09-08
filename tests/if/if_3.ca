@@ -1,0 +1,4 @@
+
+-- Use brackets
+if 1 != 2 { print('check8') } else { print('error8') }
+

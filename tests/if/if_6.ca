@@ -1,0 +1,9 @@
+
+print('Output values:')
+
+a = if true { 1 } else { 2 }
+print('Should be 1: ' a)
+a = if false { 1 } else { 2 }
+print('Should be 2: ' a)
+ 
+

@@ -1,0 +1,21 @@
+
+def f() -> bool
+  state s = 1
+  print('Called f with state: ' s)
+  s += 1
+  false
+
+def g() -> bool
+  state s = 10
+  print('Called g with state: ' s)
+  s += 1
+  false
+
+def main()
+  if f()
+  elif g()
+  else
+
+int = make_stack(main)
+int.call
+int.call

@@ -32,11 +32,15 @@ namespace if_block_function {
 
             if (firstCase) {
                 append_phrase(source, "if ", caseTerm, sym_Keyword);
-                format_source_for_input(source, caseTerm, 0);
+                Term* conditionCheck = case_find_condition_check(nested_contents(caseTerm));
+                if (conditionCheck != NULL)
+                    format_source_for_input(source, conditionCheck, 0);
                 firstCase = false;
-            } else if (caseTerm->input(0) != NULL) {
+            } else if (caseTerm->name != "else") {
                 append_phrase(source, "elif ", caseTerm, sym_Keyword);
-                format_source_for_input(source, caseTerm, 0);
+                Term* conditionCheck = case_find_condition_check(nested_contents(caseTerm));
+                if (conditionCheck != NULL)
+                    format_source_for_input(source, conditionCheck, 0);
             }
             else
                 append_phrase(source, "else", caseTerm, sym_None);

@@ -1,0 +1,10 @@
+
+
+i = 0
+lines = while i < 5
+    i += 1
+
+    concat('i = ' i)
+
+
+print(lines)

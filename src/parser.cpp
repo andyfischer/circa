@@ -935,9 +935,8 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
     // Lookbehind to see if we have a name-binding before the if block. This is needed
     // to figure out indentation.
     int nameBindingPos = 0;
-    if (lookbehind_match_leading_name_binding(tokens, &nameBindingPos)) {
+    if (lookbehind_match_leading_name_binding(tokens, &nameBindingPos))
         startPosition = tokens.getPosition() + nameBindingPos;
-    }
 
     int blockIndent = tokens[startPosition].colStart;
 
@@ -978,13 +977,15 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
         if (expectCondition) {
             possible_whitespace(tokens);
-            Term* condition = infix_expression(block, tokens, context, 0).term;
+            caseTerm = if_block_append_case(contents);
+            Block* caseContents = nested_contents(caseTerm);
+            Term* condition = infix_expression(caseContents, tokens, context, 0).term;
+            case_add_condition_check(caseContents, condition);
             ca_assert(condition != NULL);
-            caseTerm = if_block_append_case(contents, condition);
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            caseTerm = if_block_append_case(contents, NULL);
+            caseTerm = if_block_append_case(contents);
             rename(caseTerm, "else");
         }
 
@@ -1019,13 +1020,10 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
-        Term* elseTerm = if_block_append_case(contents, NULL);
+        Term* elseTerm = if_block_append_case(contents);
         rename(elseTerm, "else");
         hide_from_source(elseTerm);
     }
-
-    // Move the if_block term to be after the condition terms.
-    move_before_final_terms(result);
 
     finish_if_block(result);
     set_source_location(result, startPosition, tokens);

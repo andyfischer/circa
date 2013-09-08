@@ -977,6 +977,10 @@ void bootstrap_kernel()
     FUNCS.section_block = import_function(builtins, NULL, "def section_block() -> any");
     block_set_format_source_func(function_contents(FUNCS.section_block), section_block_formatSource);
 
+    FUNCS.next_case_if_false = import_function(builtins, NULL, "def next_case_if_false(bool condition)");
+    FUNCS.minor_return_if_empty = import_function(builtins, NULL, "def minor_return_if_empty()");
+    FUNCS.phi = import_function(builtins, NULL, "def phi(left, right) -> any");
+
     // Now we can build derived functions
 
     // Create overloaded functions

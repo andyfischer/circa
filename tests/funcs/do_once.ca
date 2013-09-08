@@ -4,12 +4,9 @@ def once() -> bool
     s = false
     return result
 
-if once()
-    print("check 1")
-
 def f()
   if once()
-      print("check 2")
+      print("Check (should only print once)")
 
 int = make_stack(f)
 int.call

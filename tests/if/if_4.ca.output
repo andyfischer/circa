@@ -1,0 +1,3 @@
+Rebinding locals:
+should be inner: inner
+should be outer: outer

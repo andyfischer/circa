@@ -193,7 +193,7 @@ Frame* stack_push(Stack* stack, Block* block)
     return stack_push(stack, block, parentPc);
 }
 
-static Frame* stack_push3(Stack* stack, Frame* parent, int parentPc, Block* block)
+static Frame* stack_push3(Stack* stack, int parentPc, Block* block)
 {
     Frame* top = stack_push_blank(stack);
     top->parentPc = parentPc;
@@ -300,14 +300,8 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
 
         if (!is_list(slot))
             set_list(slot);
-        else {
+        else
             list_touch(slot);
-
-            // Erase pre-existing state in each unused condition block.
-            for (int i=0; i < list_length(slot); i++)
-                if (caseIndex != i)
-                    set_null(list_get(slot, i));
-        }
 
         if (list_length(slot) <= caseIndex)
             list_resize(slot, caseIndex + 1);
@@ -324,6 +318,8 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
         
         if (!is_list(slot))
             set_list(slot);
+        else
+            list_touch(slot);
 
         int loopIndex = for_loop_find_index_value(top);
 
@@ -841,6 +837,7 @@ bool stack_errored(Stack* stack)
     return stack->errorOccurred;
 }
 
+#if 0
 static Block* case_block_choose_block(Stack* stack, Term* term)
 {
     // Find the accepted case
@@ -871,6 +868,7 @@ static Block* case_block_choose_block(Stack* stack, Term* term)
     }
     return NULL;
 }
+#endif
 
 static int for_loop_find_index_value(Frame* frame)
 {
@@ -1100,7 +1098,7 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             Term* caller = frame_term(s.frame, termIndex);
             Block* block = function_contents(caller->function);
 
-            Frame* top = stack_push3(stack, s.frame, termIndex, block);
+            Frame* top = stack_push3(stack, termIndex, block);
             s.frame = stack_top_parent(stack);
             expand_frame(s.frame, top);
             ca_assert(s.frame != NULL);
@@ -1425,7 +1423,7 @@ do_loop_done_insn:
 
             Block* block = nested_contents(method);
 
-            Frame* top = stack_push3(stack, s.frame, s.termIndex, block);
+            Frame* top = stack_push3(stack, s.termIndex, block);
             s.frame = stack_top_parent(stack);
             expand_frame(s.frame, top);
             continue;
@@ -1451,7 +1449,7 @@ do_func_call:
                 return;
             }
 
-            Frame* top = stack_push3(stack, s.frame, s.termIndex, block);
+            Frame* top = stack_push3(stack, s.termIndex, block);
             s.frame = stack_top_parent(stack);
             expand_frame(s.frame, top);
             top->callType = sym_FuncCall;
@@ -1475,7 +1473,7 @@ do_func_apply:
                 return;
             }
 
-            Frame* top = stack_push3(stack, s.frame, s.termIndex, block);
+            Frame* top = stack_push3(stack, s.termIndex, block);
             s.frame = stack_top_parent(stack);
             expand_frame(s.frame, top);
             top->callType = sym_FuncApply;
@@ -1485,22 +1483,46 @@ do_func_apply:
         case bc_PushCase: {
             ca_assert(s.frame == stack_top(stack));
 
-            int index = blob_read_int(s.bc, &s.pc);
-
-            s.frame->pcIndex = index;
+            int termIndex = blob_read_int(s.bc, &s.pc);
+            s.frame->pcIndex = termIndex;
             s.frame->pc = s.pc;
-            Term* caller = frame_term(s.frame, index);
+            Term* caller = frame_term(s.frame, termIndex);
 
-            Block* block = case_block_choose_block(stack, caller);
-            if (block == NULL)
-                // Error occurred inside case_block_choose_block
-                return;
+            // Start the first case.
+            Block* block = if_block_get_case(nested_contents(caller), 0);
 
-            Frame* top = stack_push(stack, block);
+            Frame* top = stack_push3(stack, termIndex, block);
             s.frame = stack_top_parent(stack);
-            // TODO Optimization: Add case index to bytecode instead of looking it up here.
-            expand_frame_indexed(s.frame, top, case_block_get_index(block));
-            top->parentPc = index;
+            expand_frame_indexed(s.frame, top, 0);
+            continue;
+        }
+        case bc_NextCaseIfFalse: {
+            caValue* condition = bc_read_local_position(stack, s.bc, &s.pc);
+
+            if (!is_bool(condition)) {
+                Value msg;
+                set_string(&msg, "Case expected bool input, found: ");
+                string_append_quoted(&msg, condition);
+                raise_error_msg(stack, as_cstring(&msg));
+                return;
+            }
+
+            if (!as_bool(condition)) {
+                Block* currentCase = stack_top(stack)->block;
+                int prevCaseIndex = case_block_get_index(currentCase);
+                int parentPc = stack_top(stack)->parentPc;
+
+                stack_pop(stack);
+
+                int caseIndex = prevCaseIndex + 1;
+                Term* caller = stack_top(stack)->block->get(parentPc);
+                Block* nextCase = if_block_get_case(nested_contents(caller), caseIndex);
+                Frame* top = stack_push3(stack, parentPc, nextCase);
+                s.frame = top;
+                s.bc = as_blob(frame_bytecode(s.frame));
+                s.pc = 0;
+                expand_frame_indexed(stack_top_parent(stack), top, caseIndex);
+            }
             continue;
         }
         case bc_PushLoop: {
@@ -1525,7 +1547,7 @@ do_func_apply:
                 block = caller->nestedContents;
             }
 
-            Frame* top = stack_push3(stack, s.frame, index, block);
+            Frame* top = stack_push3(stack, index, block);
             s.frame = stack_top_parent(stack);
 
             if (!zeroBlock) {
@@ -1723,12 +1745,14 @@ do_func_apply:
         }
 
         case bc_MaybeNullifyState: {
+#if 0
             Frame* top = stack_top(stack);
             Frame* parent = stack_top_parent(stack);
             if (!top->shouldRetain && !is_null(&parent->state)) {
                 caValue* slot = list_get(&parent->state, top->parentPc);
                 set_null(slot);
             }
+#endif
             continue;
         }
 

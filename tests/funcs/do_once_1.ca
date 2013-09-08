@@ -1,0 +1,8 @@
+
+def main()
+    print('once = ' once())
+
+int = make_stack(main)
+int.call
+int.call
+int.call

@@ -1,0 +1,12 @@
+
+print('Rebinding locals:')
+a = 'outer'
+if true
+    a = 'inner'
+print('should be inner: ' a)
+
+a = 'outer'
+if false
+    a = 'inner'
+print('should be outer: ' a)
+

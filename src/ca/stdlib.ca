@@ -51,7 +51,7 @@ def reflect_get_frame_state() -> any
     -- Special call, read this frame's state.
 
 def declared_state(Type t, Func initializer :optional) -> any
-    
+
     existing = reflect_get_frame_state()
     
     if existing != null

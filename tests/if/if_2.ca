@@ -1,0 +1,17 @@
+
+x = 3
+y = 4
+if x == y
+    print('error6')
+if x != y
+    print('check6')
+
+if x == 1
+    print('error7.1')
+elif x == 2
+    print('error7.2')
+elif x == 3
+    print('check7')
+elif x == 4
+    print('error7.3')
+

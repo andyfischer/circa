@@ -1,6 +1,4 @@
 
-print('Simple execution:')
-
 if true
     print('check1')
 
@@ -13,69 +11,3 @@ if 1 < 2
 if 1 > 2
     print('error2')
 
-if true
-    print('check3')
-elif true
-    print('error3.1')
-else
-    print('error3.2')
-
-if false
-    print('error4.1')
-elif true
-    print('check4')
-else
-    print('error4.2')
-
-if false
-    print('error5')
-else
-    print('check5')
-
-x = 3
-y = 4
-if x == y
-    print('error6')
-if x != y
-    print('check6')
-
-if x == 1
-    print('error7.1')
-elif x == 2
-    print('error7.2')
-elif x == 3
-    print('check7')
-elif x == 4
-    print('error7.3')
-
--- Use brackets
-if 1 != 2 { print('check8') } else { print('error8') }
-
-print('Rebinding locals:')
-a = 'outer'
-if true
-    a = 'inner'
-print('should be inner: ' a)
-
-a = 'outer'
-if false
-    a = 'inner'
-print('should be outer: ' a)
-
-a = 1 + 2
-if true
-    a = 3 + 4
-print('should be 7: ' a)
-
-a = 1 + 2
-if false
-    a = 5
-print('should be 3: ' a)
-
-print('Output values:')
-
-a = if true { 1 } else { 2 }
-print('Should be 1: ' a)
-a = if false { 1 } else { 2 }
-print('Should be 2: ' a)
- 

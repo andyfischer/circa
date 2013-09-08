@@ -66,6 +66,7 @@ struct UpwardIterator2
     int index;
     Block* lastBlock;
 
+    UpwardIterator2();
     UpwardIterator2(Term* firstTerm);
     UpwardIterator2(Block* startingBlock);
     void stopAt(Block* _lastBlock);

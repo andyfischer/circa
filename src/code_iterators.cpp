@@ -138,6 +138,11 @@ void UpwardIterator::advance()
     } while (unfinished() && current() == NULL);
 }
 
+UpwardIterator2::UpwardIterator2()
+  : block(NULL), index(0), lastBlock(NULL)
+{
+}
+
 UpwardIterator2::UpwardIterator2(Term* firstTerm)
   : lastBlock(NULL)
 {

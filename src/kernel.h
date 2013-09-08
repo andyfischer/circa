@@ -53,6 +53,8 @@ struct BuiltinFuncs {
     Term* loop_iterator;
     Term* loop_output_index;
     Term* memoize;
+    Term* next_case_if_false;
+    Term* minor_return_if_empty;
     Term* module;
     Term* mult;
     Term* namespace_func;
@@ -62,6 +64,7 @@ struct BuiltinFuncs {
     Term* output_explicit;
     Term* overload_error_no_match;
     Term* package;
+    Term* phi;
     Term* range;
     Term* return_func;
     Term* section_block;
@@ -74,12 +77,11 @@ struct BuiltinFuncs {
     Term* switch_func;
     Term* type;
     Term* unbound_input;
-    Term* unbounded_loop;
-    Term* unbounded_loop_finish;
     Term* unknown_function;
     Term* unknown_identifier;
     Term* unrecognized_expression;
     Term* value;
+    Term* while_loop;
 };
 
 struct BuiltinTypes {

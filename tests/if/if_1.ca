@@ -1,0 +1,20 @@
+
+if true
+    print('check3')
+elif true
+    print('error3.1')
+else
+    print('error3.2')
+
+if false
+    print('error4.1')
+elif true
+    print('check4')
+else
+    print('error4.2')
+
+if false
+    print('error5')
+else
+    print('check5')
+

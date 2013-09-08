@@ -92,6 +92,25 @@ int case_block_get_index(Block* caseBlock)
     return -1;
 }
 
+
+Term* case_find_condition_check(Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.next_case_if_false)
+            return term;
+    }
+    return NULL;
+}
+
+Term* case_find_condition(Block* block)
+{
+    Term* conditionCheck = case_find_condition_check(block);
+    if (conditionCheck != NULL)
+        return conditionCheck->input(0);
+    return NULL;
+}
+
 Term* if_block_add_input(Term* ifBlock, Term* input)
 {
     Block* contents = nested_contents(ifBlock);
@@ -159,14 +178,14 @@ Term* if_block_append_output(Block* block, caValue* description)
     return blockPlaceholder;
 }
 
-Term* if_block_get_case(Block* block, int index)
+Block* if_block_get_case(Block* block, int index)
 {
     for (int i=0; i < block->length(); i++) {
         if (block->get(i) == NULL || block->get(i)->function != FUNCS.case_func)
             continue;
 
         if (index == 0)
-            return block->get(i);
+            return nested_contents(block->get(i));
 
         index--;
     }
@@ -179,23 +198,8 @@ void if_block_start(Block* block)
     append_output_placeholder(block, NULL);
 }
 
-Term* if_block_append_case(Block* block, Term* input)
+static void if_block_setup_new_case(Block* block, Term* newCase)
 {
-    int insertPos = 0;
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-
-        if (term->function == FUNCS.input)
-            insertPos = term->index + 1;
-
-        // Insert position is right after the last non-default case.
-        if (term->function == FUNCS.case_func && term->input(0) != NULL)
-            insertPos = term->index + 1;
-    }
-
-    Term* newCase = apply(block, FUNCS.case_func, TermList(input));
-    block->move(newCase, insertPos);
-
     // Add existing input placeholders to this case
     for (int i=0;; i++) {
         Term* placeholder = get_input_placeholder(block, i);
@@ -213,9 +217,34 @@ Term* if_block_append_case(Block* block, Term* input)
         change_declared_type(localPlaceholder, placeholder->type);
         rename(localPlaceholder, term_name(placeholder));
     }
+}
 
+Term* if_block_append_case(Block* block)
+{
+    int insertPos = 0;
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+
+        if (term->function == FUNCS.input)
+            insertPos = term->index + 1;
+
+        // Insert position is right after the last case.
+        if (term->function == FUNCS.case_func && term->name != "else")
+            insertPos = term->index + 1;
+    }
+
+    Term* newCase = apply(block, FUNCS.case_func, TermList());
+    block->move(newCase, insertPos);
+
+    if_block_setup_new_case(block, newCase);
     return newCase;
 }
+
+void case_add_condition_check(Block* caseBlock, Term* condition)
+{
+    apply(caseBlock, FUNCS.next_case_if_false, TermList(condition));
+}
+
 bool is_case_block(Block* block)
 {
     return block->owningTerm != NULL && block->owningTerm->function == FUNCS.case_func;
@@ -307,6 +336,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
         Term* inputPlaceholder = find_input_placeholder_with_name(mainBlock, name);
 
         // Create it if necessary
+        #if 0
         if (inputPlaceholder == NULL) {
             inputPlaceholder = if_block_add_input(ifCall, outer);
             rename(inputPlaceholder, name);
@@ -320,6 +350,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
                 rename(casePlaceholder, name);
             }
         }
+#endif
 
         // Now make sure there is an output placeholder for this name.
         Term* outputPlaceholder = find_output_placeholder_with_name(mainBlock, name);

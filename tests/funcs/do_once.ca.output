@@ -1,3 +1,2 @@
-check 1
-check 2
-final state: {_once: {s: false}}
+Check (should only print once)
+final state: {_if: [{_once: {s: false}}]}

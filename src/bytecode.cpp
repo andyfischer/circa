@@ -22,6 +22,7 @@
 namespace circa {
     
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block);
+static void bytecode_write_local_reference(caValue* bytecode, Block* callingBlock, Term* term);
 
 void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
 {
@@ -105,6 +106,12 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_Discard:
         set_string(string, "discard");
+        break;
+    case bc_NextCaseIfFalse:
+        set_string(string, "next_case_if_false ");
+        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_u16(bcData, pos));
         break;
     case bc_LoopDone:
         set_string(string, "loop_done ");
@@ -280,9 +287,13 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         }
     }
 
+    if (term->function == FUNCS.next_case_if_false) {
+        blob_append_char(bytecode, bc_NextCaseIfFalse);
+        bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
+        return;
+    }
 
     if (is_exit_point(term)) {
-
         if (term->function == FUNCS.return_func) {
             blob_append_char(bytecode, bc_Return);
             blob_append_int(bytecode, term->index);
@@ -549,13 +560,20 @@ static void bytecode_write_local_reference(caValue* bytecode, Block* callingBloc
     blob_append_u16(bytecode, term->index);
 }
 
-static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)
+static void write_pre_exit_pack_state(caValue* bytecode, Block* block, Term* exitPoint)
 {
     // Add PackState ops for each minor block.
     bool anyPackState = false;
 
-    UpwardIterator2 packStateSearch(block);
-    packStateSearch.stopAt(find_nearest_major_block(block));
+    UpwardIterator2 packStateSearch;
+
+    if (exitPoint != NULL) {
+        packStateSearch = UpwardIterator2(exitPoint);
+        packStateSearch.stopAt(find_block_that_exit_point_will_reach(exitPoint));
+    } else {
+        packStateSearch = UpwardIterator2(block);
+        packStateSearch.stopAt(find_nearest_major_block(block));
+    }
 
     for (; packStateSearch; ++packStateSearch) {
         Term* term = packStateSearch.current();
@@ -574,8 +592,15 @@ static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoin
         }
     }
 
-    if (!anyPackState && block_get_function_term(block) == FUNCS.case_func)
+    if (!anyPackState
+            && block_get_function_term(block) == FUNCS.case_func
+            && !(exitPoint != NULL && is_conditional_exit_point(exitPoint)))
         blob_append_char(bytecode, bc_MaybeNullifyState);
+}
+
+static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)
+{
+    write_pre_exit_pack_state(bytecode, block, exitPoint);
 
     if (block_contains_memoize(block))
         blob_append_char(bytecode, bc_MemoizeFrame);
@@ -599,12 +624,15 @@ void bytecode_write_block(caValue* bytecode, Block* block)
             if (term == NULL)
                 continue;
 
-            if (is_exit_point(term)) {
+            if (is_exit_point(term) && !is_conditional_exit_point(term)) {
                 write_block_pre_exit(bytecode, block, term);
                 bytecode_write_term_call(bytecode, term);
                 exitAdded = true;
                 break;
             }
+
+            if (is_conditional_exit_point(term))
+                write_pre_exit_pack_state(bytecode, block, term);
 
             bytecode_write_term_call(bytecode, term);
         }

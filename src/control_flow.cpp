@@ -28,6 +28,20 @@ bool is_exit_point(Term* term)
     return term->function == FUNCS.return_func
         || term->function == FUNCS.break_func
         || term->function == FUNCS.continue_func
+        || term->function == FUNCS.discard
+        || term->function == FUNCS.next_case_if_false;
+}
+
+bool is_conditional_exit_point(Term* term)
+{
+    return term->function == FUNCS.next_case_if_false;
+}
+
+bool is_exit_point_that_handles_rebinding(Term* term)
+{
+    return term->function == FUNCS.return_func
+        || term->function == FUNCS.break_func
+        || term->function == FUNCS.continue_func
         || term->function == FUNCS.discard;
 }
 
@@ -49,7 +63,7 @@ Block* find_block_that_exit_point_will_reach(Term* term)
 
     Block* block = term->owningBlock;
 
-    // Function exit
+    // 'return' exits to nearest major block.
     if (term->function == FUNCS.return_func) {
         while (is_minor_block(block)) {
             Block* parent = get_parent_block(block);
@@ -61,7 +75,12 @@ Block* find_block_that_exit_point_will_reach(Term* term)
         return block;
     }
 
-    // For-loop exit
+    // 'next_case_if_false' exits the current if-block.
+    if (term->function == FUNCS.next_case_if_false) {
+        return get_parent_block(term->owningBlock);
+    }
+
+    // Otherwise, exit to nearest for-loop.
     while (!is_for_loop(block)) {
         Block* parent = get_parent_block(block);
         if (parent == NULL)
@@ -205,7 +224,7 @@ void update_for_control_flow(Block* block)
         if (term == NULL)
             continue;
 
-        if (is_exit_point(term))
+        if (is_exit_point_that_handles_rebinding(term))
             update_derived_inputs_for_exit_point(term);
 
         Block* nestedBlock = term->nestedContents;

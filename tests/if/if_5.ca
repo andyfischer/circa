@@ -1,0 +1,11 @@
+
+a = 1 + 2
+if true
+    a = 3 + 4
+print('should be 7: ' a)
+
+a = 1 + 2
+if false
+    a = 5
+print('should be 3: ' a)
+

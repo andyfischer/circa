@@ -13,10 +13,10 @@ const char bc_EnterFrame = 7;
 const char bc_LeaveFrame = 8;
 const char bc_PopFrame = 9;
 const char bc_DoneTransient = 0xa;
-const char bc_FireNative = 0x15;
-const char bc_LoopDone = 0x1d;
-const char bc_ErrorNotEnoughInputs = 0x1e;
-const char bc_ErrorTooManyInputs = 0x1f;
+const char bc_FireNative = 0xb;
+const char bc_LoopDone = 0xc;
+const char bc_ErrorNotEnoughInputs = 0xe;
+const char bc_ErrorTooManyInputs = 0xf;
 
 // Pushing a new frame.
 const char bc_PushFunction = 0x10;
@@ -48,6 +48,7 @@ const char bc_Return = 0x19;
 const char bc_Continue = 0x1a;
 const char bc_Break = 0x1b;
 const char bc_Discard = 0x1c;
+const char bc_NextCaseIfFalse = 0x1d;
 
 // Memoization
 const char bc_UseMemoizedOnEqualInputs = 0x40;
