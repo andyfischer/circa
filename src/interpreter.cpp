@@ -260,6 +260,7 @@ void stack_pop_no_retain(Stack* stack)
     set_null(&frame->customBytecode);
     set_null(&frame->dynamicScope);
     set_null(&frame->state);
+    set_null(&frame->outgoingState);
 
     stack->framesCount--;
 }
@@ -284,12 +285,14 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
     if (parent == NULL)
         return NULL;
 
-    // Expand parent->state if needed.
-    if (is_null(&parent->state))
-        set_list(&parent->state, parent->block->length());
-    touch(&parent->state);
+    caValue* parentState = &parent->outgoingState;
 
-    caValue* slot = list_get(&parent->state, top->parentPc);
+    // Expand parent state if needed.
+    if (is_null(parentState))
+        set_list(parentState, parent->block->length());
+    touch(parentState);
+
+    caValue* slot = list_get(parentState, top->parentPc);
 
     if (top->block->owningTerm->function == FUNCS.case_func) {
 
@@ -338,7 +341,7 @@ static void retain_stack_top(Stack* stack)
         return;
 
     caValue* slot = prepare_retained_slot_for_parent(stack);
-    copy_stack_frame_to_retained(stack_top(stack), slot);
+    copy_stack_frame_outgoing_state_to_retained(stack_top(stack), slot);
     stack_top_parent(stack)->shouldRetain = true;
 }
 
@@ -389,7 +392,6 @@ void stack_restart(Stack* stack)
     if (stack_top(stack) == NULL)
         return;
 
-
     while (stack_top_parent(stack) != NULL)
         stack_pop(stack);
 
@@ -397,15 +399,10 @@ void stack_restart(Stack* stack)
     Block* block = top->block;
     top->pcIndex = 0;
     top->pc = 0;
+    move(&top->outgoingState, &top->state);
 
     stack->errorOccurred = false;
     stack->step = sym_StackReady;
-}
-
-void stack_restart_at(Stack* stack, int termIndex)
-{
-    stack_restart(stack);
-
 }
 
 Stack* stack_duplicate(Stack* stack)
@@ -529,6 +526,8 @@ void stack_to_string(Stack* stack, caValue* out)
         strm << "context: " << to_string(&frame->dynamicScope) << std::endl;
         for (int x = 0; x < frameIndex+2; x++) strm << " ";
         strm << "state: " << to_string(&frame->state) << std::endl;
+        for (int x = 0; x < frameIndex+2; x++) strm << " ";
+        strm << "outgoingState: " << to_string(&frame->outgoingState) << std::endl;
 
         for (int i=0; i < frame->block->length(); i++) {
             Term* term = block->get(i);
@@ -613,7 +612,7 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 void stack_extract_state(Stack* stack, caValue* output)
 {
     Frame* frame = frame_by_index(stack, 0);
-    extract_state(frame->block, &frame->state, output);
+    extract_state(frame->block, &frame->outgoingState, output);
 }
 
 Frame* frame_parent(Frame* frame)
@@ -687,6 +686,7 @@ static void stack_resize_frame_list(Stack* stack, int newCapacity)
         initialize_null(&frame->customBytecode);
         initialize_null(&frame->dynamicScope);
         initialize_null(&frame->state);
+        initialize_null(&frame->outgoingState);
         frame->block = 0;
     }
 }
@@ -1293,6 +1293,7 @@ do_loop_done_insn:
             s.pc = 0;
             s.frame->exitType = sym_None;
             set_null(&s.frame->state);
+            set_null(&s.frame->outgoingState);
             expand_frame_indexed(stack_top_parent(stack), s.frame, as_int(index));
             continue;
         }
@@ -1496,7 +1497,7 @@ do_func_apply:
             expand_frame_indexed(s.frame, top, 0);
             continue;
         }
-        case bc_NextCaseIfFalse: {
+        case bc_CaseConditionBool: {
             caValue* condition = bc_read_local_position(stack, s.bc, &s.pc);
 
             if (!is_bool(condition)) {
@@ -1732,27 +1733,16 @@ do_func_apply:
             caValue* result = bc_read_local_position(stack, s.bc, &s.pc);
 
             Frame* declaredFrame = frame_by_depth(stack, declaredStackDistance);
-            caValue* retainedList = &declaredFrame->state;
+
+            caValue* outgoingState = &declaredFrame->outgoingState;
 
             // Expand state if necessary.
-            if (is_null(retainedList))
-                set_list(retainedList, declaredFrame->block->length());
-            touch(retainedList);
+            if (is_null(outgoingState))
+                set_list(outgoingState, declaredFrame->block->length());
+            touch(outgoingState);
 
-            copy(result, list_get(retainedList, declaredIndex));
+            copy(result, list_get(outgoingState, declaredIndex));
             frame_retain(declaredFrame);
-            continue;
-        }
-
-        case bc_MaybeNullifyState: {
-#if 0
-            Frame* top = stack_top(stack);
-            Frame* parent = stack_top_parent(stack);
-            if (!top->shouldRetain && !is_null(&parent->state)) {
-                caValue* slot = list_get(&parent->state, top->parentPc);
-                set_null(slot);
-            }
-#endif
             continue;
         }
 
@@ -2059,7 +2049,7 @@ void Frame__extract_state(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
-    extract_state(frame->block, &frame->state, output);
+    extract_state(frame->block, &frame->outgoingState, output);
 }
 
 void make_stack(caStack* stack)

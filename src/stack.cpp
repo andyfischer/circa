@@ -68,7 +68,7 @@ caValue* retained_frame_get_registers(caValue* frame)
     return list_get(frame, 3);
 }
 
-void copy_stack_frame_to_retained(Frame* source, caValue* retainedFrame)
+void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame)
 {
     if (!is_retained_frame(retainedFrame))
         set_retained_frame(retainedFrame);
@@ -76,7 +76,7 @@ void copy_stack_frame_to_retained(Frame* source, caValue* retainedFrame)
 
     set_stack(list_get(retainedFrame, 0), source->stack);
     set_block(list_get(retainedFrame, 1), source->block);
-    set_value(list_get(retainedFrame, 2), &source->state);
+    set_value(list_get(retainedFrame, 2), &source->outgoingState);
 }
 
 void copy_stack_frame_registers_to_retained(Frame* source, caValue* retainedFrame)

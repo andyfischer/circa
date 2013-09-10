@@ -1,0 +1,27 @@
+
+-- Similar to state_reset_1, but now the condition expressions are stateful.
+
+def f(bool b) -> bool
+  state inside_f = 0
+  inside_f += 1
+  return b
+
+def main(bool b)
+  if f(b)
+      state s = 0
+      s += 1
+  elif f(not(b))
+      state t = 0
+      t += 1
+
+int = make_stack(main)
+int.call(true)
+print('Call 1 to s branch: ' int.extract_state)
+int.call(true)
+print('Call 2 to s branch: ' int.extract_state)
+int.call(false)
+print('Call 1 to t branch: ' int.extract_state)
+int.call(false)
+print('Call 2 to t branch: ' int.extract_state)
+int.call(true)
+print('Call 3 to s branch: ' int.extract_state)

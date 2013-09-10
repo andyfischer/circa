@@ -29,12 +29,12 @@ bool is_exit_point(Term* term)
         || term->function == FUNCS.break_func
         || term->function == FUNCS.continue_func
         || term->function == FUNCS.discard
-        || term->function == FUNCS.next_case_if_false;
+        || term->function == FUNCS.case_condition_bool;
 }
 
 bool is_conditional_exit_point(Term* term)
 {
-    return term->function == FUNCS.next_case_if_false;
+    return term->function == FUNCS.case_condition_bool;
 }
 
 bool is_exit_point_that_handles_rebinding(Term* term)
@@ -75,10 +75,9 @@ Block* find_block_that_exit_point_will_reach(Term* term)
         return block;
     }
 
-    // 'next_case_if_false' exits the current if-block.
-    if (term->function == FUNCS.next_case_if_false) {
+    // 'case_condition_bool' exits the current if-block.
+    if (term->function == FUNCS.case_condition_bool)
         return get_parent_block(term->owningBlock);
-    }
 
     // Otherwise, exit to nearest for-loop.
     while (!is_for_loop(block)) {

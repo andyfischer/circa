@@ -1,0 +1,20 @@
+
+def main(bool b)
+  if b
+      state s = 0
+      s += 1
+  else
+      state t = 0
+      t += 1
+
+int = make_stack(main)
+int.call(true)
+print('Call 1 to s branch: ' int.extract_state)
+int.call(true)
+print('Call 2 to s branch: ' int.extract_state)
+int.call(false)
+print('Call 1 to t branch: ' int.extract_state)
+int.call(false)
+print('Call 2 to t branch: ' int.extract_state)
+int.call(true)
+print('Call 3 to s branch: ' int.extract_state)

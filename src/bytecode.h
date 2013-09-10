@@ -48,7 +48,7 @@ const char bc_Return = 0x19;
 const char bc_Continue = 0x1a;
 const char bc_Break = 0x1b;
 const char bc_Discard = 0x1c;
-const char bc_NextCaseIfFalse = 0x1d;
+const char bc_CaseConditionBool = 0x1d;
 
 // Memoization
 const char bc_UseMemoizedOnEqualInputs = 0x40;
@@ -56,7 +56,6 @@ const char bc_MemoizeFrame = 0x41;
 
 // Inline state.
 const char bc_PackState = 0x51;
-const char bc_MaybeNullifyState = 0x52;
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);

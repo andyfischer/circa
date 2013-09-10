@@ -107,8 +107,8 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
     case bc_Discard:
         set_string(string, "discard");
         break;
-    case bc_NextCaseIfFalse:
-        set_string(string, "next_case_if_false ");
+    case bc_CaseConditionBool:
+        set_string(string, "case_condition_bool ");
         string_append(string, blob_read_u16(bcData, pos));
         string_append(string, " ");
         string_append(string, blob_read_u16(bcData, pos));
@@ -185,9 +185,6 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
                 string_append(string, " ");
             string_append(string, blob_read_u16(bcData, pos));
         }
-        break;
-    case bc_MaybeNullifyState:
-        set_string(string, "maybe_nullify_state");
         break;
     default:
         set_string(string, "*unrecognized op: ");
@@ -287,8 +284,8 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         }
     }
 
-    if (term->function == FUNCS.next_case_if_false) {
-        blob_append_char(bytecode, bc_NextCaseIfFalse);
+    if (term->function == FUNCS.case_condition_bool) {
+        blob_append_char(bytecode, bc_CaseConditionBool);
         bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
         return;
     }
@@ -591,11 +588,6 @@ static void write_pre_exit_pack_state(caValue* bytecode, Block* block, Term* exi
             anyPackState = true;
         }
     }
-
-    if (!anyPackState
-            && block_get_function_term(block) == FUNCS.case_func
-            && !(exitPoint != NULL && is_conditional_exit_point(exitPoint)))
-        blob_append_char(bytecode, bc_MaybeNullifyState);
 }
 
 static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)

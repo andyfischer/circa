@@ -53,7 +53,7 @@ struct BuiltinFuncs {
     Term* loop_iterator;
     Term* loop_output_index;
     Term* memoize;
-    Term* next_case_if_false;
+    Term* case_condition_bool;
     Term* minor_return_if_empty;
     Term* module;
     Term* mult;

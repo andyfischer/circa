@@ -18,6 +18,9 @@ struct Frame
     // Stack state: data saved between invocations.
     Value state;
 
+    // Outgoing stack state. Data that will be committed upon this frame's complemtion.
+    Value outgoingState;
+
     // Source block
     Block* block;
 
@@ -51,7 +54,7 @@ Block* retained_frame_get_block(caValue* frame);
 caValue* retained_frame_get_state(caValue* frame);
 caValue* retained_frame_get_registers(caValue* frame);
 
-void copy_stack_frame_to_retained(Frame* source, caValue* retainedFrame);
+void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame);
 void copy_stack_frame_registers_to_retained(Frame* source, caValue* retainedFrame);
 
 void frame_copy(Frame* left, Frame* right);

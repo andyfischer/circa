@@ -97,7 +97,7 @@ Term* case_find_condition_check(Block* block)
 {
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        if (term->function == FUNCS.next_case_if_false)
+        if (term->function == FUNCS.case_condition_bool)
             return term;
     }
     return NULL;
@@ -242,7 +242,7 @@ Term* if_block_append_case(Block* block)
 
 void case_add_condition_check(Block* caseBlock, Term* condition)
 {
-    apply(caseBlock, FUNCS.next_case_if_false, TermList(condition));
+    apply(caseBlock, FUNCS.case_condition_bool, TermList(condition));
 }
 
 bool is_case_block(Block* block)
