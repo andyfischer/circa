@@ -156,6 +156,11 @@ void repoint_terms_to_use_input_placeholders(Block* contents)
     }
 }
 
+void update_phi_terms(Block* contents)
+{
+
+}
+
 // Find the term that should be the 'primary' result for this loop.
 Term* loop_get_primary_result(Block* block)
 {
@@ -313,6 +318,44 @@ void evaluate_unbounded_loop_finish(caStack* stack)
 }
 #endif
 
+void loop_add_condition_check(Block* caseBlock, Term* condition)
+{
+    apply(caseBlock, FUNCS.loop_condition_bool, TermList(condition));
+}
+
+Term* loop_find_condition_check(Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.loop_condition_bool)
+            return term;
+    }
+    return NULL;
+}
+
+Term* loop_find_condition(Block* block)
+{
+    Term* conditionCheck = loop_find_condition_check(block);
+    if (conditionCheck != NULL)
+        return conditionCheck->input(0);
+    return NULL;
+}
+
+void while_formatSource(caValue* source, Term* term)
+{
+    Block* contents = nested_contents(term);
+    format_name_binding(source, term);
+    append_phrase(source, "while ", term, sym_Keyword);
+    Term* conditionCheck = loop_find_condition_check(contents);
+    format_source_for_input(source, conditionCheck, 0);
+    append_phrase(source,
+            term->stringProp("syntax:lineEnding", ""),
+            term, tok_Whitespace);
+    format_block_source(source, contents, term);
+    append_phrase(source, term->stringProp("syntax:whitespaceBeforeEnd", ""),
+        term, tok_Whitespace);
+}
+
 void index_func_postCompile(Term* term)
 {
     Term* enclosingLoop = find_enclosing_for_loop(term);
@@ -334,6 +377,9 @@ void loop_setup_functions(Block* kernel)
 {
     Term* index_func = import_function(kernel, evaluate_index_func, "index(int i :optional) -> int");
     block_set_post_compile_func(function_contents(index_func), index_func_postCompile);
+
+    FUNCS.while_loop = import_function(kernel, NULL, "while()");
+    block_set_format_source_func(function_contents(FUNCS.while_loop), while_formatSource);
 }
 
 } // namespace circa

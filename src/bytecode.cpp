@@ -113,8 +113,17 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         string_append(string, " ");
         string_append(string, blob_read_u16(bcData, pos));
         break;
-    case bc_LoopDone:
-        set_string(string, "loop_done ");
+    case bc_LoopConditionBool:
+        set_string(string, "loop_condition_bool ");
+        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_u16(bcData, pos));
+        break;
+    case bc_Loop:
+        set_string(string, "loop");
+        break;
+    case bc_IterationDone:
+        set_string(string, "iteration_done ");
         if (blob_read_char(bcData, pos))
             string_append(string, " :with_output");
         else
@@ -286,6 +295,12 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
     if (term->function == FUNCS.case_condition_bool) {
         blob_append_char(bytecode, bc_CaseConditionBool);
+        bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
+        return;
+    }
+
+    if (term->function == FUNCS.loop_condition_bool) {
+        blob_append_char(bytecode, bc_LoopConditionBool);
         bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
         return;
     }
@@ -633,8 +648,12 @@ void bytecode_write_block(caValue* bytecode, Block* block)
     if (!exitAdded)
         write_block_pre_exit(bytecode, block, NULL);
 
+    if (is_while_loop(block)) {
+        blob_append_char(bytecode, bc_Loop);
+    }
+
     if (is_for_loop(block)) {
-        blob_append_char(bytecode, bc_LoopDone);
+        blob_append_char(bytecode, bc_IterationDone);
         blob_append_char(bytecode, loop_produces_output_value(block->owningTerm) ? 0x1 : 0x0);
         return;
     }

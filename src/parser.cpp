@@ -490,6 +490,7 @@ bool token_is_allowed_as_function_name(int token)
         case tok_Not:
         case tok_Require:
         case tok_Package:
+        case tok_While:
             return true;
         default:
             return false;
@@ -1190,14 +1191,12 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     set_source_location(forTerm, startPosition, tokens);
 
     // Wrap up the rebound value, if it's a complex lexpr.
-    if (rebindListName) {
+    if (rebindListName)
         rebind_possible_accessor(block, listExpr, forTerm);
-    }
 
     return ParseResult(forTerm);
 }
 
-#if 0
 ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -1205,19 +1204,18 @@ ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
     tokens.consume(tok_While);
     possible_whitespace(tokens);
 
-    Term* conditionExpr = infix_expression(block, tokens, context, 0).term;
+    Term* result = apply(block, FUNCS.while_loop, TermList());
+    set_starting_source_location(result, startPosition, tokens);
+    Block* contents = nested_contents(result);
 
-    Term* whileTerm = apply(block, FUNCS.unbounded_loop, TermList(conditionExpr));
-    Block* contents = nested_contents(whileTerm);
-    set_starting_source_location(whileTerm, startPosition, tokens);
+    Term* condition = infix_expression(contents, tokens, context, 0).term;
+    loop_add_condition_check(contents, condition);
 
     consume_block(contents, tokens, context);
+    set_source_location(result, startPosition, tokens);
 
-    finish_while_loop(whileTerm);
-    set_source_location(whileTerm, startPosition, tokens);
-    return ParseResult(whileTerm);
+    return ParseResult(result);
 }
-#endif
 
 ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 {
@@ -1541,6 +1539,8 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
         result = for_block(block, tokens, context);
     else if (tokens.nextIs(tok_Switch))
         result = switch_block(block, tokens, context);
+    else if (tokens.nextIs(tok_While))
+        result = while_block(block, tokens, context);
     else
         result = infix_expression(block, tokens, context, 0);
 

@@ -1,0 +1,26 @@
+
+def main(bool b)
+    state top = 1
+    top += 1
+
+    if b
+        return
+
+    state bottom = 100
+    bottom += 1
+
+
+
+int = make_stack(main)
+int.call(false)
+print('after 1 call without early return: ' int.extract_state)
+int.call(false)
+print('after 2 calls without early return: ' int.extract_state)
+
+int.call(true)
+print('after 1 call with early return: ' int.extract_state)
+int.call(true)
+print('after 2 calls with early return: ' int.extract_state)
+
+int.call(false)
+print('after another call without early return: ' int.extract_state)

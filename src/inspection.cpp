@@ -135,6 +135,13 @@ bool is_for_loop(Block* block)
     return block->owningTerm->function == FUNCS.for_func;
 }
 
+bool is_while_loop(Block* block)
+{
+    if (block->owningTerm == NULL)
+        return false;
+    return block->owningTerm->function == FUNCS.while_loop;
+}
+
 Term* get_input_placeholder(Block* block, int index)
 {
     if (index >= block->length())

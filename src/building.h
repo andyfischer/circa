@@ -130,6 +130,7 @@ void input_placeholders_to_list(Block* block, TermList* list);
 void list_outer_pointers(Block* block, TermList* list);
 int find_input_index_for_pointer(Term* call, Term* input);
 void check_to_add_primary_output_placeholder(Block* block);
+void list_rebound_names_in_major_scope(Block* block);
 
 // Refactoring
 

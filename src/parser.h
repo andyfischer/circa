@@ -65,6 +65,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult case_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* context);

@@ -41,6 +41,7 @@ bool is_major_block(Term* term);
 bool is_major_block(Block* block);
 bool is_minor_block(Block* block);
 bool is_for_loop(Block* block);
+bool is_while_loop(Block* block);
 
 bool has_variable_args(Block* block);
 

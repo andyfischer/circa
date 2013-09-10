@@ -14,7 +14,7 @@ const char bc_LeaveFrame = 8;
 const char bc_PopFrame = 9;
 const char bc_DoneTransient = 0xa;
 const char bc_FireNative = 0xb;
-const char bc_LoopDone = 0xc;
+const char bc_IterationDone = 0xc;
 const char bc_ErrorNotEnoughInputs = 0xe;
 const char bc_ErrorTooManyInputs = 0xf;
 
@@ -49,6 +49,8 @@ const char bc_Continue = 0x1a;
 const char bc_Break = 0x1b;
 const char bc_Discard = 0x1c;
 const char bc_CaseConditionBool = 0x1d;
+const char bc_LoopConditionBool = 0x1e;
+const char bc_Loop = 0x1f;
 
 // Memoization
 const char bc_UseMemoizedOnEqualInputs = 0x40;

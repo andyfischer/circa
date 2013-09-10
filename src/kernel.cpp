@@ -978,6 +978,7 @@ void bootstrap_kernel()
     block_set_format_source_func(function_contents(FUNCS.section_block), section_block_formatSource);
 
     FUNCS.case_condition_bool = import_function(builtins, NULL, "def case_condition_bool(bool condition)");
+    FUNCS.loop_condition_bool = import_function(builtins, NULL, "def loop_condition_bool(bool condition)");
     FUNCS.minor_return_if_empty = import_function(builtins, NULL, "def minor_return_if_empty()");
     FUNCS.phi = import_function(builtins, NULL, "def phi(left, right) -> any");
 

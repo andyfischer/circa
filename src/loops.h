@@ -25,11 +25,9 @@ void for_loop_remake_zero_block(Block* forContents);
 
 void start_for_loop(Stack* stack, bool enableLoopOutput);
 
-#if 0
-void finish_while_loop(Term* whileTerm);
-void evaluate_unbounded_loop(caStack*);
-void evaluate_unbounded_loop_finish(caStack*);
-#endif
+void loop_add_condition_check(Block* caseBlock, Term* condition);
+Term* loop_find_condition_check(Block* block);
+Term* loop_find_condition(Block* block);
 
 void loop_setup_functions(Block* kernel);
 

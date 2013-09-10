@@ -1223,7 +1223,7 @@ do_done_insn:
             s.pc = s.frame->pc;
             continue;
         }
-        case bc_LoopDone: {
+        case bc_IterationDone: {
             ca_assert(s.frame == stack_top(stack));
             
             s.loopEnableOutput = blob_read_char(s.bc, &s.pc);
@@ -1526,6 +1526,27 @@ do_func_apply:
             }
             continue;
         }
+        case bc_LoopConditionBool: {
+            caValue* condition = bc_read_local_position(stack, s.bc, &s.pc);
+
+            if (!is_bool(condition)) {
+                Value msg;
+                set_string(&msg, "Loop expected bool input, found: ");
+                string_append_quoted(&msg, condition);
+                raise_error_msg(stack, as_cstring(&msg));
+                return;
+            }
+
+            if (!as_bool(condition)) {
+                Block* currentCase = stack_top(stack)->block;
+                int parentPc = stack_top(stack)->parentPc;
+
+                s.frame = stack_top_parent(stack);
+                s.bc = as_blob(frame_bytecode(s.frame));
+                s.pc = s.frame->pc;
+            }
+            continue;
+        }
         case bc_PushLoop: {
             ca_assert(s.frame == stack_top(stack));
 
@@ -1538,7 +1559,7 @@ do_func_apply:
             
             caValue* input = stack_find_active_value(s.frame, caller->input(0));
 
-            // If there are zero inputs, use the #zero block.
+            // If the input list is empty, use the #zero block.
             Block* block = NULL;
             bool zeroBlock = false;
             if (is_list(input) && list_length(input) == 0) {
@@ -1569,6 +1590,18 @@ do_func_apply:
                 }
             }
 
+            continue;
+        }
+        case bc_Loop: {
+            // TODO: Save state
+            // TODO: Save output
+
+            s.frame->pcIndex = 0;
+            s.pc = 0;
+            s.frame->exitType = sym_None;
+            set_null(&s.frame->state);
+            set_null(&s.frame->outgoingState);
+            // expand_frame_indexed(stack_top_parent(stack), s.frame, index);
             continue;
         }
         case bc_InlineCopy: {

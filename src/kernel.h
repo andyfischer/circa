@@ -14,6 +14,7 @@ struct BuiltinFuncs {
     Term* block_unevaluated;
     Term* break_func;
     Term* case_func;
+    Term* case_condition_bool;
     Term* cast;
     Term* closure_block;
     Term* comment;
@@ -47,13 +48,13 @@ struct BuiltinFuncs {
     Term* length;
     Term* list;
     Term* list_append;
+    Term* loop_condition_bool;
     Term* native_patch;
     Term* load_script;
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output_index;
     Term* memoize;
-    Term* case_condition_bool;
     Term* minor_return_if_empty;
     Term* module;
     Term* mult;

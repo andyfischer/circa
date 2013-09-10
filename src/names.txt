@@ -178,6 +178,7 @@ tok_If
 tok_Else
 tok_Elif
 tok_For
+tok_While
 tok_State
 tok_Return
 tok_In
