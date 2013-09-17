@@ -357,7 +357,6 @@ std::string to_string(Hashtable* data)
     }
 
     // Short-term solution: use std library for sorting.
-
     std::vector<HashtableToStringEntry> entryList;
 
     for (int i=0; i < count; i++) {

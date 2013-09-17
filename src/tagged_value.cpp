@@ -375,6 +375,71 @@ bool strict_equals(caValue* left, caValue* right)
     return false;
 }
 
+static int rank_for_compare_based_on_type(Type* type)
+{
+    if (type == TYPES.bool_type)
+        return 1;
+    else if (type == TYPES.int_type)
+        return 2;
+    else if (type == TYPES.float_type)
+        return 3;
+    else if (type == TYPES.string)
+        return 4;
+    else
+        return 5;
+}
+
+int compare(caValue* left, caValue* right)
+{
+    if (strict_equals(left, right))
+        return 0;
+
+    if (left->value_type != right->value_type) {
+        // Ordering across types: bool, int, float, string, everything else.
+
+        int leftRank = rank_for_compare_based_on_type(left->value_type);
+        int rightRank = rank_for_compare_based_on_type(right->value_type);
+
+        if (leftRank < rightRank)
+            return -1;
+        else if (leftRank > rightRank)
+            return 1;
+
+        // Unhandled difference between types.
+        return 0;
+    }
+
+    if (is_bool(left)) {
+        if (as_bool(left))
+            return -1;
+        else
+            return 1;
+    }
+
+    if (is_int(left)) {
+        if (as_int(left) < as_int(right))
+            return -1;
+        else
+            return 1;
+    }
+
+    if (is_float(left)) {
+        if (as_float(left) < as_float(right))
+            return -1;
+        else
+            return 1;
+    }
+
+    if (is_string(left)) {
+        if (strcmp(as_cstring(left), as_cstring(right)) < 0)
+            return -1;
+        else
+            return 1;
+    }
+
+    return 0;
+}
+
 void set_value(caValue* target, caValue* value)
 {
     copy(value, target);

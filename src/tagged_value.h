@@ -66,6 +66,12 @@ bool equals_int(caValue* value, int i);
 
 bool strict_equals(caValue* left, caValue* right);
 
+// Order comparison using default sorting. Returns -1 if 'left' should occur first, 1 if
+// 'right' should occur first, and 0 if they have equal order.
+// Warning: This is a half-implemented function which only works reliably for
+// values of bool/int/float/string.
+int compare(caValue* left, caValue* right);
+
 // Get an element by index. Dispatched on type, the default behavior is to return NULL.
 caValue* get_index(caValue* value, int index);
 

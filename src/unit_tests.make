@@ -80,6 +80,8 @@ OBJECTS := \
 	$(OBJDIR)/hashtable_test.o \
 	$(OBJDIR)/importing_test.o \
 	$(OBJDIR)/interpreter_test.o \
+	$(OBJDIR)/list_test.o \
+	$(OBJDIR)/loop_test.o \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/migration_test.o \
 	$(OBJDIR)/modules_test.o \
@@ -200,6 +202,12 @@ $(OBJDIR)/importing_test.o: unit_tests/importing_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/interpreter_test.o: unit_tests/interpreter_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/list_test.o: unit_tests/list_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/loop_test.o: unit_tests/loop_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/main.o: unit_tests/main.cpp

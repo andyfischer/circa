@@ -37,29 +37,6 @@ void test_insert_output_placeholder()
     test_equals(get_output_placeholder(&block, 3)->getProp("note"), "fourth");
 }
 
-void preceding_term_nested()
-{
-    Block block;
-    block.compile("def f() { def g() { a = 1; b = 2; c = true; if c { d = 3 } } }");
-
-    Term* d = find_term_from_path_expression(&block, "** / d");
-
-    Term* t = preceding_term_recr_minor(d);
-    test_assert(t != NULL);
-    test_equals(&t->nameValue, "c");
-
-    t = preceding_term_recr_minor(t);
-    test_assert(t != NULL);
-    test_equals(&t->nameValue, "b");
-
-    t = preceding_term_recr_minor(t);
-    test_assert(t != NULL);
-    test_equals(&t->nameValue, "a");
-
-    t = preceding_term_recr_minor(t);
-    test_assert(t == NULL);
-}
-
 void test_find_or_create_output_term()
 {
     Block block;
@@ -86,7 +63,6 @@ void test_find_or_create_output_term()
 void register_tests()
 {
     REGISTER_TEST_CASE(building_test::test_insert_output_placeholder);
-    REGISTER_TEST_CASE(building_test::preceding_term_nested);
     REGISTER_TEST_CASE(building_test::test_find_or_create_output_term);
 }
 

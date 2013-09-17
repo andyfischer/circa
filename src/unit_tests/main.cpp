@@ -390,6 +390,8 @@ namespace handle_test { void register_tests(); }
 namespace hashtable_test { void register_tests(); }
 namespace importing_test { void register_tests(); }
 namespace interpreter_test { void register_tests(); }
+namespace list_test { void register_tests(); }
+namespace loop_test { void register_tests(); }
 namespace migration_test { void register_tests(); }
 namespace modules_test { void register_tests(); }
 namespace names_test { void register_tests(); }
@@ -422,6 +424,8 @@ int main(int argc, char** argv)
     handle_test::register_tests();
     importing_test::register_tests();
     interpreter_test::register_tests();
+    list_test::register_tests();
+    loop_test::register_tests();
     migration_test::register_tests();
     modules_test::register_tests();
     names_test::register_tests();

@@ -408,6 +408,85 @@ bool list_strict_equals(caValue* left, caValue* right)
     return true;
 }
 
+static void mergesort_step(caValue* list, SortCompareFunc func, void* context)
+{
+    int length = list_length(list);
+    int middle = int(length / 2);
+    int leftLength = middle;
+    int rightLength = length - middle;
+
+    if (length <= 1 || leftLength <= 0 || rightLength <= 0)
+        return;
+
+    Value left;
+    set_list(&left, leftLength);
+    Value right;
+    set_list(&right, rightLength);
+
+    list_touch(list);
+
+    // Divide
+
+    for (int i=0; i < leftLength; i++)
+        move(list_get(list, i), list_get(&left, i));
+    for (int i=0; i < rightLength; i++)
+        move(list_get(list, i + middle), list_get(&right, i));
+
+    mergesort_step(&left, func, context);
+    mergesort_step(&right, func, context);
+
+    // Merge
+    int leftIndex = 0;
+    int rightIndex = 0;
+    int destIndex = 0;
+
+    while (true) {
+
+        if (leftIndex >= list_length(&left)) {
+            while (rightIndex < list_length(&right))
+                move(list_get(&right, rightIndex++), list_get(list, destIndex++));
+            return;
+        }
+
+        if (rightIndex >= list_length(&right)) {
+            while (leftIndex < list_length(&left))
+                move(list_get(&left, leftIndex++), list_get(list, destIndex++));
+            return;
+        }
+
+        caValue* leftValue = list_get(&left, leftIndex);
+        caValue* rightValue = list_get(&right, rightIndex);
+        caValue* dest = list_get(list, destIndex++);
+
+        int compareResult = func(context, leftValue, rightValue);
+        if (compareResult < 0) {
+            move(leftValue, dest);
+            leftIndex++;
+        } else {
+            move(rightValue, dest);
+            rightIndex++;
+        }
+    }
+}
+
+static int default_compare_for_sort(void* context, caValue* left, caValue* right)
+{
+    return compare(left, right);
+}
+
+void list_sort_mergesort(caValue* list, SortCompareFunc func, void* context)
+{
+    if (func == NULL)
+        func = default_compare_for_sort;
+
+    mergesort_step(list, func, context);
+}
+
+void list_sort(caValue* list, SortCompareFunc func, void* context)
+{
+    list_sort_mergesort(list, func, context);
+}
+
 caValue* list_get(caValue* value, int index)
 {
     ca_assert(value->value_type->storageType == sym_StorageTypeList);

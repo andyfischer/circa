@@ -4,6 +4,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "function.h"
+#include "hashtable.h"
 #include "kernel.h"
 #include "importing.h"
 #include "inspection.h"
@@ -158,7 +159,29 @@ void repoint_terms_to_use_input_placeholders(Block* contents)
 
 void update_phi_terms(Block* contents)
 {
+}
 
+void list_names_that_must_be_looped(Block* contents, caValue* names)
+{
+    // Find all names within 'contents' that must be looped. A name must be looped when:
+    //  1) a term inside 'contents' uses the name as an input
+    //  2) a term inside 'contents' has the same name
+
+    Value namesMap;
+    set_hashtable(&namesMap);
+
+    for (BlockInputIterator it(contents); it; ++it) {
+        Term* input = it.currentInput();
+
+        if (has_empty_name(input))
+            continue;
+
+        caValue* name = term_name(input);
+        Term* local = find_local_name(contents, name);
+
+        if (local != NULL)
+            set_bool(hashtable_insert(&namesMap, name), true);
+    }
 }
 
 // Find the term that should be the 'primary' result for this loop.

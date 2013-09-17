@@ -25,6 +25,8 @@ void for_loop_remake_zero_block(Block* forContents);
 
 void start_for_loop(Stack* stack, bool enableLoopOutput);
 
+void list_names_that_must_be_looped(Block* contents, caValue* names);
+
 void loop_add_condition_check(Block* caseBlock, Term* condition);
 Term* loop_find_condition_check(Block* block);
 Term* loop_find_condition(Block* block);

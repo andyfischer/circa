@@ -109,6 +109,10 @@ bool list_contains(caValue* list, caValue* element);
 
 bool list_strict_equals(caValue* left, caValue* right);
 
+typedef int (*SortCompareFunc)(void* context, caValue* left, caValue* right);
+void list_sort_mergesort(caValue* list, SortCompareFunc func, void* context);
+void list_sort(caValue* list, SortCompareFunc func, void* context);
+
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.

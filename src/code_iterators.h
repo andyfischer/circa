@@ -116,10 +116,11 @@ struct BlockInputIterator
 
     bool unfinished() { return !finished(); }
     void operator++() { advance(); }
+    operator bool() { return !finished(); }
 };
 
 // This iterator is a filtered version of BlockInputIterator. It will only return
-// "outer inputs"- inputs to terms that are outside of the provided block.
+// "outer inputs": inputs to terms that are outside of the provided block.
 struct OuterInputIterator
 {
     BlockInputIterator blockInputIterator;
