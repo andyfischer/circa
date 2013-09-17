@@ -13,18 +13,16 @@ def list_factors(int num) -> List
 
     possibleFactor = 2
     factors = []
-    for i in range(0, 10000000)
-        if possibleFactor > num
-            break
-
+    while possibleFactor < num
         if (num / possibleFactor) % 1 == 0
             print(possibleFactor ' is a factor of ' num)
             num = num // possibleFactor
             @factors.append(possibleFactor)
+            possibleFactor = 2
         else
             possibleFactor += 1
 
-    print(factors)
+    print('factors: ' factors)
     factors
 
 def max(List list)

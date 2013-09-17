@@ -31,6 +31,8 @@ void loop_add_condition_check(Block* caseBlock, Term* condition);
 Term* loop_find_condition_check(Block* block);
 Term* loop_find_condition(Block* block);
 
+void while_loop_finish_changes(Block* contents);
+
 void loop_setup_functions(Block* kernel);
 
 } // namespace circa

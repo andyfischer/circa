@@ -44,6 +44,12 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "inline_copy ");
         string_append(string, blob_read_int(bcData, pos));
         break;
+    case bc_LocalCopy:
+        set_string(string, "local_copy ");
+        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_int(bcData, pos));
+        break;
     case bc_NoOp:
         set_string(string, "noop");
         break;
@@ -90,6 +96,10 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
             string_append(string, " :with_output");
         else
             string_append(string, " :no_output");
+        break;
+    case bc_PushWhile:
+        set_string(string, "push_while ");
+        string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_ExitPoint:
         set_string(string, "exit_point");
@@ -138,6 +148,14 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
     case bc_PushInputFromStack:
         set_string(string, "push_input_from_stack ");
         string_append(string, blob_read_int(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_int(bcData, pos));
+        break;
+    case bc_PushInputFromStack2:
+        set_string(string, "push_input_from_stack2 ");
+        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_u16(bcData, pos));
         string_append(string, " ");
         string_append(string, blob_read_int(bcData, pos));
         break;
@@ -371,6 +389,12 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
         blob_append_char(bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
     }
+
+    else if (term->function == FUNCS.while_loop) {
+        referenceTargetBlock = term->nestedContents;
+        blob_append_char(bytecode, bc_PushWhile);
+        blob_append_int(bytecode, term->index);
+    }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
         // Call the function, not nested contents.
@@ -399,19 +423,10 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     }
 
     bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);
-
     blob_append_char(bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(bytecode, term, referenceTargetBlock);
     blob_append_char(bytecode, bc_PopFrame);
     
-    // If we made it this far, then it's a normal call. Save the tag.
-    // set_symbol(outputTag, tag);
-
-    // Write input & output instructions
-    // caValue* inputInstructions = list_get(result, 1);
-    // write_term_input_instructions(term, block, inputInstructions);
-
-
     // Finally, do some lightweight optimization.
 
 #if 0
@@ -440,31 +455,11 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
     int callerInputIndex = 0;
     int lastInputIndex = caller->numInputs() - 1;
     int normalInputCount = 0;
-    bool usesExplicitState = false;
-    int explicitStateInputIndex = -1;
     bool usesVarargs = false;
-
-    // Look for special inputs (such as state)
-    for (int i=0; i < caller->numInputs(); i++) {
-        if (term_get_bool_input_prop(caller, i, "state", false)) {
-            usesExplicitState = true;
-            explicitStateInputIndex = i;
-        } else {
-            normalInputCount++;
-        }
-    }
 
     // Walk through the receivingBlock's input terms, and pull input values from the
     // caller's frame (by looking at caller's inputs).
     for (int placeholderIndex=0;; placeholderIndex++) {
-
-        // callerInputIndex should always skip over special inputs.
-        if ((callerInputIndex == explicitStateInputIndex)
-                && explicitStateInputIndex != -1) {
-            blob_append_char(bytecode, bc_PushExplicitState);
-            blob_append_int(bytecode, callerInputIndex);
-            callerInputIndex++;
-        }
 
         Term* placeholder = block->getSafe(placeholderIndex);
 
@@ -504,6 +499,14 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
             }
         } else if (placeholder->function == FUNCS.unbound_input) {
             // Ignore; closures are not handled here.
+        } else if (placeholder->function == FUNCS.looped_input) {
+            Term* startingValue = placeholder->input(0);
+            blob_append_char(bytecode, bc_PushInputFromStack2);
+            bytecode_write_local_reference(bytecode, block, startingValue);
+            blob_append_int(bytecode, placeholderIndex);
+
+        } else {
+            break;
         }
     }
 
@@ -605,6 +608,20 @@ static void write_pre_exit_pack_state(caValue* bytecode, Block* block, Term* exi
     }
 }
 
+static void write_loop_finish(caValue* bytecode, Block* block)
+{
+    // Copy values for looped_inputs.
+    for (int i=0;; i++) {
+        Term* term = block->get(i);
+        if (term->function != FUNCS.looped_input)
+            break;
+
+        blob_append_char(bytecode, bc_LocalCopy);
+        blob_append_int(bytecode, term->input(1)->index);
+        blob_append_int(bytecode, term->index);
+    }
+}
+
 static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)
 {
     write_pre_exit_pack_state(bytecode, block, exitPoint);
@@ -649,6 +666,7 @@ void bytecode_write_block(caValue* bytecode, Block* block)
         write_block_pre_exit(bytecode, block, NULL);
 
     if (is_while_loop(block)) {
+        write_loop_finish(bytecode, block);
         blob_append_char(bytecode, bc_Loop);
     }
 

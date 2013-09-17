@@ -494,6 +494,9 @@ void hashtable_get_keys(caValue* table, caValue* keysOut)
 
     ca_assert(is_hashtable(table));
     Hashtable* data = (Hashtable*) table->value_data.ptr;
+    if (data == NULL)
+        return;
+
     for (int i=0; i < data->capacity; i++)
         if (!is_null(&data->slots[i].key))
             copy(&data->slots[i].key, list_append(keysOut));

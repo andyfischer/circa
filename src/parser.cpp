@@ -1213,6 +1213,7 @@ ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     consume_block(contents, tokens, context);
     set_source_location(result, startPosition, tokens);
+    block_finish_changes(contents);
 
     return ParseResult(result);
 }

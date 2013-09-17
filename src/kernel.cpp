@@ -974,13 +974,14 @@ void bootstrap_kernel()
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(builtins);
 
-    FUNCS.section_block = import_function(builtins, NULL, "def section_block() -> any");
+    FUNCS.section_block = import_function(builtins, NULL, "def section() -> any");
     block_set_format_source_func(function_contents(FUNCS.section_block), section_block_formatSource);
 
     FUNCS.case_condition_bool = import_function(builtins, NULL, "def case_condition_bool(bool condition)");
     FUNCS.loop_condition_bool = import_function(builtins, NULL, "def loop_condition_bool(bool condition)");
     FUNCS.minor_return_if_empty = import_function(builtins, NULL, "def minor_return_if_empty()");
-    FUNCS.phi = import_function(builtins, NULL, "def phi(left, right) -> any");
+    FUNCS.looped_input = import_function(builtins, NULL, "def looped_input(first, next) -> any");
+    block_set_evaluation_empty(function_contents(FUNCS.looped_input), true);
 
     // Now we can build derived functions
 

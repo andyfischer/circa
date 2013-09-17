@@ -7,6 +7,7 @@ namespace circa {
 const char bc_Pause = 1;
 const char bc_SetNull = 2;
 const char bc_InlineCopy = 3;
+const char bc_LocalCopy = 4;
 const char bc_NoOp = 5;
 const char bc_Done = 6;
 const char bc_EnterFrame = 7;
@@ -26,15 +27,17 @@ const char bc_PushFuncCall = 0x13;
 const char bc_PushFuncApply = 0x14;
 const char bc_PushCase = 0x16;
 const char bc_PushLoop = 0x17;
+const char bc_PushWhile = 0x18;
 
 // Pushing inputs to a new frame.
 const char bc_PushInputFromStack = 0x22;
+const char bc_PushInputFromStack2 = 0x23;
 const char bc_PushVarargList = 0x20;
 const char bc_PushInputNull = 0x24;
 const char bc_PushInputsDynamic = 0x27;
 const char bc_PushExplicitState = 0x28;
 const char bc_NotEnoughInputs = 0x25;
-const char bc_TooManyInputs = 0x26;
+const char bc_TooManyInputs = 0x29;
 
 // Popping outputs from a finished frame.
 const char bc_PopOutput = 0x30;
@@ -43,21 +46,21 @@ const char bc_PopOutputsDynamic = 0x32;
 const char bc_PopExplicitState = 0x33;
 
 // Control flow.
-const char bc_ExitPoint = 0x18;
-const char bc_Return = 0x19;
-const char bc_Continue = 0x1a;
-const char bc_Break = 0x1b;
-const char bc_Discard = 0x1c;
-const char bc_CaseConditionBool = 0x1d;
-const char bc_LoopConditionBool = 0x1e;
-const char bc_Loop = 0x1f;
+const char bc_ExitPoint = 0x40;
+const char bc_Return = 0x41;
+const char bc_Continue = 0x42;
+const char bc_Break = 0x43;
+const char bc_Discard = 0x44;
+const char bc_CaseConditionBool = 0x45;
+const char bc_LoopConditionBool = 0x46;
+const char bc_Loop = 0x47;
 
 // Memoization
-const char bc_UseMemoizedOnEqualInputs = 0x40;
-const char bc_MemoizeFrame = 0x41;
+const char bc_UseMemoizedOnEqualInputs = 0x50;
+const char bc_MemoizeFrame = 0x51;
 
 // Inline state.
-const char bc_PackState = 0x51;
+const char bc_PackState = 0x55;
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);

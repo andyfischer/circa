@@ -239,4 +239,6 @@ bool block_check_invariants_print_result(Block* block, std::ostream& out);
 
 void block_link_missing_functions(Block* block, Block* source);
 
+bool block_is_child_of(Block* possibleChild, Block* possibleParent);
+
 } // namespace circa

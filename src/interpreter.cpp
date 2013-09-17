@@ -1140,6 +1140,14 @@ void run_bytecode(Stack* stack, caValue* bytecode)
 
             continue;
         }
+        case bc_PushInputFromStack2: {
+            caValue* value = bc_read_local_position(stack, s.bc, &s.pc);
+            int destSlot = blob_read_int(s.bc, &s.pc);
+            caValue* slot = frame_register(stack_top(stack), destSlot);
+            copy(value, slot);
+            continue;
+        }
+        
         case bc_PushVarargList: {
             Frame* top = stack_top(stack);
             Frame* parent = stack_top_parent(stack);
@@ -1592,6 +1600,14 @@ do_func_apply:
 
             continue;
         }
+        case bc_PushWhile: {
+            int index = blob_read_int(s.bc, &s.pc);
+            Term* caller = frame_term(s.frame, index);
+            Block* block = caller->nestedContents;
+            Frame* top = stack_push3(stack, index, block);
+            s.frame = stack_top_parent(stack);
+            continue;
+        }
         case bc_Loop: {
             // TODO: Save state
             // TODO: Save output
@@ -1614,6 +1630,15 @@ do_func_apply:
             caValue* dest = frame_register(s.frame, caller);
             copy(source, dest);
 
+            continue;
+        }
+        case bc_LocalCopy: {
+            int sourceIndex = blob_read_int(s.bc, &s.pc);
+            int destIndex = blob_read_int(s.bc, &s.pc);
+
+            caValue* source = frame_register(s.frame, sourceIndex);
+            caValue* dest = stack_find_active_value(s.frame, frame_term(s.frame, destIndex));
+            copy(source, dest);
             continue;
         }
         case bc_FireNative: {

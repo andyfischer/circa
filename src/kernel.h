@@ -54,6 +54,7 @@ struct BuiltinFuncs {
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output_index;
+    Term* looped_input;
     Term* memoize;
     Term* minor_return_if_empty;
     Term* module;
@@ -65,7 +66,6 @@ struct BuiltinFuncs {
     Term* output_explicit;
     Term* overload_error_no_match;
     Term* package;
-    Term* phi;
     Term* range;
     Term* return_func;
     Term* section_block;

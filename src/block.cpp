@@ -846,4 +846,16 @@ void block_link_missing_functions(Block* block, Block* source)
     }
 }
 
+bool block_is_child_of(Block* possibleChild, Block* possibleParent)
+{
+    while (true) {
+        possibleChild = get_parent_block(possibleChild);
+
+        if (possibleChild == NULL)
+            return false;
+        if (possibleChild == possibleParent)
+            return true;
+    }
+}
+
 } // namespace circa

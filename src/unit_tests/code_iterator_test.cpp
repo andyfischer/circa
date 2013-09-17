@@ -63,37 +63,37 @@ void upward_iterator_2()
 
     // Start at 'a'.
     set_list(&visited);
-    UpwardIterator2 it(find_term_from_path_expression(&block, "a"));
+    UpwardIterator2 it(find_term_from_path(&block, "a"));
     for (; it; ++it)
         set_value(list_append(&visited), &it.current()->nameValue);
     test_equals(&visited, "['a']");
 
     // Start at 'f'.
     set_list(&visited);
-    it = UpwardIterator2(find_term_from_path_expression(&block, "d/f"));
+    it = UpwardIterator2(find_term_from_path(&block, "d/f"));
     for (; it; ++it)
         set_value(list_append(&visited), &it.current()->nameValue);
     test_equals(&visited, "['f', 'e', 'c', 'b', 'a']");
 
     // Start at 'j'.
     set_list(&visited);
-    it = UpwardIterator2(find_term_from_path_expression(&block, "d/h/j"));
+    it = UpwardIterator2(find_term_from_path(&block, "d/h/j"));
     for (; it; ++it)
         set_value(list_append(&visited), &it.current()->nameValue);
     test_equals(&visited, "['j', 'i', 'g', 'f', 'e', 'c', 'b', 'a']");
 
     // Start at 'j', stop at section 'h'.
     set_list(&visited);
-    it = UpwardIterator2(find_term_from_path_expression(&block, "d/h/j"));
-    it.stopAt(find_block_from_path_expression(&block, "d/h"));
+    it = UpwardIterator2(find_term_from_path(&block, "d/h/j"));
+    it.stopAt(find_block_from_path(&block, "d/h"));
     for (; it; ++it)
         set_value(list_append(&visited), &it.current()->nameValue);
     test_equals(&visited, "['j', 'i']");
 
     // Start at 'j', stop at section 'd'.
     set_list(&visited);
-    it = UpwardIterator2(find_term_from_path_expression(&block, "d/h/j"));
-    it.stopAt(find_block_from_path_expression(&block, "d"));
+    it = UpwardIterator2(find_term_from_path(&block, "d/h/j"));
+    it.stopAt(find_block_from_path(&block, "d"));
     for (; it; ++it)
         set_value(list_append(&visited), &it.current()->nameValue);
     test_equals(&visited, "['j', 'i', 'g', 'f', 'e']");

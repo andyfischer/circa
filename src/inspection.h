@@ -134,8 +134,8 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caVal
 
 // Path expressions
 void parse_path_expression(const char* expr, caValue* valueOut);
-Term* find_term_from_path_expression(Block* root, caValue* path);
-Term* find_term_from_path_expression(Block* root, const char* pathExpr);
-Block* find_block_from_path_expression(Block* root, const char* pathExpr);
+Term* find_term_from_path(Block* root, caValue* path);
+Term* find_term_from_path(Block* root, const char* pathExpr);
+Block* find_block_from_path(Block* root, const char* pathExpr);
 
 } // namespace circa

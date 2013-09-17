@@ -1043,6 +1043,8 @@ void block_finish_changes(Block* block)
     // Refresh for-loop zero block
     if (is_for_loop(block))
         for_loop_remake_zero_block(block);
+    if (is_while_loop(block))
+        while_loop_finish_changes(block);
 
     dirty_bytecode(block);
     refresh_bytecode(block);

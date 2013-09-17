@@ -157,15 +157,12 @@ void repoint_terms_to_use_input_placeholders(Block* contents)
     }
 }
 
-void update_phi_terms(Block* contents)
-{
-}
-
 void list_names_that_must_be_looped(Block* contents, caValue* names)
 {
     // Find all names within 'contents' that must be looped. A name must be looped when:
-    //  1) a term inside 'contents' uses the name as an input
-    //  2) a term inside 'contents' has the same name
+    //  (1) a term outside 'contents' has the name (the initial value).
+    //  and (2) a term inside 'contents' actually uses the term that satisfies 1.
+    //  and (3) a term inside 'contents' has the name (the 'modified' value)
 
     Value namesMap;
     set_hashtable(&namesMap);
@@ -174,6 +171,10 @@ void list_names_that_must_be_looped(Block* contents, caValue* names)
         Term* input = it.currentInput();
 
         if (has_empty_name(input))
+            continue;
+
+        // Check condition (2). The input must be from outside 'contents'.
+        if (input->owningBlock == contents || block_is_child_of(input->owningBlock, contents))
             continue;
 
         caValue* name = term_name(input);
@@ -185,6 +186,48 @@ void list_names_that_must_be_looped(Block* contents, caValue* names)
 
     hashtable_get_keys(&namesMap, names);
     list_sort(names, NULL, NULL);
+}
+
+void update_looped_inputs(Block* contents)
+{
+    Value names;
+    list_names_that_must_be_looped(contents, &names);
+
+    // Terms 0 through N (where N = number of looped names) should be looped inputs.
+    for (int i=0; i < list_length(&names); i++) {
+
+        caValue* name = list_get(&names, i);
+        Term* outside = find_name_at(contents->owningTerm, name);
+        Term* inside = find_local_name(contents, name);
+
+        Term* looped = contents->getSafe(i);
+        if (looped == NULL || looped->function != FUNCS.looped_input) {
+            looped = apply(contents, FUNCS.looped_input, TermList(outside, inside));
+            move_to_index(looped, i);
+        } else {
+            set_inputs(looped, TermList(outside, inside));
+        }
+        rename(looped, as_cstring(name));
+
+        // Now repoint inputs from the outside version to the looped input.
+        for (BlockInputIterator it(contents); it; ++it)
+            if (it.currentInput() == outside && it.currentTerm() != looped)
+                set_input(it.currentTerm(), it.currentInputIndex(), looped);
+    }
+
+    // Delete any remaining looped terms.
+    for (int i=list_length(&names); i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function == FUNCS.looped_input)
+            erase_term(term);
+    }
+    remove_nulls(contents);
+}
+
+void list_names_that_should_be_used_as_minor_block_output(Block* block, caValue* names)
+{
+    Value namesMap;
+    set_hashtable(&namesMap);
 }
 
 // Find the term that should be the 'primary' result for this loop.
@@ -365,6 +408,11 @@ Term* loop_find_condition(Block* block)
     if (conditionCheck != NULL)
         return conditionCheck->input(0);
     return NULL;
+}
+
+void while_loop_finish_changes(Block* contents)
+{
+    update_looped_inputs(contents);
 }
 
 void while_formatSource(caValue* source, Term* term)

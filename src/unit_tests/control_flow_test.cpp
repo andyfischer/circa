@@ -37,14 +37,14 @@ void has_control_flow_prop()
 
     // Inside "f" does have control flow.
     test_assert(true == block_get_bool_prop(
-                find_block_from_path_expression(&block, "f"), sym_HasControlFlow, false));
+                find_block_from_path(&block, "f"), sym_HasControlFlow, false));
 
     // Inside if-block does too.
     test_assert(true == block_get_bool_prop(
-                find_block_from_path_expression(&block, "f / function=if"),
+                find_block_from_path(&block, "f / function=if"),
                 sym_HasControlFlow, false));
 
-    Term* returnCall = find_term_from_path_expression(&block, "**/function=return");
+    Term* returnCall = find_term_from_path(&block, "**/function=return");
     test_assert(block_get_bool_prop(returnCall->owningBlock, sym_HasControlFlow, true));
 }
 
@@ -53,16 +53,16 @@ void test_find_block_that_exit_point_will_reach()
     Block block;
     block.compile("def f1() { def f2() { if true { return }}}");
 
-    Term* returnCall = find_term_from_path_expression(&block, "** / function=return");
+    Term* returnCall = find_term_from_path(&block, "** / function=return");
     Block* exitsTo = find_block_that_exit_point_will_reach(returnCall);
-    test_assert(exitsTo == find_block_from_path_expression(&block, "f1 / f2"));
+    test_assert(exitsTo == find_block_from_path(&block, "f1 / f2"));
 
     block.clear();
     block.compile("def f1() { def f2() { for i in [1] { if true { break } } } }");
 
-    Term* breakCall = find_term_from_path_expression(&block, "**/function=break");
+    Term* breakCall = find_term_from_path(&block, "**/function=break");
     exitsTo = find_block_that_exit_point_will_reach(breakCall);
-    test_assert(exitsTo == find_block_from_path_expression(&block, "** / function=for"));
+    test_assert(exitsTo == find_block_from_path(&block, "** / function=for"));
 }
 
 void test_recursion_with_state()
@@ -71,8 +71,8 @@ void test_recursion_with_state()
     block.compile("def f(int level) { state s = level; if level == 0 { return }; f(level - 1); }");
     block.compile("f(3)");
 
-    Term* returnCall = find_term_from_path_expression(&block, "** / function=return");
-    Block* f = find_block_from_path_expression(&block, "f");
+    Term* returnCall = find_term_from_path(&block, "** / function=return");
+    Block* f = find_block_from_path(&block, "f");
 
     update_derived_inputs_for_exit_point(returnCall);
     test_assert(find_block_that_exit_point_will_reach(returnCall) == f);

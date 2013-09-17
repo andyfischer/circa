@@ -777,7 +777,7 @@ static bool term_matches_path_expression_node(Term* term, caValue* node)
     return false;
 }
 
-Term* find_term_from_path_expression(Block* root, caValue* path, int offset)
+Term* find_term_from_path(Block* root, caValue* path, int offset)
 {
     if (offset >= list_length(path))
         return NULL;
@@ -788,7 +788,7 @@ Term* find_term_from_path_expression(Block* root, caValue* path, int offset)
     if (is_symbol(node) && as_symbol(node) == sym_RecursiveWildcard) {
 
         // Check if recursive wildcard matches nothing.
-        Term* match = find_term_from_path_expression(root, path, offset + 1);
+        Term* match = find_term_from_path(root, path, offset + 1);
         if (match != NULL)
             return match;
 
@@ -797,7 +797,7 @@ Term* find_term_from_path_expression(Block* root, caValue* path, int offset)
             Term* term = *it;
             if (term->nestedContents == NULL)
                 continue;
-            Term* found = find_term_from_path_expression(term->nestedContents,
+            Term* found = find_term_from_path(term->nestedContents,
                     path, offset + 1);
 
             if (found != NULL)
@@ -818,7 +818,7 @@ Term* find_term_from_path_expression(Block* root, caValue* path, int offset)
             return term;
 
         if (term->nestedContents != NULL) {
-            Term* found = find_term_from_path_expression(term->nestedContents,
+            Term* found = find_term_from_path(term->nestedContents,
                     path, offset + 1);
             if (found != NULL)
                 return found;
@@ -827,21 +827,21 @@ Term* find_term_from_path_expression(Block* root, caValue* path, int offset)
     return NULL;
 }
 
-Term* find_term_from_path_expression(Block* root, caValue* path)
+Term* find_term_from_path(Block* root, caValue* path)
 {
-    return find_term_from_path_expression(root, path, 0);
+    return find_term_from_path(root, path, 0);
 }
 
-Term* find_term_from_path_expression(Block* root, const char* pathExpr)
+Term* find_term_from_path(Block* root, const char* pathExpr)
 {
     Value path;
     parse_path_expression(pathExpr, &path);
-    return find_term_from_path_expression(root, &path, 0);
+    return find_term_from_path(root, &path, 0);
 }
 
-Block* find_block_from_path_expression(Block* root, const char* pathExpr)
+Block* find_block_from_path(Block* root, const char* pathExpr)
 {
-    Term* result = find_term_from_path_expression(root, pathExpr);
+    Term* result = find_term_from_path(root, pathExpr);
     if (result == NULL)
         return NULL;
     return result->nestedContents;

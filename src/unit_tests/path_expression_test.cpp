@@ -12,9 +12,9 @@ void simple_name_match()
     Block block;
     block.compile("a = 1; b = 2; c = 3");
 
-    Term* a = find_term_from_path_expression(&block, "a");
-    Term* b = find_term_from_path_expression(&block, "b");
-    Term* c = find_term_from_path_expression(&block, "c");
+    Term* a = find_term_from_path(&block, "a");
+    Term* b = find_term_from_path(&block, "b");
+    Term* c = find_term_from_path(&block, "c");
     test_assert(a != NULL);
     test_assert(b != NULL);
     test_assert(c != NULL);
@@ -29,9 +29,9 @@ void nested_name_match()
     Term* a = block.compile("a = { b = { c = 4 }}");
     block.compile("a2 = { b2 = 5 }");
 
-    test_assert(a == find_term_from_path_expression(&block, "a"));
-    Term* c = find_term_from_path_expression(&block, "a/b/c");
-    Term* b2 = find_term_from_path_expression(&block, "a2/b2");
+    test_assert(a == find_term_from_path(&block, "a"));
+    Term* c = find_term_from_path(&block, "a/b/c");
+    Term* b2 = find_term_from_path(&block, "a2/b2");
 
     test_assert(c != NULL);
     test_assert(b2 != NULL);
@@ -45,7 +45,7 @@ void wildcard_nested_match()
     block.compile("a = { b = { c = 5 } }");
     block.compile("a = { b2 = { d = 6 } }");
 
-    Term* d = find_term_from_path_expression(&block, "a/*/d");
+    Term* d = find_term_from_path(&block, "a/*/d");
     test_assert(d != NULL);
     test_equals(term_value(d), "6");
 }
@@ -57,9 +57,9 @@ void recursive_wildcard_match()
     block.compile("b = { c = 2 }");
     block.compile("d = { e = { f = 3 } }");
 
-    Term* a = find_term_from_path_expression(&block, "**/a");
-    Term* c = find_term_from_path_expression(&block, "**/c");
-    Term* f = find_term_from_path_expression(&block, "** / f");
+    Term* a = find_term_from_path(&block, "**/a");
+    Term* c = find_term_from_path(&block, "**/c");
+    Term* f = find_term_from_path(&block, "** / f");
     test_assert(a != NULL);
     test_assert(c != NULL);
     test_assert(f != NULL);
@@ -74,8 +74,8 @@ void function_match()
     block.compile("a = add(1 2)");
     block.compile("b = mult(3 4)");
 
-    Term* a = find_term_from_path_expression(&block, "function=add");
-    Term* b = find_term_from_path_expression(&block, "function=mult");
+    Term* a = find_term_from_path(&block, "function=add");
+    Term* b = find_term_from_path(&block, "function=mult");
     test_assert(a != NULL);
     test_assert(b != NULL);
     test_assert(a->function == FUNCS.add);
@@ -87,7 +87,7 @@ void recursive_function_match()
     Block block;
     block.compile("def f() { for i in [1] { if i == 2 { return 3 } } }");
 
-    Term* returnCall = find_term_from_path_expression(&block, "** / function=return");
+    Term* returnCall = find_term_from_path(&block, "** / function=return");
     test_assert(returnCall != NULL);
     test_assert(returnCall->function == FUNCS.return_func);
 }
