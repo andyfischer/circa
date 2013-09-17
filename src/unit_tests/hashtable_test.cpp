@@ -59,12 +59,26 @@ void test_mutable_hashtable()
     test_equals(&val2, "{a: 10}");
 }
 
+void test_get_keys()
+{
+    Value table;
+    set_hashtable(&table);
+    set_int(hashtable_insert(&table, temp_string("a")), 1);
+    set_int(hashtable_insert(&table, temp_string("b")), 2);
+    set_int(hashtable_insert(&table, temp_string("c")), 3);
+
+    Value keys;
+    hashtable_get_keys(&table, &keys);
+    test_equals(&keys, "['a', 'b', 'c']");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(hashtable_test::using_empty_table);
     REGISTER_TEST_CASE(hashtable_test::test_safe_copy);
     REGISTER_TEST_CASE(hashtable_test::test_mutable_hashtable_simple);
     REGISTER_TEST_CASE(hashtable_test::test_mutable_hashtable);
+    REGISTER_TEST_CASE(hashtable_test::test_get_keys);
 }
 
 } // namespace hashtable_test

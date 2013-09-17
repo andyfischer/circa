@@ -182,6 +182,9 @@ void list_names_that_must_be_looped(Block* contents, caValue* names)
         if (local != NULL)
             set_bool(hashtable_insert(&namesMap, name), true);
     }
+
+    hashtable_get_keys(&namesMap, names);
+    list_sort(names, NULL, NULL);
 }
 
 // Find the term that should be the 'primary' result for this loop.

@@ -9,8 +9,8 @@
 namespace circa {
 
 struct Slot {
-    caValue key;
-    caValue value;
+    Value key;
+    Value value;
 };
 
 struct Hashtable {
@@ -486,6 +486,17 @@ bool hashtable_is_empty(caValue* value)
     ca_assert(is_hashtable(value));
     Hashtable*& table = (Hashtable*&) value->value_data.ptr;
     return is_empty(table);
+}
+
+void hashtable_get_keys(caValue* table, caValue* keysOut)
+{
+    set_list(keysOut);
+
+    ca_assert(is_hashtable(table));
+    Hashtable* data = (Hashtable*) table->value_data.ptr;
+    for (int i=0; i < data->capacity; i++)
+        if (!is_null(&data->slots[i].key))
+            copy(&data->slots[i].key, list_append(keysOut));
 }
 
 void hashtable_setup_type(Type* type)
