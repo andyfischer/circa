@@ -199,11 +199,11 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "pop_explicit_state ");
         string_append(string, blob_read_int(bcData, pos));
         break;
-    case bc_UseMemoizedOnEqualInputs:
-        set_string(string, "use_memoized_on_equal_inputs");
+    case bc_MemoizeCheck:
+        set_string(string, "memoize_check");
         break;
-    case bc_MemoizeFrame:
-        set_string(string, "memoize_frame");
+    case bc_MemoizeSave:
+        set_string(string, "memoize_save");
         break;
     case bc_PackState:
         set_string(string, "pack_state ");
@@ -449,9 +449,6 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
     if (block == NULL)
         return blob_append_char(bytecode, bc_PushInputsDynamic);
 
-    if (block_contains_memoize(block))
-        blob_append_char(bytecode, bc_UseMemoizedOnEqualInputs);
-
     int callerInputIndex = 0;
     int lastInputIndex = caller->numInputs() - 1;
     int normalInputCount = 0;
@@ -627,7 +624,7 @@ static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoin
     write_pre_exit_pack_state(bytecode, block, exitPoint);
 
     if (block_contains_memoize(block))
-        blob_append_char(bytecode, bc_MemoizeFrame);
+        blob_append_char(bytecode, bc_MemoizeSave);
 }
 
 void bytecode_write_block(caValue* bytecode, Block* block)
@@ -636,6 +633,9 @@ void bytecode_write_block(caValue* bytecode, Block* block)
         set_blob(bytecode, 0);
 
     bool exitAdded = false;
+
+    if (block_contains_memoize(block))
+        blob_append_char(bytecode, bc_MemoizeCheck);
 
     // Check to just trigger a C override.
     if (get_override_for_block(block) != NULL) {

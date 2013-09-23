@@ -1,0 +1,25 @@
+
+Additional notes on memoization 9/22/13
+
+- The existing memoize plan is pretty good, but here are a few tweaks and refinements.
+
+Question: Can a function be both stateful and memoized?
+
+ - Conceptually yes (although it's kind of confusing)
+ - But in order to memoize correctly, it must save and check the state input
+   (in addition to other inputs).
+ - The implementation of this would get a little crazy
+ - So I feel comfortable saying: *no state in a memoize func()*
+
+Additionally, having an exit point makes the implementation a little trickier.
+ - We would need a bc_MemoizeSave that occurs after the exit point has copied
+   values to outputs, and before the frame is popped.
+   - This idea doesn't seem crazy and is actually somewhat clean.
+     - But it's not really necessary. Let's just say: *No exit points in a memoize func*
+
+The old UseMemoizeOnEqualInputs is going bye bye
+ - It was cute running through the PushInputs in a special mode. But unnecessary.
+ - New style: Just allow the inputs to be pushed as normal (and eventually benefit from
+   optimizations). Once the frame is fully pushed, we check inputs against our retained
+   registers. If the check passes, we copy over the retained outputs and then early exit
+   the frame.

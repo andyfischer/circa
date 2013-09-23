@@ -43,7 +43,8 @@ static void retain_stack_top(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 static void push_inputs_dynamic(Stack* stack);
 void run(Stack* stack);
-bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, int* pc);
+
+bool run_memoize_check(Stack* stack);
 static caValue* bc_read_local_position(Stack* stack, const char* data, int* pc);
 static int for_loop_find_index_value(Frame* frame);
 void extract_state(Block* block, caValue* state, caValue* output);
@@ -218,10 +219,6 @@ static Frame* expand_frame(Frame* parent, Frame* top)
 
             // Copy 'retained', even if the retained frame has none.
             copy(retained_frame_get_state(retainedFrame), &top->state);
-
-            // Copy saved registers, used for memoized frames.
-            if (!is_null(retained_frame_get_registers(retainedFrame)))
-                copy(retained_frame_get_registers(retainedFrame), &top->registers);
         }
     }
 
@@ -269,7 +266,7 @@ void stack_pop(Stack* stack)
 {
     Frame* frame = stack_top(stack);
 
-    if (frame->shouldRetain)
+    if (frame->shouldRetain || !is_null(&frame->outgoingState))
         retain_stack_top(stack);
 
     stack_pop_no_retain(stack);
@@ -342,16 +339,6 @@ static void retain_stack_top(Stack* stack)
 
     caValue* slot = prepare_retained_slot_for_parent(stack);
     copy_stack_frame_outgoing_state_to_retained(stack_top(stack), slot);
-    stack_top_parent(stack)->shouldRetain = true;
-}
-
-static void retain_stack_top_registers(Stack* stack)
-{
-    if (stack_top_parent(stack) == NULL)
-        return;
-
-    caValue* slot = prepare_retained_slot_for_parent(stack);
-    copy_stack_frame_registers_to_retained(stack_top(stack), slot);
     stack_top_parent(stack)->shouldRetain = true;
 }
 
@@ -836,39 +823,6 @@ bool stack_errored(Stack* stack)
 {
     return stack->errorOccurred;
 }
-
-#if 0
-static Block* case_block_choose_block(Stack* stack, Term* term)
-{
-    // Find the accepted case
-    Frame* frame = stack_top(stack);
-    Block* contents = nested_contents(term);
-
-    int termIndex = 0;
-    while (contents->get(termIndex)->function == FUNCS.input)
-        termIndex++;
-
-    for (; termIndex < contents->length(); termIndex++) {
-        Term* caseTerm = contents->get(termIndex);
-
-        // Fallback block has NULL input
-        if (caseTerm->input(0) == NULL)
-            return nested_contents(caseTerm);
-
-        caValue* caseInput = stack_find_active_value(frame, caseTerm->input(0));
-
-        // Check type on caseInput
-        if (!is_bool(caseInput)) {
-            raise_error_msg(stack, "Expected bool input");
-            return NULL;
-        }
-
-        if (as_bool(caseInput))
-            return nested_contents(caseTerm);
-    }
-    return NULL;
-}
-#endif
 
 static int for_loop_find_index_value(Frame* frame)
 {
@@ -1775,13 +1729,21 @@ do_func_apply:
             return;
         }
 
-        case bc_MemoizeFrame: {
-            retain_stack_top_registers(stack);
+        case bc_MemoizeCheck: {
+            if (run_memoize_check(stack))
+                goto do_done_insn;
             continue;
         }
 
-        case bc_UseMemoizedOnEqualInputs: {
-            run_memoization_lookahead_check(s.frame, stack_top(stack), s.bc, &s.pc);
+        case bc_MemoizeSave: {
+            caValue* slot = prepare_retained_slot_for_parent(stack);
+            Frame* top = stack_top(stack);
+
+            // Future: Probably only need to save inputs and outputs here, instead of
+            // the entire register list.
+            copy(&top->registers, &top->outgoingState);
+            touch(&top->outgoingState);
+
             continue;
         }
 
@@ -1894,75 +1856,44 @@ static void push_inputs_dynamic(Stack* stack)
     run_bytecode(stack, &bytecode);
 }
 
-bool run_memoization_lookahead_check(Frame* frame, Frame* top, const char* bc, int* interpreterPos)
+bool run_memoize_check(Stack* stack)
 {
-    int pc = *interpreterPos;
+    Frame* top = stack_top(stack);
 
-    // Lookahead at PushInput instructions, and check to see if the existing values are strictly
-    // equal to the incoming values.
-    
-    while (true) {
-        switch (blob_read_char(bc, &pc)) {
-        case bc_PushInputFromStack: {
-            int inputIndex = blob_read_int(bc, &pc);
-            int destSlot = blob_read_int(bc, &pc);
+    caValue* state = &top->state;
+    if (!is_list(state))
+        return false;
 
-            Term* caller = frame_caller(top);
-            caValue* value = stack_find_active_value(frame, caller->input(inputIndex));
-            caValue* slot = frame_register(top, destSlot);
+    Block* block = top->block;
 
-            if (!strict_equals(value, slot))
-                return false;
+    // Check every input.
+    for (int i=0;; i++) {
+        Term* input = get_input_placeholder(block, i);
+        if (input == NULL)
+            break;
 
-            continue;
-        }
-        case bc_PushVarargList: {
-            int startIndex = blob_read_int(bc, &pc);
-            int destSlot = blob_read_int(bc, &pc);
+        if (i >= list_length(state))
+            return false;
 
-            Term* caller = frame_caller(top);
-            caValue* dest = frame_register(top, destSlot);
-            int count = caller->numInputs() - startIndex;
-
-            if (!is_list(dest) || list_length(dest) != count)
-                return false;
-
-            for (int i=0; i < count; i++) {
-                caValue* value = stack_find_active_value(frame, caller->input(startIndex+i));
-                caValue* slot = list_get(dest, i);
-                if (!strict_equals(value, slot))
-                    return false;
-            }
-            continue;
-        }
-        case bc_PushInputNull: {
-            int inputIndex = blob_read_int(bc, &pc);
-
-            if (!is_null(frame_register(top, inputIndex)))
-                return false;
-
-            continue;
-        }
-        case bc_PushInputsDynamic: {
-            // TODO
-            continue;
-        }
-        case bc_EnterFrame: {
-            // Memoization check succeeded.
-            
-            // Advance the interpreter past the EnterFrame insn.
-            *interpreterPos = pc;
-            return true;
-        }
-
-        default:
-            std::cout << "Unexpected op in run_memoization_lookahead_check:";
-            std::cout << int(bc[pc - 1]) << std::endl;
-            ca_assert(false);
-        }
+        caValue* memoizedInput = list_get(state, i);
+        if (!strict_equals(memoizedInput, frame_register(top, i)))
+            return false;
     }
 
-    return false;
+    // Check has passed. Copy every retained output to the frame.
+    for (int i=0;; i++) {
+        Term* output = get_output_placeholder(block, i);
+        if (output == NULL)
+            break;
+
+        caValue* memoizedInput = list_get(state, output->index);
+        copy(memoizedInput, frame_register(top, output));
+    }
+
+    // Preserve the memoized data.
+    copy(&top->state, &top->outgoingState);
+
+    return true;
 }
 
 static caValue* bc_read_local_position(Stack* stack, const char* data, int* pc)

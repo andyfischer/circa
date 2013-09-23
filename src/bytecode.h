@@ -56,8 +56,8 @@ const char bc_LoopConditionBool = 0x46;
 const char bc_Loop = 0x47;
 
 // Memoization
-const char bc_UseMemoizedOnEqualInputs = 0x50;
-const char bc_MemoizeFrame = 0x51;
+const char bc_MemoizeCheck = 0x50;
+const char bc_MemoizeSave = 0x51;
 
 // Inline state.
 const char bc_PackState = 0x55;

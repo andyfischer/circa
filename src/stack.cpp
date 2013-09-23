@@ -62,17 +62,10 @@ caValue* retained_frame_get_state(caValue* frame)
     ca_assert(is_retained_frame(frame));
     return list_get(frame, 2);
 }
-caValue* retained_frame_get_registers(caValue* frame)
-{
-    ca_assert(is_retained_frame(frame));
-    return list_get(frame, 3);
-}
 
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame)
 {
-    if (!is_retained_frame(retainedFrame))
-        set_retained_frame(retainedFrame);
-    touch(retainedFrame);
+    set_retained_frame(retainedFrame);
 
     set_stack(list_get(retainedFrame, 0), source->stack);
     set_block(list_get(retainedFrame, 1), source->block);
@@ -81,38 +74,19 @@ void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retaine
 
 void copy_stack_frame_registers_to_retained(Frame* source, caValue* retainedFrame)
 {
-    if (!is_retained_frame(retainedFrame))
-        set_retained_frame(retainedFrame);
-    touch(retainedFrame);
+    set_retained_frame(retainedFrame);
 
     set_stack(list_get(retainedFrame, 0), source->stack);
     set_block(list_get(retainedFrame, 1), source->block);
-    set_value(list_get(retainedFrame, 3), &source->registers);
-    touch(list_get(retainedFrame, 3));
+    set_value(list_get(retainedFrame, 2), &source->registers);
+    touch(&source->registers);
 }
-
-#if 0
-void set_frame(caValue* value)
-{
-    make_no_initialize(TYPES.frame, value);
-    value->value_data.ptr = new Frame;
-}
-
-void frame_initialize(Type* type, caValue* value)
-{
-    set_frame(value);
-}
-
-void frame_release(caValue* value)
-{
-    delete as_frame(value);
-}
-#endif
 
 void frame_copy(Frame* left, Frame* right)
 {
     right->parentPc = left->parentPc;
     copy(&left->registers, &right->registers);
+    touch(&right->registers);
     copy(&left->state, &right->state);
     copy(&left->customBytecode, &right->customBytecode);
     copy(&left->dynamicScope, &right->dynamicScope);
@@ -123,26 +97,5 @@ void frame_copy(Frame* left, Frame* right)
     right->exitType = left->exitType;
     right->shouldRetain = left->shouldRetain;
 }
-
-#if 0
-void frame_copy_boxed(Type*, caValue* leftValue, caValue* rightValue)
-{
-    Frame* left = as_frame(leftValue);
-    set_frame(rightValue);
-    Frame* right = as_frame(rightValue);
-    frame_copy(left, right);
-    touch(&right->registers);
-}
-
-void copy_stack_frame_to_boxed(Frame* frame, caValue* value)
-{
-    set_frame(value);
-    frame_copy(frame, as_frame(value));
-}
-
-void frame_setup_type(Type* type)
-{
-}
-#endif
 
 } // namespace circa

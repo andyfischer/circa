@@ -52,7 +52,6 @@ void set_retained_frame(caValue* frame);
 bool is_retained_frame(caValue* frame);
 Block* retained_frame_get_block(caValue* frame);
 caValue* retained_frame_get_state(caValue* frame);
-caValue* retained_frame_get_registers(caValue* frame);
 
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame);
 void copy_stack_frame_registers_to_retained(Frame* source, caValue* retainedFrame);
