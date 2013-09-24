@@ -378,6 +378,7 @@ void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);
 void circa_set_stack(caValue* container, caStack* stack);
 void circa_set_string(caValue* container, const char* str);
+void circa_set_symbol(caValue* container, const char* str);
 void circa_set_typed_pointer(caValue* container, caType* type, void* ptr);
 void circa_set_vec2(caValue* container, float x, float y);
 void circa_set_vec3(caValue* container, float x, float y, float z);

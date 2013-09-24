@@ -575,6 +575,8 @@ const char* STDLIB_CA_TEXT =
     "    self.x2 - self.x1\n"
     "def Rect.height(self) -> number\n"
     "    self.y2 - self.y1\n"
+    "def Rect.size(self) -> Point\n"
+    "    [self.width self.height]\n"
     "def Rect.left(self) -> number\n"
     "    self.x1\n"
     "def Rect.top(self) -> number\n"

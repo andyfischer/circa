@@ -9,6 +9,7 @@
 #include "names.h"
 #include "reflection.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -860,6 +861,10 @@ void circa_set_vec4(caValue* container, float x, float y, float z, float w)
 void circa_set_string(caValue* container, const char* str)
 {
     set_string(container, str);
+}
+void circa_set_symbol(caValue* container, const char* str)
+{
+    set_symbol_from_string(container, str);
 }
 void circa_set_string_size(caValue* container, const char* str, int size)
 {

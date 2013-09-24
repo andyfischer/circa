@@ -568,6 +568,8 @@ def Rect.width(self) -> number
     self.x2 - self.x1
 def Rect.height(self) -> number
     self.y2 - self.y1
+def Rect.size(self) -> Point
+    [self.width self.height]
 def Rect.left(self) -> number
     self.x1
 def Rect.top(self) -> number

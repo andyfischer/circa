@@ -1,6 +1,12 @@
 
 Miscellanous (ordered most-recent first)
 
+  The 'Couldn't cast ...' message was for the wrong input (0 instead of 1)
+
+  >#3420 'self' 'self' input_placeholder#21() t:Context = 'Couldn't cast input value <Context 0x7f817ac838a0> to type Context'
+     #3421 'p' 'p' input_placeholder#21() t:Point = 5
+     #3422 '_output_placeholder' output_placeholder#19(NULL) t:any = null
+
   Declared a function called 'add', and the + operator started using it?
 
   load_module should return Func for consistency
