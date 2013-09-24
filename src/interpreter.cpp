@@ -1234,6 +1234,7 @@ do_loop_done_insn:
                 // Erase the shouldRetain flag - we've already saved each iteration, and we don't want
                 // stack_pop to save anything else.
                 s.frame->shouldRetain = false;
+                set_null(&s.frame->outgoingState);
                 
                 goto do_done_insn;
             }
@@ -1684,6 +1685,7 @@ do_func_apply:
             else if (op == bc_Discard) {
                 toFrame->exitType = sym_Discard;
                 s.frame->shouldRetain = false;
+                set_null(&s.frame->outgoingState);
             }
 
             s.frame = stack_top(stack);
