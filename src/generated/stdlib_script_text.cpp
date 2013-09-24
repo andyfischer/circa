@@ -289,6 +289,8 @@ const char* STDLIB_CA_TEXT =
     "    -- Fetch the value in the nth output register.\n"
     "def Stack.errored(self) -> bool\n"
     "    -- Returns true if the interpreter has stopped due to error.\n"
+    "def Stack.has_error(self) -> bool\n"
+    "    self.errored\n"
     "def Stack.error_message(self) -> String\n"
     "    -- If there is a recorded error, returns a human-readable description string.\n"
     "def Stack.toString(self) -> String\n"

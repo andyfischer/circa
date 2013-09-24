@@ -282,6 +282,8 @@ def Stack.output(self, int index) -> any
     -- Fetch the value in the nth output register.
 def Stack.errored(self) -> bool
     -- Returns true if the interpreter has stopped due to error.
+def Stack.has_error(self) -> bool
+    self.errored
 def Stack.error_message(self) -> String
     -- If there is a recorded error, returns a human-readable description string.
 def Stack.toString(self) -> String
