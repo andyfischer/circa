@@ -110,7 +110,6 @@ int frame_register_count(Frame* frame);
 caValue* frame_registers(Frame* frame);
 caValue* frame_bytecode(Frame* frame);
 Block* frame_block(Frame* frame);
-void frame_retain(Frame* frame);
 int frame_get_index(Frame* frame);
 
 void frame_extract_state(Frame* frame, caValue* output);

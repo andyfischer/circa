@@ -153,51 +153,6 @@ void test_inject_context()
     test_equals(test_spy_get_results(), "[10]");
 }
 
-Frame* g_retainFrameSaved = NULL;
-bool g_retainFrameCalledStep2 = false;
-
-void retain_frame_test_thunk_1(caStack* stack)
-{
-    g_retainFrameSaved = stack_top(stack);
-    frame_retain(stack_top(stack));
-}
-
-void retain_frame_test_thunk_2(caStack* stack)
-{
-    g_retainFrameCalledStep2 = true;
-    test_assert(stack_top(stack) == g_retainFrameSaved);
-}
-
-void test_retain_frame()
-{
-    g_retainFrameSaved = NULL;
-    g_retainFrameCalledStep2 = false;
-
-    Block block;
-    block.compile("def thunk()");
-    block.compile("def f() { thunk() }");
-    block.compile("f()");
-
-    install_function(&block, "thunk", retain_frame_test_thunk_1);
-
-    Stack stack;
-    stack_init(&stack, &block);
-
-    run_interpreter(&stack);
-
-    ca_assert(g_retainFrameSaved != NULL);
-
-    install_function(&block, "thunk", retain_frame_test_thunk_2);
-
-    stack_restart(&stack);
-    run_interpreter(&stack);
-
-    test_assert(g_retainFrameCalledStep2);
-
-    stack_restart(&stack);
-    run_interpreter(&stack);
-}
-
 void test_that_stack_is_implicitly_restarted_in_run_interpreter()
 {
     Block block;
@@ -219,32 +174,6 @@ void test_that_stack_is_implicitly_restarted_in_run_interpreter()
     test_equals(test_spy_get_results(), "[1, 1, 1, 1]");
 }
 
-void test_run_section()
-{
-#if 0
-    Block block;
-    Term* a = compile(&block, "test_spy(:a)");
-    Term* b = compile(&block, "test_spy(:b)");
-    Term* c = compile(&block, "test_spy(:c)");
-    Term* d = compile(&block, "test_spy(:d)");
-
-    Stack stack;
-    stack_init(&stack, &block);
-
-    test_spy_clear();
-    stack_run_section(&stack, a->index, b->index);
-    test_equals(test_spy_get_results(), "[:a]");
-
-    test_spy_clear();
-    stack_run_section(&stack, a->index, c->index);
-    test_equals(test_spy_get_results(), "[:a, :b]");
-
-    test_spy_clear();
-    stack_run_section(&stack, c->index, block.length());
-    test_equals(test_spy_get_results(), "[:c, :d]");
-#endif
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
@@ -253,7 +182,6 @@ void register_tests()
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);
     REGISTER_TEST_CASE(interpreter_test::test_inject_context);
-    REGISTER_TEST_CASE(interpreter_test::test_retain_frame);
     REGISTER_TEST_CASE(interpreter_test::test_that_stack_is_implicitly_restarted_in_run_interpreter);
 }
 

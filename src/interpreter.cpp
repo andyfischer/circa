@@ -266,7 +266,7 @@ void stack_pop(Stack* stack)
 {
     Frame* frame = stack_top(stack);
 
-    if (frame->shouldRetain || !is_null(&frame->outgoingState))
+    if (!is_null(&frame->outgoingState))
         retain_stack_top(stack);
 
     stack_pop_no_retain(stack);
@@ -339,7 +339,6 @@ static void retain_stack_top(Stack* stack)
 
     caValue* slot = prepare_retained_slot_for_parent(stack);
     copy_stack_frame_outgoing_state_to_retained(stack_top(stack), slot);
-    stack_top_parent(stack)->shouldRetain = true;
 }
 
 static Frame* stack_push_blank(Stack* stack)
@@ -357,7 +356,6 @@ static Frame* stack_push_blank(Stack* stack)
     frame->pc = 0;
     frame->exitType = sym_None;
     frame->callType = sym_NormalCall;
-    frame->shouldRetain = false;
     frame->block = NULL;
 
     return frame;
@@ -502,7 +500,6 @@ void stack_to_string(Stack* stack, caValue* out)
              << ", block = #" << block->id
              << ", pcIndex = " << frame->pcIndex
              << ", pc = " << frame->pc
-             << ", shouldRetain = " << (frame->shouldRetain ? "true" : "false")
              << "]" << std::endl;
 
         if (block == NULL)
@@ -642,11 +639,6 @@ Frame* frame_by_depth(Stack* stack, int depth)
 {
     int index = stack->framesCount - 1 - depth;
     return frame_by_index(stack, index);
-}
-
-void frame_retain(Frame* frame)
-{
-    frame->shouldRetain = true;
 }
 
 int frame_get_index(Frame* frame)
@@ -1195,7 +1187,7 @@ do_loop_done_insn:
             Block* contents = s.frame->block;
 
             // Possibly save state.
-            if (s.frame->shouldRetain)
+            if (!is_null(&s.frame->outgoingState))
                 retain_stack_top(stack);
 
             caValue* index = frame_register(s.frame, for_loop_find_index(contents));
@@ -1231,9 +1223,6 @@ do_loop_done_insn:
                     set_list(frame_register_from_end(s.frame, 0), 0);
                 }
 
-                // Erase the shouldRetain flag - we've already saved each iteration, and we don't want
-                // stack_pop to save anything else.
-                s.frame->shouldRetain = false;
                 set_null(&s.frame->outgoingState);
                 
                 goto do_done_insn;
@@ -1684,7 +1673,6 @@ do_func_apply:
                 toFrame->exitType = sym_Break;
             else if (op == bc_Discard) {
                 toFrame->exitType = sym_Discard;
-                s.frame->shouldRetain = false;
                 set_null(&s.frame->outgoingState);
             }
 
@@ -1764,7 +1752,6 @@ do_func_apply:
             touch(outgoingState);
 
             copy(result, list_get(outgoingState, declaredIndex));
-            frame_retain(declaredFrame);
             continue;
         }
 

@@ -87,7 +87,6 @@ void frame_copy(Frame* left, Frame* right)
     right->pc = left->pc;
     right->callType = left->callType;
     right->exitType = left->exitType;
-    right->shouldRetain = left->shouldRetain;
 }
 
 } // namespace circa

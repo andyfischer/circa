@@ -39,9 +39,6 @@ struct Frame
 
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
-
-    // Whether to save this frame on completion.
-    bool shouldRetain;
 };
 
 Frame* as_frame_ref(caValue* value);
