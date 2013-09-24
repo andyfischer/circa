@@ -177,7 +177,6 @@ void test_that_stack_is_implicitly_restarted_in_run_interpreter()
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
-    //REGISTER_TEST_CASE(interpreter_test::run_block_after_additions);
     REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);

@@ -1,0 +1,41 @@
+
+type ClickArea {
+    Rect rect
+    Func listener
+}
+
+def click_resolver(any message)
+
+    state clickAreas = []
+
+    -- Language defect: Ridiculous code that could be improved by pattern matching
+    if is_list(message)
+        if message[0] == :add
+            rect = message[1]
+            listener = message[2]
+            @clickAreas.append(ClickArea([rect listener]))
+        elif message[0] == :resolve
+            mousePos = message[1] -> Point
+            event = message[2]
+
+            listener = null
+            for ClickArea area in clickAreas
+                if area.rect.contains(mousePos)
+                    --print('found click area: ' area)
+                    listener = area.listener
+                    --print('listener: ' listener)
+
+            if listener != null
+                -- Language defect: Unnecessary cast
+                Func(@listener)
+                listener.call(mousePos event)
+
+    elif message == :clear
+        clickAreas = []
+
+int = make_stack(click_resolver)
+int.call([:resolve, [0 0] -> Point, {}])
+int.call([:resolve, [0 0] -> Point, {}])
+int.call([:resolve, [0 0] -> Point, {}])
+
+

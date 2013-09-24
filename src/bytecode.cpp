@@ -584,7 +584,7 @@ static void write_pre_exit_pack_state(caValue* bytecode, Block* block, Term* exi
         packStateSearch.stopAt(find_block_that_exit_point_will_reach(exitPoint));
     } else {
         packStateSearch = UpwardIterator2(block);
-        packStateSearch.stopAt(find_nearest_major_block(block));
+        packStateSearch.stopAt(block);
     }
 
     for (; packStateSearch; ++packStateSearch) {
