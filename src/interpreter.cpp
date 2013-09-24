@@ -2044,8 +2044,16 @@ void Frame__extract_state(caStack* stack)
 void make_stack(caStack* stack)
 {
     Stack* newStack = create_stack(stack->world);
-    caValue* func = circa_input(stack, 0);
-    stack_init_with_closure(newStack, func);
+    caValue* closure = circa_input(stack, 0);
+
+    Block* block = as_block(list_get(closure, 0));
+    caValue* closedValues = list_get(closure, 1);
+
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
+
+    stack_init_with_closure(newStack, closure);
+
     set_pointer(circa_create_default_output(stack, 0), newStack);
 }
 

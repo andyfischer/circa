@@ -91,6 +91,7 @@ def package(String moduleName)
 def import_file(String moduleName, String filename)
 def native_patch_this(String filename)
 def load_module(String moduleName) -> Block
+def load_script(String filename) -> Block
 
 -- Packages
 type Package {
@@ -191,6 +192,8 @@ def Block.walk_terms(self) -> List
 
 def Block.to_func(self) -> Func
     Func([self, []])
+def Block.to_stack(self) -> Stack
+    make_stack(self.to_func)
 
 -- Language defect: out-of-order function definition.
 def Block.call(self, any inputs :multiple) -> any
