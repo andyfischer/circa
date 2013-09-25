@@ -678,7 +678,7 @@ Term* find_from_relative_name_list(caValue* name, Block* relativeTo)
         if (relativeTo == NULL)
             return NULL;
 
-        term = find_from_unique_name(relativeTo, as_cstring(list_get(name, index)));
+        term = find_from_unique_name(relativeTo, list_get(name, index));
 
         if (term == NULL)
             return NULL;
@@ -758,7 +758,7 @@ caValue* unique_name(Term* term)
     return &term->uniqueName.name;
 }
 
-Term* find_from_unique_name(Block* block, const char* name)
+Term* find_from_unique_name(Block* block, caValue* name)
 {
     // O(n) search; this should be made more efficient.
 

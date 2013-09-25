@@ -89,7 +89,7 @@ Term* find_from_relative_name_list(caValue* name, Block* relativeTo);
 void update_unique_name(Term* term);
 caValue* unique_name(Term* term);
 
-Term* find_from_unique_name(Block* block, const char* name);
+Term* find_from_unique_name(Block* block, caValue* name);
 Term* find_from_global_name(World* world, const char* globalName);
 
 // Construct a global name for this term. May return :None if we couldn't create a global name.

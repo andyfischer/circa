@@ -1,0 +1,20 @@
+
+def left()
+  binding = 'old'
+
+  state closure = { print('closure called with: ' binding) }
+
+def right()
+  binding = 'new'
+
+  state closure = { print('closure called with: ' binding) }
+
+  closure.call
+
+int = make_stack(left)
+int.run
+
+int.migrate_to(right)
+int.run
+
+assert(int.top.block == right.block)

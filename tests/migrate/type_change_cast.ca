@@ -1,0 +1,15 @@
+
+def left()
+  state int a = 1
+
+def right()
+  state number a = 2
+  print('after migration, a is: ' a)
+
+int = make_stack(left)
+int.run
+
+int.migrate_to(right)
+int.run
+
+assert(int.top.block == right.block)

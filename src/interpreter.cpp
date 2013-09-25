@@ -19,6 +19,7 @@
 #include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
+#include "migration.h"
 #include "modules.h"
 #include "parser.h"
 #include "reflection.h"
@@ -215,7 +216,7 @@ static Frame* expand_frame(Frame* parent, Frame* top)
         if (is_retained_frame(retainedFrame)
                 // Don't expand state on calls from within declared_state.
                 && (parent->block->owningTerm != FUNCS.declared_state)
-                && (retained_frame_get_block(retainedFrame) == top->block)) {
+                && (as_block(retained_frame_get_block(retainedFrame)) == top->block)) {
 
             // Copy 'retained', even if the retained frame has none.
             copy(retained_frame_get_state(retainedFrame), &top->state);
@@ -240,7 +241,7 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
                     // Don't expand state on calls from within declared_state.
                     && (parent->block->owningTerm != FUNCS.declared_state)) {
 
-                if (retained_frame_get_block(retainedFrame) == top->block)
+                if (as_block(retained_frame_get_block(retainedFrame)) == top->block)
                     copy(retained_frame_get_state(retainedFrame), &top->state);
             }
         }
@@ -750,6 +751,11 @@ int frame_register_count(Frame* frame)
 caValue* frame_registers(Frame* frame)
 {
     return &frame->registers;
+}
+
+caValue* frame_state(Frame* frame)
+{
+    return &frame->state;
 }
 
 caValue* frame_bytecode(Frame* frame)
@@ -2012,7 +2018,7 @@ void extract_state(Block* block, caValue* state, caValue* output)
 
 static void retained_frame_extract_state(caValue* frame, caValue* output)
 {
-    Block* block = retained_frame_get_block(frame);
+    Block* block = as_block(retained_frame_get_block(frame));
     caValue* state = retained_frame_get_state(frame);
     extract_state(block, state, output);
 }
@@ -2211,6 +2217,16 @@ void Stack__get_state_output(caStack* stack)
     copy(&top->outgoingState, circa_output(stack, 0));
 }
 
+void Stack__migrate_to(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    Block* toBlock = as_block(closure_get_block(circa_input(stack, 1)));
+    ca_assert(toBlock != NULL);
+
+    migrate_stack(self, stack_top(self)->block, toBlock);
+}
+
 void Stack__reset(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2338,6 +2354,7 @@ void interpreter_install_functions(Block* kernel)
         {"Stack.stack_pop", Stack__stack_pop},
         {"Stack.set_state_input", Stack__set_state_input},
         {"Stack.get_state_output", Stack__get_state_output},
+        {"Stack.migrate_to", Stack__migrate_to},
         {"Stack.reset", Stack__reset},
         {"Stack.restart", Stack__restart},
         {"Stack.run", Stack__run},

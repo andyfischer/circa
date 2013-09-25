@@ -205,7 +205,7 @@ def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
 
 type Frame { Stack stack, int index }
-type RetainedFrame { Stack stack, Block block, any _state }
+type RetainedFrame { Block block, any _state }
 
 def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)
@@ -258,6 +258,8 @@ def Stack.stack_pop(self)
     -- Pop the topmost frame.
 def Stack.set_state_input(self, any)
 def Stack.get_state_output(self) -> any
+def Stack.migrate_to(self, Func func)
+    -- Use 'func' as the new root, and migrate data and state.
 def Stack.reset(self)
     -- Clear this stack's state, including all frames.
 def Stack.restart(self)

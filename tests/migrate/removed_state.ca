@@ -1,0 +1,20 @@
+
+def left()
+  state a = 'old a'
+  state b = 'old b'
+  state c = 'old c'
+
+def right()
+  state a = 'new a'
+  state c = 'new c'
+
+  print('after migration, a is: ' a)
+  print('c is: ' c)
+
+int = make_stack(left)
+int.run
+
+int.migrate_to(right)
+int.run
+
+assert(int.top.block == right.block)

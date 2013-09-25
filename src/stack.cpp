@@ -52,15 +52,15 @@ bool is_retained_frame(caValue* frame)
 {
     return frame->value_type == TYPES.retained_frame;
 }
-Block* retained_frame_get_block(caValue* frame)
+caValue* retained_frame_get_block(caValue* frame)
 {
     ca_assert(is_retained_frame(frame));
-    return as_block(list_get(frame, 1));
+    return list_get(frame, 0);
 }
 caValue* retained_frame_get_state(caValue* frame)
 {
     ca_assert(is_retained_frame(frame));
-    return list_get(frame, 2);
+    return list_get(frame, 1);
 }
 
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame)
@@ -69,9 +69,8 @@ void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retaine
         set_retained_frame(retainedFrame);
     touch(retainedFrame);
 
-    set_stack(list_get(retainedFrame, 0), source->stack);
-    set_block(list_get(retainedFrame, 1), source->block);
-    set_value(list_get(retainedFrame, 2), &source->outgoingState);
+    set_block(retained_frame_get_block(retainedFrame), source->block);
+    set_value(retained_frame_get_state(retainedFrame), &source->outgoingState);
 }
 
 void frame_copy(Frame* left, Frame* right)

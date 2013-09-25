@@ -85,33 +85,71 @@ Block* migrate_block_pointer(Block* block, Migration* migration)
         return newTerm->nestedContents;
 }
 
+void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migration* migration)
+{
+    if (is_null(list) || oldBlock == newBlock)
+        return;
+
+    Value oldList;
+    move(list, &oldList);
+    touch(&oldList);
+    set_list(list, newBlock->length());
+
+    // Copy state values with matching names.
+    for (int i=0; i < list_length(&oldList); i++) {
+        caValue* oldValue = list_get(&oldList, i);
+        if (is_null(oldValue))
+            continue;
+
+        Term* oldTerm = oldBlock->get(i);
+        Term* newTerm = find_from_unique_name(newBlock, unique_name(oldTerm));
+
+        if (newTerm != NULL)
+            move(oldValue, list_get(list, newTerm->index));
+    }
+
+    migrate_value(list, migration);
+}
+
 void migrate_stack(Stack* stack, Migration* migration)
 {
     Frame* frame = stack_top(stack);
 
     while (frame != NULL) {
-        // TODO: Go in to 'state' and update branch pointers.
 
+        Block* oldBlock = frame->block;
         frame->block = migrate_block_pointer(frame->block, migration);
 
-        if (frame->block != NULL) {
-            list_resize(frame_registers(frame), block_locals_count(frame->block));
-        }
+        if (frame->block != NULL && frame->block != oldBlock) {
 
-        migrate_value(frame_registers(frame), migration);
+            list_resize(frame_registers(frame), block_locals_count(frame->block));
+
+            migrate_value(frame_registers(frame), migration);
+            migrate_state_list(&frame->state, oldBlock, frame->block, migration);
+            migrate_state_list(&frame->outgoingState, oldBlock, frame->block, migration);
+        }
 
         frame = frame_parent(frame);
     }
 }
 
+void migrate_retained_frame(caValue* retainedFrame, Migration* migration)
+{
+    Block* block = as_block(retained_frame_get_block(retainedFrame));
+    Block* newBlock = migrate_block_pointer(block, migration);
+
+    if (block == newBlock)
+        return;
+
+    touch(retainedFrame);
+    caValue* state = retained_frame_get_state(retainedFrame);
+    migrate_state_list(state, block, newBlock, migration);
+    set_block(retained_frame_get_block(retainedFrame), newBlock);
+}
+
 void migrate_value(caValue* value, Migration* migration)
 {
-    if (is_list(value)) {
-        for (ValueIterator it(value); it.unfinished(); it.advance()) {
-            caValue* element = *it;
-            migrate_value(element, migration);
-        }
-    } else if (is_ref(value)) {
+    if (is_ref(value)) {
         set_term_ref(value, migrate_term_pointer(as_term_ref(value), migration));
         
     } else if (is_block(value)) {
@@ -121,6 +159,13 @@ void migrate_value(caValue* value, Migration* migration)
     } else if (value->value_type == TYPES.mutable_type) {
         caValue* boxedValue = (caValue*) object_get_body(value);
         migrate_value(boxedValue, migration);
+    } else if (is_retained_frame(value)) {
+        migrate_retained_frame(value, migration);
+    } else if (is_list(value)) {
+        for (int i=0; i < list_length(value); i++) {
+            caValue* element = list_get(value, i);
+            migrate_value(element, migration);
+        }
     }
 }
 

@@ -24,6 +24,8 @@ Block* migrate_block_pointer(Block* block, Migration* migration);
 // Migrate (possibly modify) all code references inside the stack.
 void migrate_stack(Stack* stack, Migration* migration);
 
+void migrate_retained_frame(caValue* retainedFrame, Migration* migration);
+
 // Migrate (possibly modify) all code references inside the value.
 void migrate_value(caValue* value, Migration* migration);
 

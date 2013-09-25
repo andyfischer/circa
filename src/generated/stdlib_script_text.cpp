@@ -265,6 +265,8 @@ const char* STDLIB_CA_TEXT =
     "    -- Pop the topmost frame.\n"
     "def Stack.set_state_input(self, any)\n"
     "def Stack.get_state_output(self) -> any\n"
+    "def Stack.migrate_to(self, Func func)\n"
+    "    -- Use 'func' as the new root, and migrate data and state.\n"
     "def Stack.reset(self)\n"
     "    -- Clear this stack's state, including all frames.\n"
     "def Stack.restart(self)\n"

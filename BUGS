@@ -1,5 +1,7 @@
 
-Miscellanous (ordered most-recent first)
+Miscellanous (most-recent first)
+
+  The 'def' keyword creates a closure, but it doesn't save bindings.
 
   The 'Couldn't cast ...' message was for the wrong input (0 instead of 1)
 

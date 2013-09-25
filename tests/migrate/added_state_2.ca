@@ -1,0 +1,21 @@
+
+def left()
+  def nested()
+    state a = 'old'
+
+  nested()
+
+def right()
+  def nested()
+    state a = 'new'
+    state b = 'b'
+    print('after migration, a is: ' a)
+    print('b is: ' b)
+
+  nested()
+
+int = make_stack(left)
+int.run
+
+int.migrate_to(right)
+int.run

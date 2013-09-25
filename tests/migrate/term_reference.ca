@@ -1,0 +1,19 @@
+
+def left()
+  a = 1
+
+  state term = term_ref(a)
+
+def right()
+  a = 2
+
+  state term
+  print('after migration, term points to: ' term.value)
+
+int = make_stack(left)
+int.run
+
+int.migrate_to(right)
+int.run
+
+assert(int.top.block == right.block)
