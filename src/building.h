@@ -73,7 +73,6 @@ Term* append_output_placeholder(Block* block, Term* result);
 Term* append_output_placeholder_with_description(Block* block, caValue* description);
 Term* prepend_output_placeholder(Block* block, Term* result);
 Term* insert_output_placeholder(Block* block, Term* result, int location);
-Term* append_state_input(Block* block);
 
 void get_input_description(Term* input, caValue* result);
 Term* find_output_placeholder_with_name(Block* block, caValue* name);
@@ -85,16 +84,6 @@ Term* get_output_term(Term* term, int index);
 Term* get_extra_output(Term* term, int index);
 int count_outputs(Term* term);
 Term* find_or_create_output_term(Term* term, int index);
-Term* find_extra_output_for_state(Term* term);
-
-// Stateful inputs & outputs
-bool term_is_state_input(Term* term, int index);
-Term* find_state_input(Block* block);
-bool has_state_input(Block* block);
-Term* find_state_output(Block* block);
-bool has_state_output(Block* block);
-bool is_state_input(Term* placeholder);
-bool is_state_output(Term* placeholder);
 
 // For the given output, find the intermediate value at the given location. The definition
 // of "intermediate value" depends on what kind of output it is. For an implicit named output,

@@ -412,17 +412,11 @@ Stack* stack_duplicate(Stack* stack)
 caValue* stack_get_state(Stack* stack)
 {
     Frame* top = stack_top(stack);
-    Term* stateSlot = NULL;
     
     if (stack->step == sym_StackReady)
-        stateSlot = find_state_input(top->block);
+        return &top->state;
     else
-        stateSlot = find_state_output(top->block);
-    
-    if (stateSlot == NULL)
-        return NULL;
-
-    return frame_register(top, stateSlot);
+        return &top->outgoingState;
 }
 
 caValue* stack_find_active_value(Frame* frame, Term* term)
@@ -2197,28 +2191,12 @@ void Stack__set_state_input(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
+    Frame* top = stack_top(self);
 
-    if (stack_top(self) == NULL)
+    if (top == NULL)
         return circa_output_error(stack, "No stack frame");
 
-    // find state input
-    Block* block = stack_top(self)->block;
-    caValue* stateSlot = NULL;
-    for (int i=0;; i++) {
-        Term* input = get_input_placeholder(block, i);
-        if (input == NULL)
-            break;
-        if (is_state_input(input)) {
-            stateSlot = get_top_register(self, input);
-            break;
-        }
-    }
-
-    if (stateSlot == NULL)
-        // No-op if block doesn't expect state
-        return;
-
-    copy(circa_input(stack, 1), stateSlot);
+    copy(circa_input(stack, 1), &top->state);
 }
 
 void Stack__get_state_output(caStack* stack)
@@ -2226,29 +2204,11 @@ void Stack__get_state_output(caStack* stack)
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
 
-    if (stack_top(self) == NULL)
+    Frame* top = stack_top(self);
+    if (top == NULL)
         return circa_output_error(stack, "No stack frame");
 
-    // find state output
-    Block* block = stack_top(self)->block;
-    caValue* stateSlot = NULL;
-    for (int i=0;; i++) {
-        Term* output = get_output_placeholder(block, i);
-        if (output == NULL)
-            break;
-        if (is_state_output(output)) {
-            stateSlot = get_top_register(self, output);
-            break;
-        }
-    }
-
-    if (stateSlot == NULL) {
-        // Couldn't find outgoing state
-        set_null(circa_output(stack, 0));
-        return;
-    }
-
-    copy(stateSlot, circa_output(stack, 0));
+    copy(&top->outgoingState, circa_output(stack, 0));
 }
 
 void Stack__reset(caStack* stack)

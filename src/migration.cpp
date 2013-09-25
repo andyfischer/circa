@@ -90,23 +90,12 @@ void migrate_stack(Stack* stack, Migration* migration)
     Frame* frame = stack_top(stack);
 
     while (frame != NULL) {
-        // Save state output
-        Value stateOutput;
-        Term* stateOutputTerm = find_state_output(frame->block);
-        if (stateOutputTerm != NULL)
-            move(frame_register(frame, stateOutputTerm), &stateOutput);
+        // TODO: Go in to 'state' and update branch pointers.
 
         frame->block = migrate_block_pointer(frame->block, migration);
 
         if (frame->block != NULL) {
-
             list_resize(frame_registers(frame), block_locals_count(frame->block));
-
-            if (stateOutputTerm != NULL) {
-                Term* newStateOutputTerm = find_state_output(frame->block);
-                if (newStateOutputTerm != NULL)
-                    move(&stateOutput, frame_register(frame, newStateOutputTerm));
-            }
         }
 
         migrate_value(frame_registers(frame), migration);
@@ -159,6 +148,7 @@ Term* migrate_term_pointer(Term* term, Block* oldBlock, Block* newBlock)
     migration.newBlock = newBlock;
     return migrate_term_pointer(term, &migration);
 }
+
 void migrate_block(Block* block, Block* oldBlock, Block* newBlock)
 {
     Migration migration;

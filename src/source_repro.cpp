@@ -344,10 +344,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     // Also, possibly insert the & operator.
     if (input->name != ""
             && function_call_rebinds_input(term, inputIndex)) {
-        if (term_is_state_input(term, inputIndex))
-            append_phrase(source, "state = ", term, sym_None);
-        else
-            append_phrase(source, "&", term, tok_Ampersand);
+        append_phrase(source, "&", term, tok_Ampersand);
     }
 
     bool byValue = input->name == "";

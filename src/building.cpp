@@ -619,38 +619,10 @@ Term* insert_output_placeholder(Block* block, Term* result, int location)
     return term;
 }
 
-Term* append_state_input(Block* block)
-{
-    // Make sure that a state input doesn't already exist
-    Term* existing = find_state_input(block);
-    if (existing != NULL)
-        return existing;
-
-    int inputCount = count_input_placeholders(block);
-
-    Term* term = apply(block, FUNCS.input, TermList());
-    block->move(term, inputCount);
-    term->setBoolProp("state", true);
-    term->setBoolProp("hiddenInput", true);
-    term->setBoolProp("output", true);
-
-    on_block_inputs_changed(block);
-    set_bool(block_insert_property(block, sym_DirtyStateType), true);
-
-    return term;
-}
-
 void get_input_description(Term* input, caValue* result)
 {
-    // state input
-    if (input->hasProperty("state")) {
-        // return :State
-        set_symbol(result, sym_State);
-        return;
-    }
-
     // Primary input.
-    else if (input_placeholder_index(input) == 0) {
+    if (input_placeholder_index(input) == 0) {
         // return :Primary
         set_symbol(result, sym_Primary);
         return;
@@ -699,15 +671,6 @@ Term* find_output_from_description(Block* block, caValue* description)
                 return placeholder;
         }
     }
-    else if (as_symbol(tag) == sym_State) {
-        for (int i=0;; i++) {
-            Term* placeholder = get_output_placeholder(block, i);
-            if (placeholder == NULL)
-                return NULL;
-            if (placeholder->hasProperty("state"))
-                return placeholder;
-        }
-    }
 
     return NULL;
 }
@@ -728,14 +691,6 @@ void get_output_description(Term* output, caValue* result)
         set_list(result, 2);
         set_symbol(list_get(result, 0), sym_ExtraReturn);
         set_int(list_get(result, 1), output->intProp("extraReturn", 0));
-        return;
-    }
-
-    // state output
-    else if (output->hasProperty("state")) {
-        // return [:state]
-        set_list(result, 1);
-        set_symbol(list_get(result, 0), sym_State);
         return;
     }
 
@@ -808,68 +763,6 @@ int count_outputs(Term* term)
             return i;
 }
 
-Term* find_extra_output_for_state(Term* term)
-{
-    for (int i=0;; i++) {
-        Term* extra_output = get_extra_output(term, i);
-        if (extra_output == NULL)
-            break;
-
-        if (extra_output->boolProp("state", false))
-            return extra_output;
-    }
-    return NULL;
-}
-
-bool term_is_state_input(Term* term, int index)
-{
-    if (index >= term->numInputs())
-        return false;
-    caValue* prop = term->inputInfo(index)->properties.get("state");
-    if (prop == NULL)
-        return false;
-    return as_bool(prop);
-}
-
-Term* find_state_input(Block* block)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(block, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (is_state_input(placeholder))
-            return placeholder;
-    }
-}
-
-bool has_state_input(Block* block)
-{
-    return find_state_input(block) != NULL;
-}
-
-Term* find_state_output(Block* block)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(block, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (is_state_output(placeholder))
-            return placeholder;
-    }
-}
-bool has_state_output(Block* block)
-{
-    return find_state_output(block) != NULL;
-}
-bool is_state_input(Term* placeholder)
-{
-    return placeholder->boolProp("state", false);
-}
-bool is_state_output(Term* placeholder)
-{
-    return placeholder->boolProp("state", false);
-}
-
 Term* find_intermediate_result_for_output(Term* location, Term* output)
 {
     Value description;
@@ -935,16 +828,6 @@ void update_extra_outputs(Term* term)
         // Find the associated input placeholder (if any).
         int rebindsInput = placeholder->intProp("rebindsInput", -1);
 
-        if (rebindsInput == -1) {
-
-            // Check if we can find the rebind-input by looking for state input.
-            if (is_state_output(placeholder)) {
-                Term* stateInput = find_state_input(function);
-                if (stateInput != NULL)
-                    rebindsInput = stateInput->index;
-            }
-        }
-
         // Use the appropriate name
         if (rebindsInput >= 0) {
             Term* input = term->input(rebindsInput);
@@ -973,9 +856,6 @@ void update_extra_outputs(Term* term)
         }
 
         change_declared_type(extra_output, placeholder->type);
-
-        if (is_state_input(placeholder))
-            extra_output->setBoolProp("state", true);
     }
 }
 
@@ -1224,7 +1104,7 @@ void check_to_add_primary_output_placeholder(Block* block)
 {
     Term* output = get_output_placeholder(block, 0);
 
-    if (output == NULL || is_state_input(output))
+    if (output == NULL)
         prepend_output_placeholder(block, find_last_non_comment_expression(block));
 }
 

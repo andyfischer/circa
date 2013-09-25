@@ -192,32 +192,6 @@ void Block__get_static_errors_formatted(caStack* stack)
         format_static_error(circa_index(errors, i), circa_index(out, i));
 }
 
-void Block__has_state_input(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), has_state_input(block));
-}
-
-void Block__get_state_input_index(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    Term* stateInput = find_state_input(block);
-    if (stateInput == NULL)
-        circa_output_error(stack, "No state input on block");
-    else
-        set_int(circa_output(stack, 0), stateInput->index);
-}
-
-void Block__get_state_output_index(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    Term* stateOutput = find_state_output(block);
-    if (stateOutput == NULL)
-        circa_output_error(stack, "No state output on block");
-    else
-        set_int(circa_output(stack, 0), block->length() - stateOutput->index - 1);
-}
-
 // Reflection
 
 void Block__terms(caStack* stack)
@@ -669,9 +643,6 @@ void reflection_install_functions(Block* builtins)
         {"Block.get_static_errors", Block__get_static_errors},
         {"Block.get_static_errors_formatted", Block__get_static_errors_formatted},
         {"Block.has_static_error", Block__has_static_error},
-        {"Block.has_state_input", Block__has_state_input},
-        {"Block.get_state_input_index", Block__get_state_input_index},
-        {"Block.get_state_output_index", Block__get_state_output_index},
         {"Block.input", Block__input},
         {"Block.inputs", Block__inputs},
         {"Block.is_null", Block__is_null},
