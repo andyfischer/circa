@@ -6,6 +6,7 @@
 #include "building.h"
 #include "function.h"
 #include "kernel.h"
+#include "importing.h"
 #include "inspection.h"
 #include "parser.h"
 #include "source_repro.h"
@@ -467,12 +468,106 @@ void set_type_list(caValue* value, Type* type1, Type* type2)
     set_type(list_get(value,0), type1);
     set_type(list_get(value,1), type2);
 }
+
 void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3)
 {
     set_list(value, 3);
     set_type(list_get(value,0), type1);
     set_type(list_get(value,1), type2);
     set_type(list_get(value,2), type3);
+}
+
+void Type__declaringTerm(caStack* stack)
+{
+    Type* type = as_type(circa_input(stack, 0));
+    set_term_ref(circa_output(stack, 0), type->declaringTerm);
+}
+
+void Type__make(caStack* stack)
+{
+    Type* type = as_type(circa_input(stack, 0));
+    caValue* args = circa_input(stack, 1);
+
+    caValue* output = circa_output(stack, 0);
+    make(type, output);
+
+    int expectedFieldCount = 0;
+    caValue* fields = NULL;
+    if (is_list_based_type(type)) {
+        fields = list_get_type_list_from_type(type);
+        if (fields != NULL)
+            expectedFieldCount = list_length(fields);
+    }
+
+    for (int i=0; i < list_length(args); i++) {
+        if (i >= expectedFieldCount) {
+            Value msg;
+            set_string(&msg, "Too many fields for type ");
+            string_append(&msg, &type->name);
+            string_append(&msg, ", found ");
+            string_append(&msg, list_length(args));
+            string_append(&msg, ", expected ");
+            string_append(&msg, expectedFieldCount);
+            return circa_output_error(stack, as_cstring(&msg));
+        }
+
+        CastResult castResult;
+        caValue* source = list_get(args, i);
+        caValue* dest = list_get(output, i);
+        copy(source, dest);
+        cast(&castResult, dest, as_type(list_get(fields, i)), false);
+
+        if (!castResult.success) {
+            Value msg;
+            set_string(&msg, "Couldn't cast input ");
+            string_append(&msg, source);
+            string_append(&msg, " to type ");
+            string_append(&msg, &type->name);
+            string_append(&msg, "(index ");
+            string_append(&msg, i);
+            string_append(&msg, ")");
+            return circa_output_error(stack, as_cstring(&msg));
+        }
+    }
+}
+
+Type* Type__make__specializeType(Term* caller)
+{
+    Term* input = caller->input(0);
+    if (input == NULL)
+        return TYPES.any;
+
+    if (is_value(input) && is_type(input))
+        return as_type(input);
+
+    return TYPES.any;
+}
+
+void Type__name(caStack* stack)
+{
+    Type* type = as_type(circa_input(stack, 0));
+    copy(&type->name, circa_output(stack, 0));
+}
+
+void Type__property(caStack* stack)
+{
+    Type* type = as_type(circa_input(stack, 0));
+    const char* str = as_cstring(circa_input(stack, 1));
+    caValue* prop = get_type_property(type, str);
+    if (prop == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        copy(prop, circa_output(stack, 0));
+}
+
+void type_install_functions(Block* block)
+{
+    install_function(block, "Type.declaringTerm", Type__declaringTerm);
+    Term* Type_make = install_function(block, "Type.make", Type__make);
+    install_function(block, "Type.name", Type__name);
+    install_function(block, "Type.property", Type__property);
+
+    block_set_specialize_type_func(function_contents(Type_make), Type__make__specializeType);
 }
 
 } // namespace circa

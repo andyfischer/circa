@@ -638,29 +638,6 @@ void String__split(caStack* stack)
     string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
 }
 
-void Type__name(caStack* stack)
-{
-    Type* type = as_type(circa_input(stack, 0));
-    copy(&type->name, circa_output(stack, 0));
-}
-
-void Type__property(caStack* stack)
-{
-    Type* type = as_type(circa_input(stack, 0));
-    const char* str = as_cstring(circa_input(stack, 1));
-    caValue* prop = get_type_property(type, str);
-    if (prop == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        copy(prop, circa_output(stack, 0));
-}
-
-void Type__declaringTerm(caStack* stack)
-{
-    Type* type = as_type(circa_input(stack, 0));
-    set_term_ref(circa_output(stack, 0), type->declaringTerm);
-}
-
 void typeof_func(caStack* stack)
 {
     caValue* in = circa_input(stack, 0);
@@ -1141,9 +1118,6 @@ void bootstrap_kernel()
         {"String.to_upper", String__to_upper},
         {"String.to_lower", String__to_lower},
         
-        {"Type.name", Type__name},
-        {"Type.property", Type__property},
-        {"Type.declaringTerm", Type__declaringTerm},
         {"type", typeof_func},
         {"static_type", static_type_func},
 
@@ -1156,6 +1130,7 @@ void bootstrap_kernel()
     modules_install_functions(builtins);
     reflection_install_functions(builtins);
     interpreter_install_functions(builtins);
+    type_install_functions(builtins);
 
     // Fix 'builtins' module now that the module() function is created.
     change_function(builtinsTerm, FUNCS.module);

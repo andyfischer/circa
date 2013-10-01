@@ -1,0 +1,3 @@
+
+-- Don't error if the type is not list-based.
+assert(int.make == 0)

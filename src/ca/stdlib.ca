@@ -458,10 +458,11 @@ def String.characters(self) -> List
         self.char_at(i)
     return out
 
+def Type.declaringTerm(self) -> Term
+def Type.make(self, any values :multiple) -> any
 def Type.name(self) -> String
     -- Returns this Term's local name. May be empty.
 def Type.property(self, String name) -> any
-def Type.declaringTerm(self) -> Term
 
 
 -- Metaprogramming on Term

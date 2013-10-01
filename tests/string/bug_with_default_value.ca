@@ -1,0 +1,3 @@
+
+-- this once failed
+assert(String.make == '')

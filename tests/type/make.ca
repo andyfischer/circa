@@ -1,0 +1,23 @@
+
+type T {
+    int i
+    String s
+    bool b
+}
+
+t = T.make(1 'hi' true)
+
+assert(t.i == 1)
+assert(t.s == 'hi')
+assert(t.b == true)
+assert(type(t) == T)
+assert(static_type(t) == T)
+
+-- Test with incomplete args.
+
+t = T.make(1)
+assert(t.i == 1)
+assert(t.s == '')
+assert(t.b == false)
+assert(type(t) == T)
+assert(static_type(t) == T)
