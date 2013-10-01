@@ -876,11 +876,11 @@ void stack_run(Stack* stack)
     run_bytecode(stack, frame_bytecode(stack_top(stack)));
 }
 
-void raise_error_input_type_mismatch(Stack* stack)
+void raise_error_input_type_mismatch(Stack* stack, int inputIndex)
 {
     Frame* frame = stack_top(stack);
-    Term* term = frame->block->get(frame->pcIndex);
-    caValue* value = frame_register(frame, frame->pcIndex);
+    Term* term = frame->block->get(inputIndex);
+    caValue* value = frame_register(frame, inputIndex);
 
     circa::Value msg;
     set_string(&msg, "Couldn't cast input value ");
@@ -1082,7 +1082,7 @@ void run_bytecode(Stack* stack, caValue* bytecode)
 
             if (!cast(placeholderRegister, declared_type(placeholderTerm)))
                 if (!placeholderTerm->boolProp("optional", false))
-                    return raise_error_input_type_mismatch(stack);
+                    return raise_error_input_type_mismatch(stack, inputIndex);
 
             continue;
         }
