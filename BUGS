@@ -3,12 +3,6 @@ Miscellanous (most-recent first)
 
   The 'def' keyword creates a closure, but it doesn't save bindings.
 
-  The 'Couldn't cast ...' message was for the wrong input (0 instead of 1)
-
-  >#3420 'self' 'self' input_placeholder#21() t:Context = 'Couldn't cast input value <Context 0x7f817ac838a0> to type Context'
-     #3421 'p' 'p' input_placeholder#21() t:Point = 5
-     #3422 '_output_placeholder' output_placeholder#19(NULL) t:any = null
-
   Declared a function called 'add', and the + operator started using it?
 
   load_module should return Func for consistency
@@ -41,7 +35,7 @@ Miscellanous (most-recent first)
       def CodeView.draw(@self, cairo:Context canvas, Rect rect)
     After reloading Cairo, the CodeView module kept a reference to the old type?
    
-  Type inferrence fail in extra_output from if-block
+  Type inference fail in extra_output from if-block
 
   This code had an error with no source location:
     letterSize = [painter.currentFont.width('AAAAAAAAAA') / 10, painter.currentFont.height] -> Point
@@ -58,6 +52,7 @@ Code reload
 
 Interpreter
   Value() terms should just copy their values to the stack. Simplify stack_get_active_value.
+    (this change is questionable)
 
 Modules
   When compiling a module, the last value is automatically turned into an output (just

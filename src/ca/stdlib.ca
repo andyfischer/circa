@@ -5,8 +5,13 @@ type Func {
 }
 
 def closure_block() -> Func
+    -- Internally used function for declaring a closure.
+
 def Func.call(self, any inputs :multiple) -> any
+    -- Call the func using the given inputs.
+
 def Func.apply(self, List inputs) -> any
+    -- Like .call, but the inputs are given as one list instead of separate args.
 
 -- Builtin functions
 def convert(any value, Type t) -> any
@@ -16,6 +21,7 @@ def assert(bool condition)
     -- Raises an error if 'condition' is false.
 
 def catch(any input)
+    -- Vestigal function, don't use this.
 
 def length(List list) -> int
     -- Return the number of items in the given list
@@ -35,11 +41,17 @@ def static_type(any term :meta) -> Type
     -- Returns the static type of a value
 
 def context(Symbol name) -> any
+    -- Fetch the context variable in the current scope with the given name.
+
 def context_opt(Symbol name, any default) -> any
+    -- Like context(), but if the value doesn't exist then 'default' is used.
+    
 def set_context(Symbol name, any value)
+    -- Set a context var in the current scope.
 
 def has_effects()
-    -- Declare that a function has effects. Used in native-patched functions.
+    -- Annotation, declare that a function has effects. Used in native-patched
+    -- functions. Not fully supported yet.
 
 def native_patch(String filename)
     -- Declare that this block should be patched by a native module.
@@ -51,6 +63,8 @@ def reflect_get_frame_state() -> any
     -- Special call, read this frame's state.
 
 def declared_state(Type t, Func initializer :optional) -> any
+    -- Internally used function for fetching a stateful value. The parser
+    -- adds a call to this function whereever the 'state' keyword is used.
 
     existing = reflect_get_frame_state()
     
@@ -68,12 +82,6 @@ def declared_state(Type t, Func initializer :optional) -> any
     -- No initializer. Use the type's default value.
     return make(t)
 
-def changed(any current) -> bool
-    state any prev = null
-    result = prev != current
-    prev = current
-    return result
-
 def first_symbol(any val) -> Symbol
     if type(val) == Symbol
         val
@@ -82,16 +90,28 @@ def first_symbol(any val) -> Symbol
             first_symbol(val[0])
 
 type Mutable;
+    -- Container for a mutable value. Future status is undecided, this might
+    -- be removed.
 def Mutable.set(self, any val)
 def Mutable.get(self) -> any
 
 -- Modules
 def require(String moduleName)
+    -- Declare that the current module depends on the named module.
 def package(String moduleName)
-def import_file(String moduleName, String filename)
+    -- Declare that the current module is a reusable library with the given name.
+
 def native_patch_this(String filename)
+    -- Annotation, declare that the current module should be patched by a native
+    -- module with the given filename.
+
 def load_module(String moduleName) -> Block
+    -- Look for a loaded module with the given name, and load it if necessary.
+    -- The module search path will be used.
+
 def load_script(String filename) -> Block
+    -- Load a script with the given filename. The result will only be available
+    -- locally; it won't be loaded into module space.
 
 -- Packages
 type Package {
@@ -525,17 +545,21 @@ def Block.get_top_comments(self) -> List
 
     return out
 
+def Point.distance(self, Point b) -> number
+    -- Returns the distance between self and b.
+    sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
+
 def Point.magnitude(self) -> number
-    -- Return the magnitude of this point, or the distance to [0 0].
+    -- Return the magnitude of this point, aka the distance to the origin.
     sqrt(sqr(self.x) + sqr(self.y))
 
 def Point.norm(self) -> Point
-    -- Returns v normalized to be along the unit circle.
+    -- Returns the point normalized to be along the unit circle.
     m = self.magnitude
     [self.x / m, self.y / m]
 
 def Point.perpendicular(self) -> Point
-    -- Returns a vector that is perpendicular to self, rotated clockwise.
+    -- Returns a vector that is perpendicular to its old value, rotated clockwise.
     [self.y -self.x]
 
 def Point.to_rect_center(self, Point size) -> Rect
@@ -549,15 +573,11 @@ def Point.to_rect_topleft(self, Point size) -> Rect
     [self.x, self.y, self.x + size.x, self.y + size.y]
 
 def Point.delta(self) -> Point
-    -- Stateful function, returns the point difference since the last frame.
+    -- Stateful function, returns the point difference since the last step.
     state Point prev = self
     result = [self.x - prev.x, self.y - prev.y]
     prev = self
     result
-
-def Point.distance(self, Point b) -> number
-    -- Returns the distance between self and b.
-    sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
 
 def Point.rotate(self, number rotation) -> Point
     -- Return the point rotated around [0 0] by the given angle.
@@ -620,6 +640,22 @@ def zip(List left, List right) -> List
 
 -- Stateful functions
 
+def changed(any val) -> bool
+    -- Stateful function; returns true if the value has changed since the
+    -- previous step.
+    state any prev = null
+    result = prev != val
+    prev = val
+    return result
+
+def delta(number val) -> number
+    -- Stateful function, return the difference between this value and the value from
+    -- the previous call.
+    state number prev = val
+    result = val - prev
+    prev = val
+    return result
+
 def toggle(bool tog) -> bool
     -- Stateful function, returns a boolean status. Every frame the function is called
     -- with (true), the result flips. Starts out false.
@@ -647,8 +683,8 @@ def once() -> bool
     return result
 
 def cycle(int max) -> int
-    -- Stateful function, cycles though the integers from 0 to (max - 1). When the maximum
-    -- is reached, the function will start again at 0.
+    -- Stateful function, cycles though the integers from 0 to (max - 1). When the
+    -- maximum is reached, the function will start again at 0.
 
     state int counter = 0
     if counter >= max
@@ -666,56 +702,23 @@ def random_element(List list) -> any
     return list[rand_i(length(list))]
 
 def seed() -> number
-    -- Stateful function, returns a random number 0..1 which doesn't change after initialization.
+    -- Stateful function, returns a random number 0..1 which doesn't change after
+    -- initialization.
     state number s = rand()
     return s
 
 -- Math utility functions
 def polar(number angle) -> Point
     -- Return a point on the unit circle with the given angle.
-    return [sin(angle) -cos(angle)]
-
-def point_distance(Point a, Point b) -> number
-    -- Returns the distance between a and b.
-    sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
-
-def rotate_point(Point p, number rotation) -> Point
-    -- Rotate p around [0,0] by the given angle.
-    return [p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)]
+    [sin(angle) -cos(angle)]
 
 def random_norm_vector() -> Point
     -- Return a random normalized vector.
     angle = rand() * 360
-    return [cos(angle) sin(angle)]
+    [cos(angle) sin(angle)]
 
 def rect(number x1, number y1, number x2, number y2) -> Rect
-    return [x1 y1 x2 y2]
-
-def to_rect(Point topLeft, Point size) -> Rect
-    -- Return a Rect with the given top-left coordinate and size.
-    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
-
-def expand_rect(Point center, Point size) -> Rect
-    -- Return a Rect with the given center coordinate and size.
-    width = abs(size.x)
-    height = abs(size.y)
-    return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
-
-def grow_rect(Rect r, number amount) -> Rect
-    -- Return a Rect based on r, where each side is moved away from the center by 'amount'.
-    return Rect([r.x1 - amount, r.y1 - amount, r.x2 + amount, r.y2 + amount])
-
-def approach_rect(Rect target, number maxChange) -> Rect
-    -- Stateful function, returns a Rect that gradually approaches the target Rect.
-    -- Each coordinate will change by at most 'maxChange' per call.
-    return Rect([approach(target.x1,maxChange), approach(target.y1,maxChange),
-        approach(target.x2,maxChange),approach(target.y2,maxChange)])
-
-def interp_rect(Rect a, Rect b, number ratio) -> Rect
-    -- Linearly interpolate between two rectangles.
-    min(@ratio, 1.0)
-    result = for i in 0..4 { a[i] + (b[i] - a[i]) * ratio }
-    return Rect(result)
+    [x1 y1 x2 y2]
 
 def bezier3(number t, List points) -> Point
     -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
@@ -730,56 +733,29 @@ def bezier4(number t, List points) -> Point
     p1 = points[1] -> Point
     p2 = points[2] -> Point
     p3 = points[3] -> Point
-    return p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t)
+    p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t)
 
 def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
-    return bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
+    bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
 
 def clamp(number x, number minVal, number maxVal) -> number
     -- Return a clamped value. If x is less than 'minVal' then return 'minVal', if it's
     -- greater than 'maxVal' then return 'maxVal', otherwise return the original 'x'.
-    return min(max(x, minVal), maxVal)
+    min(max(x, minVal), maxVal)
 
 def smoothstep(number x, number edge0, number edge1) -> number
     -- Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep
     x = clamp((x - edge0)/(edge1-edge0), 0, 1)
-    return x*x*(3 - 2*x)
+    x*x*(3 - 2*x)
 
 def smootherstep(number x, number edge0, number edge1) -> number
     -- Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep
     x = clamp((x - edge0)/(edge1-edge0), 0, 1)
-    return x*x*x*(x*(x*6 - 15) + 10)
+    x*x*x*(x*(x*6 - 15) + 10)
 
 def random_color() -> Color
-    -- Return a color with random RGB components, and full alpha.
-    return [rand() rand() rand() 1.0]
-
-def blend_color(Color a, Color b, number ratio) -> Color
-    -- Return a color that is blended between a and b. If ratio is 0.0 we'll
-    -- return 'a', if it's 1.0 we'll return 'b'.
-    
-    {-
-    def unit_tests()
-        blend_color(#abc #123 0.0) == #abc
-        blend_color(#abc #123 1.0) == #123
-        blend_color(#abc #123 2.0) == #123
-        blend_color(#abc #123 -1.0) == #abc
-        blend_color(#fff #fff 0.5) == #fff
-    -}
-
-    max(@ratio, 0.0)
-    min(@ratio, 1.0)
-
-    if ratio == 0.0
-        return a
-    elif ratio == 1.0
-        return b
-    else
-        result = a + (b - a) * ratio
-
-        -- hack to preserve alpha:
-        result[3] = 1.0
-        return result
+    -- Return a color with random RGB components.
+    [rand() rand() rand() 1.0]
 
 def hsv_to_rgb(List hsv) -> Color
     -- Convert HSV components to an RGB Color
@@ -814,22 +790,33 @@ def hsv_to_rgb(List hsv) -> Color
 
     return [0 0 0 0]
 
-def Color.lighten(self, number factor) -> Color
+def Color.blend(self, Color rhs, number ratio) -> Color
+    -- Return a color that is blended between self and rhs. If ratio is 0.0 we'll
+    -- return 'self', if it's 1.0 we'll return 'rhs'.
+
+    max(@ratio, 0.0)
+    min(@ratio, 1.0)
+
+    if ratio == 0.0
+        return self
+    elif ratio == 1.0
+        return rhs
+    else
+        result = self + (rhs - self) * ratio
+
+        return result
+
+def Color.brighten(self, number factor) -> Color
+    -- Linearly brighten each component of the color.
     [ min(self.r + factor, 1.0)
       min(self.g + factor, 1.0)
       min(self.b + factor, 1.0)
       self.a]
         
 def Color.darken(self, number factor) -> Color
+    -- Linearly darken each component of the color.
     [ max(self.r - factor, 0.0)
       max(self.g - factor, 0.0)
       max(self.b - factor, 0.0)
       self.a]
 
-def delta(number val) -> number
-    -- Stateful function, return the difference between this value and the value from
-    -- the previous call.
-    state number prev = val
-    result = val - prev
-    prev = val
-    return result

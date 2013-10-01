@@ -205,15 +205,6 @@ void require_func_postCompile(Term* term)
         module_on_loaded_by_term(module, term);
 }
 
-void import_file_func_postCompile(Term* term)
-{
-    caValue* moduleName = term_value(term->input(0));
-    caValue* filename = term_value(term->input(1));
-    Block* module = load_module_file_watched(global_world(), as_cstring(moduleName),
-            as_cstring(filename));
-    module_on_loaded_by_term(module, term);
-}
-
 void native_patch_this_postCompile(Term* term)
 {
     Block* block = term->owningBlock;
@@ -289,9 +280,6 @@ void modules_install_functions(Block* kernel)
     block_set_post_compile_func(function_contents(FUNCS.require), require_func_postCompile);
 
     FUNCS.package = install_function(kernel, "package", NULL);
-
-    Term* import_file = install_function(kernel, "import_file", NULL);
-    block_set_post_compile_func(function_contents(import_file), import_file_func_postCompile);
 
     Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
     block_set_post_compile_func(function_contents(native_patch_this), native_patch_this_postCompile);
