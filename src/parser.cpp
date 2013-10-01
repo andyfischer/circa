@@ -35,6 +35,8 @@ static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
 
+static ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult root);
+
 Term* compile(Block* block, ParsingStep step, std::string const& input)
 {
     log_start(0, "parser::compile");
@@ -1639,24 +1641,46 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
         ParseResult result;
 
         if (operatorMatch == tok_RightArrow) {
+
+            // Right-apply. Consume right side as a function name.
+            
             if (!tokens.nextIs(tok_Identifier))
-                return compile_error_for_line(block, tokens, startPosition);
+                return compile_error_for_line(block, tokens, startPosition, "Expected identifier");
 
-            std::string functionName = tokens.consumeStr(tok_Identifier);
-            Term* function = find_name(block, functionName.c_str());
+            ParseResult functionName = identifier(block, tokens, context);
 
-            Term* term = apply(block, function, TermList(left.term));
+            if (tokens.nextIs(tok_Dot)) {
+                // Method call.
+                result = method_call(block, tokens, context, functionName);
 
-            if (term->function == NULL || term->function->name != functionName)
-                term->setStringProp("syntax:functionName", functionName);
+                Term* term = result.term;
 
-            term->setStringProp("syntax:declarationStyle", "arrow-concat");
+                set_input(term, 1, left.term);
+                term->setStringProp("syntax:declarationStyle", "method-right-arrow");
 
-            set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
-            // Can't use preWhitespace of input 1 here, because there is no input 1
-            term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
+                set_input_syntax_hint(term, 1, "preWhitespace", "");
+                set_input_syntax_hint(term, 1, "postWhitespace", preOperatorWhitespace);
 
-            result = ParseResult(term);
+                // Can't use preWhitespace of input 1 here, because there is no input 1
+                term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
+
+            } else {
+
+                Term* function = functionName.term;
+
+                Term* term = apply(block, function, TermList(left.term));
+
+                if (term->function == NULL || term->function->name != functionName.identifierName)
+                    term->setStringProp("syntax:functionName", functionName.identifierName);
+
+                term->setStringProp("syntax:declarationStyle", "arrow-concat");
+
+                set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
+                // Can't use preWhitespace of input 1 here, because there is no input 1
+                term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
+
+                result = ParseResult(term);
+            }
 
         } else {
             ParseResult rightExpr = infix_expression(block, tokens, context, operatorPrecedence+1);

@@ -14,5 +14,6 @@ namespace error_function {
     {
         FUNCS.error = import_function(kernel, error, "error(String msg)");
     }
+
 } // namespace error_function
 } // namespace circa

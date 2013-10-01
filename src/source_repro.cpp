@@ -286,6 +286,14 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
                 term, sym_Whitespace);
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
+    } else if (declarationStyle == "method-right-arrow") {
+        format_source_for_input(source, term, 1);
+        append_phrase(source, "->", term, sym_None);
+        append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
+                term, sym_Whitespace);
+        format_source_for_input(source, term, 0);
+        append_phrase(source, ".", term, sym_None);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "left-arrow") {
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
         append_phrase(source, term->stringProp("syntax:preOperatorWs", ""),
@@ -332,7 +340,8 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     }
 
     bool methodCall =
-        term->stringProp("syntax:declarationStyle", "") == "method-call";
+        term->stringProp("syntax:declarationStyle", "") == "method-call"
+        || term->stringProp("syntax:declarationStyle", "") == "method-right-arrow";
 
     if (methodCall && inputIndex == 0)
         defaultPost = "";
