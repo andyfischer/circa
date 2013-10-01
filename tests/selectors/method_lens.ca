@@ -7,7 +7,6 @@ type T {
 def T.lens(self) -> int
     self[1]
 
-t = T([0 0])
-
+t = T.make(0 0)
 
 -- assert(selector_reflect(t.lens) == [1])

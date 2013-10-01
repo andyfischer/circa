@@ -4,7 +4,7 @@ type T {
 }
 
 t = make(T)
-t = any(t)
+t = any.cast(t)
 
 print(t)
 

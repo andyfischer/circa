@@ -13,9 +13,9 @@ def click_resolver(any message)
         if message[0] == :add
             rect = message[1]
             listener = message[2]
-            @clickAreas.append(ClickArea([rect listener]))
+            @clickAreas.append(ClickArea.make(rect listener))
         elif message[0] == :resolve
-            mousePos = message[1] -> Point
+            mousePos = message[1] -> Point.cast
             event = message[2]
 
             listener = null
@@ -27,15 +27,15 @@ def click_resolver(any message)
 
             if listener != null
                 -- Language defect: Unnecessary cast
-                Func(@listener)
+                Func.cast(@listener)
                 listener.call(mousePos event)
 
     elif message == :clear
         clickAreas = []
 
 int = make_stack(click_resolver)
-int.call([:resolve, [0 0] -> Point, {}])
-int.call([:resolve, [0 0] -> Point, {}])
-int.call([:resolve, [0 0] -> Point, {}])
+int.call([:resolve, [0 0] -> Point.cast, {}])
+int.call([:resolve, [0 0] -> Point.cast, {}])
+int.call([:resolve, [0 0] -> Point.cast, {}])
 
 

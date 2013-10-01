@@ -12,6 +12,6 @@ print('should be [4 8 16 0]: ' [2 4 8 0] * [2 2 2 2])
 
 -- Test using a Point
 type Point { number x, number y }
-a = [1 0] -> Point
+a = [1 0] -> Point.cast
 b = a + [0 2]
 print('should be [1.0, 2.0]: ' b)

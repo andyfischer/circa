@@ -1,5 +1,5 @@
 
-r = Rect([1 2 4 8])
+r = Rect.make(1 2 4 8)
 
 assert(r.topleft == [1 2])
 assert(r.width == 3)

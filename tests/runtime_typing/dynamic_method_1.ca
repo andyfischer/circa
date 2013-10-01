@@ -9,6 +9,6 @@ def T.f(t) -> int
 def call_f(any t) -> int
     return t.f()
 
-t = T([4])
+t = T.make(4)
 result = call_f(t)
 assert(result == 4)

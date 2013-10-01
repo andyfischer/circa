@@ -24,7 +24,7 @@ type Texture;
 type TouchRegion;
 
 def viewport_size() -> Point
-  return [100 100] -> Point
+  [100 100]
 
 def Label.width(label) -> number
   return 10.0
@@ -36,7 +36,7 @@ def Label.setPosition(label, Point p)
 def Label.setColor(label, Color c)
 def Label.setText(label, Font font, String text)
 def Label.position(label) -> Point
-  return [100 100] -> Point
+  [100 100]
 def Label.right(label) -> number
   return label.position().x + label.width()
 def Label.bottom(label) -> number
@@ -45,7 +45,7 @@ def Label.left(label) -> number
   return label.position().x
 
 def create_font(String name, int size) -> Font
-  return make(Font)
+  make(Font)
 def font(String name, int size) -> Font
   state f = null
   if changed([name size])
@@ -76,9 +76,9 @@ def Sprite.setTexture2(_, Texture texture)
 def Sprite.setBlend(_, number blend)
 def Sprite.setPosition(_, Point p)
 def Sprite.position(_) -> Point
-  return [100 100] -> Point
+  [100 100]
 def Sprite.size(_) -> Point
-  return [100 100] -> Point
+  [100 100]
 
 def Sprite.bounds(_) -> Vec4
   p = _.position()

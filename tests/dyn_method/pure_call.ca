@@ -3,7 +3,7 @@
 def int.plusone(self) -> int
     return self + 1
 
-x = 4 -> any
+x = 4 -> any.cast
 
 assert(x.plusone == 5)
 

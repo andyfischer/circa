@@ -19,5 +19,5 @@ assert(append_in_bed.call("politics") == "politics in bed")
 def concat_functions(Func a, Func b) -> Func
     return { b.call(a.call(input())) }
 
-concatted = concat_functions(append_in_bed, { i = input() -> String; i.split(' ') })
+concatted = concat_functions(append_in_bed, { i = input(String); i.split(' ') })
 assert(concatted.call('spiders') == ['spiders', 'in', 'bed'])

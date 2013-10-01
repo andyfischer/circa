@@ -57,9 +57,3 @@ Interpreter
 Modules
   When compiling a module, the last value is automatically turned into an output (just
     like a function). This should probably be explicit for modules.
-
-Types
-  Should remove constructor syntax. Instead each type should get a synthetic method Typename.make
-  As in:
-    type T { int i }
-    T.make(1)

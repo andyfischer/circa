@@ -50,7 +50,7 @@ def Layout.modifyCurrentNode(self, Func f) -> Layout
 
 def Layout.setProp(self, name, value) -> Layout
     @self.modifyCurrentNode({ 
-        node = Node(input())
+        node = Node.cast(input())
         @node.props.set(name,value)
     })
     self
@@ -70,10 +70,10 @@ def Layout.solveDim(self, String dim) -> List
             prop = child.props.get(dim)
 
             if first_symbol(prop) == :percent
-                percent = prop[1] -> number / 100.0
+                percent = prop[1] -> number.cast / 100.0
                 desiredSize = (availableFin - availableStart) * percent
             else
-                desiredSize = prop -> number
+                desiredSize = prop -> number.cast
             
             min(@desiredSize, availableFin - nextLoc)
 

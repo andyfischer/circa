@@ -1,4 +1,4 @@
-window_size = [200 200]->Point
+window_size = Point.make(200 200)
 
 def wrap_around_screen(Point p) -> Point
     size = window_size

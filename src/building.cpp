@@ -36,16 +36,9 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 {
     block_start_changes(block);
 
-    // If function is NULL, use 'unknown_function' instead.
-    if (function == NULL)
+    // If function isn't a function, use 'unknown_function' instead.
+    if (function == NULL || !is_function(function))
         function = FUNCS.unknown_function;
-
-    // If 'function' is actually a type, create a call to cast().
-    if (function != NULL && is_type(function)) {
-        Term* term = apply(block, FUNCS.cast, inputs);
-        change_declared_type(term, as_type(term_value(function)));
-        return term;
-    }
 
     // Figure out the term position; it should be placed before any output() terms.
     // (unless it's an output term itself).

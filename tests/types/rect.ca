@@ -1,10 +1,9 @@
 
-r = Rect([0 2 8 10])
+r = Rect.make(0 2 8 10)
 
 assert(r.topleft == [0 2])
 assert(r.topright == [8 2])
 assert(r.bottomleft == [0 10])
 assert(r.bottomright == [8 10])
 
--- this float equality is dangerous and might fail without reason:
 assert(r.center == [4 6])

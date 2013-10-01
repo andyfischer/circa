@@ -571,7 +571,7 @@ def Point.perpendicular(self) -> Point
 
 def Point.to_rect_center(self, Point size) -> Rect
     -- Returns a Rect with this point as the center, and the given size.
-    size_half = (size * 0.5) -> Point
+    size_half = (size * 0.5) -> Point.cast
     [self.x - size_half.x,
         self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
 
@@ -729,17 +729,17 @@ def rect(number x1, number y1, number x2, number y2) -> Rect
 
 def bezier3(number t, List points) -> Point
     -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
-    p0 = points[0] -> Point
-    p1 = points[1] -> Point
-    p2 = points[2] -> Point
+    p0 = points[0] -> Point.cast
+    p1 = points[1] -> Point.cast
+    p2 = points[2] -> Point.cast
     return p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t)
 
 def bezier4(number t, List points) -> Point
     -- Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
-    p0 = points[0] -> Point
-    p1 = points[1] -> Point
-    p2 = points[2] -> Point
-    p3 = points[3] -> Point
+    p0 = points[0] -> Point.cast
+    p1 = points[1] -> Point.cast
+    p2 = points[2] -> Point.cast
+    p3 = points[3] -> Point.cast
     p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t)
 
 def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
@@ -767,9 +767,9 @@ def random_color() -> Color
 def hsv_to_rgb(List hsv) -> Color
     -- Convert HSV components to an RGB Color
 
-    h = hsv[0] -> number
-    s = hsv[1] -> number
-    v = hsv[2] -> number
+    h = hsv[0] -> number.cast
+    s = hsv[1] -> number.cast
+    v = hsv[2] -> number.cast
 
     if s == 0
         -- grey

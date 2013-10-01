@@ -7,7 +7,7 @@ def T.inc(@self)
     self.i += 1
 
 t = make(T)
-any(@t)
+any.cast(@t)
 
 
 t@inc

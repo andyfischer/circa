@@ -6,7 +6,7 @@ type T {
 def T.increment(t :out)
     t.i += 1
 
-items = [T([1]), T([2]), T([3])]
+items = [T.make(1), T.make(2), T.make(3)]
 
 print('items start: ' items)
 
