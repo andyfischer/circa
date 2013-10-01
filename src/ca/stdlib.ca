@@ -208,7 +208,7 @@ def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 
 def Block.to_func(self) -> Func
-    Func([self, []])
+    Func.make(self, [])
 def Block.to_stack(self) -> Stack
     make_stack(self.to_func)
 
@@ -459,6 +459,12 @@ def String.characters(self) -> List
     return out
 
 def Type.declaringTerm(self) -> Term
+def Type.cast(self, any value) -> any
+    value, success = cast(value, self)
+    if not(success)
+        error(concat("Couldn't cast value " value " to type " self.name))
+    value
+        
 def Type.make(self, any values :multiple) -> any
 def Type.name(self) -> String
     -- Returns this Term's local name. May be empty.
