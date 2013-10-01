@@ -160,11 +160,15 @@ bool string_equals(caValue* left, caValue* right)
     if (left->value_data.ptr == right->value_data.ptr)
         return true;
 
-    if (left->value_data.ptr == NULL)
-        return false;
-
     StringData* leftData = (StringData*) left->value_data.ptr;
     StringData* rightData = (StringData*) right->value_data.ptr;
+
+    if ((leftData == NULL || leftData->str[0] == 0)
+        && (rightData == NULL || rightData->str[0] == 0))
+        return true;
+
+    if (leftData == NULL || rightData == NULL)
+        return false;
 
     for (int i=0;; i++) {
         if (leftData->str[i] != rightData->str[i])
