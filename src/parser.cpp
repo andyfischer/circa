@@ -1317,7 +1317,7 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
     ParseResult result = name_binding_expression(block, tokens, context);
     Term* term = result.term;
 
-    resolve_rebind_operators_in_inputs(block, term);
+    // resolve_rebind_operators_in_inputs(block, term);
 
     set_source_location(term, startPosition, tokens);
     set_is_statement(term, true);
@@ -1475,21 +1475,13 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         parseResult = ParseResult(term);
     }
 
-    if (hasSimpleNameBinding) {
-        // If the term already has a name, then make it a copy. This is the case for a
-        // plain renaming, such as:
-        //   a = b
-        if (!has_empty_name(term)) {
-            term = apply(block, FUNCS.copy, TermList(term));
-            parseResult = ParseResult(term);
-        }
+    resolve_rebind_operators_in_inputs(block, term);
 
+    if (hasSimpleNameBinding) {
         term->setProp("syntax:nameBinding", &nameBindingSyntax);
 
         for (int i=0; i < list_length(&names); i++) {
-            Term* output = find_or_create_output_term(term, i);
-            ca_assert(output != NULL);
-            rename(output, list_get(&names, i));
+            rename(find_or_create_next_unnamed_term_output(term), list_get(&names, i));
         }
         set_source_location(term, startPosition, tokens);
     }
@@ -1502,7 +1494,8 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
 
         Term* right = expression(block, tokens, context).term;
 
-        Term* set = rebind_possible_accessor(block, term, right);
+        Term* output = find_or_create_next_unnamed_term_output(term);
+        Term* set = rebind_possible_accessor(block, output, right);
 
         set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         set->setStringProp("syntax:postEqualsSpace", postEqualsSpace);

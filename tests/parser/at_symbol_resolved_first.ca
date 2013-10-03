@@ -1,0 +1,20 @@
+
+
+def List.pop(self) -> (List, any)
+  return self.slice(0, -1), self.last
+
+
+list = [1 2 3 4 5]
+
+print('list initial value: ' list)
+
+@list.pop
+
+print('1st pass with "@list.pop", list = ' list)
+
+name = @list.pop
+print('2nd pass with "name = @list.pop", list = ' list ', name = ' name)
+
+list = list.pop
+print('3rd pass with "list = list.pop", list = ' list)
+

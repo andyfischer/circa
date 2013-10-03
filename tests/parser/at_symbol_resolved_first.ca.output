@@ -1,0 +1,4 @@
+list initial value: [1, 2, 3, 4, 5]
+1st pass with "@list.pop", list = [1, 2, 3, 4]
+2nd pass with "name = @list.pop", list = [1, 2, 3], name = 4
+3rd pass with "list = list.pop", list = [1, 2]

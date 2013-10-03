@@ -10,6 +10,7 @@ namespace circa {
 Term* rebind_possible_accessor(Block* block, Term* possibleAccessor, Term* result);
 
 bool term_is_accessor_traceable(Term* accessor);
+Term* find_or_create_next_unnamed_term_output(Term* term);
 void resolve_rebind_operators_in_inputs(Block* block, Term* result);
 
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error);
