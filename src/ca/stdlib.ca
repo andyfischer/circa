@@ -390,8 +390,8 @@ def List.to_set(self) -> Set
         @set.add(item)
     set
 
--- def List.pop(self) -> (List, any)
--- TODO: List.pop, needs proper support for multiple outputs
+def List.pop(self) -> (List, any)
+  return self.slice(0, -1), self.last
 
 def List.filter(self, Func func) -> List
     result = []
