@@ -1,0 +1,11 @@
+
+-- Bug repro, the for loop produced an empty output when the last iteration
+-- was interrupted.
+
+list = [1 2 3 4]
+
+for i in @list
+  if i == 4
+    discard
+
+assert(list == [1 2 3])

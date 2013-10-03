@@ -281,7 +281,7 @@ def Stack.get_state_output(self) -> any
 def Stack.migrate_to(self, Func func)
     -- Use 'func' as the new root, and migrate data and state.
 def Stack.reset(self)
-    -- Clear this stack's state, including all frames.
+def Stack.reset_state(self)
 def Stack.restart(self)
     -- Restart or "rewind" the stack, so the program counter is returned to the start
     -- of the topmost frame. State is preserved.

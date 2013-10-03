@@ -8,7 +8,6 @@ namespace circa {
 
 const char* for_loop_get_iterator_name(Term* forTerm);
 Term* for_loop_find_index(Block* contents);
-Term* for_loop_find_output_index(Block* contents);
 
 // Initialize the contents of a for-loop for a new term. 'iteratorType' is the type to use
 // for the iterator. If it's NULL then we'll infer a type from the term's input.

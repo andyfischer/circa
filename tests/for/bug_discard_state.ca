@@ -1,0 +1,20 @@
+
+-- Bug repro. When an iteration was killed with 'discard', its corresponding
+-- state was not also killed. On the next iteration, this caused an incorrect
+-- pairing of iterator to state.
+
+def main()
+
+  state list = [1 2 3]
+
+  for i in @list
+      state s = i
+
+      print('i = ' i ', state = ' s)
+
+      if i == 2
+          discard
+
+int = make_stack(main)
+int.run
+int.run

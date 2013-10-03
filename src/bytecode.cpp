@@ -110,12 +110,21 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_Continue:
         set_string(string, "continue");
+        string_append(string, blob_read_char(bcData, pos) ? " :loop_output": "");
+        string_append(string, " ");
+        string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_Break:
         set_string(string, "break");
+        string_append(string, blob_read_char(bcData, pos) ? " :loop_output": "");
+        string_append(string, " ");
+        string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_Discard:
         set_string(string, "discard");
+        string_append(string, blob_read_char(bcData, pos) ? " :loop_output": "");
+        string_append(string, " ");
+        string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_CaseConditionBool:
         set_string(string, "case_condition_bool ");
@@ -329,12 +338,15 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
             blob_append_int(bytecode, term->index);
         } else if (term->function == FUNCS.break_func) {
             blob_append_char(bytecode, bc_Break);
+            blob_append_char(bytecode, enclosing_loop_produces_output_value(term));
             blob_append_int(bytecode, term->index);
         } else if (term->function == FUNCS.continue_func) {
             blob_append_char(bytecode, bc_Continue);
+            blob_append_char(bytecode, enclosing_loop_produces_output_value(term));
             blob_append_int(bytecode, term->index);
         } else if (term->function == FUNCS.discard) {
             blob_append_char(bytecode, bc_Discard);
+            blob_append_char(bytecode, enclosing_loop_produces_output_value(term));
             blob_append_int(bytecode, term->index);
         } else {
             internal_error("unrecognized exit point function");

@@ -1,0 +1,15 @@
+
+
+-- A bug inside find_intermediate_result_for_output was causing the discard()
+-- call to use a (wrong) forward reference to 'var', causing 'var' to end up null.
+
+for j in [1]
+  var = false
+
+  for i in [1]
+    if j == 1
+      var = true
+      x = Point.cast([0 0])
+      discard
+
+  assert(var == true)

@@ -1317,11 +1317,6 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
     ParseResult result = name_binding_expression(block, tokens, context);
     Term* term = result.term;
 
-    // If the result was just the reuse of an existing identifier, create a Copy
-    // term so that source is preserved.
-    if (result.isIdentifier())
-        term = apply(block, FUNCS.copy, TermList(term));
-
     resolve_rebind_operators_in_inputs(block, term);
 
     set_source_location(term, startPosition, tokens);
@@ -1472,8 +1467,13 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
             tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
     }
 
-    ParseResult result = expression(block, tokens, context);
-    Term* term = result.term;
+    ParseResult parseResult = expression(block, tokens, context);
+    Term* term = parseResult.term;
+
+    if (parseResult.isIdentifier()) {
+        term = apply(block, FUNCS.copy, TermList(term));
+        parseResult = ParseResult(term);
+    }
 
     if (hasSimpleNameBinding) {
         // If the term already has a name, then make it a copy. This is the case for a
@@ -1481,7 +1481,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         //   a = b
         if (!has_empty_name(term)) {
             term = apply(block, FUNCS.copy, TermList(term));
-            result = ParseResult(term);
+            parseResult = ParseResult(term);
         }
 
         term->setProp("syntax:nameBinding", &nameBindingSyntax);
@@ -1507,28 +1507,28 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         set->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-        result = ParseResult(set);
+        parseResult = ParseResult(set);
     }
 
-    return result;
+    return parseResult;
 }
 
 ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
 {
-    ParseResult result;
+    ParseResult parseResult;
 
     if (tokens.nextIs(tok_If))
-        result = if_block(block, tokens, context);
+        parseResult = if_block(block, tokens, context);
     else if (tokens.nextIs(tok_For))
-        result = for_block(block, tokens, context);
+        parseResult = for_block(block, tokens, context);
     else if (tokens.nextIs(tok_Switch))
-        result = switch_block(block, tokens, context);
+        parseResult = switch_block(block, tokens, context);
     else if (tokens.nextIs(tok_While))
-        result = while_block(block, tokens, context);
+        parseResult = while_block(block, tokens, context);
     else
-        result = infix_expression(block, tokens, context, 0);
+        parseResult = infix_expression(block, tokens, context, 0);
 
-    return result;
+    return parseResult;
 }
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;

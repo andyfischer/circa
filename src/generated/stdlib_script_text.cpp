@@ -288,7 +288,7 @@ const char* STDLIB_CA_TEXT =
     "def Stack.migrate_to(self, Func func)\n"
     "    -- Use 'func' as the new root, and migrate data and state.\n"
     "def Stack.reset(self)\n"
-    "    -- Clear this stack's state, including all frames.\n"
+    "def Stack.reset_state(self)\n"
     "def Stack.restart(self)\n"
     "    -- Restart or \"rewind\" the stack, so the program counter is returned to the start\n"
     "    -- of the topmost frame. State is preserved.\n"

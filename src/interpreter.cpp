@@ -314,20 +314,15 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
         // For-loop special case: Store a list where each element corresponds with a
         // loop iteration.
         //
-        // Note that when a loop iteration is being saved, retain_stack_top is called by LoopDone
-        // instead of by stack_pop.
+        // Note that when a loop iteration is being saved, retain_stack_top is called by
+        // IterationDone instead of by stack_pop.
         
         if (!is_list(slot))
             set_list(slot);
         else
             list_touch(slot);
 
-        int loopIndex = for_loop_find_index_value(top);
-
-        if (list_length(slot) <= loopIndex)
-            list_resize(slot, loopIndex + 1);
-
-        slot = list_get(slot, loopIndex);
+        slot = list_append(slot);
     }
 
     return slot;
@@ -1005,7 +1000,7 @@ void run_bytecode(Stack* stack, caValue* bytecode)
         // Saved when jumping from DynamicMethod to PushApply/PushCall.
         int termIndex;
 
-        // Saved when jumping from Break/Continue/Discard to a LoopDone.
+        // Saved when jumping from Break/Continue/Discard to a IterationDone.
         bool loopEnableOutput;
     };
 
@@ -1187,7 +1182,7 @@ do_loop_done_insn:
             Block* contents = s.frame->block;
 
             // Possibly save state.
-            if (!is_null(&s.frame->outgoingState))
+            if (!is_null(&s.frame->outgoingState) && s.frame->exitType != sym_Discard)
                 retain_stack_top(stack);
 
             caValue* index = frame_register(s.frame, for_loop_find_index(contents));
@@ -1195,7 +1190,6 @@ do_loop_done_insn:
 
             // Preserve list output.
             if (s.loopEnableOutput && s.frame->exitType != sym_Discard) {
-                caValue* outputIndex = frame_register(s.frame, for_loop_find_output_index(contents));
 
                 caValue* resultValue = frame_register_from_end(s.frame, 0);
                 caValue* outputList = stack_find_active_value(s.frame, contents->owningTerm);
@@ -1203,9 +1197,6 @@ do_loop_done_insn:
                 copy(resultValue, list_append(outputList));
 
                 INCREMENT_STAT(LoopWriteOutput);
-
-                // Advance output index
-                set_int(outputIndex, as_int(outputIndex) + 1);
             }
 
             // Check if we are finished
@@ -1533,9 +1524,6 @@ do_func_apply:
                 expand_frame_indexed(s.frame, top, 0);
 
                 if (loopEnableOutput) {
-                    // Initialize output index.
-                    set_int(frame_register(top, for_loop_find_output_index(block)), 0);
-
                     // Initialize output value.
                     caValue* outputList = stack_find_active_value(top, block->owningTerm);
                     set_list(outputList, 0);
@@ -1644,6 +1632,7 @@ do_func_apply:
         case bc_Discard: {
             ca_assert(s.frame == stack_top(stack));
 
+            s.loopEnableOutput = blob_read_char(s.bc, &s.pc);
             int index = blob_read_int(s.bc, &s.pc);
             Term* caller = frame_term(s.frame, index);
 
@@ -1679,7 +1668,6 @@ do_func_apply:
             s.frame = stack_top(stack);
             s.pc = s.frame->pc;
             s.bc = as_blob(frame_bytecode(s.frame));
-            s.loopEnableOutput = false;
             goto do_loop_done_insn;
         }
 
@@ -2234,6 +2222,13 @@ void Stack__reset(caStack* stack)
     stack_reset(self);
 }
 
+void Stack__reset_state(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    set_null(&stack_top(self)->state);
+    set_null(&stack_top(self)->outgoingState);
+}
+
 void Stack__restart(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2356,6 +2351,7 @@ void interpreter_install_functions(Block* kernel)
         {"Stack.get_state_output", Stack__get_state_output},
         {"Stack.migrate_to", Stack__migrate_to},
         {"Stack.reset", Stack__reset},
+        {"Stack.reset_state", Stack__reset_state},
         {"Stack.restart", Stack__restart},
         {"Stack.run", Stack__run},
         {"Stack.frame", Stack__frame},

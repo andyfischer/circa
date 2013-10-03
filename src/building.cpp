@@ -778,7 +778,7 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     // Check whether the output's connection is valid at this location
     Term* result = output->input(0);
     if (result != NULL
-            && result->owningBlock == output->owningBlock
+            && result->owningBlock == location->owningBlock
             && result->index < location->index)
         return result;
 

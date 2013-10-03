@@ -33,10 +33,6 @@ Term* for_loop_find_index(Block* contents)
 {
     return find_term_with_function(contents, FUNCS.loop_index);
 }
-Term* for_loop_find_output_index(Block* contents)
-{
-    return find_term_with_function(contents, FUNCS.loop_output_index);
-}
 
 const char* for_loop_get_iterator_name(Term* forTerm)
 {
@@ -75,9 +71,6 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
 
     // Add the zero block
     create_block_unevaluated(contents, "#zero");
-
-    // Add an loop output index
-    apply(contents, FUNCS.loop_output_index, TermList());
 
     return iterator;
 }
@@ -348,9 +341,6 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
     set_int(frame_register(frame, for_loop_find_index(contents)), 0);
 
     if (enableLoopOutput) {
-        // Initialize output index.
-        set_int(frame_register(frame, for_loop_find_output_index(contents)), 0);
-
         // Initialize output value.
         caValue* outputList = stack_find_active_value(frame, contents->owningTerm);
         set_list(outputList, 0);
