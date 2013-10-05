@@ -11,6 +11,7 @@ struct BuiltinFuncs {
     Term* add;
     Term* add_i;
     Term* add_f;
+    Term* and_func;
     Term* block_unevaluated;
     Term* break_func;
     Term* case_func;
@@ -26,8 +27,10 @@ struct BuiltinFuncs {
     Term* default_case;
     Term* discard;
     Term* div;
+    Term* div_i;
     Term* dynamic_method;
     Term* error;
+    Term* equals;
     Term* extra_output;
     Term* feedback;
     Term* for_func;
@@ -37,6 +40,8 @@ struct BuiltinFuncs {
     Term* get_field;
     Term* get_index;
     Term* get_with_selector;
+    Term* greater_than;
+    Term* greater_than_eq;
     Term* has_effects;
     Term* if_block;
     Term* require;
@@ -46,10 +51,11 @@ struct BuiltinFuncs {
     Term* inputs_fit_function;
     Term* lambda;
     Term* length;
+    Term* less_than;
+    Term* less_than_eq;
     Term* list;
     Term* list_append;
     Term* loop_condition_bool;
-    Term* native_patch;
     Term* load_script;
     Term* loop_index;
     Term* loop_iterator;
@@ -60,13 +66,17 @@ struct BuiltinFuncs {
     Term* module;
     Term* mult;
     Term* namespace_func;
+    Term* native_patch;
     Term* neg;
+    Term* not_equals;
     Term* not_func;
+    Term* or_func;
     Term* output;
     Term* output_explicit;
     Term* overload_error_no_match;
     Term* package;
     Term* range;
+    Term* remainder;
     Term* return_func;
     Term* section_block;
     Term* selector;

@@ -1560,30 +1560,30 @@ int get_infix_precedence(int match)
     }
 }
 
-std::string get_function_for_infix_operator(int match)
+Term* get_function_for_infix_operator(int match)
 {
     switch (match) {
-        case tok_Plus: return "add";
-        case tok_Minus: return "sub";
-        case tok_Star: return "mult";
-        case tok_Slash: return "div";
-        case tok_DoubleSlash: return "div_i";
-        case tok_Percent: return "remainder";
-        case tok_LThan: return "less_than";
-        case tok_LThanEq: return "less_than_eq";
-        case tok_GThan: return "greater_than";
-        case tok_GThanEq: return "greater_than_eq";
-        case tok_DoubleEquals: return "equals";
-        case tok_Or: return "or";
-        case tok_And: return "and";
-        case tok_PlusEquals: return "add";
-        case tok_MinusEquals: return "sub";
-        case tok_StarEquals: return "mult";
-        case tok_SlashEquals: return "div";
-        case tok_NotEquals: return "not_equals";
-        case tok_LeftArrow: return "feedback";
-        case tok_TwoDots: return "range";
-        default: return "#unrecognized";
+        case tok_Plus: return FUNCS.add;
+        case tok_Minus: return FUNCS.sub;
+        case tok_Star: return FUNCS.mult;
+        case tok_Slash: return FUNCS.div;
+        case tok_DoubleSlash: return FUNCS.div_i;
+        case tok_Percent: return FUNCS.remainder;
+        case tok_LThan: return FUNCS.less_than;
+        case tok_LThanEq: return FUNCS.less_than_eq;
+        case tok_GThan: return FUNCS.greater_than;
+        case tok_GThanEq: return FUNCS.greater_than_eq;
+        case tok_DoubleEquals: return FUNCS.equals;
+        case tok_Or: return FUNCS.or_func;
+        case tok_And: return FUNCS.and_func;
+        case tok_PlusEquals: return FUNCS.add;
+        case tok_MinusEquals: return FUNCS.sub;
+        case tok_StarEquals: return FUNCS.mult;
+        case tok_SlashEquals: return FUNCS.div;
+        case tok_NotEquals: return FUNCS.not_equals;
+        case tok_LeftArrow: return FUNCS.feedback;
+        case tok_TwoDots: return FUNCS.range;
+        default: return NULL;
     }
 }
 
@@ -1678,13 +1678,12 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
         } else {
             ParseResult rightExpr = infix_expression(block, tokens, context, operatorPrecedence+1);
 
-            std::string functionName = get_function_for_infix_operator(operatorMatch);
+            Term* function = get_function_for_infix_operator(operatorMatch);
 
-            ca_assert(functionName != "#unrecognized");
+            ca_assert(function != NULL);
 
             bool isRebinding = is_infix_operator_rebinding(operatorMatch);
 
-            Term* function = find_name(block, functionName.c_str());
             Term* term = apply(block, function, TermList(left.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);

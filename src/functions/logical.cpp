@@ -24,9 +24,9 @@ namespace logical_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, and_func, "and(bool a, bool b) -> bool;"
+        FUNCS.and_func = import_function(kernel, and_func, "and(bool a, bool b) -> bool;"
                 "'Return whether a and b are both true'");
-        import_function(kernel, or_func, "or(bool a, bool b) -> bool;"
+        FUNCS.or_func = import_function(kernel, or_func, "or(bool a, bool b) -> bool;"
                 "'Return whether a or b are both true'");
         import_function(kernel, not_func, "not(bool b) -> bool");
     }

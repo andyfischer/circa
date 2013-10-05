@@ -21,7 +21,7 @@ namespace div_function {
     {
         import_function(kernel, div_f, "div_f(number a,number b) -> number");
         FUNCS.div = import_function(kernel, div_f, "div(number a,number b) -> number");
-        import_function(kernel, div_i, "div_i(number a,number b) -> int");
+        FUNCS.div_i = import_function(kernel, div_i, "div_i(number a,number b) -> int");
     }
 }
 } // namespace circa

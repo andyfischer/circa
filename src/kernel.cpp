@@ -967,25 +967,25 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
     append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
 
-    Term* less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
-    append_to_overloaded_function(less_than, builtins->get("less_than_i"));
-    append_to_overloaded_function(less_than, builtins->get("less_than_f"));
-    finish_building_overloaded_function(less_than);
+    FUNCS.less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
+    append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_i"));
+    append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_f"));
+    finish_building_overloaded_function(FUNCS.less_than);
 
-    Term* less_than_eq = create_overloaded_function(builtins, "less_than_eq(any a,any b) -> bool");
-    append_to_overloaded_function(less_than_eq, builtins->get("less_than_eq_i"));
-    append_to_overloaded_function(less_than_eq, builtins->get("less_than_eq_f"));
-    finish_building_overloaded_function(less_than_eq);
+    FUNCS.less_than_eq = create_overloaded_function(builtins, "less_than_eq(any a,any b) -> bool");
+    append_to_overloaded_function(FUNCS.less_than_eq, builtins->get("less_than_eq_i"));
+    append_to_overloaded_function(FUNCS.less_than_eq, builtins->get("less_than_eq_f"));
+    finish_building_overloaded_function(FUNCS.less_than_eq);
 
-    Term* greater_than = create_overloaded_function(builtins, "greater_than(any a,any b) -> bool");
-    append_to_overloaded_function(greater_than, builtins->get("greater_than_i"));
-    append_to_overloaded_function(greater_than, builtins->get("greater_than_f"));
-    finish_building_overloaded_function(greater_than);
+    FUNCS.greater_than = create_overloaded_function(builtins, "greater_than(any a,any b) -> bool");
+    append_to_overloaded_function(FUNCS.greater_than, builtins->get("greater_than_i"));
+    append_to_overloaded_function(FUNCS.greater_than, builtins->get("greater_than_f"));
+    finish_building_overloaded_function(FUNCS.greater_than);
 
-    Term* greater_than_eq = create_overloaded_function(builtins, "greater_than_eq(any a,any b) -> bool");
-    append_to_overloaded_function(greater_than_eq, builtins->get("greater_than_eq_i"));
-    append_to_overloaded_function(greater_than_eq, builtins->get("greater_than_eq_f"));
-    finish_building_overloaded_function(greater_than_eq);
+    FUNCS.greater_than_eq = create_overloaded_function(builtins, "greater_than_eq(any a,any b) -> bool");
+    append_to_overloaded_function(FUNCS.greater_than_eq, builtins->get("greater_than_eq_i"));
+    append_to_overloaded_function(FUNCS.greater_than_eq, builtins->get("greater_than_eq_f"));
+    finish_building_overloaded_function(FUNCS.greater_than_eq);
 
     Term* max_func = create_overloaded_function(builtins, "max(any a,any b) -> any");
     append_to_overloaded_function(max_func, builtins->get("max_i"));
@@ -997,10 +997,10 @@ void bootstrap_kernel()
     append_to_overloaded_function(min_func, builtins->get("min_f"));
     finish_building_overloaded_function(min_func);
 
-    Term* remainder_func = create_overloaded_function(builtins, "remainder(any a,any b) -> any");
-    append_to_overloaded_function(remainder_func, builtins->get("remainder_i"));
-    append_to_overloaded_function(remainder_func, builtins->get("remainder_f"));
-    finish_building_overloaded_function(remainder_func);
+    FUNCS.remainder = create_overloaded_function(builtins, "remainder(any a,any b) -> any");
+    append_to_overloaded_function(FUNCS.remainder, builtins->get("remainder_i"));
+    append_to_overloaded_function(FUNCS.remainder, builtins->get("remainder_f"));
+    finish_building_overloaded_function(FUNCS.remainder);
 
     Term* mod_func = create_overloaded_function(builtins, "mod(any a,any b) -> any");
     append_to_overloaded_function(mod_func, builtins->get("mod_i"));

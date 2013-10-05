@@ -3,8 +3,6 @@ Miscellanous (most-recent first)
 
   The 'def' keyword creates a closure, but it doesn't save bindings.
 
-  Declared a function called 'add', and the + operator started using it?
-
   load_module should return Func for consistency
 
   Error trace for dynamic_method: should have the actual method name, when possible.

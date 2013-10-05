@@ -19,8 +19,8 @@ namespace equals_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, equals_func, "equals(any a,any b) -> bool");
-        import_function(kernel, not_equals, "not_equals(any a,any b) -> bool");
+        FUNCS.equals = import_function(kernel, equals_func, "equals(any a,any b) -> bool");
+        FUNCS.not_equals = import_function(kernel, not_equals, "not_equals(any a,any b) -> bool");
     }
 }
 }
