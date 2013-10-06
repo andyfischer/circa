@@ -2441,7 +2441,7 @@ ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
     
     // Primary output
     insert_output_placeholder(resultBlock,
-        find_last_non_comment_expression(resultBlock), 0);
+        find_expression_for_implicit_output(resultBlock), 0);
 
     return ParseResult(term);
 }

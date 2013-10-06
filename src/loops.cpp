@@ -234,7 +234,7 @@ Term* loop_get_primary_result(Block* block)
         return block->get(iterator->name);
 
     // Otherwise, use the last expression as the output.
-    return find_last_non_comment_expression(block);
+    return find_expression_for_implicit_output(block);
 }
 
 void finish_for_loop(Term* forTerm)

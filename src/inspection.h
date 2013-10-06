@@ -76,7 +76,7 @@ int count_actual_output_terms(Term* term);
 
 Term* find_input_placeholder_with_name(Block* block, caValue* name);
 
-Term* find_last_non_comment_expression(Block* block);
+Term* find_expression_for_implicit_output(Block* block);
 Term* find_term_with_function(Block* block, Term* func);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);

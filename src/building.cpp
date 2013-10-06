@@ -908,7 +908,7 @@ void block_finish_changes(Block* block)
 
         // Don't mess with the primary if-block output.
         if (output != NULL && output->input(0) == NULL && !is_if_block(output->owningBlock)) {
-            set_input(output, 0, find_last_non_comment_expression(block));
+            set_input(output, 0, find_expression_for_implicit_output(block));
             respecialize_type(output);
         }
     }
@@ -1098,7 +1098,7 @@ void check_to_add_primary_output_placeholder(Block* block)
     Term* output = get_output_placeholder(block, 0);
 
     if (output == NULL)
-        prepend_output_placeholder(block, find_last_non_comment_expression(block));
+        prepend_output_placeholder(block, find_expression_for_implicit_output(block));
 }
 
 void rewrite(Term* term, Term* function, TermList const& inputs)

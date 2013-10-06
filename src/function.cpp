@@ -35,7 +35,7 @@ void finish_building_function(Block* contents)
     // Connect the primary output placeholder with the last expression.
     Term* primaryOutput = get_output_placeholder(contents, 0);
     ca_assert(primaryOutput->input(0) == NULL);
-    Term* lastExpression = find_last_non_comment_expression(contents);
+    Term* lastExpression = find_expression_for_implicit_output(contents);
     set_input(primaryOutput, 0, lastExpression);
 
     // Make output type more specific.

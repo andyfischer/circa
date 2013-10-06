@@ -145,7 +145,7 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Block* caseContents = nested_contents(it.current());
 
-        Term* result = find_last_non_comment_expression(caseContents);
+        Term* result = find_expression_for_implicit_output(caseContents);
 
         // If the last term already has a name then don't make it the default output.
         if (result != NULL && !has_empty_name(result))
@@ -273,7 +273,7 @@ void if_block_finish_appended_case(Block* block, Term* caseTerm)
 {
     // Add an output placeholder
     apply(nested_contents(caseTerm), FUNCS.output,
-        TermList(find_last_non_comment_expression(nested_contents(caseTerm))));
+        TermList(find_expression_for_implicit_output(nested_contents(caseTerm))));
 }
 
 bool if_block_is_name_bound_in_every_case(Block* contents, const char* name)

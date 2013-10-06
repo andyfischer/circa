@@ -1,5 +1,19 @@
 
 Miscellanous (most-recent first)
+ 
+  This expression had a type error. Is implicit output using primary of 'if'?
+
+        def every(number period) -> bool
+            state periods = 0
+
+            expected = elapsed() / period
+
+            if expected > periods
+                periods += 1
+                true
+            else
+                false
+  
 
   The 'def' keyword creates a closure, but it doesn't save bindings.
 

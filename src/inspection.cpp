@@ -286,7 +286,7 @@ bool has_variable_args(Block* block)
     }
 }
 
-Term* find_last_non_comment_expression(Block* block)
+Term* find_expression_for_implicit_output(Block* block)
 {
     for (int i = block->length() - 1; i >= 0; i--) {
         if (block->get(i) == NULL)
@@ -295,7 +295,8 @@ Term* find_last_non_comment_expression(Block* block)
         // Skip certain special functions
         Term* func = block->get(i)->function;
         if (func == FUNCS.output
-                || func == FUNCS.input)
+                || func == FUNCS.input
+                || func == FUNCS.extra_output)
             continue;
 
         if (block->get(i)->name == "#outer_rebinds")

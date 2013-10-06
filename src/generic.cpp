@@ -194,7 +194,7 @@ void list_overload_contents(Block* block, caValue* output)
         if (caseContents == NULL)
             break;
 
-        Term* call = find_last_non_comment_expression(caseContents);
+        Term* call = find_expression_for_implicit_output(caseContents);
         Term* func = call->function;
 
         if (func == FUNCS.overload_error_no_match)

@@ -1,0 +1,11 @@
+
+def f()
+    a = 'other val'
+    if true
+        a = 'other val 2'
+        'correct output'
+    else
+        a = 'other val 3'
+        'wrong output'
+
+assert(f() == 'correct output')

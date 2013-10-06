@@ -3,6 +3,8 @@
 #include "circa/circa.h"
 #include "circa/internal/for_hosted_funcs.h"
 
+#include <algorithm>
+
 #include "hashtable.h"
 #include "names.h"
 
