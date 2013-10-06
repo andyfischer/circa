@@ -487,17 +487,30 @@ void Type__make(caStack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
     caValue* args = circa_input(stack, 1);
-
     caValue* output = circa_output(stack, 0);
-    make(type, output);
+    
+    if (!is_list_based_type(type)) {
+        make(type, output);
+
+        if (list_length(args) > 0) {
+            Value msg;
+            set_string(&msg, "Too many fields for type ");
+            string_append(&msg, &type->name);
+            string_append(&msg, ", found ");
+            string_append(&msg, list_length(args));
+            string_append(&msg, ", expected 0");
+            return circa_output_error(stack, as_cstring(&msg));
+        }
+
+        return;
+    }
 
     int expectedFieldCount = 0;
-    caValue* fields = NULL;
-    if (is_list_based_type(type)) {
-        fields = list_get_type_list_from_type(type);
-        if (fields != NULL)
-            expectedFieldCount = list_length(fields);
-    }
+    caValue* fields = list_get_type_list_from_type(type);
+    if (fields != NULL)
+        expectedFieldCount = list_length(fields);
+
+    set_list(output, expectedFieldCount);
 
     for (int i=0; i < list_length(args); i++) {
         if (i >= expectedFieldCount) {
@@ -514,6 +527,7 @@ void Type__make(caStack* stack)
         CastResult castResult;
         caValue* source = list_get(args, i);
         caValue* dest = list_get(output, i);
+
         copy(source, dest);
         cast(&castResult, dest, as_type(list_get(fields, i)), false);
 
@@ -529,6 +543,17 @@ void Type__make(caStack* stack)
             return circa_output_error(stack, as_cstring(&msg));
         }
     }
+
+    // Create defaults for remaining items.
+    for (int i=list_length(args); i < expectedFieldCount; i++) {
+        Type* type = as_type(list_get(fields, i));
+        caValue* dest = list_get(output, i);
+        make(type, dest);
+    }
+
+    output->value_type = type;
+    type->inUse = true;
+    type_incref(type);
 }
 
 Type* Type__make__specializeType(Term* caller)

@@ -76,9 +76,9 @@ void handle_release(caValue* value)
 
 void handle_copy(Type*, caValue* source, caValue* dest)
 {
-    set_null(dest);
-
     as_handle(source)->refCount++;
+
+    set_null(dest);
     make_no_initialize(source->value_type, dest);
     dest->value_data.ptr = source->value_data.ptr;
 }

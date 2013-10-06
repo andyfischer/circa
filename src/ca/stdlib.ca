@@ -569,6 +569,9 @@ def Point.perpendicular(self) -> Point
     -- Returns a vector that is perpendicular to its old value, rotated clockwise.
     [self.y -self.x]
 
+def Point.translate(self, Point b) -> Point
+    [self.x + b.x, self.y + b.y]
+
 def Point.to_rect_center(self, Point size) -> Rect
     -- Returns a Rect with this point as the center, and the given size.
     size_half = (size * 0.5) -> Point.cast

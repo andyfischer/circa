@@ -1,0 +1,16 @@
+
+type T = handle_type()
+def T.release()
+    print('Called T.release')
+
+type U {
+    T t
+}
+
+t = T.make
+
+print("Calling U.make(t). This shouldn't trigger T.release")
+
+u = U.make(t)
+
+print('finished calling U.make')
