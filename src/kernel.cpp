@@ -967,6 +967,26 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
     append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
 
+    Term* add_v = create_function(builtins, "add_v");
+    create_function_vectorized_vv(function_contents(add_v), FUNCS.add, TYPES.list, TYPES.list);
+    append_to_overloaded_function(FUNCS.add, add_v);
+
+    Term* add_s = create_function(builtins, "add_s");
+    create_function_vectorized_vs(function_contents(add_s), FUNCS.add, TYPES.list, TYPES.any);
+    append_to_overloaded_function(FUNCS.add, add_s);
+
+    finish_building_overloaded_function(FUNCS.add);
+
+    FUNCS.div = create_overloaded_function(builtins, "div(any a,any b) -> any");
+    append_to_overloaded_function(FUNCS.div, FUNCS.div_f);
+
+    // div() does NOT include div_i.
+
+    Term* div_s = create_function(builtins, "div_s");
+    create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
+    append_to_overloaded_function(FUNCS.div, div_s);
+    finish_building_overloaded_function(FUNCS.div);
+
     FUNCS.less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
     append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_i"));
     append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_f"));
@@ -1011,6 +1031,15 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.mult, builtins->get("mult_i"));
     append_to_overloaded_function(FUNCS.mult, builtins->get("mult_f"));
 
+    Term* mult_v = create_function(builtins, "mult_v");
+    create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, TYPES.list, TYPES.list);
+    Term* mult_s = create_function(builtins, "mult_s");
+    create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, TYPES.list, TYPES.any);
+
+    append_to_overloaded_function(FUNCS.mult, mult_v);
+    append_to_overloaded_function(FUNCS.mult, mult_s);
+    finish_building_overloaded_function(FUNCS.mult);
+
     FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
@@ -1021,16 +1050,6 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.sub, builtins->get("sub_i"));
     append_to_overloaded_function(FUNCS.sub, builtins->get("sub_f"));
 
-    // Create vectorized functions
-    Term* add_v = create_function(builtins, "add_v");
-    create_function_vectorized_vv(function_contents(add_v), FUNCS.add, TYPES.list, TYPES.list);
-    Term* add_s = create_function(builtins, "add_s");
-    create_function_vectorized_vs(function_contents(add_s), FUNCS.add, TYPES.list, TYPES.any);
-
-    append_to_overloaded_function(FUNCS.add, add_v);
-    append_to_overloaded_function(FUNCS.add, add_s);
-    finish_building_overloaded_function(FUNCS.add);
-
     Term* sub_v = create_function(builtins, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, TYPES.list, TYPES.list);
     Term* sub_s = create_function(builtins, "sub_s");
@@ -1040,20 +1059,7 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.sub, sub_s);
     finish_building_overloaded_function(FUNCS.sub);
 
-    // Create vectorized mult() functions
-    Term* mult_v = create_function(builtins, "mult_v");
-    create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, TYPES.list, TYPES.list);
-    Term* mult_s = create_function(builtins, "mult_s");
-    create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, TYPES.list, TYPES.any);
-
-    append_to_overloaded_function(FUNCS.mult, mult_v);
-    append_to_overloaded_function(FUNCS.mult, mult_s);
-    finish_building_overloaded_function(FUNCS.mult);
-
-    Term* div_s = create_function(builtins, "div_s");
-    create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
-
-    // Need dynamic_method before any hosted functions
+    // dynamic_method() is needed before stdlib.ca.
     FUNCS.dynamic_method = import_function(builtins, NULL,
             "def dynamic_method(any inputs :multiple) -> any");
 

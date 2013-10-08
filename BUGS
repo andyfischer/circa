@@ -1,19 +1,5 @@
 
 Miscellanous (most-recent first)
- 
-  This expression had a type error. Is implicit output using primary of 'if'?
-
-        def every(number period) -> bool
-            state periods = 0
-
-            expected = elapsed() / period
-
-            if expected > periods
-                periods += 1
-                true
-            else
-                false
-  
 
   The 'def' keyword creates a closure, but it doesn't save bindings.
 
@@ -22,8 +8,6 @@ Miscellanous (most-recent first)
   Error trace for dynamic_method: should have the actual method name, when possible.
     
   Having a missing ) or ] or } symbol will *really* mess things up. Ditto for an extra ),},]
-
-  Divide operator on Point didn't work?
 
   A superfluous @ symbol caused problems:
 
@@ -61,10 +45,6 @@ Source repro
 
 Code reload
   Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay.
-
-Interpreter
-  Value() terms should just copy their values to the stack. Simplify stack_get_active_value.
-    (this change is questionable)
 
 Modules
   When compiling a module, the last value is automatically turned into an output (just
