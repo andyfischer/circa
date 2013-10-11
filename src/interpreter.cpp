@@ -2148,7 +2148,11 @@ void Stack__call(caStack* stack)
 
     stack_run(self);
 
-    copy(circa_output(self, 0), circa_output(stack, 0));
+    caValue* output = circa_output(self, 0);
+    if (output != NULL)
+        copy(output, circa_output(stack, 0));
+    else
+        set_null(output);
 }
 
 void Stack__stack_push(caStack* stack)

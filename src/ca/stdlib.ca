@@ -375,6 +375,12 @@ def List.set(self, int index, any val) -> List
     -- Set an element by index.
 def List.remove(self, int index) -> List
     -- Remove an element at the given index, shrinking the list by 1.
+
+def List.cycle(self, int index) -> any
+    -- Get an element by index. If the index is out of bounds, then module the
+    -- index to one that exists.
+    self.get(mod(index, self.length))
+
 def List.empty(self) -> bool
     -- Returns whether the list is empty.
     self.length == 0
