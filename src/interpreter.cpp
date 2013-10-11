@@ -2120,7 +2120,7 @@ void Stack__find_active_frame_for_term(caStack* stack)
     set_null(circa_output(stack, 0));
 }
 
-void Stack__inject_context(caStack* stack)
+void Stack__set_context(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
@@ -2342,7 +2342,7 @@ void interpreter_install_functions(Block* kernel)
         {"Stack.dump", Stack__dump},
         {"Stack.extract_state", Stack__extract_state},
         {"Stack.find_active_frame_for_term", Stack__find_active_frame_for_term},
-        {"Stack.inject_context", Stack__inject_context},
+        {"Stack.set_context", Stack__set_context},
         {"Stack.apply", Stack__call},
         {"Stack.call", Stack__call},
         {"Stack.stack_push", Stack__stack_push},
@@ -2542,7 +2542,7 @@ CIRCA_EXPORT void circa_dump_stack_trace(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-CIRCA_EXPORT caValue* circa_inject_context(caStack* stack, const char* name)
+CIRCA_EXPORT caValue* circa_set_context(caStack* stack, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);

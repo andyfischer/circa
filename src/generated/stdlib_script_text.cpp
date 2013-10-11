@@ -274,7 +274,7 @@ const char* STDLIB_CA_TEXT =
     "    -- Dumps a string representation to stdout.\n"
     "def Stack.extract_state(self) -> Map\n"
     "def Stack.find_active_frame_for_term(self, Term term) -> Frame\n"
-    "def Stack.inject_context(self, Symbol name, any val)\n"
+    "def Stack.set_context(self, Symbol name, any val)\n"
     "def Stack.call(self, any inputs :multiple) -> any\n"
     "def Stack.apply(self, List inputs) -> any\n"
     "def Stack.stack_push(self, Block b, List inputs)\n"

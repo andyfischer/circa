@@ -138,7 +138,7 @@ void bug_restart_dies_after_code_delete()
     stack_restart(&stack);
 }
 
-void test_inject_context()
+void test_set_context()
 {
     Block block;
     block.compile("test_spy(context(:a) + 5)");
@@ -146,7 +146,7 @@ void test_inject_context()
     Stack stack;
     stack_init(&stack, &block);
 
-    set_int(circa_inject_context(&stack, "a"), 5);
+    set_int(circa_set_context(&stack, "a"), 5);
     test_spy_clear();
     run_interpreter(&stack);
 
@@ -180,7 +180,7 @@ void register_tests()
     REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);
-    REGISTER_TEST_CASE(interpreter_test::test_inject_context);
+    REGISTER_TEST_CASE(interpreter_test::test_set_context);
     REGISTER_TEST_CASE(interpreter_test::test_that_stack_is_implicitly_restarted_in_run_interpreter);
 }
 
