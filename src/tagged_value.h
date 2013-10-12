@@ -98,8 +98,14 @@ bool is_error(caValue* value);
 bool is_float(caValue* value);
 bool is_func(caValue* value);
 bool is_int(caValue* value);
+bool is_int2(caValue* value); // is_int2 has the same story as is_list2
 bool is_stack(caValue* value);
 bool is_list(caValue* value);
+
+// is_list2 checks if the value actually has type List, whereas is_list checks if the
+// type is list-based. Should replace is_list with is_list2.
+bool is_list2(caValue* value);
+
 bool is_null(caValue* value);
 bool is_number(caValue* value);
 bool is_opaque_pointer(caValue* value);

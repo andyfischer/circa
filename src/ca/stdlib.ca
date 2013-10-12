@@ -193,11 +193,14 @@ def Block.link(self, Block lib)
 def Block.list_configs(self) -> List
     -- Return a list of Terms that look like configs (named literal values).
 def Block.output(self, int index) -> Term
+    -- Return an output term by index.
+def Block.output_placeholder(self, int index) -> Term
     -- Return an output placeholder term by index.
-def Block.outputs(self) -> List
-    -- Return a list of all output placeholders.
 def Block.owner(self) -> Term
     -- Return the Term that owns this Block (may be null).
+def Block.primary_output(self) -> Term
+    -- Return the primary output.
+    self.output(0)
 def Block.property(self, Symbol key) -> any
 def Block.properties(self) -> Map
 def Block.statements(self) -> List
@@ -312,6 +315,9 @@ def make_stack(Func func) -> Stack
 
 def make_actor(Func func) -> Stack
     make_stack(func)
+
+def Func.to_stack(self) -> Stack
+    make_stack(self)
 
 def empty_list(any initialValue, int size) -> List
 def repeat(any val, int count) -> List
@@ -473,9 +479,7 @@ def Type.cast(self, any value) -> any
         
 def Type.make(self, any values :multiple) -> any
 def Type.name(self) -> String
-    -- Returns this Term's local name. May be empty.
 def Type.property(self, String name) -> any
-
 
 -- Metaprogramming on Term
 def term_ref(any term :ignore_error) -> Term
@@ -526,7 +530,7 @@ def Term.property(self, String name) -> any
 def Term.is_value(self) -> bool
     self.function == block_ref(value)
 def Term.is_function(self) -> bool
-    self.is_value and is_function(self.value)
+    self.get_type == Func
 def Term.is_type(self) -> bool
     self.is_value and is_type(self.value)
 def Term.is_input_placeholder(self) -> bool

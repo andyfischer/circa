@@ -71,8 +71,14 @@ void Block__is_null(caStack* stack)
 void Block__output(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
-    set_term_ref(circa_output(stack, 0),
-        get_output_placeholder(block, circa_int_input(stack, 1)));
+    Term* placeholder = get_output_placeholder(block, circa_int_input(stack, 1));
+    set_term_ref(circa_output(stack, 0), placeholder->input(0));
+}
+void Block__output_placeholder(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    Term* placeholder = get_output_placeholder(block, circa_int_input(stack, 1));
+    set_term_ref(circa_output(stack, 0), placeholder);
 }
 void Block__outputs(caStack* stack)
 {
@@ -649,7 +655,7 @@ void reflection_install_functions(Block* builtins)
         {"Block.link", Block__link},
         {"Block.list_configs", Block__list_configs},
         {"Block.output", Block__output},
-        {"Block.outputs", Block__outputs},
+        {"Block.output_placeholder", Block__output_placeholder},
         {"Block.owner", Block__owner},
         {"Block.property", Block__property},
         {"Block.properties", Block__properties},

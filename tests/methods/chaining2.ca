@@ -1,0 +1,17 @@
+
+-- Make sure that a method written in rebind-input style can be called
+-- by a function in implicit-output style, and vice versa.
+
+type T {
+    List list
+}
+
+def T.rebind_style(self, val)
+    @self.list.append(val)
+
+def T.implicit_output_style(self, val)
+    self.rebind_style(val)
+
+t = T.make().implicit_output_style(1).rebind_style(2).implicit_output_style(3)
+assert(t.list == [1,2,3])
+    

@@ -1173,6 +1173,7 @@ void bootstrap_kernel()
     {
         change_declared_type(append_output_placeholder(function_contents(FUNCS.function_decl), NULL),
             TYPES.func);
+        change_declared_type(FUNCS.function_decl, TYPES.func);
         finish_building_function(function_contents(FUNCS.function_decl));
     }
 

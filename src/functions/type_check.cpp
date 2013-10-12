@@ -7,13 +7,13 @@ namespace type_check_function {
 
     void hosted_is_list(caStack* stack)
     {
-        set_bool(circa_output(stack, 0), is_list(circa_input(stack, 0)));
+        set_bool(circa_output(stack, 0), is_list2(circa_input(stack, 0)));
     }
     void hosted_is_int(caStack* stack)
     {
-        set_bool(circa_output(stack, 0), is_int(circa_input(stack, 0)));
+        set_bool(circa_output(stack, 0), is_int2(circa_input(stack, 0)));
     }
-    void hosted_is_float(caStack* stack)
+    void hosted_is_number(caStack* stack)
     {
         set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
     }
@@ -88,7 +88,7 @@ namespace type_check_function {
     {
         import_function(kernel, hosted_is_list, "is_list(any v) -> bool");
         import_function(kernel, hosted_is_int, "is_int(any v) -> bool");
-        import_function(kernel, hosted_is_float, "is_float(any v) -> bool");
+        import_function(kernel, hosted_is_number, "is_number(any v) -> bool");
         import_function(kernel, hosted_is_bool, "is_bool(any v) -> bool");
         import_function(kernel, hosted_is_string, "is_string(any v) -> bool");
         import_function(kernel, hosted_is_null, "is_null(any v) -> bool");

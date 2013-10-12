@@ -1,0 +1,17 @@
+
+assert(is_list([]))
+assert(not is_list(1))
+assert(not is_list(Point.make))
+
+assert(is_number(1.0))
+assert(not is_number(1))
+
+assert(is_int(1))
+assert(not is_int(1.0))
+assert(not is_int(:hello))
+
+assert(is_string(''))
+assert(not is_string(1))
+
+assert(is_null(null))
+assert(not is_null(0))

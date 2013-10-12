@@ -512,7 +512,8 @@ void set_type(caValue* value, Type* type)
     set_null(value);
     value->value_type = TYPES.type;
     value->value_data.ptr = type;
-    type_incref(type);
+    if (type != NULL)
+        type_incref(type);
 }
 
 void set_opaque_pointer(caValue* value, void* addr)
@@ -621,8 +622,10 @@ bool is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
 bool is_func(caValue* value) { return value->value_type == TYPES.func; }
 bool is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
+bool is_int2(caValue* value) { return value->value_type == TYPES.int_type; }
 bool is_stack(caValue* value) { return value->value_type == TYPES.stack; }
 bool is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
+bool is_list2(caValue* value) { return value->value_type == TYPES.list; }
 bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }
 bool is_ref(caValue* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
