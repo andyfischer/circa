@@ -2152,7 +2152,7 @@ void Stack__call(caStack* stack)
     if (output != NULL)
         copy(output, circa_output(stack, 0));
     else
-        set_null(output);
+        set_null(circa_output(stack, 0));
 }
 
 void Stack__stack_push(caStack* stack)

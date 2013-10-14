@@ -1,0 +1,30 @@
+calling main with: 1, cacheKey: 0
+  calling add on: 1, 2
+  result = 3
+calling main with: 1, cacheKey: 0
+  result = 3
+calling main with: 1, cacheKey: 1
+  calling add on: 1, 2
+  result = 3
+calling main with: 1, cacheKey: 1
+  result = 3
+calling main with: 2, cacheKey: 1
+  calling add on: 2, 2
+  result = 4
+calling main with: 2, cacheKey: 0
+  calling add on: 2, 2
+  result = 4
+calling main with: 2, cacheKey: 0
+  result = 4
+calling main with: 2, cacheKey: x
+  calling add on: 2, 2
+  result = 4
+calling main with: 2, cacheKey: y
+  calling add on: 2, 2
+  result = 4
+calling main with: 3, cacheKey: 0
+  calling add on: 3, 2
+  result = 5
+calling main with: 4, cacheKey: 0
+  calling add on: 4, 2
+  result = 6

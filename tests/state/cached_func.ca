@@ -1,0 +1,25 @@
+
+def add_logged(a, b)
+  print('  calling add on: ' a ', ' b)
+  add(a b)
+
+def main(v, cacheKey)
+  print('calling main with: ' v ', cacheKey: ' cacheKey)
+  result = cached({ cacheKey; add_logged(v, 2) })
+  print('  result = ' result)
+
+int = main.to_stack
+
+int.call(1, 0)
+int.call(1, 0)
+int.call(1, 1)
+int.call(1, 1)
+int.call(2, 1)
+int.call(2, 0)
+int.call(2, 0)
+int.call(2, 'x')
+int.call(2, 'y')
+int.call(3, 0)
+int.call(4, 0)
+ 
+  

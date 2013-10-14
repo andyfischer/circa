@@ -660,6 +660,14 @@ def zip(List left, List right) -> List
 
 -- Stateful functions
 
+def cached(Func refresh) -> any
+  state Func _refresh
+  state _out
+  if _refresh != refresh
+    _refresh = refresh
+    _out = refresh.call()
+  _out
+
 def changed(any val) -> bool
     -- Stateful function; returns true if the value has changed since the
     -- previous step.
