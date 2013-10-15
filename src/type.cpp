@@ -74,18 +74,19 @@ namespace type_t {
                 append_phrase(source, field->stringProp("comment",""), field, tok_Comment);
                 append_phrase(source, field->stringProp("syntax:lineEnding",""), field, tok_Whitespace);
                 continue;
-            }
-            ca_assert(field != NULL);
-            append_phrase(source, field->stringProp("syntax:preWhitespace",""),
-                    term, tok_Whitespace);
+            } else if (field->boolProp("fieldAccessor", false)) {
+                ca_assert(field != NULL);
+                append_phrase(source, field->stringProp("syntax:preWhitespace",""),
+                        term, tok_Whitespace);
 
-            Type* fieldType = get_output_type(function_contents(field), 0);
-            append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
-            append_phrase(source, field->stringProp("syntax:postNameWs"," "),
-                    term, tok_Whitespace);
-            append_phrase(source, field->name, term, tok_Identifier);
-            append_phrase(source, field->stringProp("syntax:postWhitespace",""),
-                    term, tok_Whitespace);
+                Type* fieldType = get_output_type(function_contents(field), 0);
+                append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
+                append_phrase(source, field->stringProp("syntax:postNameWs"," "),
+                        term, tok_Whitespace);
+                append_phrase(source, field->name, term, tok_Identifier);
+                append_phrase(source, field->stringProp("syntax:postWhitespace",""),
+                        term, tok_Whitespace);
+            }
         }
         append_phrase(source, "}", term, tok_RBracket);
     }
@@ -475,6 +476,61 @@ void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3)
     set_type(list_get(value,0), type1);
     set_type(list_get(value,1), type2);
     set_type(list_get(value,2), type3);
+}
+
+static int type_decl_get_field_count(Block* declaration)
+{
+    int count = 0;
+    for (int i=0; i < declaration->length(); i++) {
+        Term* term = declaration->get(i);
+
+        if (!is_function(term) || !term->boolProp("fieldAccessor", false))
+            continue;
+
+        count++;
+    }
+    return count;
+}
+
+Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fieldType)
+{
+    int fieldIndex = type_decl_get_field_count(declaration);
+
+    Term* accessor;
+    Type* owningType = unbox_type(declaration->owningTerm);
+
+    // Add getter.
+    {
+        accessor = create_function(declaration, fieldName);
+        accessor->setBoolProp("fieldAccessor", true);
+        Block* accessorContents = nested_contents(accessor);
+        Term* selfInput = append_input_placeholder(accessorContents);
+        Term* accessorIndex = create_int(accessorContents, fieldIndex, "");
+        Term* accessorGetIndex = apply(accessorContents, FUNCS.get_index,
+                TermList(selfInput, accessorIndex));
+        Term* accessorOutput = append_output_placeholder(accessorContents, accessorGetIndex);
+        change_declared_type(accessorOutput, as_type(fieldType));
+    }
+
+    // Add setter.
+    {
+        Value setterName;
+        set_string(&setterName, "set_");
+        string_append(&setterName, fieldName);
+        Term* setter = create_function(declaration, as_cstring(&setterName));
+        setter->setBoolProp("setter", true);
+        Block* setterContents = nested_contents(setter);
+        Term* selfInput = append_input_placeholder(setterContents);
+        Term* valueInput = append_input_placeholder(setterContents);
+        change_declared_type(valueInput, as_type(fieldType));
+        Term* indexValue = create_int(setterContents, fieldIndex, "");
+        Term* setIndex = apply(setterContents, FUNCS.set_index,
+                TermList(selfInput, indexValue, valueInput));
+        Term* output = append_output_placeholder(setterContents, setIndex);
+        change_declared_type(output, owningType);
+    }
+
+    return accessor;
 }
 
 void Type__declaringTerm(caStack* stack)

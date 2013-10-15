@@ -3,14 +3,11 @@ type T {
     int i
 }
 
-def T.get_i(_) -> int
-  return _.i
-
-def T.set_i(_ :out, int i)
-  _.i = i
+def T.get_i(self) -> int
+  self.i
 
 t = make(T)
 assert(t.get_i == 0)
-t.set_i(5)
+@t.set_i(5)
 assert(t.get_i == 5)
 assert(t.i == 5)

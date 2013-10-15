@@ -864,7 +864,6 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     Block* contents = nested_contents(result);
 
-    int fieldIndex = 0;
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);
 
@@ -893,16 +892,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             fieldName = tokens.consumeStr(tok_Identifier);
 
         // Create the accessor function.
-        Term* accessor = create_function(contents, fieldName.c_str());
-        accessor->setBoolProp("fieldAccessor", true);
-        Block* accessorContents = nested_contents(accessor);
-        Term* accessorInput = append_input_placeholder(accessorContents);
-        Term* accessorIndex = create_int(accessorContents, fieldIndex, "");
-        Term* accessorGetIndex = apply(accessorContents, FUNCS.get_index,
-                TermList(accessorInput, accessorIndex));
-        Term* accessorOutput = append_output_placeholder(accessorContents, accessorGetIndex);
-        change_declared_type(accessorOutput, as_type(fieldType));
-
+        Term* accessor = type_decl_append_field(contents, fieldName.c_str(), fieldType);
         accessor->setStringProp("syntax:preWhitespace", preWs);
         accessor->setStringProp("syntax:postNameWs", postNameWs);
 
@@ -920,8 +910,6 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         if (!is_null(&postWhitespace))
             accessor->setProp("syntax:postWhitespace", &postWhitespace);
-
-        fieldIndex++;
     }
 
     tokens.consume(closingToken);

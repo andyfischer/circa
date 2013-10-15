@@ -199,6 +199,8 @@ void set_type_list(caValue* value, Type* type1);
 void set_type_list(caValue* value, Type* type1, Type* type2);
 void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3);
 
+Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fieldType);
+
 void type_install_functions(Block* block);
 
 } // namespace circa
