@@ -1,5 +1,0 @@
-
-x = Point.make(1 1)
-print('1: ' x)
-mult(@x, 1.2)
-print('2: ' x)

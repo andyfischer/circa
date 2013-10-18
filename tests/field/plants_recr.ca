@@ -36,12 +36,12 @@ def Segment.step(seg)
     min(@target_length, max_segment_length)
     length = target_length * (1 - (1 / (age + 1)))
 
-    end_loc = seg.base_loc + polar(seg.base_angle) * length
+    end_loc = seg.base_loc.add(polar(seg.base_angle) * length)
 
     -- thickness
     thickness = 5.0
-    base_l = seg.base_loc + polar(seg.base_angle - 90) * (thickness/2)
-    base_r = seg.base_loc + polar(seg.base_angle + 90) * (thickness/2)
+    base_l = seg.base_loc.add(polar(seg.base_angle - 90) * (thickness/2))
+    base_r = seg.base_loc.add(polar(seg.base_angle + 90) * (thickness/2))
 
     tip_l = end_loc + [-1 0] * (thickness/2)
     tip_r = end_loc + [1 0] * (thickness/2)
@@ -68,6 +68,7 @@ def f()
 
 int = make_stack(f)
 int.call
+int.dump
 int.call
 int.call
 int.call

@@ -86,6 +86,8 @@ struct BuiltinFuncs {
     Term* set_with_selector;
     Term* static_error;
     Term* sub;
+    Term* sub_i;
+    Term* sub_f;
     Term* switch_func;
     Term* type;
     Term* unbound_input;

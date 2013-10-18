@@ -967,6 +967,7 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
     append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
 
+#if 0
     Term* add_v = create_function(builtins, "add_v");
     create_function_vectorized_vv(function_contents(add_v), FUNCS.add, TYPES.list, TYPES.list);
     append_to_overloaded_function(FUNCS.add, add_v);
@@ -974,6 +975,7 @@ void bootstrap_kernel()
     Term* add_s = create_function(builtins, "add_s");
     create_function_vectorized_vs(function_contents(add_s), FUNCS.add, TYPES.list, TYPES.any);
     append_to_overloaded_function(FUNCS.add, add_s);
+#endif
 
     finish_building_overloaded_function(FUNCS.add);
 
@@ -982,9 +984,11 @@ void bootstrap_kernel()
 
     // div() does NOT include div_i.
 
+#if 0
     Term* div_s = create_function(builtins, "div_s");
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
     append_to_overloaded_function(FUNCS.div, div_s);
+#endif
     finish_building_overloaded_function(FUNCS.div);
 
     FUNCS.less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
@@ -1031,6 +1035,7 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.mult, builtins->get("mult_i"));
     append_to_overloaded_function(FUNCS.mult, builtins->get("mult_f"));
 
+#if 0
     Term* mult_v = create_function(builtins, "mult_v");
     create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, TYPES.list, TYPES.list);
     Term* mult_s = create_function(builtins, "mult_s");
@@ -1038,6 +1043,7 @@ void bootstrap_kernel()
 
     append_to_overloaded_function(FUNCS.mult, mult_v);
     append_to_overloaded_function(FUNCS.mult, mult_s);
+#endif
     finish_building_overloaded_function(FUNCS.mult);
 
     FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
@@ -1050,6 +1056,7 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.sub, builtins->get("sub_i"));
     append_to_overloaded_function(FUNCS.sub, builtins->get("sub_f"));
 
+#if 0
     Term* sub_v = create_function(builtins, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, TYPES.list, TYPES.list);
     Term* sub_s = create_function(builtins, "sub_s");
@@ -1057,6 +1064,7 @@ void bootstrap_kernel()
     
     append_to_overloaded_function(FUNCS.sub, sub_v);
     append_to_overloaded_function(FUNCS.sub, sub_s);
+#endif
     finish_building_overloaded_function(FUNCS.sub);
 
     // dynamic_method() is needed before stdlib.ca.

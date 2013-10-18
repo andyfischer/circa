@@ -1340,7 +1340,7 @@ do_loop_done_insn:
                 raise_error(stack);
             }
 
-            std::string functionName = caller->stringProp("syntax:functionName", "");
+            std::string functionName = caller->stringProp("methodName", "");
 
             // Find and dispatch method
             Term* method = find_method(s.frame->block,

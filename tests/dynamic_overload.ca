@@ -3,5 +3,3 @@ def f(any a, any b) -> any
     return add(a,b)
 
 assert(f(1,2) == 3)
-assert(f([1],[2]) == [3])
-assert(f([1 2 3], 2) == [3 4 5])

@@ -1514,20 +1514,21 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;
 
+#if 0
 int get_infix_precedence(int match)
 {
     switch(match) {
         case tok_TwoDots:
         case tok_RightArrow:
-            return 8;
+            return 7;
         case tok_Star:
         case tok_Slash:
         case tok_DoubleSlash:
         case tok_Percent:
-            return 7;
+            return 6;
         case tok_Plus:
         case tok_Minus:
-            return 6;
+            return 5;
         case tok_LThan:
         case tok_LThanEq:
         case tok_GThan:
@@ -1547,32 +1548,91 @@ int get_infix_precedence(int match)
             return -1;
     }
 }
+#endif
 
-Term* get_function_for_infix_operator(int match)
+struct InfixOperatorInfo
 {
-    switch (match) {
-        case tok_Plus: return FUNCS.add;
-        case tok_Minus: return FUNCS.sub;
-        case tok_Star: return FUNCS.mult;
-        case tok_Slash: return FUNCS.div;
-        case tok_DoubleSlash: return FUNCS.div_i;
-        case tok_Percent: return FUNCS.remainder;
-        case tok_LThan: return FUNCS.less_than;
-        case tok_LThanEq: return FUNCS.less_than_eq;
-        case tok_GThan: return FUNCS.greater_than;
-        case tok_GThanEq: return FUNCS.greater_than_eq;
-        case tok_DoubleEquals: return FUNCS.equals;
-        case tok_Or: return FUNCS.or_func;
-        case tok_And: return FUNCS.and_func;
-        case tok_PlusEquals: return FUNCS.add;
-        case tok_MinusEquals: return FUNCS.sub;
-        case tok_StarEquals: return FUNCS.mult;
-        case tok_SlashEquals: return FUNCS.div;
-        case tok_NotEquals: return FUNCS.not_equals;
-        case tok_LeftArrow: return FUNCS.feedback;
-        case tok_TwoDots: return FUNCS.range;
-        default: return NULL;
+    Term* function;
+    int precedence;
+    bool isRebinding;
+
+    InfixOperatorInfo(Term* f, int p, bool r)
+     : function(f), precedence(p), isRebinding(r)
+    {}
+};
+
+InfixOperatorInfo get_infix_operator_info(int tokenMatch)
+{
+    switch(tokenMatch) {
+        case tok_TwoDots:
+            return InfixOperatorInfo(FUNCS.range, 7, false);
+        case tok_RightArrow:
+            return InfixOperatorInfo(NULL, 7, false);
+        case tok_Star:
+            return InfixOperatorInfo(FUNCS.mult, 6, false);
+        case tok_Slash:
+            return InfixOperatorInfo(FUNCS.div, 6, false);
+        case tok_DoubleSlash:
+            return InfixOperatorInfo(FUNCS.div_i, 6, false);
+        case tok_Percent:
+            return InfixOperatorInfo(FUNCS.remainder, 6, false);
+        case tok_Plus:
+            return InfixOperatorInfo(FUNCS.add, 5, false);
+        case tok_Minus:
+            return InfixOperatorInfo(FUNCS.sub, 5, false);
+        case tok_LThan:
+            return InfixOperatorInfo(FUNCS.less_than, 4, false);
+        case tok_LThanEq:
+            return InfixOperatorInfo(FUNCS.less_than_eq, 4, false);
+        case tok_GThan:
+            return InfixOperatorInfo(FUNCS.greater_than, 4, false);
+        case tok_GThanEq:
+            return InfixOperatorInfo(FUNCS.greater_than_eq, 4, false);
+        case tok_DoubleEquals:
+            return InfixOperatorInfo(FUNCS.equals, 4, false);
+        case tok_NotEquals:
+            return InfixOperatorInfo(FUNCS.not_equals, 4, false);
+        case tok_And:
+            return InfixOperatorInfo(FUNCS.and_func, 3, false);
+        case tok_Or:
+            return InfixOperatorInfo(FUNCS.or_func, 3, false);
+        case tok_PlusEquals:
+            return InfixOperatorInfo(FUNCS.add, 2, true);
+        case tok_MinusEquals:
+            return InfixOperatorInfo(FUNCS.sub, 2, true);
+        case tok_StarEquals:
+            return InfixOperatorInfo(FUNCS.mult, 2, true);
+        case tok_SlashEquals:
+            return InfixOperatorInfo(FUNCS.div, 2, true);
+        default:
+            return InfixOperatorInfo(NULL, -1, false);
     }
+}
+
+Term* specialize_infix_function(Term* function, Term* left, Term* right)
+{
+    if (function == FUNCS.add) {
+        if (declared_type(left) == TYPES.float_type
+                || declared_type(right) == TYPES.float_type)
+            return FUNCS.add_f;
+        if (declared_type(left) == TYPES.int_type
+                && declared_type(right) == TYPES.int_type)
+            return FUNCS.add_i;
+            
+        return function;
+    }
+
+    else if (function == FUNCS.sub) {
+        if (declared_type(left) == TYPES.float_type
+                || declared_type(right) == TYPES.float_type)
+            return FUNCS.sub_f;
+        if (declared_type(left) == TYPES.int_type)
+            return FUNCS.sub_i;
+            
+        return function;
+    }
+
+    return function;
 }
 
 ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* context,
@@ -1600,11 +1660,11 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
         // Check the precedence of the next available token.
         int lookaheadOperator = lookahead_next_non_whitespace(tokens, consumeNewlines);
-        int operatorPrecedence = get_infix_precedence(lookaheadOperator);
+        InfixOperatorInfo operatorInfo = get_infix_operator_info(lookaheadOperator);
         
         // Don't consume if it's below our minimum. This will happen if this is a recursive
         // call, or if get_infix_precedence returned -1 (next token isn't an operator)
-        if (operatorPrecedence < minimumPrecedence)
+        if (operatorInfo.precedence < minimumPrecedence)
             return left;
         
         // Parse an infix expression
@@ -1664,25 +1724,33 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             }
 
         } else {
-            ParseResult rightExpr = infix_expression(block, tokens, context, operatorPrecedence+1);
+            ParseResult rightExpr = infix_expression(block, tokens, context,
+                operatorInfo.precedence + 1);
 
-            Term* function = get_function_for_infix_operator(operatorMatch);
+            InfixOperatorInfo opInfo = get_infix_operator_info(operatorMatch);
+            Term* function = specialize_infix_function(opInfo.function,
+                left.term, rightExpr.term);
 
-            ca_assert(function != NULL);
+            Term* term = NULL;
+            if (function == NULL) {
+                // Dynamic dispatch.
 
-            bool isRebinding = is_infix_operator_rebinding(operatorMatch);
+                term = apply(block, FUNCS.dynamic_method, TermList(left.term, rightExpr.term));
+                term->setStringProp("methodName", "add");
+            } else {
+                term = apply(block, function, TermList(left.term, rightExpr.term));
+            }
 
-            Term* term = apply(block, function, TermList(left.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);
             
-            if (isRebinding)
+            if (opInfo.isRebinding)
                 term->setBoolProp("syntax:rebindingInfix", true);
 
             set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
             set_input_syntax_hint(term, 1, "preWhitespace", postOperatorWhitespace);
 
-            if (isRebinding) {
+            if (opInfo.isRebinding) {
                 // Just bind the name if left side is an identifier.
                 // Example: a += 1
                 if (left.isIdentifier()) {
@@ -1869,18 +1937,21 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     // Find the function
     Term* function = find_method(block, rootType, as_cstring(&functionName));
 
+    Term* term = NULL;
+
+    // Create the term
     if (function == NULL) {
         // Method could not be statically found. Create a dynamic_method call.
         function = FUNCS.dynamic_method;
-    }
+        term = apply(block, function, inputs);
+        term->setStringProp("methodName", as_cstring(&functionName));
 
-    // Create the term
-    Term* term = apply(block, function, inputs);
-
-    // Possibly introduce an extra_output
-    if (forceRebindLHS && function == FUNCS.dynamic_method
-            && get_extra_output(term, 0) == NULL) {
-        apply(block, FUNCS.extra_output, TermList(term));
+        // Possibly introduce an extra_output
+        if (forceRebindLHS && get_extra_output(term, 0) == NULL)
+            apply(block, FUNCS.extra_output, TermList(term));
+        
+    } else {
+        term = apply(block, function, inputs);
     }
 
     // Possibly rebind the left-hand-side

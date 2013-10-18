@@ -56,5 +56,4 @@ c = #aabbccdd
 a = 1; [a]
 a = 1; [a a,a;a
 a]
-a = [0 0] + [cos(1) sin(1)]
 

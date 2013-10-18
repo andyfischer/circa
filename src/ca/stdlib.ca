@@ -382,6 +382,15 @@ def List.set(self, int index, any val) -> List
 def List.remove(self, int index) -> List
     -- Remove an element at the given index, shrinking the list by 1.
 
+def List.add(self, any value) -> List
+    for i in self { i + value }
+def List.sub(self, any value) -> List
+    for i in self { i - value }
+def List.mult(self, any value) -> List
+    for i in self { i * value }
+def List.div(self, any value) -> List
+    for i in self { i / value }
+
 def List.cycle(self, int index) -> any
     -- Get an element by index. If the index is out of bounds, then module the
     -- index to one that exists.
@@ -562,6 +571,15 @@ def Block.get_top_comments(self) -> List
 
     return out
 
+def Point.add(self, Point b) -> Point
+    [self.x + b.x, self.y + b.y]
+def Point.sub(self, Point b) -> Point
+    [self.x - b.x, self.y - b.y]
+def Point.mult(self, number scalar) -> Point
+    [self.x * scalar, self.y * scalar]
+def Point.div(self, number scalar) -> Point
+    [self.x / scalar, self.y / scalar]
+    
 def Point.distance(self, Point b) -> number
     -- Returns the distance between self and b.
     sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
@@ -602,6 +620,15 @@ def Point.delta(self) -> Point
 def Point.rotate(self, number rotation) -> Point
     -- Return the point rotated around [0 0] by the given angle.
     [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
+
+def Rect.add(self, Rect b) -> Rect
+    [self.x1 + b.x1, self.y1 + b.y1, self.x2 + b.x2, self.y2 + b.y2]
+def Rect.sub(self, Rect b) -> Rect
+    [self.x1 - b.x1, self.y1 - b.y1, self.x2 - b.x2, self.y2 - b.y2]
+def Rect.mult(self, number s) -> Rect
+    [self.x1 * s, self.y1 * s, self.x2 * s, self.y2 * s]
+def Rect.div(self, number s) -> Rect
+    [self.x1 / s, self.y1 / s, self.x2 / s, self.y2 / s]
 
 def Rect.width(self) -> number
     self.x2 - self.x1

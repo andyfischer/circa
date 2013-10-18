@@ -4,7 +4,7 @@ def f(int i, int j) -> int
 
 -- Introspect on output
 f_output = f.block.primary_output
-assert(f_output.function.name == "add")
+assert(f_output.function.name == "add" or f_output.function.name == "add_i")
 assert(f_output.get_type.name == "int")
 assert(f_output.input(0).name == "i")
 assert(f_output.input(1).name == "j")
