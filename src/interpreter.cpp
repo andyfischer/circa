@@ -901,6 +901,15 @@ void raise_error_output_type_mismatch(Stack* stack)
     return;
 }
 
+void raise_error_stack_value_not_found(Stack* stack, int inputIndex)
+{
+    circa::Value msg;
+    set_string(&msg, "Internal error, stack value not found for input #");
+    string_append(&msg, inputIndex);
+    raise_error_msg(stack, as_cstring(&msg));
+    return;
+}
+
 int get_count_of_caller_inputs_for_error(Stack* stack)
 {
     Frame* parentFrame = stack_top_parent(stack);
@@ -1044,7 +1053,10 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             Term* placeholderTerm = top->block->get(inputIndex);
             caValue* placeholderRegister = frame_register(top, inputIndex);
             caValue* value = stack_find_active_value(parent, caller->input(inputIndex));
-            ca_assert(value != NULL);
+
+            if (value == NULL)
+                return raise_error_stack_value_not_found(stack, inputIndex);
+
             caValue* slot = frame_register(top, destSlot);
             copy(value, slot);
 
