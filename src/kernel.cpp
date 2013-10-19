@@ -665,6 +665,34 @@ std::string stackVariable_toString(caValue* value)
     return strm.str();
 }
 
+Type* specializeType_add_sub_mult(Term* term)
+{
+    Type* left = declared_type(term->input(0));
+    Type* right = declared_type(term->input(1));
+
+    if (left == TYPES.int_type && right == TYPES.int_type)
+        return TYPES.int_type;
+
+    if ((left == TYPES.int_type || left == TYPES.float_type)
+            && (right == TYPES.int_type || right == TYPES.float_type))
+        return TYPES.float_type;
+
+    return TYPES.any;
+}
+
+Type* specializeType_div(Term* term)
+{
+    Type* left = declared_type(term->input(0));
+    Type* right = declared_type(term->input(1));
+
+    if ((left == TYPES.int_type || left == TYPES.float_type)
+            && (right == TYPES.int_type || right == TYPES.float_type))
+        return TYPES.float_type;
+
+    return TYPES.any;
+}
+
+
 World* global_world()
 {
     return g_world;
@@ -960,37 +988,11 @@ void bootstrap_kernel()
     FUNCS.looped_input = import_function(builtins, NULL, "def looped_input(first, next) -> any");
     block_set_evaluation_empty(function_contents(FUNCS.looped_input), true);
 
+    // dynamic_method() is needed before stdlib.ca.
+    FUNCS.dynamic_method = import_function(builtins, NULL,
+            "def dynamic_method(any inputs :multiple) -> any");
+
     // Now we can build derived functions
-
-    // Create overloaded functions
-    FUNCS.add = create_overloaded_function(builtins, "add(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
-    append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
-
-#if 0
-    Term* add_v = create_function(builtins, "add_v");
-    create_function_vectorized_vv(function_contents(add_v), FUNCS.add, TYPES.list, TYPES.list);
-    append_to_overloaded_function(FUNCS.add, add_v);
-
-    Term* add_s = create_function(builtins, "add_s");
-    create_function_vectorized_vs(function_contents(add_s), FUNCS.add, TYPES.list, TYPES.any);
-    append_to_overloaded_function(FUNCS.add, add_s);
-#endif
-
-    finish_building_overloaded_function(FUNCS.add);
-
-    FUNCS.div = create_overloaded_function(builtins, "div(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.div, FUNCS.div_f);
-
-    // div() does NOT include div_i.
-
-#if 0
-    Term* div_s = create_function(builtins, "div_s");
-    create_function_vectorized_vs(function_contents(div_s), FUNCS.div, TYPES.list, TYPES.any);
-    append_to_overloaded_function(FUNCS.div, div_s);
-#endif
-    finish_building_overloaded_function(FUNCS.div);
-
     FUNCS.less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
     append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_i"));
     append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_f"));
@@ -1031,45 +1033,11 @@ void bootstrap_kernel()
     append_to_overloaded_function(mod_func, builtins->get("mod_f"));
     finish_building_overloaded_function(mod_func);
 
-    FUNCS.mult = create_overloaded_function(builtins, "mult(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.mult, builtins->get("mult_i"));
-    append_to_overloaded_function(FUNCS.mult, builtins->get("mult_f"));
-
-#if 0
-    Term* mult_v = create_function(builtins, "mult_v");
-    create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, TYPES.list, TYPES.list);
-    Term* mult_s = create_function(builtins, "mult_s");
-    create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, TYPES.list, TYPES.any);
-
-    append_to_overloaded_function(FUNCS.mult, mult_v);
-    append_to_overloaded_function(FUNCS.mult, mult_s);
-#endif
-    finish_building_overloaded_function(FUNCS.mult);
-
     FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
     finish_building_overloaded_function(FUNCS.neg);
     block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
-
-    FUNCS.sub = create_overloaded_function(builtins, "sub(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.sub, builtins->get("sub_i"));
-    append_to_overloaded_function(FUNCS.sub, builtins->get("sub_f"));
-
-#if 0
-    Term* sub_v = create_function(builtins, "sub_v");
-    create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, TYPES.list, TYPES.list);
-    Term* sub_s = create_function(builtins, "sub_s");
-    create_function_vectorized_vs(function_contents(sub_s), FUNCS.sub, TYPES.list, TYPES.any);
-    
-    append_to_overloaded_function(FUNCS.sub, sub_v);
-    append_to_overloaded_function(FUNCS.sub, sub_s);
-#endif
-    finish_building_overloaded_function(FUNCS.sub);
-
-    // dynamic_method() is needed before stdlib.ca.
-    FUNCS.dynamic_method = import_function(builtins, NULL,
-            "def dynamic_method(any inputs :multiple) -> any");
 
     // Load the standard library from stdlib.ca
     parser::compile(builtins, parser::statement_list, STDLIB_CA_TEXT);
@@ -1158,6 +1126,11 @@ void bootstrap_kernel()
     FUNCS.has_effects = builtins->get("has_effects");
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
+    function_contents(FUNCS.add)->overrides.specializeType = specializeType_add_sub_mult;
+    function_contents(FUNCS.sub)->overrides.specializeType = specializeType_add_sub_mult;
+    function_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
+    function_contents(FUNCS.div)->overrides.specializeType = specializeType_div;
+
     FUNCS.length = builtins->get("length");
     FUNCS.list_append = builtins->get("List.append");
     FUNCS.native_patch = builtins->get("native_patch");
@@ -1193,6 +1166,27 @@ void bootstrap_kernel()
     color_t::setup_type(TYPES.color);
 
     function_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
+}
+
+void on_new_function_parsed(Term* func, caValue* functionName)
+{
+    // Catch certain builtin functions as soon as they are defined.
+    if (FUNCS.add == NULL && string_eq(functionName, "add"))
+        FUNCS.add = func;
+    if (FUNCS.sub == NULL && string_eq(functionName, "sub"))
+        FUNCS.sub = func;
+    if (FUNCS.mult == NULL && string_eq(functionName, "mult"))
+        FUNCS.mult = func;
+    if (FUNCS.div == NULL && string_eq(functionName, "div"))
+        FUNCS.div = func;
+    if (FUNCS.declared_state == NULL && string_eq(functionName, "declared_state"))
+        FUNCS.declared_state = func;
+    if (FUNCS.closure_block == NULL && string_eq(functionName, "closure_block"))
+        FUNCS.closure_block = func;
+    if (FUNCS.func_call == NULL && string_eq(functionName, "Func.call"))
+        FUNCS.func_call = func;
+    if (FUNCS.unbound_input == NULL && string_eq(functionName, "unbound_input"))
+        FUNCS.unbound_input = func;
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

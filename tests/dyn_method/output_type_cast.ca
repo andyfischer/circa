@@ -1,0 +1,14 @@
+
+type T {
+}
+
+t = T.make
+
+def T.f(self) -> Point
+    [1, 2]
+
+assert(type(t.f) == Point)
+
+any.cast(@t)
+
+assert(type(t.f) == Point)

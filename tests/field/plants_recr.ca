@@ -68,7 +68,6 @@ def f()
 
 int = make_stack(f)
 int.call
-int.dump
 int.call
 int.call
 int.call

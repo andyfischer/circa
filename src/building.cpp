@@ -16,11 +16,11 @@
 #include "loops.h"
 #include "names.h"
 #include "parser.h"
-#include "names.h"
 #include "selector.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 #include "update_cascades.h"
@@ -99,6 +99,32 @@ Term* apply(Block* block, Term* function, TermList const& inputs, const char* na
     if (nameStr != NULL)
         set_string(&name, nameStr);
     return apply(block, function, inputs, &name);
+}
+
+Term* apply_spec(Block* block, caValue* spec)
+{
+    Term* function = as_term_ref(list_get(spec, 0));
+    caValue* inputs = list_get(spec, 1);
+
+    TermList inputList;
+    for (int i=0; i < list_length(inputs); i++) {
+        inputList.append(as_term_ref(list_get(inputs, i)));
+    }
+
+    Term* result = apply(block, function, inputList, "");
+
+    for (int i=2; i < list_length(spec); i++) {
+        caValue* key = list_get(spec, i);
+        if (symbol_eq(key, sym_Name)) {
+            i++;
+            rename(result, list_get(spec, i));
+        } else {
+            i++;
+            term_set_property(result, as_cstring(key), list_get(spec, i));
+        }
+    }
+
+    return result;
 }
 
 void set_input(Term* term, int index, Term* input)

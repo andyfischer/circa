@@ -779,15 +779,7 @@ consume_next_output: {
 
     set_source_location(result, startPosition, tokens);
 
-    // Superhack. Catch certain builtin functions as soon as they are defined.
-    if (FUNCS.declared_state == NULL && string_eq(&functionName, "declared_state"))
-        FUNCS.declared_state = result;
-    if (FUNCS.closure_block == NULL && string_eq(&functionName, "closure_block"))
-        FUNCS.closure_block = result;
-    if (FUNCS.func_call == NULL && string_eq(&functionName, "Func.call"))
-        FUNCS.func_call = result;
-    if (FUNCS.unbound_input == NULL && string_eq(&functionName, "unbound_input"))
-        FUNCS.unbound_input = result;
+    on_new_function_parsed(result, &functionName);
 
     return ParseResult(result);
 }
@@ -1514,42 +1506,6 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;
 
-#if 0
-int get_infix_precedence(int match)
-{
-    switch(match) {
-        case tok_TwoDots:
-        case tok_RightArrow:
-            return 7;
-        case tok_Star:
-        case tok_Slash:
-        case tok_DoubleSlash:
-        case tok_Percent:
-            return 6;
-        case tok_Plus:
-        case tok_Minus:
-            return 5;
-        case tok_LThan:
-        case tok_LThanEq:
-        case tok_GThan:
-        case tok_GThanEq:
-        case tok_DoubleEquals:
-        case tok_NotEquals:
-            return 4;
-        case tok_And:
-        case tok_Or:
-            return 3;
-        case tok_PlusEquals:
-        case tok_MinusEquals:
-        case tok_StarEquals:
-        case tok_SlashEquals:
-            return 2;
-        default:
-            return -1;
-    }
-}
-#endif
-
 struct InfixOperatorInfo
 {
     Term* function;
@@ -1607,32 +1563,6 @@ InfixOperatorInfo get_infix_operator_info(int tokenMatch)
         default:
             return InfixOperatorInfo(NULL, -1, false);
     }
-}
-
-Term* specialize_infix_function(Term* function, Term* left, Term* right)
-{
-    if (function == FUNCS.add) {
-        if (declared_type(left) == TYPES.float_type
-                || declared_type(right) == TYPES.float_type)
-            return FUNCS.add_f;
-        if (declared_type(left) == TYPES.int_type
-                && declared_type(right) == TYPES.int_type)
-            return FUNCS.add_i;
-            
-        return function;
-    }
-
-    else if (function == FUNCS.sub) {
-        if (declared_type(left) == TYPES.float_type
-                || declared_type(right) == TYPES.float_type)
-            return FUNCS.sub_f;
-        if (declared_type(left) == TYPES.int_type)
-            return FUNCS.sub_i;
-            
-        return function;
-    }
-
-    return function;
 }
 
 ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* context,
@@ -1728,18 +1658,8 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 operatorInfo.precedence + 1);
 
             InfixOperatorInfo opInfo = get_infix_operator_info(operatorMatch);
-            Term* function = specialize_infix_function(opInfo.function,
-                left.term, rightExpr.term);
 
-            Term* term = NULL;
-            if (function == NULL) {
-                // Dynamic dispatch.
-
-                term = apply(block, FUNCS.dynamic_method, TermList(left.term, rightExpr.term));
-                term->setStringProp("methodName", "add");
-            } else {
-                term = apply(block, function, TermList(left.term, rightExpr.term));
-            }
+            Term* term = apply(block, opInfo.function, TermList(left.term, rightExpr.term));
 
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);

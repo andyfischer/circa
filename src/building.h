@@ -16,6 +16,10 @@ Term* apply(Block* block, const char* functionName, TermList const& inputs,
 
 Term* apply(Block* block, Term* function, TermList const& inputs, const char* name);
 
+// Call apply using a spec value.
+// Example:  [Term#add [Term#a Term#b] :name 'c']
+Term* apply_spec(Block* block, caValue* spec);
+
 // Create a duplicate of the given term. Doesn't duplicate nestedContents.
 Term* create_duplicate(Block* block, Term* original, caValue* name);
 

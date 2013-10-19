@@ -1,6 +1,8 @@
 
 Miscellanous (most-recent first)
 
+  dynamic_method doesn't cast outputs?
+
   Type inferrence not working on a call to Type.cast.
 
   The cached() function is dropping cache on every file reload? shouldn't the block pointer

@@ -963,33 +963,6 @@ void raise_error_too_many_inputs(Stack* stack)
     raise_error(stack);
 }
 
-void pop_outputs_dynamic(Stack* stack, Frame* frame, Frame* top)
-{
-    Term* caller = frame_caller(top);
-    Block* finishedBlock = frame_block(top);
-
-    // Walk through caller's output terms, and pull output values from the frame.
-    int placeholderIndex = 0;
-
-    for (int callerOutputIndex=0;; callerOutputIndex++) {
-        Term* outputTerm = get_output_term(caller, callerOutputIndex);
-        if (outputTerm == NULL)
-            break;
-
-        caValue* outputRegister = frame_register(frame, outputTerm);
-
-        Term* placeholder = get_output_placeholder(finishedBlock, placeholderIndex);
-        if (placeholder == NULL) {
-            set_null(outputRegister);
-        } else {
-            caValue* placeholderRegister = frame_register(top, placeholder->index);
-            copy(placeholderRegister, outputRegister);
-        }
-
-        placeholderIndex++;
-    }
-}
-
 void run_bytecode(Stack* stack, caValue* bytecode)
 {
     struct InterpreterTransientState {
@@ -1259,15 +1232,13 @@ do_loop_done_insn:
             copy(value, receiverSlot);
 
             // Type check
-            // Future: should this use receiver's type instead of placeholder?
             bool castSuccess = cast(receiverSlot, declared_type(placeholder));
                 
             // For now, allow any output value to be null. Will revisit.
             castSuccess = castSuccess || is_null(receiverSlot);
 
-            if (!castSuccess) {
+            if (!castSuccess)
                 return raise_error_output_type_mismatch(stack);
-            }
 
             continue;
         }
@@ -1286,7 +1257,42 @@ do_loop_done_insn:
         }
         case bc_PopOutputsDynamic: {
             ca_assert(s.frame == stack_top_parent(stack));
-            pop_outputs_dynamic(stack, s.frame, stack_top(stack));
+
+            Frame* top = stack_top(stack);
+            Frame* parent = stack_top_parent(stack);
+            Term* caller = frame_caller(top);
+            Block* finishedBlock = frame_block(top);
+
+            // Walk through caller's output terms, and pull output values from the frame.
+            int placeholderIndex = 0;
+
+            for (int callerOutputIndex=0;; callerOutputIndex++) {
+                Term* outputTerm = get_output_term(caller, callerOutputIndex);
+                if (outputTerm == NULL)
+                    break;
+
+                caValue* receiverSlot = frame_register(parent, outputTerm);
+
+                Term* placeholder = get_output_placeholder(finishedBlock, placeholderIndex);
+                if (placeholder == NULL) {
+                    set_null(receiverSlot);
+                } else {
+                    caValue* placeholderRegister = frame_register(top, placeholder->index);
+                    copy(placeholderRegister, receiverSlot);
+
+                    // Type check
+                    bool castSuccess = cast(receiverSlot, declared_type(placeholder));
+                        
+                    // For now, allow any output value to be null. Will revisit.
+                    castSuccess = castSuccess || is_null(receiverSlot);
+
+                    if (!castSuccess)
+                        return raise_error_output_type_mismatch(stack);
+                }
+
+                placeholderIndex++;
+            }
+
             continue;
         }
         case bc_PopExplicitState: {

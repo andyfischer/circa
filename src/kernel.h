@@ -182,5 +182,6 @@ void test_oracle_send(caValue* value);
 void test_oracle_send(int i);
 
 void install_standard_library(Block* kernel);
+void on_new_function_parsed(Term* func, caValue* functionName);
 
 } // namespace circa

@@ -73,6 +73,11 @@ static int hash_func(caValue* value)
     return as_int(value);
 }
 
+bool symbol_eq(caValue* val, Symbol s)
+{
+    return is_symbol(val) && as_symbol(val) == s;
+}
+
 void symbol_initialize_global_table()
 {
     g_runtimeSymbolMap = new Value();

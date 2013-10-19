@@ -438,19 +438,6 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     blob_append_char(bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(bytecode, term, referenceTargetBlock);
     blob_append_char(bytecode, bc_PopFrame);
-    
-    // Finally, do some lightweight optimization.
-
-#if 0
-    // Try to statically specialize an overloaded function.
-    if (term->function != NULL && term->function->boolProp("preferSpecialize", false)) {
-        Term* specialized = statically_specialize_overload_for_call(term);
-        if (specialized != NULL) {
-            ca_assert(tag == op_CallBlock);
-            set_block(list_get(result, 3), function_contents(specialized));
-        }
-    }
-#endif
 }
 
 void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* block)

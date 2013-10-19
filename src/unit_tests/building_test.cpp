@@ -5,6 +5,8 @@
 #include "block.h"
 #include "building.h"
 #include "inspection.h"
+#include "list.h"
+#include "kernel.h"
 #include "type.h"
 
 namespace building_test {
@@ -60,10 +62,34 @@ void test_find_or_create_output_term()
     test_equals(originalLength + 1, block.length());
 }
 
+void test_apply_spec()
+{
+    Block block;
+    Term* a = block.compile("a = 1");
+
+    Value spec;
+    set_list(&spec, 6);
+    set_term_ref(list_get(&spec, 0), FUNCS.mult);
+    caValue* inputs = list_get(&spec, 1);
+    set_list(inputs, 2);
+    set_term_ref(list_get(inputs, 0), a);
+    set_term_ref(list_get(inputs, 1), a);
+    set_symbol(list_get(&spec, 2), sym_Name);
+    set_string(list_get(&spec, 3), "b");
+    set_string(list_get(&spec, 4), "foo");
+    set_string(list_get(&spec, 5), "bar");
+
+    Term* term = apply_spec(&block, &spec);
+    test_equals(term_name(term), "b");
+    test_assert(term->function == FUNCS.mult);
+    test_equals(term_get_property(term, "foo"), "bar");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(building_test::test_insert_output_placeholder);
     REGISTER_TEST_CASE(building_test::test_find_or_create_output_term);
+    REGISTER_TEST_CASE(building_test::test_apply_spec);
 }
 
 }

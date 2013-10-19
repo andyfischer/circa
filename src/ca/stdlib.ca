@@ -82,6 +82,37 @@ def declared_state(Type t, Func initializer :optional) -> any
     -- No initializer. Use the type's default value.
     return make(t)
 
+-- Primitive math funcs.
+def add(any left, any right) -> any
+    if is_int(left) and is_int(right)
+        add_i(left, right)
+    elif is_int(left) or is_number(left)
+        add_f(left, right)
+    else
+        left.add(right)
+
+def sub(any left, any right) -> any
+    if is_int(left) and is_int(right)
+        sub_i(left, right)
+    elif is_int(left) or is_number(left)
+        sub_f(left, right)
+    else
+        left.sub(right)
+
+def mult(any left, any right) -> any
+    if is_int(left) and is_int(right)
+        mult_i(left, right)
+    elif is_int(left) or is_number(left)
+        mult_f(left, right)
+    else
+        left.mult(right)
+
+def div(any left, any right) -> any
+    if is_int(left) or is_number(left)
+        div_f(left, right)
+    else
+        left.div(right)
+
 def first_symbol(any val) -> Symbol
     if type(val) == Symbol
         val
