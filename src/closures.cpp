@@ -5,6 +5,7 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
+#include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
 #include "interpreter.h"
@@ -15,10 +16,18 @@
 
 namespace circa {
 
-void closure_redirect_outside_references(Block* block)
+Term* find_nonlocal_term_for_input(Block* block, Term* input)
 {
-    TermMap outerToInnerMap;
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.nonlocal && term->input(0) == input)
+            return term;
+    }
+    return NULL;
+}
 
+void insert_nonlocal_terms(Block* block)
+{
     int nextInsertPosition = count_input_placeholders(block);
 
     for (BlockIterator it(block); it.unfinished(); it.advance()) {
@@ -28,24 +37,25 @@ void closure_redirect_outside_references(Block* block)
             if (input == NULL)
                 continue;
 
-            if (!term_is_nested_in_block(input, block)) {
-                // This is an outer reference
+            if (term_is_nested_in_block(input, block))
+                continue;
 
-                // Check if we've already created an input for this one
-                Term* existingPlaceholder = outerToInnerMap[input];
+            // This is a nonlocal reference
 
-                if (existingPlaceholder != NULL) {
-                    remap_pointers_quick(innerTerm, input, existingPlaceholder);
+            // Check if we've already created an input for this one
+            Term* existing = find_nonlocal_term_for_input(block, input);
 
-                } else {
-                    // Create a new unbound_input term.
-                    Term* unbound = apply(block, FUNCS.unbound_input,
-                        TermList(input), &input->nameValue);
-                    change_declared_type(unbound, input->type);
-                    block->move(unbound, nextInsertPosition++);
-                    remap_pointers_quick(innerTerm, input, unbound);
-                    it.advance();
-                }
+            if (existing != NULL) {
+                remap_pointers_quick(innerTerm, input, existing);
+
+            } else {
+                // Create a new nonlocal term.
+                Term* unbound = apply(block, FUNCS.nonlocal,
+                    TermList(input), &input->nameValue);
+                change_declared_type(unbound, input->type);
+                block->move(unbound, nextInsertPosition++);
+                remap_pointers_quick(innerTerm, input, unbound);
+                it.advance();
             }
         }
     }
@@ -63,6 +73,8 @@ void closure_block_evaluate(caStack* stack)
     caValue* closureOutput = circa_create_default_output(stack, 0);
     Block* block = nested_contents(term);
     set_block(list_get(closureOutput, 0), block);
+
+#if 0
     caValue* bindings = list_get(closureOutput, 1);
     set_list(bindings, 0);
 
@@ -77,6 +89,34 @@ void closure_block_evaluate(caStack* stack)
             set_null(list_append(bindings));
         else
             copy(input, list_append(bindings));
+    }
+#endif
+}
+
+void add_bindings_to_closure_output(Stack* stack, caValue* closure)
+{
+    Block* closureBlock = as_block(list_get(closure, 0));
+    Frame* top = stack_top(stack);
+    Block* finishingBlock = top->block;
+
+    for (int i=0; i < closureBlock->length(); i++) {
+        Term* term = closureBlock->get(i);
+        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            Term* input = term->input(inputIndex);
+            if (input == NULL)
+                continue;
+
+            if (input->owningBlock == finishingBlock) {
+                // Capture this binding.
+
+                Value key;
+                set_term_ref(&key, input);
+                caValue* value = frame_register(top, input);
+                touch(closure);
+
+                copy(value, hashtable_insert(list_get(closure, 1), &key));
+            }
+        }
     }
 }
 
@@ -113,8 +153,10 @@ void closures_install_functions(Block* kernel)
 
     FUNCS.function_decl = install_function(kernel, "function_decl", closure_block_evaluate);
 
+#if 0
     FUNCS.unbound_input = install_function(kernel, "unbound_input", NULL);
     block_set_evaluation_empty(function_contents(FUNCS.unbound_input), true);
+#endif
 
     FUNCS.func_apply = kernel->get("Func.apply");
 }

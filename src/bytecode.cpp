@@ -178,6 +178,10 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "push_input_from_apply_list ");
         string_append(string, blob_read_int(bcData, pos));
         break;
+    case bc_PushNonlocalInput:
+        set_string(string, "push_nonlocal_input ");
+        string_append(string, blob_read_int(bcData, pos));
+        break;
     case bc_PushInputsDynamic:
         set_string(string, "push_inputs_dynamic");
         break;
@@ -318,6 +322,12 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
             blob_append_int(bytecode, term->index);
             return;
         }
+    }
+
+    if (term->function == FUNCS.nonlocal) {
+        blob_append_char(bytecode, bc_PushNonlocalInput);
+        blob_append_int(bytecode, term->index);
+        return;
     }
 
     if (term->function == FUNCS.case_condition_bool) {
@@ -493,8 +503,6 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
 
                 callerInputIndex++;
             }
-        } else if (placeholder->function == FUNCS.unbound_input) {
-            // Ignore; closures are not handled here.
         } else if (placeholder->function == FUNCS.looped_input) {
             Term* startingValue = placeholder->input(0);
             blob_append_char(bytecode, bc_PushInputFromStack2);

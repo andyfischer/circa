@@ -1,11 +1,14 @@
 
 type Func {
     Block block
-    List bindings
+    Map bindings
 }
 
 def closure_block() -> Func
     -- Internally used function for declaring a closure.
+
+def nonlocal(any _) -> any
+    -- Internally used function for non-local references.
 
 def Func.call(self, any inputs :multiple) -> any
     -- Call the func using the given inputs.
@@ -31,9 +34,6 @@ def from_string(String s) -> any
 
 def to_string_repr(any val) -> String
     -- Encode a Circa value as a string representation
-
-def unbound_input(any _) -> any
-    -- Internally used function, used inside closure blocks to mark an unbound input.
 
 def type(any val) -> Type
     -- Returns the runtime type of a value
@@ -242,7 +242,7 @@ def Block.walk_terms(self) -> List
     -- Return a list of this block's terms, and all nested terms.
 
 def Block.to_func(self) -> Func
-    Func.make(self, [])
+    Func.make(self)
 def Block.to_stack(self) -> Stack
     make_stack(self.to_func)
 

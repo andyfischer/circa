@@ -3,6 +3,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "control_flow.h"
+#include "closures.h"
 #include "function.h"
 #include "generic.h"
 #include "kernel.h"
@@ -73,6 +74,7 @@ void finish_building_function(Block* contents)
     }
 
     update_for_control_flow(contents);
+    insert_nonlocal_terms(contents);
 
     // Possibly apply a native patch
     module_possibly_patch_new_function(global_world(), contents);

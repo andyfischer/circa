@@ -1185,8 +1185,8 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         FUNCS.closure_block = func;
     if (FUNCS.func_call == NULL && string_eq(functionName, "Func.call"))
         FUNCS.func_call = func;
-    if (FUNCS.unbound_input == NULL && string_eq(functionName, "unbound_input"))
-        FUNCS.unbound_input = func;
+    if (FUNCS.nonlocal == NULL && string_eq(functionName, "nonlocal"))
+        FUNCS.nonlocal = func;
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

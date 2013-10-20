@@ -69,6 +69,7 @@ struct BuiltinFuncs {
     Term* namespace_func;
     Term* native_patch;
     Term* neg;
+    Term* nonlocal;
     Term* not_equals;
     Term* not_func;
     Term* or_func;

@@ -4,10 +4,12 @@
 
 namespace circa {
 
-void closure_redirect_outside_references(Block* block);
+void insert_nonlocal_terms(Block* block);
 void closures_install_functions(Block* kernel);
 
 void closure_block_evaluate(caStack* stack);
+
+void add_bindings_to_closure_output(Stack* stack, caValue* closure);
 
 bool is_closure(caValue* value);
 void set_closure(caValue* value, Block* block, caValue* bindings);

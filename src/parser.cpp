@@ -1257,9 +1257,9 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         }
 
         append_output_placeholder(nested_contents(initializer), initialValue);
-        // We don't need to redirect_outside_references on this closure, because
+        // We don't need to insert_nonlocal_terms on this closure, because
         // this closure can never escape.
-        // closure_redirect_outside_references(nested_contents(initializer));
+        // insert_nonlocal_terms(nested_contents(initializer));
         block_finish_changes(nested_contents(initializer));
 
         // If an initial value was used and no specific type was mentioned, use
@@ -2415,7 +2415,7 @@ ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     set_source_location(term, startPosition, tokens);
     consume_block_with_braces(resultBlock, tokens, context, term);
-    closure_redirect_outside_references(resultBlock);
+    insert_nonlocal_terms(resultBlock);
     block_finish_changes(resultBlock);
     
     // Primary output

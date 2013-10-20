@@ -29,14 +29,22 @@ namespace circa {
 
 void block_ref(caStack* stack)
 {
-    Term* input0 = (Term*) circa_caller_input_term(stack, 0);
-    Block* block = input0->nestedContents;
+    Term* term = (Term*) circa_caller_input_term(stack, 0);
+
+    if (term->function == FUNCS.nonlocal)
+        term = term->input(0);
+
+    Block* block = term->nestedContents;
     set_block(circa_output(stack, 0), block);
 }
 
 void term_ref(caStack* stack)
 {
     caTerm* term = circa_caller_input_term(stack, 0);
+
+    if (term->function == FUNCS.nonlocal)
+        term = term->input(0);
+
     set_term_ref(circa_output(stack, 0), (Term*) term);
 }
 

@@ -153,7 +153,8 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
     caValue* closedValues = list_get(closure, 1);
     stack_init(stack, block);
 
-    // Copy closed values.
+    // CLOSURE_FIXME
+    #if 0
     int nextIncomingClosure = 0;
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
@@ -167,6 +168,7 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
             frame_register(stack_top(stack), term));
         nextIncomingClosure++;
     }
+    #endif
 }
 
 Frame* stack_push(Stack* stack, Block* block, int parentPc)
@@ -256,6 +258,7 @@ void stack_pop_no_retain(Stack* stack)
 
     set_null(&frame->registers);
     set_null(&frame->customBytecode);
+    set_null(&frame->bindings);
     set_null(&frame->dynamicScope);
     set_null(&frame->state);
     set_null(&frame->outgoingState);
@@ -417,10 +420,15 @@ caValue* stack_get_state(Stack* stack)
 
 caValue* stack_find_active_value(Frame* frame, Term* term)
 {
+    // TODO: This func should only be used for nonlocal inputs.
+    
     ca_assert(term != NULL);
 
     if (is_value(term))
         return term_value(term);
+
+    Value termRef;
+    set_term_ref(&termRef, term);
 
     caStack* stack = frame->stack;
 
@@ -444,6 +452,48 @@ caValue* stack_find_active_value(Frame* frame, Term* term)
 
     return NULL;
 }
+
+caValue* stack_find_nonlocal(Frame* frame, Term* term)
+{
+    // Replacement for stack_find_active_value. This func will not check the
+    // block for the first frame (it will check bindings for the first frame).
+    
+    ca_assert(term != NULL);
+
+    if (is_value(term))
+        return term_value(term);
+
+    Value termRef;
+    set_term_ref(&termRef, term);
+
+    caStack* stack = frame->stack;
+
+    while (true) {
+        if (!is_null(&frame->bindings)) {
+            caValue* value = hashtable_get(&frame->bindings, &termRef);
+            if (value != NULL)
+                return value;
+        }
+
+        frame = frame_parent(frame);
+        if (frame == NULL)
+            break;
+
+        if (frame->block == term->owningBlock)
+            return frame_register(frame, term);
+    }
+
+    // Special case for function values that aren't on the stack: allow these
+    // to be accessed as a term value.
+    if (term->function == FUNCS.function_decl) {
+        if (is_null(term_value(term)))
+            set_closure(term_value(term), term->nestedContents, NULL);
+        return term_value(term);
+    }
+
+    return NULL;
+}
+
 
 void stack_ignore_error(Stack* cxt)
 {
@@ -653,6 +703,7 @@ static void stack_resize_frame_list(Stack* stack, int newCapacity)
         frame->stack = stack;
         initialize_null(&frame->registers);
         initialize_null(&frame->customBytecode);
+        initialize_null(&frame->bindings);
         initialize_null(&frame->dynamicScope);
         initialize_null(&frame->state);
         initialize_null(&frame->outgoingState);
@@ -1108,6 +1159,20 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             
             continue;
         }
+        case bc_PushNonlocalInput: {
+            int termIndex = blob_read_int(s.bc, &s.pc);
+            Frame* top = stack_top(stack);
+            Frame* parent = stack_top(stack);
+            Term* caller = top->block->get(termIndex);
+            ca_assert(caller->function == FUNCS.nonlocal);
+            Term* input = caller->input(0);
+            caValue* value = stack_find_nonlocal(top, input);
+            if (value == NULL) {
+                return raise_error_stack_value_not_found(stack, termIndex);
+            }
+            copy(value, frame_register(top, caller));
+            continue;
+        }
         case bc_PushExplicitState: {
             internal_error("push explicit state is disabled");
 #if 0
@@ -1210,8 +1275,12 @@ do_loop_done_insn:
                 if (input == NULL)
                     break;
                 Term* output = get_output_placeholder(contents, i);
-                copy(frame_register(s.frame, output),
-                    frame_register(s.frame, input));
+                caValue* result = frame_register(s.frame, output);
+
+                if (is_func(result))
+                    add_bindings_to_closure_output(stack, result);
+
+                copy(result, frame_register(s.frame, input));
 
                 INCREMENT_STAT(Copy_LoopCopyRebound);
             }
@@ -1251,6 +1320,9 @@ do_loop_done_insn:
 
             if (!castSuccess)
                 return raise_error_output_type_mismatch(stack);
+
+            if (is_func(receiverSlot))
+                add_bindings_to_closure_output(stack, receiverSlot);
 
             continue;
         }
@@ -1300,6 +1372,9 @@ do_loop_done_insn:
 
                     if (!castSuccess)
                         return raise_error_output_type_mismatch(stack);
+
+                    if (is_func(receiverSlot))
+                        add_bindings_to_closure_output(stack, receiverSlot);
                 }
 
                 placeholderIndex++;
@@ -1414,6 +1489,11 @@ do_func_call:
             Frame* top = stack_push3(stack, s.termIndex, block);
             s.frame = stack_top_parent(stack);
             expand_frame(s.frame, top);
+
+            caValue* bindings = list_get(closure, 1);
+            if (!hashtable_is_empty(bindings))
+                copy(bindings, &top->bindings);
+
             top->callType = sym_FuncCall;
             continue;
         }
@@ -1438,6 +1518,11 @@ do_func_apply:
             Frame* top = stack_push3(stack, s.termIndex, block);
             s.frame = stack_top_parent(stack);
             expand_frame(s.frame, top);
+
+            caValue* bindings = list_get(closure, 1);
+            if (!hashtable_is_empty(bindings))
+                copy(bindings, &top->bindings);
+
             top->callType = sym_FuncApply;
             continue;
         }
@@ -1821,24 +1906,6 @@ static void push_inputs_dynamic(Stack* stack)
                 return raise_error_not_enough_inputs(stack);
 
             copy(list_get(inputs, placeholderIndex), placeholderSlot);
-        }
-
-        // Handle unbound_input() placeholders.
-        int nextBindingIndex = 0;
-        for (;; placeholderIndex++) {
-            Term* placeholder = top->block->getSafe(placeholderIndex);
-
-            if (placeholder == NULL || placeholder->function != FUNCS.unbound_input) {
-                break;
-            }
-
-            caValue* placeholderSlot = frame_register(top, placeholderIndex);
-
-            // Silently stop if there aren't enough bindings here.
-            if (nextBindingIndex >= list_length(bindings))
-                break;
-
-            copy(list_get(bindings, nextBindingIndex++), placeholderSlot);
         }
 
         return;

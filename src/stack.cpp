@@ -80,6 +80,7 @@ void frame_copy(Frame* left, Frame* right)
     touch(&right->registers);
     copy(&left->state, &right->state);
     copy(&left->customBytecode, &right->customBytecode);
+    copy(&left->bindings, &right->bindings);
     copy(&left->dynamicScope, &right->dynamicScope);
     right->block = left->block;
     right->pcIndex = left->pcIndex;

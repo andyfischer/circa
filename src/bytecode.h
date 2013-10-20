@@ -34,9 +34,10 @@ const char bc_PushInputFromStack = 0x22;
 const char bc_PushInputFromStack2 = 0x23;
 const char bc_PushVarargList = 0x20;
 const char bc_PushInputNull = 0x24;
-const char bc_PushInputsDynamic = 0x27;
-const char bc_PushExplicitState = 0x28;
-const char bc_NotEnoughInputs = 0x25;
+const char bc_PushNonlocalInput = 0x25;
+const char bc_PushInputsDynamic = 0x26;
+const char bc_PushExplicitState = 0x27;
+const char bc_NotEnoughInputs = 0x28;
 const char bc_TooManyInputs = 0x29;
 
 // Popping outputs from a finished frame.

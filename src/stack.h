@@ -26,6 +26,9 @@ struct Frame
 
     Value customBytecode;
 
+    // Map of Term to value, for scope-specific bindings. Used in closure call.
+    Value bindings;
+
     Value dynamicScope;
 
     // Current program counter (term index)

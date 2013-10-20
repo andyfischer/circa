@@ -8,13 +8,13 @@ Miscellanous (most-recent first)
     (Before fixing this, remember that the cache *should* be dropped, if the related code
      is modified)
 
-  The 'def' keyword creates a closure, but it doesn't save bindings.
-
   load_module should return Func for consistency
 
   Error trace for dynamic_method: should have the actual method name, when possible.
     
   Having a missing ) or ] or } symbol will *really* mess things up. Ditto for an extra ),},]
+    Actually quite a lot of syntax errors will mess things up. Syntax error can cause
+    a premature end to a block.
 
   A superfluous @ symbol caused problems:
 

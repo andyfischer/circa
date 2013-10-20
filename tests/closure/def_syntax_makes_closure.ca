@@ -1,0 +1,9 @@
+
+def top(int t)
+    def func(int i)
+      t + i
+
+    func
+
+assert(top(2).call(3) == 5)
+
