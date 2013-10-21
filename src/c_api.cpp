@@ -14,6 +14,7 @@
 #include "modules.h"
 #include "names.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "term.h"
 #include "tagged_value.h"
 #include "world.h"
@@ -275,6 +276,185 @@ void circa_dump_s(caStack* stack)
 void circa_dump_b(caBlock* block)
 {
     dump((Block*) block);
+}
+
+caStack* circa_create_stack(caWorld* world)
+{
+    return create_stack(world);
+}
+
+void circa_free_stack(caStack* stack)
+{
+    free_stack(stack);
+}
+
+bool circa_has_error(caStack* stack)
+{
+    return stack_errored(stack);
+}
+
+void circa_clear_error(caStack* stack)
+{
+    stack_ignore_error(stack);
+}
+
+void circa_clear_stack(caStack* stack)
+{
+    stack_reset(stack);
+}
+
+void circa_restart(caStack* stack)
+{
+    stack_restart(stack);
+}
+
+bool circa_push_function_by_name(caStack* stack, const char* name)
+{
+    caBlock* func = circa_find_function(NULL, name);
+
+    if (func == NULL) {
+        // TODO: Save this error on the stack instead of stdout
+        std::cout << "Function not found: " << name << std::endl;
+        return false;
+    }
+
+    circa_push_function(stack, func);
+    return true;
+}
+
+void circa_push_function(caStack* stack, caBlock* func)
+{
+    block_finish_changes(func);
+    stack_push(stack, func);
+}
+
+void circa_push_module(caStack* stack, const char* name)
+{
+    Value nameStr;
+    set_string(&nameStr, name);
+    Block* block = find_module(stack->world->root, &nameStr);
+    if (block == NULL) {
+        // TODO: Save this error on the stack instead of stdout
+        std::cout << "in circa_push_module, module not found: " << name << std::endl;
+        return;
+    }
+    stack_push(stack, block);
+}
+
+caValue* circa_frame_input(caStack* stack, int index)
+{
+    Frame* top = stack_top(stack);
+    
+    if (top == NULL)
+        return NULL;
+
+    Term* term = top->block->get(index);
+
+    if (term->function != FUNCS.input)
+        return NULL;
+    
+    return get_top_register(stack, term);
+}
+
+caValue* circa_frame_output(caStack* stack, int index)
+{
+    Frame* top = stack_top(stack);
+
+    int realIndex = top->block->length() - index - 1;
+
+    Term* term = top->block->get(realIndex);
+    if (term->function != FUNCS.output)
+        return NULL;
+
+    return get_top_register(stack, term);
+}
+
+void circa_run(caStack* stack)
+{
+    run_interpreter(stack);
+}
+
+void circa_pop(caStack* stack)
+{
+    stack_pop(stack);
+}
+
+caBlock* circa_stack_top_block(caStack* stack)
+{
+    return (caBlock*) stack_top(stack)->block;
+}
+
+caValue* circa_input(caStack* stack, int index)
+{
+    return get_input(stack, index);
+}
+
+int circa_num_inputs(caStack* stack)
+{
+    return num_inputs(stack);
+}
+
+int circa_int_input(caStack* stack, int index)
+{
+    return circa_int(circa_input(stack, index));
+}
+
+float circa_float_input(caStack* stack, int index)
+{
+    return circa_to_float(circa_input(stack, index));
+}
+
+float circa_bool_input(caStack* stack, int index)
+{
+    return circa_bool(circa_input(stack, index));
+}
+
+const char* circa_string_input(caStack* stack, int index)
+{
+    return circa_string(circa_input(stack, index));
+}
+
+caValue* circa_output(caStack* stack, int index)
+{
+    return get_output(stack, index);
+}
+
+void circa_output_error(caStack* stack, const char* msg)
+{
+    set_error_string(circa_output(stack, 0), msg);
+    raise_error(stack);
+}
+
+caTerm* circa_caller_input_term(caStack* stack, int index)
+{
+    return circa_term_get_input(circa_caller_term(stack), index);
+}
+
+caBlock* circa_caller_block(caStack* stack)
+{
+    Frame* frame = stack_top_parent(stack);
+    if (frame == NULL)
+        return NULL;
+    return frame->block;
+}
+
+caTerm* circa_caller_term(caStack* stack)
+{
+    return frame_caller(stack_top(stack));
+}
+
+void circa_dump_stack_trace(caStack* stack)
+{
+    Value str;
+    stack_trace_to_string(stack, &str);
+    write_log(as_cstring(&str));
+}
+
+caValue* circa_set_context(caStack* stack, const char* name)
+{
+    Value nameVal;
+    set_symbol_from_string(&nameVal, name);
+    return context_inject(stack, &nameVal);
 }
 
 } // extern "C"
