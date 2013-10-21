@@ -1,0 +1,15 @@
+
+left = Map.make
+assert(equals(left, Map.make))
+assert(not_equals(left, Map.make.set(1,2)))
+assert(equals(left.set(1,2), Map.make.set(1,2)))
+
+left = Map.make.set('a' 1).set('b' 2).set('c' 3)
+right = Map.make.set('c' 3)
+
+assert(not_equals(left right))
+@right.set('b' 2)
+@right.set('a' 1)
+assert(equals(left right))
+@right.set('d' 4)
+assert(not_equals(left right))

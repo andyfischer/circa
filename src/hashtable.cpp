@@ -300,12 +300,15 @@ bool is_empty(Hashtable* data)
     if (data == NULL)
         return true;
 
-    // TODO: Just look at data->count, when count is fixed to be accurate.
-    for (int i=0; i < data->capacity; i++) {
-        if (!is_null(&data->slots[i].key))
-            return false;
+#ifdef DEBUG
+    if (data->count == 0) {
+        for (int i=0; i < data->capacity; i++) {
+            ca_assert(is_null(&data->slots[i].key));
+        }
     }
-    return true;
+#endif
+
+    return data->count == 0;
 }
 
 int count(Hashtable* data)
@@ -499,9 +502,36 @@ void hashtable_get_keys(caValue* table, caValue* keysOut)
     if (data == NULL)
         return;
 
-    for (int i=0; i < data->capacity; i++)
-        if (!is_null(&data->slots[i].key))
-            copy(&data->slots[i].key, list_append(keysOut));
+    for (int i=0; i < data->capacity; i++) {
+        if (is_null(&data->slots[i].key))
+            continue;
+        copy(&data->slots[i].key, list_append(keysOut));
+    }
+}
+
+bool hashtable_equals(caValue* left, caValue* right)
+{
+    if (hashtable_is_empty(left))
+        return hashtable_is_empty(right);
+
+    Hashtable* leftData = (Hashtable*) left->value_data.ptr;
+    Hashtable* rightData = (Hashtable*) right->value_data.ptr;
+
+    if (leftData->count != rightData->count)
+        return false;
+
+    for (int i=0; i < leftData->capacity; i++) {
+        if (is_null(&leftData->slots[i].key))
+            continue;
+
+        caValue* leftKey = &leftData->slots[i].key;
+        caValue* leftVal = &leftData->slots[i].value;
+        caValue* rightVal = hashtable_get(right, leftKey);
+
+        if (rightVal == NULL || !equals(leftVal, rightVal))
+            return false;
+    }
+    return true;
 }
 
 void hashtable_setup_type(Type* type)
@@ -511,6 +541,7 @@ void hashtable_setup_type(Type* type)
     type->release = tagged_value_wrappers::release;
     type->copy = hashtable_copy;
     type->touch = hashtable_touch;
+    type->equals = hashtable_equals;
     type->toString = tagged_value_wrappers::to_string;
     type->storageType = sym_StorageTypeHashtable;
 }

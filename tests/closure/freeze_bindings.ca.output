@@ -1,0 +1,8 @@
+called case1 with: run1
+called case1 closure with: run1
+called case1 with: run2
+called case1 closure with: run2
+called case2 with: run1
+called case2 closure with: run1
+called case2 with: run2
+called case2 closure with: run1

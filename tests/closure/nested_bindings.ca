@@ -1,0 +1,10 @@
+
+def f(a)
+  def g(b)
+    def h(c)
+      print('called h with: ' a ', ' b ', ' c)
+    h
+  g
+
+
+f(1).call(2).call(3)

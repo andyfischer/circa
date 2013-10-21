@@ -1,10 +1,11 @@
 
 def add_logged(a, b)
-  print('  calling add on: ' a ', ' b)
+  print('  (reevaluate) Calling add on: ' a ', ' b)
   add(a b)
 
 def cached(Func refresh) -> any
-  print('calling cached with: ' refresh)
+  @refresh.freeze
+
   state Func _refresh
   state _out
   if _refresh != refresh
@@ -19,16 +20,27 @@ def main(v, cacheKey)
 
 int = main.to_stack
 
+print('Should reevaluate:')
 int.call(1, 0)
+print('Should use cache:')
 int.call(1, 0)
+print('Should reevaluate:')
 int.call(1, 1)
+print('Should use cache:')
 int.call(1, 1)
+print('Should reevaluate:')
 int.call(2, 1)
+print('Should reevaluate:')
 int.call(2, 0)
+print('Should use cache:')
 int.call(2, 0)
+print('Should reevaluate:')
 int.call(2, 'x')
+print('Should reevaluate:')
 int.call(2, 'y')
+print('Should reevaluate:')
 int.call(3, 0)
+print('Should reevaluate:')
 int.call(4, 0)
  
   
