@@ -9,7 +9,8 @@ void closures_install_functions(Block* kernel);
 
 void closure_block_evaluate(caStack* stack);
 
-void add_bindings_to_closure_output(Stack* stack, caValue* closure);
+void closure_save_bindings_for_frame(caValue* closure, Frame* frame);
+void closure_save_all_bindings(caValue* closure, Stack* stack);
 
 bool is_closure(caValue* value);
 void set_closure(caValue* value, Block* block, caValue* bindings);

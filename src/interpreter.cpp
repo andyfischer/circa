@@ -1223,26 +1223,25 @@ do_done_insn:
             continue;
         }
         case bc_IterationDone: {
-            ca_assert(s.frame == stack_top(stack));
-            
             s.loopEnableOutput = blob_read_char(s.bc, &s.pc);
 
 do_loop_done_insn:
+            Frame* top = stack_top(stack);
 
-            Block* contents = s.frame->block;
+            Block* contents = top->block;
 
             // Possibly save state.
-            if (!is_null(&s.frame->outgoingState) && s.frame->exitType != sym_Discard)
+            if (!is_null(&top->outgoingState) && top->exitType != sym_Discard)
                 retain_stack_top(stack);
 
-            caValue* index = frame_register(s.frame, for_loop_find_index(contents));
+            caValue* index = frame_register(top, for_loop_find_index(contents));
             set_int(index, as_int(index) + 1);
 
             // Preserve list output.
-            if (s.loopEnableOutput && s.frame->exitType != sym_Discard) {
+            if (s.loopEnableOutput && top->exitType != sym_Discard) {
 
-                caValue* resultValue = frame_register_from_end(s.frame, 0);
-                caValue* outputList = stack_find_active_value(s.frame, contents->owningTerm);
+                caValue* resultValue = frame_register_from_end(top, 0);
+                caValue* outputList = stack_find_active_value(top, contents->owningTerm);
 
                 copy(resultValue, list_append(outputList));
 
@@ -1250,21 +1249,21 @@ do_loop_done_insn:
             }
 
             // Check if we are finished
-            caValue* listInput = frame_register(s.frame, 0);
+            caValue* listInput = frame_register(top, 0);
             if (as_int(index) >= list_length(listInput)
-                    || s.frame->exitType == sym_Break
-                    || s.frame->exitType == sym_Return) {
+                    || top->exitType == sym_Break
+                    || top->exitType == sym_Return) {
 
                 // Silly code- move the output list (in the parent frame) to our frame's output,
                 // where it will get copied back to parent when the frame is finished.
                 if (s.loopEnableOutput) {
-                    caValue* outputList = stack_find_active_value(s.frame, contents->owningTerm);
-                    move(outputList, frame_register_from_end(s.frame, 0));
+                    caValue* outputList = stack_find_active_value(top, contents->owningTerm);
+                    move(outputList, frame_register_from_end(top, 0));
                 } else {
-                    set_list(frame_register_from_end(s.frame, 0), 0);
+                    set_list(frame_register_from_end(top, 0), 0);
                 }
 
-                set_null(&s.frame->outgoingState);
+                set_null(&top->outgoingState);
                 
                 goto do_done_insn;
             }
@@ -1275,23 +1274,23 @@ do_loop_done_insn:
                 if (input == NULL)
                     break;
                 Term* output = get_output_placeholder(contents, i);
-                caValue* result = frame_register(s.frame, output);
+                caValue* result = frame_register(top, output);
 
                 if (is_func(result))
-                    add_bindings_to_closure_output(stack, result);
+                    closure_save_bindings_for_frame(result, top);
 
-                copy(result, frame_register(s.frame, input));
+                copy(result, frame_register(top, input));
 
                 INCREMENT_STAT(Copy_LoopCopyRebound);
             }
 
             // Return to start of the loop.
-            s.frame->pcIndex = 0;
+            top->pcIndex = 0;
             s.pc = 0;
-            s.frame->exitType = sym_None;
-            set_null(&s.frame->state);
-            set_null(&s.frame->outgoingState);
-            expand_frame_indexed(stack_top_parent(stack), s.frame, as_int(index));
+            top->exitType = sym_None;
+            set_null(&top->state);
+            set_null(&top->outgoingState);
+            expand_frame_indexed(stack_top_parent(stack), top, as_int(index));
             continue;
         }
         
@@ -1322,7 +1321,7 @@ do_loop_done_insn:
                 return raise_error_output_type_mismatch(stack);
 
             if (is_func(receiverSlot))
-                add_bindings_to_closure_output(stack, receiverSlot);
+                closure_save_bindings_for_frame(receiverSlot, top);
 
             continue;
         }
@@ -1374,7 +1373,7 @@ do_loop_done_insn:
                         return raise_error_output_type_mismatch(stack);
 
                     if (is_func(receiverSlot))
-                        add_bindings_to_closure_output(stack, receiverSlot);
+                        closure_save_bindings_for_frame(receiverSlot, top);
                 }
 
                 placeholderIndex++;

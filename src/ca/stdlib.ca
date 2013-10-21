@@ -16,6 +16,10 @@ def Func.call(self, any inputs :multiple) -> any
 def Func.apply(self, List inputs) -> any
     -- Like .call, but the inputs are given as one list instead of separate args.
 
+def Func.freeze(self) -> Func
+    -- Return a func with all nonlocal bindings captured. Usually a binding is not
+    -- captured until the func escapes a scope.
+
 -- Builtin functions
 def convert(any value, Type t) -> any
     -- Convert the value to the given type, if possible.

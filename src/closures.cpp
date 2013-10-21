@@ -37,6 +37,9 @@ void insert_nonlocal_terms(Block* block)
             if (input == NULL)
                 continue;
 
+            if (is_value(input))
+                continue;
+
             if (term_is_nested_in_block(input, block))
                 continue;
 
@@ -93,9 +96,14 @@ void closure_block_evaluate(caStack* stack)
 #endif
 }
 
+#if 0
 void add_bindings_to_closure_output(Stack* stack, caValue* closure)
 {
     Block* closureBlock = as_block(list_get(closure, 0));
+
+    if (closureBlock == NULL)
+        return;
+
     Frame* top = stack_top(stack);
     Block* finishingBlock = top->block;
 
@@ -119,6 +127,7 @@ void add_bindings_to_closure_output(Stack* stack, caValue* closure)
         }
     }
 }
+#endif
 
 bool is_closure(caValue* value)
 {
@@ -146,6 +155,87 @@ void set_closure(caValue* value, Block* block, caValue* bindings)
         set_value(closure_get_bindings(value), bindings);
 }
 
+Block* func_block(caValue* value)
+{
+    return as_block(list_get(value, 0));
+}
+
+caValue* func_bindings(caValue* value)
+{
+    return list_get(value, 1);
+}
+
+void closure_save_bindings_for_frame(caValue* closure, Frame* frame)
+{
+    Block* closureBlock = func_block(closure);
+
+    if (closureBlock == NULL)
+        return;
+
+    Block* finishingBlock = frame->block;
+
+    for (int i=0; i < closureBlock->length(); i++) {
+        Term* term = closureBlock->get(i);
+        if (term->function != FUNCS.nonlocal)
+            continue;
+
+        Term* input = term->input(0);
+
+        if (input->owningBlock != finishingBlock)
+            continue;
+
+        // Capture this binding.
+
+        Value key;
+        set_term_ref(&key, input);
+        caValue* value = frame_register(frame, input);
+
+        // Don't overwrite an existing binding.
+        if (hashtable_get(func_bindings(closure), &key) != NULL)
+            continue;
+
+        touch(closure);
+        copy(value, hashtable_insert(func_bindings(closure), &key));
+    }
+}
+
+void closure_save_all_bindings(caValue* closure, Stack* stack)
+{
+    Block* closureBlock = func_block(closure);
+
+    if (closureBlock == NULL)
+        return;
+
+    for (int i=0; i < closureBlock->length(); i++) {
+        Term* term = closureBlock->get(i);
+        if (term->function != FUNCS.nonlocal)
+            continue;
+
+        Term* input = term->input(0);
+
+        Value key;
+        set_term_ref(&key, input);
+        caValue* value = stack_find_active_value(stack_top(stack), input);
+
+        // Don't overwrite an existing binding.
+        if (hashtable_get(func_bindings(closure), &key) != NULL)
+            continue;
+
+        touch(closure);
+        copy(value, hashtable_insert(func_bindings(closure), &key));
+    }
+}
+
+void Func__freeze(caStack* stack)
+{
+    caValue* self = circa_input(stack, 0);
+    caValue* out = circa_output(stack, 0);
+
+    copy(self, out);
+
+    closure_save_all_bindings(out, stack);
+}
+
 void closures_install_functions(Block* kernel)
 {
     FUNCS.closure_block = install_function(kernel, "closure_block", closure_block_evaluate);
@@ -153,12 +243,9 @@ void closures_install_functions(Block* kernel)
 
     FUNCS.function_decl = install_function(kernel, "function_decl", closure_block_evaluate);
 
-#if 0
-    FUNCS.unbound_input = install_function(kernel, "unbound_input", NULL);
-    block_set_evaluation_empty(function_contents(FUNCS.unbound_input), true);
-#endif
-
     FUNCS.func_apply = kernel->get("Func.apply");
+
+    install_function(kernel, "Func.freeze", Func__freeze);
 }
 
 } // namespace circa
