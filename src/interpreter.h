@@ -166,7 +166,7 @@ void raise_error_not_enough_inputs(Stack* stack);
 void raise_error_input_type_mismatch(Stack* stack);
 
 // Kernel setup.
-void interpreter_install_functions(Block* block);
+void interpreter_install_functions(NativePatch* patch);
 
 bool is_stack(caValue* value);
 Stack* as_stack(caValue* value);

@@ -76,58 +76,7 @@ void closure_block_evaluate(caStack* stack)
     caValue* closureOutput = circa_create_default_output(stack, 0);
     Block* block = nested_contents(term);
     set_block(list_get(closureOutput, 0), block);
-
-#if 0
-    caValue* bindings = list_get(closureOutput, 1);
-    set_list(bindings, 0);
-
-    // Capture unbound inputs.
-    for (int i=count_input_placeholders(block); i < block->length(); i++) {
-        Term* unbound = block->get(i);
-        if (unbound->function != FUNCS.unbound_input)
-            break;
-
-        caValue* input = stack_find_active_value(stack_top_parent(stack), unbound->input(0));
-        if (input == NULL)
-            set_null(list_append(bindings));
-        else
-            copy(input, list_append(bindings));
-    }
-#endif
 }
-
-#if 0
-void add_bindings_to_closure_output(Stack* stack, caValue* closure)
-{
-    Block* closureBlock = as_block(list_get(closure, 0));
-
-    if (closureBlock == NULL)
-        return;
-
-    Frame* top = stack_top(stack);
-    Block* finishingBlock = top->block;
-
-    for (int i=0; i < closureBlock->length(); i++) {
-        Term* term = closureBlock->get(i);
-        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
-            Term* input = term->input(inputIndex);
-            if (input == NULL)
-                continue;
-
-            if (input->owningBlock == finishingBlock) {
-                // Capture this binding.
-
-                Value key;
-                set_term_ref(&key, input);
-                caValue* value = frame_register(top, input);
-                touch(closure);
-
-                copy(value, hashtable_insert(list_get(closure, 1), &key));
-            }
-        }
-    }
-}
-#endif
 
 bool is_closure(caValue* value)
 {
@@ -238,10 +187,10 @@ void Func__freeze(caStack* stack)
 
 void closures_install_functions(Block* kernel)
 {
-    FUNCS.closure_block = install_function(kernel, "closure_block", closure_block_evaluate);
+    install_function(kernel, "closure_block", closure_block_evaluate);
     block_set_format_source_func(function_contents(FUNCS.closure_block), closure_block_formatSource);
 
-    FUNCS.function_decl = install_function(kernel, "function_decl", closure_block_evaluate);
+    install_function(kernel, "function_decl", closure_block_evaluate);
 
     FUNCS.func_apply = kernel->get("Func.apply");
 

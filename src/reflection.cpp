@@ -15,6 +15,7 @@
 #include "generic.h"
 #include "kernel.h"
 #include "modules.h"
+#include "native_patch.h"
 #include "reflection.h"
 #include "source_repro.h"
 #include "stateful_code.h"
@@ -641,69 +642,62 @@ void overload__get_contents(caStack* stack)
     list_overload_contents(self, out);
 }
 
-void reflection_install_functions(Block* builtins)
+void reflection_install_functions(NativePatch* patch)
 {
-    static const ImportRecord records[] = {
-        {"term_ref", term_ref},
-        {"block_ref", block_ref},
-        {"Block.dump", Block__dump},
-        {"Block.find_term", Block__find_term},
-        {"Block.functions", Block__functions},
-        {"Block.statements", Block__statements},
-        {"Block.to_code_lines", Block__to_code_lines},
-        {"Block.format_source", Block__format_source},
-        {"Block.format_function_heading", Block__format_function_heading},
-        {"Block.get_term", Block__get_term},
-        {"Block.get_static_errors", Block__get_static_errors},
-        {"Block.get_static_errors_formatted", Block__get_static_errors_formatted},
-        {"Block.has_static_error", Block__has_static_error},
-        {"Block.input", Block__input},
-        {"Block.inputs", Block__inputs},
-        {"Block.is_null", Block__is_null},
-        {"Block.link", Block__link},
-        {"Block.list_configs", Block__list_configs},
-        {"Block.output", Block__output},
-        {"Block.output_placeholder", Block__output_placeholder},
-        {"Block.owner", Block__owner},
-        {"Block.property", Block__property},
-        {"Block.properties", Block__properties},
-        {"Block.terms", Block__terms},
-        {"Block.walk_terms", Block__walk_terms},
-        {"Term.assign", Term__assign},
-        {"Term.asint", Term__asint},
-        {"Term.asfloat", Term__asfloat},
-        {"Term.index", Term__index},
-        {"Term.format_source", Term__format_source},
-        {"Term.format_source_normal", Term__format_source_normal},
-        {"Term.function", Term__function},
-        {"Term.get_type", Term__type},  // TODO: rename to just .type
-        {"Term.tweak", Term__tweak},
-        {"Term.input", Term__input},
-        {"Term.inputs", Term__inputs},
-        {"Term.name", Term__name},
-        {"Term.num_inputs", Term__num_inputs},
-        {"Term.parent", Term__parent},
-        {"Term.contents", Term__contents},
-        {"Term.is_null", Term__is_null},
-        {"Term.source_location", Term__source_location},
-        {"Term.location_string", Term__location_string},
-        {"Term.global_id", Term__global_id},
-        {"Term.to_string", Term__to_string},
-        {"Term.to_source_string", Term__to_source_string},
-        {"Term.properties", Term__properties},
-        {"Term.property", Term__property},
-        {"Term.is_statement", Term__is_statement},
-        {"Term.trace_dependents", Term__trace_dependents},
-        {"Term.value", Term__value},
-        {"Term.set_value", Term__set_value},
-
-        {"is_overloaded_func", is_overloaded_func},
-        {"overload_get_contents", overload__get_contents},
-    
-        {NULL, NULL}
-    };
-
-    install_function_list(builtins, records);
+    module_patch_function(patch, "term_ref", term_ref);
+    module_patch_function(patch, "block_ref", block_ref);
+    module_patch_function(patch, "Block.dump", Block__dump);
+    module_patch_function(patch, "Block.find_term", Block__find_term);
+    module_patch_function(patch, "Block.functions", Block__functions);
+    module_patch_function(patch, "Block.statements", Block__statements);
+    module_patch_function(patch, "Block.to_code_lines", Block__to_code_lines);
+    module_patch_function(patch, "Block.format_source", Block__format_source);
+    module_patch_function(patch, "Block.format_function_heading", Block__format_function_heading);
+    module_patch_function(patch, "Block.get_term", Block__get_term);
+    module_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
+    module_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
+    module_patch_function(patch, "Block.has_static_error", Block__has_static_error);
+    module_patch_function(patch, "Block.input", Block__input);
+    module_patch_function(patch, "Block.inputs", Block__inputs);
+    module_patch_function(patch, "Block.is_null", Block__is_null);
+    module_patch_function(patch, "Block.link", Block__link);
+    module_patch_function(patch, "Block.list_configs", Block__list_configs);
+    module_patch_function(patch, "Block.output", Block__output);
+    module_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
+    module_patch_function(patch, "Block.owner", Block__owner);
+    module_patch_function(patch, "Block.property", Block__property);
+    module_patch_function(patch, "Block.properties", Block__properties);
+    module_patch_function(patch, "Block.terms", Block__terms);
+    module_patch_function(patch, "Block.walk_terms", Block__walk_terms);
+    module_patch_function(patch, "Term.assign", Term__assign);
+    module_patch_function(patch, "Term.asint", Term__asint);
+    module_patch_function(patch, "Term.asfloat", Term__asfloat);
+    module_patch_function(patch, "Term.index", Term__index);
+    module_patch_function(patch, "Term.format_source", Term__format_source);
+    module_patch_function(patch, "Term.format_source_normal", Term__format_source_normal);
+    module_patch_function(patch, "Term.function", Term__function);
+    module_patch_function(patch, "Term.get_type", Term__type);  // TODO: rename to just .type
+    module_patch_function(patch, "Term.tweak", Term__tweak);
+    module_patch_function(patch, "Term.input", Term__input);
+    module_patch_function(patch, "Term.inputs", Term__inputs);
+    module_patch_function(patch, "Term.name", Term__name);
+    module_patch_function(patch, "Term.num_inputs", Term__num_inputs);
+    module_patch_function(patch, "Term.parent", Term__parent);
+    module_patch_function(patch, "Term.contents", Term__contents);
+    module_patch_function(patch, "Term.is_null", Term__is_null);
+    module_patch_function(patch, "Term.source_location", Term__source_location);
+    module_patch_function(patch, "Term.location_string", Term__location_string);
+    module_patch_function(patch, "Term.global_id", Term__global_id);
+    module_patch_function(patch, "Term.to_string", Term__to_string);
+    module_patch_function(patch, "Term.to_source_string", Term__to_source_string);
+    module_patch_function(patch, "Term.properties", Term__properties);
+    module_patch_function(patch, "Term.property", Term__property);
+    module_patch_function(patch, "Term.is_statement", Term__is_statement);
+    module_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
+    module_patch_function(patch, "Term.value", Term__value);
+    module_patch_function(patch, "Term.set_value", Term__set_value);
+    module_patch_function(patch, "is_overloaded_func", is_overloaded_func);
+    module_patch_function(patch, "overload_get_contents", overload__get_contents);
 }
 
 } // namespace circa

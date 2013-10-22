@@ -622,21 +622,6 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();
-
-#if 0
-    if (prefs->showBytecode) {
-        out << std::endl;
-        for (int i=0; i < prefs->indentLevel + 2; i++)
-            out << " ";
-
-        Block* block = term->owningBlock;
-        caValue* op = list_get_safe(&block->bytecode, term->index);
-        if (op == NULL)
-            out << "(missing bytecode)";
-        else
-            out << to_string(op);
-    }
-#endif
 }
 
 void print_term(Term* term, std::ostream& out)

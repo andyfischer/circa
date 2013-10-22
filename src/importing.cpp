@@ -52,12 +52,4 @@ Term* import_type(Block* block, Type* type)
     return term;
 }
 
-void install_function_list(Block* block, const ImportRecord* list)
-{
-    while (list->functionName != NULL) {
-        install_function(block, list->functionName, list->evaluate);
-        list++;
-    }
-}
-
 } // namespace circa

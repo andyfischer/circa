@@ -447,15 +447,17 @@ bool matches_comment_statement(Block* block, TokenStream& tokens)
 
 ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context)
 {
-    std::string commentText;
+    Value commentText;
 
     if (tokens.nextIs(tok_Comment)) {
-        commentText = tokens.nextStr();
+        tokens.getNextStr(&commentText);
         tokens.consume();
+    } else {
+        set_string(&commentText, "");
     }
 
     Term* result = apply(block, FUNCS.comment, TermList());
-    result->setStringProp("comment", commentText);
+    result->setProp("comment", &commentText);
 
     return ParseResult(result);
 }
@@ -470,16 +472,17 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
     if (!tokens.nextIs(tok_Identifier))
         return compile_error_for_line(block, tokens, startPosition);
 
-    std::string typeName = tokens.consumeStr();
+    Value typeName;
+    tokens.consumeStr(&typeName);
 
-    Term* typeTerm = find_name(block, typeName.c_str(), sym_LookupType);
+    Term* typeTerm = find_name(block, &typeName, sym_LookupType);
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
         typeTerm = TYPES.any->declaringTerm;
     }
 
-    return ParseResult(typeTerm, typeName);
+    return ParseResult(typeTerm, as_cstring(&typeName));
 }
 
 bool token_is_allowed_as_function_name(int token)
@@ -514,7 +517,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         Value msg;
         set_string(&msg, "Expected identifier after def, found: ");
-        string_append(&msg, tokens.nextStr().c_str());
+        string_append(&msg, tokens.nextCStr());
         return compile_error_for_line(block, tokens, startPosition, as_cstring(&msg));
     }
 
@@ -637,11 +640,12 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         if (!tokens.nextIs(tok_Identifier))
             return compile_error_for_line(block, tokens, startPosition, "Expected input name");
 
-        std::string name = tokens.consumeStr(tok_Identifier);
+        Value name;
+        tokens.consumeStr(&name, tok_Identifier);
         possible_whitespace(tokens);
 
         // Create an input placeholder term
-        Term* input = apply(contents, FUNCS.input, TermList(), name.c_str());
+        Term* input = apply(contents, FUNCS.input, TermList(), as_cstring(&name));
         change_declared_type(input, type);
 
         // Save some information on the input as properties.
@@ -796,8 +800,9 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     if (!tokens.nextIs(tok_Identifier))
         return compile_error_for_line(block, tokens, startPosition);
 
-    std::string name = tokens.consumeStr(tok_Identifier);
-    Term* result = create_value(block, TYPES.type, name.c_str());
+    Value name;
+    tokens.consumeStr(&name, tok_Identifier);
+    Term* result = create_value(block, TYPES.type, as_cstring(&name));
 
     // Attributes
     result->setStringProp("syntax:preLBracketWhitespace",

@@ -4,6 +4,6 @@
 
 namespace circa {
 
-void reflection_install_functions(NativePatch* kernel);
+void misc_builtins_setup_functions(NativePatch* patch);
 
 } // namespace circa

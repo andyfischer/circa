@@ -775,6 +775,11 @@ std::string TokenStream::nextStr(int lookahead) const
     return std::string(_sourceText.c_str() + startPos, length);
 }
 
+const char* TokenStream::nextCStr(int lookahead) const
+{
+    return nextStr().c_str();
+}
+
 void TokenStream::getNextStr(caValue* value, int lookahead) const
 {
     int startPos = next(lookahead).start;

@@ -73,7 +73,8 @@ struct TokenStream
 
     Token const& next(int lookahead=0) const;
     std::string nextStr(int lookahead=0) const;
-    void getNextStr(caValue* value, int lookahead) const;
+    const char* nextCStr(int lookahead=0) const;
+    void getNextStr(caValue* value, int lookahead=0) const;
 
     // Return true if the given lookahead is past the end of the list.
     bool nextIsEof(int lookahead) const;

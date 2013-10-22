@@ -579,22 +579,6 @@ bool list_equals(caValue* left, caValue* right)
             return false;
     }
 
-#if 0
-    // Sneaky optimization. We just verified that 'left' and 'right' are deeply
-    // equal, so no one will notice if they actually use the same data.
-    //
-    // TODO: This optimization can't be turned on as long as integers and numbers can
-    // compare equal. Ditto for lists that have equal contents but different type tags.
-    // 
-    // The best thing to do is probably have this function return two types of equality:
-    // 'loose' and 'exact'. We can do the sneaky optimization iff there is exact equality.
-    //
-    // Also, don't forget to preserve the type tag for 'right'.
-    //
-    set_null(right);
-    list_copy(left, right);
-#endif
-
     return true;
 }
 

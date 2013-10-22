@@ -25,6 +25,7 @@
 #include "../list.cpp"
 #include "../loops.cpp"
 #include "../migration.cpp"
+#include "../misc_builtins.cpp"
 #include "../modules.cpp"
 #include "../names.cpp"
 #include "../names_builtin.cpp"

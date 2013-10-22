@@ -91,6 +91,7 @@ OBJECTS := \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/loops.o \
 	$(OBJDIR)/migration.o \
+	$(OBJDIR)/misc_builtins.o \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/names_builtin.o \
@@ -261,6 +262,9 @@ $(OBJDIR)/loops.o: loops.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/migration.o: migration.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/misc_builtins.o: misc_builtins.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/modules.o: modules.cpp

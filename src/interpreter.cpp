@@ -21,6 +21,7 @@
 #include "list.h"
 #include "migration.h"
 #include "modules.h"
+#include "native_patch.h"
 #include "parser.h"
 #include "reflection.h"
 #include "stack.h"
@@ -150,25 +151,11 @@ void stack_init(Stack* stack, Block* block)
 void stack_init_with_closure(Stack* stack, caValue* closure)
 {
     Block* block = as_block(list_get(closure, 0));
-    caValue* closedValues = list_get(closure, 1);
+    caValue* bindings = list_get(closure, 1);
     stack_init(stack, block);
 
-    // CLOSURE_FIXME
-    #if 0
-    int nextIncomingClosure = 0;
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (term->function != FUNCS.unbound_input)
-            continue;
-
-        if (nextIncomingClosure >= list_length(closedValues))
-            break;
-
-        copy(list_get(closedValues, nextIncomingClosure),
-            frame_register(stack_top(stack), term));
-        nextIncomingClosure++;
-    }
-    #endif
+    if (!hashtable_is_empty(bindings))
+        copy(bindings, &stack_top(stack)->bindings);
 }
 
 Frame* stack_push(Stack* stack, Block* block, int parentPc)
@@ -2409,53 +2396,44 @@ void reflect_get_frame_state(caStack* stack)
         copy(list_get(&callerFrame->state, frame->parentPc), circa_output(stack, 0));
 }
 
-void interpreter_install_functions(Block* kernel)
+void interpreter_install_functions(NativePatch* patch)
 {
-    static const ImportRecord records[] = {
-        {"Frame.active_value", Frame__active_value},
-        {"Frame.set_active_value", Frame__set_active_value},
-        {"Frame.block", Frame__block},
-        {"Frame.parent", Frame__parent},
-        {"Frame.has_parent", Frame__has_parent},
-        {"Frame.register", Frame__register},
-        {"Frame.registers", Frame__registers},
-        {"Frame.pc", Frame__pc},
-        {"Frame.parentPc", Frame__parentPc},
-        {"Frame.current_term", Frame__current_term},
-        {"Frame.extract_state", Frame__extract_state},
-
-        {"make_stack", make_stack},
-        {"capture_stack", capture_stack},
-        {"Stack.block", Stack__block},
-        {"Stack.dump", Stack__dump},
-        {"Stack.extract_state", Stack__extract_state},
-        {"Stack.find_active_frame_for_term", Stack__find_active_frame_for_term},
-        {"Stack.set_context", Stack__set_context},
-        {"Stack.apply", Stack__call},
-        {"Stack.call", Stack__call},
-        {"Stack.stack_push", Stack__stack_push},
-        {"Stack.stack_pop", Stack__stack_pop},
-        {"Stack.set_state_input", Stack__set_state_input},
-        {"Stack.get_state_output", Stack__get_state_output},
-        {"Stack.migrate_to", Stack__migrate_to},
-        {"Stack.reset", Stack__reset},
-        {"Stack.reset_state", Stack__reset_state},
-        {"Stack.restart", Stack__restart},
-        {"Stack.run", Stack__run},
-        {"Stack.frame", Stack__frame},
-        {"Stack.output", Stack__output},
-        {"Stack.errored", Stack__errored},
-        {"Stack.error_message", Stack__error_message},
-        {"Stack.toString", Stack__toString},
-        {"reflect:caller", reflect__caller},
-        {"reflect_get_frame_state", reflect_get_frame_state},
-
-        {NULL, NULL}
-    };
-
-    install_function_list(kernel, records);
-
-    TYPES.frame = circa_find_type_local(kernel, "Frame");
+    module_patch_function(patch, "Frame.active_value", Frame__active_value);
+    module_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
+    module_patch_function(patch, "Frame.block", Frame__block);
+    module_patch_function(patch, "Frame.parent", Frame__parent);
+    module_patch_function(patch, "Frame.has_parent", Frame__has_parent);
+    module_patch_function(patch, "Frame.register", Frame__register);
+    module_patch_function(patch, "Frame.registers", Frame__registers);
+    module_patch_function(patch, "Frame.pc", Frame__pc);
+    module_patch_function(patch, "Frame.parentPc", Frame__parentPc);
+    module_patch_function(patch, "Frame.current_term", Frame__current_term);
+    module_patch_function(patch, "Frame.extract_state", Frame__extract_state);
+    module_patch_function(patch, "make_stack", make_stack);
+    module_patch_function(patch, "capture_stack", capture_stack);
+    module_patch_function(patch, "Stack.block", Stack__block);
+    module_patch_function(patch, "Stack.dump", Stack__dump);
+    module_patch_function(patch, "Stack.extract_state", Stack__extract_state);
+    module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
+    module_patch_function(patch, "Stack.set_context", Stack__set_context);
+    module_patch_function(patch, "Stack.apply", Stack__call);
+    module_patch_function(patch, "Stack.call", Stack__call);
+    module_patch_function(patch, "Stack.stack_push", Stack__stack_push);
+    module_patch_function(patch, "Stack.stack_pop", Stack__stack_pop);
+    module_patch_function(patch, "Stack.set_state_input", Stack__set_state_input);
+    module_patch_function(patch, "Stack.get_state_output", Stack__get_state_output);
+    module_patch_function(patch, "Stack.migrate_to", Stack__migrate_to);
+    module_patch_function(patch, "Stack.reset", Stack__reset);
+    module_patch_function(patch, "Stack.reset_state", Stack__reset_state);
+    module_patch_function(patch, "Stack.restart", Stack__restart);
+    module_patch_function(patch, "Stack.run", Stack__run);
+    module_patch_function(patch, "Stack.frame", Stack__frame);
+    module_patch_function(patch, "Stack.output", Stack__output);
+    module_patch_function(patch, "Stack.errored", Stack__errored);
+    module_patch_function(patch, "Stack.error_message", Stack__error_message);
+    module_patch_function(patch, "Stack.toString", Stack__toString);
+    module_patch_function(patch, "reflect:caller", reflect__caller);
+    module_patch_function(patch, "reflect_get_frame_state", reflect_get_frame_state);
 }
 
 } // namespace circa

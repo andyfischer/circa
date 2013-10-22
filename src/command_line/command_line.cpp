@@ -370,7 +370,6 @@ void print_usage()
         "  -call <filename> <func name> <args>\n"
         "                    : Call a function in a script file, print results\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
-        "  -e <expression>   : Evaluate an expression on the command line\n"
         "  -check <filename> : Statically check the script for errors\n"
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
         "  -run-stdin        : Read and execute commands from stdin\n"
@@ -472,29 +471,6 @@ int run_command_line(caWorld* world, caValue* args)
     // Print help
     if (string_eq(list_get(args, 0), "-help")) {
         print_usage();
-        return 0;
-    }
-
-    // Eval mode
-    if (string_eq(list_get(args, 0), "-e")) {
-#if 0
-        list_remove_index(args, 0);
-
-        Value command;
-        set_string(&command, "");
-
-        bool firstArg = true;
-        while (!list_empty(args)) {
-            if (!firstArg)
-                string_append(&command, " ");
-            string_append(&command, list_get(args, 0));
-            list_remove_index(args, 0);
-            firstArg = false;
-        }
-
-        caValue* result = term_value(mainBlock->eval(as_cstring(&command)));
-        std::cout << to_string(result) << std::endl;
-#endif
         return 0;
     }
 

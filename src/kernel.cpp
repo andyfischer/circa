@@ -21,6 +21,8 @@
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"
+#include "misc_builtins.h"
+#include "native_patch.h"
 #include "parser.h"
 #include "reflection.h"
 #include "selector.h"
@@ -76,11 +78,6 @@ Type* output_placeholder_specializeType(Term* caller)
     return declared_type(caller->input(0));
 }
 
-void hosted_assert(caStack* stack)
-{
-    if (!circa_bool_input(stack, 0))
-        circa_output_error(stack, "Assert failed");
-}
 
 caValue* find_context_value(caStack* stack, caValue* key)
 {
@@ -189,473 +186,6 @@ void sys__perf_stats_dump(caStack* stack)
     perf_stats_to_list(circa_output(stack, 0));
 }
 
-void Dict__count(caStack* stack)
-{
-    caValue* dict = circa_input(stack, 0);
-    set_int(circa_output(stack, 0), dict_count(dict));
-}
-
-void Dict__set(caStack* stack)
-{
-    caValue* dict = circa_output(stack, 0);
-    copy(circa_input(stack, 0), dict);
-
-    const char* key = circa_string_input(stack, 1);
-    caValue* value = circa_input(stack, 2);
-
-    copy(value, dict_insert(dict, key));
-}
-
-void Dict__get(caStack* stack)
-{
-    caValue* dict = circa_input(stack, 0);
-    const char* key = circa_string_input(stack, 1);
-
-    copy(dict_get(dict, key), circa_output(stack, 0));
-}
-
-void empty_list(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    int size = circa_int_input(stack, 1);
-    caValue* initialValue = circa_input(stack, 0);
-    set_list(out, size);
-    for (int i=0; i < size; i++) {
-        copy(initialValue, list_get(out, i));
-    }
-}
-
-void repeat(caStack* stack)
-{
-    caValue* source = circa_input(stack, 0);
-    int repeatCount = circa_int_input(stack, 1);
-
-    caValue* out = circa_output(stack, 0);
-    circa_set_list(out, repeatCount);
-
-    for (int i=0; i < repeatCount; i++)
-        copy(source, circa_index(out, i));
-}
-
-void List__append(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-    copy(circa_input(stack, 1), list_append(out));
-}
-
-void List__concat(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    caValue* additions = circa_input(stack, 1);
-
-    int oldLength = list_length(out);
-    int additionsLength = list_length(additions);
-
-    list_resize(out, oldLength + additionsLength);
-    for (int i = 0; i < additionsLength; i++)
-        copy(list_get(additions, i), list_get(out, oldLength + i));
-}
-
-Type* List__append_specializeType(Term* term)
-{
-    Term* listInput = term->input(0);
-    switch (list_get_parameter_type(&listInput->type->parameter)) {
-    case sym_Untyped:
-        return listInput->type;
-    case sym_UniformListType:
-    {
-        Type* listElementType = list_get_repeated_type_from_type(listInput->type);
-        Type* commonType = find_common_type(listElementType, term->input(1)->type);
-        if (commonType == listElementType)
-            return listInput->type;
-        else
-            return create_typed_unsized_list_type(commonType);
-    }
-    case sym_AnonStructType:
-    case sym_StructType:
-    {    
-        List elementTypes;
-        copy(list_get_type_list_from_type(listInput->type), &elementTypes);
-        set_type(elementTypes.append(), term->input(1)->type);
-        return create_typed_unsized_list_type(find_common_type(&elementTypes));
-    }
-    case sym_Invalid:
-    default:
-        return TYPES.any;
-    }
-}
-
-void List__resize(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-    int count = circa_int_input(stack, 1);
-    circa_resize(out, count);
-}
-
-void List__extend(caStack* stack)
-{
-    caValue* out = circa_output(stack, 1);
-    copy(circa_input(stack, 0), out);
-
-    caValue* additions = circa_input(stack, 1);
-
-    int oldLength = list_length(out);
-    int additionsLength = list_length(additions);
-
-    list_resize(out, oldLength + additionsLength);
-    for (int i = 0; i < additionsLength; i++)
-        copy(list_get(additions, i), list_get(out, oldLength + i));
-}
-
-void List__count(caStack* stack)
-{
-    set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
-}
-void List__length(caStack* stack)
-{
-    set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
-}
-
-void List__insert(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    copy(circa_input(stack, 2), list_insert(out, circa_int_input(stack, 1)));
-}
-
-void List__slice(caStack* stack)
-{
-    caValue* input = circa_input(stack, 0);
-    int start = circa_int_input(stack, 1);
-    int end = circa_int_input(stack, 2);
-    caValue* output = circa_output(stack, 0);
-
-    if (start < 0)
-        start = 0;
-    else if (start > list_length(input))
-        start = list_length(input);
-
-    if (end > list_length(input))
-        end = list_length(input);
-    else if (end < 0)
-        end = list_length(input) + end;
-
-    if (end < start) {
-        set_list(output, 0);
-        return;
-    }
-
-    int length = end - start;
-    set_list(output, length);
-
-    for (int i=0; i < length; i++)
-        copy(list_get(input, start + i), list_get(output, i));
-}
-
-void List__join(caStack* stack)
-{
-    caValue* input = circa_input(stack, 0);
-    caValue* joiner = circa_input(stack, 1);
-
-    caValue* out = circa_output(stack, 0);
-    set_string(out, "");
-
-    for (int i=0; i < list_length(input); i++) {
-        if (i != 0)
-            string_append(out, joiner);
-
-        string_append(out, list_get(input, i));
-    }
-}
-
-void List__get(caStack* stack)
-{
-    caValue* self = circa_input(stack, 0);
-    int index = circa_int_input(stack, 1);
-    if (index < 0 || index >= list_length(self))
-        return raise_error_msg(stack, "Index out of bounds");
-
-    copy(list_get(self, index), circa_output(stack, 0));
-}
-
-void List__set(caStack* stack)
-{
-    caValue* self = circa_output(stack, 0);
-    copy(circa_input(stack, 0), self);
-
-    int index = circa_int_input(stack, 1);
-    caValue* value = circa_input(stack, 2);
-
-    touch(self);
-    copy(value, list_get(self, index));
-}
-
-void List__remove(caStack* stack)
-{
-    caValue* self = circa_output(stack, 0);
-    copy(circa_input(stack, 0), self);
-    int index = circa_int_input(stack, 1);
-
-    if (index < 0 || index >= list_length(self))
-        return circa_output_error(stack, "Invalid index");
-
-    list_remove_index(self, index);
-}
-
-void Map__contains(caStack* stack)
-{
-    caValue* value = hashtable_get(circa_input(stack, 0), circa_input(stack, 1));
-    set_bool(circa_output(stack, 0), value != NULL);
-}
-
-void Map__remove(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    hashtable_remove(out, circa_input(stack, 1));
-}
-
-void Map__get(caStack* stack)
-{
-    caValue* table = circa_input(stack, 0);
-    caValue* key = circa_input(stack, 1);
-    caValue* value = hashtable_get(table, key);
-    if (value == NULL) {
-        std::string msg = "Key not found: " + to_string(key);
-        return circa_output_error(stack, msg.c_str());
-    }
-    copy(value, circa_output(stack, 0));
-}
-
-void Map__set(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    caValue* key = circa_input(stack, 1);
-    caValue* value = circa_input(stack, 2);
-
-    copy(value, hashtable_insert(out, key, false));
-}
-
-void Map__insertPairs(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    caValue* pairs = circa_input(stack, 1);
-    for (int i=0; i < list_length(pairs); i++) {
-        caValue* pair = list_get(pairs, i);
-        copy(list_get(pair, 1), hashtable_insert(out, list_get(pair, 0), false));
-    }
-}
-
-void Map__empty(caStack* stack)
-{
-    set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
-}
-
-void Mutable__get(caStack* stack)
-{
-    caValue* val = (caValue*) circa_object_input(stack, 0);
-    copy(val, circa_output(stack, 0));
-}
-
-void Mutable__set(caStack* stack)
-{
-    caValue* val = (caValue*) circa_object_input(stack, 0);
-    copy(circa_input(stack, 1), val);
-}
-
-void Mutable_initialize(Type* type, caValue* value)
-{
-    object_initialize(type, value);
-    caValue* val = (caValue*) object_get_body(value);
-    initialize_null(val);
-}
-
-void Mutable_release(caValue* value)
-{
-    caValue* val = (caValue*) object_get_body(value);
-    set_null(val);
-}
-
-std::string Mutable_toString(caValue* value)
-{
-    return "Mutable[" + to_string((caValue*) object_get_body(value)) + "]";
-}
-
-void Mutable_release(void* object)
-{
-    caValue* val = (caValue*) object;
-    set_null(val);
-}
-
-void String__char_at(caStack* stack)
-{
-    const char* str = circa_string_input(stack, 0);
-    int index = circa_int_input(stack, 1);
-
-    if (index < 0) {
-        circa_output_error(stack, "negative index");
-        return;
-    }
-
-    if ((unsigned) index >= strlen(str)) {
-        set_string(circa_output(stack, 0), "");
-        return;
-    }
-
-    char output[1];
-    output[0] = str[index];
-    set_string(circa_output(stack, 0), output, 1);
-}
-
-void String__length(caStack* stack)
-{
-    const char* str = circa_string_input(stack, 0);
-    set_int(circa_output(stack, 0), (int) strlen(str));
-}
-
-void String__substr(caStack* stack)
-{
-    int start = circa_int_input(stack, 1);
-    int end = circa_int_input(stack, 2);
-    std::string const& s = as_string(circa_input(stack, 0));
-
-    if (start < 0) return circa_output_error(stack, "Negative index");
-    if (end < 0) return circa_output_error(stack, "Negative index");
-
-    if ((unsigned) start > s.length()) {
-        std::stringstream msg;
-        msg << "Start index is too high: " << start;
-        return circa_output_error(stack, msg.str().c_str());
-    }
-    if ((unsigned) (start+end) > s.length()) {
-        std::stringstream msg;
-        msg << "End index is too high: " << start;
-        return circa_output_error(stack, msg.str().c_str());
-    }
-
-    set_string(circa_output(stack, 0), s.substr(start, end));
-}
-
-char character_to_lower(char c)
-{
-    if (c >= 'A' && c <= 'Z')
-        return c + 'a' - 'A';
-    return c;
-}
-
-void String__to_camel_case(caStack* stack)
-{
-    const char* in = circa_string_input(stack, 0);
-    set_string(circa_output(stack, 0), in);
-
-    char* out = (char*) as_cstring(circa_output(stack, 0));
-    if (out[0] == 0)
-        return;
-
-    out[0] = character_to_lower(out[0]);
-}
-
-void String__to_lower(caStack* stack)
-{
-    const char* in = circa_string_input(stack, 0);
-    int len = (int) strlen(in);
-
-    set_string(circa_output(stack, 0), in);
-    char* out = (char*) as_cstring(circa_output(stack, 0));
-
-    for (int i=0; i < len; i++) {
-        char c = in[i];
-
-        if (c >= 'A' && c <= 'Z')
-            c = c + 'a' - 'A';
-        out[i] = c;
-    }
-}
-
-void String__to_upper(caStack* stack)
-{
-    const char* in = circa_string_input(stack, 0);
-    int len = (int) strlen(in);
-
-    set_string(circa_output(stack, 0), in);
-    char* out = (char*) as_cstring(circa_output(stack, 0));
-
-    for (int i=0; i < len; i++) {
-        char c = in[i];
-
-        if (c >= 'a' && c <= 'z')
-            c = c + 'A' - 'a';
-        out[i] = c;
-    }
-}
-
-void String__slice(caStack* stack)
-{
-    int start = circa_int_input(stack, 1);
-    int end = circa_int_input(stack, 2);
-    std::string const& s = as_string(circa_input(stack, 0));
-
-    // Negative indexes are relatve to end of string
-    if (start < 0) start = (int) s.length() + start;
-    if (end < 0) end = (int) s.length() + end;
-
-    if (start < 0) return set_string(circa_output(stack, 0), "");
-    if (end < 0) return set_string(circa_output(stack, 0), "");
-
-    if ((unsigned) start > s.length())
-        start = (int) s.length();
-
-    if ((unsigned) end > s.length())
-        end = (int) s.length();
-
-    if (end < start)
-        return set_string(circa_output(stack, 0), "");
-
-    set_string(circa_output(stack, 0), s.substr(start, end - start));
-}
-
-void String__ends_with(caStack* stack)
-{
-    set_bool(circa_output(stack, 0), string_ends_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
-}
-void String__starts_with(caStack* stack)
-{
-    set_bool(circa_output(stack, 0), string_starts_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
-}
-
-void String__split(caStack* stack)
-{
-    string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
-}
-
-void typeof_func(caStack* stack)
-{
-    caValue* in = circa_input(stack, 0);
-    set_type(circa_output(stack, 0), in->value_type);
-}
-
-void static_type_func(caStack* stack)
-{
-    Term* caller = (Term*) circa_caller_term(stack);
-    Term* input = caller->input(0);
-    set_type(circa_output(stack, 0), input->type);
-}
-
-void length(caStack* stack)
-{
-    set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
-}
-
 std::string stackVariable_toString(caValue* value)
 {
     short relativeFrame = value->value_data.asint >> 16;
@@ -690,6 +220,53 @@ Type* specializeType_div(Term* term)
         return TYPES.float_type;
 
     return TYPES.any;
+}
+
+Type* List__append_specializeType(Term* term)
+{
+    Term* listInput = term->input(0);
+    switch (list_get_parameter_type(&listInput->type->parameter)) {
+    case sym_Untyped:
+        return listInput->type;
+    case sym_UniformListType:
+    {
+        Type* listElementType = list_get_repeated_type_from_type(listInput->type);
+        Type* commonType = find_common_type(listElementType, term->input(1)->type);
+        if (commonType == listElementType)
+            return listInput->type;
+        else
+            return create_typed_unsized_list_type(commonType);
+    }
+    case sym_AnonStructType:
+    case sym_StructType:
+    {    
+        List elementTypes;
+        copy(list_get_type_list_from_type(listInput->type), &elementTypes);
+        set_type(elementTypes.append(), term->input(1)->type);
+        return create_typed_unsized_list_type(find_common_type(&elementTypes));
+    }
+    case sym_Invalid:
+    default:
+        return TYPES.any;
+    }
+}
+
+void Mutable_initialize(Type* type, caValue* value)
+{
+    object_initialize(type, value);
+    caValue* val = (caValue*) object_get_body(value);
+    initialize_null(val);
+}
+
+std::string Mutable_toString(caValue* value)
+{
+    return "Mutable[" + to_string((caValue*) object_get_body(value)) + "]";
+}
+
+void Mutable_release(void* object)
+{
+    caValue* val = (caValue*) object;
+    set_null(val);
 }
 
 
@@ -822,6 +399,7 @@ void bootstrap_kernel()
     // Allocate a World object.
     g_world = alloc_world();
     g_world->bootstrapStatus = sym_Bootstrapping;
+    World* world = g_world;
 
     // Instanciate the types that are used by Type.
     TYPES.dict = create_type_unconstructed();
@@ -1039,80 +617,33 @@ void bootstrap_kernel()
     finish_building_overloaded_function(FUNCS.neg);
     block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
 
+    // Install native functions.
+    module_patch_function(world->builtinPatch, "context", get_context);
+    module_patch_function(world->builtinPatch, "file:version", file__version);
+    module_patch_function(world->builtinPatch, "file:exists", file__exists);
+    module_patch_function(world->builtinPatch, "file:read_text", file__read_text);
+    module_patch_function(world->builtinPatch, "from_string", from_string);
+    module_patch_function(world->builtinPatch, "set_context", set_context);
+    module_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
+    module_patch_function(world->builtinPatch, "test_spy", test_spy);
+    module_patch_function(world->builtinPatch, "test_oracle", test_oracle);
+    module_patch_function(world->builtinPatch, "reflect:this_block", reflect__this_block);
+    module_patch_function(world->builtinPatch, "reflect:kernel", reflect__kernel);
+    module_patch_function(world->builtinPatch, "sys:module_search_paths", sys__module_search_paths);
+    module_patch_function(world->builtinPatch, "sys:perf_stats_reset", sys__perf_stats_reset);
+    module_patch_function(world->builtinPatch, "sys:perf_stats_dump", sys__perf_stats_dump);
+
     // Load the standard library from stdlib.ca
     parser::compile(builtins, parser::statement_list, STDLIB_CA_TEXT);
 
-    // Install C functions
-    static const ImportRecord records[] = {
-        {"assert", hosted_assert},
-        {"context", get_context},
-        {"file:version", file__version},
-        {"file:exists", file__exists},
-        {"file:read_text", file__read_text},
-        {"length", length},
-        {"from_string", from_string},
-        {"set_context", set_context},
-        {"to_string_repr", to_string_repr},
-        {"test_spy", test_spy},
-        {"test_oracle", test_oracle},
-        {"reflect:this_block", reflect__this_block},
-        {"reflect:kernel", reflect__kernel},
-        {"sys:module_search_paths", sys__module_search_paths},
-        {"sys:perf_stats_reset", sys__perf_stats_reset},
-        {"sys:perf_stats_dump", sys__perf_stats_dump},
-
-        {"Dict.count", Dict__count},
-        {"Dict.get", Dict__get},
-        {"Dict.set", Dict__set},
-
-        {"empty_list", empty_list},
-        {"repeat", repeat},
-        {"List.append", List__append},
-        {"List.concat", List__concat},
-        {"List.resize", List__resize},
-        {"List.count", List__count},
-        {"List.insert", List__insert},
-        {"List.length", List__length},
-        {"List.join", List__join},
-        {"List.slice", List__slice},
-        {"List.get", List__get},
-        {"List.set", List__set},
-        {"List.remove", List__remove},
-
-        {"Map.contains", Map__contains},
-        {"Map.remove", Map__remove},
-        {"Map.get", Map__get},
-        {"Map.set", Map__set},
-        {"Map.insertPairs", Map__insertPairs},
-        {"Map.empty", Map__empty},
-
-        {"Mutable.get", Mutable__get},
-        {"Mutable.set", Mutable__set},
-
-        {"String.char_at", String__char_at},
-        {"String.ends_with", String__ends_with},
-        {"String.length", String__length},
-        {"String.substr", String__substr},
-        {"String.slice", String__slice},
-        {"String.starts_with", String__starts_with},
-        {"String.split", String__split},
-        {"String.to_camel_case", String__to_camel_case},
-        {"String.to_upper", String__to_upper},
-        {"String.to_lower", String__to_lower},
-        
-        {"type", typeof_func},
-        {"static_type", static_type_func},
-
-        {NULL, NULL}
-    };
-
-    install_function_list(builtins, records);
-
     closures_install_functions(builtins);
     modules_install_functions(builtins);
-    reflection_install_functions(builtins);
-    interpreter_install_functions(builtins);
+    reflection_install_functions(world->builtinPatch);
+    interpreter_install_functions(world->builtinPatch);
+    misc_builtins_setup_functions(world->builtinPatch);
     type_install_functions(builtins);
+
+    native_patch_apply_patch(world->builtinPatch, builtins);
 
     // Fix 'builtins' module now that the module() function is created.
     change_function(builtinsTerm, FUNCS.module);
@@ -1173,18 +704,22 @@ void on_new_function_parsed(Term* func, caValue* functionName)
     // Catch certain builtin functions as soon as they are defined.
     if (FUNCS.add == NULL && string_eq(functionName, "add"))
         FUNCS.add = func;
+    if (FUNCS.closure_block == NULL && string_eq(functionName, "closure_block"))
+        FUNCS.closure_block = func;
+    if (FUNCS.declared_state == NULL && string_eq(functionName, "declared_state"))
+        FUNCS.declared_state = func;
+    if (FUNCS.equals == NULL && string_eq(functionName, "equals"))
+        FUNCS.equals = func;
+    if (FUNCS.func_call == NULL && string_eq(functionName, "Func.call"))
+        FUNCS.func_call = func;
+    if (FUNCS.div == NULL && string_eq(functionName, "div"))
+        FUNCS.div = func;
     if (FUNCS.sub == NULL && string_eq(functionName, "sub"))
         FUNCS.sub = func;
     if (FUNCS.mult == NULL && string_eq(functionName, "mult"))
         FUNCS.mult = func;
-    if (FUNCS.div == NULL && string_eq(functionName, "div"))
-        FUNCS.div = func;
-    if (FUNCS.declared_state == NULL && string_eq(functionName, "declared_state"))
-        FUNCS.declared_state = func;
-    if (FUNCS.closure_block == NULL && string_eq(functionName, "closure_block"))
-        FUNCS.closure_block = func;
-    if (FUNCS.func_call == NULL && string_eq(functionName, "Func.call"))
-        FUNCS.func_call = func;
+    if (FUNCS.not_equals == NULL && string_eq(functionName, "not_equals"))
+        FUNCS.not_equals = func;
     if (FUNCS.nonlocal == NULL && string_eq(functionName, "nonlocal"))
         FUNCS.nonlocal = func;
 }

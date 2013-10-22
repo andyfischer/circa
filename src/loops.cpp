@@ -349,34 +349,6 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
     // Interpreter will run the contents of the block
 }
 
-#if 0
-void finish_while_loop(Term* whileTerm)
-{
-    Block* block = nested_contents(whileTerm);
-
-    // Append a call to unbounded_loop_finish()
-    Term* term = apply(block, FUNCS.unbounded_loop_finish,
-        TermList());
-    move_before_outputs(term);
-}
-
-void evaluate_unbounded_loop(caStack* stack)
-{
-    Block* contents = (Block*) circa_caller_block(stack);
-
-    // Check for zero evaluations
-    if (!as_bool(circa_input(stack, 0))) {
-        return;
-    }
-
-    stack_push(stack, contents);
-}
-
-void evaluate_unbounded_loop_finish(caStack* stack)
-{
-}
-#endif
-
 void loop_add_condition_check(Block* caseBlock, Term* condition)
 {
     apply(caseBlock, FUNCS.loop_condition_bool, TermList(condition));

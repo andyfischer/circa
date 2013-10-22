@@ -22,12 +22,4 @@ Term* install_function(Block* block, const char* name, EvaluateFunc evaluate);
 
 Term* import_type(Block* block, Type* type);
 
-struct ImportRecord
-{
-    const char* functionName;
-    EvaluateFunc evaluate;
-};
-
-void install_function_list(Block* block, const ImportRecord* list);
-
 } // namespace circa

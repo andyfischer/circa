@@ -8,25 +8,6 @@
 
 namespace block_test {
 
-void test_state_type()
-{
-#if 0
-    Block block;
-
-    block.compile("a = 1; b = 2; c = 3");
-    block_update_state_type(&block);
-    test_assert(block.stateType == NULL);
-
-    clear_block(&block);
-    block.compile("state a = 1; state b = 2.0");
-    block_update_state_type(&block);
-    test_assert(block.stateType != NULL);
-
-    //test_equals(&block.stateType->parameter, "[[<Type int>, <Type number>], ['a', 'b']]");
-    test_equals(&block.stateType->parameter, "[[<Type any>, <Type any>], ['a', 'b']]");
-#endif
-}
-
 void test_erase_term()
 {
     Block block;
@@ -52,7 +33,6 @@ void test_erase_term()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(block_test::test_state_type);
     REGISTER_TEST_CASE(block_test::test_erase_term);
 }
 

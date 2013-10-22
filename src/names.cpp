@@ -802,16 +802,6 @@ Block* find_function_local(Block* block, const char* name)
     return function_contents(term);
 }
 
-#if 0
-Block* find_module(World* world, const char* name)
-{
-    caTerm* term = find_name(world->root, name, sym_LookupModule);
-    if (term == NULL)
-        return NULL;
-    return nested_contents(term);
-}
-#endif
-
 void qualified_name_get_first_section(caValue* name, caValue* prefixResult)
 {
     int len = string_length(name);

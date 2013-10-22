@@ -1,4 +1,5 @@
 
+-- Func --
 type Func {
     Block block
     Map bindings
@@ -20,7 +21,7 @@ def Func.freeze(self) -> Func
     -- Return a func with all nonlocal bindings captured. Usually a binding is not
     -- captured until the func escapes a scope.
 
--- Builtin functions
+-- Builtin functions --
 def convert(any value, Type t) -> any
     -- Convert the value to the given type, if possible.
 
@@ -30,17 +31,24 @@ def assert(bool condition)
 def catch(any input)
     -- Vestigal function, don't use this.
 
-def length(List list) -> int
-    -- Return the number of items in the given list
+def equals(any a,any b) -> bool
 
 def from_string(String s) -> any
     -- Parse a string representation to a Circa value
+
+def error(String msg)
+
+def length(List list) -> int
+    -- Return the number of items in the given list
+
+def not_equals(any a,any b) -> bool
 
 def to_string_repr(any val) -> String
     -- Encode a Circa value as a string representation
 
 def type(any val) -> Type
     -- Returns the runtime type of a value
+
 def static_type(any term :meta) -> Type
     -- Returns the static type of a value
 
@@ -86,7 +94,7 @@ def declared_state(Type t, Func initializer :optional) -> any
     -- No initializer. Use the type's default value.
     return make(t)
 
--- Primitive math funcs.
+-- Primitive math funcs --
 def add(any left, any right) -> any
     if is_int(left) and is_int(right)
         add_i(left, right)
@@ -117,12 +125,33 @@ def div(any left, any right) -> any
     else
         left.div(right)
 
+-- Misc builtin funcs --
+
+def abs(number n) -> number
+    -- Absolute value
+def any_true(list) -> bool
+    result = true
+    for i in list
+      if not(i)
+        return false
+    true
+
+def swap(a, b) -> (any,any)
+    return b, a
+
 def first_symbol(any val) -> Symbol
     if type(val) == Symbol
         val
     elif type(val) == List
         if length(val) > 0
             first_symbol(val[0])
+
+def to_string(any val) -> String
+
+def print(any items :multiple)
+    -- Prints a line of text output to the console.
+def trace(any items :multiple)
+    -- Prints a line of text output to the console.
 
 type Mutable;
     -- Container for a mutable value. Future status is undecided, this might
@@ -297,17 +326,21 @@ def Frame.extract_state(self) -> Map
 
 def capture_stack() -> Stack
     -- Returns a frozen copy of the currently executing stack.
+def Stack.apply(self, List inputs) -> any
 def Stack.block(self) -> Block
     -- Returns the (topmost) block.
+def Stack.call(self, any inputs :multiple) -> any
 def Stack.current_term(self) -> Term
     self.top.current_term
 def Stack.dump(self)
     -- Dumps a string representation to stdout.
+def Stack.rethrow(self)
+    -- If the stack has an error, raise it in this context.
+    if self.has_error
+      error(self.error_message)
 def Stack.extract_state(self) -> Map
 def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.set_context(self, Symbol name, any val)
-def Stack.call(self, any inputs :multiple) -> any
-def Stack.apply(self, List inputs) -> any
 def Stack.stack_push(self, Block b, List inputs)
     -- Push a new frame, using the given block and input list.
 def Stack.stack_push2(self, Func func)
