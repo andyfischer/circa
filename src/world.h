@@ -31,6 +31,9 @@ struct World {
     // Whether the world is currently bootstrapping. Either :Bootstrapping or :Done.
     Symbol bootstrapStatus;
 
+    // NativePatch for all builtins.
+    NativePatch* builtinPatch;
+
     caLogFunc logFunc;
     void* logContext;
 

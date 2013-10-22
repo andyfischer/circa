@@ -47,14 +47,14 @@ struct NativePatch
     void* dll;
 };
 
-NativePatchWorld* create_native_patch_world()
+NativePatchWorld* alloc_native_patch_world()
 {
     NativePatchWorld* world = new NativePatchWorld();
     set_hashtable(&world->everyPatchedFunction);
     return world;
 }
 
-void dealloc_native_patch_world(NativePatchWorld* world)
+void free_native_patch_world(NativePatchWorld* world)
 {
     std::map<std::string, NativePatch*>::const_iterator it;
     for (it = world->nativeModules.begin(); it != world->nativeModules.end(); ++it) {
@@ -64,7 +64,7 @@ void dealloc_native_patch_world(NativePatchWorld* world)
     delete world;
 }
 
-static NativePatch* create_native_patch(World* world)
+NativePatch* alloc_native_patch(World* world)
 {
     NativePatch* patch = new NativePatch();
     patch->world = world;
@@ -72,7 +72,7 @@ static NativePatch* create_native_patch(World* world)
     return patch;
 }
 
-static void free_native_patch(NativePatch* patch)
+void free_native_patch(NativePatch* patch)
 {
     delete patch;
 }
@@ -101,7 +101,7 @@ NativePatch* add_native_patch(World* world, const char* targetName)
         return module;
 
     // Create new module with this name.
-    module = create_native_patch(world);
+    module = alloc_native_patch(world);
     set_string(&module->targetName, targetName);
     nativeWorld->nativeModules[targetName] = module;
     return module;

@@ -34,6 +34,7 @@ World* alloc_world()
     world->nextStackID = 1;
     world->firstStack = NULL;
     world->lastStack = NULL;
+    world->builtinPatch = NULL;
 
     return world;
 }
@@ -51,15 +52,18 @@ void world_initialize(World* world)
     set_list(&world->moduleSearchPaths);
     set_list(&world->fileSources);
 
-    world->nativePatchWorld = create_native_patch_world();
-    world->fileWatchWorld = create_file_watch_world();
+    world->nativePatchWorld = alloc_native_patch_world();
+    world->fileWatchWorld = alloc_file_watch_world();
+
+    world->builtinPatch = alloc_native_patch(world);
 }
 
 void world_uninitialize(World* world)
 {
     set_null(&world->moduleSearchPaths);
-    dealloc_native_patch_world(world->nativePatchWorld);
-    dealloc_file_watch_world(world->fileWatchWorld);
+    free_native_patch(world->builtinPatch);
+    free_native_patch_world(world->nativePatchWorld);
+    free_file_watch_world(world->fileWatchWorld);
 }
 
 World* create_world()

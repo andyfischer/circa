@@ -29,13 +29,13 @@ struct FileWatchWorld
     std::map<std::string, FileWatch*> watches;
 };
 
-FileWatchWorld* create_file_watch_world()
+FileWatchWorld* alloc_file_watch_world()
 {
     FileWatchWorld* world = new FileWatchWorld();
     return world;
 }
 
-void dealloc_file_watch_world(FileWatchWorld* world)
+void free_file_watch_world(FileWatchWorld* world)
 {
     std::map<std::string, FileWatch*>::const_iterator it;
     for (it = world->watches.begin();
