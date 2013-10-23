@@ -28,6 +28,7 @@ const char bc_PushFuncApply = 0x14;
 const char bc_PushCase = 0x16;
 const char bc_PushLoop = 0x17;
 const char bc_PushWhile = 0x18;
+const char bc_PushBlockDynamic = 0x19;
 
 // Pushing inputs to a new frame.
 const char bc_PushInputFromStack = 0x22;
@@ -45,6 +46,7 @@ const char bc_PopOutput = 0x30;
 const char bc_PopOutputNull = 0x31;
 const char bc_PopOutputsDynamic = 0x32;
 const char bc_PopExplicitState = 0x33;
+const char bc_PopAsModule = 0x34;
 
 // Control flow.
 const char bc_ExitPoint = 0x40;

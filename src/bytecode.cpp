@@ -101,6 +101,14 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "push_while ");
         string_append(string, blob_read_int(bcData, pos));
         break;
+    case bc_PushBlockDynamic:
+        set_string(string, "push_block_dynamic ");
+        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_u16(bcData, pos));
+        break;
     case bc_ExitPoint:
         set_string(string, "exit_point");
         break;
@@ -212,6 +220,10 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "pop_explicit_state ");
         string_append(string, blob_read_int(bcData, pos));
         break;
+    case bc_PopAsModule:
+        set_string(string, "pop_as_module ");
+        string_append(string, blob_read_int(bcData, pos));
+        break;
     case bc_MemoizeCheck:
         set_string(string, "memoize_check");
         break;
@@ -311,7 +323,30 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 {
     INCREMENT_STAT(WriteTermBytecode);
 
-    if (term->function == FUNCS.output) {
+    if (term->function == FUNCS.bc_push_block_dynamic) {
+        blob_append_char(bytecode, bc_PushBlockDynamic);
+        blob_append_int(bytecode, term->index);
+        bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
+        return;
+    }
+
+    else if (term->function == FUNCS.bc_pop_as_module) {
+        blob_append_char(bytecode, bc_PopAsModule);
+        blob_append_int(bytecode, term->index);
+        return;
+    }
+
+    else if (term->function == FUNCS.bc_enter_frame) {
+        blob_append_char(bytecode, bc_EnterFrame);
+        return;
+    }
+
+    else if (term->function == FUNCS.bc_pop_frame) {
+        blob_append_char(bytecode, bc_PopFrame);
+        return;
+    }
+
+    else if (term->function == FUNCS.output) {
 
         if (term->input(0) == NULL) {
             blob_append_char(bytecode, bc_SetNull);
@@ -424,7 +459,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_char(bytecode, bc_PushFunction);
         blob_append_int(bytecode, term->index);
     }
-    
+
     else if (term->nestedContents != NULL) {
 
         referenceTargetBlock = term->nestedContents;

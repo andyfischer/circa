@@ -159,11 +159,13 @@ type Mutable;
 def Mutable.set(self, any val)
 def Mutable.get(self) -> any
 
+-- Internally used bytecode-level operations (our version of ASM)
+def _bc_push_block_dynamic(Block block)
+def _bc_enter_frame()
+def _bc_pop_as_module()
+def _bc_pop_frame()
+
 -- Modules
-def require(String moduleName)
-    -- Declare that the current module depends on the named module.
-def package(String moduleName)
-    -- Declare that the current module is a reusable library with the given name.
 
 def native_patch_this(String filename)
     -- Annotation, declare that the current module should be patched by a native
@@ -171,11 +173,26 @@ def native_patch_this(String filename)
 
 def load_module(String moduleName) -> Block
     -- Look for a loaded module with the given name, and load it if necessary.
-    -- The module search path will be used.
+    -- The module search path will be used, and the result is stored in module
+    -- space.
 
 def load_script(String filename) -> Block
     -- Load a script with the given filename. The result will only be available
     -- locally; it won't be loaded into module space.
+
+def require(String moduleName) -> Map
+    -- Load a module, and use it during name lookup.
+    -- TODO: This call should be memoized.
+    
+    block = load_module(moduleName)
+    _bc_push_block_dynamic(block)
+    _bc_enter_frame()
+    result = _bc_pop_as_module()
+    _bc_pop_frame()
+    result
+
+def package(String moduleName)
+    -- Declare that the current module is a reusable library with the given name.
 
 -- Packages
 type Package {

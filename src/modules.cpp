@@ -6,10 +6,12 @@
 
 #include "block.h"
 #include "building.h"
+#include "closures.h"
 #include "code_iterators.h"
 #include "file.h"
 #include "file_watch.h"
 #include "function.h"
+#include "hashtable.h"
 #include "inspection.h"
 #include "importing.h"
 #include "interpreter.h"
@@ -178,6 +180,29 @@ void module_on_loaded_by_term(Block* module, Term* loadCall)
         move_before(moduleTerm, callersModule);
 }
 
+void module_capture_exports_from_stack(Frame* frame, caValue* output)
+{
+    Block* block = frame->block;
+
+    set_hashtable(output);
+
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+
+        if (!is_function(term))
+            return;
+
+        // Future: If we had a system to declare some terms as 'private', then
+        // this loop shouldn't copy them to the map.
+
+        caValue* closure = frame_register(frame, term);
+
+        caValue* slot = hashtable_insert(output, term_name(term));
+        copy(closure, slot);
+        closure_save_bindings_for_frame(slot, frame);
+    }
+}
+
 Block* find_module_from_filename(const char* filename)
 {
     // O(n) search for a module with this filename. Could stand to be more efficient.
@@ -276,7 +301,7 @@ Block* find_module(Block* root, caValue* name)
 
 void modules_install_functions(Block* kernel)
 {
-    FUNCS.require = install_function(kernel, "require", NULL);
+    FUNCS.require = kernel->get("require");
     block_set_post_compile_func(function_contents(FUNCS.require), require_func_postCompile);
 
     FUNCS.package = install_function(kernel, "package", NULL);

@@ -1068,16 +1068,27 @@ void run_bytecode(Stack* stack, caValue* bytecode)
         case bc_PushNested: {
             ca_assert(s.frame == stack_top(stack));
 
-            int index = blob_read_int(s.bc, &s.pc);
+            int termIndex = blob_read_int(s.bc, &s.pc);
 
-            s.frame->pcIndex = index;
+            s.frame->pcIndex = termIndex;
             s.frame->pc = s.pc;
-            Term* caller = frame_term(s.frame, index);
+            Term* caller = frame_term(s.frame, termIndex);
             Block* block = caller->nestedContents;
 
             Frame* top = stack_push(stack, block);
-            top->parentPc = index;
+            top->parentPc = termIndex;
             s.frame = stack_top_parent(stack);
+            continue;
+        }
+        case bc_PushBlockDynamic: {
+            int termIndex = blob_read_int(s.bc, &s.pc);
+            caValue* value = bc_read_local_position(stack, s.bc, &s.pc);
+
+            Frame* top = stack_top(stack);
+            Block* block = as_block(value);
+            Term* caller = frame_term(s.frame, termIndex);
+            top = stack_push3(stack, termIndex, block);
+            expand_frame(s.frame, top);
             continue;
         }
         case bc_PushInputFromStack: {
@@ -1382,6 +1393,17 @@ do_loop_done_insn:
 
             copy_stack_frame_to_boxed(top, receiverSlot);
 #endif
+            continue;
+        }
+        case bc_PopAsModule: {
+            int outputIndex = blob_read_int(s.bc, &s.pc);
+
+            Frame* top = stack_top(stack);
+            Frame* parent = stack_top_parent(stack);
+            caValue* slot = frame_register(parent, outputIndex);
+
+            module_capture_exports_from_stack(top, slot);
+
             continue;
         }
         case bc_PopFrame: {

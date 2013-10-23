@@ -31,6 +31,9 @@ Block* load_module_by_name(World* world, const char* module_name);
 // rearrange the global module order so that the module is located before the term.
 void module_on_loaded_by_term(Block* module, Term* loadCall);
 
+// Called by interpreter during a require() call.
+void module_capture_exports_from_stack(Frame* frame, caValue* output);
+
 // Deprecated: does not reference World or Block.
 Block* find_loaded_module(const char* name);
 Block* find_module_from_filename(const char* filename);

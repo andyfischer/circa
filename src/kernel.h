@@ -14,6 +14,10 @@ struct BuiltinFuncs {
     Term* and_func;
     Term* block_unevaluated;
     Term* break_func;
+    Term* bc_push_block_dynamic;
+    Term* bc_enter_frame;
+    Term* bc_pop_as_module;
+    Term* bc_pop_frame;
     Term* case_func;
     Term* case_condition_bool;
     Term* cast;
