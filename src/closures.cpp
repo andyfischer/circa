@@ -32,6 +32,10 @@ void insert_nonlocal_terms(Block* block)
 
     for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* innerTerm = *it;
+
+        if (innerTerm->function == FUNCS.nonlocal)
+            continue;
+
         for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
             Term* input = innerTerm->input(inputIndex);
             if (input == NULL)

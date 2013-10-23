@@ -185,6 +185,9 @@ def require(String moduleName) -> Map
     -- TODO: This call should be memoized.
     
     block = load_module(moduleName)
+    if block.is_null
+      return Map.make
+
     _bc_push_block_dynamic(block)
     _bc_enter_frame()
     result = _bc_pop_as_module()
