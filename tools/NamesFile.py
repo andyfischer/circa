@@ -60,7 +60,10 @@ def names_to_trie(names, i):
         by_prefix[c].append(name)
 
     result = {}
-    for prefix,contains in by_prefix.items():
+
+    print('by_prefix:', by_prefix)
+
+    for prefix,contains in sorted(by_prefix.items(), key=str):
         if len(contains) == 1:
             assert len(contains) == 1
             result[prefix] = contains[0]
@@ -117,8 +120,7 @@ def write_impl(lines):
 
     def write_name_lookup_switch(trie, dist):
         yield "switch (str[" + str(dist) + "]) {"
-        yield "default: return -1;"
-        for prefix,sub in trie.items():
+        for prefix,sub in sorted(trie.items(), key=str):
             yield "case " + ('0' if prefix == 0 else "'" + prefix + "'") + ':'
             if type(sub) == str:
                 # This leaf only has a string value, meaning that it can be only one possible thing.
@@ -135,6 +137,7 @@ def write_impl(lines):
             else:
                 for line in write_name_lookup_switch(sub, dist + 1):
                     yield line
+        yield "default: return -1;"
         yield "}"
 
     for line in write_name_lookup_switch(names_to_trie([name for (name,_,_) in every_symbol()], 0), 0):
