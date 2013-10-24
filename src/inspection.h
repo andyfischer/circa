@@ -40,6 +40,10 @@ bool is_an_unknown_identifier(Term* term);
 bool is_major_block(Term* term);
 bool is_major_block(Block* block);
 bool is_minor_block(Block* block);
+
+// Find the nearest (parent) block that is a major block. May return the 'block' itself.
+Block* find_nearest_major_block(Block* block);
+
 bool is_for_loop(Block* block);
 bool is_while_loop(Block* block);
 

@@ -126,6 +126,15 @@ bool is_minor_block(Block* block)
         || owner->function == FUNCS.for_func;
 }
 
+Block* find_nearest_major_block(Block* block)
+{
+    while (true) {
+        if (block == NULL || is_major_block(block))
+            return block;
+        block = get_parent_block(block);
+    }
+}
+
 bool is_for_loop(Block* block)
 {
     if (block->owningTerm == NULL)

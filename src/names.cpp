@@ -533,15 +533,6 @@ bool name_is_reachable_from(Term* term, Block* block)
     return name_is_reachable_from(term, parent);
 }
 
-Block* find_nearest_major_block(Block* block)
-{
-    while (true) {
-        if (block == NULL || is_major_block(block))
-            return block;
-        block = get_parent_block(block);
-    }
-}
-
 Block* find_first_common_block(Term* left, Term* right)
 {
     Block* leftParent = left->owningBlock;

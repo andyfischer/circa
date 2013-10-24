@@ -33,7 +33,11 @@ void insert_nonlocal_terms(Block* block)
     for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* innerTerm = *it;
 
-        if (innerTerm->function == FUNCS.nonlocal)
+        // If we find a nonlocal() term that is in a different major block, then
+        // we do need to create a nonlocal() in this major block. But if the
+        // nonlocal() is in the same major block, ignore it.
+        if (innerTerm->function == FUNCS.nonlocal
+                && find_nearest_major_block(innerTerm->owningBlock) == block)
             continue;
 
         for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
