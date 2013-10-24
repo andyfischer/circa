@@ -61,8 +61,6 @@ def names_to_trie(names, i):
 
     result = {}
 
-    print('by_prefix:', by_prefix)
-
     for prefix,contains in sorted(by_prefix.items(), key=str):
         if len(contains) == 1:
             assert len(contains) == 1

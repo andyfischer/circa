@@ -3,16 +3,6 @@ def add_logged(a, b)
   print('  (reevaluate) Calling add on: ' a ', ' b)
   add(a b)
 
-def cached(Func refresh) -> any
-  @refresh.freeze
-
-  state Func _refresh
-  state _out
-  if _refresh != refresh
-    _refresh = refresh
-    _out = refresh.call()
-  _out
-
 def main(v, cacheKey)
   print('calling main with: ' v ', cacheKey: ' cacheKey)
   result = cached({ cacheKey; add_logged(v, 2) })

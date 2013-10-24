@@ -1274,9 +1274,6 @@ do_loop_done_insn:
                 Term* output = get_output_placeholder(contents, i);
                 caValue* result = frame_register(top, output);
 
-                if (is_func(result))
-                    closure_save_bindings_for_frame(result, top);
-
                 copy(result, frame_register(top, input));
 
                 INCREMENT_STAT(Copy_LoopCopyRebound);
@@ -1317,9 +1314,6 @@ do_loop_done_insn:
 
             if (!castSuccess)
                 return raise_error_output_type_mismatch(stack);
-
-            if (is_func(receiverSlot))
-                closure_save_bindings_for_frame(receiverSlot, top);
 
             continue;
         }
@@ -1369,9 +1363,6 @@ do_loop_done_insn:
 
                     if (!castSuccess)
                         return raise_error_output_type_mismatch(stack);
-
-                    if (is_func(receiverSlot))
-                        closure_save_bindings_for_frame(receiverSlot, top);
                 }
 
                 placeholderIndex++;

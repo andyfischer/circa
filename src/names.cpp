@@ -43,11 +43,6 @@ bool fits_lookup_type(Term* term, Symbol type)
     return false;
 }
 
-bool is_module(Block* block)
-{
-    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.module;
-}
-
 Block* find_module_for_require_statement(Term* term)
 {
     if (term->input(0) == NULL)

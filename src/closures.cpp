@@ -4,6 +4,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "closures.h"
 #include "code_iterators.h"
 #include "hashtable.h"
 #include "importing.h"
@@ -29,15 +30,15 @@ Term* find_nonlocal_term_for_input(Block* block, Term* input)
 void insert_nonlocal_terms(Block* block)
 {
     int nextInsertPosition = count_input_placeholders(block);
+    Block* compilationUnit = find_nearest_compilation_unit(block);
 
     for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* innerTerm = *it;
 
-        // If we find a nonlocal() term that is in a different major block, then
-        // we do need to create a nonlocal() in this major block. But if the
-        // nonlocal() is in the same major block, ignore it.
+        // Skip nonlocal() terms in this block. But, don't skip nonlocal terms that are
+        // in nested major blocks.
         if (innerTerm->function == FUNCS.nonlocal
-                && find_nearest_major_block(innerTerm->owningBlock) == block)
+                && innerTerm->owningBlock == block)
             continue;
 
         for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
@@ -45,13 +46,20 @@ void insert_nonlocal_terms(Block* block)
             if (input == NULL)
                 continue;
 
+            // No nonlocal needed for a pure value.
             if (is_value(input))
                 continue;
 
+            // No nonlocal needed if input is inside this major block.
             if (term_is_nested_in_block(input, block))
                 continue;
 
-            // This is a nonlocal reference
+            // No nonlocal needed if input is in a different compilation unit.
+            // (Should only happen for a value reference to builtins)
+            if (find_nearest_compilation_unit(input->owningBlock) != compilationUnit)
+                continue;
+
+            // This input needs a nonlocal() term.
 
             // Check if we've already created an input for this one
             Term* existing = find_nonlocal_term_for_input(block, input);
@@ -84,6 +92,7 @@ void closure_block_evaluate(caStack* stack)
     caValue* closureOutput = circa_create_default_output(stack, 0);
     Block* block = nested_contents(term);
     set_block(list_get(closureOutput, 0), block);
+    closure_save_all_bindings(closureOutput, stack);
 }
 
 bool is_closure(caValue* value)
@@ -183,16 +192,6 @@ void closure_save_all_bindings(caValue* closure, Stack* stack)
     }
 }
 
-void Func__freeze(caStack* stack)
-{
-    caValue* self = circa_input(stack, 0);
-    caValue* out = circa_output(stack, 0);
-
-    copy(self, out);
-
-    closure_save_all_bindings(out, stack);
-}
-
 void closures_install_functions(Block* kernel)
 {
     install_function(kernel, "closure_block", closure_block_evaluate);
@@ -201,8 +200,6 @@ void closures_install_functions(Block* kernel)
     install_function(kernel, "function_decl", closure_block_evaluate);
 
     FUNCS.func_apply = kernel->get("Func.apply");
-
-    install_function(kernel, "Func.freeze", Func__freeze);
 }
 
 } // namespace circa
