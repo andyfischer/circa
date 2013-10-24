@@ -1460,7 +1460,23 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         parseResult = ParseResult(term);
     }
 
+    int outputCountPreRebindOperators = count_outputs(term);
+
     resolve_rebind_operators_in_inputs(block, term);
+
+#if 0
+    // If there were any "implicit" outputs (as in, from rebind operators), then
+    // the indexes in the nameBindingSyntax will need to be corrected.
+    int implicitOutputCount = count_outputs(term) - outputCountPreRebindOperators;
+    if (implicitOutputCount > 0) {
+        touch(&nameBindingSyntax);
+        for (int i=0; i < list_length(&nameBindingSyntax); i++) {
+            caValue* element = list_get(&nameBindingSyntax, i);
+            if (is_int(element))
+                set_int(element, implicitOutputCount + as_int(element));
+        }
+    }
+#endif
 
     if (hasSimpleNameBinding) {
         term->setProp("syntax:nameBinding", &nameBindingSyntax);
@@ -1875,6 +1891,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         if (forceRebindLHS && get_extra_output(term, 0) == NULL)
             apply(block, FUNCS.extra_output, TermList(term));
         
+
     } else {
         term = apply(block, function, inputs);
     }

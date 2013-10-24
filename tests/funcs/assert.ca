@@ -1,0 +1,12 @@
+
+def main(b)
+  assert(b)
+
+
+int = make_stack(main)
+
+int.call(true)
+assert(not int.errored)
+
+int.call(false)
+assert(int.errored)
