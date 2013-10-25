@@ -311,7 +311,7 @@ void get_global_name(Term* term, caValue* nameOut)
 
     // Construct a global qualified name.
     set_string(nameOut, "");
-    for (int i = stack.size()-1; i >= 0; i--) {
+    for (int i = int(stack.size())-1; i >= 0; i--) {
         Term* subTerm = stack[i];
 
         // If this term has no name then we can't construct a global name. Bail out.

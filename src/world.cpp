@@ -83,7 +83,9 @@ void world_append_file_source(World* world, caValue* fileSource)
     copy(fileSource, list_append(&world->fileSources));
 }
 
-CIRCA_EXPORT void circa_use_local_filesystem(caWorld* world, const char* rootDir)
+extern "C" {
+
+void circa_use_local_filesystem(caWorld* world, const char* rootDir)
 {
     Value fileSource;
     set_list(&fileSource, 2);
@@ -92,10 +94,12 @@ CIRCA_EXPORT void circa_use_local_filesystem(caWorld* world, const char* rootDir
     world_append_file_source(world, &fileSource);
 }
 
-CIRCA_EXPORT void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)
+void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)
 {
     world->logContext = context;
     world->logFunc = func;
 }
+
+} // extern "C"
 
 } // namespace circa

@@ -15,6 +15,10 @@ void hashtable_remove(caValue* table, caValue* key);
 bool hashtable_is_empty(caValue* table);
 void hashtable_get_keys(caValue* table, caValue* keysOut);
 
+int hashtable_slot_count(caValue* table);
+caValue* hashtable_key_by_index(caValue* table, int index);
+caValue* hashtable_value_by_index(caValue* table, int index);
+
 void hashtable_setup_type(Type* type);
 
 } // namespace circa

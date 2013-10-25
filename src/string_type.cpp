@@ -330,7 +330,7 @@ bool string_starts_with(caValue* s, const char* beginning)
 
 bool string_ends_with(caValue* s, const char* ending)
 {
-    int ending_len = strlen(ending);
+    int ending_len = (int) strlen(ending);
     int s_len = string_length(s);
     const char* left = as_cstring(s);
 
@@ -346,7 +346,7 @@ void string_remove_suffix(caValue* s, const char* str)
     if (!string_ends_with(s, str))
         return;
 
-    string_resize(s, string_length(s) - strlen(str));
+    string_resize(s, string_length(s) - int(strlen(str)));
 }
 
 char string_get(caValue* s, int index)

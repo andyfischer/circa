@@ -144,8 +144,6 @@ static void commit_append(caWorld* world, caValue* event, bool dryRun, caValue* 
 
     Block* block = get_single_block_target(change_event_target(event));
 
-    int prevRegisterCount = block_locals_count(block);
-
     compile(block, as_cstring(change_event_field(event, 0)));
     dirty_bytecode(block);
     refresh_bytecode(block);

@@ -73,8 +73,8 @@ void check_term_for_static_error(List* errors, Term* term)
     if (!is_function(term->function))
         return append_static_error(errors, term, "not_a_function");
 
-    bool varArgs = term_has_variable_args(term);
-    int expectedInputCount = term_count_input_placeholders(term);
+    //bool varArgs = term_has_variable_args(term);
+    //int expectedInputCount = term_count_input_placeholders(term);
 
     // Checking input count here is disabled. TODO: Look at bytecode instead.
 

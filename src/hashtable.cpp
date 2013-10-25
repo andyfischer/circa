@@ -509,10 +509,32 @@ void hashtable_get_keys(caValue* table, caValue* keysOut)
     }
 }
 
+int hashtable_slot_count(caValue* table)
+{
+    ca_assert(is_hashtable(table));
+    if (hashtable_is_empty(table))
+        return 0;
+    return ((Hashtable*) table->value_data.ptr)->capacity;
+}
+caValue* hashtable_key_by_index(caValue* table, int index)
+{
+    ca_assert(is_hashtable(table));
+    return &((Hashtable*) table->value_data.ptr)->slots[index].key;
+}
+caValue* hashtable_value_by_index(caValue* table, int index)
+{
+    ca_assert(is_hashtable(table));
+    return &((Hashtable*) table->value_data.ptr)->slots[index].value;
+}
+
 bool hashtable_equals(caValue* left, caValue* right)
 {
+    if (!is_hashtable(right))
+        return false;
     if (hashtable_is_empty(left))
         return hashtable_is_empty(right);
+    if (hashtable_is_empty(right))
+        return false;
 
     Hashtable* leftData = (Hashtable*) left->value_data.ptr;
     Hashtable* rightData = (Hashtable*) right->value_data.ptr;

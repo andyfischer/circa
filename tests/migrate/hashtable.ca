@@ -1,0 +1,26 @@
+
+def left()
+  a = 1
+  b = 2
+
+  state map = Map.make.set(term_ref(a), term_ref(b))
+
+def right()
+  a = 3
+  b = 4
+
+  state map
+
+  print('After migration..')
+  if not(map.contains(term_ref(a)))
+    print('key not found: ' term_ref(a))
+    print('map equals: ' map)
+    return
+
+  print('  map has: 3 -> ' map.get(term_ref(a)).value)
+
+int = make_stack(left)
+int.run
+
+int.migrate_to(right)
+int.run

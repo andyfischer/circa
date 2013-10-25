@@ -1460,7 +1460,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         parseResult = ParseResult(term);
     }
 
-    int outputCountPreRebindOperators = count_outputs(term);
+    // int outputCountPreRebindOperators = count_outputs(term);
 
     resolve_rebind_operators_in_inputs(block, term);
 

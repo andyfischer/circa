@@ -1,5 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include <cstdlib>
 #include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
@@ -10,7 +11,7 @@ namespace range_function {
         int start = circa_int_input(stack, 0);
         int max = circa_int_input(stack, 1);
 
-        int count = abs(max-start);
+        int count = abs(max - start);
         caValue* output = circa_output(stack, 0);
         set_list(output, count);
 

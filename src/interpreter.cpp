@@ -367,7 +367,6 @@ void stack_restart(Stack* stack)
         stack_pop(stack);
 
     Frame* top = stack_top(stack);
-    Block* block = top->block;
     top->pcIndex = 0;
     top->pc = 0;
     move(&top->outgoingState, &top->state);
@@ -417,8 +416,6 @@ caValue* stack_find_active_value(Frame* frame, Term* term)
     Value termRef;
     set_term_ref(&termRef, term);
 
-    caStack* stack = frame->stack;
-
     while (true) {
         if (frame->block == term->owningBlock)
             return frame_register(frame, term);
@@ -452,8 +449,6 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
 
     Value termRef;
     set_term_ref(&termRef, term);
-
-    caStack* stack = frame->stack;
 
     while (true) {
         if (!is_null(&frame->bindings)) {
@@ -849,13 +844,6 @@ bool stack_errored(Stack* stack)
     return stack->errorOccurred;
 }
 
-static int for_loop_find_index_value(Frame* frame)
-{
-    Term* term = for_loop_find_index(frame->block);
-    ca_assert(term != NULL);
-    return as_int(frame_register(frame, term));
-}
-
 static void start_interpreter_session(Stack* stack)
 {
     Block* topBlock = stack_top(stack)->block;
@@ -967,7 +955,6 @@ int get_count_of_caller_inputs_for_error(Stack* stack)
 void raise_error_not_enough_inputs(Stack* stack)
 {
     Frame* frame = stack_top(stack);
-    Frame* parent = stack_top_parent(stack);
     Term* caller = frame_caller(frame);
 
     int expectedCount = count_input_placeholders(frame->block);
@@ -991,7 +978,6 @@ void raise_error_not_enough_inputs(Stack* stack)
 void raise_error_too_many_inputs(Stack* stack)
 {
     Frame* frame = stack_top(stack);
-    Frame* parent = stack_top_parent(stack);
     Term* caller = frame_caller(frame);
 
     int expectedCount = count_input_placeholders(frame->block);
@@ -1086,7 +1072,6 @@ void run_bytecode(Stack* stack, caValue* bytecode)
 
             Frame* top = stack_top(stack);
             Block* block = as_block(value);
-            Term* caller = frame_term(s.frame, termIndex);
             top = stack_push3(stack, termIndex, block);
             expand_frame(s.frame, top);
             continue;
@@ -1160,7 +1145,6 @@ void run_bytecode(Stack* stack, caValue* bytecode)
         case bc_PushNonlocalInput: {
             int termIndex = blob_read_int(s.bc, &s.pc);
             Frame* top = stack_top(stack);
-            Frame* parent = stack_top(stack);
             Term* caller = top->block->get(termIndex);
             ca_assert(caller->function == FUNCS.nonlocal);
             Term* input = caller->input(0);
@@ -1583,9 +1567,6 @@ do_func_apply:
             }
 
             if (!as_bool(condition)) {
-                Block* currentCase = stack_top(stack)->block;
-                int parentPc = stack_top(stack)->parentPc;
-
                 s.frame = stack_top_parent(stack);
                 s.bc = as_blob(frame_bytecode(s.frame));
                 s.pc = s.frame->pc;
@@ -1638,7 +1619,7 @@ do_func_apply:
             int index = blob_read_int(s.bc, &s.pc);
             Term* caller = frame_term(s.frame, index);
             Block* block = caller->nestedContents;
-            Frame* top = stack_push3(stack, index, block);
+            stack_push3(stack, index, block);
             s.frame = stack_top_parent(stack);
             continue;
         }
@@ -1823,7 +1804,6 @@ do_func_apply:
             // the entire register list.
             copy(&top->registers, &top->outgoingState);
             touch(&top->outgoingState);
-
             continue;
         }
 
@@ -1864,9 +1844,6 @@ static void push_inputs_dynamic(Stack* stack)
 
         Value copiedInputs;
         caValue* inputs;
-
-        caValue* func = stack_find_active_value(callerFrame, caller->input(0));
-        caValue* bindings = list_get(func, 1);
 
         if (top->callType == sym_FuncApply) {
             inputs = stack_find_active_value(callerFrame, caller->input(1));
@@ -2108,7 +2085,6 @@ void make_stack(caStack* stack)
     caValue* closure = circa_input(stack, 0);
 
     Block* block = as_block(list_get(closure, 0));
-    caValue* closedValues = list_get(closure, 1);
 
     if (block == NULL)
         return circa_output_error(stack, "NULL block");

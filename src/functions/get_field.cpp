@@ -8,7 +8,6 @@ namespace get_field_function {
     void evaluate(caStack* stack)
     {
         caValue* head = circa_input(stack, 0);
-        const char* keyStr = circa_string_input(stack, 1);
 
         Value error;
         caValue* value = get_field(head, circa_input(stack, 1), &error);

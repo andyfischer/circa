@@ -133,7 +133,6 @@ void copy(caValue* source, caValue* dest)
         return;
 
     Type::Copy copyFunc = source->value_type->copy;
-    Type* oldDestType = dest->value_type;
 
     if (copyFunc != NULL) {
         copyFunc(source->value_type, source, dest);

@@ -172,7 +172,7 @@ Term* if_block_append_output(Block* block, caValue* description)
 
         Block* caseContents = nested_contents(it.current());
 
-        Term* placeholder = append_output_placeholder_with_description(caseContents, description);
+        append_output_placeholder_with_description(caseContents, description);
     }
 
     return blockPlaceholder;
@@ -331,12 +331,12 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
         // This term rebinds an outer name.
 
         // First, bring in the outer name as an input to the block.
-
+        
+#if 0
         // Check if we already have an output for this name.
         Term* inputPlaceholder = find_input_placeholder_with_name(mainBlock, name);
 
         // Create it if necessary
-        #if 0
         if (inputPlaceholder == NULL) {
             inputPlaceholder = if_block_add_input(ifCall, outer);
             rename(inputPlaceholder, name);

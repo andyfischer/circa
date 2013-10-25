@@ -6,6 +6,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "interpreter.h"
+#include "hashtable.h"
 #include "kernel.h"
 #include "migration.h"
 #include "term.h"
@@ -162,9 +163,31 @@ void migrate_value(caValue* value, Migration* migration)
     } else if (is_retained_frame(value)) {
         migrate_retained_frame(value, migration);
     } else if (is_list(value)) {
+        touch(value);
         for (int i=0; i < list_length(value); i++) {
             caValue* element = list_get(value, i);
             migrate_value(element, migration);
+        }
+    } else if (is_hashtable(value)) {
+        Value oldHashtable;
+        move(value, &oldHashtable);
+
+        set_hashtable(value);
+        caValue* hashtable = value;
+
+        for (int i=0; i < hashtable_slot_count(&oldHashtable); i++) {
+            caValue* oldKey = hashtable_key_by_index(&oldHashtable, i);
+            if (oldKey == NULL || is_null(oldKey))
+                continue;
+
+            caValue* oldValue = hashtable_value_by_index(&oldHashtable, i);
+
+            Value key;
+            copy(oldKey, &key);
+            migrate_value(&key, migration);
+            caValue* newValue = hashtable_insert(hashtable, &key);
+            copy(oldValue, newValue);
+            migrate_value(newValue, migration);
         }
     }
 }

@@ -277,7 +277,6 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
 
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
 {
-    const char* bcData = as_blob(bytecode);
     int pos = 0;
 
     set_list(lines, 0);
@@ -495,7 +494,6 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
 
     int callerInputIndex = 0;
     int lastInputIndex = caller->numInputs() - 1;
-    int normalInputCount = 0;
     bool usesVarargs = false;
 
     // Walk through the receivingBlock's input terms, and pull input values from the
