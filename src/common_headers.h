@@ -159,3 +159,7 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 #define CIRCA_ASSERT_ON_ERROR 1
 
 #define CIRCA_THROW_ON_ERROR !CIRCA_ASSERT_ON_ERROR
+
+// temp
+#define NEW_INPUT_PASSING 1
+

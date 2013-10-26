@@ -50,3 +50,14 @@ Future
     methods of course.
   Should we do that as part of this change?
     Probably not, but let's at least plan for it.
+
+---
+
+Update 10/26/2013
+
+The closure changes are in place.
+Modules are executed on 'require' and they output a map.
+
+Next on the list:
+  Add 'module.function' syntax.
+    Add 'map.name' syntax.

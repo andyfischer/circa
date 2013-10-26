@@ -60,7 +60,7 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         set_string(string, "leave_frame");
         break;
     case bc_PopFrame:
-        set_string(string, "stack_pop");
+        set_string(string, "pop_frame");
         break;
     case bc_PushFunction:
         set_string(string, "push_function ");
@@ -176,6 +176,12 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         string_append(string, " ");
         string_append(string, blob_read_int(bcData, pos));
         break;
+    case bc_PushInputFromStack3:
+        set_string(string, "push_input_from_stack3 ");
+        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, " ");
+        string_append(string, blob_read_u16(bcData, pos));
+        break;
     case bc_PushVarargList:
         set_string(string, "push_vararg_list ");
         string_append(string, blob_read_int(bcData, pos));
@@ -183,15 +189,19 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_PushInputNull:
-        set_string(string, "push_input_from_apply_list ");
+        set_string(string, "push_input_null ");
+        string_append(string, blob_read_int(bcData, pos));
+        break;
+    case bc_PushInputNull2:
+        set_string(string, "push_input_null2");
+        break;
+    case bc_PushInputFromValue:
+        set_string(string, "push_input_from_value ");
         string_append(string, blob_read_int(bcData, pos));
         break;
     case bc_PushNonlocalInput:
         set_string(string, "push_nonlocal_input ");
         string_append(string, blob_read_int(bcData, pos));
-        break;
-    case bc_PushInputsDynamic:
-        set_string(string, "push_inputs_dynamic");
         break;
     case bc_PushExplicitState:
         set_string(string, "push_explicit_state ");
@@ -478,7 +488,15 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
-    bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);
+#if NEW_INPUT_PASSING
+    if (term->function == FUNCS.dynamic_method
+            || term->function == FUNCS.func_call
+            || term->function == FUNCS.func_apply)
+        bytecode_write_input_instructions2(bytecode, term);
+    else
+#endif
+        bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);
+
     blob_append_char(bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(bytecode, term, referenceTargetBlock);
     blob_append_char(bytecode, bc_PopFrame);
@@ -489,8 +507,7 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
     if (!is_blob(bytecode))
         set_blob(bytecode, 0);
 
-    if (block == NULL)
-        return blob_append_char(bytecode, bc_PushInputsDynamic);
+    ca_assert(block != NULL);
 
     int callerInputIndex = 0;
     int lastInputIndex = caller->numInputs() - 1;
@@ -549,6 +566,23 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
 
     if (!usesVarargs && callerInputIndex <= lastInputIndex) {
         blob_append_char(bytecode, bc_TooManyInputs);
+    }
+}
+
+void bytecode_write_input_instructions2(caValue* bytecode, Term* caller)
+{
+    for (int i=0; i < caller->numInputs(); i++) {
+        Term* input = caller->input(i);
+
+        if (input == NULL) {
+            blob_append_char(bytecode, bc_PushInputNull2);
+        } else if (is_value(input) || input->owningBlock == global_builtins_block()) {
+            blob_append_char(bytecode, bc_PushInputFromValue);
+            blob_append_int(bytecode, i);
+        } else {
+            blob_append_char(bytecode, bc_PushInputFromStack3);
+            bytecode_write_local_reference(bytecode, caller->owningBlock, input);
+        }
     }
 }
 
