@@ -676,10 +676,22 @@ void bootstrap_kernel()
     TYPES.color = as_type(builtins->get("Color"));
     TYPES.file_signature = as_type(builtins->get("FileSignature"));
     TYPES.func = as_type(builtins->get("Func"));
+    TYPES.module_value = as_type(builtins->get("Module"));
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
     TYPES.retained_frame = as_type(builtins->get("RetainedFrame"));
     TYPES.point = as_type(builtins->get("Point"));
+
+    {
+        // Setup module_value type.
+        TYPES.module_value->initialize = TYPES.map->initialize;
+        TYPES.module_value->release = TYPES.map->release;
+        TYPES.module_value->copy = TYPES.map->copy;
+        TYPES.module_value->touch = TYPES.map->touch;
+        TYPES.module_value->equals = TYPES.map->equals;
+        TYPES.module_value->toString = TYPES.map->toString;
+        TYPES.module_value->storageType = sym_StorageTypeHashtable;
+    }
 
     // Fix function_decl now that Func type is available.
     {

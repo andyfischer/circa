@@ -184,13 +184,13 @@ void module_capture_exports_from_stack(Frame* frame, caValue* output)
 {
     Block* block = frame->block;
 
-    set_hashtable(output);
+    set_module_value(output);
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
 
         if (!is_function(term))
-            return;
+            continue;
 
         // Future: If we had a system to declare some terms as 'private', then
         // this loop shouldn't copy them to the map.
@@ -297,6 +297,16 @@ Block* find_module(Block* root, caValue* name)
     }
 
     return NULL;
+}
+
+void set_module_value(caValue* value)
+{
+    make(TYPES.module_value, value);
+}
+
+bool is_module_value(caValue* value)
+{
+    return value->value_type == TYPES.module_value;
 }
 
 void modules_install_functions(Block* kernel)

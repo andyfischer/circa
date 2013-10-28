@@ -450,7 +450,7 @@ void set_mutable_hashtable(caValue* value)
 
 caValue* hashtable_get(caValue* table, caValue* key)
 {
-    ca_assert(is_hashtable(table));
+    ca_assert(table->value_type->storageType == sym_StorageTypeHashtable);
     return hashtable_get((Hashtable*) table->value_data.ptr, key);
 }
 
@@ -463,8 +463,8 @@ caValue* hashtable_get(caValue* table, const char* keystr)
 
 caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
 {
+    ca_assert(tableTv->value_type->storageType == sym_StorageTypeHashtable);
     hashtable_touch(tableTv);
-    ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     int index = hashtable_insert(&table, key, consumeKey);
 
@@ -566,6 +566,7 @@ void hashtable_setup_type(Type* type)
     type->equals = hashtable_equals;
     type->toString = tagged_value_wrappers::to_string;
     type->storageType = sym_StorageTypeHashtable;
+    // If you add something here, possibly add it to TYPES.module_value too.
 }
 
 // Publich functions

@@ -48,6 +48,9 @@ Block* module_create_empty_bundle(World* world, const char* name);
 Block* module_load_from_zip_data(char* data, size_t data);
 #endif
 
+void set_module_value(caValue* value);
+bool is_module_value(caValue* value);
+
 // Install builtin modules functions.
 void modules_install_functions(Block* kernel);
 

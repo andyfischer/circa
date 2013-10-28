@@ -163,6 +163,8 @@ def _bc_pop_frame()
 
 -- Modules
 
+type Module;
+
 def native_patch_this(String filename)
     -- Annotation, declare that the current module should be patched by a native
     -- module with the given filename.
@@ -176,7 +178,7 @@ def load_script(String filename) -> Block
     -- Load a script with the given filename. The result will only be available
     -- locally; it won't be loaded into module space.
 
-def require(String moduleName) -> Map
+def require(String moduleName) -> Module
     -- Load a module, and use it during name lookup.
     -- TODO: This call should be memoized.
     

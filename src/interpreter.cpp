@@ -48,6 +48,8 @@ static void run_input_instructions_apply(caStack* stack, caValue* inputs);
 static caValue* run_single_input_instruction(Frame* frame, Term* caller, const char* bytecode, int* pc);
 static bool handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key,
     const char* bc, int* pc);
+static bool handle_method_as_module_access(Frame* top, Term* caller, caValue* module,
+    caValue* method, const char* bc, int* pc);
 void run(Stack* stack);
 
 bool run_memoize_check(Stack* stack);
@@ -1423,6 +1425,10 @@ do_loop_done_insn:
                         s.bc, &s.pc))
                     continue;
 
+                if (handle_method_as_module_access(top, caller, object, elementName,
+                        s.bc, &s.pc))
+                    continue;
+
                 Value msg;
                 set_string(&msg, "Method ");
                 string_append(&msg, elementName);
@@ -2006,7 +2012,20 @@ static bool handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* 
 
     copy(element, frame_register(top, caller));
     return true;
+}
 
+static bool handle_method_as_module_access(Frame* top, Term* caller, caValue* module,
+    caValue* method, const char* bc, int* pc)
+{
+    if (!is_module_value(module))
+        return false;
+
+    caValue* func = hashtable_get(module, method);
+
+    if (func == NULL)
+        return false;
+
+    return false;
 }
 
 bool run_memoize_check(Stack* stack)
