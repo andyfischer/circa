@@ -9,15 +9,6 @@ struct TokenStream;
 
 namespace parser {
 
-enum BlockSyntax {
-    BLOCK_SYNTAX_UNDEF=0,
-    BLOCK_SYNTAX_COLON=1,
-    BLOCK_SYNTAX_IMPLICIT_BEGIN=2, // deprecated
-    BLOCK_SYNTAX_BEGIN=3,          // deprecated
-    BLOCK_SYNTAX_BRACE=4,
-    BLOCK_SYNTAX_DO=5
-};
-
 struct ParserCxt {
 
     // Number of open parenthesis in the current expression. (This affects whether we'll

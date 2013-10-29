@@ -1211,15 +1211,16 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         return compile_error_for_line(block, tokens, startPosition,
                 "Expected identifier after 'state'");
 
-    std::string name = tokens.consumeStr(tok_Identifier);
+    Value name;
+    tokens.consumeStr(&name, tok_Identifier);
     possible_whitespace(tokens);
 
-    std::string typeName;
+    Value typeName;
 
     // check for "state <type> <name>" syntax
     if (tokens.nextIs(tok_Identifier)) {
-        typeName = name;
-        name = tokens.consumeStr(tok_Identifier);
+        move(&name, &typeName);
+        tokens.consumeStr(&name, tok_Identifier);
         possible_whitespace(tokens);
     }
 
@@ -1227,8 +1228,8 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     Type* type = TYPES.any;
 
     bool unknownType = false;
-    if (typeName != "") {
-        Term* typeTerm = find_name(block, typeName.c_str(), sym_LookupType);
+    if (!string_eq(&typeName, "")) {
+        Term* typeTerm = find_name(block, &typeName, sym_LookupType);
 
         if (typeTerm == NULL) {
             unknownType = true;
@@ -1264,7 +1265,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
-        if (typeName == "" && initialValue->type != TYPES.null) {
+        if (is_null(&typeName) && initialValue->type != TYPES.null) {
             type = initialValue->type;
         }
     }
@@ -1272,17 +1273,17 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     // Term* stateContainer = find_or_create_default_state_input(block);
 
     // Create the declared_state() term.
-    Term* result = apply(block, FUNCS.declared_state, TermList(), name.c_str());
+    Term* result = apply(block, FUNCS.declared_state, TermList(), as_cstring(&name));
 
     change_declared_type(result, type);
     set_input(result, 0, type->declaringTerm);
     set_input(result, 1, initializer);
     
     result->setBoolProp("syntax:stateKeyword", true);
-    if (unknownType)
-        result->setStringProp("error:unknownType", typeName);
-    if (typeName != "")
-        result->setStringProp("syntax:explicitType", typeName);
+    if (unknownType && !is_null(&typeName))
+        result->setProp("error:unknownType", &typeName);
+    if (!is_null(&typeName))
+        result->setProp("syntax:explicitType", &typeName);
 
     set_source_location(result, startPosition, tokens);
 
@@ -2477,16 +2478,17 @@ ParseResult identifier(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
     
-    std::string id = tokens.consumeStr(tok_Identifier);
+    Value ident;
+    tokens.consumeStr(&ident, tok_Identifier);
 
-    Term* term = find_name(block, id.c_str());
+    Term* term = find_name(block, &ident);
     if (term == NULL) {
-        ParseResult result = unknown_identifier(block, id);
+        ParseResult result = unknown_identifier(block, as_cstring(&ident));
         set_source_location(result.term, startPosition, tokens);
         return result;
     }
 
-    return ParseResult(term, id);
+    return ParseResult(term, as_cstring(&ident));
 }
 
 ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -2500,19 +2502,19 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
         rebindOperator = true;
     }
 
-    std::string id = tokens.consumeStr(tok_Identifier);
+    Value ident;
+    tokens.consumeStr(&ident, tok_Identifier);
 
-    Term* head = find_name(block, id.c_str());
+    Term* head = find_name(block, &ident);
     ParseResult result;
 
     if (head == NULL)
-        result = unknown_identifier(block, id);
+        result = unknown_identifier(block, as_cstring(&ident));
     else
-        result = ParseResult(head, id);
+        result = ParseResult(head, as_cstring(&ident));
 
-    if (rebindOperator) {
+    if (rebindOperator)
         result.identifierRebind = true;
-    }
 
     return result;
 }
@@ -2615,20 +2617,6 @@ ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int star
     ca_assert(has_static_error(existing));
 
     return ParseResult(existing);
-}
-
-bool is_infix_operator_rebinding(int match)
-{
-    switch (match) {
-        case tok_PlusEquals:
-        case tok_MinusEquals:
-        case tok_StarEquals:
-        case tok_SlashEquals:
-            return true;
-
-        default:
-            return false;
-    }
 }
 
 std::string possible_whitespace(TokenStream& tokens)
