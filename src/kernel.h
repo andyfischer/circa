@@ -70,7 +70,6 @@ struct BuiltinFuncs {
     Term* minor_return_if_empty;
     Term* module;
     Term* mult;
-    Term* namespace_func;
     Term* native_patch;
     Term* neg;
     Term* nonlocal;
@@ -161,10 +160,6 @@ namespace file_changed_function {
 
 namespace for_function {
     std::string get_heading_source(Term* term);
-}
-
-namespace namespace_function {
-    void early_setup(Block* kernel);
 }
 
 namespace neg_function {

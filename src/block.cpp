@@ -320,16 +320,6 @@ Block::compile(std::string const& code)
     return parser::compile(this, parser::statement_list, code);
 }
 
-bool is_namespace(Term* term)
-{
-    return term->function == FUNCS.namespace_func;
-}
-
-bool is_namespace(Block* block)
-{
-    return block->owningTerm != NULL && is_namespace(block->owningTerm);
-}
-
 caValue* block_bytecode(Block* block)
 {
     return &block->bytecode;

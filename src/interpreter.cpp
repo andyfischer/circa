@@ -2545,7 +2545,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.errored", Stack__errored);
     module_patch_function(patch, "Stack.error_message", Stack__error_message);
     module_patch_function(patch, "Stack.toString", Stack__toString);
-    module_patch_function(patch, "reflect:caller", reflect__caller);
+    module_patch_function(patch, "reflect_caller", reflect__caller);
     module_patch_function(patch, "reflect_get_frame_state", reflect_get_frame_state);
 }
 

@@ -13,17 +13,6 @@
 
 namespace names_test {
 
-void find_name()
-{
-    Block block;
-    block.compile("a = 1");
-    block.compile("namespace ns { a = 2; b = 3; } ");
-
-    test_equals(term_value(find_name(&block, "a")), "1");
-    test_equals(term_value(find_name(&block, "ns:a")), "2");
-    test_equals(term_value(find_name(&block, "ns:b")), "3");
-}
-
 void unique_ordinals()
 {
     Block block;
@@ -173,7 +162,6 @@ void type_name_visible_from_module()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(names_test::find_name);
     REGISTER_TEST_CASE(names_test::global_names);
     REGISTER_TEST_CASE(names_test::unique_ordinals);
     REGISTER_TEST_CASE(names_test::test_find_ordinal_suffix);

@@ -210,25 +210,24 @@ def test_spy(any val)
     -- For internal testing. This function will save inputs to a global list which
     -- can be easily examined from C++ with test_spy_get_results().
 
-namespace file
-    def exists(String filename) -> bool
-    def version(String filename) -> int
-    def read_text(String filename) -> String
+-- File module
+def file_exists(String filename) -> bool
+def file_version(String filename) -> int
+def file_read_text(String filename) -> String
+def file_changed(String filename) -> bool
+    ver = file_version(filename)
+    return changed([filename ver])
 
-    def file_changed(String filename) -> bool
-        ver = version(filename)
-        return changed([filename ver])
+-- Reflect module
+def reflect_this_block() -> Block
+def reflect_caller() -> Term
+def reflect_kernel() -> Block
 
-namespace reflect
-    def this_block() -> Block
-    def caller() -> Term
-    def kernel() -> Block
-
-namespace sys
-    def arg(int index) -> String
-    def module_search_paths() -> List
-    def perf_stats_reset()
-    def perf_stats_dump() -> List
+-- Sys module
+def sys_arg(int index) -> String
+def sys_module_search_paths() -> List
+def sys_perf_stats_reset()
+def sys_perf_stats_dump() -> List
 
 -- Builtin types
 type FileSignature { String filename, int time_modified }

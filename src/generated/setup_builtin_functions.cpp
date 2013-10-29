@@ -33,7 +33,6 @@ namespace logical_function { void setup(Block* kernel); }
 namespace make_function { void setup(Block* kernel); }
 namespace math_function { void setup(Block* kernel); }
 namespace mult_function { void setup(Block* kernel); }
-namespace namespace_function { void setup(Block* kernel); }
 namespace neg_function { void setup(Block* kernel); }
 namespace rand_function { void setup(Block* kernel); }
 namespace range_function { void setup(Block* kernel); }
@@ -79,7 +78,6 @@ void setup_builtin_functions(Block* kernel)
     make_function::setup(kernel);
     math_function::setup(kernel);
     mult_function::setup(kernel);
-    namespace_function::setup(kernel);
     neg_function::setup(kernel);
     rand_function::setup(kernel);
     range_function::setup(kernel);

@@ -33,7 +33,6 @@ void patch_manually()
     // Run with an unpatched 'my_add'
     Block block;
     block.compile("def my_add(int a, int b) -> int { a + a }");
-    block.compile("namespace ns { def my_add(int a, int b) -> int { a + a } }");
     block.compile("test_spy(my_add(1 2))");
 
     Stack stack;
@@ -55,34 +54,6 @@ void patch_manually()
     test_equals(test_spy_get_results(), "[3]");
 
     remove_native_patch(world, "patch_manually");
-}
-
-void patch_manually_ns()
-{
-    World* world = global_world();
-
-    // Similar to 'patch_manually' test, but with a namespaced name.
-    Block block;
-    block.compile("def f1() -> int { 1 }");
-    block.compile("namespace ns_a { def f1() -> int { 1 } }");
-    block.compile("namespace ns_b { namespace ns_a { def f1() -> int { 1 } } }");
-    block.compile("test_spy(f1())");
-    block.compile("test_spy(ns_a:f1())");
-    block.compile("test_spy(ns_b:ns_a:f1())");
-
-    NativePatch* patch = add_native_patch(world, "patch_manually_ns");
-    module_patch_function(patch, "ns_a:f1", my_5);
-    module_patch_function(patch, "ns_b:ns_a:f1", my_6);
-    native_patch_apply_patch(patch, &block);
-
-    Stack stack;
-    stack_init(&stack, &block);
-    test_spy_clear();
-    run_interpreter(&stack);
-
-    test_equals(test_spy_get_results(), "[1, 5, 6]");
-
-    remove_native_patch(world, "patch_manually_ns");
 }
 
 void trigger_change()
@@ -165,7 +136,6 @@ void patch_manually_public_api()
 void register_tests()
 {
     REGISTER_TEST_CASE(native_patch_test::patch_manually);
-    REGISTER_TEST_CASE(native_patch_test::patch_manually_ns);
     REGISTER_TEST_CASE(native_patch_test::trigger_change);
     REGISTER_TEST_CASE(native_patch_test::new_function_patched_by_world);
     REGISTER_TEST_CASE(native_patch_test::patch_manually_public_api);

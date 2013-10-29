@@ -6,4 +6,4 @@ namespace a_namespace
   def function_from_a_2() -> string
     return "Success 2"
 
-reflect:kernel().dump()
+reflect_kernel().dump()

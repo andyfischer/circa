@@ -381,11 +381,6 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
         result = continue_statement(block, tokens, context);
     }
 
-    // Namespace block
-    else if (tokens.nextIs(tok_Namespace)) {
-        result = namespace_block(block, tokens, context);
-    }
-
     // Case statement
     else if (tokens.nextIs(tok_Case)) {
         result = case_statement(block, tokens, context);
@@ -2466,28 +2461,6 @@ ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
     set_source_location(term, startPosition, tokens);
     consume_block_with_braces(resultBlock, tokens, context, term);
     block_finish_changes(resultBlock);
-
-    return ParseResult(term);
-}
-
-ParseResult namespace_block(Block* block, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-    tokens.consume(tok_Namespace);
-    possible_whitespace(tokens);
-
-    if (!tokens.nextIs(tok_Identifier))
-        return compile_error_for_line(block, tokens, startPosition,
-            "Expected identifier after 'namespace'");
-
-    Value name;
-    tokens.consumeStr(&name, tok_Identifier);
-    Term* term = apply(block, FUNCS.namespace_func, TermList(), &name);
-    set_starting_source_location(term, startPosition, tokens);
-
-    consume_block(nested_contents(term), tokens, context);
-
-    block_finish_changes(nested_contents(term));
 
     return ParseResult(term);
 }

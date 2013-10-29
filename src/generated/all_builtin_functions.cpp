@@ -21,7 +21,6 @@
 #include "../functions/make.cpp"
 #include "../functions/math.cpp"
 #include "../functions/mult.cpp"
-#include "../functions/namespace.cpp"
 #include "../functions/neg.cpp"
 #include "../functions/rand.cpp"
 #include "../functions/range.cpp"

@@ -1,3 +1,3 @@
 
-contents = file:read_text('x' -> rpath)
+contents = file_read_text('x' -> rpath)
 assert(contents == 'a b c\n')

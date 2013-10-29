@@ -9,29 +9,18 @@ assert(a() == 5)
 
 --
 
-namespace ns
-  def a() -> int
-    return b_2()
+def a2() -> int
+  b2()
 
-def b_2() -> int
-    return 10
+def b2() -> int
+  10
     
-assert(ns:a() == 10)
-
-def a() -> int
-  return ns_2:b()
-
-namespace ns_2
-  def b() -> int
-    return 20
-
-assert(a() == 20)
-
+assert(a2() == 10)
 
 for i in [1]
-    for j in [2]
-        for k in [3]
-            assert(b_3() == 25)
+  for j in [2]
+    for k in [3]
+      assert(b3() == 25)
 
-def b_3() -> int
-    return 25
+def b3() -> int
+  25

@@ -121,11 +121,7 @@ def touch_region(Vec4 bounds) -> bool
   s.setBounds(bounds)
   return s.checkActivated()
   
-namespace strs
-  -- Generated at runtime by DisplayableStrings
-  
-namespace action
-  def options_menu()
+def action_options_menu()
 
 -- Helper functions
 def xline(number x, Color c)
@@ -162,7 +158,7 @@ def main()
     optionsIcon.setPosition([viewport_width - optionsIcon.size().x, 20])
 
     if touch_region(optionsIcon.bounds())
-      action:options_menu()
+      action_options_menu()
       -- todo: change the icon's color here in reaction to the touch
 
     -- Daily buttons

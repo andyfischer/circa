@@ -538,8 +538,6 @@ void bootstrap_kernel()
     apply(function_contents(FUNCS.output),
         FUNCS.input, TermList())->setBoolProp("optional", true);
 
-    namespace_function::early_setup(builtins);
-
     // Setup declare_field() function, needed to represent compound types.
     FUNCS.declare_field = import_function(builtins, NULL, "declare_field() -> any");
 
@@ -619,19 +617,19 @@ void bootstrap_kernel()
 
     // Install native functions.
     module_patch_function(world->builtinPatch, "context", get_context);
-    module_patch_function(world->builtinPatch, "file:version", file__version);
-    module_patch_function(world->builtinPatch, "file:exists", file__exists);
-    module_patch_function(world->builtinPatch, "file:read_text", file__read_text);
+    module_patch_function(world->builtinPatch, "file_version", file__version);
+    module_patch_function(world->builtinPatch, "file_exists", file__exists);
+    module_patch_function(world->builtinPatch, "file_read_text", file__read_text);
     module_patch_function(world->builtinPatch, "from_string", from_string);
     module_patch_function(world->builtinPatch, "set_context", set_context);
     module_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
     module_patch_function(world->builtinPatch, "test_spy", test_spy);
     module_patch_function(world->builtinPatch, "test_oracle", test_oracle);
-    module_patch_function(world->builtinPatch, "reflect:this_block", reflect__this_block);
-    module_patch_function(world->builtinPatch, "reflect:kernel", reflect__kernel);
-    module_patch_function(world->builtinPatch, "sys:module_search_paths", sys__module_search_paths);
-    module_patch_function(world->builtinPatch, "sys:perf_stats_reset", sys__perf_stats_reset);
-    module_patch_function(world->builtinPatch, "sys:perf_stats_dump", sys__perf_stats_dump);
+    module_patch_function(world->builtinPatch, "reflect_this_block", reflect__this_block);
+    module_patch_function(world->builtinPatch, "reflect_kernel", reflect__kernel);
+    module_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
+    module_patch_function(world->builtinPatch, "sys_perf_stats_reset", sys__perf_stats_reset);
+    module_patch_function(world->builtinPatch, "sys_perf_stats_dump", sys__perf_stats_dump);
 
     // Load the standard library from stdlib.ca
     parser::compile(builtins, parser::statement_list, STDLIB_CA_TEXT);

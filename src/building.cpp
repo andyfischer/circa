@@ -547,10 +547,6 @@ Block* find_or_create_block(Block* owner, const char* name)
     return create_block(owner, name);
 }
 
-Block* create_namespace(Block* block, const char* name)
-{
-    return apply(block, FUNCS.namespace_func, TermList(), name)->contents();
-}
 Block* create_block_unevaluated(Block* owner, const char* name)
 {
     return nested_contents(apply(owner, FUNCS.block_unevaluated, TermList(), name));
