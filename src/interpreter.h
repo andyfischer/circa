@@ -24,6 +24,10 @@ struct Stack
     int framesCount;
     int framesCapacity;
 
+    // Transient data, used during run_bytecode;
+    const char* bc;
+    int pc;
+
     // Current step, either StackReady, StackRunning or StackFinished.
     Symbol step;
 
@@ -63,9 +67,6 @@ Block* stack_top_block(Stack* stack);
 // (Re)initialize the stack to have just one frame, using 'main' as its block. Existing data
 // is erased.
 void stack_init(Stack* stack, Block* main);
-
-// Push a frame onto the stack.
-Frame* stack_push(Stack* stack, Block* block);
 
 // Pop the topmost frame from the stack.
 void stack_pop(Stack* stack);

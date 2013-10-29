@@ -24,10 +24,9 @@ namespace circa {
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block);
 static void bytecode_write_local_reference(caValue* bytecode, Block* callingBlock, Term* term);
 
-void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
+void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
 {
-    const char* bcData = as_blob(bytecode);
-    char op = blob_read_char(bcData, pos); 
+    char op = blob_read_char(bc, pc); 
 
     switch (op) {
     case bc_Done:
@@ -38,17 +37,17 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_SetNull:
         set_string(string, "set_null ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_InlineCopy:
         set_string(string, "inline_copy ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_LocalCopy:
         set_string(string, "local_copy ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_NoOp:
         set_string(string, "noop");
@@ -64,94 +63,94 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_PushFunction:
         set_string(string, "push_function ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushNested:
         set_string(string, "push_nested ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushDynamicMethod:
         set_string(string, "push_dyn_method ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushFuncCall:
         set_string(string, "push_func_call ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushFuncApply:
         set_string(string, "push_func_apply ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_FireNative:
         set_string(string, "fire_native");
         break;
     case bc_PushCase:
         set_string(string, "push_case ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushLoop:
         set_string(string, "push_loop ");
-        string_append(string, blob_read_int(bcData, pos));
-        if (blob_read_char(bcData, pos))
+        string_append(string, blob_read_int(bc, pc));
+        if (blob_read_char(bc, pc))
             string_append(string, " :with_output");
         else
             string_append(string, " :no_output");
         break;
     case bc_PushWhile:
         set_string(string, "push_while ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushBlockDynamic:
         set_string(string, "push_block_dynamic ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         break;
     case bc_ExitPoint:
         set_string(string, "exit_point");
         break;
     case bc_Return:
         set_string(string, "return ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_Continue:
         set_string(string, "continue");
-        string_append(string, blob_read_char(bcData, pos) ? " :loop_output": "");
+        string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_Break:
         set_string(string, "break");
-        string_append(string, blob_read_char(bcData, pos) ? " :loop_output": "");
+        string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_Discard:
         set_string(string, "discard");
-        string_append(string, blob_read_char(bcData, pos) ? " :loop_output": "");
+        string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_CaseConditionBool:
         set_string(string, "case_condition_bool ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         break;
     case bc_LoopConditionBool:
         set_string(string, "loop_condition_bool ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         break;
     case bc_Loop:
         set_string(string, "loop");
         break;
     case bc_IterationDone:
         set_string(string, "iteration_done ");
-        if (blob_read_char(bcData, pos))
+        if (blob_read_char(bc, pc))
             string_append(string, " :with_output");
         else
             string_append(string, " :no_output");
@@ -164,48 +163,48 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_PushInputFromStack:
         set_string(string, "push_input_from_stack ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushInputFromStack2:
         set_string(string, "push_input_from_stack2 ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushInputFromStack3:
         set_string(string, "push_input_from_stack3 ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u16(bcData, pos));
+        string_append(string, blob_read_u16(bc, pc));
         break;
     case bc_PushVarargList:
         set_string(string, "push_vararg_list ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushInputNull:
         set_string(string, "push_input_null ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushInputNull2:
         set_string(string, "push_input_null2");
         break;
     case bc_PushInputFromValue:
         set_string(string, "push_input_from_value ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushNonlocalInput:
         set_string(string, "push_nonlocal_input ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushExplicitState:
         set_string(string, "push_explicit_state ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_NotEnoughInputs:
         set_string(string, "not_enough_inputs");
@@ -215,24 +214,24 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         break;
     case bc_PopOutput:
         set_string(string, "pop_output ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PopOutputNull:
         set_string(string, "pop_output_null ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PopOutputsDynamic:
         set_string(string, "pop_outputs_dynamic");
         break;
     case bc_PopExplicitState:
         set_string(string, "pop_explicit_state ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PopAsModule:
         set_string(string, "pop_as_module ");
-        string_append(string, blob_read_int(bcData, pos));
+        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_MemoizeCheck:
         set_string(string, "memoize_check");
@@ -245,7 +244,7 @@ void bytecode_op_to_string(caValue* bytecode, caValue* string, int* pos)
         for (int i=0; i < 4; i++) {
             if (i > 0)
                 string_append(string, " ");
-            string_append(string, blob_read_u16(bcData, pos));
+            string_append(string, blob_read_u16(bc, pc));
         }
         break;
     default:
@@ -258,7 +257,7 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
 {
     std::stringstream strm;
 
-    const char* bcData = as_blob(bytecode);
+    const char* bc = as_blob(bytecode);
     int pos = 0;
 
     while (true) {
@@ -266,11 +265,11 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
         int prevPos = pos;
 
         circa::Value line;
-        bytecode_op_to_string(bytecode, &line, &pos);
+        bytecode_op_to_string(bc, &pos, &line);
 
         strm << as_cstring(&line) << std::endl;
 
-        switch (blob_read_char(bcData, &prevPos)) {
+        switch (blob_read_char(bc, &prevPos)) {
             case bc_Done:
                 set_string(string, strm.str().c_str());
                 return;
@@ -299,7 +298,7 @@ void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
         string_append(line, "] ");
 
         circa::Value op;
-        bytecode_op_to_string(bytecode, &op, &pos);
+        bytecode_op_to_string(as_cstring(bytecode), &pos, &op);
 
         string_append(line, &op);
     }
@@ -315,12 +314,12 @@ void bytecode_dump(caValue* bytecode)
     }
 }
 
-void bytecode_dump_next_op(caValue* bytecode, Block* block, int pos)
+void bytecode_dump_next_op(const char* bc, int pc)
 {
     circa::Value line;
-    int prevPos = pos;
-    bytecode_op_to_string(bytecode, &line, &pos);
-    printf("[%d.%d] %s\n", block->id, prevPos, as_cstring(&line));
+    int lookahead = pc;
+    bytecode_op_to_string(bc, &lookahead, &line);
+    printf("[%d] %s\n", pc, as_cstring(&line));
 }
 
 bool block_contains_memoize(Block* block)

@@ -5,10 +5,10 @@
 namespace circa {
 namespace namespace_function {
 
+    // TODO: Delete this whole namespace business.
+
     void evaluate(caStack* stack)
     {
-        Term* caller = (Term*) circa_caller_term(stack);
-        stack_push(stack, nested_contents(caller));
     }
 
     void format_source(caValue* source, Term* term)

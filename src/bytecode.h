@@ -70,7 +70,7 @@ const char bc_PackState = 0x55;
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);
-void bytecode_dump_next_op(caValue* bytecode, Block* block, int pos);
+void bytecode_dump_next_op(const char* bc, int pc);
 void bytecode_dump(caValue* bytecode);
 
 void bytecode_write_term_call(caValue* bytecode, Term* term);

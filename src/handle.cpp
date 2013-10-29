@@ -58,7 +58,7 @@ void handle_release(caValue* value)
         Term* releaseMethod = find_method(NULL, value->value_type, "release");
         if (releaseMethod != NULL) {
             Stack stack;
-            stack_push(&stack, function_contents(releaseMethod));
+            stack_init(&stack, function_contents(releaseMethod));
             caValue* inputSlot = get_input(&stack, 0);
 
             // Don't copy this value, otherwise we'll get in trouble when the copy

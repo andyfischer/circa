@@ -325,7 +325,7 @@ bool circa_push_function_by_name(caStack* stack, const char* name)
 void circa_push_function(caStack* stack, caBlock* func)
 {
     block_finish_changes(func);
-    stack_push(stack, func);
+    stack_init(stack, func);
 }
 
 void circa_push_module(caStack* stack, const char* name)
@@ -338,7 +338,7 @@ void circa_push_module(caStack* stack, const char* name)
         std::cout << "in circa_push_module, module not found: " << name << std::endl;
         return;
     }
-    stack_push(stack, block);
+    stack_init(stack, block);
 }
 
 caValue* circa_frame_input(caStack* stack, int index)
