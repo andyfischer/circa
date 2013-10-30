@@ -19,13 +19,13 @@ Block* fetch_module(World* world, const char* name);
 // Load a module from the given filename. If the module already exists, then we'll replace
 // the existing contents, and we'll update any existing references that point to the replaced
 // code. Does not create a file watch (see load_module_file_watched).
-Block* load_module_file(World* world, const char* moduleName, const char* filename);
+Block* load_module_file(World* world, caValue* moduleName, const char* filename);
 
 // Loads a module from the given filename, and creates a file watch.
-Block* load_module_file_watched(World* world, const char* moduleName, const char* filename);
+Block* load_module_file_watched(World* world, caValue* moduleName, const char* filename);
 
 // Load a module via name. The file will be found via standard module lookup.
-Block* load_module_by_name(World* world, const char* module_name);
+Block* load_module_by_name(World* world, Block* loadedBy, caValue* module_name);
 
 // This should be called whenever a new module is loaded by a certain term. We may
 // rearrange the global module order so that the module is located before the term.

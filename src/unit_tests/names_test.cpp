@@ -146,10 +146,10 @@ void bug_with_lookup_type_and_qualified_name()
 void type_name_visible_from_module()
 {
     test_write_fake_file("a", 1, "type A { int i }");
-    load_module_file(global_world(), "a", "a");
+    load_module_file(global_world(), temp_string("a"), "a");
 
     test_write_fake_file("b", 1, "require a\ntest_spy(make(A))");
-    Block* b = load_module_file(global_world(), "b", "b");
+    Block* b = load_module_file(global_world(), temp_string("b"), "b");
 
     Stack stack;
     stack_init(&stack, b);

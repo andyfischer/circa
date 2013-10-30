@@ -16,7 +16,7 @@ void test_simple()
     test_write_fake_file("file1", 1, "x = 1");
 
     // Load the block using a file watch.
-    add_file_watch_module_load(world, "file1", "file_block");
+    add_file_watch_module_load(world, "file1", temp_string("file_block"));
     file_watch_trigger_actions(world, "file1");
 
     test_equals(term_value(find_from_global_name(world, "file_block:x")), "1");
@@ -39,7 +39,7 @@ void test_check_all_watches()
     test_write_fake_file("file1", 1, "x = 1");
 
     // Load the block using a file watch.
-    add_file_watch_module_load(world, "file1", "file_block");
+    add_file_watch_module_load(world, "file1", temp_string("file_block"));
     file_watch_trigger_actions(world, "file1");
 
     test_equals(term_value(find_from_global_name(world, "file_block:x")), "1");

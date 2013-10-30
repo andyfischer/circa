@@ -1,0 +1,9 @@
+
+print('evaluating lib1.ca')
+
+outerValue = 1 + 2
+
+def f(i)
+    print('Called lib1.f with ' i ', outerValue = ', outerValue)
+
+

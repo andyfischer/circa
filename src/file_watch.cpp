@@ -129,7 +129,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         case sym_PatchBlock: {
             // Reload this code block.
             caValue* moduleName = list_get(action, 1);
-            load_module_file(world, as_cstring(moduleName), as_cstring(&watch->filename));
+            load_module_file(world, moduleName, as_cstring(&watch->filename));
             break;
         }
         default:
@@ -172,12 +172,12 @@ void file_watch_check_all(World* world)
     }
 }
 
-FileWatch* add_file_watch_module_load(World* world, const char* filename, const char* moduleName)
+FileWatch* add_file_watch_module_load(World* world, const char* filename, caValue* moduleName)
 {
     circa::Value action;
     set_list(&action, 2);
     set_symbol(list_get(&action, 0), sym_PatchBlock);
-    set_string(list_get(&action, 1), moduleName);
+    set_value(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }
 

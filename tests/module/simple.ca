@@ -1,0 +1,3 @@
+
+lib = require('lib1')
+lib.f('input1')

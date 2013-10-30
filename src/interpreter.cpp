@@ -49,7 +49,8 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller);
 static void vm_run_input_bytecodes(caStack* stack, Term* caller);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key);
-static bool vm_handle_method_as_module_access(Frame* top, Term* caller, caValue* module, caValue* method);
+static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method);
+static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure);
 static void vm_push_func_call(Stack* stack, int callerIndex);
 static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
@@ -1340,13 +1341,15 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             // Method not found.
             if (method == NULL) {
 
-                if (is_hashtable(object)
-                        && vm_handle_method_as_hashtable_field(top, caller, object, elementName))
-                    continue;
+                if (is_module_value(object)) {
+                    if (vm_handle_method_as_module_access(top, termIndex, object, elementName))
+                        continue;
 
-                if (is_module_value(object)
-                        && vm_handle_method_as_module_access(top, caller, object, elementName))
-                    continue;
+                }
+                else if (is_hashtable(object)) {
+                    if (vm_handle_method_as_hashtable_field(top, caller, object, elementName))
+                        continue;
+                }
 
                 Value msg;
                 set_string(&msg, "Method ");
@@ -1852,9 +1855,10 @@ static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValu
     if (element == NULL)
         return false;
 
-    // Advance past push/pop instructions.
+    // Throw away the 'object' input (already have it).
     vm_run_single_input(top, caller);
 
+    // Advance past push/pop instructions.
     if (vm_read_char(top->stack) != bc_EnterFrame)
         return false;
 
@@ -1868,7 +1872,7 @@ static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValu
     return true;
 }
 
-static bool vm_handle_method_as_module_access(Frame* top, Term* caller, caValue* module, caValue* method)
+static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method)
 {
     if (!is_module_value(module))
         return false;
@@ -1877,17 +1881,22 @@ static bool vm_handle_method_as_module_access(Frame* top, Term* caller, caValue*
 
     if (func == NULL)
         return false;
-
-    return false;
-}
-
-static void vm_push_func_call(Stack* stack, int callerIndex)
-{
-    Frame* top = stack_top(stack);
+    if (!is_closure(func))
+        return false;
 
     Term* caller = frame_term(top, callerIndex);
-    caValue* closure = vm_run_single_input(top, caller);
 
+    // Throw away the 'object' input (already have it).
+    vm_run_single_input(top, caller);
+
+    vm_push_func_call_closure(top->stack, callerIndex, func);
+    return true;
+}
+
+static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure)
+{
+    Frame* top = stack_top(stack);
+    Term* caller = frame_term(top, callerIndex);
     Block* block = as_block(list_get(closure, 0));
 
     if (block == NULL) {
@@ -1907,6 +1916,16 @@ static void vm_push_func_call(Stack* stack, int callerIndex)
     top->callType = sym_FuncCall;
 
     vm_run_input_bytecodes(stack, caller);
+}
+
+static void vm_push_func_call(Stack* stack, int callerIndex)
+{
+    Frame* top = stack_top(stack);
+    Term* caller = frame_term(top, callerIndex);
+
+    caValue* closure = vm_run_single_input(top, caller);
+
+    vm_push_func_call_closure(stack, callerIndex, closure);
 }
 
 static void vm_push_func_apply(Stack* stack, int callerIndex)

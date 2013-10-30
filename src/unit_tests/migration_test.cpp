@@ -52,7 +52,8 @@ void translate_terms_type()
 {
     // Setup
     test_write_fake_file("lib.ca", 1, "type T { int a }");
-    Block* lib = load_module_file(global_world(), "translate_terms_type_lib", "lib.ca");
+    Block* lib = load_module_file(global_world(),
+        temp_string("translate_terms_type_lib"), "lib.ca");
     Type* T = find_type_local(lib, "T");
 
     Block block;
@@ -61,7 +62,8 @@ void translate_terms_type()
     test_assert(block["t"]->type == T);
 
     test_write_fake_file("lib.ca", 2, "type T { float a }");
-    Block* newLib = load_module_file(global_world(), "translate_terms_type_lib", "lib.ca");
+    Block* newLib = load_module_file(global_world(),
+        temp_string("translate_terms_type_lib"), "lib.ca");
     Type* newT = find_type_local(newLib, "T");
     test_assert(T != newT);
 

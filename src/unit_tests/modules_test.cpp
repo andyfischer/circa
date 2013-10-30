@@ -14,7 +14,8 @@ namespace modules_test {
 void source_file_location()
 {
     test_write_fake_file("block.ca", 1, "a = 1");
-    Block* block = load_module_file(global_world(), "source_file_location", "block.ca");
+    Block* block = load_module_file(global_world(),
+        temp_string("source_file_location"), "block.ca");
 
     test_equals(block_get_source_filename(block), "block.ca");
 }
@@ -27,8 +28,8 @@ void test_require()
       "module:f('with prefix')"
       );
 
-    load_module_file(global_world(), "module", "module.ca");
-    Block* block = load_module_file(global_world(), "test_require", "user.ca");
+    load_module_file(global_world(), temp_string("module"), "module.ca");
+    Block* block = load_module_file(global_world(), temp_string("test_require"), "user.ca");
 
     test_spy_clear();
 
@@ -76,8 +77,8 @@ void non_required_module_is_not_visible()
 
     test_write_fake_file("module_a.ca", 1, "a = 1");
     test_write_fake_file("module_b.ca", 1, "b = 1");
-    Block* module_a = load_module_file(world, "module_a", "module_a.ca");
-    Block* module_b = load_module_file(world, "module_b", "module_b.ca");
+    Block* module_a = load_module_file(world, temp_string("module_a"), "module_a.ca");
+    Block* module_b = load_module_file(world, temp_string("module_b"), "module_b.ca");
     test_assert(find_name(module_a, "a") != NULL);
     test_assert(find_name(module_b, "a") == NULL);
 }
