@@ -1,1 +1,2 @@
-internal_error: ca_assert(is_list(value)) failed in list.cpp line 339
+evaluating lib1.ca
+Called lib1.f with input1, outerValue = 3
