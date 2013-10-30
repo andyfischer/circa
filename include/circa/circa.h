@@ -143,7 +143,7 @@ void circa_add_module_search_path(caWorld* world, const char* path);
 caBlock* circa_load_module_from_file(caWorld* world,
                                       const char* module_name,
                                       const char* filename);
-caBlock* circa_load_module(caWorld* world, const char* moduleName);
+caBlock* circa_load_module(caWorld* world, caBlock* loadedBy, const char* moduleName);
 
 // -- Interpreter --
 

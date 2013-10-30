@@ -152,7 +152,7 @@ private:
 void block_setup_type(Type* type);
 void assert_valid_block(Block const* obj);
 
-Block* alloc_block_gc();
+Block* alloc_block();
 
 caValue* block_bytecode(Block* block);
 bool has_nested_contents(Term* term);

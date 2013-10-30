@@ -135,10 +135,13 @@ Block* load_module_file(World* world, caValue* moduleName, const char* filename)
 
     if (existing == NULL) {
         Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
-        existing = nested_contents(term);
+        Block* newBlock = nested_contents(term);
+        load_script(newBlock, filename);
+        update_static_error_list(newBlock);
+        return newBlock;
     }
 
-    Block* newBlock = alloc_block_gc();
+    Block* newBlock = alloc_block();
     block_graft_replacement(existing, newBlock);
     load_script(newBlock, filename);
 
@@ -148,7 +151,6 @@ Block* load_module_file(World* world, caValue* moduleName, const char* filename)
         Migration migration;
         migration.oldBlock = existing;
         migration.newBlock = newBlock;
-
         migrate_world(world, &migration);
     }
 

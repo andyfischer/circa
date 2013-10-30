@@ -28,7 +28,8 @@ const char bc_PushFuncApply = 0x14;
 const char bc_PushCase = 0x16;
 const char bc_PushLoop = 0x17;
 const char bc_PushWhile = 0x18;
-const char bc_PushBlockDynamic = 0x19;
+const char bc_PushRequire = 0x19;
+const char bc_PushBlockDynamic = 0x1a;
 
 // Pushing inputs to a new frame.
 const char bc_PushInputFromStack = 0x22;

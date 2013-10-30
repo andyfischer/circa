@@ -179,21 +179,11 @@ def load_script(String filename) -> Block
     -- locally; it won't be loaded into module space.
 
 def require(String moduleName) -> Module
-    -- Load a module, and use it during name lookup.
-    -- TODO: This call should be memoized.
-    
-    block = load_module(moduleName)
-    if block.is_null
-      return Map.make
-
-    _bc_push_block_dynamic(block)
-    _bc_enter_frame()
-    result = _bc_pop_as_module()
-    _bc_pop_frame()
-    result
+    -- Load a module.
 
 def package(String moduleName)
     -- Declare that the current module is a reusable library with the given name.
+    -- (Note: Currently this function does nothing)
 
 -- Packages
 type Package {

@@ -55,8 +55,6 @@ static void vm_push_func_call(Stack* stack, int callerIndex);
 static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
-static caValue* vm_read_local_position(Stack* stack);
-static caValue* vm_read_local_position(Frame* frame);
 
 bool run_memoize_check(Stack* stack);
 static int for_loop_find_index_value(Frame* frame);
@@ -1509,6 +1507,28 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             Term* caller = frame_term(top, index);
             Block* block = caller->nestedContents;
             vm_push_frame(stack, index, block);
+            continue;
+        }
+        case bc_PushRequire: {
+            int callerIndex = vm_read_int(stack);
+
+            Frame* top = stack_top(stack);
+            Term* caller = frame_term(top, callerIndex);
+
+            caValue* moduleName = vm_run_single_input(top, caller);
+
+            Block* module = load_module_by_name(stack->world, top->block, moduleName);
+
+            if (module == NULL) {
+                Value msg;
+                set_string(&msg, "Couldn't find module named: ");
+                string_append_quoted(&msg, moduleName);
+                raise_error_msg(stack, as_cstring(&msg));
+                return;
+            }
+
+            top = vm_push_frame(stack, callerIndex, module);
+            expand_frame(stack_top_parent(stack), top);
             continue;
         }
         case bc_Loop: {

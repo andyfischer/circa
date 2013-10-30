@@ -100,6 +100,10 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "push_while ");
         string_append(string, blob_read_int(bc, pc));
         break;
+    case bc_PushRequire:
+        set_string(string, "push_require ");
+        string_append(string, blob_read_int(bc, pc));
+        break;
     case bc_PushBlockDynamic:
         set_string(string, "push_block_dynamic ");
         string_append(string, blob_read_int(bc, pc));
@@ -367,19 +371,19 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         }
     }
 
-    if (term->function == FUNCS.nonlocal) {
+    else if (term->function == FUNCS.nonlocal) {
         blob_append_char(bytecode, bc_PushNonlocalInput);
         blob_append_int(bytecode, term->index);
         return;
     }
 
-    if (term->function == FUNCS.case_condition_bool) {
+    else if (term->function == FUNCS.case_condition_bool) {
         blob_append_char(bytecode, bc_CaseConditionBool);
         bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
         return;
     }
 
-    if (term->function == FUNCS.loop_condition_bool) {
+    else if (term->function == FUNCS.loop_condition_bool) {
         blob_append_char(bytecode, bc_LoopConditionBool);
         bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
         return;
@@ -468,6 +472,12 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
+    else if (term->function == FUNCS.require) {
+        referenceTargetBlock = NULL;
+        blob_append_char(bytecode, bc_PushRequire);
+        blob_append_int(bytecode, term->index);
+    }
+
     else if (term->nestedContents != NULL) {
 
         referenceTargetBlock = term->nestedContents;
@@ -487,13 +497,12 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
-#if NEW_INPUT_PASSING
     if (term->function == FUNCS.dynamic_method
             || term->function == FUNCS.func_call
-            || term->function == FUNCS.func_apply)
+            || term->function == FUNCS.func_apply
+            || term->function == FUNCS.require)
         bytecode_write_input_instructions2(bytecode, term);
     else
-#endif
         bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);
 
     blob_append_char(bytecode, bc_EnterFrame);
@@ -587,6 +596,12 @@ void bytecode_write_input_instructions2(caValue* bytecode, Term* caller)
 
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 {
+    if (caller->function == FUNCS.require) {
+        blob_append_char(bytecode, bc_PopAsModule);
+        blob_append_int(bytecode, caller->index);
+        return;
+    }
+
     if (block == NULL) {
         blob_append_char(bytecode, bc_PopOutputsDynamic);
         return;

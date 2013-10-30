@@ -6,6 +6,8 @@ solution "Circa"
     flags { "Symbols" }
     targetdir "build"
     objdir "build/obj"
+    configuration "*.cpp"
+        buildoptions { "-std=c++11" }
 
     configuration "Release"
         flags { "OptimizeSpeed" }

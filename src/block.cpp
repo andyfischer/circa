@@ -53,7 +53,7 @@ Block::~Block()
     clear_block(this);
 }
 
-Block* alloc_block_gc()
+Block* alloc_block()
 {
     Block* block = new Block();
     return block;
