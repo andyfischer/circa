@@ -1,0 +1,5 @@
+evaluating lib1.ca
+evaluating lib2.ca
+Calling lib2.f with input2, outerValue = hi there
+lib2.f is calling lib1.f ..
+Called lib1.f with input2, outerValue = 3

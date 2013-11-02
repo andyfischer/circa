@@ -1,0 +1,11 @@
+
+lib1 = require('lib1')
+
+print('evaluating lib2.ca')
+
+outerValue = concat('hi ', 'there')
+
+def f(i)
+  print('Calling lib2.f with ' i ', outerValue = ' outerValue)
+  print('lib2.f is calling lib1.f ..')
+  lib1.f(i)
