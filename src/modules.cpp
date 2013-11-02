@@ -110,12 +110,14 @@ static bool find_module_file(World* world, Block* loadedBy,
     caValue* moduleName, caValue* filenameOut)
 {
     // Check directory local to load location.
-    caValue* loadedByFilename = block_get_property(loadedBy, sym_Filename);
-    if (loadedByFilename != NULL) {
-        Value directory;
-        get_directory_for_filename(loadedByFilename, &directory);
-        if (check_module_search_path(world, moduleName, &directory, filenameOut))
-            return true;
+    if (loadedBy != NULL) {
+        caValue* loadedByFilename = block_get_property(loadedBy, sym_Filename);
+        if (loadedByFilename != NULL) {
+            Value directory;
+            get_directory_for_filename(loadedByFilename, &directory);
+            if (check_module_search_path(world, moduleName, &directory, filenameOut))
+                return true;
+        }
     }
 
     int count = list_length(&world->moduleSearchPaths);

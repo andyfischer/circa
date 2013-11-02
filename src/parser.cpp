@@ -1085,7 +1085,7 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
             "Expected module name (as a string or identifier)");
     }
 
-    Term* term = apply(block, FUNCS.require, TermList(moduleName));
+    Term* term = apply(block, FUNCS.require, TermList(moduleName), term_value(moduleName));
 
     return ParseResult(term);
 }
