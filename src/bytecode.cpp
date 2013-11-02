@@ -77,6 +77,10 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "push_func_call ");
         string_append(string, blob_read_int(bc, pc));
         break;
+    case bc_PushFuncCallImplicit:
+        set_string(string, "push_func_call_implicit ");
+        string_append(string, blob_read_int(bc, pc));
+        break;
     case bc_PushFuncApply:
         set_string(string, "push_func_apply ");
         string_append(string, blob_read_int(bc, pc));
@@ -434,6 +438,12 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
+    else if (is_dynamic_func_call(term)) {
+        referenceTargetBlock = NULL;
+        blob_append_char(bytecode, bc_PushFuncCallImplicit);
+        blob_append_int(bytecode, term->index);
+    }
+
     else if (term->function == FUNCS.func_apply) {
         referenceTargetBlock = NULL;
         blob_append_char(bytecode, bc_PushFuncApply);
@@ -500,7 +510,8 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     if (term->function == FUNCS.dynamic_method
             || term->function == FUNCS.func_call
             || term->function == FUNCS.func_apply
-            || term->function == FUNCS.require)
+            || term->function == FUNCS.require
+            || is_dynamic_func_call(term))
         bytecode_write_input_instructions2(bytecode, term);
     else
         bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);

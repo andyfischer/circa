@@ -102,6 +102,11 @@ bool is_copying_call(Term* term)
         || term->function == FUNCS.copy;
 }
 
+bool is_dynamic_func_call(Term* term)
+{
+    return !is_function(term->function);
+}
+
 bool is_an_unknown_identifier(Term* term)
 {
     return term->function == FUNCS.unknown_identifier;

@@ -568,6 +568,9 @@ void bootstrap_kernel()
     FUNCS.dynamic_method = import_function(builtins, NULL,
             "def dynamic_method(any inputs :multiple) -> any");
 
+    FUNCS.func_call_implicit = import_function(builtins, NULL,
+            "def func_call_implicit(any inputs :multiple) -> any");
+
     // Now we can build derived functions
     FUNCS.less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
     append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_i"));

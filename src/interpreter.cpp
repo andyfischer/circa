@@ -1312,9 +1312,10 @@ void run_bytecode(Stack* stack, caValue* bytecode)
         }
         
         case bc_PushDynamicMethod: {
-            Frame* top = stack_top(stack);
 
             int termIndex = vm_read_int(stack);
+
+            Frame* top = stack_top(stack);
             Term* caller = frame_term(top, termIndex);
 
             top->pcIndex = termIndex;
@@ -1384,6 +1385,28 @@ void run_bytecode(Stack* stack, caValue* bytecode)
             int termIndex = vm_read_int(stack);
 
             vm_push_func_call(stack, termIndex);
+            if (stack->step != sym_StackRunning)
+                return;
+            continue;
+        }
+
+        case bc_PushFuncCallImplicit: {
+            int termIndex = vm_read_int(stack);
+
+            Frame* top = stack_top(stack);
+            Term* caller = frame_term(top, termIndex);
+
+            caValue* closure = stack_find_active_value(top, caller->function);
+
+            if (!is_closure(closure)) {
+                Value msg;
+                set_string(&msg, "Not a function: ");
+                string_append(&msg, term_name(caller->function));
+                circa_output_error(stack, as_cstring(&msg));
+                return;
+            }
+
+            vm_push_func_call_closure(stack, termIndex, closure);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -1915,6 +1938,13 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 
 static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure)
 {
+    if (!is_closure(closure)) {
+        Value msg;
+        set_string(&msg, "Not a function");
+        circa_output_error(stack, as_cstring(&msg));
+        return;
+    }
+    
     Frame* top = stack_top(stack);
     Term* caller = frame_term(top, callerIndex);
     Block* block = as_block(list_get(closure, 0));

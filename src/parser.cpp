@@ -1918,12 +1918,7 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
 
     std::string functionName = tokens.consumeStr(tok_Identifier);
 
-    Term* function = find_name(block, functionName.c_str(), sym_LookupFunction);
-
-    // If we didn't find anything with LookupFunction, then try to find a type name.
-    // DEPRECATED: Type names as functions.
-    if (function == NULL)
-        function = find_name(block, functionName.c_str(), sym_LookupType);
+    Term* function = find_name(block, functionName.c_str());
 
     tokens.consume(tok_LParen);
 
@@ -1936,8 +1931,8 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
         return compile_error_for_line(block, tokens, startPosition, "Expected: )");
     tokens.consume(tok_RParen);
 
-    // If the function isn't callable, then bail out with unknown_function
-    if (function != NULL && !is_function(function) && !is_type(function)) {
+    // If function isn't found, bail out with unknown_function.
+    if (function == NULL) {
         Term* result = apply(block, FUNCS.unknown_function, inputs);
         result->setStringProp("syntax:functionName", functionName);
         return ParseResult(result);

@@ -41,6 +41,7 @@ struct BuiltinFuncs {
     Term* for_func;
     Term* func_apply;
     Term* func_call;
+    Term* func_call_implicit;
     Term* function_decl;
     Term* get_field;
     Term* get_index;

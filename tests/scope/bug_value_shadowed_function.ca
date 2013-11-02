@@ -1,9 +1,0 @@
-
--- In this bug, the value of 'a' was shadowing a function named 'a'.
-
-def a() -> int
-    return 1
-
-a = 2
-
-assert(a() == 1)

@@ -36,10 +36,6 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 {
     block_start_changes(block);
 
-    // If function isn't a function, use 'unknown_function' instead.
-    if (function == NULL || !is_function(function))
-        function = FUNCS.unknown_function;
-
     // Figure out the term position; it should be placed before any output() terms.
     // (unless it's an output term itself).
     int position = block->length();
@@ -269,10 +265,6 @@ void change_function(Term* term, Term* function)
     if (term->function == function)
         return;
 
-    if (function != NULL) {
-        ca_assert(is_function(function));
-    }
-
     Term* previousFunction = term->function;
 
     term->function = function;
@@ -288,7 +280,9 @@ void change_function(Term* term, Term* function)
         append_user(term, function);
     }
 
-    if (function != NULL && (function_contents(function)->functionAttrs.hasNestedContents))
+    if (function != NULL
+            && is_function(function) 
+            && function_contents(function)->functionAttrs.hasNestedContents)
         make_nested_contents(term);
 #if 0
     else
