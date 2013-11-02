@@ -72,7 +72,9 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* context,
         int minimumPrecedence);
 ParseResult unary_expression(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult lhs);
 ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult lhs);
 ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_integer(Block* block, TokenStream& tokens, ParserCxt* context);

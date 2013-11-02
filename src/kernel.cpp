@@ -663,6 +663,7 @@ void bootstrap_kernel()
     function_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
     function_contents(FUNCS.div)->overrides.specializeType = specializeType_div;
 
+    FUNCS.get_with_symbol = builtins->get("get_with_symbol");
     FUNCS.length = builtins->get("length");
     FUNCS.list_append = builtins->get("List.append");
     FUNCS.native_patch = builtins->get("native_patch");

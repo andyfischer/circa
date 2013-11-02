@@ -35,8 +35,6 @@ static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
 
-static ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult root);
-
 Term* compile(Block* block, ParsingStep step, std::string const& input)
 {
     log_start(0, "parser::compile");
@@ -1817,7 +1815,7 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
     }
 }
 
-ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult root)
+ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult lhs)
 {
     int startPosition = tokens.getPosition();
 
@@ -1825,10 +1823,12 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     Symbol dotOperator = sym_None;
 
     if (tokens.nextIs(tok_DotAt)) {
+        // Deprecated
         forceRebindLHS = true;
         dotOperator = tok_DotAt;
         tokens.consume();
     } else if (tokens.nextIs(tok_At)) {
+        // Deprecated
         forceRebindLHS = true;
         dotOperator = tok_At;
         tokens.consume();
@@ -1842,9 +1842,13 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     
     bool rebindLHS = forceRebindLHS;
 
+    // Check for name.symbol syntax.
+    if (tokens.nextIs(tok_ColonString))
+        return dot_symbol(block, tokens, context, lhs);
+
     if (!tokens.nextIs(tok_Identifier)) {
         return compile_error_for_line(block, tokens, startPosition,
-                "Expected identifier after dot");
+                "Expected identifier or symbol after dot");
     }
 
     Value functionName;
@@ -1867,9 +1871,9 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         tokens.consume(tok_RParen);
     }
 
-    inputs.prepend(root.term);
+    inputs.prepend(lhs.term);
     inputHints.insert(0);
-    Type* rootType = root.term->type;
+    Type* rootType = lhs.term->type;
 
     // Find the function
     Term* function = find_method(block, rootType, as_cstring(&functionName));
@@ -1886,7 +1890,6 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         // Possibly introduce an extra_output
         if (forceRebindLHS && get_extra_output(term, 0) == NULL)
             apply(block, FUNCS.extra_output, TermList(term));
-        
 
     } else {
         term = apply(block, function, inputs);
@@ -1899,7 +1902,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     }
 
     inputHints.apply(term);
-    apply_hints_from_parsed_input(term, 0, root);
+    apply_hints_from_parsed_input(term, 0, lhs);
     term->setStringProp("syntax:functionName", as_cstring(&functionName));
     term->setStringProp("syntax:declarationStyle", "method-call");
     if (!hasParens)
@@ -1946,6 +1949,17 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
         result->setStringProp("syntax:functionName", functionName);
 
     inputHints.apply(result);
+
+    return ParseResult(result);
+}
+
+ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult lhs)
+{
+    int startPosition = tokens.getPosition();
+
+    ParseResult symbol = literal_symbol(block, tokens, context);
+
+    Term* result = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
 
     return ParseResult(result);
 }

@@ -46,6 +46,7 @@ struct BuiltinFuncs {
     Term* get_field;
     Term* get_index;
     Term* get_with_selector;
+    Term* get_with_symbol;
     Term* greater_than;
     Term* greater_than_eq;
     Term* has_effects;

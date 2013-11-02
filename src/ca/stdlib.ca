@@ -132,6 +132,8 @@ def any_true(list) -> bool
         return false
     true
 
+def get_with_symbol(any lhs, Symbol symbol) -> any
+
 def swap(a, b) -> (any,any)
     return b, a
 

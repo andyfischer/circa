@@ -7,9 +7,11 @@
 #include "hashtable.h"
 #include "interpreter.h"
 #include "list.h"
-#include "stack.h"
+#include "modules.h"
 #include "native_patch.h"
+#include "stack.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 
@@ -458,6 +460,24 @@ void error(caStack* stack)
     circa_output_error(stack, circa_string_input(stack, 0));
 }
 
+void get_with_symbol(caStack* stack)
+{
+    caValue* left = circa_input(stack, 0);
+    Value str;
+    symbol_as_string(circa_input(stack, 1), &str);
+
+    if (is_module_value(left)) {
+        caValue* value = hashtable_get(left, &str);
+
+        if (value != NULL) {
+            copy(value, circa_output(stack, 0));
+            return;
+        }
+    }
+
+    circa_output_error(stack, "Symbol not found");
+}
+
 void print(caStack* stack)
 {
     caValue* args = circa_input(stack, 0);
@@ -497,6 +517,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "empty_list", empty_list);
     module_patch_function(patch, "equals", equals_func);
     module_patch_function(patch, "error", error);
+    module_patch_function(patch, "get_with_symbol", get_with_symbol);
     module_patch_function(patch, "length", length);
     module_patch_function(patch, "List.append", List__append);
     module_patch_function(patch, "List.concat", List__concat);

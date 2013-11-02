@@ -49,22 +49,29 @@ void set_symbol_from_string(caValue* val, const char* str)
     set_symbol_from_string(val, &strVal);
 }
 
-static std::string symbol_to_string(caValue* value)
+void symbol_as_string(caValue* symbol, caValue* str)
 {
-    const char* builtinName = builtin_symbol_to_string(as_int(value));
+    const char* builtinName = builtin_symbol_to_string(as_int(symbol));
     if (builtinName == NULL) {
-        caValue* tableVal = list_get(g_runtimeSymbolTable, as_int(value));
+        caValue* tableVal = list_get(g_runtimeSymbolTable, as_int(symbol));
         if (tableVal != NULL)
             builtinName = as_cstring(tableVal);
         else
             builtinName = "";
     }
-    return std::string(":") + builtinName;
+    set_string(str, builtinName);
+}
+
+static std::string symbol_to_source_string(caValue* value)
+{
+    Value str;
+    symbol_as_string(value, &str);
+    return std::string(":") + as_cstring(&str);
 }
 
 static void format_source(caValue* source, Term* term)
 {
-    std::string s = symbol_to_string(term_value(term));
+    std::string s = symbol_to_source_string(term_value(term));
     append_phrase(source, s.c_str(), term, tok_ColonString);
 }
 
@@ -101,7 +108,7 @@ void symbol_setup_type(Type* type)
     reset_type(type);
     set_string(&type->name, "Symbol");
     type->storageType = sym_StorageTypeInt;
-    type->toString = symbol_to_string;
+    type->toString = symbol_to_source_string;
     type->formatSource = format_source;
     type->hashFunc = hash_func;
 }
