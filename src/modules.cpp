@@ -22,6 +22,7 @@
 #include "names.h"
 #include "native_patch.h"
 #include "reflection.h"
+#include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -248,6 +249,15 @@ void require_func_postCompile(Term* term)
         module_on_loaded_by_term(module, term);
 }
 
+void require_formatSource(caValue* source, Term* term)
+{
+    if (!term->boolProp("syntax:require", false))
+        return format_term_source_default_formatting(source, term);
+
+    append_phrase(source, "require ", term, tok_Require);
+    append_phrase(source, term->name.c_str(), term, sym_TermName);
+}
+
 void native_patch_this_postCompile(Term* term)
 {
     Block* block = term->owningBlock;
@@ -332,11 +342,13 @@ void modules_install_functions(Block* kernel)
 {
     FUNCS.require = kernel->get("require");
     block_set_post_compile_func(function_contents(FUNCS.require), require_func_postCompile);
+    block_set_format_source_func(function_contents(FUNCS.require), require_formatSource);
 
     FUNCS.package = install_function(kernel, "package", NULL);
 
     Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
-    block_set_post_compile_func(function_contents(native_patch_this), native_patch_this_postCompile);
+    block_set_post_compile_func(function_contents(native_patch_this),
+        native_patch_this_postCompile);
 
     FUNCS.module = import_function(kernel, NULL, "module()");
 

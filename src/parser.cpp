@@ -1084,6 +1084,7 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     }
 
     Term* term = apply(block, FUNCS.require, TermList(moduleName), term_value(moduleName));
+    term->setBoolProp("syntax:require", true);
 
     return ParseResult(term);
 }
