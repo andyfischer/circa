@@ -208,17 +208,21 @@ void module_capture_exports_from_stack(Frame* frame, caValue* output)
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
 
-        if (!is_function(term))
-            continue;
+        if (is_function(term)) {
+            caValue* closure = frame_register(frame, term);
+
+            caValue* slot = hashtable_insert(output, term_name(term));
+            copy(closure, slot);
+            closure_save_bindings_for_frame(slot, frame);
+        }
+
+        else if (is_type(term)) {
+            caValue* slot = hashtable_insert(output, term_name(term));
+            copy(term_value(term), slot);
+        }
 
         // Future: If we had a system to declare some terms as 'private', then
         // this loop shouldn't copy them to the map.
-
-        caValue* closure = frame_register(frame, term);
-
-        caValue* slot = hashtable_insert(output, term_name(term));
-        copy(closure, slot);
-        closure_save_bindings_for_frame(slot, frame);
     }
 }
 

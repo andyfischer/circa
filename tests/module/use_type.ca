@@ -1,0 +1,14 @@
+
+lib1 = require('lib1')
+
+t = lib1.Lib1_T.make
+
+print('Created a Lib1_T instance: ', t)
+
+t.f(123)
+
+t = lib1.Lib1_T.make('hello')
+
+print('Created a Lib1_T instance: ', t)
+
+t.f(456)

@@ -1,0 +1,21 @@
+
+
+type T {}
+
+def T.f(self, args :multiple)
+  print('T.f: ', args)
+
+t = T.make
+
+t.f
+t.f(1)
+t.f(1 2)
+
+any.cast(@t)
+
+-- This had a bug: when using dynamic inputs, the 't.f' call would set 'args' to
+-- null instead of [].
+t.f
+
+t.f(1)
+t.f(1 2)

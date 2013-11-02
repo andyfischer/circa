@@ -1847,6 +1847,13 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
     if (is_input_placeholder(placeholder)
             && !placeholder->boolProp("multiple", false))
         return raise_error_not_enough_inputs(stack);
+
+    // If we never reached the :multiple input, make sure to set it to [].
+    if (placeholder->boolProp("multiple", false)) {
+        caValue* listValue = frame_register(top, placeholderIndex);
+        if (!is_list(listValue))
+            set_list(listValue);
+    }
 }
 
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs)
@@ -1920,20 +1927,36 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
     if (!is_module_value(module))
         return false;
 
-    caValue* func = hashtable_get(module, method);
+    caValue* value = hashtable_get(module, method);
 
-    if (func == NULL)
+    if (value == NULL)
         return false;
-    if (!is_closure(func))
-        return false;
-
-    Term* caller = frame_term(top, callerIndex);
 
     // Throw away the 'object' input (already have it).
+    Term* caller = frame_term(top, callerIndex);
     vm_run_single_input(top, caller);
 
-    vm_push_func_call_closure(top->stack, callerIndex, func);
-    return true;
+    if (is_closure(value)) {
+        vm_push_func_call_closure(top->stack, callerIndex, value);
+        return true;
+    }
+
+    if (is_type(value)) {
+        // Advance past push/pop instructions.
+        if (vm_read_char(top->stack) != bc_EnterFrame)
+            return false;
+
+        if (vm_read_char(top->stack) != bc_PopOutputsDynamic)
+            return false;
+
+        if (vm_read_char(top->stack) != bc_PopFrame)
+            return false;
+
+        copy(value, frame_register(top, callerIndex));
+        return true;
+    }
+
+    return false;
 }
 
 static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure)

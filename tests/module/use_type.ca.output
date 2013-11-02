@@ -1,0 +1,5 @@
+evaluating lib1.ca
+Created a Lib1_T instance: {s: ''}
+Called Lib1_T.f with: 123
+Created a Lib1_T instance: {s: 'hello'}
+Called Lib1_T.f with: 456
