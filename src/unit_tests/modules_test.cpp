@@ -20,27 +20,6 @@ void source_file_location()
     test_equals(block_get_source_filename(block), "block.ca");
 }
 
-void test_require()
-{
-    test_write_fake_file("module.ca", 1, "def f(String s)->int { test_spy(concat('f: ' s)) }");
-    test_write_fake_file("user.ca", 1, "require module\n"
-      "f('without prefix')\n"
-      "module:f('with prefix')"
-      );
-
-    load_module_file(global_world(), temp_string("module"), "module.ca");
-    Block* block = load_module_file(global_world(), temp_string("test_require"), "user.ca");
-
-    test_spy_clear();
-
-    Stack stack;
-    stack_init(&stack, block);
-    run_interpreter(&stack);
-
-    test_assert(&stack);
-    test_equals(test_spy_get_results(), "['f: without prefix', 'f: with prefix']");
-}
-
 void test_explicit_output()
 {
     World* world = global_world();
@@ -86,7 +65,6 @@ void non_required_module_is_not_visible()
 void register_tests()
 {
     REGISTER_TEST_CASE(modules_test::source_file_location);
-    REGISTER_TEST_CASE(modules_test::test_require);
     REGISTER_TEST_CASE(modules_test::test_explicit_output);
     REGISTER_TEST_CASE(modules_test::module_always_has_primary_output);
     REGISTER_TEST_CASE(modules_test::non_required_module_is_not_visible);

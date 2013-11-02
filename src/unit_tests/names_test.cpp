@@ -143,23 +143,6 @@ void bug_with_lookup_type_and_qualified_name()
     test_assert(T == find_name(&block, "module:T", sym_LookupType));
 }
 
-void type_name_visible_from_module()
-{
-    test_write_fake_file("a", 1, "type A { int i }");
-    load_module_file(global_world(), temp_string("a"), "a");
-
-    test_write_fake_file("b", 1, "require a\ntest_spy(make(A))");
-    Block* b = load_module_file(global_world(), temp_string("b"), "b");
-
-    Stack stack;
-    stack_init(&stack, b);
-    test_spy_clear();
-    run_interpreter(&stack);
-    test_assert(&stack);
-
-    test_equals(test_spy_get_results(), "[{i: 0}]");
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(names_test::global_names);
@@ -167,7 +150,6 @@ void register_tests()
     REGISTER_TEST_CASE(names_test::test_find_ordinal_suffix);
     REGISTER_TEST_CASE(names_test::search_every_global_name);
     REGISTER_TEST_CASE(names_test::bug_with_lookup_type_and_qualified_name);
-    REGISTER_TEST_CASE(names_test::type_name_visible_from_module);
 }
 
 } // namespace names

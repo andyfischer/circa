@@ -267,6 +267,10 @@ void format_term_source_default_formatting(caValue* source, Term* term)
 
         if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, ")", term, tok_RParen);
+    } else if (declarationStyle == "dot-access") {
+        format_source_for_input(source, term, 0);
+        append_phrase(source, ".", term, sym_None);
+        format_source_for_input(source, term, 1);
     } else if (declarationStyle == "dot-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, ".", term, sym_None);

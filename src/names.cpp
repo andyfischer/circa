@@ -106,6 +106,7 @@ Term* run_name_search(NameSearch* params)
         }
 
         // Check for a 'require' statement. If found, continue this search in the designated module.
+        #if 0
         if (term->function == FUNCS.require) {
             Block* module = find_module_for_require_statement(term);
             if (module != NULL) {
@@ -121,6 +122,7 @@ Term* run_name_search(NameSearch* params)
                     return found;
             }
         }
+        #endif
     }
 
     // Check if the name is a qualified name.
@@ -460,11 +462,7 @@ bool exposes_nested_names(Term* term)
 {
     if (term->nestedContents == NULL)
         return false;
-    if (nested_contents(term)->length() == 0)
-        return false;
     if (term->function == FUNCS.include_func)
-        return true;
-    if (term->function == FUNCS.module)
         return true;
 
     return false;

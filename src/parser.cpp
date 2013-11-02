@@ -1962,6 +1962,10 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
 
     Term* result = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
 
+    result->setStringProp("syntax:declarationStyle", "dot-access");
+    set_input_syntax_hint(result, 0, "postWhitespace", "");
+    set_input_syntax_hint(result, 1, "preWhitespace", "");
+
     return ParseResult(result);
 }
 
