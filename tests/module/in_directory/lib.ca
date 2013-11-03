@@ -1,0 +1,6 @@
+
+print('Executed in_directory/lib.ca')
+
+def f(i)
+    print('Called in_directory/lib.f with ' i)
+
