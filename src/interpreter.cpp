@@ -2535,6 +2535,12 @@ void Stack__frame(caStack* stack)
     set_frame_ref(circa_output(stack, 0), frame);
 }
 
+void Stack__frame_count(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    set_int(circa_output(stack, 0), stack_frame_count(self));
+}
+
 void Stack__output(caStack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
@@ -2633,6 +2639,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.restart", Stack__restart);
     module_patch_function(patch, "Stack.run", Stack__run);
     module_patch_function(patch, "Stack.frame", Stack__frame);
+    module_patch_function(patch, "Stack.frame_count", Stack__frame_count);
     module_patch_function(patch, "Stack.output", Stack__output);
     module_patch_function(patch, "Stack.errored", Stack__errored);
     module_patch_function(patch, "Stack.error_message", Stack__error_message);

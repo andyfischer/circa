@@ -370,6 +370,7 @@ def Stack.run(self)
     -- is raised.
 def Stack.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
+def Stack.frame_count(self) -> int
 def Stack.top(self) -> Frame
     -- Return the topmost Frame.
     self.frame(0)

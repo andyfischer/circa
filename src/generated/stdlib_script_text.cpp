@@ -377,6 +377,7 @@ const char* STDLIB_CA_TEXT =
     "    -- is raised.\n"
     "def Stack.frame(self, int depth) -> Frame\n"
     "    -- Return the Frame with the given depth. The top of the stack has depth 0.\n"
+    "def Stack.frame_count(self) -> int\n"
     "def Stack.top(self) -> Frame\n"
     "    -- Return the topmost Frame.\n"
     "    self.frame(0)\n"
