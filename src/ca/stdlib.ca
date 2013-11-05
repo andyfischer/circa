@@ -157,12 +157,6 @@ type Mutable;
 def Mutable.set(self, any val)
 def Mutable.get(self) -> any
 
--- Internally used bytecode-level operations (our version of ASM)
-def _bc_push_block_dynamic(Block block)
-def _bc_enter_frame()
-def _bc_pop_as_module()
-def _bc_pop_frame()
-
 -- Modules
 
 type Module;

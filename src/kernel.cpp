@@ -718,14 +718,6 @@ void on_new_function_parsed(Term* func, caValue* functionName)
     // Catch certain builtin functions as soon as they are defined.
     if (FUNCS.add == NULL && string_eq(functionName, "add"))
         FUNCS.add = func;
-    if (FUNCS.bc_push_block_dynamic == NULL && string_eq(functionName, "_bc_push_block_dynamic"))
-        FUNCS.bc_push_block_dynamic = func;
-    if (FUNCS.bc_enter_frame == NULL && string_eq(functionName, "_bc_enter_frame"))
-        FUNCS.bc_enter_frame = func;
-    if (FUNCS.bc_pop_as_module == NULL && string_eq(functionName, "_bc_pop_as_module"))
-        FUNCS.bc_pop_as_module = func;
-    if (FUNCS.bc_pop_frame == NULL && string_eq(functionName, "_bc_pop_frame"))
-        FUNCS.bc_pop_frame = func;
     if (FUNCS.closure_block == NULL && string_eq(functionName, "closure_block"))
         FUNCS.closure_block = func;
     if (FUNCS.declared_state == NULL && string_eq(functionName, "declared_state"))

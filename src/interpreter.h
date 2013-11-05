@@ -24,7 +24,7 @@ struct Stack
     int framesCount;
     int framesCapacity;
 
-    // Transient data, used during run_bytecode;
+    // Transient data, used during vm_run;
     const char* bc;
     int pc;
 
@@ -127,7 +127,7 @@ void run_interpreter(Stack* stack);
 
 void stack_run(Stack* stack);
 
-void run_bytecode(Stack* stack, caValue* bytecode);
+void vm_run(Stack* stack, caValue* bytecode);
 
 // Deprecated
 void evaluate_block(Stack* stack, Block* block);

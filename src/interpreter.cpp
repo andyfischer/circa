@@ -473,6 +473,12 @@ void stack_clear_error(Stack* stack)
     top->pcIndex = top->block->length();
 }
 
+static void indent(std::stringstream& strm, int count)
+{
+    for (int x = 0; x < count; x++)
+        strm << " ";
+}
+
 void stack_to_string(Stack* stack, caValue* out)
 {
     std::stringstream strm;
@@ -507,20 +513,26 @@ void stack_to_string(Stack* stack, caValue* out)
         if (block == NULL)
             continue;
 
-        // indent
-        for (int x = 0; x < frameIndex+2; x++) strm << " ";
-        strm << "context: " << to_string(&frame->dynamicScope) << std::endl;
-        for (int x = 0; x < frameIndex+2; x++) strm << " ";
-        strm << "state: " << to_string(&frame->state) << std::endl;
-        for (int x = 0; x < frameIndex+2; x++) strm << " ";
-        strm << "outgoingState: " << to_string(&frame->outgoingState) << std::endl;
+        if (!is_null(&frame->dynamicScope)) {
+            indent(strm, frameIndex+2);
+            strm << "context: " << to_string(&frame->dynamicScope) << std::endl;
+        }
+        if (!is_null(&frame->state)) {
+            indent(strm, frameIndex+2);
+            strm << "state: " << to_string(&frame->state) << std::endl;
+        }
+        if (!is_null(&frame->outgoingState)) {
+            indent(strm, frameIndex+2);
+            strm << "outgoingState: " << to_string(&frame->outgoingState) << std::endl;
+        }
 
+        int bytecodePc = 0;
+        char* bytecode = as_blob(frame_bytecode(frame));
+        
         for (int i=0; i < frame->block->length(); i++) {
             Term* term = block->get(i);
 
-            // indent
-            for (int x = 0; x < frameIndex+1; x++)
-                strm << " ";
+            indent(strm, frameIndex+1);
 
             if (i == activeTermIndex)
                 strm << ">";
@@ -541,6 +553,22 @@ void stack_to_string(Stack* stack, caValue* out)
                 else
                     strm << " = " << to_string(value);
             }
+
+            // bytecode
+            #if 0
+            while (bytecode[bytecodePc] != bc_Done) {
+                int currentTermIndex = bytecode_op_to_term_index(bytecode, bytecodePc);
+                if (currentTermIndex != -1 && currentTermIndex != i)
+                    break;
+
+                Value str;
+                bytecode_op_to_string(bytecode, &bytecodePc, &str);
+                strm << std::endl;
+                indent(strm, frameIndex+4);
+                strm << as_cstring(&str);
+            }
+            #endif
+
             strm << std::endl;
         }
     }
@@ -875,7 +903,7 @@ void stack_run(Stack* stack)
     stack->errorOccurred = false;
     stack->step = sym_StackRunning;
 
-    run_bytecode(stack, frame_bytecode(stack_top(stack)));
+    vm_run(stack, frame_bytecode(stack_top(stack)));
 }
 
 void raise_error_input_type_mismatch(Stack* stack, int inputIndex)
@@ -1018,7 +1046,7 @@ static caValue* vm_read_local_value(Frame* referenceFrame)
     return frame_register(frame, index);
 }
 
-void run_bytecode(Stack* stack, caValue* bytecode)
+void vm_run(Stack* stack, caValue* bytecode)
 {
     stack->bc = as_blob(bytecode);
     stack->pc = stack_top(stack)->pc;

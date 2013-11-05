@@ -261,6 +261,88 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     }
 }
 
+int bytecode_op_to_term_index(const char* bc, int pc)
+{
+    char op = blob_read_char(bc, &pc);
+
+    switch (op) {
+    case bc_Done:
+        return -1;
+    case bc_Pause:
+        return -1;
+    case bc_SetNull:
+        return blob_read_int(bc, &pc);
+    case bc_InlineCopy:
+        return blob_read_int(bc, &pc);
+    case bc_LocalCopy:
+        return -1;
+    case bc_NoOp:
+        return -1;
+    case bc_EnterFrame:
+        return -1;
+    case bc_LeaveFrame:
+        return -1;
+    case bc_PopFrame:
+        return -1;
+    case bc_PushFunction:
+        return blob_read_int(bc, &pc);
+    case bc_PushNested:
+        return blob_read_int(bc, &pc);
+    case bc_PushDynamicMethod:
+        return blob_read_int(bc, &pc);
+    case bc_PushFuncCall:
+        return blob_read_int(bc, &pc);
+    case bc_PushFuncCallImplicit:
+        return blob_read_int(bc, &pc);
+    case bc_PushFuncApply:
+        return blob_read_int(bc, &pc);
+    case bc_FireNative:
+        return -1;
+    case bc_PushCase:
+        return blob_read_int(bc, &pc);
+    case bc_PushLoop:
+        return blob_read_int(bc, &pc);
+    case bc_PushWhile:
+        return blob_read_int(bc, &pc);
+    case bc_PushRequire:
+        return blob_read_int(bc, &pc);
+    case bc_PushBlockDynamic:
+        return blob_read_int(bc, &pc);
+    case bc_ExitPoint:
+    case bc_Return:
+    case bc_Continue:
+    case bc_Break:
+    case bc_Discard:
+    case bc_CaseConditionBool:
+    case bc_LoopConditionBool:
+    case bc_Loop:
+    case bc_IterationDone:
+    case bc_ErrorNotEnoughInputs:
+    case bc_ErrorTooManyInputs:
+    case bc_PushInputFromStack:
+    case bc_PushInputFromStack2:
+    case bc_PushInputFromStack3:
+    case bc_PushVarargList:
+    case bc_PushInputNull:
+    case bc_PushInputNull2:
+    case bc_PushInputFromValue:
+    case bc_PushNonlocalInput:
+    case bc_PushExplicitState:
+    case bc_NotEnoughInputs:
+    case bc_TooManyInputs:
+    case bc_PopOutput:
+    case bc_PopOutputNull:
+    case bc_PopOutputsDynamic:
+    case bc_PopExplicitState:
+    case bc_PopAsModule:
+    case bc_MemoizeCheck:
+    case bc_MemoizeSave:
+    case bc_PackState:
+    default:
+        return -1;
+    }
+}
+
 void bytecode_to_string(caValue* bytecode, caValue* string)
 {
     std::stringstream strm;
@@ -288,7 +370,6 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
             set_string(string, strm.str().c_str());
             return;
         }
-
     }
 }
 
@@ -339,30 +420,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 {
     INCREMENT_STAT(WriteTermBytecode);
 
-    if (term->function == FUNCS.bc_push_block_dynamic) {
-        blob_append_char(bytecode, bc_PushBlockDynamic);
-        blob_append_int(bytecode, term->index);
-        bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
-        return;
-    }
-
-    else if (term->function == FUNCS.bc_pop_as_module) {
-        blob_append_char(bytecode, bc_PopAsModule);
-        blob_append_int(bytecode, term->index);
-        return;
-    }
-
-    else if (term->function == FUNCS.bc_enter_frame) {
-        blob_append_char(bytecode, bc_EnterFrame);
-        return;
-    }
-
-    else if (term->function == FUNCS.bc_pop_frame) {
-        blob_append_char(bytecode, bc_PopFrame);
-        return;
-    }
-
-    else if (term->function == FUNCS.output) {
+    if (term->function == FUNCS.output) {
 
         if (term->input(0) == NULL) {
             blob_append_char(bytecode, bc_SetNull);
@@ -772,7 +830,6 @@ void bytecode_write_block(caValue* bytecode, Block* block)
     if (is_for_loop(block)) {
         blob_append_char(bytecode, bc_IterationDone);
         blob_append_char(bytecode, loop_produces_output_value(block->owningTerm) ? 0x1 : 0x0);
-        return;
     }
 
     blob_append_char(bytecode, bc_Done);

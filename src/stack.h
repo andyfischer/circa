@@ -34,7 +34,7 @@ struct Frame
     // Current program counter (term index)
     int pcIndex;
 
-    // Program counter (bytecode position)
+    // Program counter (bytecode position).
     int pc;
 
     // Whether this frame was pushed from a normal call, or Func.apply/Func.call.

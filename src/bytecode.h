@@ -71,6 +71,8 @@ const char bc_MemoizeSave = 0x51;
 const char bc_PackState = 0x55;
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
+int bytecode_op_to_term_index(const char* bc, int pc);
+void bytecode_op_to_string(const char* bc, int* pc, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);
 void bytecode_dump_next_op(const char* bc, int pc);
 void bytecode_dump(caValue* bytecode);
