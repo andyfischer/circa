@@ -548,19 +548,22 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
     else if (term->nestedContents != NULL) {
 
+        // Otherwise if the term has nested contents, then use it.
         referenceTargetBlock = term->nestedContents;
 
         if (block_is_evaluation_empty(referenceTargetBlock))
             return;
 
-        // Otherwise if the term has nested contents, then use it.
         blob_append_char(bytecode, bc_PushNested);
         blob_append_int(bytecode, term->index);
     } else {
-        referenceTargetBlock = function_contents(term->function);
+
         // If no other case applies, use the term's function.
+        referenceTargetBlock = function_contents(term->function);
+
         if (block_is_evaluation_empty(referenceTargetBlock))
             return;
+
         blob_append_char(bytecode, bc_PushFunction);
         blob_append_int(bytecode, term->index);
     }
@@ -569,7 +572,10 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
             || term->function == FUNCS.func_call
             || term->function == FUNCS.func_apply
             || term->function == FUNCS.require
-            || is_dynamic_func_call(term))
+            || is_dynamic_func_call(term)
+            || term->function == FUNCS.if_block
+            || term->function == FUNCS.for_func
+            )
         bytecode_write_input_instructions2(bytecode, term);
     else
         bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);

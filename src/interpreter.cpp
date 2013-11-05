@@ -1462,6 +1462,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             top = vm_push_frame(stack, termIndex, block);
             expand_frame_indexed(stack_top_parent(stack), top, 0);
+            vm_run_input_bytecodes(stack, caller);
             continue;
         }
         case bc_CaseConditionBool: {
@@ -1519,8 +1520,11 @@ void vm_run(Stack* stack, caValue* bytecode)
             top->pcIndex = index;
             top->pc = stack->pc;
             Term* caller = frame_term(top, index);
-            
-            caValue* input = stack_find_active_value(top, caller->input(0));
+
+            // Peek at the first input.
+            int peekPc = stack->pc;
+            caValue* input = vm_run_single_input(top, caller);
+            stack->pc = peekPc;
 
             // If the input list is empty, use the #zero block.
             Block* block = NULL;
@@ -1533,6 +1537,7 @@ void vm_run(Stack* stack, caValue* bytecode)
             }
 
             top = vm_push_frame(stack, index, block);
+            vm_run_input_bytecodes(stack, caller);
 
             if (!zeroBlock) {
 
@@ -1809,7 +1814,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
         return term_value(caller->input(index));
     }
     default:
-        frame->pc--; // Rewind.
+        frame->stack->pc--; // Rewind.
         return NULL;
     }
 }
