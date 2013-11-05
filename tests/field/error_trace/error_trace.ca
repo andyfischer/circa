@@ -1,0 +1,46 @@
+
+require indent_writer
+
+def Block.source_filename(self) -> String
+    self.property(:Filename)
+
+def Stack.frames_from_top(self) -> List
+  for i in 0..self.frame_count
+    self.frame(i)
+
+def Stack.frames_from_start(self) -> List
+  for i in self.frame_count..0
+    self.frame(i-1)
+
+def trace_to_string(Stack stack) -> String
+  writer = indent_writer.new
+
+  for frame in stack.frames_from_start
+    @writer.write(frame.block.source_filename ' ')
+
+    caller = frame.block.owner
+
+    if not caller.is_null
+      if caller.name != ''
+        @writer.write(caller.name ' ')
+
+    @writer.writeln
+    @writer.indent
+
+  @writer.write('Error: ' stack.top.register(stack.top.pc))
+
+  writer.toString
+
+def f()
+  assert(false)
+
+def g()
+  f()
+
+def main()
+  g()
+
+int = make_stack(main)
+int.run
+
+trace_to_string(int) -> print

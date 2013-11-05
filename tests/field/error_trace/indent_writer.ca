@@ -1,0 +1,32 @@
+
+type IndentWriter {
+    int curIndent
+    bool needsIndent
+    List output
+}
+def IndentWriter.write(self, args :multiple)
+    if self.needsIndent
+        self.needsIndent = false
+        for i in 0..self.curIndent
+            @self.output.append(' ')
+    @self.output.append(concat.apply(args))
+    self
+
+def IndentWriter.writeln(self, args :multiple)
+    @self.write(concat.apply(args))
+    @self.output.append("\n")
+    self.needsIndent = true
+    self
+
+def IndentWriter.indent(self)
+    self.curIndent += 1
+    self
+def IndentWriter.unindent(self)
+    self.curIndent -= 1
+    self
+
+def IndentWriter.toString(self) -> String
+    self.output.join("")
+
+def new() -> IndentWriter
+    IndentWriter.make
