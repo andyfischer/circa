@@ -1094,17 +1094,6 @@ void vm_run(Stack* stack, caValue* bytecode)
             Block* block = caller->nestedContents;
 
             top = vm_push_frame(stack, termIndex, block);
-            top->parentPc = termIndex;
-            continue;
-        }
-        case bc_PushBlockDynamic: {
-            int termIndex = vm_read_int(stack);
-            caValue* value = vm_read_local_value(stack);
-
-            Frame* top = stack_top(stack);
-            Block* block = as_block(value);
-            top = vm_push_frame(stack, termIndex, block);
-            expand_frame(stack_top_parent(stack), top);
             continue;
         }
         case bc_PushInputFromStack: {

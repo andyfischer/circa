@@ -108,14 +108,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "push_require ");
         string_append(string, blob_read_int(bc, pc));
         break;
-    case bc_PushBlockDynamic:
-        set_string(string, "push_block_dynamic ");
-        string_append(string, blob_read_int(bc, pc));
-        string_append(string, " ");
-        string_append(string, blob_read_u16(bc, pc));
-        string_append(string, " ");
-        string_append(string, blob_read_u16(bc, pc));
-        break;
     case bc_ExitPoint:
         set_string(string, "exit_point");
         break;
@@ -305,8 +297,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_PushWhile:
         return blob_read_int(bc, &pc);
     case bc_PushRequire:
-        return blob_read_int(bc, &pc);
-    case bc_PushBlockDynamic:
         return blob_read_int(bc, &pc);
     case bc_ExitPoint:
     case bc_Return:
