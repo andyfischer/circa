@@ -1781,7 +1781,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
         return term_value(caller->input(index));
     }
     default:
-        internal_error("unhandled op in vm_run_single_input");
+        frame->pc--; // Rewind.
         return NULL;
     }
 }
@@ -1893,6 +1893,13 @@ static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs)
     if (is_input_placeholder(placeholder)
             && !placeholder->boolProp("multiple", false))
         return raise_error_not_enough_inputs(stack);
+
+    // If we never reached the :multiple input, make sure to set it to [].
+    if (placeholder->boolProp("multiple", false)) {
+        caValue* listValue = frame_register(top, placeholderIndex);
+        if (!is_list(listValue))
+            set_list(listValue);
+    }
 }
 
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key)
@@ -2019,7 +2026,7 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
         return;
     }
 
-    if (!is_list(inputList)) {
+    if (inputList == NULL || !is_list(inputList)) {
         Value msg;
         set_string(&msg, "Input 1 is not a list");
         circa_output_error(stack, as_cstring(&msg));

@@ -1,0 +1,12 @@
+
+
+
+assert(concat.apply([]) == "")
+assert(concat.apply([1 2 3]) == "123")
+
+def no_args()
+  concat.apply()
+
+int = make_stack(no_args)
+int.run
+assert(int.has_error)
