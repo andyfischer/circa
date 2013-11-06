@@ -111,6 +111,18 @@ void Block__owner(caStack* stack)
 
     set_term_ref(circa_output(stack, 0), block->owningTerm);
 }
+
+void Block__parent(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL) {
+        set_block(circa_output(stack, 0), NULL);
+        return;
+    }
+
+    set_block(circa_output(stack, 0), get_parent_block(block));
+}
+
 void Block__property(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -666,6 +678,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Block.output", Block__output);
     module_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
     module_patch_function(patch, "Block.owner", Block__owner);
+    module_patch_function(patch, "Block.parent", Block__parent);
     module_patch_function(patch, "Block.property", Block__property);
     module_patch_function(patch, "Block.properties", Block__properties);
     module_patch_function(patch, "Block.terms", Block__terms);

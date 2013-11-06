@@ -1,0 +1,20 @@
+
+def test()
+  def test2()
+    assert(false)
+
+  test2()
+
+int = make_stack(test).run
+
+assert(int.has_error)
+
+top = int.top
+cond(top.block.name == 'assert', top.parent, @top)
+
+test2 = top.block
+assert(test2.name == 'test2')
+
+test = test2.parent
+assert(test.name == 'test')
+assert(test2.owner.parent == test2.parent)

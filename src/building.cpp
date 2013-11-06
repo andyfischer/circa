@@ -218,7 +218,6 @@ static void remove_user(Term* usee, Term* user)
         if (usee->function == FUNCS.for_func)
             dirty_bytecode(usee->nestedContents);
     }
-    
 }
 
 void possibly_prune_user_list(Term* user, Term* usee)

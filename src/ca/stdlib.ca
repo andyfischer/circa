@@ -265,6 +265,8 @@ def Block.output_placeholder(self, int index) -> Term
     -- Return an output placeholder term by index.
 def Block.owner(self) -> Term
     -- Return the Term that owns this Block (may be null).
+def Block.parent(self) -> Block
+    -- Return the Block that owns this Block (may be null).
 def Block.primary_output(self) -> Term
     -- Return the primary output.
     self.output(0)
@@ -359,7 +361,7 @@ def Stack.reset_state(self)
 def Stack.restart(self)
     -- Restart or "rewind" the stack, so the program counter is returned to the start
     -- of the topmost frame. State is preserved.
-def Stack.run(self)
+def Stack.run(self) -> Stack
     -- Run the interpreter until either the topmost frame is finished, or an error
     -- is raised.
 def Stack.frame(self, int depth) -> Frame

@@ -2550,6 +2550,7 @@ void Stack__run(caStack* stack)
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     run_interpreter(self);
+    copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
 void Stack__frame(caStack* stack)

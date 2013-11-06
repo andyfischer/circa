@@ -478,9 +478,8 @@ Block* get_parent_block(Block* block)
     if (block == global_root_block())
         return NULL;
 
-    // TODO: Revisit this. Should the global block always be considered a parent?
     if (block->owningTerm == NULL)
-        return global_root_block();
+        return NULL;
 
     if (block->owningTerm->owningBlock == NULL)
         return global_root_block();
