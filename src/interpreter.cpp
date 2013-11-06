@@ -1623,7 +1623,11 @@ void vm_run(Stack* stack, caValue* bytecode)
             override(stack);
 
             if (stack_errored(stack)) {
-                top->pcIndex = top->block->length() - 1;
+                // Throw away the current frame, store the error in the calling frame.
+                Frame* parent = stack_top_parent(stack);
+                caValue* error = circa_output(stack, 0);
+                move(error, frame_register(parent, top->parentPc));
+                stack_pop_no_retain(stack);
                 return;
             }
 
