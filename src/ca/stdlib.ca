@@ -571,14 +571,17 @@ def Term.assign(self, any val)
 def Term.asint(self) -> int
 def Term.asfloat(self) -> number
 def Term.index(self) -> int
-def Term.parent(self) -> Block
 def Term.contents(self) -> Block
     -- Fetch the nested Block contents of this Term. The format and the meaning
     -- of these contents is dictated by the term's function.
+def Term.is_input(self) -> bool
 def Term.is_null(self) -> bool
     -- Returns whether this is a null Term reference.
+def Term.is_output(self) -> bool
+def Term.is_statement(self) -> bool
 def Term.name(self) -> String
     -- Return this term's local name. May be blank.
+def Term.parent(self) -> Block
 def Term.to_string(self) -> String
 def Term.to_source_string(self) -> String
 def Term.format_source(self) -> List
@@ -591,7 +594,6 @@ def Term.function(self) -> Block
     -- Fetch this term's function.
 def Term.get_type(self) -> Type
     -- Fetch the declared type of this term.
-def Term.is_statement(self) -> bool
 def Term.value(self) -> any
     -- For a value term, this fetches the actual value.
 def Term.set_value(self, any val)

@@ -554,11 +554,19 @@ void Term__parent(caStack* stack)
 void Term__contents(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
-    if (t == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
     set_block(circa_output(stack, 0), t->nestedContents);
+}
+void Term__is_input(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), t != NULL && is_input_placeholder(t));
+}
+void Term__is_output(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), t != NULL && is_output_placeholder(t));
 }
 void Term__is_null(caStack* stack)
 {
@@ -717,6 +725,8 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.num_inputs", Term__num_inputs);
     module_patch_function(patch, "Term.parent", Term__parent);
     module_patch_function(patch, "Term.contents", Term__contents);
+    module_patch_function(patch, "Term.is_input", Term__is_input);
+    module_patch_function(patch, "Term.is_output", Term__is_output);
     module_patch_function(patch, "Term.is_null", Term__is_null);
     module_patch_function(patch, "Term.source_location", Term__source_location);
     module_patch_function(patch, "Term.location_string", Term__location_string);
