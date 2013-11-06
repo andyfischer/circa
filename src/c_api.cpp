@@ -422,6 +422,7 @@ caValue* circa_output(caStack* stack, int index)
 void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
+    stack_top(stack)->termIndex = stack_top(stack)->block->length() - 1;
     raise_error(stack);
 }
 

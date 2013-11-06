@@ -583,42 +583,32 @@ void stack_trace_to_string(Stack* stack, caValue* out)
     for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
 
         Frame* frame = frame_by_index(stack, frameIndex);
+        Term* term = frame_current_term(frame);
 
-        bool lastFrame = frameIndex == stack->framesCount - 1;
-
-        Frame* childFrame = NULL;
-        if (!lastFrame)
-            childFrame = frame_by_index(stack, frameIndex + 1);
-
-        int activeTermIndex = frame->termIndex;
-        if (childFrame != NULL)
-            activeTermIndex = childFrame->parentIndex;
-
-
-        Term* term = frame->block->get(activeTermIndex);
+        if (is_input_placeholder(term) || is_output_placeholder(term))
+            continue;
 
         // Print a short location label
-        if (term->function == FUNCS.input) {
-            strm << "(input " << term->index << ")";
-        } else {
-            strm << get_short_location(term) << " ";
-            if (term->name != "")
-                strm << term->name << " = ";
-            strm << term->function->name;
-            strm << "()";
-        }
-
-        // Print the error value
-        caValue* reg = frame_register(frame, activeTermIndex);
-        if (lastFrame || is_error(reg)) {
-            strm << " | ";
-            if (is_string(reg))
-                strm << as_cstring(reg);
-            else
-                strm << to_string(reg);
-        }
+        strm << get_short_location(term) << " ";
+        if (term->name != "")
+            strm << term->name << " = ";
+        strm << term->function->name;
+        strm << "()";
         strm << std::endl;
     }
+
+    // Print the error value
+    Frame* top = stack_top(stack);
+    caValue* msg = frame_register(top, top->termIndex);
+    Term* errorLocation = top->block->get(top->termIndex);
+    if (is_input_placeholder(errorLocation))
+        strm << "(input " << errorLocation->index << ") ";
+
+    if (is_string(msg))
+        strm << as_cstring(msg);
+    else
+        strm << to_string(msg);
+    strm << std::endl;
 
     set_string(out, strm.str().c_str());
 }
@@ -977,10 +967,8 @@ void raise_error_not_enough_inputs(Stack* stack)
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    // Discard the top branch.
-    stack_pop_no_retain(stack);
-
-    set_error_string(frame_register(stack_top(stack), caller), as_cstring(&msg));
+    frame->termIndex = frame->block->length() - 1;
+    set_error_string(circa_output(stack, 0), as_cstring(&msg));
     raise_error(stack);
 }
 
@@ -998,10 +986,8 @@ void raise_error_too_many_inputs(Stack* stack)
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    // Discard the top branch.
-    stack_pop_no_retain(stack);
-
-    set_error_string(frame_register(stack_top(stack), caller), as_cstring(&msg));
+    frame->termIndex = frame->block->length() - 1;
+    set_error_string(circa_output(stack, 0), as_cstring(&msg));
     raise_error(stack);
 }
 
@@ -1460,6 +1446,7 @@ void vm_run(Stack* stack, caValue* bytecode)
             if (!is_bool(condition)) {
                 Value msg;
                 set_string(&msg, "Case expected bool input, found: ");
+                stack_top(stack)->termIndex = stack_top(stack)->block->length() - 1;
                 string_append_quoted(&msg, condition);
                 raise_error_msg(stack, as_cstring(&msg));
                 return;
@@ -1568,6 +1555,7 @@ void vm_run(Stack* stack, caValue* bytecode)
                 Value msg;
                 set_string(&msg, "Couldn't find module named: ");
                 string_append_quoted(&msg, moduleName);
+                stack_top(stack)->termIndex = callerIndex;
                 raise_error_msg(stack, as_cstring(&msg));
                 return;
             }
@@ -1622,14 +1610,8 @@ void vm_run(Stack* stack, caValue* bytecode)
             // Override functions may not push/pop frames or change PC.
             override(stack);
 
-            if (stack_errored(stack)) {
-                // Throw away the current frame, store the error in the calling frame.
-                Frame* parent = stack_top_parent(stack);
-                caValue* error = circa_output(stack, 0);
-                move(error, frame_register(parent, top->parentIndex));
-                stack_pop_no_retain(stack);
+            if (stack_errored(stack))
                 return;
-            }
 
             continue;
         }
@@ -2010,6 +1992,7 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
     caValue* closure = vm_run_single_input(top, caller);
     caValue* inputList = vm_run_single_input(top, caller);
     
+    top->termIndex = callerIndex;
     Block* block = as_block(list_get(closure, 0));
 
     if (block == NULL) {
