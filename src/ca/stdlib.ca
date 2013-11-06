@@ -272,6 +272,7 @@ def Block.primary_output(self) -> Term
     self.output(0)
 def Block.property(self, Symbol key) -> any
 def Block.properties(self) -> Map
+def Block.source_filename(self) -> String
 def Block.statements(self) -> List
     -- Return a list of Terms that are statements.
 def Block.terms(self) -> List

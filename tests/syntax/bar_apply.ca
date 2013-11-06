@@ -1,0 +1,11 @@
+
+
+def increment(int i)
+  i + 1
+
+'should be 5: ' | print
+3 | increment | increment | print
+
+'should be 4: ' | print
+
+1 + 3 | print

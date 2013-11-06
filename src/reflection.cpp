@@ -149,6 +149,21 @@ void Block__properties(caStack* stack)
     else
         copy(&block->properties, circa_output(stack, 0));
 }
+void Block__source_filename(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    while (block != NULL) {
+        caValue* filename = block_get_source_filename(block);
+
+        if (filename != NULL) {
+            copy(filename, circa_output(stack, 0));
+            return;
+        }
+
+        block = get_parent_block(block);
+    }
+    set_string(circa_output(stack, 0), "");
+}
 
 void Block__to_code_lines(caStack* stack)
 {
@@ -557,9 +572,12 @@ void Term__source_location(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    circa_set_vec4(circa_output(stack, 0),
-        t->sourceLoc.col, t->sourceLoc.line,
-        t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
+    caValue* out = circa_create_default_output(stack, 0);
+    touch(out);
+    set_int(list_get(out, 0), t->sourceLoc.col);
+    set_int(list_get(out, 1), t->sourceLoc.line);
+    set_int(list_get(out, 2), t->sourceLoc.colEnd);
+    set_int(list_get(out, 3), t->sourceLoc.lineEnd);
 }
 void Term__location_string(caStack* stack)
 {
@@ -681,6 +699,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Block.parent", Block__parent);
     module_patch_function(patch, "Block.property", Block__property);
     module_patch_function(patch, "Block.properties", Block__properties);
+    module_patch_function(patch, "Block.source_filename", Block__source_filename);
     module_patch_function(patch, "Block.terms", Block__terms);
     module_patch_function(patch, "Block.walk_terms", Block__walk_terms);
     module_patch_function(patch, "Term.assign", Term__assign);

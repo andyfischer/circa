@@ -57,6 +57,7 @@ const char* get_token_text(int match)
         case tok_LeftArrow: return "<-";
         case tok_Ampersand: return "&";
         case tok_DoubleAmpersand: return "&&";
+        case tok_VerticalBar: return "||";
         case tok_DoubleVerticalBar: return "||";
         case tok_Semicolon: return ";";
         case tok_TwoDots: return "..";
@@ -495,11 +496,10 @@ void top_level_consume_token(TokenizeContext &context)
             return;
 
         case '>':
-            if (context.next(1) == '=') {
+            if (context.next(1) == '=')
                 context.consume(tok_GThanEq, 2);
-                return;
-            }
-            context.consume(tok_GThan, 1);
+            else
+                context.consume(tok_GThan, 1);
             return;
 
         case '%':
@@ -507,19 +507,17 @@ void top_level_consume_token(TokenizeContext &context)
             return;
 
         case '|':
-            if (context.next(1) == '|') {
+            if (context.next(1) == '|')
                 context.consume(tok_DoubleVerticalBar, 2);
-                return;
-            }
-            break;
+            else
+                context.consume(tok_VerticalBar, 1);
+            return;
 
         case '&':
-            if (context.next(1) == '&') {
+            if (context.next(1) == '&')
                 context.consume(tok_DoubleAmpersand, 2);
-                return;
-            }
-
-            context.consume(tok_Ampersand, 1);
+            else
+                context.consume(tok_Ampersand, 1);
             return;
 
         case ';':

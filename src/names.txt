@@ -161,6 +161,7 @@ tok_RightArrow
 tok_LeftArrow
 tok_Ampersand
 tok_DoubleAmpersand
+tok_VerticalBar
 tok_DoubleVerticalBar
 tok_Semicolon
 tok_TwoDots

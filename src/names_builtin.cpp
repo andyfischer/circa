@@ -142,6 +142,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_LeftArrow: return "tok_LeftArrow";
     case tok_Ampersand: return "tok_Ampersand";
     case tok_DoubleAmpersand: return "tok_DoubleAmpersand";
+    case tok_VerticalBar: return "tok_VerticalBar";
     case tok_DoubleVerticalBar: return "tok_DoubleVerticalBar";
     case tok_Semicolon: return "tok_Semicolon";
     case tok_TwoDots: return "tok_TwoDots";
@@ -2072,6 +2073,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'V':
+        if (strcmp(str + 5, "erticalBar") == 0)
+            return tok_VerticalBar;
+        break;
     case 'W':
     switch (str[5]) {
     case 'h':

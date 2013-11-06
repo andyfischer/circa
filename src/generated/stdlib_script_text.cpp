@@ -279,6 +279,7 @@ const char* STDLIB_CA_TEXT =
     "    self.output(0)\n"
     "def Block.property(self, Symbol key) -> any\n"
     "def Block.properties(self) -> Map\n"
+    "def Block.source_filename(self) -> String\n"
     "def Block.statements(self) -> List\n"
     "    -- Return a list of Terms that are statements.\n"
     "def Block.terms(self) -> List\n"

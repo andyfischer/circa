@@ -1568,14 +1568,16 @@ InfixOperatorInfo get_infix_operator_info(int tokenMatch)
             return InfixOperatorInfo(FUNCS.and_func, 3, false);
         case tok_Or:
             return InfixOperatorInfo(FUNCS.or_func, 3, false);
+        case tok_VerticalBar:
+            return InfixOperatorInfo(NULL, 2, false);
         case tok_PlusEquals:
-            return InfixOperatorInfo(FUNCS.add, 2, true);
+            return InfixOperatorInfo(FUNCS.add, 1, true);
         case tok_MinusEquals:
-            return InfixOperatorInfo(FUNCS.sub, 2, true);
+            return InfixOperatorInfo(FUNCS.sub, 1, true);
         case tok_StarEquals:
-            return InfixOperatorInfo(FUNCS.mult, 2, true);
+            return InfixOperatorInfo(FUNCS.mult, 1, true);
         case tok_SlashEquals:
-            return InfixOperatorInfo(FUNCS.div, 2, true);
+            return InfixOperatorInfo(FUNCS.div, 1, true);
         default:
             return InfixOperatorInfo(NULL, -1, false);
     }
@@ -1627,7 +1629,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
         ParseResult result;
 
-        if (operatorMatch == tok_RightArrow) {
+        if (operatorMatch == tok_RightArrow || operatorMatch == tok_VerticalBar) {
 
             // Right-apply. Consume right side as a function name.
             
@@ -1660,7 +1662,10 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 if (term->function == NULL || term->function->name != functionName.identifierName)
                     term->setStringProp("syntax:functionName", functionName.identifierName);
 
-                term->setStringProp("syntax:declarationStyle", "arrow-concat");
+                if (operatorMatch == tok_RightArrow)
+                    term->setStringProp("syntax:declarationStyle", "arrow-concat");
+                else
+                    term->setStringProp("syntax:declarationStyle", "bar-apply");
 
                 set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
                 // Can't use preWhitespace of input 1 here, because there is no input 1

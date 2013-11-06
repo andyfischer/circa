@@ -7,7 +7,7 @@ def test()
 
 int = make_stack(test).run
 
-assert(int.has_error)
+int.has_error | assert
 
 top = int.top
 cond(top.block.name == 'assert', top.parent, @top)

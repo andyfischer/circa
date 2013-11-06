@@ -290,6 +290,12 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
                 term, sym_Whitespace);
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
+    } else if (declarationStyle == "bar-apply") {
+        format_source_for_input(source, term, 0);
+        append_phrase(source, "|", term, sym_None);
+        append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
+                term, sym_Whitespace);
+        append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "method-right-arrow") {
         format_source_for_input(source, term, 1);
         append_phrase(source, "->", term, sym_None);
