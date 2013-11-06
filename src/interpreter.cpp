@@ -44,7 +44,7 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index);
 static void retain_stack_top(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 
-static Frame* vm_push_frame(Stack* stack, int parentPc, Block* block);
+static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block);
 static caValue* vm_run_single_input(Frame* frame, Term* caller);
 static void vm_run_input_bytecodes(caStack* stack, Term* caller);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
@@ -167,10 +167,10 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
         copy(bindings, &stack_top(stack)->bindings);
 }
 
-static Frame* vm_push_frame(Stack* stack, int parentPc, Block* block)
+static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block)
 {
     Frame* top = stack_push_blank(stack);
-    top->parentPc = parentPc;
+    top->parentIndex = parentIndex;
     top->block = block;
     set_list(&top->registers, block_locals_count(block));
     refresh_bytecode(block);
@@ -180,10 +180,10 @@ static Frame* vm_push_frame(Stack* stack, int parentPc, Block* block)
 static Frame* expand_frame(Frame* parent, Frame* top)
 {
     // Look for a retained frame to carry over from parent.
-    if (is_list(&parent->state) && !is_null(list_get(&parent->state, top->parentPc))) {
+    if (is_list(&parent->state) && !is_null(list_get(&parent->state, top->parentIndex))) {
 
-        // Found non-null state for this parentPc.
-        caValue* retainedFrame = list_get(&parent->state, top->parentPc);
+        // Found non-null state for this parentIndex.
+        caValue* retainedFrame = list_get(&parent->state, top->parentIndex);
 
         if (is_retained_frame(retainedFrame)
                 // Don't expand state on calls from within declared_state.
@@ -201,10 +201,10 @@ static Frame* expand_frame(Frame* parent, Frame* top)
 static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
 {
     // Look for frame state to carry over from parent.
-    if (is_list(&parent->state) && !is_null(list_get(&parent->state, top->parentPc))) {
+    if (is_list(&parent->state) && !is_null(list_get(&parent->state, top->parentIndex))) {
 
-        // Found non-null state for this parentPc.
-        caValue* retainedList = list_get(&parent->state, top->parentPc);
+        // Found non-null state for this parentIndex.
+        caValue* retainedList = list_get(&parent->state, top->parentIndex);
 
         if (is_list(retainedList) && index < list_length(retainedList)) {
             caValue* retainedFrame = list_get(retainedList, index);
@@ -263,7 +263,7 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
         set_list(parentState, parent->block->length());
     touch(parentState);
 
-    caValue* slot = list_get(parentState, top->parentPc);
+    caValue* slot = list_get(parentState, top->parentIndex);
 
     if (top->block->owningTerm->function == FUNCS.case_func) {
 
@@ -321,7 +321,7 @@ static Frame* stack_push_blank(Stack* stack)
     Frame* frame = stack_top(stack);
 
     // Initialize frame
-    frame->pcIndex = 0;
+    frame->termIndex = 0;
     frame->pc = 0;
     frame->exitType = sym_None;
     frame->callType = sym_NormalCall;
@@ -350,7 +350,7 @@ void stack_restart(Stack* stack)
         stack_pop(stack);
 
     Frame* top = stack_top(stack);
-    top->pcIndex = 0;
+    top->termIndex = 0;
     top->pc = 0;
     move(&top->outgoingState, &top->state);
 
@@ -470,7 +470,7 @@ void stack_clear_error(Stack* stack)
         stack_pop(stack);
 
     Frame* top = stack_top(stack);
-    top->pcIndex = top->block->length();
+    top->termIndex = top->block->length();
 }
 
 static void indent(std::stringstream& strm, int count)
@@ -497,16 +497,16 @@ void stack_to_string(Stack* stack, caValue* out)
         if (!lastFrame)
             childFrame = frame_by_index(stack, frameIndex + 1);
 
-        int activeTermIndex = frame->pcIndex;
+        int activeTermIndex = frame->termIndex;
         if (childFrame != NULL)
-            activeTermIndex = childFrame->parentPc;
+            activeTermIndex = childFrame->parentIndex;
 
         int depth = stack->framesCount - 1 - frameIndex;
         Block* block = frame->block;
         strm << " [Frame index " << frameIndex
              << ", depth = " << depth
              << ", block = #" << block->id
-             << ", pcIndex = " << frame->pcIndex
+             << ", termIndex = " << frame->termIndex
              << ", pc = " << frame->pc
              << "]" << std::endl;
 
@@ -590,9 +590,9 @@ void stack_trace_to_string(Stack* stack, caValue* out)
         if (!lastFrame)
             childFrame = frame_by_index(stack, frameIndex + 1);
 
-        int activeTermIndex = frame->pcIndex;
+        int activeTermIndex = frame->termIndex;
         if (childFrame != NULL)
-            activeTermIndex = childFrame->parentPc;
+            activeTermIndex = childFrame->parentIndex;
 
 
         Term* term = frame->block->get(activeTermIndex);
@@ -640,12 +640,12 @@ Frame* frame_parent(Frame* frame)
 
 Term* frame_caller(Frame* frame)
 {
-    return frame_term(frame_parent(frame), frame->parentPc);
+    return frame_term(frame_parent(frame), frame->parentIndex);
 }
 
 Term* frame_current_term(Frame* frame)
 {
-    return frame->block->get(frame->pcIndex);
+    return frame->block->get(frame->termIndex);
 }
 
 Term* frame_term(Frame* frame, int index)
@@ -753,14 +753,14 @@ caValue* get_output(Stack* stack, int index)
 caValue* get_caller_output(Stack* stack, int index)
 {
     Frame* frame = stack_top_parent(stack);
-    Term* currentTerm = frame->block->get(frame->pcIndex);
+    Term* currentTerm = frame->block->get(frame->termIndex);
     return frame_register(frame, get_output_term(currentTerm, index));
 }
 
 Term* current_term(Stack* stack)
 {
     Frame* top = stack_top(stack);
-    return top->block->get(top->pcIndex);
+    return top->block->get(top->termIndex);
 }
 
 Block* current_block(Stack* stack)
@@ -948,7 +948,7 @@ void raise_error_stack_value_not_found(Stack* stack, int inputIndex)
 int get_count_of_caller_inputs_for_error(Stack* stack)
 {
     Frame* parentFrame = stack_top_parent(stack);
-    Term* callerTerm = parentFrame->block->get(parentFrame->pcIndex);
+    Term* callerTerm = parentFrame->block->get(parentFrame->termIndex);
     int foundCount = callerTerm->numInputs();
 
     if (callerTerm->function == FUNCS.func_call)
@@ -1074,7 +1074,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             int termIndex = vm_read_int(stack);
 
-            top->pcIndex = termIndex;
+            top->termIndex = termIndex;
             top->pc = stack->pc;
             Term* caller = frame_term(top, termIndex);
             Block* block = function_contents(caller->function);
@@ -1088,7 +1088,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             int termIndex = vm_read_int(stack);
 
-            top->pcIndex = termIndex;
+            top->termIndex = termIndex;
             top->pc = stack->pc;
             Term* caller = frame_term(top, termIndex);
             Block* block = caller->nestedContents;
@@ -1220,7 +1220,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             Frame* top = stack_top(stack);
             Frame* parent = stack_top_parent(stack);
-            Term* caller = frame_term(parent, top->parentPc);
+            Term* caller = frame_term(parent, top->parentIndex);
 
             Term* placeholder = get_output_placeholder(top->block, placeholderIndex);
             caValue* value = frame_register(top, placeholder);
@@ -1335,7 +1335,7 @@ void vm_run(Stack* stack, caValue* bytecode)
             Frame* top = stack_top(stack);
             Term* caller = frame_term(top, termIndex);
 
-            top->pcIndex = termIndex;
+            top->termIndex = termIndex;
 
             INCREMENT_STAT(DynamicMethodCall);
 
@@ -1442,7 +1442,7 @@ void vm_run(Stack* stack, caValue* bytecode)
             int termIndex = vm_read_int(stack);
 
             Frame* top = stack_top(stack);
-            top->pcIndex = termIndex;
+            top->termIndex = termIndex;
             top->pc = stack->pc;
             Term* caller = frame_term(top, termIndex);
 
@@ -1468,14 +1468,14 @@ void vm_run(Stack* stack, caValue* bytecode)
             if (!as_bool(condition)) {
                 Block* currentCase = stack_top(stack)->block;
                 int prevCaseIndex = case_block_get_index(currentCase);
-                int parentPc = stack_top(stack)->parentPc;
+                int parentIndex = stack_top(stack)->parentIndex;
 
                 stack_pop(stack);
 
                 int caseIndex = prevCaseIndex + 1;
-                Term* caller = stack_top(stack)->block->get(parentPc);
+                Term* caller = stack_top(stack)->block->get(parentIndex);
                 Block* nextCase = if_block_get_case(nested_contents(caller), caseIndex);
-                Frame* top = vm_push_frame(stack, parentPc, nextCase);
+                Frame* top = vm_push_frame(stack, parentIndex, nextCase);
                 stack->bc = as_blob(frame_bytecode(top));
                 stack->pc = 0;
                 expand_frame_indexed(stack_top_parent(stack), top, caseIndex);
@@ -1506,7 +1506,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             Frame* top = stack_top(stack);
 
-            top->pcIndex = index;
+            top->termIndex = index;
             top->pc = stack->pc;
             Term* caller = frame_term(top, index);
 
@@ -1582,7 +1582,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             Frame* top = stack_top(stack);
 
-            top->pcIndex = 0;
+            top->termIndex = 0;
             stack->pc = 0;
             top->exitType = sym_None;
             set_null(&top->state);
@@ -1626,7 +1626,7 @@ void vm_run(Stack* stack, caValue* bytecode)
                 // Throw away the current frame, store the error in the calling frame.
                 Frame* parent = stack_top_parent(stack);
                 caValue* error = circa_output(stack, 0);
-                move(error, frame_register(parent, top->parentPc));
+                move(error, frame_register(parent, top->parentIndex));
                 stack_pop_no_retain(stack);
                 return;
             }
@@ -2130,7 +2130,7 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput)
     }
 
     // Return to start of the loop.
-    top->pcIndex = 0;
+    top->termIndex = 0;
     stack->pc = 0;
     top->exitType = sym_None;
     set_null(&top->state);
@@ -2268,14 +2268,14 @@ void Frame__pc(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
-    set_int(circa_output(stack, 0), frame->pcIndex);
+    set_int(circa_output(stack, 0), frame->termIndex);
 }
 
 void Frame__parentPc(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
-    set_int(circa_output(stack, 0), frame->parentPc);
+    set_int(circa_output(stack, 0), frame->parentIndex);
 }
 
 void Frame__current_term(caStack* stack)
@@ -2476,7 +2476,7 @@ void Stack__stack_push(caStack* stack)
 
     ca_assert(block != NULL);
 
-    Frame* top = vm_push_frame(self, stack_top(self)->pcIndex, block);
+    Frame* top = vm_push_frame(self, stack_top(self)->termIndex, block);
 
     caValue* inputs = circa_input(stack, 2);
 
@@ -2601,12 +2601,12 @@ void Stack__error_message(caStack* stack)
 
     Frame* frame = stack_top(self);
 
-    if (frame->pcIndex >= frame_register_count(frame)) {
+    if (frame->termIndex >= frame_register_count(frame)) {
         set_string(circa_output(stack, 0), "");
         return;
     }
 
-    caValue* errorReg = frame_register(frame, frame->pcIndex);
+    caValue* errorReg = frame_register(frame, frame->termIndex);
 
     if (is_string(errorReg))
         set_string(circa_output(stack, 0), as_cstring(errorReg));
@@ -2638,7 +2638,7 @@ void reflect_get_frame_state(caStack* stack)
     if (is_null(&callerFrame->state))
         set_null(circa_output(stack, 0));
     else
-        copy(list_get(&callerFrame->state, frame->parentPc), circa_output(stack, 0));
+        copy(list_get(&callerFrame->state, frame->parentIndex), circa_output(stack, 0));
 }
 
 void interpreter_install_functions(NativePatch* patch)
@@ -2651,7 +2651,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Frame.register", Frame__register);
     module_patch_function(patch, "Frame.registers", Frame__registers);
     module_patch_function(patch, "Frame.pc", Frame__pc);
-    module_patch_function(patch, "Frame.parentPc", Frame__parentPc);
+    module_patch_function(patch, "Frame.parentIndex", Frame__parentPc);
     module_patch_function(patch, "Frame.current_term", Frame__current_term);
     module_patch_function(patch, "Frame.extract_state", Frame__extract_state);
     module_patch_function(patch, "make_stack", make_stack);

@@ -75,7 +75,7 @@ void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retaine
 
 void frame_copy(Frame* left, Frame* right)
 {
-    right->parentPc = left->parentPc;
+    right->parentIndex = left->parentIndex;
     copy(&left->registers, &right->registers);
     touch(&right->registers);
     copy(&left->state, &right->state);
@@ -83,7 +83,7 @@ void frame_copy(Frame* left, Frame* right)
     copy(&left->bindings, &right->bindings);
     copy(&left->dynamicScope, &right->dynamicScope);
     right->block = left->block;
-    right->pcIndex = left->pcIndex;
+    right->termIndex = left->termIndex;
     right->pc = left->pc;
     right->callType = left->callType;
     right->exitType = left->exitType;

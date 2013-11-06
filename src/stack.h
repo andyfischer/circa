@@ -10,7 +10,7 @@ struct Frame
     Stack* stack;
 
     // PC (in the parent frame) that this frame was expanded from. Invalid for the first frame.
-    int parentPc;
+    int parentIndex;
 
     // Register values.
     Value registers;
@@ -32,7 +32,7 @@ struct Frame
     Value dynamicScope;
 
     // Current program counter (term index)
-    int pcIndex;
+    int termIndex;
 
     // Program counter (bytecode position).
     int pc;
