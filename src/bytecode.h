@@ -16,8 +16,6 @@ const char bc_PopFrame = 9;
 const char bc_DoneTransient = 0xa;
 const char bc_FireNative = 0xb;
 const char bc_IterationDone = 0xc;
-const char bc_ErrorNotEnoughInputs = 0xe;
-const char bc_ErrorTooManyInputs = 0xf;
 
 // Pushing a new frame.
 const char bc_PushFunction = 0x10;
@@ -42,8 +40,8 @@ const char bc_PushInputNull2 = 0x2b;
 const char bc_PushInputFromValue = 0x2c;
 const char bc_PushNonlocalInput = 0x25;
 const char bc_PushExplicitState = 0x27;
-const char bc_NotEnoughInputs = 0x28;
-const char bc_TooManyInputs = 0x29;
+const char bc_ErrorNotEnoughInputs = 0x28;
+const char bc_ErrorTooManyInputs = 0x29;
 
 // Popping outputs from a finished frame.
 const char bc_PopOutput = 0x30;

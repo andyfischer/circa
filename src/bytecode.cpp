@@ -206,12 +206,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "push_explicit_state ");
         string_append(string, blob_read_int(bc, pc));
         break;
-    case bc_NotEnoughInputs:
-        set_string(string, "not_enough_inputs");
-        break;
-    case bc_TooManyInputs:
-        set_string(string, "too_many_inputs");
-        break;
     case bc_PopOutput:
         set_string(string, "pop_output ");
         string_append(string, blob_read_int(bc, pc));
@@ -307,8 +301,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_LoopConditionBool:
     case bc_Loop:
     case bc_IterationDone:
-    case bc_ErrorNotEnoughInputs:
-    case bc_ErrorTooManyInputs:
     case bc_PushInputFromStack:
     case bc_PushInputFromStack2:
     case bc_PushInputFromStack3:
@@ -318,8 +310,8 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_PushInputFromValue:
     case bc_PushNonlocalInput:
     case bc_PushExplicitState:
-    case bc_NotEnoughInputs:
-    case bc_TooManyInputs:
+    case bc_ErrorNotEnoughInputs:
+    case bc_ErrorTooManyInputs:
     case bc_PopOutput:
     case bc_PopOutputNull:
     case bc_PopOutputsDynamic:
@@ -610,7 +602,7 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
 
                 // Consume a normal input.
                 if (callerInputIndex > lastInputIndex) {
-                    blob_append_char(bytecode, bc_NotEnoughInputs);
+                    blob_append_char(bytecode, bc_ErrorNotEnoughInputs);
                     return;
                 }
 
@@ -638,7 +630,7 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* b
     }
 
     if (!usesVarargs && callerInputIndex <= lastInputIndex) {
-        blob_append_char(bytecode, bc_TooManyInputs);
+        blob_append_char(bytecode, bc_ErrorTooManyInputs);
     }
 }
 

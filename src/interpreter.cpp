@@ -1712,43 +1712,10 @@ void vm_run(Stack* stack, caValue* bytecode)
             continue;
         }
 
-        case bc_NotEnoughInputs:
+        case bc_ErrorNotEnoughInputs:
             return raise_error_not_enough_inputs(stack);
-        case bc_TooManyInputs:
+        case bc_ErrorTooManyInputs:
             return raise_error_too_many_inputs(stack);
-        case bc_ErrorNotEnoughInputs: {
-            Frame* top = stack_top(stack);
-            Term* currentTerm = frame_current_term(top);
-            circa::Value msg;
-            Block* func = function_contents(currentTerm->function);
-            int expectedCount = count_input_placeholders(func);
-            if (has_variable_args(func))
-                expectedCount--;
-            int foundCount = currentTerm->numInputs();
-            set_string(&msg, "Too few inputs, expected ");
-            string_append(&msg, expectedCount);
-            if (has_variable_args(func))
-                string_append(&msg, " (or more)");
-            string_append(&msg, ", received ");
-            string_append(&msg, foundCount);
-            raise_error_msg(stack, as_cstring(&msg));
-            return;
-        }
-        case bc_ErrorTooManyInputs: {
-            Frame* top = stack_top(stack);
-            Term* currentTerm = frame_current_term(top);
-            circa::Value msg;
-            Block* func = function_contents(currentTerm->function);
-            int expectedCount = count_input_placeholders(func);
-            int foundCount = currentTerm->numInputs();
-            set_string(&msg, "Too many inputs, expected ");
-            string_append(&msg, expectedCount);
-            string_append(&msg, ", received ");
-            string_append(&msg, foundCount);
-
-            raise_error_msg(stack, as_cstring(&msg));
-            return;
-        }
 
         case bc_MemoizeCheck: {
             if (run_memoize_check(stack)) {
