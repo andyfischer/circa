@@ -1849,8 +1849,11 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     bool rebindLHS = forceRebindLHS;
 
     // Check for name.symbol syntax.
-    if (tokens.nextIs(tok_ColonString))
-        return dot_symbol(block, tokens, context, lhs);
+    if (tokens.nextIs(tok_ColonString)) {
+        Term* term = dot_symbol(block, tokens, context, lhs).term;
+        set_source_location(term, startPosition, tokens);
+        return ParseResult(term);
+    }
 
     if (!tokens.nextIs(tok_Identifier)) {
         return compile_error_for_line(block, tokens, startPosition,
@@ -1965,13 +1968,15 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
 
     ParseResult symbol = literal_symbol(block, tokens, context);
 
-    Term* result = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
+    Term* term = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
 
-    result->setStringProp("syntax:declarationStyle", "dot-access");
-    set_input_syntax_hint(result, 0, "postWhitespace", "");
-    set_input_syntax_hint(result, 1, "preWhitespace", "");
+    term->setStringProp("syntax:declarationStyle", "dot-access");
+    set_input_syntax_hint(term, 0, "postWhitespace", "");
+    set_input_syntax_hint(term, 1, "preWhitespace", "");
 
-    return ParseResult(result);
+    set_source_location(term, startPosition, tokens);
+
+    return ParseResult(term);
 }
 
 ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* context)

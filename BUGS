@@ -1,5 +1,8 @@
 
 Miscellanous (most-recent first)
+  
+  No source location for the contents of { module.:function }
+    Fixed now, but need a complete test for source location.
 
   Type inferrence not working on a call to Type.cast.
 
