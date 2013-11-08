@@ -370,6 +370,11 @@ void section_block_formatSource(caValue* source, Term* term)
     format_block_source(source, nested_contents(term), term);
 }
 
+void nonlocal_formatSource(caValue* source, Term* term)
+{
+    append_phrase(source, as_cstring(term_name(term->input(0))), term, sym_None);
+}
+
 void for_each_root_type(void (*callback)(Type* type))
 {
     (*callback)(TYPES.any);
@@ -645,6 +650,8 @@ void bootstrap_kernel()
     type_install_functions(builtins);
 
     native_patch_apply_patch(world->builtinPatch, builtins);
+
+    block_set_format_source_func(function_contents(FUNCS.nonlocal), nonlocal_formatSource);
 
     // Fix 'builtins' module now that the module() function is created.
     change_function(builtinsTerm, FUNCS.module);

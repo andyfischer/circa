@@ -69,11 +69,7 @@ void declared_state_format_source(caValue* source, Term* term)
 
     if (defaultValue != NULL) {
         append_phrase(source, " = ", term, sym_None);
-        if (defaultValue->name != "")
-            append_phrase(source, get_relative_name_at(term, defaultValue),
-                    term, sym_TermName);
-        else
-            format_term_source(source, defaultValue);
+        format_term_source(source, defaultValue);
     }
 }
 

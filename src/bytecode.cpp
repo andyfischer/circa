@@ -163,36 +163,12 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         break;
     case bc_PushInputFromStack:
         set_string(string, "push_input_from_stack ");
-        string_append(string, blob_read_int(bc, pc));
-        string_append(string, " ");
-        string_append(string, blob_read_int(bc, pc));
-        break;
-    case bc_PushInputFromStack2:
-        set_string(string, "push_input_from_stack2 ");
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u16(bc, pc));
-        string_append(string, " ");
-        string_append(string, blob_read_int(bc, pc));
-        break;
-    case bc_PushInputFromStack3:
-        set_string(string, "push_input_from_stack3 ");
-        string_append(string, blob_read_u16(bc, pc));
-        string_append(string, " ");
-        string_append(string, blob_read_u16(bc, pc));
-        break;
-    case bc_PushVarargList:
-        set_string(string, "push_vararg_list ");
-        string_append(string, blob_read_int(bc, pc));
-        string_append(string, " ");
-        string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushInputNull:
-        set_string(string, "push_input_null ");
-        string_append(string, blob_read_int(bc, pc));
-        break;
-    case bc_PushInputNull2:
-        set_string(string, "push_input_null2");
+        set_string(string, "push_input_null");
         break;
     case bc_PushInputFromValue:
         set_string(string, "push_input_from_value ");
@@ -302,11 +278,7 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_Loop:
     case bc_IterationDone:
     case bc_PushInputFromStack:
-    case bc_PushInputFromStack2:
-    case bc_PushInputFromStack3:
-    case bc_PushVarargList:
     case bc_PushInputNull:
-    case bc_PushInputNull2:
     case bc_PushInputFromValue:
     case bc_PushNonlocalInput:
     case bc_PushExplicitState:
@@ -550,102 +522,25 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
-    if (term->function == FUNCS.dynamic_method
-            || term->function == FUNCS.func_call
-            || term->function == FUNCS.func_apply
-            || term->function == FUNCS.require
-            || is_dynamic_func_call(term)
-            || term->function == FUNCS.if_block
-            || term->function == FUNCS.for_func
-            )
-        bytecode_write_input_instructions2(bytecode, term);
-    else
-        bytecode_write_input_instructions(bytecode, term, referenceTargetBlock);
+    bytecode_write_input_instructions(bytecode, term);
 
     blob_append_char(bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(bytecode, term, referenceTargetBlock);
     blob_append_char(bytecode, bc_PopFrame);
 }
 
-void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* block)
-{
-    if (!is_blob(bytecode))
-        set_blob(bytecode, 0);
-
-    ca_assert(block != NULL);
-
-    int callerInputIndex = 0;
-    int lastInputIndex = caller->numInputs() - 1;
-    bool usesVarargs = false;
-
-    // Walk through the receivingBlock's input terms, and pull input values from the
-    // caller's frame (by looking at caller's inputs).
-    for (int placeholderIndex=0;; placeholderIndex++) {
-
-        Term* placeholder = block->getSafe(placeholderIndex);
-
-        if (placeholder == NULL)
-            break;
-
-        if (placeholder->function == FUNCS.input) {
-            if (placeholder->boolProp("multiple", false)) {
-
-                // Consume remaining inputs.
-                blob_append_char(bytecode, bc_PushVarargList);
-                blob_append_int(bytecode, callerInputIndex);
-                blob_append_int(bytecode, placeholderIndex);
-
-                callerInputIndex = lastInputIndex;
-                usesVarargs = true;
-
-            } else {
-
-                // Consume a normal input.
-                if (callerInputIndex > lastInputIndex) {
-                    blob_append_char(bytecode, bc_ErrorNotEnoughInputs);
-                    return;
-                }
-
-                Term* input = caller->input(callerInputIndex);
-                if (input == NULL) {
-                    blob_append_char(bytecode, bc_PushInputNull);
-                    blob_append_int(bytecode, placeholderIndex);
-                } else {
-                    blob_append_char(bytecode, bc_PushInputFromStack);
-                    blob_append_int(bytecode, callerInputIndex);
-                    blob_append_int(bytecode, placeholderIndex);
-                }
-
-                callerInputIndex++;
-            }
-        } else if (placeholder->function == FUNCS.looped_input) {
-            Term* startingValue = placeholder->input(0);
-            blob_append_char(bytecode, bc_PushInputFromStack2);
-            bytecode_write_local_reference(bytecode, block, startingValue);
-            blob_append_int(bytecode, placeholderIndex);
-
-        } else {
-            break;
-        }
-    }
-
-    if (!usesVarargs && callerInputIndex <= lastInputIndex) {
-        blob_append_char(bytecode, bc_ErrorTooManyInputs);
-    }
-}
-
-void bytecode_write_input_instructions2(caValue* bytecode, Term* caller)
+void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
 {
     for (int i=0; i < caller->numInputs(); i++) {
         Term* input = caller->input(i);
 
         if (input == NULL) {
-            blob_append_char(bytecode, bc_PushInputNull2);
+            blob_append_char(bytecode, bc_PushInputNull);
         } else if (is_value(input) || input->owningBlock == global_builtins_block()) {
             blob_append_char(bytecode, bc_PushInputFromValue);
             blob_append_int(bytecode, i);
         } else {
-            blob_append_char(bytecode, bc_PushInputFromStack3);
+            blob_append_char(bytecode, bc_PushInputFromStack);
             bytecode_write_local_reference(bytecode, caller->owningBlock, input);
         }
     }

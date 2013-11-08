@@ -1067,6 +1067,9 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             top = vm_push_frame(stack, termIndex, block);
             expand_frame(stack_top_parent(stack), top);
+            vm_run_input_bytecodes(stack, caller);
+            if (stack->step != sym_StackRunning)
+                return;
             continue;
         }
         case bc_PushNested: {
@@ -1080,66 +1083,12 @@ void vm_run(Stack* stack, caValue* bytecode)
             Block* block = caller->nestedContents;
 
             top = vm_push_frame(stack, termIndex, block);
-            continue;
-        }
-        case bc_PushInputFromStack: {
-            Frame* top = stack_top(stack);
-            Frame* parent = stack_top_parent(stack);
-            Term* caller = frame_caller(top);
-
-            int inputIndex = vm_read_int(stack);
-            int destSlot = vm_read_int(stack);
-
-            Term* placeholderTerm = top->block->get(inputIndex);
-            caValue* placeholderRegister = frame_register(top, inputIndex);
-            caValue* value = stack_find_active_value(parent, caller->input(inputIndex));
-
-            if (value == NULL)
-                return raise_error_stack_value_not_found(stack, inputIndex);
-
-            caValue* slot = frame_register(top, destSlot);
-            copy(value, slot);
-
-            if (!cast(placeholderRegister, declared_type(placeholderTerm)))
-                if (!placeholderTerm->boolProp("optional", false))
-                    return raise_error_input_type_mismatch(stack, inputIndex);
-
-            continue;
-        }
-        case bc_PushInputFromStack2: {
-            caValue* value = vm_read_local_value(stack);
-            int destSlot = vm_read_int(stack);
-            caValue* slot = frame_register(stack_top(stack), destSlot);
-            copy(value, slot);
+            vm_run_input_bytecodes(stack, caller);
+            if (stack->step != sym_StackRunning)
+                return;
             continue;
         }
         
-        case bc_PushVarargList: {
-            Frame* top = stack_top(stack);
-            Frame* parent = stack_top_parent(stack);
-            Term* caller = frame_caller(top);
-
-            int startIndex = vm_read_int(stack);
-            int destSlot = vm_read_int(stack);
-
-            caValue* dest = frame_register(top, destSlot);
-            int count = caller->numInputs() - startIndex;
-            set_list(dest, count);
-            for (int i=0; i < count; i++) {
-                caValue* value = stack_find_active_value(parent, caller->input(startIndex+i));
-                copy(value, list_get(dest, i));
-            }
-
-            continue;
-        }
-        case bc_PushInputNull: {
-            int inputIndex = vm_read_int(stack);
-
-            Frame* top = stack_top(stack);
-
-            set_null(frame_register(top, inputIndex));
-            continue;
-        }
         case bc_PushNonlocalInput: {
             int termIndex = vm_read_int(stack);
             Frame* top = stack_top(stack);
@@ -1438,6 +1387,8 @@ void vm_run(Stack* stack, caValue* bytecode)
             top = vm_push_frame(stack, termIndex, block);
             expand_frame_indexed(stack_top_parent(stack), top, 0);
             vm_run_input_bytecodes(stack, caller);
+            if (stack->step != sym_StackRunning)
+                return;
             continue;
         }
         case bc_CaseConditionBool: {
@@ -1514,6 +1465,8 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             top = vm_push_frame(stack, index, block);
             vm_run_input_bytecodes(stack, caller);
+            if (stack->step != sym_StackRunning)
+                return;
 
             if (!zeroBlock) {
 
@@ -1539,6 +1492,9 @@ void vm_run(Stack* stack, caValue* bytecode)
             Term* caller = frame_term(top, index);
             Block* block = caller->nestedContents;
             vm_push_frame(stack, index, block);
+            vm_run_input_bytecodes(stack, caller);
+            if (stack->step != sym_StackRunning)
+                return;
             continue;
         }
         case bc_PushRequire: {
@@ -1748,7 +1704,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
 {
     char op = vm_read_char(frame->stack);
     switch (op) {
-    case bc_PushInputFromStack3: {
+    case bc_PushInputFromStack: {
         return vm_read_local_value(frame);
     }
     case bc_PushInputFromValue: {
@@ -1781,6 +1737,7 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
             return raise_error_too_many_inputs(stack);
 
         caValue* dest = NULL;
+        int nextPlaceholderIndex = placeholderIndex;
 
         if (placeholder->boolProp("multiple", false)) {
             caValue* listValue = frame_register(top, placeholderIndex);
@@ -1789,33 +1746,36 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
 
             dest = list_append(listValue);
         } else {
-            dest = frame_register(top, placeholderIndex++);
+            dest = frame_register(top, placeholderIndex);
+            nextPlaceholderIndex = placeholderIndex + 1;
         }
 
         switch (op) {
-            case bc_PushInputFromStack3: {
+            case bc_PushInputFromStack: {
                 caValue* value = vm_read_local_value(parent);
                 copy(value, dest);
-                continue;
+                break;
             }
             case bc_PushInputFromValue: {
                 int index = vm_read_int(stack);
                 caValue* value = term_value(caller->input(index));
                 copy(value, dest);
-                continue;
+                break;
             }
-            case bc_PushInputNull2: {
+            case bc_PushInputNull: {
                 set_null(dest);
-                continue;
+                break;
             }
             default: {
                 internal_error("Unexpected op inside vm_run_input_bytecodes");
             }
-
-            if (!cast(dest, declared_type(placeholder)))
-                if (!placeholder->boolProp("optional", false))
-                    return raise_error_input_type_mismatch(stack, placeholderIndex);
         }
+
+        if (!cast(dest, declared_type(placeholder)))
+            if (!placeholder->boolProp("optional", false))
+                return raise_error_input_type_mismatch(stack, placeholderIndex);
+
+        placeholderIndex = nextPlaceholderIndex;
     }
 
     Term* placeholder = top->block->get(placeholderIndex);

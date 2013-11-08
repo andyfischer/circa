@@ -1247,7 +1247,8 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
 
         // Create a lambda block for any new expressions.
         initializer = apply(block, FUNCS.closure_block, TermList());
-        Term* initialValue = infix_expression(nested_contents(initializer), tokens, context, 0).term;
+        Block* contents = nested_contents(initializer);
+        Term* initialValue = infix_expression(contents, tokens, context, 0).term;
 
         // Possibly add a cast()
         if (type != declared_type(initialValue) && type != TYPES.any) {
@@ -1256,11 +1257,9 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
             change_declared_type(initialValue, type);
         }
 
-        append_output_placeholder(nested_contents(initializer), initialValue);
-        // We don't need to insert_nonlocal_terms on this closure, because
-        // this closure can never escape.
-        // insert_nonlocal_terms(nested_contents(initializer));
-        block_finish_changes(nested_contents(initializer));
+        append_output_placeholder(contents, initialValue);
+        insert_nonlocal_terms(contents);
+        block_finish_changes(contents);
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
@@ -1268,8 +1267,6 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
             type = initialValue->type;
         }
     }
-
-    // Term* stateContainer = find_or_create_default_state_input(block);
 
     // Create the declared_state() term.
     Term* result = apply(block, FUNCS.declared_state, TermList(), as_cstring(&name));

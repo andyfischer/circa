@@ -30,13 +30,9 @@ const char bc_PushWhile = 0x18;
 const char bc_PushRequire = 0x19;
 
 // Pushing inputs to a new frame.
-const char bc_PushInputFromStack = 0x22;
-const char bc_PushInputFromStack2 = 0x23;
-const char bc_PushInputFromStack3 = 0x2a;
+const char bc_PushInputFromStack = 0x2a;
 const char bc_PushValue = 0x2e;
-const char bc_PushVarargList = 0x20;
-const char bc_PushInputNull = 0x24;
-const char bc_PushInputNull2 = 0x2b;
+const char bc_PushInputNull = 0x2b;
 const char bc_PushInputFromValue = 0x2c;
 const char bc_PushNonlocalInput = 0x25;
 const char bc_PushExplicitState = 0x27;
@@ -75,8 +71,7 @@ void bytecode_dump_next_op(const char* bc, int pc);
 void bytecode_dump(caValue* bytecode);
 
 void bytecode_write_term_call(caValue* bytecode, Term* term);
-void bytecode_write_input_instructions(caValue* bytecode, Term* caller, Block* block);
-void bytecode_write_input_instructions2(caValue* bytecode, Term* caller);
+void bytecode_write_input_instructions(caValue* bytecode, Term* caller);
 void bytecode_write_block(caValue* bytecode, Block* block);
 
 } // namespace circa
