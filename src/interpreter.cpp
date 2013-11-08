@@ -2199,6 +2199,12 @@ void Frame__parent(caStack* stack)
         set_frame_ref(circa_output(stack, 0), parent);
 }
 
+void Frame__height(caStack* stack)
+{
+    Frame* frame = as_frame_ref(circa_input(stack, 0));
+    set_int(circa_output(stack, 0), frame_get_index(frame));
+}
+
 void Frame__has_parent(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
@@ -2507,6 +2513,17 @@ void Stack__run(caStack* stack)
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
+void Stack__frame_from_base(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    int index = circa_int_input(stack, 1);
+    if (index >= self->framesCount)
+        return circa_output_error(stack, "Index out of range");
+
+    Frame* frame = frame_by_index(self, index);
+    set_frame_ref(circa_output(stack, 0), frame);
+}
 void Stack__frame(caStack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
@@ -2594,15 +2611,16 @@ void reflect_get_frame_state(caStack* stack)
 void interpreter_install_functions(NativePatch* patch)
 {
     module_patch_function(patch, "Frame.active_value", Frame__active_value);
-    module_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
     module_patch_function(patch, "Frame.block", Frame__block);
-    module_patch_function(patch, "Frame.parent", Frame__parent);
+    module_patch_function(patch, "Frame.current_term", Frame__current_term);
+    module_patch_function(patch, "Frame.height", Frame__height);
     module_patch_function(patch, "Frame.has_parent", Frame__has_parent);
+    module_patch_function(patch, "Frame.parent", Frame__parent);
     module_patch_function(patch, "Frame.register", Frame__register);
     module_patch_function(patch, "Frame.registers", Frame__registers);
     module_patch_function(patch, "Frame.pc", Frame__pc);
     module_patch_function(patch, "Frame.parentIndex", Frame__parentPc);
-    module_patch_function(patch, "Frame.current_term", Frame__current_term);
+    module_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
     module_patch_function(patch, "Frame.extract_state", Frame__extract_state);
     module_patch_function(patch, "make_stack", make_stack);
     module_patch_function(patch, "capture_stack", capture_stack);
@@ -2623,6 +2641,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.restart", Stack__restart);
     module_patch_function(patch, "Stack.run", Stack__run);
     module_patch_function(patch, "Stack.frame", Stack__frame);
+    module_patch_function(patch, "Stack.frame_from_base", Stack__frame_from_base);
     module_patch_function(patch, "Stack.frame_count", Stack__frame_count);
     module_patch_function(patch, "Stack.output", Stack__output);
     module_patch_function(patch, "Stack.errored", Stack__errored);

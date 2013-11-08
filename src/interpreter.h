@@ -113,6 +113,7 @@ caValue* frame_state(Frame* frame);
 caValue* frame_bytecode(Frame* frame);
 Block* frame_block(Frame* frame);
 int frame_get_index(Frame* frame);
+int frame_get_depth(Frame* frame);
 
 void frame_extract_state(Frame* frame, caValue* output);
 

@@ -304,21 +304,23 @@ def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)
 def Frame.block(self) -> Block
     -- Return the Block associated with this Frame.
-def Frame.parent(self) -> Frame
-    -- Return this frame's parent.
-def Frame.has_parent(self) -> bool
-def Frame.register(self, int index) -> any
-    -- Fetch the value in the given register index.
-def Frame.registers(self) -> List
-    -- Fetch a list of all register values.
-def Frame.pc(self) -> int
-    -- Fetch the current program counter (the interpreter's current position).
-def Frame.parentPc(self) -> int
 def Frame.current_term(self) -> Term
     -- Fetch the term associated with the current program counter.
 def Frame.create_expansion(self, Term term) -> Frame
     -- Create an expansion frame using the given Term.
     -- Errors if the Term is not part of this frame's block.
+def Frame.height(self) -> int
+    -- Frame height, the distance from the base frame.
+def Frame.has_parent(self) -> bool
+def Frame.parent(self) -> Frame
+    -- Return this frame's parent.
+def Frame.pc(self) -> int
+    -- Fetch the current program counter (the interpreter's current position).
+def Frame.parentPc(self) -> int
+def Frame.register(self, int index) -> any
+    -- Fetch the value in the given register index.
+def Frame.registers(self) -> List
+    -- Fetch a list of all register values.
 def Frame.inputs(self) -> List
     -- Returns a list of input register values
 def Frame.input(self, int nth) -> any
@@ -367,6 +369,8 @@ def Stack.run(self) -> Stack
     -- is raised.
 def Stack.frame(self, int depth) -> Frame
     -- Return the Frame with the given depth. The top of the stack has depth 0.
+def Stack.frame_from_base(self, int height) -> Frame
+    -- Return the Frame with the given height.
 def Stack.frame_count(self) -> int
 def Stack.top(self) -> Frame
     -- Return the topmost Frame.
