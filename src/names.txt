@@ -110,6 +110,7 @@ StorageTypeType
 StorageTypeHandle
 StorageTypeHashtable
 StorageTypeObject
+InterfaceType
 
 # Change types
 ChangeAppend

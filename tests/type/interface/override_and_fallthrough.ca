@@ -1,0 +1,20 @@
+
+type T {
+}
+
+def T.a(self)
+  'T.a'
+
+def T.b(self)
+  concat('T.b calling T.a: ' self.a)
+
+type Interface = :interface
+
+def Interface.a(self)
+  'Interface.a'
+
+def my_func(Interface val)
+  print('Calling Interface.a: ' val.a)
+  print('Calling Interface.b: ' val.b)
+
+my_func(T.make)

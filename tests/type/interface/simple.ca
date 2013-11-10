@@ -1,0 +1,10 @@
+
+type A = :interface
+
+def A.f(self) -> String
+  'A.f called'
+
+def use_a(A a)
+  print(a.f)
+
+use_a(1)

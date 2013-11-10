@@ -96,6 +96,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_StorageTypeHandle: return "StorageTypeHandle";
     case sym_StorageTypeHashtable: return "StorageTypeHashtable";
     case sym_StorageTypeObject: return "StorageTypeObject";
+    case sym_InterfaceType: return "InterfaceType";
     case sym_ChangeAppend: return "ChangeAppend";
     case sym_ChangeRename: return "ChangeRename";
     case tok_Identifier: return "tok_Identifier";
@@ -550,6 +551,10 @@ int builtin_symbol_from_string(const char* str)
     case 'f':
         if (strcmp(str + 3, "ixOperator") == 0)
             return sym_InfixOperator;
+        break;
+    case 't':
+        if (strcmp(str + 3, "erfaceType") == 0)
+            return sym_InterfaceType;
         break;
     case 'v':
         if (strcmp(str + 3, "alid") == 0)

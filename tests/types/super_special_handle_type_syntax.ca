@@ -1,2 +1,2 @@
 
-type T = handle_type()
+type T = :handle

@@ -52,8 +52,10 @@ namespace type_t {
         append_phrase(source, "type ", term, sym_Keyword);
         append_phrase(source, term->name, term, sym_TypeName);
 
-        if (term->boolProp("syntax:SuperSpecialHandleType", false)) {
-            append_phrase(source, " = handle_type()", term, sym_None);
+        if (term->hasProperty("syntax:TypeMagicSymbol")) {
+            append_phrase(source, " = ", term, sym_None);
+            append_phrase(source, term->stringProp("syntax:TypeMagicSymbol", ""),
+                term, sym_None);
         }
 
         if (term->boolProp("syntax:noBrackets", false))
@@ -531,6 +533,16 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
     }
 
     return accessor;
+}
+
+void setup_interface_type(Type* type)
+{
+    type->storageType = sym_InterfaceType;
+    type->initialize = NULL;
+    type->copy = NULL;
+    type->release = NULL;
+    type->equals = NULL;
+    type->hashFunc = NULL;
 }
 
 void Type__declaringTerm(caStack* stack)

@@ -97,6 +97,11 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     if (value->value_type == type)
         return;
 
+    // Casting to a interface always succeeds. Future: check if the value actually
+    // fits the interface.
+    if (type->storageType == sym_InterfaceType)
+        return;
+
     if (type->cast != NULL) {
         INCREMENT_STAT(ValueCastDispatched);
 

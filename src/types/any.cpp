@@ -18,18 +18,13 @@ namespace any_t {
     {
         return query->succeed();
     }
-    void cast(CastResult* result, caValue* source, Type* type, bool checkOnly)
-    {
-        // casting to 'any' always succeeds.
-        result->success = true;
-    }
     void setup_type(Type* type)
     {
         set_string(&type->name, "any");
         type->initialize = initialize;
         type->toString = to_string;
         type->staticTypeQuery = staticTypeQuery;
-        type->cast = cast;
+        type->storageType = sym_InterfaceType;
     }
 
 } // namespace any_t

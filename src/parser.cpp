@@ -813,22 +813,29 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         possible_whitespace_or_newline(tokens);
     }
 
-    // Possibly consume a very special syntax. This will be improved to be more
-    // general purpose, if it sticks.
+    // Possibly consume "= :symbol" syntax, used as a temporary way to declare
+    // certain types.
     if (tokens.nextIs(tok_Equals)) {
         tokens.consume(tok_Equals);
         possible_whitespace(tokens);
-        std::string funcName = tokens.consumeStr(tok_Identifier);
-        if (funcName != "handle_type") {
+        if (!tokens.nextIs(tok_ColonString)) {
             return compile_error_for_line(result, tokens, startPosition,
-                    "Failed to parse super special handle_type syntax");
+                    "Expected :symbol after =");
         }
 
-        tokens.consume(tok_LParen);
-        tokens.consume(tok_RParen);
+        Value str;
+        tokens.consumeStr(&str, tok_ColonString);
 
-        setup_handle_type(as_type(result));
-        result->setBoolProp("syntax:SuperSpecialHandleType", true);
+        if (string_eq(&str, ":handle")) {
+            setup_handle_type(as_type(result));
+        } else if (string_eq(&str, ":interface")) {
+            setup_interface_type(as_type(result));
+        } else {
+            return compile_error_for_line(result, tokens, startPosition,
+                    "Unrecognized magic symbol for type");
+        }
+
+        result->setStringProp("syntax:TypeMagicSymbol", as_cstring(&str));
         result->setBoolProp("syntax:noBrackets", true);
         return ParseResult(result);
     }
