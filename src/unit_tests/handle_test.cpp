@@ -44,7 +44,7 @@ void my_release_func(caStack* stack)
 void test_release()
 {
     Block block;
-    block.compile("type T = handle_type()");
+    block.compile("type T = :handle");
     block.compile("def T.release(self)");
 
     install_function(&block, "T.release", my_release_func);

@@ -446,7 +446,7 @@ char* string_initialize(caValue* value, int length)
 void set_string(caValue* value, const char* s)
 {
     make(TYPES.string, value);
-    int length = strlen(s);
+    int length = (int) strlen(s);
     StringData* data = string_create(length);
     memcpy(data->str, s, length + 1);
     value->value_data.ptr = data;
