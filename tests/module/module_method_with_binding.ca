@@ -1,6 +1,0 @@
-
-require lib3
-
-t = lib3.newT
-
-t.f(123)

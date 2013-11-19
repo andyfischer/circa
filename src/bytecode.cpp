@@ -492,11 +492,13 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
+#if 0
     else if (term->function == FUNCS.require) {
         referenceTargetBlock = NULL;
         blob_append_char(bytecode, bc_PushRequire);
         blob_append_int(bytecode, term->index);
     }
+#endif
 
     else if (term->nestedContents != NULL) {
 
@@ -546,10 +548,12 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
 
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 {
+#if 0
     if (caller->function == FUNCS.require) {
         blob_append_char(bytecode, bc_PopRequire);
         return;
     }
+#endif
 
     if (block == NULL) {
         blob_append_char(bytecode, bc_PopOutputsDynamic);

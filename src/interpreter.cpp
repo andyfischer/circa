@@ -452,9 +452,12 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
         return term_value(term);
     }
 
+    if (term->function == FUNCS.require) {
+        return term_value(term);
+    }
+
     return NULL;
 }
-
 
 void stack_ignore_error(Stack* cxt)
 {
@@ -1287,15 +1290,14 @@ void vm_run(Stack* stack, caValue* bytecode)
             // Method not found.
             if (method == NULL) {
 
-                if (is_module_ref(object)) {
-                    if (vm_handle_method_as_module_access(top, termIndex, object, elementName))
-                        continue;
-
-                }
-                else if (is_hashtable(object)) {
-                    if (vm_handle_method_as_hashtable_field(top, caller, object, elementName))
-                        continue;
-                }
+                if (is_module_ref(object)
+                        && vm_handle_method_as_module_access(top, termIndex, object, elementName))
+                    goto dyn_call_resolved;
+                
+                if (is_hashtable(object)
+                        && vm_handle_method_as_hashtable_field(top, caller, object, elementName))
+                    goto dyn_call_resolved;
+                
 
                 Value msg;
                 set_string(&msg, "Method ");
@@ -1309,30 +1311,27 @@ void vm_run(Stack* stack, caValue* bytecode)
             
             // Check for methods that are normally handled with different bytecode.
 
-            if (method == FUNCS.func_call)
+            if (method == FUNCS.func_call) {
                 vm_push_func_call(stack, termIndex);
-            else if (method == FUNCS.func_apply)
-                vm_push_func_apply(stack, termIndex);
-            else {
-
-                // Call this method.
-
-                caValue* closure = module_find_closure_on_stack(stack, method);
-                if (closure != NULL) {
-                    vm_push_func_call_closure(top->stack, termIndex, closure);
-                } else {
-
-                    // No closure found in moduleSpace.
-
-                    Block* block = nested_contents(method);
-
-                    top = vm_push_frame(stack, termIndex, block);
-                    expand_frame(stack_top_parent(stack), top);
-
-                    vm_run_input_bytecodes(stack, caller);
-                }
+                goto dyn_call_resolved;
             }
 
+            if (method == FUNCS.func_apply) {
+                vm_push_func_apply(stack, termIndex);
+                goto dyn_call_resolved;
+            }
+
+            // Call this method.
+            {
+                Block* block = nested_contents(method);
+
+                top = vm_push_frame(stack, termIndex, block);
+                expand_frame(stack_top_parent(stack), top);
+
+                vm_run_input_bytecodes(stack, caller);
+            }
+
+dyn_call_resolved:
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -1502,6 +1501,7 @@ void vm_run(Stack* stack, caValue* bytecode)
                 return;
             continue;
         }
+#if 0
         case bc_PushRequire: {
             int callerIndex = vm_read_int(stack);
 
@@ -1552,6 +1552,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             continue;
         }
+#endif
         case bc_Loop: {
             // TODO: Save state
             // TODO: Save output
@@ -1898,8 +1899,19 @@ static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValu
 
 static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* moduleRef, caValue* method)
 {
+    Stack* stack = top->stack;
+    Term* caller = frame_term(top, callerIndex);
+
     ca_assert(is_module_ref(moduleRef));
 
+    Block* moduleBlock = module_ref_get_block(moduleRef);
+
+    Term* term = find_local_name(moduleBlock, method);
+
+    if (term == NULL)
+        return false;
+
+#if 0
     caValue* moduleContents = module_get_stack_contents(top->stack, moduleRef);
 
     caValue* value = hashtable_get(moduleContents, method);
@@ -1910,24 +1922,26 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
     // Throw away the 'object' input (already have it).
     Term* caller = frame_term(top, callerIndex);
     vm_run_single_input(top, caller);
+#endif
 
-    if (is_closure(value)) {
-        vm_push_func_call_closure(top->stack, callerIndex, value);
+    if (is_function(term)) {
+        // Throw away the 'object' input (already have it).
+        vm_run_single_input(top, caller);
+
+        Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);
+        expand_frame(stack_top_parent(stack), top);
+        vm_run_input_bytecodes(stack, caller);
         return true;
     }
 
-    if (is_type(value)) {
+    if (is_type(term)) {
         // Advance past push/pop instructions.
-        if (vm_read_char(top->stack) != bc_EnterFrame)
-            return false;
+        while (true) {
+            if (vm_read_char(stack) == bc_PopFrame)
+                break;
+        }
 
-        if (vm_read_char(top->stack) != bc_PopOutputsDynamic)
-            return false;
-
-        if (vm_read_char(top->stack) != bc_PopFrame)
-            return false;
-
-        copy(value, frame_register(top, callerIndex));
+        copy(term_value(term), frame_register(top, callerIndex));
         return true;
     }
 

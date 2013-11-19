@@ -167,7 +167,7 @@ const char* STDLIB_CA_TEXT =
     "-- Modules\n"
     "\n"
     "type ModuleRef {\n"
-    "  String name\n"
+    "  Block block\n"
     "}\n"
     "\n"
     "def native_patch_this(String filename)\n"

@@ -1,9 +1,7 @@
-evaluating lib1.ca
-evaluating lib2.ca
 Calling closure list..
 Looping across closures, index = 0
-Called lib1.f with 0, outerValue = 3
+Called lib1.f with 0
 Looping across closures, index = 1
-Calling lib2.f with 1, outerValue = hi there
+Calling lib2.f with 1
 lib2.f is calling lib1.f ..
-Called lib1.f with 1, outerValue = 3
+Called lib1.f with 1

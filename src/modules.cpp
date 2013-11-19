@@ -199,7 +199,6 @@ void module_on_loaded_by_term(Block* module, Term* loadCall)
         move_before(moduleTerm, callersModule);
 }
 
-
 Block* find_module_from_filename(const char* filename)
 {
     // O(n) search for a module with this filename. Could stand to be more efficient.
@@ -225,6 +224,11 @@ void require_func_postCompile(Term* term)
     Block* module = load_module_by_name(global_world(), term->owningBlock, moduleName);
     if (module != NULL)
         module_on_loaded_by_term(module, term);
+
+    // Save a ModuleRef value.
+    caValue* moduleRef = term_value(term);
+    make(TYPES.module_ref, moduleRef);
+    set_block(list_get(moduleRef, 0), module);
 }
 
 void require_formatSource(caValue* source, Term* term)
@@ -306,71 +310,33 @@ Block* find_module(Block* root, caValue* name)
     return NULL;
 }
 
-bool module_is_loaded_in_stack(Stack* stack, caValue* moduleRef)
+Block* module_ref_get_block(caValue* moduleRef)
 {
-    return is_hashtable(&stack->moduleSpace)
-        && hashtable_get(&stack->moduleSpace, list_get(moduleRef, 0)) != NULL;
-}
-
-caValue* module_insert_in_stack(Stack* stack, caValue* moduleRef)
-{
-    if (!is_hashtable(&stack->moduleSpace))
-        set_hashtable(&stack->moduleSpace);
-    return hashtable_insert(&stack->moduleSpace, list_get(moduleRef, 0));
-}
-
-caValue* module_get_stack_contents(Stack* stack, caValue* moduleRef)
-{
-    if (!is_hashtable(&stack->moduleSpace))
-        return NULL;
-    return hashtable_insert(&stack->moduleSpace, list_get(moduleRef, 0));
-}
-
-void module_capture_exports_from_stack(Frame* frame, caValue* output)
-{
-    Block* block = frame->block;
-
-    set_hashtable(output);
-
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-
-        if (is_function(term)) {
-            caValue* closure = frame_register(frame, term);
-
-            caValue* slot = hashtable_insert(output, term_name(term));
-            copy(closure, slot);
-            closure_save_bindings_for_frame(slot, frame);
-        }
-
-        else if (is_type(term)) {
-            caValue* slot = hashtable_insert(output, term_name(term));
-            copy(term_value(term), slot);
-        }
-
-        // Future: If we had a system to declare some terms as 'private', then
-        // this loop shouldn't copy them to the map.
-    }
-}
-
-caValue* module_find_closure_on_stack(Stack* stack, Term* function)
-{
-    if (!is_hashtable(&stack->moduleSpace))
-        return NULL;
-
-    Value blockRef;
-    set_block(&blockRef, function->owningBlock);
-
-    caValue* moduleContents = hashtable_get(&stack->moduleSpace, &blockRef);
-    if (moduleContents == NULL)
-        return NULL;
-
-    return hashtable_get(moduleContents, term_name(function));
+    return as_block(list_get(moduleRef, 0));
 }
 
 bool is_module_ref(caValue* value)
 {
     return value->value_type == TYPES.module_ref;
+}
+
+void require_eval(caStack* stack)
+{
+    caValue* moduleName = circa_input(stack, 0);
+    Block* module = load_module_by_name(stack->world, circa_caller_block(stack), moduleName);
+
+    if (module == NULL) {
+        Value msg;
+        set_string(&msg, "Couldn't find module named: ");
+        string_append_quoted(&msg, moduleName);
+        circa_output_error(stack, as_cstring(&msg));
+        return;
+    }
+
+    // Save a ModuleRef value.
+    caValue* moduleRef = circa_output(stack, 0);
+    make(TYPES.module_ref, moduleRef);
+    set_block(list_get(moduleRef, 0), module);
 }
 
 void modules_install_functions(Block* kernel)
@@ -387,6 +353,7 @@ void modules_install_functions(Block* kernel)
 
     FUNCS.module = import_function(kernel, NULL, "module()");
 
+    install_function(kernel, "require", require_eval);
     install_function(kernel, "load_module", load_module_eval);
     install_function(kernel, "load_script", load_script_eval);
 }

@@ -39,11 +39,14 @@ Block* find_module_from_filename(const char* filename);
 Block* find_module(Block* root, caValue* name);
 
 // Runtime calls (when evaluating require)
+#if 0
 bool module_is_loaded_in_stack(Stack* stack, caValue* moduleRef);
 caValue* module_insert_in_stack(Stack* stack, caValue* moduleRef);
 caValue* module_get_stack_contents(Stack* stack, caValue* moduleRef);
 void module_capture_exports_from_stack(Frame* frame, caValue* output);
 caValue* module_find_closure_on_stack(Stack* stack, Term* function);
+#endif
+Block* module_ref_get_block(caValue* moduleRef);
 
 // -- Bundles --
 Block* module_create_empty_bundle(World* world, const char* name);

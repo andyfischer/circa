@@ -1,8 +1,6 @@
 
 print('evaluating lib1.ca')
 
-outerValue = 1 + 2
-
 type Lib1_T {
     String s
 }
@@ -11,4 +9,4 @@ def Lib1_T.f(self, i)
     print('Called Lib1_T.f with: ', i)
 
 def f(i)
-    print('Called lib1.f with ' i ', outerValue = ', outerValue)
+    print('Called lib1.f with ' i)

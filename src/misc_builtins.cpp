@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "closures.h"
 #include "debug.h"
 #include "dict.h"
 #include "hashtable.h"
@@ -467,11 +468,11 @@ void get_with_symbol(caStack* stack)
     symbol_as_string(circa_input(stack, 1), &str);
 
     if (is_module_ref(left)) {
-        caValue* contents = module_get_stack_contents(stack, left);
-        caValue* value = hashtable_get(contents, &str);
+        Block* block = module_ref_get_block(left);
+        Term* term = find_local_name(block, &str);
 
-        if (value != NULL) {
-            copy(value, circa_output(stack, 0));
+        if (term != NULL) {
+            set_closure(circa_output(stack, 0), term->nestedContents, NULL);
             return;
         }
     }
