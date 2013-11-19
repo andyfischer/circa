@@ -199,32 +199,6 @@ void module_on_loaded_by_term(Block* module, Term* loadCall)
         move_before(moduleTerm, callersModule);
 }
 
-void module_capture_exports_from_stack(Frame* frame, caValue* output)
-{
-    Block* block = frame->block;
-
-    set_module_value(output);
-
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-
-        if (is_function(term)) {
-            caValue* closure = frame_register(frame, term);
-
-            caValue* slot = hashtable_insert(output, term_name(term));
-            copy(closure, slot);
-            closure_save_bindings_for_frame(slot, frame);
-        }
-
-        else if (is_type(term)) {
-            caValue* slot = hashtable_insert(output, term_name(term));
-            copy(term_value(term), slot);
-        }
-
-        // Future: If we had a system to declare some terms as 'private', then
-        // this loop shouldn't copy them to the map.
-    }
-}
 
 Block* find_module_from_filename(const char* filename)
 {
@@ -332,14 +306,71 @@ Block* find_module(Block* root, caValue* name)
     return NULL;
 }
 
-void set_module_value(caValue* value)
+bool module_is_loaded_in_stack(Stack* stack, caValue* moduleRef)
 {
-    make(TYPES.module_value, value);
+    return is_hashtable(&stack->moduleSpace)
+        && hashtable_get(&stack->moduleSpace, list_get(moduleRef, 0)) != NULL;
 }
 
-bool is_module_value(caValue* value)
+caValue* module_insert_in_stack(Stack* stack, caValue* moduleRef)
 {
-    return value->value_type == TYPES.module_value;
+    if (!is_hashtable(&stack->moduleSpace))
+        set_hashtable(&stack->moduleSpace);
+    return hashtable_insert(&stack->moduleSpace, list_get(moduleRef, 0));
+}
+
+caValue* module_get_stack_contents(Stack* stack, caValue* moduleRef)
+{
+    if (!is_hashtable(&stack->moduleSpace))
+        return NULL;
+    return hashtable_insert(&stack->moduleSpace, list_get(moduleRef, 0));
+}
+
+void module_capture_exports_from_stack(Frame* frame, caValue* output)
+{
+    Block* block = frame->block;
+
+    set_hashtable(output);
+
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+
+        if (is_function(term)) {
+            caValue* closure = frame_register(frame, term);
+
+            caValue* slot = hashtable_insert(output, term_name(term));
+            copy(closure, slot);
+            closure_save_bindings_for_frame(slot, frame);
+        }
+
+        else if (is_type(term)) {
+            caValue* slot = hashtable_insert(output, term_name(term));
+            copy(term_value(term), slot);
+        }
+
+        // Future: If we had a system to declare some terms as 'private', then
+        // this loop shouldn't copy them to the map.
+    }
+}
+
+caValue* module_find_closure_on_stack(Stack* stack, Term* function)
+{
+    if (!is_hashtable(&stack->moduleSpace))
+        return NULL;
+
+    Value blockRef;
+    set_block(&blockRef, function->owningBlock);
+
+    caValue* moduleContents = hashtable_get(&stack->moduleSpace, &blockRef);
+    if (moduleContents == NULL)
+        return NULL;
+
+    return hashtable_get(moduleContents, term_name(function));
+}
+
+bool is_module_ref(caValue* value)
+{
+    return value->value_type == TYPES.module_ref;
 }
 
 void modules_install_functions(Block* kernel)

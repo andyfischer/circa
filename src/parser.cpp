@@ -1889,7 +1889,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     Type* rootType = lhs.term->type;
 
     // Find the function
-    Term* function = find_method(block, rootType, as_cstring(&functionName));
+    Term* function = find_method(block, rootType, &functionName);
 
     Term* term = NULL;
 

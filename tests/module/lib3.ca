@@ -1,0 +1,12 @@
+
+type T {
+
+}
+
+outerValue = 1 + 2
+
+def T.f(self, i)
+  print('called T.f(' i '), outerValue = ' outerValue)
+
+def newT()
+  T.make

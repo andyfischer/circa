@@ -72,10 +72,19 @@ std::string block_to_string(caValue* val)
     }
 }
 
+int block_hashFunc(caValue* val)
+{
+    Block* block = as_block(val);
+    if (block == NULL)
+        return 0;
+    return block->id;
+}
+
 void block_setup_type(Type* type)
 {
     set_string(&type->name, "Block");
     type->toString = block_to_string;
+    type->hashFunc = block_hashFunc;
 }
 
 int Block::length()

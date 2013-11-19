@@ -55,7 +55,9 @@ void handle_release(caValue* value)
     if (container->refCount == 0) {
 
         // Find the type's release function (if any), and call it.
-        Term* releaseMethod = find_method(NULL, value->value_type, "release");
+        Value releaseStr;
+        set_string(&releaseStr, "release");
+        Term* releaseMethod = find_method(NULL, value->value_type, &releaseStr);
         if (releaseMethod != NULL) {
             Stack stack;
             stack_init(&stack, function_contents(releaseMethod));

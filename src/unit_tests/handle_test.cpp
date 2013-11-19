@@ -51,7 +51,7 @@ void test_release()
 
     Type* T = find_type(&block, "T");
     test_assert(T != NULL);
-    test_assert(find_method(NULL, T, "release") != NULL);
+    test_assert(find_method(NULL, T, temp_string("release")) != NULL);
 
     gTimesReleaseCalled = 0;
 

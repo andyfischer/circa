@@ -187,7 +187,7 @@ void clear_type_contents(Type* type);
 
 void initialize_simple_pointer_type(Type* type);
 
-Term* find_method(Block* block, Type* type, const char* name);
+Term* find_method(Block* block, Type* type, caValue* name);
 
 // Change the type value for an existing type. 'term' should be a value of
 // type Type.

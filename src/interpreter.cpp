@@ -57,7 +57,6 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
 
 bool run_memoize_check(Stack* stack);
-static int for_loop_find_index_value(Frame* frame);
 void extract_state(Block* block, caValue* state, caValue* output);
 static void retained_frame_extract_state(caValue* frame, caValue* output);
 
@@ -525,9 +524,6 @@ void stack_to_string(Stack* stack, caValue* out)
             indent(strm, frameIndex+2);
             strm << "outgoingState: " << to_string(&frame->outgoingState) << std::endl;
         }
-
-        int bytecodePc = 0;
-        char* bytecode = as_blob(frame_bytecode(frame));
         
         for (int i=0; i < frame->block->length(); i++) {
             Term* term = block->get(i);
@@ -622,7 +618,7 @@ void stack_extract_state(Stack* stack, caValue* output)
 Frame* frame_parent(Frame* frame)
 {
     Stack* stack = frame->stack;
-    int index = frame - stack->frames - 1;
+    int index = (int) (frame - stack->frames - 1);
     if (index < 0)
         return NULL;
     return &stack->frames[index];
@@ -664,7 +660,7 @@ Frame* frame_by_depth(Stack* stack, int depth)
 int frame_get_index(Frame* frame)
 {
     Stack* stack = frame->stack;
-    return frame - stack->frames;
+    return (int) (frame - stack->frames);
 }
 
 static void stack_resize_frame_list(Stack* stack, int newCapacity)
@@ -926,11 +922,10 @@ void raise_error_output_type_mismatch(Stack* stack)
     return;
 }
 
-void raise_error_stack_value_not_found(Stack* stack, int inputIndex)
+void raise_error_stack_value_not_found(Stack* stack)
 {
     circa::Value msg;
-    set_string(&msg, "Internal error, stack value not found for input #");
-    string_append(&msg, inputIndex);
+    set_string(&msg, "Internal error, stack value not found");
     raise_error_msg(stack, as_cstring(&msg));
     return;
 }
@@ -954,7 +949,6 @@ int get_count_of_caller_inputs_for_error(Stack* stack)
 void raise_error_not_enough_inputs(Stack* stack)
 {
     Frame* frame = stack_top(stack);
-    Term* caller = frame_caller(frame);
 
     int expectedCount = count_input_placeholders(frame->block);
     int foundCount = get_count_of_caller_inputs_for_error(stack);
@@ -975,7 +969,6 @@ void raise_error_not_enough_inputs(Stack* stack)
 void raise_error_too_many_inputs(Stack* stack)
 {
     Frame* frame = stack_top(stack);
-    Term* caller = frame_caller(frame);
 
     int expectedCount = count_input_placeholders(frame->block);
     int foundCount = get_count_of_caller_inputs_for_error(stack);
@@ -1097,7 +1090,8 @@ void vm_run(Stack* stack, caValue* bytecode)
             Term* input = caller->input(0);
             caValue* value = stack_find_nonlocal(top, input);
             if (value == NULL) {
-                return raise_error_stack_value_not_found(stack, termIndex);
+                top->termIndex = termIndex;
+                return raise_error_stack_value_not_found(stack);
             }
             copy(value, frame_register(top, caller));
             continue;
@@ -1240,6 +1234,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 #endif
             continue;
         }
+#if 0
         case bc_PopAsModule: {
             int outputIndex = vm_read_int(stack);
 
@@ -1251,6 +1246,7 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             continue;
         }
+#endif
         case bc_PopFrame: {
             stack_pop(stack);
             stack->bc = as_blob(frame_bytecode(stack_top(stack)));
@@ -1286,13 +1282,12 @@ void vm_run(Stack* stack, caValue* bytecode)
             caValue* elementName = caller->getProp("methodName");
 
             // Find and dispatch method
-            Term* method = find_method(top->block,
-                (Type*) circa_type_of(object), as_cstring(elementName));
+            Term* method = find_method(top->block, (Type*) circa_type_of(object), elementName);
 
             // Method not found.
             if (method == NULL) {
 
-                if (is_module_value(object)) {
+                if (is_module_ref(object)) {
                     if (vm_handle_method_as_module_access(top, termIndex, object, elementName))
                         continue;
 
@@ -1320,12 +1315,22 @@ void vm_run(Stack* stack, caValue* bytecode)
                 vm_push_func_apply(stack, termIndex);
             else {
 
-                Block* block = nested_contents(method);
+                // Call this method.
 
-                top = vm_push_frame(stack, termIndex, block);
-                expand_frame(stack_top_parent(stack), top);
+                caValue* closure = module_find_closure_on_stack(stack, method);
+                if (closure != NULL) {
+                    vm_push_func_call_closure(top->stack, termIndex, closure);
+                } else {
 
-                vm_run_input_bytecodes(stack, caller);
+                    // No closure found in moduleSpace.
+
+                    Block* block = nested_contents(method);
+
+                    top = vm_push_frame(stack, termIndex, block);
+                    expand_frame(stack_top_parent(stack), top);
+
+                    vm_run_input_bytecodes(stack, caller);
+                }
             }
 
             if (stack->step != sym_StackRunning)
@@ -1504,7 +1509,6 @@ void vm_run(Stack* stack, caValue* bytecode)
             Term* caller = frame_term(top, callerIndex);
 
             caValue* moduleName = vm_run_single_input(top, caller);
-
             Block* module = load_module_by_name(stack->world, top->block, moduleName);
 
             if (module == NULL) {
@@ -1516,8 +1520,36 @@ void vm_run(Stack* stack, caValue* bytecode)
                 return;
             }
 
-            top = vm_push_frame(stack, callerIndex, module);
-            expand_frame(stack_top_parent(stack), top);
+            // Save a ModuleRef value.
+            caValue* moduleRef = frame_register(top, callerIndex);
+            make(TYPES.module_ref, moduleRef);
+            set_block(list_get(moduleRef, 0), module);
+
+            if (module_is_loaded_in_stack(stack, moduleRef)) {
+                // Skip PushRequire and PopRequire.
+                char op = vm_read_char(stack);
+                ca_assert(op == bc_EnterFrame);
+                op = vm_read_char(stack);
+                ca_assert(op == bc_PopRequire);
+                op = vm_read_char(stack);
+                ca_assert(op == bc_PopFrame);
+            } else {
+                top = vm_push_frame(stack, callerIndex, module);
+                expand_frame(stack_top_parent(stack), top);
+            }
+            continue;
+        }
+        case bc_PopRequire: {
+            Frame* top = stack_top(stack);
+            Frame* parent = stack_top_parent(stack);
+
+            int callerIndex = top->parentIndex;
+            caValue* moduleRef = frame_register(parent, callerIndex);
+            
+            // Save the exports from the topmost frame in moduleSpace.
+            caValue* dest = module_insert_in_stack(stack, moduleRef);
+            module_capture_exports_from_stack(top, dest);
+
             continue;
         }
         case bc_Loop: {
@@ -1665,7 +1697,7 @@ void vm_run(Stack* stack, caValue* bytecode)
         }
 
         case bc_MemoizeSave: {
-            caValue* slot = prepare_retained_slot_for_parent(stack);
+            // caValue* slot = prepare_retained_slot_for_parent(stack);
             Frame* top = stack_top(stack);
 
             // Future: Probably only need to save inputs and outputs here, instead of
@@ -1864,12 +1896,13 @@ static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValu
     return true;
 }
 
-static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method)
+static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* moduleRef, caValue* method)
 {
-    if (!is_module_value(module))
-        return false;
+    ca_assert(is_module_ref(moduleRef));
 
-    caValue* value = hashtable_get(module, method);
+    caValue* moduleContents = module_get_stack_contents(top->stack, moduleRef);
+
+    caValue* value = hashtable_get(moduleContents, method);
 
     if (value == NULL)
         return false;

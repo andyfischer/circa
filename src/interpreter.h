@@ -34,6 +34,8 @@ struct Stack
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
 
+    Value moduleSpace;
+
     // Linked list of all stacks across this world.
     Stack* prevStack;
     Stack* nextStack;

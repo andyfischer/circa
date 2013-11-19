@@ -466,8 +466,9 @@ void get_with_symbol(caStack* stack)
     Value str;
     symbol_as_string(circa_input(stack, 1), &str);
 
-    if (is_module_value(left)) {
-        caValue* value = hashtable_get(left, &str);
+    if (is_module_ref(left)) {
+        caValue* contents = module_get_stack_contents(stack, left);
+        caValue* value = hashtable_get(contents, &str);
 
         if (value != NULL) {
             copy(value, circa_output(stack, 0));

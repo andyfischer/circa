@@ -16,6 +16,7 @@ const char bc_PopFrame = 9;
 const char bc_DoneTransient = 0xa;
 const char bc_FireNative = 0xb;
 const char bc_IterationDone = 0xc;
+const char bc_PopRequire = 0xd;
 
 // Pushing a new frame.
 const char bc_PushFunction = 0x10;
@@ -44,7 +45,6 @@ const char bc_PopOutput = 0x30;
 const char bc_PopOutputNull = 0x31;
 const char bc_PopOutputsDynamic = 0x32;
 const char bc_PopExplicitState = 0x33;
-const char bc_PopAsModule = 0x34;
 
 // Control flow.
 const char bc_ExitPoint = 0x40;

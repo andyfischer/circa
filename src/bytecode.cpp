@@ -155,6 +155,9 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         else
             string_append(string, " :no_output");
         break;
+    case bc_PopRequire:
+        set_string(string, "pop_require");
+        break;
     case bc_ErrorNotEnoughInputs:
         set_string(string, "error_not_enough_inputs");
         break;
@@ -197,10 +200,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         break;
     case bc_PopExplicitState:
         set_string(string, "pop_explicit_state ");
-        string_append(string, blob_read_int(bc, pc));
-        break;
-    case bc_PopAsModule:
-        set_string(string, "pop_as_module ");
         string_append(string, blob_read_int(bc, pc));
         break;
     case bc_MemoizeCheck:
@@ -288,7 +287,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_PopOutputNull:
     case bc_PopOutputsDynamic:
     case bc_PopExplicitState:
-    case bc_PopAsModule:
     case bc_MemoizeCheck:
     case bc_MemoizeSave:
     case bc_PackState:
@@ -549,8 +547,7 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 {
     if (caller->function == FUNCS.require) {
-        blob_append_char(bytecode, bc_PopAsModule);
-        blob_append_int(bytecode, caller->index);
+        blob_append_char(bytecode, bc_PopRequire);
         return;
     }
 

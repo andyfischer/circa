@@ -159,7 +159,9 @@ def Mutable.get(self) -> any
 
 -- Modules
 
-type Module;
+type ModuleRef {
+  Block block
+}
 
 def native_patch_this(String filename)
     -- Annotation, declare that the current module should be patched by a native
@@ -174,7 +176,7 @@ def load_script(String filename) -> Block
     -- Load a script with the given filename. The result will only be available
     -- locally; it won't be loaded into module space.
 
-def require(String moduleName) -> Module
+def require(String moduleName) -> ModuleRef
     -- Load a module.
 
 def package(String moduleName)

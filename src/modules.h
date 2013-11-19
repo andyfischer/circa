@@ -31,15 +31,19 @@ Block* load_module_by_name(World* world, Block* loadedBy, caValue* moduleName);
 // rearrange the global module order so that the module is located before the term.
 void module_on_loaded_by_term(Block* module, Term* loadCall);
 
-// Called by interpreter during a require() call.
-void module_capture_exports_from_stack(Frame* frame, caValue* output);
-
 // Deprecated: does not reference World or Block.
 Block* find_loaded_module(const char* name);
 Block* find_module_from_filename(const char* filename);
 
 // Prefered:
 Block* find_module(Block* root, caValue* name);
+
+// Runtime calls (when evaluating require)
+bool module_is_loaded_in_stack(Stack* stack, caValue* moduleRef);
+caValue* module_insert_in_stack(Stack* stack, caValue* moduleRef);
+caValue* module_get_stack_contents(Stack* stack, caValue* moduleRef);
+void module_capture_exports_from_stack(Frame* frame, caValue* output);
+caValue* module_find_closure_on_stack(Stack* stack, Term* function);
 
 // -- Bundles --
 Block* module_create_empty_bundle(World* world, const char* name);
@@ -48,8 +52,7 @@ Block* module_create_empty_bundle(World* world, const char* name);
 Block* module_load_from_zip_data(char* data, size_t data);
 #endif
 
-void set_module_value(caValue* value);
-bool is_module_value(caValue* value);
+bool is_module_ref(caValue* value);
 
 // Install builtin modules functions.
 void modules_install_functions(Block* kernel);

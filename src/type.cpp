@@ -406,7 +406,7 @@ Term* find_method_with_search_name(Block* block, Type* type, const char* searchN
     return NULL;
 }
 
-Term* find_method(Block* block, Type* type, const char* name)
+Term* find_method(Block* block, Type* type, caValue* name)
 {
     if (string_eq(&type->name, ""))
         return NULL;
@@ -421,7 +421,7 @@ Term* find_method(Block* block, Type* type, const char* name)
     }
 
     // Construct the search name, which looks like TypeName.functionName.
-    std::string searchName = std::string(as_cstring(&type->name)) + "." + name;
+    std::string searchName = std::string(as_cstring(&type->name)) + "." + as_cstring(name);
 
     // Standard search.
     Term* result = find_method_with_search_name(block, type, searchName.c_str());
@@ -433,7 +433,7 @@ Term* find_method(Block* block, Type* type, const char* name)
     // for the base type name (such as List).
     std::string baseTypeSymbol = get_base_type_name(as_cstring(&type->name));
     if (baseTypeSymbol != "") {
-        std::string searchName = baseTypeSymbol + "." + name;
+        std::string searchName = baseTypeSymbol + "." + as_cstring(name);
         result = find_method_with_search_name(block, type, searchName.c_str());
 
         if (result != NULL)
