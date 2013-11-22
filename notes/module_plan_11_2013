@@ -1,0 +1,66 @@
+
+Revising the module plan
+
+Having trouble with expressions that are in module scope. Functions in the module
+may refer to those expressions, so when that function is called, where does it
+get that value?
+
+A tricky case:
+  Module A exports a type T which refers to some local value in A
+  Module B gets a value of type T from module A, and passes it to a function in module C.
+  While we're at it, the value is passed to a new stack too.
+  Now module C uses a method on the value of type T, which was defined in module A.
+  This module and stack has never heard of module A, so where does it find that value?
+
+Making this harder is the concept of the hackset (not yet implemented). The design:
+  Every stack has a 'hackset' value, which is an arbitrarily complicated way to configure
+    bytecode generation.
+  So, bytecode cannot always be shared across stacks.
+  So, talking about module-locals. We (most likely) cannot share a module local from one
+    stack into another.
+
+New design:
+
+Every Stack has a moduleFrames map, mapping a block to a register list.
+
+Whenever a module is used, it might need to be lazily evaulated within the calling scope.
+The same module might be evaluated multiple times, one per stack.
+
+So, we might need to evaluate a module as-needed.
+  A module doesn't have inputs & outputs
+  Module top-level can reference context.. but realistically it shouldn't. Or at least,
+  it should only reference top-level context that was passed in from the stack owner.
+
+How about state as a module-local?
+  Yeesh
+  Really?
+  What would this mean?
+  Is there one invocation of state per module load, or..?
+
+How does the module-local get evaluated on demand?
+  In its own stack
+    This seems like it would cause more problems.. reflection would be confused, need
+    to copy over context and etc.
+  Same stack, new frame appended to top
+  Same stack, new frame at 0 with existing frames temporarily swapped out
+  On-demand on a term-by-term basis
+
+State at module top-level IS like an input, which is why its causing problems
+
+If we allow state at module top-level then we have to go back to require() as a function
+which always reevaluates the module. Can have state.
+
+So..
+  Calling a module function means walking the stack upwards to find the active value
+    for that require() call, then using its contents for the function..?
+  Calling a method on a type from a module that we never required means..
+    Evaluating the necessary term on-demand?
+    Evaluating the module on-demand?
+
+On-demand evaluation might get surprising w/r/t side effects
+  But when we cache we will have this problem anyway.
+
+Conclusion..
+
+All these crazy plans of the module frame will not be pursued. Reasons:
+  - No clear plan on when to evaluate the module frame, esp when values cross stack boundaries.

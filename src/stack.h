@@ -21,9 +21,6 @@ struct Stack
     // Frame list
     FrameList frames;
 
-    // Module frames. Map of branch to register list.
-    Value moduleFrames;
-
     // Transient data, used during vm_run.
     const char* bc;
     int pc;
