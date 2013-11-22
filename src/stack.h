@@ -2,7 +2,54 @@
 
 #pragma once
 
+#include "common_headers.h"
+
 namespace circa {
+
+struct Stack
+{
+    // Globally unique ID.
+    int id;
+
+    // Frame list
+    Frame* frames;
+    int framesCount;
+    int framesCapacity;
+
+    // Module frames. Map of branch to register list.
+    Value moduleFrames;
+
+    // Transient data, used during vm_run.
+    const char* bc;
+    int pc;
+
+    // Current step, either StackReady, StackRunning or StackFinished.
+    Symbol step;
+
+    // Flag that indicates the most recent run was interrupted by an error
+    bool errorOccurred;
+
+    // Linked list of all stacks across this world.
+    Stack* prevStack;
+    Stack* nextStack;
+
+    // Owning world
+    caWorld* world;
+
+    // Value slot, may be used by the stack's owner.
+    Value context;
+
+    Stack();
+    ~Stack();
+
+    void dump();
+
+private:
+    // Disabled C++ functions.
+    Stack(Stack const&) {}
+    Stack& operator=(Stack const&) { return *this; }
+};
+    
 
 struct Frame
 {
@@ -43,6 +90,10 @@ struct Frame
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
 };
+
+void stack_resize_frame_list(Stack* stack, int newCapacity);
+Frame* stack_push_blank_frame(Stack* stack);
+Stack* stack_duplicate(Stack* stack);
 
 Frame* as_frame_ref(caValue* value);
 bool is_frame_ref(caValue* value);

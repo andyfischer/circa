@@ -36,8 +36,6 @@
 
 namespace circa {
 
-static Frame* stack_push_blank(Stack* stack);
-static void stack_resize_frame_list(Stack* stack, int newCapacity);
 static Term* frame_current_term(Frame* frame);
 static Frame* expand_frame(Frame* parent, Frame* top);
 static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index);
@@ -59,47 +57,6 @@ static void vm_finish_frame(Stack* stack);
 bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
 static void retained_frame_extract_state(caValue* frame, caValue* output);
-
-Stack::Stack()
- : errorOccurred(false),
-   world(NULL)
-{
-    id = global_world()->nextStackID++;
-
-    step = sym_StackReady;
-    framesCapacity = 0;
-    framesCount = 0;
-    frames = NULL;
-    nextStack = NULL;
-    prevStack = NULL;
-}
-
-Stack::~Stack()
-{
-    // Clear error, so that stack_pop doesn't complain about losing an errored frame.
-    stack_ignore_error(this);
-
-    stack_reset(this);
-
-    free(frames);
-
-    if (world != NULL) {
-        if (world->firstStack == this)
-            world->firstStack = world->firstStack->nextStack;
-        if (world->lastStack == this)
-            world->lastStack = world->lastStack->prevStack;
-        if (nextStack != NULL)
-            nextStack->prevStack = prevStack;
-        if (prevStack != NULL)
-            prevStack->nextStack = nextStack;
-    }
-}
-
-void
-Stack::dump()
-{
-    circa::dump(this);
-}
 
 Stack* create_stack(World* world)
 {
@@ -168,7 +125,7 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
 
 static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block)
 {
-    Frame* top = stack_push_blank(stack);
+    Frame* top = stack_push_blank_frame(stack);
     top->parentIndex = parentIndex;
     top->block = block;
     set_list(&top->registers, block_locals_count(block));
@@ -309,25 +266,6 @@ static void retain_stack_top(Stack* stack)
     copy_stack_frame_outgoing_state_to_retained(stack_top(stack), slot);
 }
 
-static Frame* stack_push_blank(Stack* stack)
-{
-    // Check capacity.
-    if ((stack->framesCount + 1) >= stack->framesCapacity)
-        stack_resize_frame_list(stack, stack->framesCapacity == 0 ? 8 : stack->framesCapacity * 2);
-
-    stack->framesCount++;
-
-    Frame* frame = stack_top(stack);
-
-    // Initialize frame
-    frame->termIndex = 0;
-    frame->pc = 0;
-    frame->exitType = sym_None;
-    frame->callType = sym_NormalCall;
-    frame->block = NULL;
-
-    return frame;
-}
 
 void stack_reset(Stack* stack)
 {
@@ -355,25 +293,6 @@ void stack_restart(Stack* stack)
 
     stack->errorOccurred = false;
     stack->step = sym_StackReady;
-}
-
-Stack* stack_duplicate(Stack* stack)
-{
-    Stack* dupe = create_stack(stack->world);
-    stack_resize_frame_list(dupe, stack->framesCapacity);
-
-    for (int i=0; i < stack->framesCapacity; i++) {
-        Frame* sourceFrame = &stack->frames[i];
-        Frame* dupeFrame = &dupe->frames[i];
-
-        frame_copy(sourceFrame, dupeFrame);
-    }
-
-    dupe->framesCount = stack->framesCount;
-    dupe->step = stack->step;
-    dupe->errorOccurred = stack->errorOccurred;
-    set_value(&dupe->context, &stack->context);
-    return dupe;
 }
 
 caValue* stack_get_state(Stack* stack)
@@ -452,6 +371,7 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
         return term_value(term);
     }
 
+    // Ditto for require() values.
     if (term->function == FUNCS.require) {
         return term_value(term);
     }
@@ -666,29 +586,6 @@ int frame_get_index(Frame* frame)
     return (int) (frame - stack->frames);
 }
 
-static void stack_resize_frame_list(Stack* stack, int newCapacity)
-{
-    // Currently, the frame list can only be grown.
-    ca_assert(newCapacity >= stack->framesCapacity);
-
-    int oldCapacity = stack->framesCapacity;
-    stack->framesCapacity = newCapacity;
-    stack->frames = (Frame*) realloc(stack->frames, sizeof(Frame) * stack->framesCapacity);
-
-    for (int i = oldCapacity; i < newCapacity; i++) {
-
-        // Initialize new frame
-        Frame* frame = &stack->frames[i];
-        frame->stack = stack;
-        initialize_null(&frame->registers);
-        initialize_null(&frame->customBytecode);
-        initialize_null(&frame->bindings);
-        initialize_null(&frame->dynamicScope);
-        initialize_null(&frame->state);
-        initialize_null(&frame->outgoingState);
-        frame->block = 0;
-    }
-}
 
 void fetch_stack_outputs(Stack* stack, caValue* outputs)
 {

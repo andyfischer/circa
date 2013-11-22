@@ -11,50 +11,6 @@
 
 namespace circa {
 
-struct Stack
-{
-    // GCable object header.
-    CircaObject header;
-
-    // Globally unique ID.
-    int id;
-
-    // Frame list
-    Frame* frames;
-    int framesCount;
-    int framesCapacity;
-
-    // Transient data, used during vm_run;
-    const char* bc;
-    int pc;
-
-    // Current step, either StackReady, StackRunning or StackFinished.
-    Symbol step;
-
-    // Flag that indicates the most recent run was interrupted by an error
-    bool errorOccurred;
-
-    // Linked list of all stacks across this world.
-    Stack* prevStack;
-    Stack* nextStack;
-
-    // Owning world
-    caWorld* world;
-
-    // Value slot, may be used by the stack's owner.
-    Value context;
-
-    Stack();
-    ~Stack();
-
-    void dump();
-
-private:
-    // Disabled C++ functions.
-    Stack(Stack const&) {}
-    Stack& operator=(Stack const&) { return *this; }
-};
-
 // Allocate a new Stack object.
 Stack* create_stack(World* world);
 void free_stack(Stack* stack);
