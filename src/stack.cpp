@@ -18,9 +18,9 @@ Stack::Stack()
     id = global_world()->nextStackID++;
 
     step = sym_StackReady;
-    framesCapacity = 0;
-    framesCount = 0;
-    frames = NULL;
+    frames.capacity = 0;
+    frames.count = 0;
+    frames.frame = NULL;
     nextStack = NULL;
     prevStack = NULL;
 }
@@ -32,7 +32,7 @@ Stack::~Stack()
 
     stack_reset(this);
 
-    free(frames);
+    free(frames.frame);
 
     if (world != NULL) {
         if (world->firstStack == this)
@@ -55,16 +55,16 @@ Stack::dump()
 void stack_resize_frame_list(Stack* stack, int newCapacity)
 {
     // Currently, the frame list can only be grown.
-    ca_assert(newCapacity >= stack->framesCapacity);
+    ca_assert(newCapacity >= stack->frames.capacity);
 
-    int oldCapacity = stack->framesCapacity;
-    stack->framesCapacity = newCapacity;
-    stack->frames = (Frame*) realloc(stack->frames, sizeof(Frame) * stack->framesCapacity);
+    int oldCapacity = stack->frames.capacity;
+    stack->frames.capacity = newCapacity;
+    stack->frames.frame = (Frame*) realloc(stack->frames.frame,
+        sizeof(Frame) * stack->frames.capacity);
 
     for (int i = oldCapacity; i < newCapacity; i++) {
-
-        // Initialize new frame
-        Frame* frame = &stack->frames[i];
+        // Initialize newly allocated frame.
+        Frame* frame = &stack->frames.frame[i];
         frame->stack = stack;
         initialize_null(&frame->registers);
         initialize_null(&frame->customBytecode);
@@ -79,14 +79,14 @@ void stack_resize_frame_list(Stack* stack, int newCapacity)
 Frame* stack_push_blank_frame(Stack* stack)
 {
     // Check capacity.
-    if ((stack->framesCount + 1) >= stack->framesCapacity)
-        stack_resize_frame_list(stack, stack->framesCapacity == 0 ? 8 : stack->framesCapacity * 2);
+    if ((stack->frames.count + 1) >= stack->frames.capacity)
+        stack_resize_frame_list(stack, stack->frames.capacity == 0 ? 8 : stack->frames.capacity * 2);
 
-    stack->framesCount++;
+    stack->frames.count++;
 
     Frame* frame = stack_top(stack);
 
-    // Initialize frame
+    // Prepare frame.
     frame->termIndex = 0;
     frame->pc = 0;
     frame->exitType = sym_None;
@@ -99,16 +99,16 @@ Frame* stack_push_blank_frame(Stack* stack)
 Stack* stack_duplicate(Stack* stack)
 {
     Stack* dupe = create_stack(stack->world);
-    stack_resize_frame_list(dupe, stack->framesCapacity);
+    stack_resize_frame_list(dupe, stack->frames.capacity);
 
-    for (int i=0; i < stack->framesCapacity; i++) {
-        Frame* sourceFrame = &stack->frames[i];
-        Frame* dupeFrame = &dupe->frames[i];
+    for (int i=0; i < stack->frames.capacity; i++) {
+        Frame* sourceFrame = &stack->frames.frame[i];
+        Frame* dupeFrame = &dupe->frames.frame[i];
 
         frame_copy(sourceFrame, dupeFrame);
     }
 
-    dupe->framesCount = stack->framesCount;
+    dupe->frames.count = stack->frames.count;
     dupe->step = stack->step;
     dupe->errorOccurred = stack->errorOccurred;
     set_value(&dupe->context, &stack->context);
@@ -131,7 +131,7 @@ Frame* as_frame_ref(caValue* value)
 
     Stack* stack = frame_ref_get_stack(value);
     int index = frame_ref_get_index(value);
-    if (index >= stack->framesCount)
+    if (index >= stack->frames.count)
         return NULL;
 
     return frame_by_index(stack, index);

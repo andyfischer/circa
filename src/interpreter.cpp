@@ -84,16 +84,16 @@ void free_stack(Stack* stack)
 
 Frame* stack_top(Stack* stack)
 {
-    if (stack->framesCount == 0)
+    if (stack->frames.count == 0)
         return NULL;
-    return &stack->frames[stack->framesCount - 1];
+    return &stack->frames.frame[stack->frames.count - 1];
 }
 
 Frame* stack_top_parent(Stack* stack)
 {
-    if (stack->framesCount <= 1)
+    if (stack->frames.count <= 1)
         return NULL;
-    return &stack->frames[stack->framesCount - 2];
+    return &stack->frames.frame[stack->frames.count - 2];
 }
 
 Block* stack_top_block(Stack* stack)
@@ -189,7 +189,7 @@ void stack_pop_no_retain(Stack* stack)
     set_null(&frame->state);
     set_null(&frame->outgoingState);
 
-    stack->framesCount--;
+    stack->frames.count--;
 }
 
 void stack_pop(Stack* stack)
@@ -406,14 +406,14 @@ void stack_to_string(Stack* stack, caValue* out)
     std::stringstream strm;
 
     strm << "[Stack #" << stack->id
-        << ", frames = " << stack->framesCount
+        << ", frames = " << stack->frames.count
         << "]" << std::endl;
 
-    for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
+    for (int frameIndex = 0; frameIndex < stack->frames.count; frameIndex++) {
 
         Frame* frame = frame_by_index(stack, frameIndex);
 
-        bool lastFrame = frameIndex == stack->framesCount - 1;
+        bool lastFrame = frameIndex == stack->frames.count - 1;
 
         Frame* childFrame = NULL;
         if (!lastFrame)
@@ -423,7 +423,7 @@ void stack_to_string(Stack* stack, caValue* out)
         if (childFrame != NULL)
             activeTermIndex = childFrame->parentIndex;
 
-        int depth = stack->framesCount - 1 - frameIndex;
+        int depth = stack->frames.count - 1 - frameIndex;
         Block* block = frame->block;
         strm << " [Frame index " << frameIndex
              << ", depth = " << depth
@@ -499,7 +499,7 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 {
     std::stringstream strm;
 
-    for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
+    for (int frameIndex = 0; frameIndex < stack->frames.count; frameIndex++) {
 
         Frame* frame = frame_by_index(stack, frameIndex);
         Term* term = frame_current_term(frame);
@@ -541,10 +541,10 @@ void stack_extract_state(Stack* stack, caValue* output)
 Frame* frame_parent(Frame* frame)
 {
     Stack* stack = frame->stack;
-    int index = (int) (frame - stack->frames - 1);
+    int index = (int) (frame - stack->frames.frame - 1);
     if (index < 0)
         return NULL;
-    return &stack->frames[index];
+    return &stack->frames.frame[index];
 }
 
 Term* frame_caller(Frame* frame)
@@ -564,26 +564,26 @@ Term* frame_term(Frame* frame, int index)
 
 int stack_frame_count(Stack* stack)
 {
-    return stack->framesCount;
+    return stack->frames.count;
 }
 
 Frame* frame_by_index(Stack* stack, int index)
 {
     ca_assert(index >= 0);
-    ca_assert(index < stack->framesCount);
-    return &stack->frames[index];
+    ca_assert(index < stack->frames.count);
+    return &stack->frames.frame[index];
 }
 
 Frame* frame_by_depth(Stack* stack, int depth)
 {
-    int index = stack->framesCount - 1 - depth;
+    int index = stack->frames.count - 1 - depth;
     return frame_by_index(stack, index);
 }
 
 int frame_get_index(Frame* frame)
 {
     Stack* stack = frame->stack;
-    return (int) (frame - stack->frames);
+    return (int) (frame - stack->frames.frame);
 }
 
 
@@ -2422,7 +2422,7 @@ void Stack__frame_from_base(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
-    if (index >= self->framesCount)
+    if (index >= self->frames.count)
         return circa_output_error(stack, "Index out of range");
 
     Frame* frame = frame_by_index(self, index);
@@ -2433,7 +2433,7 @@ void Stack__frame(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
-    if (index >= self->framesCount)
+    if (index >= self->frames.count)
         return circa_output_error(stack, "Index out of range");
 
     Frame* frame = frame_by_depth(self, index);

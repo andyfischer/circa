@@ -6,15 +6,20 @@
 
 namespace circa {
 
+struct FrameList
+{
+    Frame* frame;
+    int count;
+    int capacity;
+};
+
 struct Stack
 {
     // Globally unique ID.
     int id;
 
     // Frame list
-    Frame* frames;
-    int framesCount;
-    int framesCapacity;
+    FrameList frames;
 
     // Module frames. Map of branch to register list.
     Value moduleFrames;
@@ -50,7 +55,6 @@ private:
     Stack& operator=(Stack const&) { return *this; }
 };
     
-
 struct Frame
 {
     // Pointer to owning Stack.
