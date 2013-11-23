@@ -1465,15 +1465,11 @@ dyn_call_resolved:
             continue;
         }
         case bc_InlineCopy: {
-            int index = vm_read_int(stack);
-
             Frame* top = stack_top(stack);
-            Term* caller = frame_term(top, index);
-
-            caValue* source = stack_find_active_value(top, caller->input(0));
-            caValue* dest = frame_register(top, caller);
+            int index = vm_read_int(stack);
+            caValue* source = vm_read_local_value(top);
+            caValue* dest = frame_register(top, index);
             copy(source, dest);
-
             continue;
         }
         case bc_LocalCopy: {
@@ -1639,6 +1635,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
     }
     case bc_PushInputFromValue: {
         int index = vm_read_int(frame->stack);
+        ca_assert(caller != NULL);
         return term_value(caller->input(index));
     }
     default:

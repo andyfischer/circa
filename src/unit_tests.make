@@ -78,6 +78,7 @@ OBJECTS := \
 	$(OBJDIR)/function_test.o \
 	$(OBJDIR)/handle_test.o \
 	$(OBJDIR)/hashtable_test.o \
+	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing_test.o \
 	$(OBJDIR)/interpreter_test.o \
 	$(OBJDIR)/list_test.o \
@@ -196,6 +197,9 @@ $(OBJDIR)/handle_test.o: unit_tests/handle_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/hashtable_test.o: unit_tests/hashtable_test.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/if_block.o: unit_tests/if_block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/importing_test.o: unit_tests/importing_test.cpp

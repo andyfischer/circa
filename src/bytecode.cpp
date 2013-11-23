@@ -24,8 +24,12 @@ namespace circa {
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block);
 static void bytecode_write_local_reference(caValue* bytecode, Block* callingBlock, Term* term);
 
-static void bc_append_local_reference(const char* bc, int* pc, caValue* string)
+static void bc_append_local_reference_string(caValue* string, const char* bc, int* pc)
 {
+    string_append(string, "frame:");
+    string_append(string, blob_read_u16(bc, pc));
+    string_append(string, " reg:");
+    string_append(string, blob_read_u16(bc, pc));
 }
 
 void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
@@ -46,6 +50,7 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_InlineCopy:
         set_string(string, "inline_copy ");
         string_append(string, blob_read_int(bc, pc));
+        bc_append_local_reference_string(string, bc, pc);
         break;
     case bc_LocalCopy:
         set_string(string, "local_copy ");
@@ -384,9 +389,9 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
             return;
         } else {
             blob_append_char(bytecode, bc_InlineCopy);
+            blob_append_int(bytecode, term->index);
             bytecode_write_local_reference(bytecode, term->owningBlock,
                 term->input(0));
-            blob_append_int(bytecode, term->index);
             return;
         }
     }

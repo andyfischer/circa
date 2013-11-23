@@ -276,15 +276,6 @@ void if_block_finish_appended_case(Block* block, Term* caseTerm)
         TermList(find_expression_for_implicit_output(nested_contents(caseTerm))));
 }
 
-bool if_block_is_name_bound_in_every_case(Block* contents, const char* name)
-{
-    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
-        if (!nested_contents(it.current())->contains(name))
-            return false;
-    }
-    return true;
-}
-
 void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 {
     Block* contents = nested_contents(ifCall);
@@ -326,6 +317,10 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
 
         Term* outer = find_name(outerBlock, name);
         if (outer == NULL)
+            continue;
+
+        // Don't look at names outside the major block.
+        if (find_nearest_major_block(outer->owningBlock) != outerBlock)
             continue;
 
         // This term rebinds an outer name.
