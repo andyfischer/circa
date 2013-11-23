@@ -54,6 +54,8 @@ static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
 
+static void vm_evaluate_expression_on_demand(Stack* stack, Term* term);
+
 bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
 static void retained_frame_extract_state(caValue* frame, caValue* output);
@@ -989,11 +991,30 @@ void vm_run(Stack* stack, caValue* bytecode)
             ca_assert(caller->function == FUNCS.nonlocal);
             Term* input = caller->input(0);
             caValue* value = stack_find_nonlocal(top, input);
-            if (value == NULL) {
-                top->termIndex = termIndex;
-                return raise_error_stack_value_not_found(stack);
+            if (value != NULL) {
+                copy(value, frame_register(top, caller));
+                continue;
             }
-            copy(value, frame_register(top, caller));
+
+            top->termIndex = termIndex;
+            top->pc = stack->pc;
+
+            vm_evaluate_expression_on_demand(stack, input);
+
+            stack->bc = as_blob(frame_bytecode(stack_top(stack)));
+            stack->pc = 0;
+
+#if 0
+            if (stack->step != sym_StackRunning)
+                return;
+
+            Frame* ourFrame = stack_top_parent(stack);
+            copy(value, frame_register(ourFrame, caller));
+
+            // Teardown generated frame.
+            stack_pop_no_retain(stack);
+#endif
+
             continue;
         }
         case bc_PushExplicitState: {
@@ -2003,6 +2024,45 @@ static void vm_finish_frame(Stack* stack)
 
     stack->bc = as_blob(frame_bytecode(parent));
     stack->pc = parent->pc;
+}
+
+static void vm_evaluate_expression_on_demand(Stack* stack, Term* term)
+{
+    Block* block = term->owningBlock;
+    Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, term->owningBlock);
+
+    bool* involvedTerms = (bool*) malloc(sizeof(bool) * block->length());
+    memset(involvedTerms, 0, sizeof(bool) * block->length());
+
+    involvedTerms[term->index] = true;
+
+    for (int i=term->index; i >= 0; i--) {
+
+        if (!involvedTerms[i])
+            continue;
+
+        Term* involvedTerm = block->get(i);
+
+        for (int i=0; i < involvedTerm->numInputs(); i++) {
+            Term* input = term->input(i);
+            if (input == NULL || input->owningBlock != block || is_value(input))
+                continue;
+
+            involvedTerms[input->index] = true;
+        }
+    }
+
+    caValue* bytecode = &top->customBytecode;
+    set_blob(bytecode, 0);
+
+    for (int i=0; i <= term->index; i++) {
+        if (involvedTerms[i])
+            bytecode_write_term_call(bytecode, block->get(i));
+    }
+
+    free(involvedTerms);
+
+    blob_append_char(bytecode, bc_Done);
 }
 
 bool run_memoize_check(Stack* stack)
