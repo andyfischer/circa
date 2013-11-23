@@ -2,7 +2,7 @@
 l = []
 
 for i in [1 2 3]
-    if i == 2
-        @l.append(i)
+  if i == 2
+    @l.append(i)
 
 assert(l == [2])

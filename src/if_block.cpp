@@ -92,7 +92,6 @@ int case_block_get_index(Block* caseBlock)
     return -1;
 }
 
-
 Term* case_find_condition_check(Block* block)
 {
     for (int i=0; i < block->length(); i++) {
@@ -320,7 +319,8 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
             continue;
 
         // Don't look at names outside the major block.
-        if (find_nearest_major_block(outer->owningBlock) != outerBlock)
+        if (find_nearest_major_block(outer->owningBlock) !=
+                find_nearest_major_block(outerBlock))
             continue;
 
         // This term rebinds an outer name.
