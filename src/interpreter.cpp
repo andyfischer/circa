@@ -1361,14 +1361,14 @@ dyn_call_resolved:
             continue;
         }
         case bc_PushLoop: {
-            int index = vm_read_int(stack);
+            int termIndex = vm_read_int(stack);
             bool loopEnableOutput = vm_read_char(stack) != 0;
 
             Frame* top = stack_top(stack);
 
-            top->termIndex = index;
+            top->termIndex = termIndex;
             top->pc = stack->pc;
-            Term* caller = frame_term(top, index);
+            Term* caller = frame_term(top, termIndex);
 
             // Peek at the first input.
             int peekPc = stack->pc;
@@ -1385,7 +1385,7 @@ dyn_call_resolved:
                 block = caller->nestedContents;
             }
 
-            top = vm_push_frame(stack, index, block);
+            top = vm_push_frame(stack, termIndex, block);
             vm_run_input_bytecodes(stack, caller);
             if (stack->step != sym_StackRunning)
                 return;
@@ -1400,7 +1400,7 @@ dyn_call_resolved:
 
                 if (loopEnableOutput) {
                     // Initialize output value.
-                    caValue* outputList = stack_find_active_value(top, block->owningTerm);
+                    caValue* outputList = frame_register(stack_top_parent(stack), termIndex);
                     set_list(outputList, 0);
                 }
             }
@@ -1499,7 +1499,7 @@ dyn_call_resolved:
 
             Frame* top = stack_top(stack);
             caValue* source = frame_register(top, sourceIndex);
-            caValue* dest = stack_find_active_value(top, frame_term(top, destIndex));
+            caValue* dest = frame_register(top, destIndex);
             copy(source, dest);
             continue;
         }
@@ -1519,10 +1519,10 @@ dyn_call_resolved:
             continue;
         }
         case bc_Return: {
-            int index = vm_read_int(stack);
+            int termIndex = vm_read_int(stack);
 
             Frame* top = stack_top(stack);
-            Term* caller = frame_term(top, index);
+            Term* caller = frame_term(top, termIndex);
 
             Frame* toFrame = top;
 
@@ -1960,7 +1960,7 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput)
     if (enableOutput && top->exitType != sym_Discard) {
 
         caValue* resultValue = frame_register_from_end(top, 0);
-        caValue* outputList = stack_find_active_value(top, contents->owningTerm);
+        caValue* outputList = frame_register(stack_top_parent(stack), contents->owningTerm);
 
         copy(resultValue, list_append(outputList));
 
@@ -1976,7 +1976,7 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput)
         // Silly code- move the output list (in the parent frame) to our frame's output,
         // where it will get copied back to parent when the frame is finished.
         if (enableOutput) {
-            caValue* outputList = stack_find_active_value(top, contents->owningTerm);
+            caValue* outputList = frame_register(stack_top_parent(stack), contents->owningTerm);
             move(outputList, frame_register_from_end(top, 0));
         } else {
             set_list(frame_register_from_end(top, 0), 0);

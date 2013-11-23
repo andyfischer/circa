@@ -503,14 +503,6 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         blob_append_int(bytecode, term->index);
     }
 
-#if 0
-    else if (term->function == FUNCS.require) {
-        referenceTargetBlock = NULL;
-        blob_append_char(bytecode, bc_PushRequire);
-        blob_append_int(bytecode, term->index);
-    }
-#endif
-
     else if (term->nestedContents != NULL) {
 
         // Otherwise if the term has nested contents, then use it.
@@ -559,13 +551,6 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
 
 void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block)
 {
-#if 0
-    if (caller->function == FUNCS.require) {
-        blob_append_char(bytecode, bc_PopRequire);
-        return;
-    }
-#endif
-
     if (block == NULL) {
         blob_append_char(bytecode, bc_PopOutputsDynamic);
         return;
@@ -578,26 +563,19 @@ void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* 
         if (output == NULL)
             break;
 
-        if (output->boolProp("state", false)) {
-            // Explicit state output.
-            blob_append_char(bytecode, bc_PopExplicitState);
+        // Normal output.
+
+        Term* placeholder = get_output_placeholder(block, placeholderIndex);
+        if (placeholder == NULL) {
+            blob_append_char(bytecode, bc_PopOutputNull);
             blob_append_int(bytecode, outputIndex);
-
         } else {
-            // Normal output.
-
-            Term* placeholder = get_output_placeholder(block, placeholderIndex);
-            if (placeholder == NULL) {
-                blob_append_char(bytecode, bc_PopOutputNull);
-                blob_append_int(bytecode, outputIndex);
-            } else {
-                blob_append_char(bytecode, bc_PopOutput);
-                blob_append_int(bytecode, placeholderIndex);
-                blob_append_int(bytecode, outputIndex);
-            }
-
-            placeholderIndex++;
+            blob_append_char(bytecode, bc_PopOutput);
+            blob_append_int(bytecode, placeholderIndex);
+            blob_append_int(bytecode, outputIndex);
         }
+
+        placeholderIndex++;
     }
 }
 
