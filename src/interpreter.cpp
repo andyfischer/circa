@@ -54,7 +54,7 @@ static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
 
-static void vm_evaluate_expression_on_demand(Stack* stack, Term* term);
+static void vm_evaluate_module_on_demand(Stack* stack, Term* term);
 
 bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
@@ -1019,7 +1019,7 @@ void vm_run(Stack* stack, caValue* bytecode)
             top->termIndex = termIndex;
             top->pc = stack->pc;
 
-            vm_evaluate_expression_on_demand(stack, input);
+            vm_evaluate_module_on_demand(stack, input);
 
             stack->bc = as_blob(frame_bytecode(stack_top(stack)));
             stack->pc = 0;
@@ -1035,6 +1035,15 @@ void vm_run(Stack* stack, caValue* bytecode)
             stack_pop_no_retain(stack);
 #endif
 
+            continue;
+        }
+        case bc_SaveInModuleFrames: {
+            // Save this frame in moduleFrames.
+            Frame* top = stack_top(stack);
+            Value registers;
+            copy(frame_registers(top), &registers);
+            touch(&registers);
+            stack_module_frame_save(stack, top->block, &registers);
             continue;
         }
         case bc_PushExplicitState: {
@@ -2038,7 +2047,7 @@ static void vm_finish_frame(Stack* stack)
     stack->pc = parent->pc;
 }
 
-static void vm_evaluate_expression_on_demand(Stack* stack, Term* term)
+static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
 {
     Block* block = term->owningBlock;
     Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, term->owningBlock);
@@ -2074,6 +2083,7 @@ static void vm_evaluate_expression_on_demand(Stack* stack, Term* term)
 
     free(involvedTerms);
 
+    blob_append_char(bytecode, bc_SaveInModuleFrames);
     blob_append_char(bytecode, bc_Done);
 }
 

@@ -308,6 +308,7 @@ const char* STDLIB_CA_TEXT =
     "\n"
     "type Frame { Stack stack, int index }\n"
     "type RetainedFrame { Block block, any _state }\n"
+    "type ModuleFrame { Block block, List registers }\n"
     "\n"
     "def Frame.active_value(self, Term) -> any\n"
     "def Frame.set_active_value(self, Term, any)\n"

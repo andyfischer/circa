@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "hashtable.h"
 #include "interpreter.h"
 #include "kernel.h"
 #include "stack.h"
@@ -23,6 +24,8 @@ Stack::Stack()
     frames.frame = NULL;
     nextStack = NULL;
     prevStack = NULL;
+    
+    set_hashtable(&moduleFrames);
 }
 
 Stack::~Stack()
@@ -113,6 +116,30 @@ Stack* stack_duplicate(Stack* stack)
     dupe->errorOccurred = stack->errorOccurred;
     set_value(&dupe->context, &stack->context);
     return dupe;
+}
+
+caValue* stack_module_frames_get(Stack* stack, int blockId)
+{
+    return hashtable_get_int_key(&stack->moduleFrames, blockId);
+}
+
+caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers)
+{
+    caValue* val = hashtable_insert_int_key(&stack->moduleFrames, block->id);
+    make(TYPES.retained_frame, val);
+    set_block(list_get(val, 0), block);
+    set_value(list_get(val, 1), registers);
+    return val;
+}
+
+Block* module_frame_get_block(caValue* moduleFrame)
+{
+    return as_block(list_get(moduleFrame, 0));
+}
+
+caValue* module_frame_get_registers(caValue* moduleFrame)
+{
+    return list_get(moduleFrame, 1);
 }
 
 Stack* frame_ref_get_stack(caValue* value)

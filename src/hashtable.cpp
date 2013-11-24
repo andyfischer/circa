@@ -478,6 +478,21 @@ caValue* hashtable_insert(caValue* table, caValue* key)
     return hashtable_insert(table, key, false);
 }
 
+caValue* hashtable_get_int_key(caValue* table, int key)
+{
+    // Future: Optimize by not creating a Value.
+    Value boxedKey;
+    set_int(&boxedKey, key);
+    return hashtable_get(table, &boxedKey);
+}
+
+caValue* hashtable_insert_int_key(caValue* table, int key)
+{
+    Value boxedKey;
+    set_int(&boxedKey, key);
+    return hashtable_insert(table, &boxedKey);
+}
+
 void hashtable_remove(caValue* tableTv, caValue* key)
 {
     ca_assert(is_hashtable(tableTv));

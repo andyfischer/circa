@@ -116,6 +116,7 @@ struct BuiltinTypes {
     Type* list;
     Type* map;
     Type* module_ref;
+    Type* module_frame;
     Type* mutable_type;
     Type* null;
     Type* opaque_pointer;

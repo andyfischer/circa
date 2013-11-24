@@ -688,6 +688,7 @@ void bootstrap_kernel()
     TYPES.module_ref = as_type(builtins->get("ModuleRef"));
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
+    TYPES.module_frame = as_type(builtins->get("ModuleFrame"));
     TYPES.retained_frame = as_type(builtins->get("RetainedFrame"));
     TYPES.point = as_type(builtins->get("Point"));
 

@@ -18,8 +18,11 @@ struct Stack
     // Globally unique ID.
     int id;
 
-    // Frame list
+    // Activation frame list.
     FrameList frames;
+
+    // Stored frame per module, keyed by block ID.
+    Value moduleFrames;
 
     // Transient data, used during vm_run.
     const char* bc;
@@ -95,6 +98,11 @@ struct Frame
 void stack_resize_frame_list(Stack* stack, int newCapacity);
 Frame* stack_push_blank_frame(Stack* stack);
 Stack* stack_duplicate(Stack* stack);
+
+caValue* stack_module_frames_get(Stack* stack, int blockId);
+caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers);
+Block* module_frame_get_block(caValue* moduleFrame);
+caValue* module_frame_get_registers(caValue* moduleFrame);
 
 Frame* as_frame_ref(caValue* value);
 bool is_frame_ref(caValue* value);

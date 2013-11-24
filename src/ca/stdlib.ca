@@ -301,6 +301,7 @@ def Dict.get(self, String key) -> any
 
 type Frame { Stack stack, int index }
 type RetainedFrame { Block block, any _state }
+type ModuleFrame { Block block, List registers }
 
 def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)
