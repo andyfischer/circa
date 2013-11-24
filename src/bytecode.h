@@ -30,12 +30,12 @@ const char bc_PushWhile = 0x18;
 const char bc_PushRequire = 0x19;
 
 // Pushing inputs to a new frame.
-const char bc_PushInputFromStack = 0x2a;
+const char bc_InputFromStack = 0x2a;
 const char bc_PushValue = 0x2e;
-const char bc_PushInputNull = 0x2b;
-const char bc_PushInputFromValue = 0x2c;
+const char bc_InputNull = 0x2b;
+const char bc_InputFromValue = 0x2c;
 const char bc_PushNonlocalInput = 0x25;
-const char bc_PushInputFromBlockRef = 0x26;
+const char bc_InputFromBlockRef = 0x26;
 const char bc_PushExplicitState = 0x27;
 const char bc_ErrorNotEnoughInputs = 0x28;
 const char bc_ErrorTooManyInputs = 0x29;

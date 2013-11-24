@@ -1650,10 +1650,10 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
 {
     char op = vm_read_char(frame->stack);
     switch (op) {
-    case bc_PushInputFromStack: {
+    case bc_InputFromStack: {
         return vm_read_local_value(frame);
     }
-    case bc_PushInputFromValue: {
+    case bc_InputFromValue: {
         int index = vm_read_int(frame->stack);
         ca_assert(caller != NULL);
         Term* input = caller->input(index);
@@ -1665,7 +1665,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
         }
         return term_value(input);
     }
-    case bc_PushInputFromBlockRef: {
+    case bc_InputFromBlockRef: {
         int blockId = vm_read_int(frame->stack);
         int termIndex = vm_read_int(frame->stack);
         return find_active_value_from_block_id(frame, blockId, termIndex);
@@ -1710,25 +1710,25 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
         }
 
         switch (op) {
-            case bc_PushInputFromStack: {
+            case bc_InputFromStack: {
                 caValue* value = vm_read_local_value(parent);
                 copy(value, dest);
                 break;
             }
-            case bc_PushInputFromValue: {
+            case bc_InputFromValue: {
                 int index = vm_read_int(stack);
                 caValue* value = term_value(caller->input(index));
                 copy(value, dest);
                 break;
             }
-            case bc_PushInputFromBlockRef: {
+            case bc_InputFromBlockRef: {
                 int blockId = vm_read_int(stack);
                 int termIndex = vm_read_int(stack);
                 caValue* value = find_active_value_from_block_id(parent, blockId, termIndex);
                 copy(value, dest);
                 break;
             }
-            case bc_PushInputNull: {
+            case bc_InputNull: {
                 set_null(dest);
                 break;
             }

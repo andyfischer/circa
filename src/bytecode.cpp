@@ -169,25 +169,25 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_ErrorTooManyInputs:
         set_string(string, "error_too_many_inputs");
         break;
-    case bc_PushInputFromStack:
-        set_string(string, "push_input_from_stack ");
+    case bc_InputFromStack:
+        set_string(string, "input_from_stack ");
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u16(bc, pc));
         break;
-    case bc_PushInputNull:
-        set_string(string, "push_input_null");
+    case bc_InputNull:
+        set_string(string, "input_null");
         break;
-    case bc_PushInputFromValue:
-        set_string(string, "push_input_from_value ");
+    case bc_InputFromValue:
+        set_string(string, "input_from_value ");
         string_append(string, blob_read_int(bc, pc));
         break;
     case bc_PushNonlocalInput:
         set_string(string, "push_nonlocal_input ");
         string_append(string, blob_read_int(bc, pc));
         break;
-    case bc_PushInputFromBlockRef:
-        set_string(string, "push_input_from_block_ref ");
+    case bc_InputFromBlockRef:
+        set_string(string, "input_from_block_ref ");
         string_append(string, blob_read_int(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_int(bc, pc));
@@ -285,11 +285,11 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_LoopConditionBool:
     case bc_Loop:
     case bc_IterationDone:
-    case bc_PushInputFromStack:
-    case bc_PushInputNull:
-    case bc_PushInputFromValue:
+    case bc_InputFromStack:
+    case bc_InputNull:
+    case bc_InputFromValue:
     case bc_PushNonlocalInput:
-    case bc_PushInputFromBlockRef:
+    case bc_InputFromBlockRef:
     case bc_PushExplicitState:
     case bc_ErrorNotEnoughInputs:
     case bc_ErrorTooManyInputs:
@@ -535,7 +535,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
 void bytecode_write_input_instruction_block_ref(caValue* bytecode, Term* input)
 {
-    blob_append_char(bytecode, bc_PushInputFromBlockRef);
+    blob_append_char(bytecode, bc_InputFromBlockRef);
     blob_append_int(bytecode, input->owningBlock->id);
     blob_append_int(bytecode, input->index);
 }
@@ -548,13 +548,13 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
     for (int i=0; i < caller->numInputs(); i++) {
         Term* input = caller->input(i);
         if (input == NULL) {
-            blob_append_char(bytecode, bc_PushInputNull);
+            blob_append_char(bytecode, bc_InputNull);
         } else if (is_value(input) || input->owningBlock == global_builtins_block()) {
-            blob_append_char(bytecode, bc_PushInputFromValue);
+            blob_append_char(bytecode, bc_InputFromValue);
             blob_append_int(bytecode, i);
         } else {
             bytecode_write_input_instruction_block_ref(bytecode, input);
-            //blob_append_char(bytecode, bc_PushInputFromStack);
+            //blob_append_char(bytecode, bc_InputFromStack);
             //bytecode_write_local_reference(bytecode, caller->owningBlock, input);
         }
     }
