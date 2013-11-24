@@ -381,10 +381,8 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
     return NULL;
 }
 
-caValue* find_active_value_from_block_id(Stack* stack, int blockId, int termIndex)
+caValue* find_active_value_from_block_id(Frame* frame, int blockId, int termIndex)
 {
-    Frame* frame = stack_top(stack);
-
     while (true) {
         if (frame->block->id == blockId) {
             Term* term = frame_term(frame, termIndex);
@@ -1670,7 +1668,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
     case bc_PushInputFromBlockRef: {
         int blockId = vm_read_int(frame->stack);
         int termIndex = vm_read_int(frame->stack);
-        return find_active_value_from_block_id(frame->stack, blockId, termIndex);
+        return find_active_value_from_block_id(frame, blockId, termIndex);
     }
     default:
         frame->stack->pc--; // Rewind.
@@ -1726,7 +1724,7 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
             case bc_PushInputFromBlockRef: {
                 int blockId = vm_read_int(stack);
                 int termIndex = vm_read_int(stack);
-                caValue* value = find_active_value_from_block_id(stack, blockId, termIndex);
+                caValue* value = find_active_value_from_block_id(parent, blockId, termIndex);
                 copy(value, dest);
                 break;
             }

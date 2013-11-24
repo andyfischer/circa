@@ -533,7 +533,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     blob_append_char(bytecode, bc_PopFrame);
 }
 
-void bytecode_write_input_instruction_new(caValue* bytecode, Term* input)
+void bytecode_write_input_instruction_block_ref(caValue* bytecode, Term* input)
 {
     blob_append_char(bytecode, bc_PushInputFromBlockRef);
     blob_append_int(bytecode, input->owningBlock->id);
@@ -543,7 +543,7 @@ void bytecode_write_input_instruction_new(caValue* bytecode, Term* input)
 void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
 {
     if (is_dynamic_func_call(caller))
-        bytecode_write_input_instruction_new(bytecode, caller->function);
+        bytecode_write_input_instruction_block_ref(bytecode, caller->function);
 
     for (int i=0; i < caller->numInputs(); i++) {
         Term* input = caller->input(i);
@@ -553,8 +553,9 @@ void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
             blob_append_char(bytecode, bc_PushInputFromValue);
             blob_append_int(bytecode, i);
         } else {
-            blob_append_char(bytecode, bc_PushInputFromStack);
-            bytecode_write_local_reference(bytecode, caller->owningBlock, input);
+            bytecode_write_input_instruction_block_ref(bytecode, input);
+            //blob_append_char(bytecode, bc_PushInputFromStack);
+            //bytecode_write_local_reference(bytecode, caller->owningBlock, input);
         }
     }
 }
