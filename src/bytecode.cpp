@@ -86,10 +86,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "push_func_call ");
         string_append(string, blob_read_int(bc, pc));
         break;
-    case bc_PushFuncCallImplicit:
-        set_string(string, "push_func_call_implicit ");
-        string_append(string, blob_read_int(bc, pc));
-        break;
     case bc_PushFuncApply:
         set_string(string, "push_func_apply ");
         string_append(string, blob_read_int(bc, pc));
@@ -190,6 +186,12 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "push_nonlocal_input ");
         string_append(string, blob_read_int(bc, pc));
         break;
+    case bc_PushInputFromBlockRef:
+        set_string(string, "push_input_from_block_ref ");
+        string_append(string, blob_read_int(bc, pc));
+        string_append(string, " ");
+        string_append(string, blob_read_int(bc, pc));
+        break;
     case bc_PushExplicitState:
         set_string(string, "push_explicit_state ");
         string_append(string, blob_read_int(bc, pc));
@@ -262,8 +264,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
         return blob_read_int(bc, &pc);
     case bc_PushFuncCall:
         return blob_read_int(bc, &pc);
-    case bc_PushFuncCallImplicit:
-        return blob_read_int(bc, &pc);
     case bc_PushFuncApply:
         return blob_read_int(bc, &pc);
     case bc_FireNative:
@@ -289,6 +289,7 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_PushInputNull:
     case bc_PushInputFromValue:
     case bc_PushNonlocalInput:
+    case bc_PushInputFromBlockRef:
     case bc_PushExplicitState:
     case bc_ErrorNotEnoughInputs:
     case bc_ErrorTooManyInputs:
@@ -461,7 +462,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
     else if (is_dynamic_func_call(term)) {
         referenceTargetBlock = NULL;
-        blob_append_char(bytecode, bc_PushFuncCallImplicit);
+        blob_append_char(bytecode, bc_PushFuncCall);
         blob_append_int(bytecode, term->index);
     }
 
@@ -532,11 +533,20 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     blob_append_char(bytecode, bc_PopFrame);
 }
 
+void bytecode_write_input_instruction_new(caValue* bytecode, Term* input)
+{
+    blob_append_char(bytecode, bc_PushInputFromBlockRef);
+    blob_append_int(bytecode, input->owningBlock->id);
+    blob_append_int(bytecode, input->index);
+}
+
 void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
 {
+    if (is_dynamic_func_call(caller))
+        bytecode_write_input_instruction_new(bytecode, caller->function);
+
     for (int i=0; i < caller->numInputs(); i++) {
         Term* input = caller->input(i);
-
         if (input == NULL) {
             blob_append_char(bytecode, bc_PushInputNull);
         } else if (is_value(input) || input->owningBlock == global_builtins_block()) {

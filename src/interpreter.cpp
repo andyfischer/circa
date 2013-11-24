@@ -381,6 +381,28 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
     return NULL;
 }
 
+caValue* find_active_value_from_block_id(Stack* stack, int blockId, int termIndex)
+{
+    Frame* frame = stack_top(stack);
+
+    while (true) {
+        if (frame->block->id == blockId) {
+            Term* term = frame_term(frame, termIndex);
+            if (is_value(term))
+                return term_value(term);
+
+            return frame_register(frame, termIndex);
+        }
+
+        frame = frame_parent(frame);
+
+        if (frame == NULL)
+            break;
+    }
+
+    return NULL;
+}
+
 void stack_ignore_error(Stack* cxt)
 {
     cxt->errorOccurred = false;
@@ -1191,8 +1213,10 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             INCREMENT_STAT(DynamicMethodCall);
 
-            // Lookup method
-            caValue* object = stack_find_active_value(top, caller->input(0));
+            // Fetch target object.
+            int pcBeforeTargetObject = stack->pc;
+
+            caValue* object = vm_run_single_input(top, caller);
             if (object == NULL) {
                 Value msg;
                 set_string(&msg, "Input 0 is null");
@@ -1230,11 +1254,12 @@ void vm_run(Stack* stack, caValue* bytecode)
             // Check for methods that are normally handled with different bytecode.
 
             if (method == FUNCS.func_call) {
-                vm_push_func_call(stack, termIndex);
+                vm_push_func_call_closure(stack, termIndex, object);
                 goto dyn_call_resolved;
             }
 
             if (method == FUNCS.func_apply) {
+                stack->pc = pcBeforeTargetObject;
                 vm_push_func_apply(stack, termIndex);
                 goto dyn_call_resolved;
             }
@@ -1242,10 +1267,9 @@ void vm_run(Stack* stack, caValue* bytecode)
             // Call this method.
             {
                 Block* block = nested_contents(method);
-
+                stack->pc = pcBeforeTargetObject;
                 top = vm_push_frame(stack, termIndex, block);
                 expand_frame(stack_top_parent(stack), top);
-
                 vm_run_input_bytecodes(stack, caller);
             }
 
@@ -1257,30 +1281,7 @@ dyn_call_resolved:
 
         case bc_PushFuncCall: {
             int termIndex = vm_read_int(stack);
-
             vm_push_func_call(stack, termIndex);
-            if (stack->step != sym_StackRunning)
-                return;
-            continue;
-        }
-
-        case bc_PushFuncCallImplicit: {
-            int termIndex = vm_read_int(stack);
-
-            Frame* top = stack_top(stack);
-            Term* caller = frame_term(top, termIndex);
-
-            caValue* closure = stack_find_active_value(top, caller->function);
-
-            if (!is_closure(closure)) {
-                Value msg;
-                set_string(&msg, "Not a function: ");
-                string_append(&msg, term_name(caller->function));
-                circa_output_error(stack, as_cstring(&msg));
-                return;
-            }
-
-            vm_push_func_call_closure(stack, termIndex, closure);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -1657,7 +1658,19 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
     case bc_PushInputFromValue: {
         int index = vm_read_int(frame->stack);
         ca_assert(caller != NULL);
-        return term_value(caller->input(index));
+        Term* input = caller->input(index);
+
+        // Special case for function values: lazily create closures for these.
+        if (input->function == FUNCS.function_decl) {
+            if (is_null(term_value(input)))
+                set_closure(term_value(input), input->nestedContents, NULL);
+        }
+        return term_value(input);
+    }
+    case bc_PushInputFromBlockRef: {
+        int blockId = vm_read_int(frame->stack);
+        int termIndex = vm_read_int(frame->stack);
+        return find_active_value_from_block_id(frame->stack, blockId, termIndex);
     }
     default:
         frame->stack->pc--; // Rewind.
@@ -1707,6 +1720,13 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
             case bc_PushInputFromValue: {
                 int index = vm_read_int(stack);
                 caValue* value = term_value(caller->input(index));
+                copy(value, dest);
+                break;
+            }
+            case bc_PushInputFromBlockRef: {
+                int blockId = vm_read_int(stack);
+                int termIndex = vm_read_int(stack);
+                caValue* value = find_active_value_from_block_id(stack, blockId, termIndex);
                 copy(value, dest);
                 break;
             }
@@ -1795,9 +1815,6 @@ static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValu
     if (element == NULL)
         return false;
 
-    // Throw away the 'object' input (already have it).
-    vm_run_single_input(top, caller);
-
     // Advance past push/pop instructions.
     if (vm_read_char(top->stack) != bc_EnterFrame)
         return false;
@@ -1840,9 +1857,6 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 #endif
 
     if (is_function(term)) {
-        // Throw away the 'object' input (already have it).
-        vm_run_single_input(top, caller);
-
         Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);
         expand_frame(stack_top_parent(stack), top);
         vm_run_input_bytecodes(stack, caller);
@@ -1913,7 +1927,7 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
 
     caValue* closure = vm_run_single_input(top, caller);
     caValue* inputList = vm_run_single_input(top, caller);
-    
+
     top->termIndex = callerIndex;
     Block* block = as_block(list_get(closure, 0));
 
