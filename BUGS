@@ -1,5 +1,7 @@
 
 Miscellanous (most-recent first)
+
+  Null is allowed as an output type. Was deliberate but needs to be fixed.
   
   No source location for the contents of { module.:function }
     Fixed now, but need a complete test for source location.

@@ -383,6 +383,8 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
 
 caValue* find_active_value_from_block_id(Frame* frame, int blockId, int termIndex)
 {
+    Stack* stack = frame->stack;
+
     while (true) {
         if (frame->block->id == blockId) {
             Term* term = frame_term(frame, termIndex);
@@ -397,6 +399,11 @@ caValue* find_active_value_from_block_id(Frame* frame, int blockId, int termInde
         if (frame == NULL)
             break;
     }
+
+    // Check moduleFrames.
+    caValue* moduleFrame = stack_module_frame_get(stack, blockId);
+    if (moduleFrame != NULL)
+        return list_get(module_frame_get_registers(moduleFrame), termIndex);
 
     return NULL;
 }
@@ -790,7 +797,7 @@ void evaluate_block(Stack* stack, Block* block)
 
     stack_init(stack, block);
 
-    run_interpreter(stack);
+    stack_run(stack);
 
     if (!stack_errored(stack))
         stack_pop(stack);
@@ -1038,7 +1045,6 @@ void vm_run(Stack* stack, caValue* bytecode)
             continue;
         }
         case bc_SaveInModuleFrames: {
-            // Save this frame in moduleFrames.
             Frame* top = stack_top(stack);
             Value registers;
             copy(frame_registers(top), &registers);
@@ -1079,17 +1085,27 @@ void vm_run(Stack* stack, caValue* bytecode)
             stack->pc = 0;
             continue;
         }
-        case bc_Done: {
+        case bc_FinishBlock: {
             vm_finish_frame(stack);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
         }
-        case bc_IterationDone: {
+        case bc_FinishIteration: {
             bool loopEnableOutput = vm_read_char(stack);
             vm_finish_loop_iteration(stack, loopEnableOutput);
             if (stack->step != sym_StackRunning)
                 return;
+            continue;
+        }
+        case bc_FinishDemandFrame: {
+            stack_pop_no_retain(stack);
+            if (stack_frame_count(stack) == 0)
+                return;
+
+            Frame* top = stack_top(stack);
+            stack->pc = top->pc;
+            stack->bc = as_blob(frame_bytecode(top));
             continue;
         }
         
@@ -2050,7 +2066,6 @@ static void vm_finish_frame(Stack* stack)
 static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
 {
     Block* block = term->owningBlock;
-    Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, term->owningBlock);
 
     bool* involvedTerms = (bool*) malloc(sizeof(bool) * block->length());
     memset(involvedTerms, 0, sizeof(bool) * block->length());
@@ -2073,6 +2088,7 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
         }
     }
 
+    Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, term->owningBlock);
     caValue* bytecode = &top->customBytecode;
     set_blob(bytecode, 0);
 
@@ -2084,7 +2100,8 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
     free(involvedTerms);
 
     blob_append_char(bytecode, bc_SaveInModuleFrames);
-    blob_append_char(bytecode, bc_Done);
+    blob_append_char(bytecode, bc_FinishDemandFrame);
+    blob_append_char(bytecode, bc_End);
 }
 
 bool run_memoize_check(Stack* stack)
@@ -2343,6 +2360,26 @@ void Stack__extract_state(caStack* stack)
     stack_extract_state(self, circa_output(stack, 0));
 }
 
+void Stack__eval_on_demand(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Term* term = as_term_ref(circa_input(stack, 1));
+    vm_evaluate_module_on_demand(self, term);
+}
+
+void Stack__find_active_value(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Term* term = as_term_ref(circa_input(stack, 1));
+    caValue* value = find_active_value_from_block_id(stack_top(self),
+        term->owningBlock->id, term->index);
+
+    if (value == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        set_value(circa_output(stack, 0), value);
+}
+
 void Stack__find_active_frame_for_term(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2492,7 +2529,7 @@ void Stack__run(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
-    run_interpreter(self);
+    stack_run(self);
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
@@ -2610,6 +2647,8 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.block", Stack__block);
     module_patch_function(patch, "Stack.dump", Stack__dump);
     module_patch_function(patch, "Stack.extract_state", Stack__extract_state);
+    module_patch_function(patch, "Stack.eval_on_demand", Stack__eval_on_demand);
+    module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
     module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
     module_patch_function(patch, "Stack.set_context", Stack__set_context);
     module_patch_function(patch, "Stack.apply", Stack__call);

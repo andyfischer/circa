@@ -37,8 +37,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     char op = blob_read_char(bc, pc); 
 
     switch (op) {
-    case bc_Done:
-        set_string(string, "done");
+    case bc_End:
+        set_string(string, "end");
         break;
     case bc_Pause:
         set_string(string, "pause");
@@ -63,9 +63,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         break;
     case bc_EnterFrame:
         set_string(string, "enter_frame");
-        break;
-    case bc_LeaveFrame:
-        set_string(string, "leave_frame");
         break;
     case bc_PopFrame:
         set_string(string, "pop_frame");
@@ -153,12 +150,21 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_Loop:
         set_string(string, "loop");
         break;
-    case bc_IterationDone:
-        set_string(string, "iteration_done ");
+    case bc_FinishIteration:
+        set_string(string, "finish_iteration ");
         if (blob_read_char(bc, pc))
             string_append(string, " :with_output");
         else
             string_append(string, " :no_output");
+        break;
+    case bc_FinishBlock:
+        set_string(string, "finish_block");
+        break;
+    case bc_FinishDemandFrame:
+        set_string(string, "finish_demand_frame");
+        break;
+    case bc_SaveInModuleFrames:
+        set_string(string, "save_in_module_frames");
         break;
     case bc_PopRequire:
         set_string(string, "pop_require");
@@ -238,8 +244,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     char op = blob_read_char(bc, &pc);
 
     switch (op) {
-    case bc_Done:
-        return -1;
     case bc_Pause:
         return -1;
     case bc_SetNull:
@@ -251,8 +255,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_NoOp:
         return -1;
     case bc_EnterFrame:
-        return -1;
-    case bc_LeaveFrame:
         return -1;
     case bc_PopFrame:
         return -1;
@@ -284,7 +286,7 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_CaseConditionBool:
     case bc_LoopConditionBool:
     case bc_Loop:
-    case bc_IterationDone:
+    case bc_FinishIteration:
     case bc_InputFromStack:
     case bc_InputNull:
     case bc_InputFromValue:
@@ -322,7 +324,7 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
         strm << as_cstring(&line) << std::endl;
 
         switch (blob_read_char(bc, &prevPos)) {
-            case bc_Done:
+            case bc_End:
                 set_string(string, strm.str().c_str());
                 return;
         }
@@ -712,11 +714,13 @@ void bytecode_write_block(caValue* bytecode, Block* block)
     }
 
     if (is_for_loop(block)) {
-        blob_append_char(bytecode, bc_IterationDone);
+        blob_append_char(bytecode, bc_FinishIteration);
         blob_append_char(bytecode, loop_produces_output_value(block->owningTerm) ? 0x1 : 0x0);
+    } else {
+        blob_append_char(bytecode, bc_FinishBlock);
     }
 
-    blob_append_char(bytecode, bc_Done);
+    blob_append_char(bytecode, bc_End);
 }
 
 } // namespace circa

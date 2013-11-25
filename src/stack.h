@@ -99,7 +99,7 @@ void stack_resize_frame_list(Stack* stack, int newCapacity);
 Frame* stack_push_blank_frame(Stack* stack);
 Stack* stack_duplicate(Stack* stack);
 
-caValue* stack_module_frames_get(Stack* stack, int blockId);
+caValue* stack_module_frame_get(Stack* stack, int blockId);
 caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers);
 Block* module_frame_get_block(caValue* moduleFrame);
 caValue* module_frame_get_registers(caValue* moduleFrame);

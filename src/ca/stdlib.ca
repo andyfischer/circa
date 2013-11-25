@@ -345,6 +345,8 @@ def Stack.current_term(self) -> Term
     self.top.current_term
 def Stack.dump(self)
     -- Dumps a string representation to stdout.
+def Stack.eval_on_demand(self, Term term)
+def Stack.find_active_value(self, Term term) -> any
 def Stack.rethrow(self)
     -- If the stack has an error, raise it in this context.
     if self.has_error

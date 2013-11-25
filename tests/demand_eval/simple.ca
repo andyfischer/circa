@@ -1,0 +1,25 @@
+
+def main()
+
+  def get_a() -> int
+    print('called get_a')
+    3
+  def get_b() -> int
+    print('called get_b')
+    4
+  def get_c(i) -> int
+    print('called get_c')
+    5 + i
+
+  a = get_a()
+  b = get_b()
+  c = get_c(a)
+
+stack = make_stack({})
+
+print('evaluating a..')
+t = main.block.find_term('a')
+stack.eval_on_demand(t)
+stack.run
+
+print('a value: ', stack.find_active_value(t))

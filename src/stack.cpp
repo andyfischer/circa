@@ -118,7 +118,7 @@ Stack* stack_duplicate(Stack* stack)
     return dupe;
 }
 
-caValue* stack_module_frames_get(Stack* stack, int blockId)
+caValue* stack_module_frame_get(Stack* stack, int blockId)
 {
     return hashtable_get_int_key(&stack->moduleFrames, blockId);
 }
