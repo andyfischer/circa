@@ -352,7 +352,7 @@ const char* STDLIB_CA_TEXT =
     "    self.top.current_term\n"
     "def Stack.dump(self)\n"
     "    -- Dumps a string representation to stdout.\n"
-    "def Stack.eval_on_demand(self, Term term)\n"
+    "def Stack.eval_on_demand(self, Term term) -> any\n"
     "def Stack.find_active_value(self, Term term) -> any\n"
     "def Stack.rethrow(self)\n"
     "    -- If the stack has an error, raise it in this context.\n"

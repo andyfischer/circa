@@ -54,7 +54,7 @@ static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
 
-static void vm_evaluate_module_on_demand(Stack* stack, Term* term);
+static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop);
 
 bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
@@ -377,33 +377,6 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
     if (term->function == FUNCS.require) {
         return term_value(term);
     }
-
-    return NULL;
-}
-
-caValue* find_active_value_from_block_id(Frame* frame, int blockId, int termIndex)
-{
-    Stack* stack = frame->stack;
-
-    while (true) {
-        if (frame->block->id == blockId) {
-            Term* term = frame_term(frame, termIndex);
-            if (is_value(term))
-                return term_value(term);
-
-            return frame_register(frame, termIndex);
-        }
-
-        frame = frame_parent(frame);
-
-        if (frame == NULL)
-            break;
-    }
-
-    // Check moduleFrames.
-    caValue* moduleFrame = stack_module_frame_get(stack, blockId);
-    if (moduleFrame != NULL)
-        return list_get(module_frame_get_registers(moduleFrame), termIndex);
 
     return NULL;
 }
@@ -815,9 +788,6 @@ void stack_run(Stack* stack)
 
     start_interpreter_session(stack);
 
-    stack->errorOccurred = false;
-    stack->step = sym_StackRunning;
-
     vm_run(stack, frame_bytecode(stack_top(stack)));
 }
 
@@ -956,14 +926,24 @@ static caValue* vm_read_local_value(Frame* referenceFrame)
 
 void vm_run(Stack* stack, caValue* bytecode)
 {
-    stack->bc = as_blob(bytecode);
+    stack->errorOccurred = false;
+    stack->step = sym_StackRunning;
+
+    if (bytecode == NULL)
+        stack->bc = as_blob(frame_bytecode(stack_top(stack)));
+    else
+        stack->bc = as_blob(bytecode);
+
     stack->pc = stack_top(stack)->pc;
 
     while (true) {
 
         INCREMENT_STAT(StepInterpreter);
 
-        // bytecode_dump_next_op(stack->bc, stack->pc);
+#if 0
+        printf("stack %d: ", stack->id);
+        bytecode_dump_next_op(stack->bc, stack->pc);
+#endif
 
         // Dispatch op
         char op = vm_read_char(stack);
@@ -1026,7 +1006,7 @@ void vm_run(Stack* stack, caValue* bytecode)
             top->termIndex = termIndex;
             top->pc = stack->pc;
 
-            vm_evaluate_module_on_demand(stack, input);
+            vm_evaluate_module_on_demand(stack, input, false);
 
             stack->bc = as_blob(frame_bytecode(stack_top(stack)));
             stack->pc = 0;
@@ -1099,6 +1079,9 @@ void vm_run(Stack* stack, caValue* bytecode)
             continue;
         }
         case bc_FinishDemandFrame: {
+            printf("finish_demand_frame:\n");
+            dump(stack);
+
             stack_pop_no_retain(stack);
             if (stack_frame_count(stack) == 0)
                 return;
@@ -1217,6 +1200,10 @@ void vm_run(Stack* stack, caValue* bytecode)
             stack_pop(stack);
             stack->bc = as_blob(frame_bytecode(stack_top(stack)));
             continue;
+        }
+        case bc_PopFrameAndPause: {
+            stack_pop(stack);
+            return;
         }
         case bc_SetNull: {
             Frame* top = stack_top(stack);
@@ -1693,7 +1680,7 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
     case bc_InputFromBlockRef: {
         int blockId = vm_read_int(frame->stack);
         int termIndex = vm_read_int(frame->stack);
-        return find_active_value_from_block_id(frame, blockId, termIndex);
+        return stack_active_value_for_block_id(frame, blockId, termIndex);
     }
     default:
         frame->stack->pc--; // Rewind.
@@ -1749,7 +1736,7 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
             case bc_InputFromBlockRef: {
                 int blockId = vm_read_int(stack);
                 int termIndex = vm_read_int(stack);
-                caValue* value = find_active_value_from_block_id(parent, blockId, termIndex);
+                caValue* value = stack_active_value_for_block_id(parent, blockId, termIndex);
                 copy(value, dest);
                 break;
             }
@@ -2063,7 +2050,7 @@ static void vm_finish_frame(Stack* stack)
     stack->pc = parent->pc;
 }
 
-static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
+static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop)
 {
     Block* block = term->owningBlock;
 
@@ -2072,23 +2059,39 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
 
     involvedTerms[term->index] = true;
 
-    for (int i=term->index; i >= 0; i--) {
+    caValue* existingModule = stack_module_frame_get(stack, block->id);
+    caValue* existingRegisters = NULL;
+    if (existingModule != NULL)
+        existingRegisters = module_frame_get_registers(existingModule);
 
-        if (!involvedTerms[i])
+    for (int searchIndex=term->index; searchIndex >= 0; searchIndex--) {
+
+        if (!involvedTerms[searchIndex])
             continue;
 
-        Term* involvedTerm = block->get(i);
+        Term* involvedTerm = block->get(searchIndex);
 
         for (int i=0; i < involvedTerm->numInputs(); i++) {
-            Term* input = term->input(i);
+            Term* input = involvedTerm->input(i);
             if (input == NULL || input->owningBlock != block || is_value(input))
                 continue;
+
+            if (existingRegisters != NULL)
+                if (input->index < list_length(existingRegisters) &&
+                        !is_null(list_get(existingRegisters, input->index)))
+                    continue;
 
             involvedTerms[input->index] = true;
         }
     }
 
-    Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, term->owningBlock);
+    Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, block);
+
+    if (existingRegisters != NULL) {
+        copy(existingRegisters, &top->registers);
+        touch(&top->registers);
+    }
+
     caValue* bytecode = &top->customBytecode;
     set_blob(bytecode, 0);
 
@@ -2100,8 +2103,22 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term)
     free(involvedTerms);
 
     blob_append_char(bytecode, bc_SaveInModuleFrames);
-    blob_append_char(bytecode, bc_FinishDemandFrame);
-    blob_append_char(bytecode, bc_End);
+
+    if (thenStop) {
+        blob_append_char(bytecode, bc_PopFrameAndPause);
+        blob_append_char(bytecode, bc_End);
+    } else {
+
+        // Copy the new value to output position 0.
+        blob_append_char(bytecode, bc_LocalCopy);
+        blob_append_int(bytecode, term->index);
+        blob_append_int(bytecode, block->length() - 1);
+
+        blob_append_char(bytecode, bc_FinishDemandFrame);
+        blob_append_char(bytecode, bc_End);
+    }
+
+    // bytecode_dump(bytecode);
 }
 
 bool run_memoize_check(Stack* stack)
@@ -2364,14 +2381,17 @@ void Stack__eval_on_demand(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
-    vm_evaluate_module_on_demand(self, term);
+    vm_evaluate_module_on_demand(self, term, true);
+    vm_run(self, NULL);
+    caValue* result = stack_active_value_for_term(stack_top(self), term);
+    copy(result, circa_output(stack, 0));
 }
 
 void Stack__find_active_value(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = find_active_value_from_block_id(stack_top(self),
+    caValue* value = stack_active_value_for_block_id(stack_top(self),
         term->owningBlock->id, term->index);
 
     if (value == NULL)

@@ -1,0 +1,29 @@
+
+def main()
+  def get_a() -> String
+    print('called get_a')
+    'a'
+
+  def get_b() -> String
+    print('called get_b')
+    'b'
+
+  def get_c(i) -> String
+    print('called get_c')
+    concat(i ' c')
+
+  def get_d(i) -> String
+    print('called get_d')
+    concat(i ' d')
+
+  d = get_d(get_c(get_a()))
+  b = get_b()
+
+stack = make_stack({})
+
+print('Evaluating on demand..')
+t = main.block.find_term('d')
+val = stack.eval_on_demand(t)
+
+print('d = ', val)
+

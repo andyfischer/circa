@@ -67,6 +67,9 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_PopFrame:
         set_string(string, "pop_frame");
         break;
+    case bc_PopFrameAndPause:
+        set_string(string, "pop_frame_and_pause");
+        break;
     case bc_PushFunction:
         set_string(string, "push_function ");
         string_append(string, blob_read_int(bc, pc));

@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "hashtable.h"
+#include "inspection.h"
 #include "interpreter.h"
 #include "kernel.h"
 #include "stack.h"
@@ -116,6 +117,38 @@ Stack* stack_duplicate(Stack* stack)
     dupe->errorOccurred = stack->errorOccurred;
     set_value(&dupe->context, &stack->context);
     return dupe;
+}
+
+caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termIndex)
+{
+    Stack* stack = frame->stack;
+
+    while (true) {
+        if (frame->block->id == blockId) {
+            Term* term = frame_term(frame, termIndex);
+            if (is_value(term))
+                return term_value(term);
+
+            return frame_register(frame, termIndex);
+        }
+
+        frame = frame_parent(frame);
+
+        if (frame == NULL)
+            break;
+    }
+
+    // Check moduleFrames.
+    caValue* moduleFrame = stack_module_frame_get(stack, blockId);
+    if (moduleFrame != NULL)
+        return list_get(module_frame_get_registers(moduleFrame), termIndex);
+
+    return NULL;
+}
+
+caValue* stack_active_value_for_term(Frame* frame, Term* term)
+{
+    return stack_active_value_for_block_id(frame, term->owningBlock->id, term->index);
 }
 
 caValue* stack_module_frame_get(Stack* stack, int blockId)

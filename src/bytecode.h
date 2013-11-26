@@ -4,21 +4,22 @@
 
 namespace circa {
 
-const char bc_End = 0;
+const char bc_End = 0x0;
 const char bc_Pause = 0x1;
 const char bc_SetNull = 0x2;
 const char bc_InlineCopy = 0x3;
 const char bc_LocalCopy = 0x4;
 const char bc_NoOp = 0x5;
-const char bc_EnterFrame = 0x7;
-const char bc_PopFrame = 0x9;
-const char bc_DoneTransient = 0xa;
-const char bc_FireNative = 0xb;
-const char bc_FinishBlock = 0x6;
-const char bc_FinishIteration = 0xf;
-const char bc_FinishDemandFrame = 0xc;
-const char bc_PopRequire = 0xd;
-const char bc_SaveInModuleFrames = 0xe;
+const char bc_EnterFrame = 0x6;
+const char bc_PopFrame = 0x7;
+const char bc_PopFrameAndPause = 0x8;
+const char bc_DoneTransient = 0x9;
+const char bc_FireNative = 0xa;
+const char bc_FinishBlock = 0xb;
+const char bc_FinishIteration = 0xc;
+const char bc_FinishDemandFrame = 0xd;
+const char bc_PopRequire = 0xe;
+const char bc_SaveInModuleFrames = 0xf;
 
 // Pushing a new frame.
 const char bc_PushFunction = 0x10;
