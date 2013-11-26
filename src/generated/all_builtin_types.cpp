@@ -6,5 +6,4 @@
 #include "../types/null.cpp"
 #include "../types/number.cpp"
 #include "../types/opaque_pointer_t.cpp"
-#include "../types/set.cpp"
 #include "../types/void.cpp"

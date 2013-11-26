@@ -114,6 +114,8 @@ void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migrati
 
 void migrate_stack(Stack* stack, Migration* migration)
 {
+    stack_on_migration(stack);
+
     Frame* frame = stack_top(stack);
 
     while (frame != NULL) {

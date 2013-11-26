@@ -547,9 +547,6 @@ void bootstrap_kernel()
     FUNCS.declare_field = import_function(builtins, NULL, "declare_field() -> any");
 
     // Initialize a few more types
-    Term* set_type = create_value(builtins, TYPES.type, "Set");
-    set_t::setup_type(unbox_type(set_type));
-
     TYPES.selector = unbox_type(create_value(builtins, TYPES.type, "Selector"));
     list_t::setup_type(TYPES.selector);
 

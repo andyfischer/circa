@@ -2520,6 +2520,14 @@ void Stack__get_state_output(caStack* stack)
     copy(&top->outgoingState, circa_output(stack, 0));
 }
 
+void Stack__migrate(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Block* fromBlock = as_block(circa_input(stack, 1));
+    Block* toBlock = as_block(circa_input(stack, 2));
+    migrate_stack(self, fromBlock, toBlock);
+}
+
 void Stack__migrate_to(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2683,6 +2691,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.stack_pop", Stack__stack_pop);
     module_patch_function(patch, "Stack.set_state_input", Stack__set_state_input);
     module_patch_function(patch, "Stack.get_state_output", Stack__get_state_output);
+    module_patch_function(patch, "Stack.migrate", Stack__migrate);
     module_patch_function(patch, "Stack.migrate_to", Stack__migrate_to);
     module_patch_function(patch, "Stack.reset", Stack__reset);
     module_patch_function(patch, "Stack.reset_state", Stack__reset_state);

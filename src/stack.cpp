@@ -175,6 +175,11 @@ caValue* module_frame_get_registers(caValue* moduleFrame)
     return list_get(moduleFrame, 1);
 }
 
+void stack_on_migration(Stack* stack)
+{
+    set_hashtable(&stack->moduleFrames);
+}
+
 Stack* frame_ref_get_stack(caValue* value)
 {
     return as_stack(list_get(value, 0));

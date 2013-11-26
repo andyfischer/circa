@@ -362,6 +362,7 @@ def Stack.stack_pop(self)
     -- Pop the topmost frame.
 def Stack.set_state_input(self, any)
 def Stack.get_state_output(self) -> any
+def Stack.migrate(self, Block from, Block to)
 def Stack.migrate_to(self, Func func)
     -- Use 'func' as the new root, and migrate data and state.
 def Stack.reset(self)
@@ -489,11 +490,7 @@ def List.first(self) -> any
 def List.last(self) -> any
     -- Returns the last element
     self.get(self.length - 1)
-def List.to_set(self) -> Set
-    set = make(Set)
-    for item in self
-        @set.add(item)
-    set
+
 
 def List.pop(self) -> (List, any)
   return self.slice(0, -1), self.last
@@ -530,6 +527,25 @@ def Map.insertPairs(self, List pairs) -> Map
 def Map.empty(self) -> bool
 def Map.map_element(@self, any key, Func func)
     @self.set(key, func.call(self.get(key)))
+
+type Set {
+  Map m
+}
+
+def Set.add(self, element) -> Set
+  @self.m.set(element, true)
+
+def Set.contains(self, element) -> bool
+  self.m.contains(element)
+
+def Set.remove(self, element) -> Set
+  @self.m.remove(element)
+
+def List.to_set(self) -> Set
+  set = make(Set)
+  for item in self
+    @set.add(item)
+  set
 
 -- Overloaded functions
 def is_overloaded_func(Block block) -> bool

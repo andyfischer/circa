@@ -17,7 +17,6 @@ namespace comment_function { void setup(Block* kernel); }
 namespace comparison_function { void setup(Block* kernel); }
 namespace concat_function { void setup(Block* kernel); }
 namespace cond_function { void setup(Block* kernel); }
-namespace container_set_function { void setup(Block* kernel); }
 namespace copy_function { void setup(Block* kernel); }
 namespace div_function { void setup(Block* kernel); }
 namespace extra_output_function { void setup(Block* kernel); }
@@ -39,8 +38,6 @@ namespace range_function { void setup(Block* kernel); }
 namespace rpath_function { void setup(Block* kernel); }
 namespace set_field_function { void setup(Block* kernel); }
 namespace set_index_function { void setup(Block* kernel); }
-namespace set_methods_function { void setup(Block* kernel); }
-namespace set_union_function { void setup(Block* kernel); }
 namespace static_error_function { void setup(Block* kernel); }
 namespace sub_function { void setup(Block* kernel); }
 namespace switch_function { void setup(Block* kernel); }
@@ -62,7 +59,6 @@ void setup_builtin_functions(Block* kernel)
     comparison_function::setup(kernel);
     concat_function::setup(kernel);
     cond_function::setup(kernel);
-    container_set_function::setup(kernel);
     copy_function::setup(kernel);
     div_function::setup(kernel);
     extra_output_function::setup(kernel);
@@ -84,8 +80,6 @@ void setup_builtin_functions(Block* kernel)
     rpath_function::setup(kernel);
     set_field_function::setup(kernel);
     set_index_function::setup(kernel);
-    set_methods_function::setup(kernel);
-    set_union_function::setup(kernel);
     static_error_function::setup(kernel);
     sub_function::setup(kernel);
     switch_function::setup(kernel);

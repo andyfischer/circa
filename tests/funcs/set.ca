@@ -1,23 +1,17 @@
 
 s = make(Set)
-s.add(1)
+@s.add(1)
 
 assert(s.contains(1))
 assert(not(s.contains(2)))
-assert(to_string(s) == "{1}")
 
-s.remove(1)
-assert(to_string(s) == "{}")
+@s.remove(1)
 assert(not(s.contains(1)))
 assert(not(s.contains(2)))
 
-s.add(2)
-assert(to_string(s) == "{2}")
-s.add(2)
-assert(to_string(s) == "{2}")
-
-s.add(1)
-s.add(3)
+@s.add(1)
+@s.add(2)
+@s.add(3)
 assert(s.contains(1))
 assert(s.contains(2))
 assert(s.contains(3))

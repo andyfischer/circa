@@ -107,6 +107,8 @@ caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers)
 Block* module_frame_get_block(caValue* moduleFrame);
 caValue* module_frame_get_registers(caValue* moduleFrame);
 
+void stack_on_migration(Stack* stack);
+
 Frame* as_frame_ref(caValue* value);
 bool is_frame_ref(caValue* value);
 void set_frame_ref(caValue* value, Frame* frame);
