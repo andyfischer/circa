@@ -222,6 +222,10 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "pop_explicit_state ");
         string_append(string, blob_read_int(bc, pc));
         break;
+    case bc_SetFrameOutput:
+        set_string(string, "set_frame_output ");
+        string_append(string, blob_read_int(bc, pc));
+        break;
     case bc_MemoizeCheck:
         set_string(string, "memoize_check");
         break;

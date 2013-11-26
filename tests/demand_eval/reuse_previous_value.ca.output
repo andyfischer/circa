@@ -1,0 +1,7 @@
+Evaluating b:
+called get_a
+called get_b
+b = a b
+Evaluating c: (this should't call get_a)
+called get_c
+c = a c

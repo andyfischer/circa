@@ -1,0 +1,21 @@
+
+def module()
+
+  def get_a()
+    print('called get_a')
+    'a'
+  def get_b()
+    print('called get_a')
+    'b'
+
+  a = get_a()
+  b = get_b()
+
+  def main()
+    print('running main')
+    print('in main, a = ' a)
+
+
+stack = make_stack(module.block.find_term('main').contents.to_func)
+stack.run
+assert(not(stack.has_error))

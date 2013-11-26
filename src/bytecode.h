@@ -48,6 +48,7 @@ const char bc_PopOutput = 0x30;
 const char bc_PopOutputNull = 0x31;
 const char bc_PopOutputsDynamic = 0x32;
 const char bc_PopExplicitState = 0x33;
+const char bc_SetFrameOutput = 0x34;
 
 // Control flow.
 const char bc_ExitPoint = 0x40;

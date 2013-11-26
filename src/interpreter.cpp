@@ -1003,6 +1003,8 @@ void vm_run(Stack* stack, caValue* bytecode)
                 continue;
             }
 
+            // Evaluate on-demand.
+
             top->termIndex = termIndex;
             top->pc = stack->pc;
 
@@ -1079,9 +1081,6 @@ void vm_run(Stack* stack, caValue* bytecode)
             continue;
         }
         case bc_FinishDemandFrame: {
-            printf("finish_demand_frame:\n");
-            dump(stack);
-
             stack_pop_no_retain(stack);
             if (stack_frame_count(stack) == 0)
                 return;
@@ -1166,6 +1165,15 @@ void vm_run(Stack* stack, caValue* bytecode)
             }
 
             continue;
+        }
+        case bc_SetFrameOutput: {
+            int termIndex = vm_read_int(stack);
+
+            Frame* top = stack_top(stack);
+            Frame* parent = stack_top_parent(stack);
+
+            copy(frame_register(top, termIndex), frame_register(parent, parent->termIndex));
+            break;
         }
         case bc_PopExplicitState: {
             internal_error("pop explicit state is disabled");
@@ -2109,10 +2117,8 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop
         blob_append_char(bytecode, bc_End);
     } else {
 
-        // Copy the new value to output position 0.
-        blob_append_char(bytecode, bc_LocalCopy);
+        blob_append_char(bytecode, bc_SetFrameOutput);
         blob_append_int(bytecode, term->index);
-        blob_append_int(bytecode, block->length() - 1);
 
         blob_append_char(bytecode, bc_FinishDemandFrame);
         blob_append_char(bytecode, bc_End);
