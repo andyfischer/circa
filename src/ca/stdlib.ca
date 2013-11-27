@@ -71,24 +71,24 @@ def reflect_get_frame_state() -> any
     -- Special call, read this frame's state.
 
 def declared_state(Type t, Func initializer :optional) -> any
-    -- Internally used function for fetching a stateful value. The parser
-    -- adds a call to this function whereever the 'state' keyword is used.
+  -- Internally used function for fetching a stateful value. The parser
+  -- adds a call to this function whereever the 'state' keyword is used.
 
-    existing = reflect_get_frame_state()
-    
-    if existing != null
-        -- Try to cast to the desired type
-        existing, cast_success = cast(existing, t)
+  existing = reflect_get_frame_state()
+  
+  if existing != null
+    -- Try to cast to the desired type
+    existing, cast_success = cast(existing, t)
 
-        if cast_success
-            return existing
+    if cast_success
+      return existing
 
-    -- Cast failed. Try to use the initializer.
-    if initializer != null
-        return initializer.call()
+  -- Cast failed. Try to use the initializer.
+  if initializer != null
+    return initializer.call()
 
-    -- No initializer. Use the type's default value.
-    return make(t)
+  -- No initializer. Use the type's default value.
+  return make(t)
 
 -- Primitive math funcs --
 def add(any left, any right) -> any

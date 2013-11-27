@@ -9,10 +9,11 @@ namespace cast_function {
     {
         caValue* source = circa_input(stack, 0);
 
-        if (circa_caller_term(stack)->type == TYPES.any)
+        Type* type = circa_caller_term(stack)->type;
+
+        if (type == TYPES.any)
             return copy(source, circa_output(stack, 0));
 
-        Type* type = circa_caller_term(stack)->type;
         if (!cast_possible(source, type)) {
             std::stringstream message;
             message << "Can't cast value " << to_string(source)
@@ -34,6 +35,7 @@ namespace cast_function {
         copy(circa_input(stack, 0), result);
 
         Type* type = unbox_type(circa_input(stack, 1));
+
         bool success = cast(result, type);
         set_bool(circa_output(stack, 1), success);
     }
