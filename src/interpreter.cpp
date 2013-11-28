@@ -2431,6 +2431,12 @@ void Stack__find_active_frame_for_term(caStack* stack)
     set_null(circa_output(stack, 0));
 }
 
+void Stack__id(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    set_int(circa_output(stack, 0), self->id);
+}
+
 void Stack__set_context(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2684,6 +2690,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.eval_on_demand", Stack__eval_on_demand);
     module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
     module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
+    module_patch_function(patch, "Stack.id", Stack__id);
     module_patch_function(patch, "Stack.set_context", Stack__set_context);
     module_patch_function(patch, "Stack.apply", Stack__call);
     module_patch_function(patch, "Stack.call", Stack__call);

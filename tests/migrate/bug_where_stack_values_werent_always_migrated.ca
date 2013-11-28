@@ -1,0 +1,28 @@
+
+
+def func1()
+
+def func2()
+
+def func_to_name(func)
+  if func == func1
+    'func1'
+  elif func == func2
+    'func2'
+  else
+    'some other func'
+
+my_func_value = func1
+
+def main(_val)
+  state val = _val
+  val
+
+stack = make_stack(main)
+stack.call(func1)
+
+assert(func_to_name(stack.call({})) == 'func1')
+
+stack.migrate(func1.block, func2.block)
+
+assert(func_to_name(stack.call({})) == 'func2')

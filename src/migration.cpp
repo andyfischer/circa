@@ -107,7 +107,7 @@ Type* migrate_type(Type* type, Migration* migration)
 
 void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migration* migration)
 {
-    if (is_null(list) || oldBlock == newBlock)
+    if (is_null(list))
         return;
 
     Value oldList;
@@ -124,8 +124,19 @@ void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migrati
         Term* oldTerm = oldBlock->get(i);
         Term* newTerm = find_from_unique_name(newBlock, unique_name(oldTerm));
 
-        if (newTerm != NULL)
-            move(oldValue, list_get(list, newTerm->index));
+#if 0
+        printf("looking at unique name = %s for term %d, newTerm = %p\n",
+            as_cstring(unique_name(oldTerm)), oldTerm->id, newTerm);
+#endif
+
+        if (newTerm != NULL) {
+            caValue* newSlot = list_get(list, newTerm->index);
+            move(oldValue, newSlot);
+
+#if 0
+            printf("migrating state value, term name = %s\n", as_cstring(unique_name(oldTerm)));
+#endif
+        }
     }
 
     migrate_value(list, migration);
@@ -133,6 +144,10 @@ void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migrati
 
 void migrate_stack(Stack* stack, Migration* migration)
 {
+#if 0
+    printf("migrating stack #%d\n", stack->id);
+#endif
+
     stack_on_migration(stack);
 
     Frame* frame = stack_top(stack);
@@ -142,14 +157,17 @@ void migrate_stack(Stack* stack, Migration* migration)
         Block* oldBlock = frame->block;
         frame->block = migrate_block_pointer(frame->block, migration);
 
-        if (frame->block != NULL && frame->block != oldBlock) {
+#if 0
+        printf("migrate_stack looking at frame with oldBlock #%d, newBlock = #%d\n",
+            oldBlock->id, frame->block->id);
+#endif
 
+        if (frame->block != NULL && frame->block != oldBlock)
             list_resize(frame_registers(frame), block_locals_count(frame->block));
 
-            migrate_value(frame_registers(frame), migration);
-            migrate_state_list(&frame->state, oldBlock, frame->block, migration);
-            migrate_state_list(&frame->outgoingState, oldBlock, frame->block, migration);
-        }
+        migrate_value(frame_registers(frame), migration);
+        migrate_state_list(&frame->state, oldBlock, frame->block, migration);
+        migrate_state_list(&frame->outgoingState, oldBlock, frame->block, migration);
 
         frame = frame_parent(frame);
     }
@@ -235,6 +253,11 @@ void migrate_value(caValue* value, Migration* migration)
 
 void migrate_world(World* world, Migration* migration)
 {
+#if 0
+    printf("running migrate_world, from = #%d, to = #%d\n",
+        migration->oldBlock->id, migration->newBlock->id);
+#endif
+
     // Update references in every module.
     for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
