@@ -21,6 +21,14 @@ void migrate_block(Block* target, Migration* migration)
 {
     ca_assert(target != migration->oldBlock);
 
+    // Migrate term values; needs to happen whether or not the migration targets
+    // this block. Needed for ModuleRef values that are written by require().
+    // Future: Might be able to change require() to make this unnecessary.
+    for (BlockIterator it(target); it.unfinished(); it.advance()) {
+        Term* term = *it;
+        migrate_value(term_value(term), migration);
+    }
+
     if (target == migration->newBlock)
         return;
 
@@ -177,9 +185,11 @@ void migrate_retained_frame(caValue* retainedFrame, Migration* migration)
 {
     Block* block = as_block(retained_frame_get_block(retainedFrame));
     Block* newBlock = migrate_block_pointer(block, migration);
-
-    if (block == newBlock)
+    
+    if (newBlock == NULL) {
+        set_null(retainedFrame);
         return;
+    }
 
     touch(retainedFrame);
     caValue* state = retained_frame_get_state(retainedFrame);
@@ -253,10 +263,8 @@ void migrate_value(caValue* value, Migration* migration)
 
 void migrate_world(World* world, Migration* migration)
 {
-#if 0
     printf("running migrate_world, from = #%d, to = #%d\n",
         migration->oldBlock->id, migration->newBlock->id);
-#endif
 
     // Update references in every module.
     for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
