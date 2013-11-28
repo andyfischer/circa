@@ -90,6 +90,8 @@ namespace type_t {
                         term, tok_Whitespace);
             }
         }
+        append_phrase(source, term->stringProp("syntax:preRBracketWhitespace",""),
+            term, tok_Whitespace);
         append_phrase(source, "}", term, tok_RBracket);
     }
 

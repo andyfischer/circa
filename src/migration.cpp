@@ -11,6 +11,7 @@
 #include "migration.h"
 #include "term.h"
 #include "term_map.h"
+#include "type.h"
 #include "world.h"
 #include "value_iterator.h"
 
@@ -86,6 +87,24 @@ Block* migrate_block_pointer(Block* block, Migration* migration)
         return newTerm->nestedContents;
 }
 
+Type* migrate_type(Type* type, Migration* migration)
+{
+    if (type->declaringTerm == NULL)
+        return NULL;
+
+    Term* newTerm = migrate_term_pointer(type->declaringTerm, migration);
+    if (newTerm == NULL)
+        return NULL;
+
+    if (newTerm == type->declaringTerm)
+        return type;
+
+    if (!is_type(newTerm))
+        return NULL;
+
+    return as_type(newTerm);
+}
+
 void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migration* migration)
 {
     if (is_null(list) || oldBlock == newBlock)
@@ -150,6 +169,29 @@ void migrate_retained_frame(caValue* retainedFrame, Migration* migration)
     set_block(retained_frame_get_block(retainedFrame), newBlock);
 }
 
+void migrate_list_value(caValue* value, Migration* migration)
+{
+    touch(value);
+    for (int i=0; i < list_length(value); i++) {
+        caValue* element = list_get(value, i);
+        migrate_value(element, migration);
+    }
+
+    // Migrate type if this is a user-type instance.
+    // Future: We could try to reshape the value if the new type has different fields.
+    Type* newType = migrate_type(value->value_type, migration);
+
+    if (newType != value->value_type) {
+        if (newType == NULL)
+            newType = TYPES.list;
+        else
+            type_incref(newType);
+
+        type_decref(value->value_type);
+        value->value_type = newType;
+    }
+}
+
 void migrate_value(caValue* value, Migration* migration)
 {
     if (is_ref(value)) {
@@ -165,11 +207,8 @@ void migrate_value(caValue* value, Migration* migration)
     } else if (is_retained_frame(value)) {
         migrate_retained_frame(value, migration);
     } else if (is_list(value)) {
-        touch(value);
-        for (int i=0; i < list_length(value); i++) {
-            caValue* element = list_get(value, i);
-            migrate_value(element, migration);
-        }
+        migrate_list_value(value, migration);
+
     } else if (is_hashtable(value)) {
         Value oldHashtable;
         move(value, &oldHashtable);
@@ -217,6 +256,14 @@ Term* migrate_term_pointer(Term* term, Block* oldBlock, Block* newBlock)
     migration.oldBlock = oldBlock;
     migration.newBlock = newBlock;
     return migrate_term_pointer(term, &migration);
+}
+
+Type* migrate_type(Type* type, Block* oldBlock, Block* newBlock)
+{
+    Migration migration;
+    migration.oldBlock = oldBlock;
+    migration.newBlock = newBlock;
+    return migrate_type(type, &migration);
 }
 
 void migrate_block(Block* block, Block* oldBlock, Block* newBlock)

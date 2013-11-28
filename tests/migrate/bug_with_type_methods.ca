@@ -1,0 +1,34 @@
+
+def left()
+  type T {
+    int a
+  }
+
+  def T.func(self)
+    print(' [left] called T.func with: ' self)
+
+  state t = T.make(1)
+  any.cast(@t)
+  t
+
+def right()
+  type T {
+    int a
+  }
+
+  def T.func(self)
+    print(' [right] called T.func with: ' self)
+
+  state t
+  any.cast(@t)
+  t
+ 
+int = make_stack(left)
+t_from_left = int.call
+print('Calling t_from_left.func:')
+t_from_left.func
+
+int.migrate_to(right)
+t_from_right = int.call
+print('Calling t_from_right.func:')
+t_from_right.func

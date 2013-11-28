@@ -849,10 +849,10 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     if (!tokens.nextIs(tok_LBrace) && !tokens.nextIs(tok_LBracket))
         return compile_error_for_line(result, tokens, startPosition);
 
-    // Parse as compound type
+    // Parse as compound type.
     list_t::setup_type(unbox_type(result));
 
-    // Opening brace
+    // Opening brace.
     int closingToken = tokens.nextIs(tok_LBrace) ? tok_RBrace : tok_RBracket;
     tokens.consume();
 
@@ -864,8 +864,10 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);
 
-        if (tokens.nextIs(closingToken))
+        if (tokens.nextIs(closingToken)) {
+            result->setStringProp("syntax:preRBracketWhitespace", preWs);
             break;
+        }
 
         // Look for comment
         if (tokens.nextIs(tok_Comment)) {

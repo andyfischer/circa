@@ -659,137 +659,137 @@ def Block.name(self) -> String
     self.owner.name
 
 def Block.is_method(self) -> bool
-    self.owner.property("syntax:methodDecl") == true
+  self.owner.property("syntax:methodDecl") == true
 
 def Block.get_top_comments(self) -> List
-    out = []
-    for Term t in self.terms
-        if t.is_input_placeholder
-            continue
-        elif t.is_comment
-            str = t.property('comment')
-            if str == ""
-                break
+  out = []
+  for Term t in self.terms
+    if t.is_input_placeholder
+      continue
+    elif t.is_comment
+      str = t.property('comment')
+      if str == ""
+        break
 
-            out.append(t.property('comment'))
-        else
-            break
+      out.append(t.property('comment'))
+    else
+      break
 
-    return out
+  out
 
 def Point.add(self, Point b) -> Point
-    [self.x + b.x, self.y + b.y]
+  [self.x + b.x, self.y + b.y]
 def Point.sub(self, Point b) -> Point
-    [self.x - b.x, self.y - b.y]
+  [self.x - b.x, self.y - b.y]
 def Point.mult(self, number scalar) -> Point
-    [self.x * scalar, self.y * scalar]
+  [self.x * scalar, self.y * scalar]
 def Point.div(self, number scalar) -> Point
-    [self.x / scalar, self.y / scalar]
+  [self.x / scalar, self.y / scalar]
     
 def Point.distance(self, Point b) -> number
-    -- Returns the distance between self and b.
-    sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
+  -- Returns the distance between self and b.
+  sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
 
 def Point.magnitude(self) -> number
-    -- Return the magnitude of this point, aka the distance to the origin.
-    sqrt(sqr(self.x) + sqr(self.y))
+  -- Return the magnitude of this point, aka the distance to the origin.
+  sqrt(sqr(self.x) + sqr(self.y))
 
 def Point.norm(self) -> Point
-    -- Returns the point normalized to be along the unit circle.
-    m = self.magnitude
-    [self.x / m, self.y / m]
+  -- Returns the point normalized to be along the unit circle.
+  m = self.magnitude
+  [self.x / m, self.y / m]
 
 def Point.perpendicular(self) -> Point
-    -- Returns a vector that is perpendicular to its old value, rotated clockwise.
-    [self.y -self.x]
+  -- Returns a vector that is perpendicular to its old value, rotated clockwise.
+  [self.y -self.x]
 
 def Point.translate(self, Point b) -> Point
-    [self.x + b.x, self.y + b.y]
+  [self.x + b.x, self.y + b.y]
 
 def Point.to_rect_center(self, Point size) -> Rect
-    -- Returns a Rect with this point as the center, and the given size.
-    size_half = (size * 0.5) -> Point.cast
-    [self.x - size_half.x,
-        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
+  -- Returns a Rect with this point as the center, and the given size.
+  size_half = (size * 0.5) -> Point.cast
+  [self.x - size_half.x,
+      self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
 
 def Point.to_rect_topleft(self, Point size) -> Rect
-    -- Returns a Rect with this point as the top-left, and the given size.
-    [self.x, self.y, self.x + size.x, self.y + size.y]
+  -- Returns a Rect with this point as the top-left, and the given size.
+  [self.x, self.y, self.x + size.x, self.y + size.y]
 
 def Point.delta(self) -> Point
-    -- Stateful function, returns the point difference since the last step.
-    state Point prev = self
-    result = [self.x - prev.x, self.y - prev.y]
-    prev = self
-    result
+  -- Stateful function, returns the point difference since the last step.
+  state Point prev = self
+  result = [self.x - prev.x, self.y - prev.y]
+  prev = self
+  result
 
 def Point.rotate(self, number rotation) -> Point
-    -- Return the point rotated around [0 0] by the given angle.
-    [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
+  -- Return the point rotated around [0 0] by the given angle.
+  [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
 
 def Rect.add(self, Rect b) -> Rect
-    [self.x1 + b.x1, self.y1 + b.y1, self.x2 + b.x2, self.y2 + b.y2]
+  [self.x1 + b.x1, self.y1 + b.y1, self.x2 + b.x2, self.y2 + b.y2]
 def Rect.sub(self, Rect b) -> Rect
-    [self.x1 - b.x1, self.y1 - b.y1, self.x2 - b.x2, self.y2 - b.y2]
+  [self.x1 - b.x1, self.y1 - b.y1, self.x2 - b.x2, self.y2 - b.y2]
 def Rect.mult(self, number s) -> Rect
-    [self.x1 * s, self.y1 * s, self.x2 * s, self.y2 * s]
+  [self.x1 * s, self.y1 * s, self.x2 * s, self.y2 * s]
 def Rect.div(self, number s) -> Rect
-    [self.x1 / s, self.y1 / s, self.x2 / s, self.y2 / s]
+  [self.x1 / s, self.y1 / s, self.x2 / s, self.y2 / s]
 
 def Rect.width(self) -> number
-    self.x2 - self.x1
+  self.x2 - self.x1
 def Rect.height(self) -> number
-    self.y2 - self.y1
+  self.y2 - self.y1
 def Rect.size(self) -> Point
-    [self.width self.height]
+  [self.width self.height]
 def Rect.left(self) -> number
-    self.x1
+  self.x1
 def Rect.top(self) -> number
-    self.y1
+  self.y1
 def Rect.right(self) -> number
-    self.x2
+  self.x2
 def Rect.bottom(self) -> number
-    self.y2
+  self.y2
 def Rect.topleft(self) -> Point
-    -- Returns the top-left coordinates as a Point.
-    [self.x1 self.y1]
+  -- Returns the top-left coordinates as a Point.
+  [self.x1 self.y1]
 def Rect.topright(self) -> Point
-    -- Returns the top-rigth coordinates as a Point.
-    [self.x2 self.y1]
+  -- Returns the top-rigth coordinates as a Point.
+  [self.x2 self.y1]
 def Rect.bottomleft(self) -> Point
-    -- Returns the bottom-left coordinates as a Point.
-    [self.x1 self.y2]
+  -- Returns the bottom-left coordinates as a Point.
+  [self.x1 self.y2]
 def Rect.bottomright(self) -> Point
-    -- Returns the bottom-right coordinates as a Point.
-    [self.x2 self.y2]
+  -- Returns the bottom-right coordinates as a Point.
+  [self.x2 self.y2]
 def Rect.center(self) -> Point
-    -- Returns the rectangle's center as a Point
-    [(self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2]
+  -- Returns the rectangle's center as a Point
+  [(self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2]
 
 def Rect.intersects(self, Rect b) -> bool
-    -- Return whether the two rectangles intersect.
-    intersects_on_x = (self.x2 > b.x1) and (b.x2 > self.x1)
-    intersects_on_y = (self.y2 > b.y1) and (b.y2 > self.y1)
-    return intersects_on_x and intersects_on_y
+  -- Return whether the two rectangles intersect.
+  intersects_on_x = (self.x2 > b.x1) and (b.x2 > self.x1)
+  intersects_on_y = (self.y2 > b.y1) and (b.y2 > self.y1)
+  intersects_on_x and intersects_on_y
 
 def Rect.translate(self, Point p) -> Rect
-    [self.x1 + p.x, self.y1 + p.y, self.x2 + p.x, self.y2 + p.y]
+  [self.x1 + p.x, self.y1 + p.y, self.x2 + p.x, self.y2 + p.y]
 
 def Rect.contains(self, Point p) -> bool
-    p.x >= self.x1 and p.y >= self.y1 and p.x < self.x2 and p.y < self.y2
+  p.x >= self.x1 and p.y >= self.y1 and p.x < self.x2 and p.y < self.y2
 
 def Rect.grow(self, Point size) -> Rect
-    [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
+  [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
 
 def sum(List numbers) -> number
-    result = 0
-    for i in numbers
-        result += i
-    result
+  result = 0
+  for i in numbers
+    result += i
+  result
     
 def zip(List left, List right) -> List
-    for l in left
-        [l, right.get_optional(index(), null)]
+  for l in left
+    [l, right.get_optional(index(), null)]
 
 -- Stateful functions
 
@@ -802,182 +802,180 @@ def cached(Func refresh) -> any
   _out
 
 def changed(any val) -> bool
-    -- Stateful function; returns true if the value has changed since the
-    -- previous step.
-    state any prev = null
-    result = prev != val
-    prev = val
-    return result
+  -- Stateful function; returns true if the value has changed since the
+  -- previous step.
+  state any prev = null
+  result = prev != val
+  prev = val
+  result
 
 def delta(number val) -> number
-    -- Stateful function, return the difference between this value and the value from
-    -- the previous call.
-    state number prev = val
-    result = val - prev
-    prev = val
-    return result
+  -- Stateful function, return the difference between this value and the value from
+  -- the previous call.
+  state number prev = val
+  result = val - prev
+  prev = val
+  result
 
 def toggle(bool tog) -> bool
-    -- Stateful function, returns a boolean status. Every frame the function is called
-    -- with (true), the result flips. Starts out false.
+  -- Stateful function, returns a boolean status. Every frame the function is called
+  -- with (true), the result flips. Starts out false.
 
-    state bool s = false
-    if tog
-        s = not(s)
-    return s
+  state bool s = false
+  if tog
+    s = not(s)
+  s
 
 def approach(number target, number maximum_change) -> number
-    -- Stateful function, returns a result which approaches 'target'. Each time the
-    -- function is called, the result will change at most by 'maximum_change'.
-    state current = target
-    if target > current
-        current += min(maximum_change, target - current)
-    elif target < current
-        current -= min(maximum_change, current - target)
-    return current
+  -- Stateful function, returns a result which approaches 'target'. Each time the
+  -- function is called, the result will change at most by 'maximum_change'.
+  state current = target
+  if target > current
+    current += min(maximum_change, target - current)
+  elif target < current
+    current -= min(maximum_change, current - target)
+  current
 
 def once() -> bool
-    -- Stateful function, returns true the first time it's called, and false thereafter.
-    state bool s = true
-    result = s
-    s = false
-    return result
+  -- Stateful function, returns true the first time it's called, and false thereafter.
+  state bool s = true
+  result = s
+  s = false
+  result
 
 def cycle(int max) -> int
-    -- Stateful function, cycles though the integers from 0 to (max - 1). When the
-    -- maximum is reached, the function will start again at 0.
+  -- Stateful function, cycles though the integers from 0 to (max - 1). When the
+  -- maximum is reached, the function will start again at 0.
 
-    state int counter = 0
-    if counter >= max
-        counter = 0
-    result = counter
-    counter += 1
-    return result
+  state int counter = 0
+  if counter >= max
+    counter = 0
+  result = counter
+  counter += 1
+  result
 
 def cycle_elements(List list) -> any
-    -- Stateful function, cycles through each item of 'list' one at a time.
-    return list[cycle(length(list))]
+  -- Stateful function, cycles through each item of 'list' one at a time.
+  list[cycle(length(list))]
 
 def random_element(List list) -> any
-    -- Return a random element from the given list, with equal probability per element.
-    return list[rand_i(length(list))]
+  -- Return a random element from the given list, with equal probability per element.
+  list[rand_i(length(list))]
 
 def seed() -> number
-    -- Stateful function, returns a random number 0..1 which doesn't change after
-    -- initialization.
-    state number s = rand()
-    return s
+  -- Stateful function, returns a random number 0..1 which doesn't change after
+  -- initialization.
+  state number s = rand()
+  s
 
 -- Math utility functions
 def polar(number angle) -> Point
-    -- Return a point on the unit circle with the given angle.
-    [sin(angle) -cos(angle)]
+  -- Return a point on the unit circle with the given angle.
+  [sin(angle) -cos(angle)]
 
 def random_norm_vector() -> Point
-    -- Return a random normalized vector.
-    angle = rand() * 360
-    [cos(angle) sin(angle)]
+  -- Return a random normalized vector.
+  angle = rand() * 360
+  [cos(angle) sin(angle)]
 
 def rect(number x1, number y1, number x2, number y2) -> Rect
-    [x1 y1 x2 y2]
+  [x1 y1 x2 y2]
 
 def bezier3(number t, List points) -> Point
-    -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
-    p0 = points[0] -> Point.cast
-    p1 = points[1] -> Point.cast
-    p2 = points[2] -> Point.cast
-    return p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t)
+  -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
+  p0 = points[0] -> Point.cast
+  p1 = points[1] -> Point.cast
+  p2 = points[2] -> Point.cast
+  (p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t))
 
 def bezier4(number t, List points) -> Point
-    -- Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
-    p0 = points[0] -> Point.cast
-    p1 = points[1] -> Point.cast
-    p2 = points[2] -> Point.cast
-    p3 = points[3] -> Point.cast
-    p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t)
+  -- Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
+  p0 = points[0] -> Point.cast
+  p1 = points[1] -> Point.cast
+  p2 = points[2] -> Point.cast
+  p3 = points[3] -> Point.cast
+  (p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t))
 
 def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
-    bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
+  bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
 
 def clamp(number x, number minVal, number maxVal) -> number
-    -- Return a clamped value. If x is less than 'minVal' then return 'minVal', if it's
-    -- greater than 'maxVal' then return 'maxVal', otherwise return the original 'x'.
-    min(max(x, minVal), maxVal)
+  -- Return a clamped value. If x is less than 'minVal' then return 'minVal', if it's
+  -- greater than 'maxVal' then return 'maxVal', otherwise return the original 'x'.
+  min(max(x, minVal), maxVal)
 
 def smoothstep(number x, number edge0, number edge1) -> number
-    -- Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep
-    x = clamp((x - edge0)/(edge1-edge0), 0, 1)
-    x*x*(3 - 2*x)
+  -- Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep
+  x = clamp((x - edge0)/(edge1-edge0), 0, 1)
+  x*x*(3 - 2*x)
 
 def smootherstep(number x, number edge0, number edge1) -> number
-    -- Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep
-    x = clamp((x - edge0)/(edge1-edge0), 0, 1)
-    x*x*x*(x*(x*6 - 15) + 10)
+  -- Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep
+  x = clamp((x - edge0)/(edge1-edge0), 0, 1)
+  x*x*x*(x*(x*6 - 15) + 10)
 
 def random_color() -> Color
-    -- Return a color with random RGB components.
-    [rand() rand() rand() 1.0]
+  -- Return a color with random RGB components.
+  [rand() rand() rand() 1.0]
 
 def hsv_to_rgb(List hsv) -> Color
-    -- Convert HSV components to an RGB Color
+  -- Convert HSV components to an RGB Color
 
-    h = hsv[0] -> number.cast
-    s = hsv[1] -> number.cast
-    v = hsv[2] -> number.cast
+  h = hsv[0] -> number.cast
+  s = hsv[1] -> number.cast
+  v = hsv[2] -> number.cast
 
-    if s == 0
-        -- grey
-        return [v v v 1]
+  if s == 0
+      -- grey
+      return [v v v 1]
 
-    h *= 6
-    i = floor(h)
-    f = h - i
-    p = v * (1 - s)
-    q = v * (1 - s * f)
-    t = v * (1 - s * (1 - f))
+  h *= 6
+  i = floor(h)
+  f = h - i
+  p = v * (1 - s)
+  q = v * (1 - s * f)
+  t = v * (1 - s * (1 - f))
 
-    if i == 0
-        return [v t p 1]
-    elif i == 1
-        return [q v p 1]
-    elif i == 2
-        return [p v t 1]
-    elif i == 3
-        return [p q v 1]
-    elif i == 4
-        return [t p v 1]
-    elif i == 5
-        return [v p q 1]
-
-    return [0 0 0 0]
+  if i == 0
+    [v t p 1]
+  elif i == 1
+    [q v p 1]
+  elif i == 2
+    [p v t 1]
+  elif i == 3
+    [p q v 1]
+  elif i == 4
+    [t p v 1]
+  elif i == 5
+    [v p q 1]
+  else
+    [0 0 0 0]
 
 def Color.blend(self, Color rhs, number ratio) -> Color
-    -- Return a color that is blended between self and rhs. If ratio is 0.0 we'll
-    -- return 'self', if it's 1.0 we'll return 'rhs'.
+  -- Return a color that is blended between self and rhs. If ratio is 0.0 we'll
+  -- return 'self', if it's 1.0 we'll return 'rhs'.
 
-    max(@ratio, 0.0)
-    min(@ratio, 1.0)
+  max(@ratio, 0.0)
+  min(@ratio, 1.0)
 
-    if ratio == 0.0
-        return self
-    elif ratio == 1.0
-        return rhs
-    else
-        result = self + (rhs - self) * ratio
+  if ratio == 0.0
+    self
+  elif ratio == 1.0
+    rhs
+  else
+    self + (rhs - self) * ratio
 
-        return result
-
-def Color.brighten(self, number factor) -> Color
-    -- Linearly brighten each component of the color.
-    [ min(self.r + factor, 1.0)
-      min(self.g + factor, 1.0)
-      min(self.b + factor, 1.0)
-      self.a]
+def Color.lighten(self, number factor) -> Color
+  -- Linearly lighte each component of the color.
+  [ min(self.r + factor, 1.0)
+    min(self.g + factor, 1.0)
+    min(self.b + factor, 1.0)
+    self.a]
         
 def Color.darken(self, number factor) -> Color
-    -- Linearly darken each component of the color.
-    [ max(self.r - factor, 0.0)
-      max(self.g - factor, 0.0)
-      max(self.b - factor, 0.0)
-      self.a]
+  -- Linearly darken each component of the color.
+  [ max(self.r - factor, 0.0)
+    max(self.g - factor, 0.0)
+    max(self.b - factor, 0.0)
+    self.a]
 
