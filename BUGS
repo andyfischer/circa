@@ -1,6 +1,11 @@
 
 Miscellanous (most-recent first)
 
+  Allow for the trailing part of a dot-expression to be on a new line:
+
+     m = Map.make
+       .set(:a 1)
+
   Null is allowed as an output type. Was deliberate but needs to be fixed.
   
   No source location for the contents of { module.:function }

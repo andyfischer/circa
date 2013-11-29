@@ -24,9 +24,6 @@ def convert(any value, Type t) -> any
 def assert(bool condition)
   -- Raises an error if 'condition' is false.
 
-def catch(any input)
-  -- Vestigal function, don't use this.
-
 def equals(any a,any b) -> bool
 
 def from_string(String s) -> any
