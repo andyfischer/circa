@@ -297,6 +297,26 @@ void stack_restart(Stack* stack)
     stack->step = sym_StackReady;
 }
 
+void stack_restart_discarding_state(Stack* stack)
+{
+    if (stack->step == sym_StackReady)
+        return;
+
+    if (stack_top(stack) == NULL)
+        return;
+
+    while (stack_top_parent(stack) != NULL)
+        stack_pop(stack);
+
+    Frame* top = stack_top(stack);
+    top->termIndex = 0;
+    top->pc = 0;
+    set_null(&top->outgoingState);
+
+    stack->errorOccurred = false;
+    stack->step = sym_StackReady;
+}
+
 caValue* stack_get_state(Stack* stack)
 {
     Frame* top = stack_top(stack);
@@ -2568,6 +2588,13 @@ void Stack__restart(caStack* stack)
     stack_restart(self);
 }
 
+void Stack__restart_discarding_state(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    stack_restart_discarding_state(self);
+}
+
 void Stack__run(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2707,6 +2734,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.reset", Stack__reset);
     module_patch_function(patch, "Stack.reset_state", Stack__reset_state);
     module_patch_function(patch, "Stack.restart", Stack__restart);
+    module_patch_function(patch, "Stack.restart_discarding_state", Stack__restart_discarding_state);
     module_patch_function(patch, "Stack.run", Stack__run);
     module_patch_function(patch, "Stack.frame", Stack__frame);
     module_patch_function(patch, "Stack.frame_from_base", Stack__frame_from_base);

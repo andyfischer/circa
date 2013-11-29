@@ -369,6 +369,7 @@ def Stack.reset_state(self)
 def Stack.restart(self)
   -- Restart or "rewind" the stack, so the program counter is returned to the start
   -- of the topmost frame. State is preserved.
+def Stack.restart_discarding_state(self)
 def Stack.run(self) -> Stack
   -- Run the interpreter until either the topmost frame is finished, or an error
   -- is raised.

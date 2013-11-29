@@ -1,0 +1,19 @@
+
+def main()
+  state i = 0
+  i += 1
+  i
+
+stack = make_stack(main)
+
+assert(stack.call == 1)
+assert(stack.call == 2)
+assert(stack.call == 3)
+
+stack.restart_discarding_state
+assert(stack.call == 3)
+stack.restart_discarding_state
+assert(stack.call == 3)
+
+stack.restart
+assert(stack.call == 4)
