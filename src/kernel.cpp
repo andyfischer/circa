@@ -93,6 +93,12 @@ caValue* find_context_value(caStack* stack, caValue* key)
         frame = frame_parent(frame);
     }
 
+    if (!is_null(&stack->topContext)) {
+        caValue* value = hashtable_get(&stack->topContext, key);
+        if (value != NULL)
+            return value;
+    }
+
     return NULL;
 }
 

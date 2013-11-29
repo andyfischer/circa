@@ -694,14 +694,12 @@ Block* frame_block(Frame* frame)
     return frame->block;
 }
 
-caValue* context_inject(Stack* stack, caValue* name)
+caValue* stack_context_insert(Stack* stack, caValue* name)
 {
-    Frame* frame = frame_by_index(stack, 0);
+    if (!is_hashtable(&stack->topContext))
+        set_hashtable(&stack->topContext);
 
-    if (is_null(&frame->dynamicScope))
-        set_hashtable(&frame->dynamicScope);
-
-    return hashtable_insert(&frame->dynamicScope, name);
+    return hashtable_insert(&stack->topContext, name);
 }
 
 caValue* frame_register_from_end(Frame* frame, int index)
@@ -2440,13 +2438,18 @@ void Stack__id(caStack* stack)
 void Stack__set_context(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
+    caValue* map = circa_input(stack, 1);
+
+    copy(map, &self->topContext);
+}
+
+void Stack__set_context_val(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
     caValue* val = circa_input(stack, 2);
 
-    if (stack_top(self) == NULL)
-        return raise_error_msg(stack, "Can't inject onto stack with no frames");
-
-    copy(val, context_inject(self, name));
+    copy(val, stack_context_insert(self, name));
 }
 
 void Stack__call(caStack* stack)
@@ -2692,6 +2695,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
     module_patch_function(patch, "Stack.id", Stack__id);
     module_patch_function(patch, "Stack.set_context", Stack__set_context);
+    module_patch_function(patch, "Stack.set_context_val", Stack__set_context_val);
     module_patch_function(patch, "Stack.apply", Stack__call);
     module_patch_function(patch, "Stack.call", Stack__call);
     module_patch_function(patch, "Stack.stack_push", Stack__stack_push);

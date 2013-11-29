@@ -24,6 +24,9 @@ struct Stack
     // Stored frame per module, keyed by block ID.
     Value moduleFrames;
 
+    // Top-level context.
+    Value topContext;
+
     // Transient data, used during vm_run.
     const char* bc;
     int pc;

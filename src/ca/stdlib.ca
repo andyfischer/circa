@@ -1,74 +1,74 @@
 
 -- Func --
 type Func {
-    Block block
-    Map bindings
+  Block block
+  Map bindings
 }
 
 def closure_block() -> Func
-    -- Internally used function for declaring a closure.
+  -- Internally used function for declaring a closure.
 
 def nonlocal(any _) -> any
-    -- Internally used function for non-local references.
+  -- Internally used function for non-local references.
 
 def Func.call(self, any inputs :multiple) -> any
-    -- Call the func using the given inputs.
+  -- Call the func using the given inputs.
 
 def Func.apply(self, List inputs) -> any
-    -- Like .call, but the inputs are given as one list instead of separate args.
+  -- Like .call, but the inputs are given as one list instead of separate args.
 
 -- Builtin functions --
 def convert(any value, Type t) -> any
-    -- Convert the value to the given type, if possible.
+  -- Convert the value to the given type, if possible.
 
 def assert(bool condition)
-    -- Raises an error if 'condition' is false.
+  -- Raises an error if 'condition' is false.
 
 def catch(any input)
-    -- Vestigal function, don't use this.
+  -- Vestigal function, don't use this.
 
 def equals(any a,any b) -> bool
 
 def from_string(String s) -> any
-    -- Parse a string representation to a Circa value
+  -- Parse a string representation to a Circa value
 
 def error(String msg)
 
 def length(List list) -> int
-    -- Return the number of items in the given list
+  -- Return the number of items in the given list
 
 def not_equals(any a,any b) -> bool
 
 def to_string_repr(any val) -> String
-    -- Encode a Circa value as a string representation
+  -- Encode a Circa value as a string representation.
 
 def type(any val) -> Type
-    -- Returns the runtime type of a value
+  -- Returns the runtime type of a value.
 
 def static_type(any term :meta) -> Type
-    -- Returns the static type of a value
+  -- Returns the static type of a value.
 
-def context(Symbol name) -> any
-    -- Fetch the context variable in the current scope with the given name.
+def context(any name) -> any
+  -- Fetch the context variable in the current scope with the given name.
 
-def context_opt(Symbol name, any default) -> any
-    -- Like context(), but if the value doesn't exist then 'default' is used.
-    
-def set_context(Symbol name, any value)
-    -- Set a context var in the current scope.
+def context_opt(any name, any default) -> any
+  -- Like context(), but if the value doesn't exist then 'default' is used.
+
+def set_context(any name, any value)
+  -- Set a context var in the current scope.
 
 def has_effects()
-    -- Annotation, declare that a function has effects. Used in native-patched
-    -- functions. Not fully supported yet.
+  -- Annotation, declare that a function has effects. Used in native-patched
+  -- functions. Not fully supported yet.
 
 def native_patch(String filename)
-    -- Declare that this block should be patched by a native module.
+  -- Declare that this block should be patched by a native module.
 
 def memoize()
-    -- Instruct the VM to memoize the current frame.
+  -- Instruct the VM to memoize the current frame.
 
 def reflect_get_frame_state() -> any
-    -- Special call, read this frame's state.
+  -- Special call, read this frame's state.
 
 def declared_state(Type t, Func initializer :optional) -> any
   -- Internally used function for fetching a stateful value. The parser
@@ -92,68 +92,68 @@ def declared_state(Type t, Func initializer :optional) -> any
 
 -- Primitive math funcs --
 def add(any left, any right) -> any
-    if is_int(left) and is_int(right)
-        add_i(left, right)
-    elif is_int(left) or is_number(left)
-        add_f(left, right)
-    else
-        left.add(right)
+  if is_int(left) and is_int(right)
+    add_i(left, right)
+  elif is_int(left) or is_number(left)
+    add_f(left, right)
+  else
+    left.add(right)
 
 def sub(any left, any right) -> any
-    if is_int(left) and is_int(right)
-        sub_i(left, right)
-    elif is_int(left) or is_number(left)
-        sub_f(left, right)
-    else
-        left.sub(right)
+  if is_int(left) and is_int(right)
+    sub_i(left, right)
+  elif is_int(left) or is_number(left)
+    sub_f(left, right)
+  else
+    left.sub(right)
 
 def mult(any left, any right) -> any
-    if is_int(left) and is_int(right)
-        mult_i(left, right)
-    elif is_int(left) or is_number(left)
-        mult_f(left, right)
-    else
-        left.mult(right)
+  if is_int(left) and is_int(right)
+    mult_i(left, right)
+  elif is_int(left) or is_number(left)
+    mult_f(left, right)
+  else
+    left.mult(right)
 
 def div(any left, any right) -> any
-    if is_int(left) or is_number(left)
-        div_f(left, right)
-    else
-        left.div(right)
+  if is_int(left) or is_number(left)
+    div_f(left, right)
+  else
+    left.div(right)
 
 -- Misc builtin funcs --
 
 def abs(number n) -> number
-    -- Absolute value
+  -- Absolute value
 def any_true(list) -> bool
-    result = true
-    for i in list
-      if not(i)
-        return false
-    true
+  result = true
+  for i in list
+    if not(i)
+      return false
+  true
 
 def get_with_symbol(any lhs, Symbol symbol) -> any
 
-def swap(a, b) -> (any,any)
-    return b, a
+def swap(a, b) -> (any, any)
+  return b, a
 
 def first_symbol(any val) -> Symbol
-    if type(val) == Symbol
-        val
-    elif type(val) == List
-        if length(val) > 0
-            first_symbol(val[0])
+  if type(val) == Symbol
+    val
+  elif type(val) == List
+    if length(val) > 0
+      first_symbol(val[0])
 
 def to_string(any val) -> String
 
 def print(any items :multiple)
-    -- Prints a line of text output to the console.
+  -- Prints a line of text output to the console.
 def trace(any items :multiple)
-    -- Prints a line of text output to the console.
+  -- Prints a line of text output to the console.
 
 type Mutable;
-    -- Container for a mutable value. Future status is undecided, this might
-    -- be removed.
+  -- Container for a mutable value. Future status is undecided, this might
+  -- be removed.
 def Mutable.set(self, any val)
 def Mutable.get(self) -> any
 
@@ -164,47 +164,47 @@ type ModuleRef {
 }
 
 def native_patch_this(String filename)
-    -- Annotation, declare that the current module should be patched by a native
-    -- module with the given filename.
+  -- Annotation, declare that the current module should be patched by a native
+  -- module with the given filename.
 
 def load_module(String moduleName) -> Block
-    -- Look for a loaded module with the given name, and load it if necessary.
-    -- The module search path will be used, and the result is stored in module
-    -- space.
+  -- Look for a loaded module with the given name, and load it if necessary.
+  -- The module search path will be used, and the result is stored in module
+  -- space.
 
 def load_script(String filename) -> Block
-    -- Load a script with the given filename. The result will only be available
-    -- locally; it won't be loaded into module space.
+  -- Load a script with the given filename. The result will only be available
+  -- locally; it won't be loaded into module space.
 
 def require(String moduleName) -> ModuleRef
-    -- Load a module.
+  -- Load a module.
 
 def package(String moduleName)
-    -- Declare that the current module is a reusable library with the given name.
-    -- (Note: Currently this function does nothing)
+  -- Declare that the current module is a reusable library with the given name.
+  -- (Note: Currently this function does nothing)
 
 -- Packages
 type Package {
-    String name
-    Map files
+  String name
+  Map files
 }
 
 -- Test helpers
 def test_oracle() -> any
-    -- For internal testing. This function will output values that are manually
-    -- inserted with the C++ function oracle_send.
+  -- For internal testing. This function will output values that are manually
+  -- inserted with the C++ function oracle_send().
 
 def test_spy(any val)
-    -- For internal testing. This function will save inputs to a global list which
-    -- can be easily examined from C++ with test_spy_get_results().
+  -- For internal testing. This function will save inputs to a global list which
+  -- can be easily examined from C++ with test_spy_get_results().
 
 -- File module
 def file_exists(String filename) -> bool
 def file_version(String filename) -> int
 def file_read_text(String filename) -> String
 def file_changed(String filename) -> bool
-    ver = file_version(filename)
-    return changed([filename ver])
+  ver = file_version(filename)
+  changed([filename ver])
 
 -- Reflect module
 def reflect_this_block() -> Block
@@ -229,75 +229,75 @@ type Rect_i { int x1 int y1 int x2 int y2 }
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block
-    -- Obtain a Block ref from an expression.
+  -- Obtain a Block ref from an expression.
 def Block.dump(self)
-    -- Dump this block's raw contents to stdout.
+  -- Dump this block's raw contents to stdout.
 def Block.find_term(self, String name) -> Term
-    -- Find a term inside this Block with the given name.
+  -- Find a term inside this Block with the given name.
 def Block.to_code_lines(self) -> List
 def Block.format_source(self) -> List
-    -- Return the block's contents as formatted source.
+  -- Return the block's contents as formatted source.
 def Block.format_function_heading(self) -> List
-    -- Return a formatted function header for this block.
+  -- Return a formatted function header for this block.
 def Block.functions(self) -> List
-    -- Return a list of functions that occur inside this block.
+  -- Return a list of functions that occur inside this block.
 def Block.get_term(self, int index) -> Term
-    -- Fetch a term by index.
+  -- Fetch a term by index.
 def Block.get_static_errors(self) -> List
-    -- Return a raw list of static errors inside this block.
+  -- Return a raw list of static errors inside this block.
 def Block.get_static_errors_formatted(self) -> List
-    -- Return a formatted list of static errors inside this block.
+  -- Return a formatted list of static errors inside this block.
 def Block.has_static_error(self) -> bool
-    -- Return whether this block has any static errors.
+  -- Return whether this block has any static errors.
 def Block.input(self, int index) -> Term
-    -- Fetch an input placeholder term by index.
+  -- Fetch an input placeholder term by index.
 def Block.is_null(self) -> bool
-    -- Return whether this is a null Block reference.
+  -- Return whether this is a null Block reference.
 def Block.inputs(self) -> List
-    -- Return a list of input placeholder terms.
+  -- Return a list of input placeholder terms.
 def Block.link(self, Block lib)
-    -- Iterate through this block, looking for terms that have missing references.
-    -- For each missing reference, if a term with the expected name is found in 'lib',
-    -- then modify the term to use the named term in 'lib'.
+  -- Iterate through this block, looking for terms that have missing references.
+  -- For each missing reference, if a term with the expected name is found in 'lib',
+  -- then modify the term to use the named term in 'lib'.
 def Block.list_configs(self) -> List
-    -- Return a list of Terms that look like configs (named literal values).
+  -- Return a list of Terms that look like configs (named literal values).
 def Block.output(self, int index) -> Term
-    -- Return an output term by index.
+  -- Return an output term by index.
 def Block.output_placeholder(self, int index) -> Term
-    -- Return an output placeholder term by index.
+  -- Return an output placeholder term by index.
 def Block.owner(self) -> Term
-    -- Return the Term that owns this Block (may be null).
+  -- Return the Term that owns this Block (may be null).
 def Block.parent(self) -> Block
-    -- Return the Block that owns this Block (may be null).
+  -- Return the Block that owns this Block (may be null).
 def Block.primary_output(self) -> Term
-    -- Return the primary output.
-    self.output(0)
+  -- Return the primary output.
+  self.output(0)
 def Block.property(self, Symbol key) -> any
 def Block.properties(self) -> Map
 def Block.source_filename(self) -> String
 def Block.statements(self) -> List
-    -- Return a list of Terms that are statements.
+  -- Return a list of Terms that are statements.
 def Block.terms(self) -> List
-    -- Return a list of this block's terms.
+  -- Return a list of this block's terms.
 def Block.walk_terms(self) -> List
-    -- Return a list of this block's terms, and all nested terms.
+  -- Return a list of this block's terms, and all nested terms.
 
 def Block.to_func(self) -> Func
-    Func.make(self)
+  Func.make(self)
 def Block.to_stack(self) -> Stack
-    make_stack(self.to_func)
+  make_stack(self.to_func)
 
 -- Language defect: out-of-order function definition.
 def Block.call(self, any inputs :multiple) -> any
-    -- Invoke this Block with the given inputs.
-    self.to_func.apply(inputs)
+  -- Invoke this Block with the given inputs.
+  self.to_func.apply(inputs)
 
 def Dict.count(self) -> int
-    -- Return the number of elements
+  -- Return the number of elements
 def Dict.set(self, String key, any value) -> Dict
-    -- Assign a key-value pair.
+  -- Assign a key-value pair.
 def Dict.get(self, String key) -> any
-    -- Retrieve the value for a given key.
+  -- Retrieve the value for a given key.
 
 type Frame { Stack stack, int index }
 type RetainedFrame { Block block, any _state }
@@ -306,232 +306,232 @@ type ModuleFrame { Block block, List registers }
 def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)
 def Frame.block(self) -> Block
-    -- Return the Block associated with this Frame.
+  -- Return the Block associated with this Frame.
 def Frame.current_term(self) -> Term
-    -- Fetch the term associated with the current program counter.
+  -- Fetch the term associated with the current program counter.
 def Frame.create_expansion(self, Term term) -> Frame
-    -- Create an expansion frame using the given Term.
-    -- Errors if the Term is not part of this frame's block.
+  -- Create an expansion frame using the given Term.
+  -- Errors if the Term is not part of this frame's block.
 def Frame.height(self) -> int
-    -- Frame height, the distance from the base frame.
+  -- Frame height, the distance from the base frame.
 def Frame.has_parent(self) -> bool
 def Frame.parent(self) -> Frame
-    -- Return this frame's parent.
+  -- Return this frame's parent.
 def Frame.pc(self) -> int
-    -- Fetch the current program counter (the interpreter's current position).
+  -- Fetch the current program counter (the interpreter's current position).
 def Frame.parentPc(self) -> int
 def Frame.register(self, int index) -> any
-    -- Fetch the value in the given register index.
+  -- Fetch the value in the given register index.
 def Frame.registers(self) -> List
-    -- Fetch a list of all register values.
+  -- Fetch a list of all register values.
 def Frame.inputs(self) -> List
-    -- Returns a list of input register values
+  -- Returns a list of input register values
 def Frame.input(self, int nth) -> any
-    -- Returns the nth input register value
+  -- Returns the nth input register value
 def Frame.outputs(self) -> List
-    -- Returns a list of output register values
+  -- Returns a list of output register values
 def Frame.output(self, int nth) -> any
-    -- Returns the nth output register value
+  -- Returns the nth output register value
 def Frame.extract_state(self) -> Map
-    -- Returns the frame's state as a plain object (composite of maps and lists).
+  -- Returns the frame's state as a plain object (composite of maps and lists).
 
 def capture_stack() -> Stack
-    -- Returns a frozen copy of the currently executing stack.
+  -- Returns a frozen copy of the currently executing stack.
 def Stack.apply(self, List inputs) -> any
 def Stack.block(self) -> Block
-    -- Returns the (topmost) block.
+  -- Returns the (topmost) block.
 def Stack.call(self, any inputs :multiple) -> any
 def Stack.current_term(self) -> Term
-    self.top.current_term
+  self.top.current_term
 def Stack.dump(self)
-    -- Dumps a string representation to stdout.
+  -- Dumps a string representation to stdout.
 def Stack.eval_on_demand(self, Term term) -> any
 def Stack.find_active_value(self, Term term) -> any
 def Stack.rethrow(self)
-    -- If the stack has an error, raise it in this context.
-    if self.has_error
-      error(self.error_message)
+  -- If the stack has an error, raise it in this context.
+  if self.has_error
+    error(self.error_message)
 def Stack.extract_state(self) -> Map
 def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.id(self) -> int
-def Stack.set_context(self, Symbol name, any val)
+def Stack.set_context(self, Map map)
+def Stack.set_context_val(self, any name, any val)
 def Stack.stack_push(self, Block b, List inputs)
-    -- Push a new frame, using the given block and input list.
+  -- Push a new frame, using the given block and input list.
 def Stack.stack_push2(self, Func func)
-    self.stack_push(func.block, [])
+  self.stack_push(func.block, [])
 def Stack.stack_pop(self)
-    -- Pop the topmost frame.
+  -- Pop the topmost frame.
 def Stack.set_state_input(self, any)
 def Stack.get_state_output(self) -> any
 def Stack.migrate(self, Block from, Block to)
 def Stack.migrate_to(self, Func func)
-    -- Use 'func' as the new root, and migrate data and state.
+  -- Use 'func' as the new root, and migrate data and state.
 def Stack.reset(self)
 def Stack.reset_state(self)
 def Stack.restart(self)
-    -- Restart or "rewind" the stack, so the program counter is returned to the start
-    -- of the topmost frame. State is preserved.
+  -- Restart or "rewind" the stack, so the program counter is returned to the start
+  -- of the topmost frame. State is preserved.
 def Stack.run(self) -> Stack
-    -- Run the interpreter until either the topmost frame is finished, or an error
-    -- is raised.
+  -- Run the interpreter until either the topmost frame is finished, or an error
+  -- is raised.
 def Stack.frame(self, int depth) -> Frame
-    -- Return the Frame with the given depth. The top of the stack has depth 0.
+  -- Return the Frame with the given depth. The top of the stack has depth 0.
 def Stack.frame_from_base(self, int height) -> Frame
-    -- Return the Frame with the given height.
+  -- Return the Frame with the given height.
 def Stack.frame_count(self) -> int
 def Stack.top(self) -> Frame
-    -- Return the topmost Frame.
-    self.frame(0)
+  -- Return the topmost Frame.
+  self.frame(0)
 def Stack.active_value(self, Term term) -> any
-    self.top.active_value(term)
+  self.top.active_value(term)
 def Stack.set_active_value(self, Term term, any val)
-    self.top.set_active_value(term, val)
+  self.top.set_active_value(term, val)
 def Stack.output(self, int index) -> any
-    -- Fetch the value in the nth output register.
+  -- Fetch the value in the nth output register.
 def Stack.errored(self) -> bool
-    -- Returns true if the interpreter has stopped due to error.
+  -- Returns true if the interpreter has stopped due to error.
 def Stack.has_error(self) -> bool
-    self.errored
+  self.errored
 def Stack.error_message(self) -> String
-    -- If there is a recorded error, returns a human-readable description string.
+  -- If there is a recorded error, returns a human-readable description string.
 def Stack.toString(self) -> String
 
 def make_stack(Func func) -> Stack
-    -- Create a new stack
+  -- Create a new stack
 
 def make_actor(Func func) -> Stack
-    make_stack(func)
+  make_stack(func)
 
 def Func.to_stack(self) -> Stack
-    make_stack(self)
+  make_stack(self)
 
 def empty_list(any initialValue, int size) -> List
 def repeat(any val, int count) -> List
 def List.append(self, any item) -> List
-    -- Append an item to the end of this list.
+  -- Append an item to the end of this list.
 def List.clear(self) -> List
-    -- Return an empty list.
-    []
+  -- Return an empty list.
+  []
 
 def List.concat(self, List rightSide) -> List
-    -- Concatenate two lists.
+  -- Concatenate two lists.
 def List.resize(self, int length) -> List
-    -- Resize the list to have the given length. If the length is increased, then
-    -- null values are appended on the right; if the length is decreased then
-    -- existing values on the right are dropped.
+  -- Resize the list to have the given length. If the length is increased, then
+  -- null values are appended on the right; if the length is decreased then
+  -- existing values on the right are dropped.
 def List.count(self) -> int
-    -- Return the number of elements in this list.
+  -- Return the number of elements in this list.
 
 def List.insert(self, int index, any val) -> List
-    -- Insert an element at the given index. If necessary, existing elements will
-    -- be shifted to the right to make room.
-    --
-    -- Example:
-    --   a = [1 2 3]
-    --   a.insert(1, 'X')
-    --   -- a now equals [1 'X' 2 3]
+  -- Insert an element at the given index. If necessary, existing elements will
+  -- be shifted to the right to make room.
+  --
+  -- Example:
+  --   a = [1 2 3]
+  --   a.insert(1, 'X')
+  --   -- a now equals [1 'X' 2 3]
     
 def List.length(self) -> int
-    -- Return the number of elements in this list.
+  -- Return the number of elements in this list.
 
 def List.join(self, String joiner) -> String
-    -- Return a string constructed by converting every element to a string, and
-    -- concatenating those strings, each separated by 'joiner'.
-    --
-    -- Example:
-    --  [1 2 3].join(', ')
-    -- 
-    -- Outputs: '1, 2, 3'
+  -- Return a string constructed by converting every element to a string, and
+  -- concatenating those strings, each separated by 'joiner'.
+  --
+  -- Example:
+  --  [1 2 3].join(', ')
+  -- 
+  -- Outputs: '1, 2, 3'
 
 def List.slice(self, int start, int fin) -> List
-    -- Return a list constructed from the elements starting from index 'start', and
-    -- ending immediately before index 'fin'.
-    --
-    -- If either 'start' or 'fin' is negative, it's interpreted as an offset from the
-    -- end of the list.
-    --
-    -- Examples:
-    --  [1 2 3 4].slice(1 3)
-    --  Outputs: [2 3]
-    -- 
-    --  [1 2 3 4].slice(0 -2)
-    --  Outputs: [1 2 3 4]
+  -- Return a list constructed from the elements starting from index 'start', and
+  -- ending immediately before index 'fin'.
+  --
+  -- If either 'start' or 'fin' is negative, it's interpreted as an offset from the
+  -- end of the list.
+  --
+  -- Examples:
+  --  [1 2 3 4].slice(1 3)
+  --  Outputs: [2 3]
+  -- 
+  --  [1 2 3 4].slice(0 -2)
+  --  Outputs: [1 2 3 4]
 
 def List.get(self, int index) -> any
-    -- Get an element by index.
+  -- Get an element by index.
 
 def List.get_optional(self, int index, any fallback) -> any
-    -- Get an element by index if it exists, otherwise return 'fallback'.
-    if index < 0 or index >= self.length
-        fallback
-    else
-        self.get(index)
+  -- Get an element by index if it exists, otherwise return 'fallback'.
+  if index < 0 or index >= self.length
+    fallback
+  else
+    self.get(index)
 
 def List.set(self, int index, any val) -> List
-    -- Set an element by index.
+  -- Set an element by index.
 def List.remove(self, int index) -> List
-    -- Remove an element at the given index, shrinking the list by 1.
+  -- Remove an element at the given index, shrinking the list by 1.
 
 def List.add(self, any value) -> List
-    for i in self { i + value }
+  for i in self { i + value }
 def List.sub(self, any value) -> List
-    for i in self { i - value }
+  for i in self { i - value }
 def List.mult(self, any value) -> List
-    for i in self { i * value }
+  for i in self { i * value }
 def List.div(self, any value) -> List
-    for i in self { i / value }
+  for i in self { i / value }
 
 def List.cycle(self, int index) -> any
-    -- Get an element by index. If the index is out of bounds, then module the
-    -- index to one that exists.
-    self.get(mod(index, self.length))
+  -- Get an element by index. If the index is out of bounds, then module the
+  -- index to one that exists.
+  self.get(mod(index, self.length))
 
 def List.empty(self) -> bool
-    -- Returns whether the list is empty.
-    self.length == 0
+  -- Returns whether the list is empty.
+  self.length == 0
 def List.first(self) -> any
-    -- Returns the first element
-    self.get(0)
+  -- Returns the first element
+  self.get(0)
 def List.last(self) -> any
-    -- Returns the last element
-    self.get(self.length - 1)
-
+  -- Returns the last element
+  self.get(self.length - 1)
 
 def List.pop(self) -> (List, any)
   return self.slice(0, -1), self.last
 
 def List.filter(self, Func func) -> List
-    result = []
-    for i in self
-        if func.call(i)
-            result.append(i)
-    result
+  result = []
+  for i in self
+    if func.call(i)
+      result.append(i)
+  result
 
 def List.map(self, Func func) -> List
-    for i in self
-        func.call(i)
+  for i in self
+    func.call(i)
 
 def List.mapItem(self, int index, Func func) -> List
-    self.set(index, func.call(self[index]))
+  self.set(index, func.call(self[index]))
 
 def Map.contains(self, any key) -> bool
-    -- Returns true if the map contains the given key.
+  -- Returns true if the map contains the given key.
 def Map.remove(self, any key) -> Map
-    -- Removes the given key from the map.
+  -- Removes the given key from the map.
 def Map.get(self, any key) -> any
-    -- Gets the key associated with this value.
+  -- Gets the key associated with this value.
 def Map.get_optional(self, any key, any default) -> any
-    if self.contains(key)
-        self.get(key)
-    else
-        default
+  if self.contains(key)
+    self.get(key)
+  else
+    default
 def Map.set(self, any key, any value) -> Map
-    -- Sets the value associated with this key.
+  -- Sets the value associated with this key.
 def Map.insertPairs(self, List pairs) -> Map
-    -- Set multiple key-value pairs.
+  -- Set multiple key-value pairs.
 def Map.empty(self) -> bool
 def Map.map_element(@self, any key, Func func)
-    @self.set(key, func.call(self.get(key)))
+  @self.set(key, func.call(self.get(key)))
 
 type Set {
   Map m

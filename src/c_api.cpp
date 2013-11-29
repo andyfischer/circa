@@ -455,7 +455,7 @@ caValue* circa_set_context(caStack* stack, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);
-    return context_inject(stack, &nameVal);
+    return stack_context_insert(stack, &nameVal);
 }
 
 } // extern "C"
