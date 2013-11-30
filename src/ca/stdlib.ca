@@ -780,6 +780,29 @@ def Rect.contains(self, Point p) -> bool
 def Rect.grow(self, Point size) -> Rect
   [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
 
+def Rect.subtractFrom(self, Symbol side, number dimension) -> (Rect, Rect)
+  if side == :top
+    min(@dimension, self.height)
+    out = self.set_y2(dimension)
+    self.y1 += dimension
+    return self, out
+  if side == :left
+    min(@dimension, self.width)
+    out = self.set_x2(self.x1 + dimension)
+    self.x1 += dimension
+    return self, out
+  if side == :right
+    min(@dimension, self.width)
+    out = self.set_x1(self.x2 - dimension)
+    self.x2 -= dimension
+    return self, out
+  if side == :bottom
+    min(@dimension, self.height)
+    out = self.set_y1(self.y2 - dimension)
+    self.y2 -= dimension
+    return self, out
+  error(concat('Unrecognized side: ' side))
+
 def sum(List numbers) -> number
   result = 0
   for i in numbers

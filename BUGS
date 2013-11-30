@@ -13,11 +13,6 @@ Miscellanous (most-recent first)
 
   Type inferrence not working on a call to Type.cast.
 
-  The cached() function is dropping cache on every file reload? shouldn't the block pointer
-  be migrated?
-    (Before fixing this, remember that the cache *should* be dropped, if the related code
-     is modified)
-
   load_module should return Func for consistency
 
   Error trace for dynamic_method: should have the actual method name, when possible.
