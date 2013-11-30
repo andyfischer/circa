@@ -67,6 +67,7 @@ def memoize()
 def reflect_get_frame_state() -> any
   -- Special call, read this frame's state.
 
+
 def declared_state(Type t, Func initializer :optional) -> any
   -- Internally used function for fetching a stateful value. The parser
   -- adds a call to this function whereever the 'state' keyword is used.
@@ -213,6 +214,8 @@ def sys_arg(int index) -> String
 def sys_module_search_paths() -> List
 def sys_perf_stats_reset()
 def sys_perf_stats_dump() -> List
+
+def global_script_version() -> int
 
 -- Builtin types
 type FileSignature { String filename, int time_modified }
@@ -817,8 +820,9 @@ def zip(List left, List right) -> List
 
 def cached(Func refresh) -> any
   state Func _refresh
+  state version = global_script_version()
   state _out
-  if _refresh != refresh
+  if _refresh != refresh or version != global_script_version()
     _refresh = refresh
     _out = refresh.call()
   _out

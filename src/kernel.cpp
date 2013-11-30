@@ -191,6 +191,11 @@ void sys__perf_stats_dump(caStack* stack)
 {
     perf_stats_to_list(circa_output(stack, 0));
 }
+void global_script_version(caStack* stack)
+{
+    World* world = stack->world;
+    set_int(circa_output(stack, 0), world->globalScriptVersion);
+}
 
 std::string stackVariable_toString(caValue* value)
 {
@@ -641,6 +646,7 @@ void bootstrap_kernel()
     module_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
     module_patch_function(world->builtinPatch, "sys_perf_stats_reset", sys__perf_stats_reset);
     module_patch_function(world->builtinPatch, "sys_perf_stats_dump", sys__perf_stats_dump);
+    module_patch_function(world->builtinPatch, "global_script_version", global_script_version);
 
     // Load the standard library from stdlib.ca
     parser::compile(builtins, parser::statement_list, STDLIB_CA_TEXT);

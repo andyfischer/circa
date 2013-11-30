@@ -1915,9 +1915,9 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 
 static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure)
 {
-    if (!is_closure(closure)) {
+    if (closure == NULL || !is_closure(closure)) {
         Value msg;
-        set_string(&msg, "Not a function");
+        set_string(&msg, "Left side is not a function");
         circa_output_error(stack, as_cstring(&msg));
         return;
     }

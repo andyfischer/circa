@@ -1,0 +1,9 @@
+
+def main()
+  Point([0 0])
+
+stack = make_stack(main)
+stack.run
+
+assert(stack.has_error)
+assert(stack.error_message == "Left side is not a function")

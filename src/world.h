@@ -34,6 +34,8 @@ struct World {
     // NativePatch for all builtins.
     NativePatch* builtinPatch;
 
+    int globalScriptVersion;
+
     caLogFunc logFunc;
     void* logContext;
 

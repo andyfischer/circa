@@ -35,6 +35,8 @@ static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
 
+static ParseResult right_apply_to_function(Block* block, Term* lhs, caValue* functionName);
+
 Term* compile(Block* block, ParsingStep step, std::string const& input)
 {
     log_start(0, "parser::compile");
@@ -1642,7 +1644,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             if (!tokens.nextIs(tok_Identifier))
                 return compile_error_for_line(block, tokens, startPosition, "Expected identifier");
 
-            ParseResult functionName = identifier(block, tokens, context);
+            ParseResult functionName = identifier_possibly_null(block, tokens, context);
 
             if (tokens.nextIs(tok_Dot)) {
                 // Method call.
@@ -1656,29 +1658,22 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 set_input_syntax_hint(term, 1, "preWhitespace", "");
                 set_input_syntax_hint(term, 1, "postWhitespace", preOperatorWhitespace);
 
-                // Can't use preWhitespace of input 1 here, because there is no input 1
-                term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
-
             } else {
 
-                Term* function = functionName.term;
+                Value functionNameVal;
+                set_string(&functionNameVal, functionName.identifierName);
+                result = right_apply_to_function(block, left.term, &functionNameVal);
 
-                Term* term = apply(block, function, TermList(left.term));
-
-                if (term->function == NULL || term->function->name != functionName.identifierName)
-                    term->setStringProp("syntax:functionName", functionName.identifierName);
-
+                Term* term = result.term;
                 if (operatorMatch == tok_RightArrow)
                     term->setStringProp("syntax:declarationStyle", "arrow-concat");
                 else
                     term->setStringProp("syntax:declarationStyle", "bar-apply");
-
                 set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
-                // Can't use preWhitespace of input 1 here, because there is no input 1
-                term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
 
-                result = ParseResult(term);
             }
+
+            result.term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
 
         } else {
             ParseResult rightExpr = infix_expression(block, tokens, context,
@@ -1966,6 +1961,25 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
     inputHints.apply(result);
 
     return ParseResult(result);
+}
+
+ParseResult right_apply_to_function(Block* block, Term* lhs, caValue* functionName)
+{
+    Term* function = find_name(block, functionName);
+
+    if (function == NULL) {
+        Term* term = apply(block, FUNCS.unknown_function, TermList(lhs));
+        term->setProp("syntax:functionName", functionName);
+        return ParseResult(term);
+    } else {
+
+        Term* term = apply(block, function, TermList(lhs));
+
+        if (!string_equals(&term->function->nameValue, functionName))
+            term->setProp("syntax:functionName", functionName);
+
+        return ParseResult(term);
+    }
 }
 
 ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, ParseResult lhs)
@@ -2518,6 +2532,17 @@ ParseResult identifier(Block* block, TokenStream& tokens, ParserCxt* context)
         return result;
     }
 
+    return ParseResult(term, as_cstring(&ident));
+}
+
+ParseResult identifier_possibly_null(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+    
+    Value ident;
+    tokens.consumeStr(&ident, tok_Identifier);
+
+    Term* term = find_name(block, &ident);
     return ParseResult(term, as_cstring(&ident));
 }
 

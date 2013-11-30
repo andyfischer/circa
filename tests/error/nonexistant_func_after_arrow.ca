@@ -1,0 +1,9 @@
+
+def main()
+  1 -> NonexistantFunc
+
+stack = make_stack(main)
+stack.run
+
+assert(stack.has_error)
+assert(stack.error_message == "Unknown function: NonexistantFunc")

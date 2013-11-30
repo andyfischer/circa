@@ -35,6 +35,7 @@ World* alloc_world()
     world->firstStack = NULL;
     world->lastStack = NULL;
     world->builtinPatch = NULL;
+    world->globalScriptVersion = 1;
 
     return world;
 }
