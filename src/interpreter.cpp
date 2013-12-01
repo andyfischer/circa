@@ -1175,8 +1175,10 @@ void vm_run(Stack* stack, caValue* bytecode)
                     // For now, allow any output value to be null. Will revisit.
                     castSuccess = castSuccess || is_null(receiverSlot);
 
-                    if (!castSuccess)
+                    if (!castSuccess) {
+                        top->termIndex = placeholder->index;
                         return raise_error_output_type_mismatch(stack);
+                    }
                 }
 
                 placeholderIndex++;
@@ -1317,6 +1319,8 @@ dyn_call_resolved:
 
         case bc_PushFuncCall: {
             int termIndex = vm_read_int(stack);
+
+            stack_top(stack)->termIndex = termIndex;
             vm_push_func_call(stack, termIndex);
             if (stack->step != sym_StackRunning)
                 return;
@@ -1326,6 +1330,7 @@ dyn_call_resolved:
         case bc_PushFuncApply: {
             int termIndex = vm_read_int(stack);
 
+            stack_top(stack)->termIndex = termIndex;
             vm_push_func_apply(stack, termIndex);
             if (stack->step != sym_StackRunning)
                 return;
