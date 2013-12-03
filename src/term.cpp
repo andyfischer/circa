@@ -4,9 +4,10 @@
 
 #include "block.h"
 #include "building.h"
-#include "kernel.h"
 #include "debug.h"
+#include "hashtable.h"
 #include "heap_debugging.h"
+#include "kernel.h"
 #include "inspection.h"
 #include "names.h"
 #include "string_type.h"
@@ -29,6 +30,8 @@ Term::Term()
     id = global_world()->nextTermID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
+
+    set_hashtable(&properties);
 
     if (id == DEBUG_BREAK_ON_TERM)
         ca_debugger_break();
@@ -127,12 +130,12 @@ Term::toString()
 
 bool Term::hasProperty(const char* name)
 {
-    return properties.contains(name);
+    return term_get_property(this, name) != NULL;
 }
 
 void Term::removeProperty(const char* name)
 {
-    properties.remove(name);
+    term_remove_property(this, name);
 }
 
 caValue* Term::getProp(const char* name)
@@ -227,7 +230,9 @@ void dealloc_term(Term* term)
 
 caValue* term_insert_property(Term* term, const char* name)
 {
-    return term->properties.insert(name);
+    Value str;
+    set_string(&str, name);
+    return hashtable_insert(&term->properties, &str);
 }
 
 void term_set_property(Term* term, const char* name, caValue* value)
@@ -237,21 +242,25 @@ void term_set_property(Term* term, const char* name, caValue* value)
 
 caValue* term_get_property(Term* term, const char* name)
 {
-    INCREMENT_STAT(TermPropAccess);
-    return term->properties[name];
+    Value str;
+    set_string(&str, name);
+    return hashtable_get(&term->properties, &str);
 }
 
 void term_remove_property(Term* term, const char* name)
 {
-    term->properties.remove(name);
+    Value str;
+    set_string(&str, name);
+    hashtable_remove(&term->properties, &str);
 }
 
 void term_move_property(Term* from, Term* to, const char* propName)
 {
-    if (!from->hasProperty(propName))
+    caValue* existing = term_get_property(from, propName);
+    if (existing == NULL)
         return;
 
-    term_set_property(to, propName, term_get_property(from, propName));
+    term_set_property(to, propName, existing);
     term_remove_property(from, propName);
 }
 

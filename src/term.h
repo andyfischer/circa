@@ -66,7 +66,7 @@ struct Term
     Block* nestedContents;
 
     // Dynamic properties
-    Dict properties;
+    Value properties;
 
     // Terms which are using this term as an input.
     TermList users;

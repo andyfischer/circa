@@ -1713,7 +1713,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
                     if (existingPostWhitespace != NULL)
                         move(existingPostWhitespace,
-                            set->properties.insert("syntax:preEqualsSpace"));
+                            term_insert_property(set, "syntax:preEqualsSpace"));
 
                     term = set;
                 }
