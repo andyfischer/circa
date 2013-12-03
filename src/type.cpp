@@ -6,6 +6,7 @@
 #include "building.h"
 #include "function.h"
 #include "kernel.h"
+#include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
 #include "parser.h"
@@ -173,17 +174,21 @@ Type* get_type_of_input(Term* term, int inputIndex)
 
 caValue* get_type_property(Type* type, const char* name)
 {
-    return type->properties[name];
+    Value str;
+    set_string(&str, name);
+    return hashtable_get(&type->properties, &str);
 }
 
 caValue* type_property_insert(Type* type, const char* name)
 {
-    return type->properties.insert(name);
+    Value str;
+    set_string(&str, name);
+    return hashtable_insert(&type->properties, &str);
 }
 
 void set_type_property(Type* type, const char* name, caValue* value)
 {
-    copy(value, type->properties.insert(name));
+    copy(value, type_property_insert(type, name));
 }
 
 Block* type_declaration_block(Type* type)
@@ -206,7 +211,7 @@ Type* create_type_unconstructed()
 void type_finish_construction(Type* t)
 {
     initialize_null(&t->properties);
-    set_dict(&t->properties);
+    set_hashtable(&t->properties);
 
     initialize_null(&t->parameter);
     initialize_null(&t->name);

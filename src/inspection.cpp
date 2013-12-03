@@ -627,7 +627,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
 
         if (prefs->showProperties) {
             out << " ";
-            out << term->inputInfo(i)->properties.toString();
+            out << to_string(&term->inputInfo(i)->properties);
         }
     }
     out << ") ";

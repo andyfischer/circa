@@ -42,6 +42,16 @@ Term::~Term()
     debug_unregister_valid_object(this, TERM_OBJECT);
 }
 
+Term::Input::Input() : term(NULL)
+{
+    set_hashtable(&properties);
+}
+
+Term::Input::Input(Term* t) : term(t)
+{
+    set_hashtable(&properties);
+}
+
 const char*
 Term::nameStr()
 {
@@ -269,11 +279,13 @@ caValue* term_get_input_property(Term* term, int inputIndex, const char* name)
     Term::Input* info = term->inputInfo(inputIndex);
     if (info == NULL)
         return NULL;
-    return dict_get(&info->properties, name);
+    return hashtable_get(&info->properties, name);
 }
 caValue* term_insert_input_property(Term* term, int inputIndex, const char* name)
 {
-    return dict_insert(&term->inputInfo(inputIndex)->properties, name);
+    Value str;
+    set_string(&str, name);
+    return hashtable_insert(&term->inputInfo(inputIndex)->properties, &str);
 }
 
 bool term_get_bool_input_prop(Term* term, int inputIndex, const char* name, bool defaultValue)
@@ -282,6 +294,14 @@ bool term_get_bool_input_prop(Term* term, int inputIndex, const char* name, bool
     if (value == NULL)
         return defaultValue;
     return as_bool(value);
+}
+
+const char* term_get_string_input_prop(Term* term, int inputIndex, const char* name, const char* defaultValue)
+{
+    caValue* value = term_get_input_property(term, inputIndex, name);
+    if (value == NULL)
+        return defaultValue;
+    return as_cstring(value);
 }
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue)

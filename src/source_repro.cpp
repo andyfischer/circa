@@ -337,7 +337,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
         return;
 
     // Check if this input is hidden
-    if (term->inputInfo(inputIndex)->properties.getBool("hidden", false))
+    if (term_get_bool_input_prop(term, inputIndex, "hidden", false))
         return;
 
     // Prevent infinite recursion; don't directly format the input source
@@ -512,7 +512,7 @@ int get_first_visible_input_index(Term* term)
 {
     int i = 0;
     for (; i < term->numInputs(); i++) {
-        if (term->inputInfo(i)->properties.contains("hidden"))
+        if (term_get_input_property(term, i, "hidden") != NULL)
             continue;
         else
             break;
@@ -525,7 +525,7 @@ std::string get_input_syntax_hint(Term* term, int index, const char* field)
     if (term->inputInfo(index) == NULL)
         return "";
 
-    return term->inputInfo(index)->properties.getString(field, "");
+    return term_get_string_input_prop(term, index, field, "");
 }
 
 std::string get_input_syntax_hint_optional(Term* term, int index, const char* field,
@@ -534,20 +534,20 @@ std::string get_input_syntax_hint_optional(Term* term, int index, const char* fi
     if (term->inputInfo(index) == NULL)
         return defaultValue;
 
-    return term->inputInfo(index)->properties.getString(field, defaultValue.c_str());
+    return term_get_string_input_prop(term, index, field, defaultValue.c_str());
 }
 
 void set_input_syntax_hint(Term* term, int index, const char* field,
         std::string const& value)
 {
     ca_assert(term->inputInfo(index) != NULL);
-    term->inputInfo(index)->properties.setString(field, value.c_str());
+    set_string(term_insert_input_property(term, index, field), value.c_str());
 }
 
 void set_input_syntax_hint(Term* term, int index, const char* field, caValue* value)
 {
     ca_assert(term->inputInfo(index) != NULL);
-    term->inputInfo(index)->properties.set(field, value);
+    copy(value, term_insert_input_property(term, index, field));
 }
 
 void hide_from_source(Term* term)

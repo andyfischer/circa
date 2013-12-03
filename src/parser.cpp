@@ -5,6 +5,7 @@
 #include "block.h"
 #include "building.h"
 #include "closures.h"
+#include "dict.h"
 #include "loops.h"
 #include "function.h"
 #include "if_block.h"
@@ -1709,7 +1710,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
                     // Move an input's post-whitespace to this term.
                     caValue* existingPostWhitespace =
-                        newValue->inputInfo(0)->properties.get("postWhitespace");
+                        term_get_input_property(newValue, 0, "postWhitespace");
 
                     if (existingPostWhitespace != NULL)
                         move(existingPostWhitespace,

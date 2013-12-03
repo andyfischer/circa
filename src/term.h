@@ -5,7 +5,6 @@
 #include "common_headers.h"
 
 #include "block.h"
-#include "dict.h"
 #include "term_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
@@ -23,10 +22,10 @@ struct Term
 
     struct Input {
         Term* term;
-        Dict properties;
+        Value properties;
 
-        Input() : term(NULL) {}
-        Input(Term* t) : term(t) {}
+        Input();
+        Input(Term* t);
     };
 
     typedef std::vector<Input> InputList;
@@ -146,6 +145,8 @@ void term_move_property(Term* source, Term* dest, const char* propName);
 caValue* term_get_input_property(Term* term, int inputIndex, const char* name);
 caValue* term_insert_input_property(Term* term, int inputIndex, const char* name);
 bool term_get_bool_input_prop(Term* term, int inputIndex, const char* name, bool defaultValue);
+const char* term_get_string_input_prop(Term* term, int inputIndex, const char* name,
+    const char* defaultValue);
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue);
 void term_set_int_prop(Term* term, Symbol prop, int value);

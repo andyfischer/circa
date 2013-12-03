@@ -88,7 +88,7 @@ struct Type
     // Parent type, may be null.
     Type* parent;
 
-    Dict properties;
+    Value properties;
     
     // Type parameters
     Value parameter;

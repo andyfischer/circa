@@ -419,11 +419,14 @@ void bootstrap_kernel()
 
     // Instanciate the types that are used by Type.
     TYPES.dict = create_type_unconstructed();
+    TYPES.map = create_type_unconstructed();
     TYPES.null = create_type_unconstructed();
     TYPES.string = create_type_unconstructed();
     TYPES.type = create_type_unconstructed();
 
+    // Now we can fully instanciate types.
     type_finish_construction(TYPES.dict);
+    type_finish_construction(TYPES.map);
     type_finish_construction(TYPES.null);
     type_finish_construction(TYPES.string);
     type_finish_construction(TYPES.type);
