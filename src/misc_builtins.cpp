@@ -4,7 +4,6 @@
 
 #include "closures.h"
 #include "debug.h"
-#include "dict.h"
 #include "hashtable.h"
 #include "interpreter.h"
 #include "list.h"
@@ -27,31 +26,6 @@ void assert_func(caStack* stack)
 {
     if (!circa_bool_input(stack, 0))
         circa_output_error(stack, "Assert failed");
-}
-
-void Dict__count(caStack* stack)
-{
-    caValue* dict = circa_input(stack, 0);
-    set_int(circa_output(stack, 0), dict_count(dict));
-}
-
-void Dict__set(caStack* stack)
-{
-    caValue* dict = circa_output(stack, 0);
-    copy(circa_input(stack, 0), dict);
-
-    const char* key = circa_string_input(stack, 1);
-    caValue* value = circa_input(stack, 2);
-
-    copy(value, dict_insert(dict, key));
-}
-
-void Dict__get(caStack* stack)
-{
-    caValue* dict = circa_input(stack, 0);
-    const char* key = circa_string_input(stack, 1);
-
-    copy(dict_get(dict, key), circa_output(stack, 0));
 }
 
 void empty_list(caStack* stack)
@@ -513,9 +487,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
 {
     module_patch_function(patch, "abs", abs);
     module_patch_function(patch, "assert", assert_func);
-    module_patch_function(patch, "Dict.count", Dict__count);
-    module_patch_function(patch, "Dict.get", Dict__get);
-    module_patch_function(patch, "Dict.set", Dict__set);
     module_patch_function(patch, "empty_list", empty_list);
     module_patch_function(patch, "equals", equals_func);
     module_patch_function(patch, "error", error);

@@ -32,7 +32,7 @@ namespace get_index_function {
 
     void format_source(caValue* source, Term* term)
     {
-        if (term->boolProp("syntax:brackets", false)) {
+        if (term->boolProp(sym_Syntax_Brackets, false)) {
             format_name_binding(source, term);
             format_source_for_input(source, term, 0);
             append_phrase(source, "[", term, tok_LBracket);

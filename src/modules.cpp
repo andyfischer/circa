@@ -233,7 +233,7 @@ void require_func_postCompile(Term* term)
 
 void require_formatSource(caValue* source, Term* term)
 {
-    if (!term->boolProp("syntax:require", false))
+    if (!term->boolProp(sym_Syntax_Require, false))
         return format_term_source_default_formatting(source, term);
 
     append_phrase(source, "require ", term, tok_Require);

@@ -57,6 +57,9 @@ def names_to_trie(names, i):
         if c not in by_prefix:
             by_prefix[c] = []
 
+        if name in by_prefix[c]:
+            raise Exception("Duplicate name found: ", name)
+
         by_prefix[c].append(name)
 
     result = {}

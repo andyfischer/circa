@@ -7,6 +7,7 @@
 #include "inspection.h"
 #include "list.h"
 #include "kernel.h"
+#include "symbols.h"
 #include "type.h"
 
 namespace building_test {
@@ -15,28 +16,30 @@ void test_insert_output_placeholder()
 {
     Block block;
 
-    insert_output_placeholder(&block, NULL, 0)->setStringProp("note", "first");
+    Symbol note = symbol_from_string("note");
+
+    insert_output_placeholder(&block, NULL, 0)->setStringProp(note, "first");
 
     test_equals(count_output_placeholders(&block), 1);
-    test_equals(get_output_placeholder(&block, 0)->getProp("note"), "first");
+    test_equals(get_output_placeholder(&block, 0)->getProp(note), "first");
 
-    insert_output_placeholder(&block, NULL, 0)->setStringProp("note", "second");
+    insert_output_placeholder(&block, NULL, 0)->setStringProp(note, "second");
     test_equals(count_output_placeholders(&block), 2);
-    test_equals(get_output_placeholder(&block, 0)->getProp("note"), "second");
-    test_equals(get_output_placeholder(&block, 1)->getProp("note"), "first");
+    test_equals(get_output_placeholder(&block, 0)->getProp(note), "second");
+    test_equals(get_output_placeholder(&block, 1)->getProp(note), "first");
 
-    insert_output_placeholder(&block, NULL, 1)->setStringProp("note", "third");
+    insert_output_placeholder(&block, NULL, 1)->setStringProp(note, "third");
     test_equals(count_output_placeholders(&block), 3);
-    test_equals(get_output_placeholder(&block, 0)->getProp("note"), "second");
-    test_equals(get_output_placeholder(&block, 1)->getProp("note"), "third");
-    test_equals(get_output_placeholder(&block, 2)->getProp("note"), "first");
+    test_equals(get_output_placeholder(&block, 0)->getProp(note), "second");
+    test_equals(get_output_placeholder(&block, 1)->getProp(note), "third");
+    test_equals(get_output_placeholder(&block, 2)->getProp(note), "first");
 
-    insert_output_placeholder(&block, NULL, 3)->setStringProp("note", "fourth");
+    insert_output_placeholder(&block, NULL, 3)->setStringProp(note, "fourth");
     test_equals(count_output_placeholders(&block), 4);
-    test_equals(get_output_placeholder(&block, 0)->getProp("note"), "second");
-    test_equals(get_output_placeholder(&block, 1)->getProp("note"), "third");
-    test_equals(get_output_placeholder(&block, 2)->getProp("note"), "first");
-    test_equals(get_output_placeholder(&block, 3)->getProp("note"), "fourth");
+    test_equals(get_output_placeholder(&block, 0)->getProp(note), "second");
+    test_equals(get_output_placeholder(&block, 1)->getProp(note), "third");
+    test_equals(get_output_placeholder(&block, 2)->getProp(note), "first");
+    test_equals(get_output_placeholder(&block, 3)->getProp(note), "fourth");
 }
 
 void test_find_or_create_output_term()
@@ -76,13 +79,13 @@ void test_apply_spec()
     set_term_ref(list_get(inputs, 1), a);
     set_symbol(list_get(&spec, 2), sym_Name);
     set_string(list_get(&spec, 3), "b");
-    set_string(list_get(&spec, 4), "foo");
+    set_symbol(list_get(&spec, 4), symbol_from_string("foo"));
     set_string(list_get(&spec, 5), "bar");
 
     Term* term = apply_spec(&block, &spec);
     test_equals(term_name(term), "b");
     test_assert(term->function == FUNCS.mult);
-    test_equals(term_get_property(term, "foo"), "bar");
+    test_equals(term_get_property(term, symbol_from_string("foo")), "bar");
 }
 
 void register_tests()

@@ -86,8 +86,8 @@ Term* create_overloaded_function(Block* block, const char* header)
 
     set_input(get_output_placeholder(contents, 0), 0, ifBlock);
 
-    function->setBoolProp("overloadedFunc", true);
-    function->setBoolProp("preferSpecialize", true);
+    function->setBoolProp(sym_OverloadedFunc, true);
+    function->setBoolProp(sym_PreferSpecialize, true);
     return function;
 }
 
@@ -177,7 +177,7 @@ bool is_overloaded_function(Block* block)
     if (block->owningTerm == NULL)
         return false;
 
-    return block->owningTerm->boolProp("overloadedFunc", false);
+    return block->owningTerm->boolProp(sym_OverloadedFunc, false);
 }
 
 void list_overload_contents(Block* block, caValue* output)

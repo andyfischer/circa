@@ -1,6 +1,10 @@
 
 Miscellanous (most-recent first)
 
+  Performance killers:
+    #1 the O(n) lookup for method names
+    #2 boolProp inside vm_run_input_bytecodes
+
   Allow for the trailing part of a dot-expression to be on a new line:
 
      m = Map.make

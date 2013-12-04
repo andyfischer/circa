@@ -230,7 +230,7 @@ Term* loop_get_primary_result(Block* block)
 
     // For a rebound list, use the last term that has the iterator's
     // name, even if it's the iterator itself.
-    if (block->owningTerm->boolProp("modifyList", false))
+    if (block->owningTerm->boolProp(sym_ModifyList, false))
         return block->get(iterator->name);
 
     // Otherwise, use the last expression as the output.
@@ -247,7 +247,7 @@ void finish_for_loop(Term* forTerm)
     // Add a a primary output
     Term* primaryOutput = apply(contents, FUNCS.output,
             TermList(loop_get_primary_result(contents)));
-    primaryOutput->setBoolProp("accumulatingOutput", true);
+    primaryOutput->setBoolProp(sym_AccumulatingOutput, true);
     respecialize_type(primaryOutput);
 
     add_implicit_placeholders(forTerm);
@@ -303,8 +303,8 @@ void for_loop_remake_zero_block(Block* forContents)
             break;
         Term* clone = append_input_placeholder(zero);
         rename(clone, &placeholder->nameValue);
-        if (placeholder->boolProp("state", false))
-            clone->setBoolProp("state", true);
+        if (placeholder->boolProp(sym_State, false))
+            clone->setBoolProp(sym_State, true);
     }
 
     Term* loopOutput = create_list(zero);
@@ -385,10 +385,10 @@ void while_formatSource(caValue* source, Term* term)
     Term* conditionCheck = loop_find_condition_check(contents);
     format_source_for_input(source, conditionCheck, 0);
     append_phrase(source,
-            term->stringProp("syntax:lineEnding", ""),
+            term->stringProp(sym_Syntax_LineEnding, ""),
             term, tok_Whitespace);
     format_block_source(source, contents, term);
-    append_phrase(source, term->stringProp("syntax:whitespaceBeforeEnd", ""),
+    append_phrase(source, term->stringProp(sym_Syntax_WhitespaceBeforeEnd, ""),
         term, tok_Whitespace);
 }
 

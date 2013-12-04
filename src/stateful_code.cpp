@@ -40,13 +40,13 @@ void list_visible_declared_state(Block* block, TermList* output)
 
 void declared_state_format_source(caValue* source, Term* term)
 {
-    if (!term->boolProp("syntax:stateKeyword", false))
+    if (!term->boolProp(sym_Syntax_StateKeyword, false))
         return format_term_source_default_formatting(source, term);
 
     append_phrase(source, "state ", term, tok_State);
 
-    if (term->hasProperty("syntax:explicitType")) {
-        append_phrase(source, term->stringProp("syntax:explicitType",""),
+    if (term->hasProperty(sym_Syntax_ExplicitType)) {
+        append_phrase(source, term->stringProp(sym_Syntax_ExplicitType,""),
                 term, sym_TypeName);
         append_phrase(source, " ", term, tok_Whitespace);
     }
@@ -63,7 +63,7 @@ void declared_state_format_source(caValue* source, Term* term)
 
     if (initializer != NULL) {
         defaultValue = initializer->getFromEnd(0)->input(0);
-        if (defaultValue->boolProp("hidden", false))
+        if (defaultValue->boolProp(sym_Hidden, false))
             defaultValue = defaultValue->input(0);
     }
 

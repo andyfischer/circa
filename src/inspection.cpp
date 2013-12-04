@@ -54,12 +54,12 @@ Term* declared_type_term(Term* term)
 
 void set_is_statement(Term* term, bool value)
 {
-    term->setBoolProp("statement", value);
+    term->setBoolProp(sym_Statement, value);
 }
 
 bool is_statement(Term* term)
 {
-    return term->boolProp("statement", false);
+    return term->boolProp(sym_Statement, false);
 }
 
 bool is_comment(Term* term)
@@ -69,7 +69,7 @@ bool is_comment(Term* term)
 
 bool is_empty_comment(Term* term)
 {
-    return is_comment(term) && term->stringProp("comment","") == "";
+    return is_comment(term) && term->stringProp(sym_Comment,"") == "";
 }
 
 bool is_value(Term* term)
@@ -79,7 +79,7 @@ bool is_value(Term* term)
 
 bool is_hidden(Term* term)
 {
-    if (term->boolProp("syntax:hidden", false))
+    if (term->boolProp(sym_Hidden, false))
         return true;
 
     if (term->name == "")
@@ -236,7 +236,7 @@ bool is_input_meta(Block* block, int index)
     Term* placeholder = get_input_placeholder(block, index);
     if (placeholder == NULL)
         return false;
-    return placeholder->boolProp("meta", false);
+    return placeholder->boolProp(sym_Meta, false);
 }
 
 Block* term_get_function_details(Term* call)
@@ -315,7 +315,7 @@ bool has_variable_args(Block* block)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return false;
-        if (placeholder->boolProp("multiple", false))
+        if (placeholder->boolProp(sym_Multiple, false))
             return true;
     }
 }
@@ -633,14 +633,14 @@ void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
     out << ") ";
 
     // Print out certain properties
-    if (term->boolProp("multiple", false))
+    if (term->boolProp(sym_Multiple, false))
         out << ":multiple ";
-    if (term->boolProp("output", false))
+    if (term->boolProp(sym_Output, false))
         out << ":output ";
-    if (term->boolProp("state", false))
+    if (term->boolProp(sym_State, false))
         out << ":state ";
-    if (term->hasProperty("field"))
-        out << ":field(" << term->stringProp("field", "") << ")";
+    if (term->hasProperty(sym_Field))
+        out << ":field(" << term->stringProp(sym_Field, "") << ")";
 
     out << "t:";
     

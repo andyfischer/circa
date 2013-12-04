@@ -116,7 +116,7 @@ Term* apply_spec(Block* block, caValue* spec)
             rename(result, list_get(spec, i));
         } else {
             i++;
-            term_set_property(result, as_cstring(key), list_get(spec, i));
+            term_set_property(result, as_symbol(key), list_get(spec, i));
         }
     }
 
@@ -446,7 +446,7 @@ Term* apply(Block* block, std::string const& functionName, TermList const& input
         internal_error("function not found: "+functionName);
 
     Term* result = apply(block, function, inputs, name);
-    result->setStringProp("syntax:functionName", functionName.c_str());
+    result->setStringProp(sym_Syntax_FunctionName, functionName.c_str());
     return result;
 }
 
@@ -606,7 +606,7 @@ Term* append_output_placeholder_with_description(Block* block, caValue* descript
         return result;
     } else if (as_symbol(descriptionTag) == sym_Control) {
         Term* result = append_output_placeholder(block, NULL);
-        result->setBoolProp("control", true);
+        result->setBoolProp(sym_Control, true);
         return result;
     } else {
         Term* result = append_output_placeholder(block, NULL);
@@ -666,7 +666,7 @@ Term* find_output_from_description(Block* block, caValue* description)
             Term* placeholder = get_output_placeholder(block, i);
             if (placeholder == NULL)
                 return NULL;
-            if (placeholder->hasProperty("control"))
+            if (placeholder->hasProperty(sym_Control))
                 return placeholder;
         }
     }
@@ -675,7 +675,7 @@ Term* find_output_from_description(Block* block, caValue* description)
             Term* placeholder = get_output_placeholder(block, i);
             if (placeholder == NULL)
                 return NULL;
-            if (placeholder->hasProperty("extraReturn"))
+            if (placeholder->hasProperty(sym_ExtraReturn))
                 return placeholder;
         }
     }
@@ -686,7 +686,7 @@ Term* find_output_from_description(Block* block, caValue* description)
 void get_output_description(Term* output, caValue* result)
 {
     // control output
-    if (output->hasProperty("control")) {
+    if (output->hasProperty(sym_Control)) {
         // return [:control]
         set_list(result, 1);
         set_symbol(list_get(result, 0), sym_Control);
@@ -694,11 +694,11 @@ void get_output_description(Term* output, caValue* result)
     }
 
     // extraReturn output
-    else if (output->hasProperty("extraReturn")) {
+    else if (output->hasProperty(sym_ExtraReturn)) {
         // return [:extraReturn <index>]
         set_list(result, 2);
         set_symbol(list_get(result, 0), sym_ExtraReturn);
-        set_int(list_get(result, 1), output->intProp("extraReturn", 0));
+        set_int(list_get(result, 1), output->intProp(sym_ExtraReturn, 0));
         return;
     }
 
@@ -784,7 +784,7 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
             Term* term = block->get(i);
             if (term == NULL)
                 continue;
-            if (term->boolProp("control", false))
+            if (term->boolProp(sym_Control, false))
                 return term;
         }
         return NULL;
@@ -834,7 +834,7 @@ void update_extra_outputs(Term* term)
         Value name;
 
         // Find the associated input placeholder (if any).
-        int rebindsInput = placeholder->intProp("rebindsInput", -1);
+        int rebindsInput = placeholder->intProp(sym_RebindsInput, -1);
 
         // Use the appropriate name
         if (rebindsInput >= 0) {
@@ -860,7 +860,7 @@ void update_extra_outputs(Term* term)
             move_to_index(extra_output, term->index + index);
 
             if (rebindsInput >= 0)
-                extra_output->setIntProp("rebindsInput", rebindsInput);
+                extra_output->setIntProp(sym_RebindsInput, rebindsInput);
         }
 
         change_declared_type(extra_output, placeholder->type);
@@ -869,12 +869,12 @@ void update_extra_outputs(Term* term)
 
 void set_step(Term* term, float step)
 {
-    term->setFloatProp("step", step);
+    term->setFloatProp(sym_Step, step);
 }
 
 float get_step(Term* term)
 {
-    return term->floatProp("step", 1.0);
+    return term->floatProp(sym_Step, 1.0);
 }
 
 void block_start_changes(Block* block)
@@ -1014,7 +1014,7 @@ bool term_belongs_at_block_end(Term* term)
     if (term->function == FUNCS.output)
         return true;
 
-    if (term->boolProp("final", false))
+    if (term->boolProp(sym_Final, false))
         return true;
 
     return false;

@@ -53,19 +53,19 @@ namespace type_t {
         append_phrase(source, "type ", term, sym_Keyword);
         append_phrase(source, term->name, term, sym_TypeName);
 
-        if (term->hasProperty("syntax:TypeMagicSymbol")) {
+        if (term->hasProperty(sym_Syntax_TypeMagicSymbol)) {
             append_phrase(source, " = ", term, sym_None);
-            append_phrase(source, term->stringProp("syntax:TypeMagicSymbol", ""),
+            append_phrase(source, term->stringProp(sym_Syntax_TypeMagicSymbol, ""),
                 term, sym_None);
         }
 
-        if (term->boolProp("syntax:noBrackets", false))
+        if (term->boolProp(sym_Syntax_NoBrackets, false))
             return;
 
-        append_phrase(source, term->stringProp("syntax:preLBracketWhitespace", " "),
+        append_phrase(source, term->stringProp(sym_Syntax_PreLBracketWs, " "),
                 term, tok_Whitespace);
         append_phrase(source, "{", term, tok_LBracket);
-        append_phrase(source, term->stringProp("syntax:postLBracketWhitespace", " "),
+        append_phrase(source, term->stringProp(sym_Syntax_PostLBracketWs, " "),
                 term, tok_Whitespace);
 
         Block* contents = nested_contents(term);
@@ -74,24 +74,24 @@ namespace type_t {
             Term* field = contents->get(i);
 
             if (is_comment(field)) {
-                append_phrase(source, field->stringProp("comment",""), field, tok_Comment);
-                append_phrase(source, field->stringProp("syntax:lineEnding",""), field, tok_Whitespace);
+                append_phrase(source, field->stringProp(sym_Comment,""), field, tok_Comment);
+                append_phrase(source, field->stringProp(sym_Syntax_LineEnding,""), field, tok_Whitespace);
                 continue;
-            } else if (field->boolProp("fieldAccessor", false)) {
+            } else if (field->boolProp(sym_FieldAccessor, false)) {
                 ca_assert(field != NULL);
-                append_phrase(source, field->stringProp("syntax:preWhitespace",""),
+                append_phrase(source, field->stringProp(sym_Syntax_PreWs,""),
                         term, tok_Whitespace);
 
                 Type* fieldType = get_output_type(function_contents(field), 0);
                 append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
-                append_phrase(source, field->stringProp("syntax:postNameWs"," "),
+                append_phrase(source, field->stringProp(sym_Syntax_PostNameWs," "),
                         term, tok_Whitespace);
                 append_phrase(source, field->name, term, tok_Identifier);
-                append_phrase(source, field->stringProp("syntax:postWhitespace",""),
+                append_phrase(source, field->stringProp(sym_Syntax_PostWs,""),
                         term, tok_Whitespace);
             }
         }
-        append_phrase(source, term->stringProp("syntax:preRBracketWhitespace",""),
+        append_phrase(source, term->stringProp(sym_Syntax_PreRBracketWs,""),
             term, tok_Whitespace);
         append_phrase(source, "}", term, tok_RBracket);
     }
@@ -493,7 +493,7 @@ static int type_decl_get_field_count(Block* declaration)
     for (int i=0; i < declaration->length(); i++) {
         Term* term = declaration->get(i);
 
-        if (!is_function(term) || !term->boolProp("fieldAccessor", false))
+        if (!is_function(term) || !term->boolProp(sym_FieldAccessor, false))
             continue;
 
         count++;
@@ -511,7 +511,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
     // Add getter.
     {
         accessor = create_function(declaration, fieldName);
-        accessor->setBoolProp("fieldAccessor", true);
+        accessor->setBoolProp(sym_FieldAccessor, true);
         Block* accessorContents = nested_contents(accessor);
         Term* selfInput = append_input_placeholder(accessorContents);
         Term* accessorIndex = create_int(accessorContents, fieldIndex, "");
@@ -527,7 +527,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
         set_string(&setterName, "set_");
         string_append(&setterName, fieldName);
         Term* setter = create_function(declaration, as_cstring(&setterName));
-        setter->setBoolProp("setter", true);
+        setter->setBoolProp(sym_Setter, true);
         Block* setterContents = nested_contents(setter);
         Term* selfInput = append_input_placeholder(setterContents);
         Term* valueInput = append_input_placeholder(setterContents);

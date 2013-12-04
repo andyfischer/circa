@@ -102,20 +102,20 @@ struct Term
 
     std::string toString();
 
-    bool hasProperty(const char* name);
-    void removeProperty(const char* name);
-    caValue* getProp(const char* name);
+    bool hasProperty(Symbol key);
+    void removeProperty(Symbol key);
+    caValue* getProp(Symbol key);
 
-    int intProp(const char* name, int defaultValue);
-    float floatProp(const char* name, float defaultValue);
-    bool boolProp(const char* name, bool defaultValue);
-    std::string stringProp(const char* name, const char* defaultValue);
+    int intProp(Symbol key, int defaultValue);
+    float floatProp(Symbol key, float defaultValue);
+    bool boolProp(Symbol key, bool defaultValue);
+    std::string stringProp(Symbol key, const char* defaultValue);
 
-    void setProp(const char* name, caValue* value);
-    void setIntProp(const char* name, int i);
-    void setFloatProp(const char* name, float f);
-    void setBoolProp(const char* name, bool b);
-    void setStringProp(const char* name, std::string const& s);
+    void setProp(Symbol key, caValue* value);
+    void setIntProp(Symbol key, int i);
+    void setFloatProp(Symbol key, float f);
+    void setBoolProp(Symbol key, bool b);
+    void setStringProp(Symbol key, std::string const& s);
 
     void dump();
     Block* parent();
@@ -126,26 +126,26 @@ Term* alloc_term();
 void dealloc_term(Term*);
 
 // Fetches a term property, creating it if it doesn't exist.
-caValue* term_insert_property(Term* term, const char* name);
+caValue* term_insert_property(Term* term, Symbol key);
 
 // Fetches a term property.
-caValue* term_get_property(Term* term, const char* name);
+caValue* term_get_property(Term* term, Symbol key);
 
 // Assigns a property with the given name and value. The argument 'value' is consumed.
-void term_set_property(Term* term, const char* name, caValue* value);
+void term_set_property(Term* term, Symbol key, caValue* value);
 
 // Removes a term property.
-void term_remove_property(Term* term, const char* name);
+void term_remove_property(Term* term, Symbol key);
 
 // Removes the property with the given name from 'source', and assigns that
 // property to 'dest'. Has no effect if 'source' does not have the property.
-void term_move_property(Term* source, Term* dest, const char* propName);
+void term_move_property(Term* source, Term* dest, Symbol key);
 
 // Fetches an input property.
-caValue* term_get_input_property(Term* term, int inputIndex, const char* name);
-caValue* term_insert_input_property(Term* term, int inputIndex, const char* name);
-bool term_get_bool_input_prop(Term* term, int inputIndex, const char* name, bool defaultValue);
-const char* term_get_string_input_prop(Term* term, int inputIndex, const char* name,
+caValue* term_get_input_property(Term* term, int inputIndex, Symbol key);
+caValue* term_insert_input_property(Term* term, int inputIndex, Symbol key);
+bool term_get_bool_input_prop(Term* term, int inputIndex, Symbol key, bool defaultValue);
+const char* term_get_string_input_prop(Term* term, int inputIndex, Symbol key,
     const char* defaultValue);
 
 int term_get_int_prop(Term* term, Symbol prop, int defaultValue);

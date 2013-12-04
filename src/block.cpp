@@ -831,7 +831,7 @@ void block_link_missing_functions(Block* block, Block* source)
     for (BlockIterator it(block); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
-            std::string funcName = term->stringProp("syntax:functionName", "");
+            std::string funcName = term->stringProp(sym_Syntax_FunctionName, "");
 
             if (funcName == "")
                 continue;

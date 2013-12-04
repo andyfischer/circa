@@ -11,7 +11,6 @@
 #include "closures.h"
 #include "control_flow.h"
 #include "code_iterators.h"
-#include "dict.h"
 #include "function.h"
 #include "generic.h"
 #include "hashtable.h"
@@ -69,7 +68,7 @@ caValue* g_spyValues;
 Type* output_placeholder_specializeType(Term* caller)
 {
     // Special case: if we're an accumulatingOutput then the output type is List.
-    if (caller->boolProp("accumulatingOutput", false))
+    if (caller->boolProp(sym_AccumulatingOutput, false))
         return TYPES.list;
 
     if (caller->input(0) == NULL)
@@ -392,7 +391,6 @@ void for_each_root_type(void (*callback)(Type* type))
     (*callback)(TYPES.blob);
     (*callback)(TYPES.block);
     (*callback)(TYPES.bool_type);
-    (*callback)(TYPES.dict);
     (*callback)(TYPES.error);
     (*callback)(TYPES.float_type);
     (*callback)(TYPES.int_type);
@@ -418,14 +416,12 @@ void bootstrap_kernel()
     World* world = g_world;
 
     // Instanciate the types that are used by Type.
-    TYPES.dict = create_type_unconstructed();
     TYPES.map = create_type_unconstructed();
     TYPES.null = create_type_unconstructed();
     TYPES.string = create_type_unconstructed();
     TYPES.type = create_type_unconstructed();
 
     // Now we can fully instanciate types.
-    type_finish_construction(TYPES.dict);
     type_finish_construction(TYPES.map);
     type_finish_construction(TYPES.null);
     type_finish_construction(TYPES.string);
@@ -453,7 +449,6 @@ void bootstrap_kernel()
     blob_setup_type(TYPES.blob);
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
-    dict_t::setup_type(TYPES.dict);
     hashtable_setup_type(TYPES.map);
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
@@ -517,7 +512,6 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.bool_type, "bool");
     create_type_value(builtins, TYPES.blob, "blob");
     create_type_value(builtins, TYPES.block, "Block");
-    create_type_value(builtins, TYPES.dict, "Dict");
     create_type_value(builtins, TYPES.float_type, "number");
     create_type_value(builtins, TYPES.int_type, "int");
     create_type_value(builtins, TYPES.list, "List");
@@ -555,7 +549,7 @@ void bootstrap_kernel()
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
     apply(function_contents(FUNCS.output),
-        FUNCS.input, TermList())->setBoolProp("optional", true);
+        FUNCS.input, TermList())->setBoolProp(sym_Optional, true);
 
     // Setup declare_field() function, needed to represent compound types.
     FUNCS.declare_field = import_function(builtins, NULL, "declare_field() -> any");

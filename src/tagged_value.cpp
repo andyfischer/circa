@@ -456,12 +456,6 @@ void set_bool(caValue* value, bool b)
     value->value_data.asbool = b;
 }
 
-Dict* set_dict(caValue* value)
-{
-    make(TYPES.dict, value);
-    return (Dict*) value;
-}
-
 void set_error_string(caValue* value, const char* s)
 {
     set_string(value, s);

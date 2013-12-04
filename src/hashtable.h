@@ -15,6 +15,7 @@ caValue* hashtable_insert(caValue* table, caValue* key);
 
 caValue* hashtable_get_int_key(caValue* table, int key);
 caValue* hashtable_insert_int_key(caValue* table, int key);
+void hashtable_remove_int_key(caValue* table, int key);
 
 void hashtable_remove(caValue* table, caValue* key);
 bool hashtable_is_empty(caValue* table);
@@ -25,5 +26,23 @@ caValue* hashtable_key_by_index(caValue* table, int index);
 caValue* hashtable_value_by_index(caValue* table, int index);
 
 void hashtable_setup_type(Type* type);
+
+struct HashtableIterator
+{
+    caValue* table;
+    int index;
+
+    HashtableIterator(caValue* table);
+
+    caValue* currentKey();
+    caValue* current();
+    void advance();
+    bool finished();
+
+    operator bool() { return !finished(); }
+    void operator++() { advance(); }
+
+    void _advanceWhileInvalid();
+};
 
 } // namespace circa

@@ -292,13 +292,6 @@ def Block.call(self, any inputs :multiple) -> any
   -- Invoke this Block with the given inputs.
   self.to_func.apply(inputs)
 
-def Dict.count(self) -> int
-  -- Return the number of elements
-def Dict.set(self, String key, any value) -> Dict
-  -- Assign a key-value pair.
-def Dict.get(self, String key) -> any
-  -- Retrieve the value for a given key.
-
 type Frame { Stack stack, int index }
 type RetainedFrame { Block block, any _state }
 type ModuleFrame { Block block, List registers }
@@ -642,8 +635,8 @@ def Term.location_string(self) -> String
 def Term.global_id(self) -> int
     -- Fetch this term's global identifier.
 def Term.properties(self) -> Map
-def Term.property(self, String name) -> any
-    -- Fetch a term property by name.
+def Term.property(self, Symbol key) -> any
+    -- Fetch a term property.
 def Term.is_value(self) -> bool
     self.function == block_ref(value)
 def Term.is_function(self) -> bool

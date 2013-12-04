@@ -98,7 +98,7 @@ bool is_accessor_function(Term* accessor)
 
     // Future: We should be able to detect if a method behaves as an accessor, without
     // an explicit property.
-    if (accessor->function->boolProp("fieldAccessor", false))
+    if (accessor->function->boolProp(sym_FieldAccessor, false))
         return true;
     
     return false;
@@ -165,7 +165,7 @@ Term* write_selector_for_accessor_chain(Block* block, TermList* chain)
             selectorInputs.append(term->input(1));
 
         } else if (is_accessor_function(term)) {
-            Term* element = create_string(block, term->stringProp("syntax:functionName", "").c_str());
+            Term* element = create_string(block, term->stringProp(sym_Syntax_FunctionName, "").c_str());
             selectorInputs.append(element);
         }
     }
@@ -233,7 +233,7 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* term)
             inputIndexOfInterest = inputIndex;
 
         caValue* identifierRebindHint = term_get_input_property(termBeforeHead,
-                inputIndexOfInterest, "syntax:identifierRebind");
+                inputIndexOfInterest, sym_Syntax_IdentifierRebind);
         if (head == NULL || has_empty_name(head)
                 || identifierRebindHint == NULL
                 || !as_bool(identifierRebindHint))
@@ -245,7 +245,7 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* term)
         if (input == head) {
             // No accessor expression, then just do a name rebind.
             rename(output, &head->nameValue);
-            output->setBoolProp("syntax:implicitName", true);
+            output->setBoolProp(sym_Syntax_ImplicitName, true);
         } else {
             // Create a set_with_selector expression.
             TermList accessorChain;
@@ -344,15 +344,15 @@ void set_with_selector__formatSource(caValue* source, Term* term)
 
     selector_format_source(source, selector);
 
-    append_phrase(source, term->stringProp("syntax:preEqualsSpace",""), term, tok_Whitespace);
+    append_phrase(source, term->stringProp(sym_Syntax_PreEqualsSpace,""), term, tok_Whitespace);
 
-    if (term->hasProperty("syntax:rebindOperator")) {
-        append_phrase(source, term->stringProp("syntax:rebindOperator",""), term, tok_Equals);
-        append_phrase(source, term->stringProp("syntax:postEqualsSpace",""), term, tok_Whitespace);
+    if (term->hasProperty(sym_Syntax_RebindOperator)) {
+        append_phrase(source, term->stringProp(sym_Syntax_RebindOperator,""), term, tok_Equals);
+        append_phrase(source, term->stringProp(sym_Syntax_PostEqualsSpace,""), term, tok_Whitespace);
         format_source_for_input(source, term->input(2), 1, "", "");
     } else {
         append_phrase(source, "=", term, tok_Equals);
-        append_phrase(source, term->stringProp("syntax:postEqualsSpace",""), term, tok_Whitespace);
+        append_phrase(source, term->stringProp(sym_Syntax_PostEqualsSpace,""), term, tok_Whitespace);
         format_source_for_input(source, term, 2, "", "");
     }
 }

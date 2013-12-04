@@ -10,7 +10,7 @@ namespace unknown_function_function {
         std::string out;
         out += "Unknown function: ";
         Term* caller = (Term*) circa_caller_term(stack);
-        out += caller->stringProp("syntax:functionName", "");
+        out += caller->stringProp(sym_Syntax_FunctionName, "");
         circa_output_error(stack, out.c_str());
     }
 

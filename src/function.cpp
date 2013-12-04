@@ -50,14 +50,14 @@ void finish_building_function(Block* contents)
     for (int i = count_input_placeholders(contents) - 1; i >= 0; i--) {
         Term* input = get_input_placeholder(contents, i);
 
-        if (input->boolProp("output", false)) {
+        if (input->boolProp(sym_Output, false)) {
 
             Term* result = find_name(contents, input->name.c_str());
             
             Term* output = append_output_placeholder(contents, result);
             rename(output, &input->nameValue);
             change_declared_type(output, input->type);
-            output->setIntProp("rebindsInput", i);
+            output->setIntProp(sym_RebindsInput, i);
         }
     }
 
@@ -95,7 +95,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (outputType == NULL)
         outputType = TYPES.any;
 
-    if (function->boolProp("preferSpecialize", false)) {
+    if (function->boolProp(sym_PreferSpecialize, false)) {
         Term* specialized = statically_specialize_overload_for_call(call);
         if (specialized != NULL)
             return get_output_type(function_contents(specialized), 0);
@@ -105,7 +105,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
 
 bool function_call_rebinds_input(Term* term, int index)
 {
-    return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";
+    return get_input_syntax_hint_optional(term, index, sym_RebindsInput, "") == "t";
 }
 
 void function_format_header_source(caValue* source, Block* function)
@@ -116,9 +116,9 @@ void function_format_header_source(caValue* source, Block* function)
 
     append_phrase(source, term->name, term, sym_TermName);
 
-    append_phrase(source, term->stringProp("syntax:postNameWs", ""),
+    append_phrase(source, term->stringProp(sym_Syntax_PostNameWs, ""),
             term, tok_Whitespace);
-    append_phrase(source, term->stringProp("syntax:properties", ""),
+    append_phrase(source, term->stringProp(sym_Syntax_Properties, ""),
             term, sym_None);
 
     append_phrase(source, "(", term, tok_LParen);
@@ -131,10 +131,10 @@ void function_format_header_source(caValue* source, Block* function)
 
         std::string name = input->name;
 
-        if (input->boolProp("hiddenInput", false))
+        if (input->boolProp(sym_HiddenInput, false))
             continue;
 
-        if (input->boolProp("state", false))
+        if (input->boolProp(sym_State, false))
             append_phrase(source, "state ", term, sym_None);
 
         if (!first)
@@ -142,35 +142,35 @@ void function_format_header_source(caValue* source, Block* function)
         first = false;
 
         // Type (may be omitted)
-        if (input->boolProp("syntax:explicitType", true)) {
+        if (input->boolProp(sym_Syntax_ExplicitType, true)) {
             append_phrase(source, as_cstring(&input->type->name),
                 input->type->declaringTerm, sym_TypeName);
             append_phrase(source, " ", term, tok_Whitespace);
         }
 
         // Name
-        if (input->boolProp("syntax:rebindSymbol", false))
+        if (input->boolProp(sym_Syntax_RebindSymbol, false))
             append_phrase(source, "@", term, sym_None);
 
         append_phrase(source, name, term, sym_None);
 
-        if (input->boolProp("output", false)
-                && !input->boolProp("syntax:rebindSymbol", false)) {
+        if (input->boolProp(sym_Output, false)
+                && !input->boolProp(sym_Syntax_RebindSymbol, false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":out", term, sym_None);
         }
 
-        if (input->boolProp("meta", false)) {
+        if (input->boolProp(sym_Meta, false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":meta", term, sym_None);
         }
 
-        if (input->boolProp("rebind", false)) {
+        if (input->boolProp(sym_Rebind, false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":rebind", term, sym_None);
         }
 
-        if (input->boolProp("multiple", false)) {
+        if (input->boolProp(sym_Multiple, false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":multiple", term, sym_None);
         }
@@ -178,11 +178,11 @@ void function_format_header_source(caValue* source, Block* function)
 
     append_phrase(source, ")", term, tok_LParen);
 
-    if (term->boolProp("syntax:explicitType", false)) {
-        append_phrase(source, term->stringProp("syntax:whitespacePreColon", ""),
+    if (term->boolProp(sym_Syntax_ExplicitType, false)) {
+        append_phrase(source, term->stringProp(sym_Syntax_WhitespacePreColon, ""),
                 term, tok_Whitespace);
         append_phrase(source, "->", term, sym_None);
-        append_phrase(source, term->stringProp("syntax:whitespacePostColon", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_WhitespacePostColon, ""),
                 term, tok_Whitespace);
 
         int unhiddenOutputCount = 0;

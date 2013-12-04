@@ -74,7 +74,6 @@ OBJECTS := \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/control_flow.o \
 	$(OBJDIR)/debug.o \
-	$(OBJDIR)/dict.o \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/filepack.o \
@@ -211,9 +210,6 @@ $(OBJDIR)/control_flow.o: control_flow.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/debug.o: debug.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/dict.o: dict.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file.o: file.cpp

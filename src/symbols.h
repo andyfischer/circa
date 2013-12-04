@@ -4,6 +4,7 @@
 
 namespace circa {
 
+Symbol symbol_from_string(const char* str);
 void set_symbol_from_string(caValue* val, caValue* str);
 void set_symbol_from_string(caValue* val, const char* str);
 

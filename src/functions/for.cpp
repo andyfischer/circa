@@ -9,14 +9,14 @@ namespace for_function {
     {
         format_name_binding(source, term);
         append_phrase(source, "for ", term, sym_Keyword);
-        std::string explicitTypeName = term->stringProp("syntax:explicitType", "");
+        std::string explicitTypeName = term->stringProp(sym_Syntax_ExplicitType, "");
         if (explicitTypeName != "") {
             append_phrase(source, explicitTypeName, term, sym_None);
             append_phrase(source, " ", term, sym_Whitespace);
         }
         append_phrase(source, for_loop_get_iterator_name(term), term, sym_None);
         append_phrase(source, " in ", term, sym_Keyword);
-        if (term->boolProp("modifyList", false))
+        if (term->boolProp(sym_ModifyList, false))
             append_phrase(source, "@", term, sym_None);
         format_source_for_input(source, term, 0);
     }
@@ -25,7 +25,7 @@ namespace for_function {
     {
         format_heading(source, term);
         format_block_source(source, nested_contents(term), term);
-        append_phrase(source, term->stringProp("syntax:whitespaceBeforeEnd", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_WhitespaceBeforeEnd, ""),
             term, tok_Whitespace);
     }
 

@@ -114,10 +114,10 @@ void discard_formatSource(caValue* source, Term* term)
 
 void return_formatSource(caValue* source, Term* term)
 {
-    if (term->boolProp("syntax:returnStatement", false)) {
+    if (term->boolProp(sym_Syntax_ReturnStatement, false)) {
         append_phrase(source, "return", term, sym_Keyword);
         append_phrase(source,
-                term->stringProp("syntax:postKeywordWs", " "),
+                term->stringProp(sym_Syntax_PostKeywordWs, " "),
                 term, sym_Whitespace);
 
         for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {

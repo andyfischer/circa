@@ -493,6 +493,13 @@ caValue* hashtable_insert_int_key(caValue* table, int key)
     return hashtable_insert(table, &boxedKey);
 }
 
+void hashtable_remove_int_key(caValue* table, int key)
+{
+    Value boxedKey;
+    set_int(&boxedKey, key);
+    hashtable_remove(table, &boxedKey);
+}
+
 void hashtable_remove(caValue* tableTv, caValue* key)
 {
     ca_assert(is_hashtable(tableTv));
@@ -581,7 +588,45 @@ void hashtable_setup_type(Type* type)
     type->equals = hashtable_equals;
     type->toString = tagged_value_wrappers::to_string;
     type->storageType = sym_StorageTypeHashtable;
-    // If you add something here, possibly add it to TYPES.module_value too.
+}
+
+HashtableIterator::HashtableIterator(caValue* _table)
+  : table(_table), index(0)
+{
+    _advanceWhileInvalid();
+}
+
+caValue* HashtableIterator::currentKey()
+{
+    return hashtable_key_by_index(table, index);
+}
+
+caValue* HashtableIterator::current()
+{
+    return hashtable_value_by_index(table, index);
+}
+
+void HashtableIterator::advance()
+{
+    index++;
+    _advanceWhileInvalid();
+}
+
+bool HashtableIterator::finished()
+{
+    return index >= hashtable_slot_count(table);
+}
+
+void HashtableIterator::_advanceWhileInvalid()
+{
+possibly_invalid:
+    if (finished())
+        return;
+
+    if (is_null(hashtable_key_by_index(table, index))) {
+        index++;
+        goto possibly_invalid;
+    }
 }
 
 // Publich functions

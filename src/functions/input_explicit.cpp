@@ -16,7 +16,7 @@ namespace input_explicit_function {
 
         Term* in = append_input_placeholder(block);
         set_input(term, 1, in);
-        set_bool(term_insert_input_property(term, 1, "hidden"), true);
+        set_bool(term_insert_input_property(term, 1, sym_Hidden), true);
 
         if (term->input(0) != NULL) {
             Type* type = as_type(term_value(term->input(0)));

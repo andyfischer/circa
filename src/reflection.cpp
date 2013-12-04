@@ -616,8 +616,7 @@ void Term__property(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    const char* key = circa_string_input(stack, 1);
-
+    Symbol key = as_symbol(circa_input(stack, 1));
     caValue* value = term_get_property(t, key);
 
     if (value == NULL)

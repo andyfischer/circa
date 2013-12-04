@@ -696,7 +696,7 @@ void list_type_initialize_from_decl(Type* type, Block* decl)
     for (int i=0; i < decl->length(); i++) {
         Term* term = decl->get(i);
 
-        if (!is_function(term) || !term->boolProp("fieldAccessor", false))
+        if (!is_function(term) || !term->boolProp(sym_FieldAccessor, false))
             continue;
 
         Type* fieldType = get_output_type(function_contents(term), 0);

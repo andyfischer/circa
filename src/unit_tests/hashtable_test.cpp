@@ -72,6 +72,24 @@ void test_get_keys()
     test_equals(&keys, "['a', 'b', 'c']");
 }
 
+void test_hashtable_iterator()
+{
+    Value table;
+    set_hashtable(&table);
+    set_int(hashtable_insert(&table, temp_string("a")), 1);
+    set_int(hashtable_insert(&table, temp_string("b")), 2);
+    set_int(hashtable_insert(&table, temp_string("c")), 3);
+
+    Value table2;
+    set_hashtable(&table2);
+
+    for (HashtableIterator it(&table); it; ++it) {
+        set_value(hashtable_insert(&table2, it.currentKey()), it.current());
+    }
+
+    test_assert(equals(&table, &table2));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(hashtable_test::using_empty_table);
@@ -79,6 +97,7 @@ void register_tests()
     REGISTER_TEST_CASE(hashtable_test::test_mutable_hashtable_simple);
     REGISTER_TEST_CASE(hashtable_test::test_mutable_hashtable);
     REGISTER_TEST_CASE(hashtable_test::test_get_keys);
+    REGISTER_TEST_CASE(hashtable_test::test_hashtable_iterator);
 }
 
 } // namespace hashtable_test

@@ -9,7 +9,6 @@
 #include "closures.h"
 #include "code_iterators.h"
 #include "control_flow.h"
-#include "dict.h"
 #include "function.h"
 #include "generic.h"
 #include "hashtable.h"
@@ -1262,7 +1261,7 @@ void vm_run(Stack* stack, caValue* bytecode)
                 return raise_error(stack);
             }
 
-            caValue* elementName = caller->getProp("methodName");
+            caValue* elementName = caller->getProp(sym_MethodName);
 
             // Find and dispatch method
             Term* method = find_method(top->block, (Type*) circa_type_of(object), elementName);
@@ -1741,7 +1740,7 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
         caValue* dest = NULL;
         int nextPlaceholderIndex = placeholderIndex;
 
-        if (placeholder->boolProp("multiple", false)) {
+        if (placeholder->boolProp(sym_Multiple, false)) {
             caValue* listValue = frame_register(top, placeholderIndex);
             if (!is_list(listValue))
                 set_list(listValue);
@@ -1781,7 +1780,7 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
         }
 
         if (!cast(dest, declared_type(placeholder)))
-            if (!placeholder->boolProp("optional", false))
+            if (!placeholder->boolProp(sym_Optional, false))
                 return raise_error_input_type_mismatch(stack, placeholderIndex);
 
         placeholderIndex = nextPlaceholderIndex;
@@ -1789,11 +1788,11 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
 
     Term* placeholder = top->block->get(placeholderIndex);
     if (is_input_placeholder(placeholder)
-            && !placeholder->boolProp("multiple", false))
+            && !placeholder->boolProp(sym_Multiple, false))
         return raise_error_not_enough_inputs(stack);
 
     // If we never reached the :multiple input, make sure to set it to [].
-    if (placeholder->boolProp("multiple", false)) {
+    if (placeholder->boolProp(sym_Multiple, false)) {
         caValue* listValue = frame_register(top, placeholderIndex);
         if (!is_list(listValue))
             set_list(listValue);
@@ -1816,7 +1815,7 @@ static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs)
         caValue* source = list_get(inputs, inputIndex);
         caValue* dest = NULL;
 
-        if (placeholder->boolProp("multiple", false)) {
+        if (placeholder->boolProp(sym_Multiple, false)) {
             caValue* listValue = frame_register(top, placeholderIndex);
             if (!is_list(listValue))
                 set_list(listValue);
@@ -1828,18 +1827,18 @@ static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs)
             copy(source, dest);
 
             if (!cast(dest, declared_type(placeholder)))
-                if (!placeholder->boolProp("optional", false))
+                if (!placeholder->boolProp(sym_Optional, false))
                     return raise_error_input_type_mismatch(stack, placeholderIndex);
         }
     }
 
     Term* placeholder = top->block->get(placeholderIndex);
     if (is_input_placeholder(placeholder)
-            && !placeholder->boolProp("multiple", false))
+            && !placeholder->boolProp(sym_Multiple, false))
         return raise_error_not_enough_inputs(stack);
 
     // If we never reached the :multiple input, make sure to set it to [].
-    if (placeholder->boolProp("multiple", false)) {
+    if (placeholder->boolProp(sym_Multiple, false)) {
         caValue* listValue = frame_register(top, placeholderIndex);
         if (!is_list(listValue))
             set_list(listValue);

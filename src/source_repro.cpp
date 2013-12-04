@@ -21,10 +21,10 @@ namespace circa {
 void format_block_source(caValue* source, Block* block, Term* format)
 {
     if (format != NULL)
-        append_phrase(source, format->stringProp("syntax:postHeadingWs", ""),
+        append_phrase(source, format->stringProp(sym_Syntax_PostHeadingWs, ""),
                 format, sym_Whitespace);
 
-    bool styleBraces = format && format->stringProp("syntax:blockStyle","") == "braces";
+    bool styleBraces = format && format->stringProp(sym_Syntax_BlockStyle,"") == "braces";
 
     if (styleBraces)
         append_phrase(source, "{", format, sym_None);
@@ -42,15 +42,15 @@ void format_block_source(caValue* source, Block* block, Term* format)
         }
 
         // Indentation
-        append_phrase(source, term->stringProp("syntax:preWhitespace", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_PreWs, ""),
             term, sym_Whitespace);
 
         format_term_source(source, term);
 
-        if (term->hasProperty("syntax:lineEnding")) {
-            append_phrase(source, term->stringProp("syntax:lineEnding", ""),
+        if (term->hasProperty(sym_Syntax_LineEnding)) {
+            append_phrase(source, term->stringProp(sym_Syntax_LineEnding, ""),
                 term, sym_None);
-        } else if (term->hasProperty("syntax:postHeadingWs"))  {
+        } else if (term->hasProperty(sym_Syntax_PostHeadingWs))  {
             // no newline needed
         } else {
             newlineNeeded = true;
@@ -58,7 +58,7 @@ void format_block_source(caValue* source, Block* block, Term* format)
     }
 
     if (format != NULL) {
-        append_phrase(source, format->stringProp("syntax:preEndWs", ""),
+        append_phrase(source, format->stringProp(sym_Syntax_WhitespaceBeforeEnd, ""),
                 format, sym_Whitespace);
     }
 
@@ -96,7 +96,7 @@ void block_to_code_lines(Block* block, caValue* out)
         set_list(&phrases, 0);
 
         // Indentation
-        append_phrase(&phrases, term->stringProp("syntax:preWhitespace", ""),
+        append_phrase(&phrases, term->stringProp(sym_Syntax_PreWs, ""),
             term, sym_Whitespace);
 
         format_term_source(&phrases, term);
@@ -135,23 +135,15 @@ std::string unformat_rich_source(caValue* source)
 
 static void format_value_term(caValue* source, Term* valueTerm)
 {
-    // Special constructor syntax
-    if (valueTerm->boolProp("constructor", false)) {
-        append_phrase(source, as_cstring(&valueTerm->type->name), valueTerm, sym_None);
-        append_phrase(source, "()", valueTerm, sym_None);
-
-    // Otherwise use formatSource on type type.
-    } else {
-        Type* type = term_value(valueTerm)->value_type;
-        if (type->formatSource == NULL) {
-            std::stringstream out;
-            out << "Type " << as_cstring(&type->name) <<
-                " doesn't have a formatSource function";
-            internal_error(out.str());
-        }
-
-        type->formatSource(source, valueTerm);
+    Type* type = term_value(valueTerm)->value_type;
+    if (type->formatSource == NULL) {
+        std::stringstream out;
+        out << "Type " << as_cstring(&type->name) <<
+            " doesn't have a formatSource function";
+        internal_error(out.str());
     }
+
+    type->formatSource(source, valueTerm);
 }
 
 void format_term_source(caValue* source, Term* term)
@@ -175,8 +167,7 @@ void format_term_source(caValue* source, Term* term)
         format_term_source_default_formatting(source, term);
     }
 
-    // Post whitespace
-    append_phrase(source, term->stringProp("syntax:postWhitespace", ""),
+    append_phrase(source, term->stringProp(sym_Syntax_PostWs, ""),
             term, sym_Whitespace);
 }
 
@@ -210,17 +201,17 @@ void format_term_source_normal(caValue* source, Term* term)
 
 void format_term_source_default_formatting(caValue* source, Term* term)
 {
-    std::string declarationStyle = term->stringProp("syntax:declarationStyle",
+    std::string declarationStyle = term->stringProp(sym_Syntax_DeclarationStyle,
             "function-call");
 
-    std::string functionName = term->stringProp("syntax:functionName",
+    std::string functionName = term->stringProp(sym_Syntax_FunctionName,
             term->function->name.c_str());
 
     // Check for an infix operator with implicit rebinding (like +=).
-    if (declarationStyle == "infix" && term->boolProp("syntax:rebindingInfix", false)) {
+    if (declarationStyle == "infix" && term->boolProp(sym_Syntax_RebindingInfix, false)) {
         append_phrase(source, term->name.c_str(), term, sym_None);
         append_phrase(source,
-                get_input_syntax_hint_optional(term, 0, "preWhitespace", " "),
+                get_input_syntax_hint_optional(term, 0, sym_Syntax_PreWs, " "),
                 term, sym_Whitespace);
         append_phrase(source, functionName.c_str(), term, sym_InfixOperator);
         format_source_for_input(source, term, 1);
@@ -231,7 +222,7 @@ void format_term_source_default_formatting(caValue* source, Term* term)
     format_name_binding(source, term);
 
     // possibly add parens
-    int numParens = term->intProp("syntax:parens", 0);
+    int numParens = term->intProp(sym_Syntax_Parens, 0);
     for (int p=0; p < numParens; p++)
         append_phrase(source, "(", term, tok_LParen);
 
@@ -242,30 +233,30 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         else
             append_phrase(source, functionName.c_str(), term, sym_FunctionName);
 
-        if (!term->boolProp("syntax:no-parens", false))
+        if (!term->boolProp(sym_Syntax_NoParens, false))
             append_phrase(source, "(", term, tok_LParen);
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
-        if (!term->boolProp("syntax:no-parens", false))
+        if (!term->boolProp(sym_Syntax_NoParens, false))
             append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
         
-        append_phrase(source, term->stringProp("syntax:operator", "."),
+        append_phrase(source, term->stringProp(sym_Syntax_Operator, "."),
             term, sym_None);
 
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
 
-        if (!term->boolProp("syntax:no-parens", false))
+        if (!term->boolProp(sym_Syntax_NoParens, false))
             append_phrase(source, "(", term, tok_LParen);
 
         for (int i=1; i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
-        if (!term->boolProp("syntax:no-parens", false))
+        if (!term->boolProp(sym_Syntax_NoParens, false))
             append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "dot-access") {
         format_source_for_input(source, term, 0);
@@ -281,32 +272,32 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         format_source_for_input(source, term, 1);
     } else if (declarationStyle == "prefix") {
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
-        append_phrase(source, term->stringProp("syntax:postFunctionWs", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_PostFunctionWs, ""),
             term, sym_Whitespace);
         format_source_for_input(source, term, 0);
     } else if (declarationStyle == "arrow-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, "->", term, sym_None);
-        append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_PostOperatorWs, ""),
                 term, sym_Whitespace);
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "bar-apply") {
         format_source_for_input(source, term, 0);
         append_phrase(source, "|", term, sym_None);
-        append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_PostOperatorWs, ""),
                 term, sym_Whitespace);
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "method-right-arrow") {
         format_source_for_input(source, term, 1);
         append_phrase(source, "->", term, sym_None);
-        append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_PostOperatorWs, ""),
                 term, sym_Whitespace);
         format_source_for_input(source, term, 0);
         append_phrase(source, ".", term, sym_None);
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
     } else if (declarationStyle == "left-arrow") {
         append_phrase(source, functionName.c_str(), term, sym_FunctionName);
-        append_phrase(source, term->stringProp("syntax:preOperatorWs", ""),
+        append_phrase(source, term->stringProp(sym_Syntax_PreOperatorWs, ""),
                 term, sym_Whitespace);
         append_phrase(source, "<-", term, sym_None);
         format_source_for_input(source, term, 0);
@@ -337,7 +328,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
         return;
 
     // Check if this input is hidden
-    if (term_get_bool_input_prop(term, inputIndex, "hidden", false))
+    if (term_get_bool_input_prop(term, inputIndex, sym_Hidden, false))
         return;
 
     // Prevent infinite recursion; don't directly format the input source
@@ -350,14 +341,14 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     }
 
     bool methodCall =
-        term->stringProp("syntax:declarationStyle", "") == "method-call"
-        || term->stringProp("syntax:declarationStyle", "") == "method-right-arrow";
+        term->stringProp(sym_Syntax_DeclarationStyle, "") == "method-call"
+        || term->stringProp(sym_Syntax_DeclarationStyle, "") == "method-right-arrow";
 
     if (methodCall && inputIndex == 0)
         defaultPost = "";
 
     append_phrase(source,
-        get_input_syntax_hint_optional(term, inputIndex, "preWhitespace", defaultPre), 
+        get_input_syntax_hint_optional(term, inputIndex, sym_Syntax_PreWs, defaultPre), 
         term, sym_Whitespace);
 
     // Also, possibly insert the & operator.
@@ -372,20 +363,20 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
         format_term_source(source, input);
     } else {
         // Named input
-        caValue* identifierRebind = term_get_input_property(term, inputIndex, "syntax:identifierRebind");
+        caValue* identifierRebind = term_get_input_property(term, inputIndex, sym_Syntax_IdentifierRebind);
         if (identifierRebind != NULL && as_bool(identifierRebind))
             append_phrase(source, "@", term, sym_TermName);
         append_phrase(source, get_relative_name_at(term, input), term, sym_TermName);
     }
 
     append_phrase(source,
-        get_input_syntax_hint_optional(term, inputIndex, "postWhitespace", defaultPost), 
+        get_input_syntax_hint_optional(term, inputIndex, sym_Syntax_PostWs, defaultPost), 
         term, sym_Whitespace);
 }
 
 bool is_method_call(Term* term)
 {
-    return term->stringProp("syntax:declarationStyle", "") == "method-call";
+    return term->stringProp(sym_Syntax_DeclarationStyle, "") == "method-call";
 }
 
 static bool has_implicit_name_binding(Term* term)
@@ -393,15 +384,15 @@ static bool has_implicit_name_binding(Term* term)
     if (term->name == "")
         return false;
 
-    if (term->boolProp("syntax:implicitName", false))
+    if (term->boolProp(sym_Syntax_ImplicitName, false))
         return true;
 
-    if (term->hasProperty("syntax:rebindOperator"))
+    if (term->hasProperty(sym_Syntax_RebindOperator))
         return true;
 
     if (is_method_call(term)) {
         return get_input_placeholder(term_function(term), 0)
-            ->boolProp("rebind", false);
+            ->boolProp(sym_Rebind, false);
     }
 
     return false;
@@ -415,7 +406,7 @@ void format_name_binding(caValue* source, Term* term)
         return;
     else {
 
-        caValue* nameBindingSyntax = term_get_property(term, "syntax:nameBinding");
+        caValue* nameBindingSyntax = term_get_property(term, sym_Syntax_NameBinding);
 
         if (nameBindingSyntax == NULL) {
             // Default formatting.
@@ -512,7 +503,7 @@ int get_first_visible_input_index(Term* term)
 {
     int i = 0;
     for (; i < term->numInputs(); i++) {
-        if (term_get_input_property(term, i, "hidden") != NULL)
+        if (term_get_input_property(term, i, sym_Hidden) != NULL)
             continue;
         else
             break;
@@ -520,40 +511,40 @@ int get_first_visible_input_index(Term* term)
     return i;
 }
 
-std::string get_input_syntax_hint(Term* term, int index, const char* field)
+std::string get_input_syntax_hint(Term* term, int index, Symbol key)
 {
     if (term->inputInfo(index) == NULL)
         return "";
 
-    return term_get_string_input_prop(term, index, field, "");
+    return term_get_string_input_prop(term, index, key, "");
 }
 
-std::string get_input_syntax_hint_optional(Term* term, int index, const char* field,
+std::string get_input_syntax_hint_optional(Term* term, int index, Symbol key,
         std::string const& defaultValue)
 {
     if (term->inputInfo(index) == NULL)
         return defaultValue;
 
-    return term_get_string_input_prop(term, index, field, defaultValue.c_str());
+    return term_get_string_input_prop(term, index, key, defaultValue.c_str());
 }
 
-void set_input_syntax_hint(Term* term, int index, const char* field,
+void set_input_syntax_hint(Term* term, int index, Symbol key,
         std::string const& value)
 {
     ca_assert(term->inputInfo(index) != NULL);
-    set_string(term_insert_input_property(term, index, field), value.c_str());
+    set_string(term_insert_input_property(term, index, key), value.c_str());
 }
 
-void set_input_syntax_hint(Term* term, int index, const char* field, caValue* value)
+void set_input_syntax_hint(Term* term, int index, Symbol key, caValue* value)
 {
     ca_assert(term->inputInfo(index) != NULL);
-    copy(value, term_insert_input_property(term, index, field));
+    copy(value, term_insert_input_property(term, index, key));
 }
 
 void hide_from_source(Term* term)
 {
     ca_assert(term != NULL);
-    term->setBoolProp("syntax:hidden", true);
+    term->setBoolProp(sym_Hidden, true);
 }
 
 } // namespace circa

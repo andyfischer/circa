@@ -106,7 +106,6 @@ struct BuiltinTypes {
     Type* blob;
     Type* bool_type;
     Type* color;
-    Type* dict;
     Type* error;
     Type* file_signature;
     Type* frame;

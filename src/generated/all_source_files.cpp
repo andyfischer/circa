@@ -8,7 +8,6 @@
 #include "../code_iterators.cpp"
 #include "../control_flow.cpp"
 #include "../debug.cpp"
-#include "../dict.cpp"
 #include "../file.cpp"
 #include "../file_watch.cpp"
 #include "../filepack.cpp"
