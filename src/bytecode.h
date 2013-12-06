@@ -4,6 +4,7 @@
 
 namespace circa {
 
+// Instructions.
 const char bc_End = 0x0;
 const char bc_Pause = 0x1;
 const char bc_SetNull = 0x2;
@@ -66,6 +67,10 @@ const char bc_MemoizeSave = 0x51;
 
 // Inline state.
 const char bc_PackState = 0x55;
+
+// Method lookup caching.
+const int c_methodCacheCount = 5;
+const size_t c_methodCacheSize = 5 * (sizeof(int) + sizeof(Block*));
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
 int bytecode_op_to_term_index(const char* bc, int pc);

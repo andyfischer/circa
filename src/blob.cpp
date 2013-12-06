@@ -116,6 +116,14 @@ void blob_append_int(caValue* blob, unsigned int val)
     *position = val;
 }
 
+void blob_append_space(caValue* blob, size_t size)
+{
+    size_t previousSize = blob_size(blob);
+    blob_resize(blob, previousSize + size);
+    char* position = &as_blob(blob)[size];
+    memset(position, 0, size);
+}
+
 char blob_read_char(const char* data, int* pos)
 {
     char c = data[*pos];

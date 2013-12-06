@@ -81,6 +81,7 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_PushDynamicMethod:
         set_string(string, "push_dyn_method ");
         string_append(string, blob_read_int(bc, pc));
+        *pc += c_methodCacheSize;
         break;
     case bc_PushFuncCall:
         set_string(string, "push_func_call ");
@@ -485,6 +486,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         referenceTargetBlock = NULL;
         blob_append_char(bytecode, bc_PushDynamicMethod);
         blob_append_int(bytecode, term->index);
+        blob_append_space(bytecode, c_methodCacheSize);
     }
 
     else if (term->function == FUNCS.if_block) {

@@ -915,6 +915,11 @@ u16 vm_read_u16(Stack* stack)
     return blob_read_u16(stack->bc, &stack->pc);
 }
 
+void vm_skip_bytecode(Stack* stack, size_t size)
+{
+    stack->pc += size;
+}
+
 static caValue* vm_read_local_value(Stack* stack)
 {
     u16 stackDistance = vm_read_u16(stack);
@@ -1243,6 +1248,8 @@ void vm_run(Stack* stack, caValue* bytecode)
 
             int termIndex = vm_read_int(stack);
 
+            vm_skip_bytecode(stack, c_methodCacheSize);
+
             Frame* top = stack_top(stack);
             Term* caller = frame_term(top, termIndex);
 
@@ -1261,53 +1268,57 @@ void vm_run(Stack* stack, caValue* bytecode)
                 return raise_error(stack);
             }
 
-            caValue* elementName = caller->getProp(sym_MethodName);
+            Block* block = vm_search_method_cache(stack, object);
+           
+            if (block == NULL) {
+                caValue* elementName = caller->getProp(sym_MethodName);
 
-            // Find and dispatch method
-            Term* method = find_method(top->block, (Type*) circa_type_of(object), elementName);
+                // Find and dispatch method
+                Term* method = find_method(top->block, (Type*) circa_type_of(object), elementName);
 
-            // Method not found.
-            if (method == NULL) {
+                // Method not found.
+                if (method == NULL) {
 
-                if (is_module_ref(object)
-                        && vm_handle_method_as_module_access(top, termIndex, object, elementName))
-                    goto dyn_call_resolved;
+                    if (is_module_ref(object)
+                            && vm_handle_method_as_module_access(top, termIndex, object, elementName))
+                        goto dyn_call_resolved;
+                    
+                    if (is_hashtable(object)
+                            && vm_handle_method_as_hashtable_field(top, caller, object, elementName))
+                        goto dyn_call_resolved;
+                    
+
+                    Value msg;
+                    set_string(&msg, "Method ");
+                    string_append(&msg, elementName);
+                    string_append(&msg, " not found on type ");
+                    string_append(&msg, &circa_type_of(object)->name);
+                    set_error_string(frame_register(top, caller), as_cstring(&msg));
+                    raise_error(stack);
+                    return;
+                }
                 
-                if (is_hashtable(object)
-                        && vm_handle_method_as_hashtable_field(top, caller, object, elementName))
+                // Check for methods that are normally handled with different bytecode.
+
+                if (method == FUNCS.func_call) {
+                    vm_push_func_call_closure(stack, termIndex, object);
                     goto dyn_call_resolved;
-                
+                }
 
-                Value msg;
-                set_string(&msg, "Method ");
-                string_append(&msg, elementName);
-                string_append(&msg, " not found on type ");
-                string_append(&msg, &circa_type_of(object)->name);
-                set_error_string(frame_register(top, caller), as_cstring(&msg));
-                raise_error(stack);
-                return;
-            }
-            
-            // Check for methods that are normally handled with different bytecode.
+                if (method == FUNCS.func_apply) {
+                    stack->pc = pcBeforeTargetObject;
+                    vm_push_func_apply(stack, termIndex);
+                    goto dyn_call_resolved;
+                }
 
-            if (method == FUNCS.func_call) {
-                vm_push_func_call_closure(stack, termIndex, object);
-                goto dyn_call_resolved;
-            }
-
-            if (method == FUNCS.func_apply) {
-                stack->pc = pcBeforeTargetObject;
-                vm_push_func_apply(stack, termIndex);
-                goto dyn_call_resolved;
-            }
-
-            // Call this method.
-            {
-                Block* block = nested_contents(method);
-                stack->pc = pcBeforeTargetObject;
-                top = vm_push_frame(stack, termIndex, block);
-                expand_frame(stack_top_parent(stack), top);
-                vm_run_input_bytecodes(stack, caller);
+                // Call this method.
+                {
+                    Block* block = nested_contents(method);
+                    stack->pc = pcBeforeTargetObject;
+                    top = vm_push_frame(stack, termIndex, block);
+                    expand_frame(stack_top_parent(stack), top);
+                    vm_run_input_bytecodes(stack, caller);
+                }
             }
 
 dyn_call_resolved:
@@ -2147,6 +2158,22 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop
     }
 
     // bytecode_dump(bytecode);
+}
+
+static Block* vm_search_method_cache()
+{
+    // Check method lookup cache here.
+    for (int i=0; i < c_methodCacheCount; i++) {
+        int typeId = vm_read_int();
+        Block* block = vm_read_pointer();
+
+        if (typeId == object->value_type->id) {
+            return block;
+        }
+    }
+
+    vm_move_pc();
+    
 }
 
 bool run_memoize_check(Stack* stack)

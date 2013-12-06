@@ -10,6 +10,7 @@ void blob_resize(caValue* blob, int size);
 void blob_append_char(caValue* blob, char c);
 void blob_append_u16(caValue* blob, u16 val);
 void blob_append_int(caValue* blob, unsigned int val);
+void blob_append_space(caValue* blob, size_t size);
 
 char blob_read_char(const char* data, int* pos);
 u16 blob_read_u16(const char* data, int* pos);
