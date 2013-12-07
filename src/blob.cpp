@@ -108,11 +108,11 @@ void blob_append_u16(caValue* blob, u16 val)
     *position = val;
 }
 
-void blob_append_int(caValue* blob, unsigned int val)
+void blob_append_u32(caValue* blob, u32 val)
 {
     int size = blob_size(blob);
     blob_resize(blob, size + 4);
-    unsigned int* position = (unsigned int*) &as_blob(blob)[size];
+    u32* position = (u32*) &as_blob(blob)[size];
     *position = val;
 }
 
@@ -137,9 +137,9 @@ u16 blob_read_u16(const char* data, int* pos)
     return value;
 }
 
-unsigned int blob_read_int(const char* data, int* pos)
+u32 blob_read_u32(const char* data, int* pos)
 {
-    unsigned int value = *((unsigned int*) &data[*pos]);
+    u32 value = *((u32*) &data[*pos]);
     *pos += 4;
     return value;
 }
@@ -151,9 +151,9 @@ void* blob_read_pointer(const char* data, int* pos)
     return value;
 }
 
-void blob_write_int(char* data, int* pos, unsigned int value)
+void blob_write_u32(char* data, int* pos, u32 value)
 {
-    *((unsigned int*) &data[*pos]) = value;
+    *((u32*) &data[*pos]) = value;
     *pos += 4;
 }
 

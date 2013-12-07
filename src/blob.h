@@ -9,15 +9,15 @@ int blob_size(caValue* blob);
 void blob_resize(caValue* blob, int size);
 void blob_append_char(caValue* blob, char c);
 void blob_append_u16(caValue* blob, u16 val);
-void blob_append_int(caValue* blob, unsigned int val);
+void blob_append_u32(caValue* blob, u32 val);
 void blob_append_space(caValue* blob, size_t size);
 
 char blob_read_char(const char* data, int* pos);
 u16 blob_read_u16(const char* data, int* pos);
-unsigned int blob_read_int(const char* data, int* pos);
+u32 blob_read_u32(const char* data, int* pos);
 void* blob_read_pointer(const char* data, int* pos);
 
-void blob_write_int(char* data, int* pos, unsigned int value);
+void blob_write_u32(char* data, int* pos, u32 value);
 void blob_write_pointer(char* data, int* pos, void* value);
 
 void blob_to_hex_string(caValue* blob, caValue* str);
