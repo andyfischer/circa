@@ -58,6 +58,8 @@ struct Type
     // CircaObject header, must be the first field.
     CircaObject header;
 
+    int id;
+
     Value name;
 
     // Enum describing the data structure used to store this type's value.

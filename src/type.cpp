@@ -205,6 +205,7 @@ Type* create_type_unconstructed()
     t->storageType = sym_StorageTypeNull;
     t->header.refcount = 1;
     t->inUse = false;
+    t->id = global_world()->nextTypeID++;
     return t;
 }
 

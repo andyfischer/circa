@@ -32,6 +32,7 @@ World* alloc_world()
     world->nextTermID = 1;
     world->nextBlockID = 1;
     world->nextStackID = 1;
+    world->nextTypeID = 1;
     world->firstStack = NULL;
     world->lastStack = NULL;
     world->builtinPatch = NULL;

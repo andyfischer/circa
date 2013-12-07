@@ -15,6 +15,10 @@ void blob_append_space(caValue* blob, size_t size);
 char blob_read_char(const char* data, int* pos);
 u16 blob_read_u16(const char* data, int* pos);
 unsigned int blob_read_int(const char* data, int* pos);
+void* blob_read_pointer(const char* data, int* pos);
+
+void blob_write_int(char* data, int* pos, unsigned int value);
+void blob_write_pointer(char* data, int* pos, void* value);
 
 void blob_to_hex_string(caValue* blob, caValue* str);
 

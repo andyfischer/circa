@@ -28,7 +28,7 @@ struct Stack
     Value topContext;
 
     // Transient data, used during vm_run.
-    const char* bc;
+    char* bc;
     int pc;
 
     // Current step, either StackReady, StackRunning or StackFinished.

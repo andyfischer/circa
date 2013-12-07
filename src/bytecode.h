@@ -70,7 +70,8 @@ const char bc_PackState = 0x55;
 
 // Method lookup caching.
 const int c_methodCacheCount = 5;
-const size_t c_methodCacheSize = 5 * (sizeof(int) + sizeof(Block*));
+const size_t c_methodCacheLineSize = sizeof(int) + sizeof(Block*);
+const size_t c_methodCacheSize = 5 * c_methodCacheLineSize;
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
 int bytecode_op_to_term_index(const char* bc, int pc);

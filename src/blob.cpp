@@ -116,12 +116,11 @@ void blob_append_int(caValue* blob, unsigned int val)
     *position = val;
 }
 
-void blob_append_space(caValue* blob, size_t size)
+void blob_append_space(caValue* blob, size_t additionalSize)
 {
-    size_t previousSize = blob_size(blob);
-    blob_resize(blob, previousSize + size);
-    char* position = &as_blob(blob)[size];
-    memset(position, 0, size);
+    size_t size = blob_size(blob);
+    blob_resize(blob, size + additionalSize);
+    memset(as_blob(blob) + size, 0, additionalSize);
 }
 
 char blob_read_char(const char* data, int* pos)
@@ -133,16 +132,35 @@ char blob_read_char(const char* data, int* pos)
 
 u16 blob_read_u16(const char* data, int* pos)
 {
-    u16 val = *((u16*) &data[*pos]);
+    u16 value = *((u16*) &data[*pos]);
     *pos += 2;
-    return val;
+    return value;
 }
 
 unsigned int blob_read_int(const char* data, int* pos)
 {
-    int val = *((unsigned int*) &data[*pos]);
+    unsigned int value = *((unsigned int*) &data[*pos]);
     *pos += 4;
-    return val;
+    return value;
+}
+
+void* blob_read_pointer(const char* data, int* pos)
+{
+    void* value = *((void**) &data[*pos]);
+    *pos += sizeof(void*);
+    return value;
+}
+
+void blob_write_int(char* data, int* pos, unsigned int value)
+{
+    *((unsigned int*) &data[*pos]) = value;
+    *pos += 4;
+}
+
+void blob_write_pointer(char* data, int* pos, void* value)
+{
+    *((void**) &data[*pos]) = value;
+    *pos += sizeof(void*);
 }
 
 static char to_hex_digit(int i)

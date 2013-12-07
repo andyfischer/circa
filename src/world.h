@@ -18,6 +18,7 @@ struct World {
     int nextTermID;
     int nextBlockID;
     int nextStackID;
+    int nextTypeID;
 
     // Active file sources.
     Value fileSources;
