@@ -1,9 +1,8 @@
 
 Miscellanous (most-recent first)
 
-  Performance killers:
-    #1 the O(n) lookup for method names
-    #2 boolProp inside vm_run_input_bytecodes
+  Method lookup cache:
+    Currently does not cache method-on-module-ref, or hashtable value as method.
 
   Allow for the trailing part of a dot-expression to be on a new line:
 

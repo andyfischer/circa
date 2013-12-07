@@ -424,7 +424,7 @@ static void indent(std::stringstream& strm, int count)
         strm << " ";
 }
 
-void stack_to_string(Stack* stack, caValue* out)
+void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
 {
     std::stringstream strm;
 
@@ -437,6 +437,9 @@ void stack_to_string(Stack* stack, caValue* out)
         Frame* frame = frame_by_index(stack, frameIndex);
 
         bool lastFrame = frameIndex == stack->frames.count - 1;
+
+        const char* bytecode = as_blob(frame_bytecode(frame));
+        int bytecodePc = 0;
 
         Frame* childFrame = NULL;
         if (!lastFrame)
@@ -496,20 +499,21 @@ void stack_to_string(Stack* stack, caValue* out)
                     strm << " = " << to_string(value);
             }
 
-            // bytecode
-            #if 0
-            while (bytecode[bytecodePc] != bc_Done) {
-                int currentTermIndex = bytecode_op_to_term_index(bytecode, bytecodePc);
-                if (currentTermIndex != -1 && currentTermIndex != i)
-                    break;
 
-                Value str;
-                bytecode_op_to_string(bytecode, &bytecodePc, &str);
-                strm << std::endl;
-                indent(strm, frameIndex+4);
-                strm << as_cstring(&str);
+            // bytecode
+            if (withBytecode) {
+                while (bytecode[bytecodePc] != bc_End) {
+                    int currentTermIndex = bytecode_op_to_term_index(bytecode, bytecodePc);
+                    if (currentTermIndex != -1 && currentTermIndex != i)
+                        break;
+
+                    Value str;
+                    bytecode_op_to_string(bytecode, &bytecodePc, &str);
+                    strm << std::endl;
+                    indent(strm, frameIndex+4);
+                    strm << as_cstring(&str);
+                }
             }
-            #endif
 
             strm << std::endl;
         }
@@ -2452,7 +2456,17 @@ void Stack__block(caStack* stack)
 void Stack__dump(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    dump(self);
+    Value str;
+    stack_to_string(self, &str, false);
+    write_log(as_cstring(&str));
+}
+
+void Stack__dump_with_bytecode(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Value str;
+    stack_to_string(self, &str, true);
+    write_log(as_cstring(&str));
 }
 
 void Stack__extract_state(caStack* stack)
@@ -2736,7 +2750,7 @@ void Stack__toString(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
 
-    stack_to_string(self, circa_output(stack, 0));
+    stack_to_string(self, circa_output(stack, 0), false);
 }
 
 void reflect__caller(caStack* stack)
@@ -2776,6 +2790,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "capture_stack", capture_stack);
     module_patch_function(patch, "Stack.block", Stack__block);
     module_patch_function(patch, "Stack.dump", Stack__dump);
+    module_patch_function(patch, "Stack.dump_with_bytecode", Stack__dump_with_bytecode);
     module_patch_function(patch, "Stack.extract_state", Stack__extract_state);
     module_patch_function(patch, "Stack.eval_on_demand", Stack__eval_on_demand);
     module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);

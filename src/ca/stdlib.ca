@@ -338,6 +338,7 @@ def Stack.current_term(self) -> Term
   self.top.current_term
 def Stack.dump(self)
   -- Dumps a string representation to stdout.
+def Stack.dump_with_bytecode(self)
 def Stack.eval_on_demand(self, Term term) -> any
 def Stack.find_active_value(self, Term term) -> any
 def Stack.rethrow(self)
@@ -477,7 +478,7 @@ def List.div(self, any value) -> List
   for i in self { i / value }
 
 def List.cycle(self, int index) -> any
-  -- Get an element by index. If the index is out of bounds, then module the
+  -- Get an element by index. If the index is out of bounds, then modulo the
   -- index to one that exists.
   self.get(mod(index, self.length))
 

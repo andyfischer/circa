@@ -59,7 +59,7 @@ void dump(caValue* value)
 void dump(Stack* stack)
 {
     Value str;
-    stack_to_string(stack, &str);
+    stack_to_string(stack, &str, false);
     write_log(as_cstring(&str));
 }
 

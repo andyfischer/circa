@@ -50,7 +50,7 @@ caValue* stack_find_active_value(Frame* frame, Term* term);
 // Returns whether evaluation has been stopped due to an error.
 bool stack_errored(Stack* stack);
 
-void stack_to_string(Stack* stack, caValue* out);
+void stack_to_string(Stack* stack, caValue* out, bool withBytecode);
 void stack_trace_to_string(Stack* stack, caValue* out);
 
 void stack_extract_state(Stack* stack, caValue* output);

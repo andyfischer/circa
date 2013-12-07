@@ -1,0 +1,47 @@
+
+type A {}
+
+def A.f(self)
+  print('called A.f')
+
+type B {}
+
+def B.f(self)
+  print('called B.f')
+
+type C {}
+
+def C.f(self)
+  print('called C.f')
+
+type D {}
+
+def D.f(self)
+  print('called D.f')
+
+type E {}
+
+def E.f(self)
+  print('called E.f')
+
+type F {}
+
+def F.f(self)
+  print('called F.f')
+
+type G {}
+
+def G.f(self)
+  print('called G.f')
+
+def main(int i)
+  val = [A B C D E F G].cycle(i).make
+  any.cast(@val)
+  val.f
+
+stack = make_stack(main)
+
+for i in 0..20
+  stack.call(i)
+
+  --stack.dump_with_bytecode

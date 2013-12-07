@@ -67,7 +67,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
         return;
     }
     if (string_eq(line, "/stack")) {
-        stack_to_string(stack, list_append(output));
+        stack_to_string(stack, list_append(output), false);
         return;
     }
 
