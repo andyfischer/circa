@@ -8,6 +8,12 @@ namespace input_explicit_function {
     void input_explicit(caStack* stack)
     {
         copy(circa_input(stack, 1), circa_output(stack, 0));
+
+        Term* in = circa_caller_term(stack)->input(0);
+        if (in != NULL) {
+            Type* type = as_type(circa_input(stack, 0));
+            cast(circa_output(stack, 0), type);
+        }
     }
 
     void input_postCompile(Term* term)
@@ -18,12 +24,13 @@ namespace input_explicit_function {
         set_input(term, 1, in);
         set_bool(term_insert_input_property(term, 1, sym_Hidden), true);
 
-        if (term->input(0) != NULL) {
+        Term* input = term->input(0);
+
+        if (input != NULL && is_type(term_value(input))) {
             Type* type = as_type(term_value(term->input(0)));
             change_declared_type(in, type);
             change_declared_type(term, type);
         }
-
     }
 
     void output_postCompile(Term* term)

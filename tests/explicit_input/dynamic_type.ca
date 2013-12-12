@@ -1,0 +1,16 @@
+
+type T {
+  int i
+}
+
+def getT() -> Type
+  return T
+
+func = {
+
+    i = input(getT())
+
+    assert(type(i) == T)
+}
+
+func([3])
