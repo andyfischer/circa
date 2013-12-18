@@ -20,7 +20,7 @@ Value* gTempValue = NULL;
 
 Value* gFakeFileMap = NULL;
 
-void post_test_sanity_check();
+void after_each_test();
 
 void test_assert_function(bool condition, int line, const char* file)
 {
@@ -197,7 +197,7 @@ void before_each_test()
 
     caWorld* world = global_world();
     world_clear_file_sources(world);
-    world_append_file_source(world, gFakeFileMap);
+    set_value(world_append_file_source(world), gFakeFileMap);
 }
 
 bool run_test(TestCase& testCase, bool catch_exceptions)
@@ -215,7 +215,7 @@ bool run_test(TestCase& testCase, bool catch_exceptions)
             // The test code may declare itself failed.
             bool result = !gCurrentTestCase.failed;
 
-            post_test_sanity_check();
+            after_each_test();
             return result;
         }
         catch (std::runtime_error const& err) {
@@ -225,9 +225,8 @@ bool run_test(TestCase& testCase, bool catch_exceptions)
         }
     } else {
         testCase.execute();
+        after_each_test();
     }
-
-    post_test_sanity_check();
 
     return !gCurrentTestCase.failed;
 }
@@ -291,10 +290,13 @@ bool run_all_tests()
     return failureCount == 0;
 }
 
-void post_test_sanity_check()
+void after_each_test()
 {
     if (gTempValue != NULL)
         set_null(gTempValue);
+
+    caWorld* world = global_world();
+    world_clear_file_sources(world);
 }
 
 std::vector<std::string> list_all_test_names()

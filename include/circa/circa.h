@@ -371,6 +371,7 @@ caValue* circa_map_get(caValue* map, caValue* key);
 // -- Writing to a caValue --
 
 // Assign to a caValue.
+void circa_set_blob(caValue* container, int size);
 void circa_set_bool(caValue* container, bool value);
 void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);
@@ -533,6 +534,7 @@ void circa_read_file_with_stack(caStack* stack, const char* filename, caValue* c
 bool circa_file_exists(caWorld* world, const char* filename);
 int circa_file_get_version(caWorld* world, const char* filename);
 void circa_use_local_filesystem(caWorld* world, const char* rootDir);
+void circa_use_tarball_filesystem(caWorld* world, caValue* tarball);
 
 // -- Path tools --
 void circa_get_directory_for_filename(caValue* filename, caValue* result);

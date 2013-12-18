@@ -7,6 +7,7 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
+#include "filepack.h"
 #include "interpreter.h"
 #include "file_watch.h"
 #include "kernel.h"
@@ -80,20 +81,21 @@ void world_clear_file_sources(World* world)
     set_list(&world->fileSources, 0);
 }
 
-void world_append_file_source(World* world, caValue* fileSource)
+caValue* world_append_file_source(World* world)
 {
-    copy(fileSource, list_append(&world->fileSources));
+    return list_append(&world->fileSources);
 }
 
 extern "C" {
 
 void circa_use_local_filesystem(caWorld* world, const char* rootDir)
 {
-    Value fileSource;
-    set_list(&fileSource, 2);
-    set_symbol(list_get(&fileSource, 0), sym_Filesystem);
-    set_string(list_get(&fileSource, 1), rootDir);
-    world_append_file_source(world, &fileSource);
+    filepack_create_using_filesystem(world_append_file_source(world), rootDir);
+}
+
+void circa_use_tarball_filesystem(caWorld* world, caValue* tarball)
+{
+    filepack_create_from_tarball(world_append_file_source(world), tarball);
 }
 
 void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)

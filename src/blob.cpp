@@ -33,10 +33,10 @@ void decref(BlobData* data)
 
 BlobData* blob_create(int length)
 {
-    BlobData* result = (BlobData*) malloc(sizeof(BlobData) + length);
+    BlobData* result = (BlobData*) malloc(sizeof(BlobData) + length + 1);
     result->refCount = 1;
     result->length = length;
-
+    result->data[length] = 0; // Null terminate
     return result;
 }
 
@@ -66,8 +66,9 @@ void blob_resize(BlobData** existing, int length)
     }
 
     if ((*existing)->refCount == 1) {
-        *existing = (BlobData*) realloc(*existing, sizeof(BlobData) + length);
+        *existing = (BlobData*) realloc(*existing, sizeof(BlobData) + length + 1);
         (*existing)->length = length;
+        (*existing)->data[length] = 0;
         return;
     }
 
@@ -214,7 +215,18 @@ void blob_initialize(Type* type, caValue* value)
 
 void blob_release(caValue* value)
 {
+    ca_assert(is_blob(value));
     decref((BlobData*) value->value_data.ptr);
+}
+
+void blob_copy(Type* type, caValue* source, caValue* dest)
+{
+    BlobData* data = (BlobData*) source->value_data.ptr;
+    if (data != NULL)
+        incref(data);
+
+    make_no_initialize(TYPES.blob, dest);
+    dest->value_data.ptr = data;
 }
 
 std::string blob_toString(caValue* value)
@@ -230,7 +242,8 @@ void blob_setup_type(Type* type)
     set_string(&type->name, "Blob");
     type->initialize = blob_initialize;
     type->release = blob_release;
-    type->storageType = sym_StorageTypeString;
+    type->copy = blob_copy;
+    type->storageType = sym_StorageTypeBlob;
     type->toString = blob_toString;
 }
 

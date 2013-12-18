@@ -53,7 +53,7 @@ void world_uninitialize(World* world);
 World* create_world();
 
 void world_clear_file_sources(World* world);
-void world_append_file_source(World* world, caValue* fileSource);
+caValue* world_append_file_source(World* world);
 void world_use_local_filesystem(World* world, const char* rootDir);
 
 void refresh_all_modules(caWorld* world);

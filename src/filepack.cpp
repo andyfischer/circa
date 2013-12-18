@@ -75,16 +75,20 @@ Some design thoughts:
 #include "string.h"
 #include "tagged_value.h"
 #include "world.h"
+#include "fs/read_tar.h"
 
 namespace circa {
 
-// FilePack values come in two flavors:
+// FilePack values come in these flavors:
 //
 // Flat in-memory map:
 //   map : Hashtable(filename : String -> [version : int, contents : String])
 //
 // Filesystem backed:
 //   [:filesystem, rootDir : String]
+//
+// Tarball backed:
+//   [:tarball, contents : Blob]
 
 
 static bool filepack_is_map(caValue* filepack)
@@ -98,6 +102,14 @@ static bool filepack_is_filesystem_backed(caValue* filepack)
         && (list_length(filepack) >= 1)
         && (is_symbol(list_get(filepack, 0)))
         && (as_symbol(list_get(filepack, 0)) == sym_Filesystem);
+}
+
+static bool filepack_is_tarball_backed(caValue* filepack)
+{
+    return is_list(filepack)
+        && (list_length(filepack) >= 1)
+        && (is_symbol(list_get(filepack, 0)))
+        && (as_symbol(list_get(filepack, 0)) == sym_Tarball);
 }
 
 void filepack_read_file(caValue* filepack, caValue* name, caValue* contents)
@@ -119,6 +131,12 @@ void filepack_read_file(caValue* filepack, caValue* name, caValue* contents)
         read_text_file(as_cstring(&fullPath), contents);
         return;
     }
+
+    else if (filepack_is_tarball_backed(filepack)) {
+        caValue* tarball = list_get(filepack, 1);
+        tar_read_file(tarball, as_cstring(name), contents);
+        return;
+    }
     internal_error("filepack_read_file: filepack type not recognized");
 }
 
@@ -133,6 +151,10 @@ bool filepack_does_file_exist(caValue* filepack, caValue* name)
         copy(rootDir, &fullPath);
         join_path(&fullPath, name);
         return file_exists(as_cstring(&fullPath));
+    }
+    else if (filepack_is_tarball_backed(filepack)) {
+        caValue* tarball = list_get(filepack, 1);
+        return tar_file_exists(tarball, as_cstring(name));
     }
     internal_error("filepack_does_file_exist: filepack type not recognized");
     return false;
@@ -154,20 +176,26 @@ int filepack_get_file_version(caValue* filepack, caValue* name)
         join_path(&fullPath, name);
         return file_get_mtime(as_cstring(&fullPath));
     }
+    else if (filepack_is_tarball_backed(filepack)) {
+        // Currently no version support for tarballs.
+        return 1;
+    }
     return 0;
     internal_error("filepack_get_file_version: filepack type not recognized");
 }
 
-void filepack_create_using_filesystem(caValue* filepack, caValue* rootDir)
+void filepack_create_using_filesystem(caValue* filepack, const char* rootDir)
 {
     set_list(filepack, 2);
     set_symbol(list_get(filepack, 0), sym_Filesystem);
-    copy(rootDir, list_get(filepack, 1));
+    set_string(list_get(filepack, 1), rootDir);
 }
 
-void filepack_create_from_blob(caValue* filepack, caValue* blob)
+void filepack_create_from_tarball(caValue* filepack, caValue* blob)
 {
-    // TODO
+    set_list(filepack, 2);
+    set_symbol(list_get(filepack, 0), sym_Tarball);
+    set_value(list_get(filepack, 1), blob);
 }
 
 CIRCA_EXPORT void circa_read_file(caWorld* world, const char* filename, caValue* contentsOut)

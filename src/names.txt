@@ -169,6 +169,7 @@ PatchBlock
 
 # Filepack types
 Filesystem
+Tarball
 
 # Bootstrap status
 Bootstrapping
@@ -178,6 +179,7 @@ Done
 StorageTypeNull
 StorageTypeInt
 StorageTypeFloat
+StorageTypeBlob
 StorageTypeBool
 StorageTypeStack
 StorageTypeString

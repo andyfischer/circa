@@ -89,6 +89,16 @@ void tar_read_file(caValue* tarBlob, const char* filename, caValue* fileOut)
     set_null(fileOut);
 }
 
+bool tar_file_exists(caValue* tarBlob, const char* filename)
+{
+    char* data = as_blob(tarBlob);
+    while (!eof(data)) {
+        if (strcmp(file_name(data), filename) == 0)
+            return true;
+    }
+    return false;
+}
+
 void tar_debug_dump_listing(caValue* tarBlob)
 {
     char* data = as_blob(tarBlob);

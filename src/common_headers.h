@@ -17,7 +17,6 @@
 // standard libraries
 #include <cmath>
 #include <cstdio>
-#include <cstdint>
 #include <cstring>
 #include <exception>
 #include <iostream>
@@ -26,6 +25,7 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <stdint.h>
 #include <stdlib.h>
 
 #define EXPORT extern "C"
@@ -161,3 +161,4 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 
 #define CIRCA_THROW_ON_ERROR !CIRCA_ASSERT_ON_ERROR
 
+#define CIRCA_ENABLE_SNEAKY_EQUALS 1

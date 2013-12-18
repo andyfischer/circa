@@ -10,7 +10,7 @@ bool filepack_does_file_exist(caValue* filepack, caValue* name);
 int filepack_get_file_version(caValue* filepack, caValue* name);
 
 // Filepack creation.
-void filepack_create_using_filesystem(caValue* filepack, caValue* rootDir);
-void filepack_create_from_blob(caValue* filepack, caValue* blob);
+void filepack_create_using_filesystem(caValue* filepack, const char* rootDir);
+void filepack_create_from_tarball(caValue* filepack, caValue* tarball);
 
 } // namespace circa

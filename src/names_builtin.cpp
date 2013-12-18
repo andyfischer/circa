@@ -155,11 +155,13 @@ const char* builtin_symbol_to_string(int name)
     case sym_NativePatch: return "NativePatch";
     case sym_PatchBlock: return "PatchBlock";
     case sym_Filesystem: return "Filesystem";
+    case sym_Tarball: return "Tarball";
     case sym_Bootstrapping: return "Bootstrapping";
     case sym_Done: return "Done";
     case sym_StorageTypeNull: return "StorageTypeNull";
     case sym_StorageTypeInt: return "StorageTypeInt";
     case sym_StorageTypeFloat: return "StorageTypeFloat";
+    case sym_StorageTypeBlob: return "StorageTypeBlob";
     case sym_StorageTypeBool: return "StorageTypeBool";
     case sym_StorageTypeStack: return "StorageTypeStack";
     case sym_StorageTypeString: return "StorageTypeString";
@@ -1051,9 +1053,17 @@ int builtin_symbol_from_string(const char* str)
     case 'e':
     switch (str[11]) {
     case 'B':
-        if (strcmp(str + 12, "ool") == 0)
+    switch (str[12]) {
+    case 'l':
+        if (strcmp(str + 13, "ob") == 0)
+            return sym_StorageTypeBlob;
+        break;
+    case 'o':
+        if (strcmp(str + 13, "ol") == 0)
             return sym_StorageTypeBool;
         break;
+    default: return -1;
+    }
     case 'F':
         if (strcmp(str + 12, "loat") == 0)
             return sym_StorageTypeFloat;
@@ -1490,6 +1500,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'T':
     switch (str[1]) {
+    case 'a':
+        if (strcmp(str + 2, "rball") == 0)
+            return sym_Tarball;
+        break;
     case 'e':
         if (strcmp(str + 2, "rmName") == 0)
             return sym_TermName;

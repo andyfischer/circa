@@ -485,7 +485,7 @@ const char* STDLIB_CA_TEXT =
     "  for i in self { i / value }\n"
     "\n"
     "def List.cycle(self, int index) -> any\n"
-    "  -- Get an element by index. If the index is out of bounds, then module the\n"
+    "  -- Get an element by index. If the index is out of bounds, then modulo the\n"
     "  -- index to one that exists.\n"
     "  self.get(mod(index, self.length))\n"
     "\n"

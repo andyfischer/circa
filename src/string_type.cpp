@@ -154,7 +154,7 @@ int string_hash(caValue* val)
 
 bool string_equals(caValue* left, caValue* right)
 {
-    if (!is_string(right))
+    if (left->value_type != right->value_type)
         return false;
 
     // Shortcut, check if objects are the same.
@@ -178,12 +178,14 @@ bool string_equals(caValue* left, caValue* right)
             break;
     }
 
-    // Strings are equal. Sneakily have both values reference the same data.
-    // Prefer to preserve the one that has more references.
-    if (leftData->refCount >= rightData->refCount)
-        string_copy(NULL, left, right);
-    else
-        string_copy(NULL, right, left);
+    #if CIRCA_ENABLE_SNEAKY_EQUALS
+        // Strings are equal. Sneakily have both values reference the same data.
+        // Prefer to preserve the one that has more references.
+        if (leftData->refCount >= rightData->refCount)
+            string_copy(NULL, left, right);
+        else
+            string_copy(NULL, right, left);
+    #endif
 
     return true;
 }
