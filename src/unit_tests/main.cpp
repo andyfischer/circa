@@ -2,6 +2,7 @@
 
 #include "unit_test_common.h"
 
+#include "blob.h"
 #include "hashtable.h"
 #include "interpreter.h"
 #include "inspection.h"
@@ -185,7 +186,7 @@ void test_write_fake_file(const char* filename, int version, const char* content
     caValue* entry = hashtable_insert(gFakeFileMap, &key);
     set_list(entry, 2);
     set_int(list_get(entry, 0), version);
-    set_string(list_get(entry, 1), contents);
+    set_blob_from_string(list_get(entry, 1), contents);
 }
 
 void before_each_test()

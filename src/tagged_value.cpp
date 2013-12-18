@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "blob.h"
 #include "debug.h"
 #include "function.h"
 #include "hashtable.h"
@@ -675,6 +676,7 @@ using namespace circa;
 extern "C" {
 
 bool circa_is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
+bool circa_is_blob(caValue* value) { return value->value_type == TYPES.blob; }
 bool circa_is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool circa_is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool circa_is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
@@ -690,6 +692,10 @@ bool circa_is_type(caValue* value) { return value->value_type->storageType == sy
 bool circa_bool(caValue* value) {
     ca_assert(circa_is_bool(value));
     return value->value_data.asbool;
+}
+char* circa_blob(caValue* value) {
+    ca_assert(circa_is_blob(value));
+    return as_blob(value);
 }
 caBlock* circa_block(caValue* value) {
     ca_assert(circa_is_block(value));

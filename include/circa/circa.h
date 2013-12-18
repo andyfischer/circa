@@ -317,6 +317,7 @@ caType* circa_type_of(caValue* value);
 
 // Check the type of a caValue.
 bool circa_is_bool(caValue* value);
+bool circa_is_blob(caValue* value);
 bool circa_is_block(caValue* value);
 bool circa_is_error(caValue* value);
 bool circa_is_function(caValue* value);
@@ -331,6 +332,7 @@ bool circa_is_type(caValue* value);
 
 // Read the value from a caValue.
 bool        circa_bool(caValue* value);
+char*       circa_blob(caValue* value);
 caBlock*    circa_block(caValue* value);
 float       circa_float(caValue* value);
 int         circa_int(caValue* value);
@@ -391,6 +393,7 @@ void circa_set_point(caValue* point, float x, float y);
 void circa_set_string_size(caValue* container, const char* str, int size);
 
 int circa_string_length(caValue* string);
+int circa_blob_length(caValue* string);
 
 // Append to a string
 void circa_string_append(caValue* container, const char* str);

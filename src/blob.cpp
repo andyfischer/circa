@@ -36,6 +36,7 @@ BlobData* blob_create(int length)
     BlobData* result = (BlobData*) malloc(sizeof(BlobData) + length);
     result->refCount = 1;
     result->length = length;
+
     return result;
 }
 
@@ -199,6 +200,13 @@ void set_blob(caValue* value, int length)
     value->value_data.ptr = blob_create(length);
 }
 
+void set_blob_from_string(caValue* value, const char* str)
+{
+    size_t size = strlen(str);
+    set_blob(value, size);
+    memcpy(as_blob(value), str, size);
+}
+
 void blob_initialize(Type* type, caValue* value)
 {
     set_blob(value, 0);
@@ -211,9 +219,9 @@ void blob_release(caValue* value)
 
 std::string blob_toString(caValue* value)
 {
-    Value asHex;
-    blob_to_hex_string(value, &asHex);
-    return as_cstring(&asHex);
+    //Value asHex;
+    //blob_to_hex_string(value, &asHex);
+    return std::string(as_blob(value), blob_size(value));
 }
 
 void blob_setup_type(Type* type)

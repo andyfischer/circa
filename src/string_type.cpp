@@ -4,9 +4,10 @@
 
 #include <cstring>
 
-#include "kernel.h"
+#include "blob.h"
 #include "importing.h"
 #include "interpreter.h"
+#include "kernel.h"
 #include "list.h"
 #include "string_type.h"
 #include "source_repro.h"
@@ -472,6 +473,11 @@ char* circa_strdup(const char* s)
 CIRCA_EXPORT int circa_string_length(caValue* string)
 {
     return string_length(string);
+}
+
+CIRCA_EXPORT int circa_blob_length(caValue* blob)
+{
+    return blob_size(blob);
 }
 
 } // namespace circa

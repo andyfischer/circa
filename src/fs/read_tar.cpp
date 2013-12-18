@@ -4,8 +4,9 @@
 #include "common_headers.h"
 
 #include "blob.h"
+#include "tagged_value.h"
 
-const int tarHeaderSize = 512;
+namespace circa {
 
 struct TarHeader
 {
@@ -34,7 +35,7 @@ static int parse_octal_string(char* str, int len)
 {
     int output = 0;
     for (int i=0; i < len; i++) {
-        output += output* 8 + (str[i] - '0');
+        output = output * 8 + (str[i] - '0');
     }
     return output;
 }
@@ -51,27 +52,48 @@ static const char* file_name(char* data)
     return header->name;
 }
 
+static void file_copy_contents(char* data, caValue* out)
+{
+    int size = file_size(data);
+    char* file = data + 512;
+    set_blob(out, size);
+    memcpy(as_blob(out), file, size);
+}
+
 static void advance_to_next_file(char** data)
 {
     int size = file_size(*data);
-    *data += (((size - 1) / 512) + 1) * 512;
+    *data += 512;
+    if (size > 0)
+        *data += (((size-1) / 512) + 1) * 512;
 }
 
-namespace circa {
-
-void tar_read_file(caValue* tarBlob, caValue* filename, caValue* fileOut)
+static bool eof(char* data)
 {
-    char* data = as_blob(tarBlob);
+    return file_name(data)[0] == 0;
 }
 
-void tar_debug_list_every_file(caValue* tarBlob)
+void tar_read_file(caValue* tarBlob, const char* filename, caValue* fileOut)
 {
     char* data = as_blob(tarBlob);
-    char* end = data + blob_size(tarBlob);
 
-    int pos = 0;
+    while (!eof(data)) {
+        if (strcmp(file_name(data), filename) == 0) {
+            file_copy_contents(data, fileOut);
+            return;
+        }
 
-    while (data < end) {
+        advance_to_next_file(&data);
+    }
+
+    set_null(fileOut);
+}
+
+void tar_debug_dump_listing(caValue* tarBlob)
+{
+    char* data = as_blob(tarBlob);
+
+    while (!eof(data)) {
         printf("file: %s\n", file_name(data));
         printf("  size: %d\n", file_size(data));
         advance_to_next_file(&data);

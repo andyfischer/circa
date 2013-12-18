@@ -25,6 +25,7 @@ void blob_to_hex_string(caValue* blob, caValue* str);
 bool is_blob(caValue* val);
 char* as_blob(caValue* val);
 void set_blob(caValue* val, int length);
+void set_blob_from_string(caValue* value, const char* str);
 void blob_setup_type(Type* type);
 
 } // namespace circa
