@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#include "blob.h"
 #include "list.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -203,10 +204,11 @@ void read_text_file(const char* filename, caValue* contentsOut)
 
     // Read raw data.
     touch(contentsOut);
-    char* contentsData = string_initialize(contentsOut, int(file_size));
-    size_t bytesRead = fread(contentsData, 1, file_size, fp);
+    set_blob(contentsOut, int(file_size) + 1);
 
-    contentsData[bytesRead] = 0;
+    size_t bytesRead = fread(as_blob(contentsOut), 1, file_size, fp);
+
+    as_blob(contentsOut)[bytesRead] = 0;
 
     fclose(fp);
 }

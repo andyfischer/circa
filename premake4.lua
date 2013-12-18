@@ -21,6 +21,7 @@ solution "Circa"
         location "src"
         files {
             "src/*.cpp",
+            "src/fs/*.cpp",
             "src/generated/all_builtin_functions.cpp",
             "src/generated/all_builtin_types.cpp",
             "src/generated/setup_builtin_functions.cpp",

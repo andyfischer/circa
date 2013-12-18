@@ -4,6 +4,7 @@
 
 #include "circa/file.h"
 
+#include "blob.h"
 #include "block.h"
 #include "building.h"
 #include "kernel.h"
@@ -607,7 +608,7 @@ Symbol load_script(Block* block, const char* filename)
         return sym_Failure;
     }
 
-    parser::compile(block, parser::statement_list, as_cstring(&contents));
+    parser::compile(block, parser::statement_list, as_blob(&contents));
 
     // Make sure the block has a primary output.
     if (get_output_placeholder(block, 0) == NULL)

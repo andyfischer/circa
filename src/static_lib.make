@@ -118,6 +118,7 @@ OBJECTS := \
 	$(OBJDIR)/type_inference.o \
 	$(OBJDIR)/update_cascades.o \
 	$(OBJDIR)/world.o \
+	$(OBJDIR)/read_tar.o \
 	$(OBJDIR)/all_builtin_functions.o \
 	$(OBJDIR)/all_builtin_types.o \
 	$(OBJDIR)/setup_builtin_functions.o \
@@ -342,6 +343,9 @@ $(OBJDIR)/update_cascades.o: update_cascades.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/world.o: world.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/read_tar.o: fs/read_tar.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/all_builtin_functions.o: generated/all_builtin_functions.cpp
