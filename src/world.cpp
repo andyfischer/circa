@@ -90,11 +90,13 @@ extern "C" {
 
 void circa_use_local_filesystem(caWorld* world, const char* rootDir)
 {
+    world_clear_file_sources(world);
     filepack_create_using_filesystem(world_append_file_source(world), rootDir);
 }
 
 void circa_use_tarball_filesystem(caWorld* world, caValue* tarball)
 {
+    world_clear_file_sources(world);
     filepack_create_from_tarball(world_append_file_source(world), tarball);
 }
 

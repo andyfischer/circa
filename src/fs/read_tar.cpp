@@ -70,6 +70,8 @@ static void advance_to_next_file(char** data)
 
 static bool eof(char* data)
 {
+    if (data == NULL)
+        return true;
     return file_name(data)[0] == 0;
 }
 
@@ -95,6 +97,7 @@ bool tar_file_exists(caValue* tarBlob, const char* filename)
     while (!eof(data)) {
         if (strcmp(file_name(data), filename) == 0)
             return true;
+        advance_to_next_file(&data);
     }
     return false;
 }
