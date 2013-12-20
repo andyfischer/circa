@@ -971,6 +971,15 @@ def hsv_to_rgb(List hsv) -> Color
   else
     [0 0 0 0]
 
+def Color.add(self, any value) -> Color
+  for i in self { i + value }
+def Color.sub(self, any value) -> Color
+  for i in self { i - value }
+def Color.mult(self, any value) -> Color
+  for i in self { i * value }
+def Color.div(self, any value) -> Color
+  for i in self { i / value }
+
 def Color.blend(self, Color rhs, number ratio) -> Color
   -- Return a color that is blended between self and rhs. If ratio is 0.0 we'll
   -- return 'self', if it's 1.0 we'll return 'rhs'.
