@@ -121,7 +121,7 @@ void blob_append_u32(caValue* blob, u32 val)
 void blob_append_space(caValue* blob, size_t additionalSize)
 {
     size_t size = blob_size(blob);
-    blob_resize(blob, size + additionalSize);
+    blob_resize(blob, int(size + additionalSize));
     memset(as_blob(blob) + size, 0, additionalSize);
 }
 
@@ -204,7 +204,7 @@ void set_blob(caValue* value, int length)
 void set_blob_from_string(caValue* value, const char* str)
 {
     size_t size = strlen(str);
-    set_blob(value, size);
+    set_blob(value, (int) size);
     memcpy(as_blob(value), str, size);
 }
 

@@ -5,38 +5,6 @@
 namespace circa {
 namespace type_check_function {
 
-    void hosted_is_list(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_list2(circa_input(stack, 0)));
-    }
-    void hosted_is_int(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_int2(circa_input(stack, 0)));
-    }
-    void hosted_is_number(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
-    }
-    void hosted_is_bool(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_bool(circa_input(stack, 0)));
-    }
-    void hosted_is_string(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_string(circa_input(stack, 0)));
-    }
-    void hosted_is_null(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_null(circa_input(stack, 0)));
-    }
-    void hosted_is_function(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_func(circa_input(stack, 0)));
-    }
-    void hosted_is_type(caStack* stack)
-    {
-        set_bool(circa_output(stack, 0), is_type(circa_input(stack, 0)));
-    }
     void inputs_fit_function(caStack* stack)
     {
         caValue* inputs = circa_input(stack, 0);
@@ -86,15 +54,6 @@ namespace type_check_function {
 
     void setup(Block* kernel)
     {
-        import_function(kernel, hosted_is_list, "is_list(any v) -> bool");
-        import_function(kernel, hosted_is_int, "is_int(any v) -> bool");
-        import_function(kernel, hosted_is_number, "is_number(any v) -> bool");
-        import_function(kernel, hosted_is_bool, "is_bool(any v) -> bool");
-        import_function(kernel, hosted_is_string, "is_string(any v) -> bool");
-        import_function(kernel, hosted_is_null, "is_null(any v) -> bool");
-        import_function(kernel, hosted_is_function, "is_function(any v) -> bool");
-        import_function(kernel, hosted_is_type, "is_type(any v) -> bool");
-
         FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
             "inputs_fit_function(List inputs,Function func) -> bool");
         FUNCS.overload_error_no_match = import_function(kernel,

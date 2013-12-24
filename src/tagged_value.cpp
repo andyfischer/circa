@@ -624,6 +624,7 @@ bool is_int(caValue* value) { return value->value_type->storageType == sym_Stora
 bool is_int2(caValue* value) { return value->value_type == TYPES.int_type; }
 bool is_stack(caValue* value) { return value->value_type == TYPES.stack; }
 bool is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
+bool is_list_storage(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool is_list2(caValue* value) { return value->value_type == TYPES.list; }
 bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }

@@ -45,6 +45,45 @@ void equals_func(caStack* stack)
             equals(circa_input(stack, 0), circa_input(stack, 1)));
 }
 
+void hosted_is_compound(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_list_storage(circa_input(stack, 0)));
+}
+
+void hosted_is_list(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_list2(circa_input(stack, 0)));
+}
+void hosted_is_int(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_int2(circa_input(stack, 0)));
+}
+void hosted_is_number(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
+}
+void hosted_is_bool(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_bool(circa_input(stack, 0)));
+}
+void hosted_is_string(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_string(circa_input(stack, 0)));
+}
+void hosted_is_null(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_null(circa_input(stack, 0)));
+}
+void hosted_is_function(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_func(circa_input(stack, 0)));
+}
+void hosted_is_type(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_type(circa_input(stack, 0)));
+}
+
+
 void repeat(caStack* stack)
 {
     caValue* source = circa_input(stack, 0);
@@ -491,6 +530,15 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "equals", equals_func);
     module_patch_function(patch, "error", error);
     module_patch_function(patch, "get_with_symbol", get_with_symbol);
+    module_patch_function(patch, "is_compound", hosted_is_compound);
+    module_patch_function(patch, "is_list", hosted_is_list);
+    module_patch_function(patch, "is_int", hosted_is_int);
+    module_patch_function(patch, "is_number", hosted_is_number);
+    module_patch_function(patch, "is_bool", hosted_is_bool);
+    module_patch_function(patch, "is_string", hosted_is_string);
+    module_patch_function(patch, "is_null", hosted_is_null);
+    module_patch_function(patch, "is_function", hosted_is_function);
+    module_patch_function(patch, "is_type", hosted_is_type);
     module_patch_function(patch, "length", length);
     module_patch_function(patch, "List.append", List__append);
     module_patch_function(patch, "List.concat", List__concat);

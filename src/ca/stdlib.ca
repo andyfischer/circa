@@ -67,6 +67,16 @@ def memoize()
 def reflect_get_frame_state() -> any
   -- Special call, read this frame's state.
 
+-- Type checking
+def is_compound(any) -> bool
+def is_list(any) -> bool
+def is_int(any) -> bool
+def is_number(any) -> bool
+def is_bool(any) -> bool
+def is_string(any) -> bool
+def is_null(any) -> bool
+def is_function(any) -> bool
+def is_type(any) -> bool
 
 def declared_state(Type t, Func initializer :optional) -> any
   -- Internally used function for fetching a stateful value. The parser
@@ -411,6 +421,11 @@ def List.clear(self) -> List
 
 def List.concat(self, List rightSide) -> List
   -- Concatenate two lists.
+def List.contains(self, any val) -> bool
+  for i in self
+    if i == val
+      return true
+  return false
 def List.resize(self, int length) -> List
   -- Resize the list to have the given length. If the length is increased, then
   -- null values are appended on the right; if the length is decreased then
@@ -469,13 +484,25 @@ def List.remove(self, int index) -> List
   -- Remove an element at the given index, shrinking the list by 1.
 
 def List.add(self, any value) -> List
-  for i in self { i + value }
+  if is_compound(value)
+    for i in self { i + value[index()] }
+  else
+    for i in self { i + value }
 def List.sub(self, any value) -> List
-  for i in self { i - value }
+  if is_compound(value)
+    for i in self { i - value[index()] }
+  else
+    for i in self { i - value }
 def List.mult(self, any value) -> List
-  for i in self { i * value }
+  if is_compound(value)
+    for i in self { i * value[index()] }
+  else
+    for i in self { i * value }
 def List.div(self, any value) -> List
-  for i in self { i / value }
+  if is_compound(value)
+    for i in self { i / value[index()] }
+  else
+    for i in self { i / value }
 
 def List.cycle(self, int index) -> any
   -- Get an element by index. If the index is out of bounds, then modulo the
