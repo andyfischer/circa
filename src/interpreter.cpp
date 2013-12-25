@@ -312,6 +312,7 @@ void stack_restart_discarding_state(Stack* stack)
     Frame* top = stack_top(stack);
     top->termIndex = 0;
     top->pc = 0;
+    set_null(&top->state);
     set_null(&top->outgoingState);
 
     stack->errorOccurred = false;

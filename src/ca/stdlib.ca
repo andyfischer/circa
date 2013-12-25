@@ -918,7 +918,7 @@ def seed() -> number
 -- Math utility functions
 def polar(number angle) -> Point
   -- Return a point on the unit circle with the given angle.
-  [sin(angle) -cos(angle)]
+  [cos(angle) sin(angle)]
 
 def random_norm_vector() -> Point
   -- Return a random normalized vector.
