@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
+#include "rand.h"
 
 namespace circa {
 
@@ -46,6 +47,8 @@ struct Stack
 
     // Value slot, may be used by the stack's owner.
     Value context;
+
+    RandState randState;
 
     Stack();
     ~Stack();

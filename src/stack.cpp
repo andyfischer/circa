@@ -27,6 +27,7 @@ Stack::Stack()
     prevStack = NULL;
     
     set_hashtable(&moduleFrames);
+    rand_init(&randState, 0);
 }
 
 Stack::~Stack()

@@ -110,6 +110,7 @@ Block* current_block(Stack* stack);
 caValue* get_top_register(Stack* stack, Term* term);
 
 caValue* stack_context_insert(Stack* stack, caValue* name);
+caValue* stack_context_get(Stack* stack, caValue* name);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.

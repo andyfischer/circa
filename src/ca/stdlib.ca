@@ -5,6 +5,8 @@ type Func {
   Map bindings
 }
 
+def rand() -> number
+
 def closure_block() -> Func
   -- Internally used function for declaring a closure.
 
@@ -35,6 +37,12 @@ def length(List list) -> int
   -- Return the number of items in the given list
 
 def not_equals(any a,any b) -> bool
+
+def print(any items :multiple)
+  -- Prints a line of text output to the console.
+def trace(any items :multiple)
+
+def to_string(any val) -> String
 
 def to_string_repr(any val) -> String
   -- Encode a Circa value as a string representation.
@@ -142,8 +150,6 @@ def any_true(list) -> bool
 
 def get_with_symbol(any lhs, Symbol symbol) -> any
 
-def swap(a, b) -> (any, any)
-  return b, a
 
 def first_symbol(any val) -> Symbol
   if type(val) == Symbol
@@ -152,12 +158,14 @@ def first_symbol(any val) -> Symbol
     if length(val) > 0
       first_symbol(val[0])
 
-def to_string(any val) -> String
+def rand_range(number min, number max) -> number
+  min + rand() * (max - min)
+def rand_i(int range) -> int
+  floor(rand() * range)
 
-def print(any items :multiple)
-  -- Prints a line of text output to the console.
-def trace(any items :multiple)
-  -- Prints a line of text output to the console.
+def swap(a, b) -> (any, any)
+  return b, a
+
 
 type Mutable;
   -- Container for a mutable value. Future status is undecided, this might

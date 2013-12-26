@@ -33,7 +33,7 @@
 
 #ifdef CIRCA_USE_LINENOISE
     extern "C" {
-        #include "linenoise.h"
+        #include "linenoise/linenoise.h"
     }
 #endif
 

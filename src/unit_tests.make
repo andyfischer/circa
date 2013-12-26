@@ -24,7 +24,7 @@ ifeq ($(config),debug)
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/circa_test
   DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I.
+  INCLUDES  += -I../include -I. -I../3rdparty
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
@@ -46,7 +46,7 @@ ifeq ($(config),release)
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/circa_test_r
   DEFINES   += 
-  INCLUDES  += -I../include -I.
+  INCLUDES  += -I../include -I. -I../3rdparty
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 

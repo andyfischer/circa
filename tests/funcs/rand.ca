@@ -1,0 +1,10 @@
+
+for i in 0..1000
+  r = rand()
+  assert(r >= 0.0)
+  assert(r < 1.0)
+
+for i in 1..1000
+  r = rand_i(i)
+  assert(r >= 0)
+  assert(r < i)

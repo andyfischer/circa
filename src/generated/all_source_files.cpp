@@ -31,6 +31,7 @@
 #include "../native_patch.cpp"
 #include "../object.cpp"
 #include "../parser.cpp"
+#include "../rand.cpp"
 #include "../reflection.cpp"
 #include "../repl.cpp"
 #include "../selector.cpp"

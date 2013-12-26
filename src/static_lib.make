@@ -24,7 +24,7 @@ ifeq ($(config),debug)
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca_d.a
   DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I.
+  INCLUDES  += -I../include -I. -I../3rdparty
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
@@ -46,7 +46,7 @@ ifeq ($(config),release)
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca.a
   DEFINES   += 
-  INCLUDES  += -I../include -I.
+  INCLUDES  += -I../include -I. -I../3rdparty
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
@@ -97,6 +97,7 @@ OBJECTS := \
 	$(OBJDIR)/native_patch.o \
 	$(OBJDIR)/object.o \
 	$(OBJDIR)/parser.o \
+	$(OBJDIR)/rand.o \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/repl.o \
 	$(OBJDIR)/selector.o \
@@ -123,6 +124,7 @@ OBJECTS := \
 	$(OBJDIR)/all_builtin_types.o \
 	$(OBJDIR)/setup_builtin_functions.o \
 	$(OBJDIR)/stdlib_script_text.o \
+	$(OBJDIR)/tinymt64.o \
 
 RESOURCES := \
 
@@ -282,6 +284,9 @@ $(OBJDIR)/object.o: object.cpp
 $(OBJDIR)/parser.o: parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/rand.o: rand.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/reflection.o: reflection.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -360,5 +365,8 @@ $(OBJDIR)/setup_builtin_functions.o: generated/setup_builtin_functions.cpp
 $(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/tinymt64.o: ../3rdparty/tinymt/tinymt64.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

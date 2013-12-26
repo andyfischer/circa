@@ -33,7 +33,6 @@ namespace make_function { void setup(Block* kernel); }
 namespace math_function { void setup(Block* kernel); }
 namespace mult_function { void setup(Block* kernel); }
 namespace neg_function { void setup(Block* kernel); }
-namespace rand_function { void setup(Block* kernel); }
 namespace range_function { void setup(Block* kernel); }
 namespace rpath_function { void setup(Block* kernel); }
 namespace set_field_function { void setup(Block* kernel); }
@@ -75,7 +74,6 @@ void setup_builtin_functions(Block* kernel)
     math_function::setup(kernel);
     mult_function::setup(kernel);
     neg_function::setup(kernel);
-    rand_function::setup(kernel);
     range_function::setup(kernel);
     rpath_function::setup(kernel);
     set_field_function::setup(kernel);

@@ -134,6 +134,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Name: return "Name";
     case sym_Primary: return "Primary";
     case sym_Anonymous: return "Anonymous";
+    case sym_Entropy: return "Entropy";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -458,6 +459,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'E':
     switch (str[1]) {
+    case 'n':
+        if (strcmp(str + 2, "tropy") == 0)
+            return sym_Entropy;
+        break;
     case 'r':
     switch (str[2]) {
     case 'r':

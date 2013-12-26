@@ -137,6 +137,9 @@ Name
 Primary
 Anonymous
 
+# Interpreter misc
+Entropy
+
 # Stack steps
 StackReady
 StackRunning

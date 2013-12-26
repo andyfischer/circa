@@ -9,6 +9,7 @@
 #include "list.h"
 #include "modules.h"
 #include "native_patch.h"
+#include "rand.h"
 #include "stack.h"
 #include "string_type.h"
 #include "symbols.h"
@@ -83,6 +84,10 @@ void hosted_is_type(caStack* stack)
     set_bool(circa_output(stack, 0), is_type(circa_input(stack, 0)));
 }
 
+void rand(caStack* stack)
+{
+    set_float(circa_output(stack, 0), rand_next_double(&stack->randState));
+}
 
 void repeat(caStack* stack)
 {
@@ -571,6 +576,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "String.to_lower", String__to_lower);
     module_patch_function(patch, "not_equals", not_equals);
     module_patch_function(patch, "print", print);
+    module_patch_function(patch, "rand", rand);
     module_patch_function(patch, "repeat", repeat);
     module_patch_function(patch, "to_string", to_string);
     module_patch_function(patch, "trace", print);

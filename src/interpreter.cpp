@@ -312,7 +312,6 @@ void stack_restart_discarding_state(Stack* stack)
     Frame* top = stack_top(stack);
     top->termIndex = 0;
     top->pc = 0;
-    set_null(&top->state);
     set_null(&top->outgoingState);
 
     stack->errorOccurred = false;
@@ -728,6 +727,14 @@ caValue* stack_context_insert(Stack* stack, caValue* name)
     return hashtable_insert(&stack->topContext, name);
 }
 
+caValue* stack_context_get(Stack* stack, caValue* name)
+{
+    if (!is_hashtable(&stack->topContext))
+        return NULL;
+
+    return hashtable_get(&stack->topContext, name);
+}
+
 caValue* frame_register_from_end(Frame* frame, int index)
 {
     return list_get(&frame->registers, frame_register_count(frame) - 1 - index);
@@ -784,6 +791,13 @@ static void start_interpreter_session(Stack* stack)
         caValue* slot = get_top_register(stack, placeholder);
         cast(slot, placeholder->type);
     }
+
+    // Re-seed random generator.
+    caValue* seed = NULL;
+    if (is_hashtable(&stack->topContext))
+        seed = hashtable_get_int_key(&stack->topContext, sym_Entropy);
+    if (seed != NULL)
+        rand_init(&stack->randState, get_hash_value(seed));
 }
 
 void evaluate_block(Stack* stack, Block* block)
