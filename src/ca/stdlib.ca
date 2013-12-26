@@ -366,6 +366,7 @@ def Stack.rethrow(self)
 def Stack.extract_state(self) -> Map
 def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.id(self) -> int
+def Stack.has_incoming_state(self) -> bool
 def Stack.set_context(self, Map map)
 def Stack.set_context_val(self, any name, any val)
 def Stack.stack_push(self, Block b, List inputs)

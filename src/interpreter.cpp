@@ -2005,7 +2005,6 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput)
         }
 
         set_null(&top->outgoingState);
-        
         vm_finish_frame(stack);
         return;
     }
@@ -2260,10 +2259,8 @@ bool run_memoize_check(Stack* stack)
 
     // Preserve the memoized data.
     copy(&top->state, &top->outgoingState);
-
     return true;
 }
-
 
 void Frame__registers(caStack* stack)
 {
@@ -2544,6 +2541,16 @@ void Stack__id(caStack* stack)
     set_int(circa_output(stack, 0), self->id);
 }
 
+void Stack__has_incoming_state(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Frame* top = stack_top(self);
+    if (top == NULL)
+        set_bool(circa_output(stack, 0), false);
+    else
+        set_bool(circa_output(stack, 0), !is_null(&top->state));
+}
+
 void Stack__set_context(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2811,6 +2818,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
     module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
     module_patch_function(patch, "Stack.id", Stack__id);
+    module_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
     module_patch_function(patch, "Stack.set_context", Stack__set_context);
     module_patch_function(patch, "Stack.set_context_val", Stack__set_context_val);
     module_patch_function(patch, "Stack.apply", Stack__call);
