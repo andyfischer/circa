@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <map>
+
 namespace circa {
 
 struct TermMap

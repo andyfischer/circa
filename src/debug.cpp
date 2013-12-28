@@ -65,16 +65,10 @@ void dump(Stack* stack)
 
 void internal_error(const char* message)
 {
-    #if CIRCA_ASSERT_ON_ERROR
-    {
-        std::string msg("internal_error: ");
-        msg += message;
-        write_log(msg.c_str());
-        assert(false);
-    }
-    #else
-        throw std::runtime_error(message);
-    #endif
+    std::string msg("internal_error: ");
+    msg += message;
+    write_log(msg.c_str());
+    assert(false);
 }
 
 void internal_error(std::string const& message)

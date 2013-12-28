@@ -18,11 +18,8 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <exception>
 #include <iostream>
-#include <map>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <stdint.h>
@@ -154,11 +151,5 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 #define CIRCA_ENABLE_HEAP_DEBUGGING 0
 
 #endif
-
-// Trigger an assert when internal_error is called. If this is off, the alternative is
-// that an exception is thrown.
-#define CIRCA_ASSERT_ON_ERROR 1
-
-#define CIRCA_THROW_ON_ERROR !CIRCA_ASSERT_ON_ERROR
 
 #define CIRCA_ENABLE_SNEAKY_EQUALS 1

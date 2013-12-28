@@ -27,8 +27,7 @@ void dump(caValue* value);
 void dump(Stack* context);
 void dump(caStack* stack);
 
-// Signal that an unexpected error has occurred. Depending on debug settings, this
-// will either throw an exception or trigger an assert().
+// Signal that an unexpected error has occurred. Will trigger an assert().
 void internal_error(const char* message);
 void internal_error(std::string const& message);
 

@@ -200,33 +200,13 @@ void before_each_test()
     set_value(world_append_file_source(world), gFakeFileMap);
 }
 
-bool run_test(TestCase& testCase, bool catch_exceptions)
+bool run_test(TestCase& testCase)
 {
     gCurrentTestCase = testCase;
 
     before_each_test();
-
-    if (catch_exceptions) {
-        try {
-            gCurrentTestCase = testCase;
-
-            testCase.execute();
-
-            // The test code may declare itself failed.
-            bool result = !gCurrentTestCase.failed;
-
-            after_each_test();
-            return result;
-        }
-        catch (std::runtime_error const& err) {
-            std::cout << "Error white running test case " << testCase.name << std::endl;
-            std::cout << err.what() << std::endl;
-            return false;
-        }
-    } else {
-        testCase.execute();
-        after_each_test();
-    }
+    testCase.execute();
+    after_each_test();
 
     return !gCurrentTestCase.failed;
 }
@@ -242,7 +222,7 @@ bool run_tests(std::string const& searchStr)
             continue;
         totalTestCount++;
         std::cout << "Running " << it->name << std::endl;
-        bool result = run_test(*it, false);
+        bool result = run_test(*it);
         if (result) successCount++;
         else {
             failureCount++;
@@ -270,7 +250,7 @@ bool run_all_tests()
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         totalTestCount++;
-        bool result = run_test(*it, false);
+        bool result = run_test(*it);
         if (result) successCount++;
         else {
             failureCount++;

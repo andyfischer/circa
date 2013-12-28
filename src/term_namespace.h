@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "common_headers.h"
+#include <map>
 
 #include "debug.h"
 #include "term_map.h"
