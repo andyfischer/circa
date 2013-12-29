@@ -54,6 +54,12 @@ void Block__dump(caStack* stack)
     dump(as_block(circa_input(stack, 0)));
 }
 
+void Block__id(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    set_int(circa_output(stack, 0), block->id);
+}
+
 void Block__input(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -498,6 +504,11 @@ void Term__asfloat(caStack* stack)
     
     set_float(circa_output(stack, 0), to_float(term_value(t)));
 }
+void Term__id(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    set_int(circa_output(stack, 0), t->id);
+}
 void Term__index(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
@@ -695,6 +706,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
     module_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
     module_patch_function(patch, "Block.has_static_error", Block__has_static_error);
+    module_patch_function(patch, "Block.id", Block__id);
     module_patch_function(patch, "Block.input", Block__input);
     module_patch_function(patch, "Block.inputs", Block__inputs);
     module_patch_function(patch, "Block.is_null", Block__is_null);
@@ -712,6 +724,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.assign", Term__assign);
     module_patch_function(patch, "Term.asint", Term__asint);
     module_patch_function(patch, "Term.asfloat", Term__asfloat);
+    module_patch_function(patch, "Term.id", Term__id);
     module_patch_function(patch, "Term.index", Term__index);
     module_patch_function(patch, "Term.format_source", Term__format_source);
     module_patch_function(patch, "Term.format_source_normal", Term__format_source_normal);

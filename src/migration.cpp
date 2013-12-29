@@ -174,6 +174,8 @@ void migrate_stack(Stack* stack, Migration* migration)
             list_resize(frame_registers(frame), block_locals_count(frame->block));
 
         migrate_value(frame_registers(frame), migration);
+        migrate_value(&frame->bindings, migration);
+        migrate_value(&frame->dynamicScope, migration);
         migrate_state_list(&frame->state, oldBlock, frame->block, migration);
         migrate_state_list(&frame->outgoingState, oldBlock, frame->block, migration);
 
@@ -263,10 +265,8 @@ void migrate_value(caValue* value, Migration* migration)
 
 void migrate_world(World* world, Migration* migration)
 {
-#if 0
     printf("running migrate_world, from = #%d, to = #%d\n",
         migration->oldBlock->id, migration->newBlock->id);
-#endif
 
     // Update references in every module.
     for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {

@@ -142,14 +142,16 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 // which use this map to check if their object pointers are valid. Has a
 // large performance penalty.
 
-#ifdef CIRCA_TEST_BUILD
-
-#define CIRCA_ENABLE_HEAP_DEBUGGING 1
-
-#else
-
-#define CIRCA_ENABLE_HEAP_DEBUGGING 0
-
+#ifndef CIRCA_ENABLE_HEAP_DEBUGGING
+ #ifdef CIRCA_TEST_BUILD
+  #define CIRCA_ENABLE_HEAP_DEBUGGING 1
+ #else
+  #define CIRCA_ENABLE_HEAP_DEBUGGING 0
+ #endif
 #endif
 
+// ENABLE_SNEAKY_EQUALS - When enabled, equals() is allowed to combine the
+// internal representation of values (when it's correct to do so).
 #define CIRCA_ENABLE_SNEAKY_EQUALS 1
+
+#define CIRCA_ENABLE_INLINE_DYNAMIC_METHOD_CACHE 1

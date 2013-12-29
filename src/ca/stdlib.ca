@@ -267,6 +267,7 @@ def Block.get_static_errors_formatted(self) -> List
   -- Return a formatted list of static errors inside this block.
 def Block.has_static_error(self) -> bool
   -- Return whether this block has any static errors.
+def Block.id(self) -> int
 def Block.input(self, int index) -> Term
   -- Fetch an input placeholder term by index.
 def Block.is_null(self) -> bool
@@ -655,6 +656,7 @@ def Term.function(self) -> Block
     -- Fetch this term's function.
 def Term.get_type(self) -> Type
     -- Fetch the declared type of this term.
+def Term.id(self) -> int
 def Term.value(self) -> any
     -- For a value term, this fetches the actual value.
 def Term.set_value(self, any val)

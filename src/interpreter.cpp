@@ -2118,6 +2118,8 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop
 
 static Block* vm_dynamic_method_search_cache(caValue* object, char* data)
 {
+#if CIRCA_ENABLE_INLINE_DYNAMIC_METHOD_CACHE
+
     int pos = 0;
 
     // Check method lookup cache here.
@@ -2128,6 +2130,7 @@ static Block* vm_dynamic_method_search_cache(caValue* object, char* data)
         if (typeId == object->value_type->id)
             return block;
     }
+#endif
 
     return NULL;
 }
