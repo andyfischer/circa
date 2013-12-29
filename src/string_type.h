@@ -18,6 +18,7 @@ void string_append_quoted(caValue* left, caValue* right);
 
 // Append an integer value as a string.
 void string_append(caValue* left, int value);
+void string_append_f(caValue* left, float value);
 
 void string_append_char(caValue* left, char c);
 

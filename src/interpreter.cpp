@@ -921,32 +921,37 @@ void raise_error_too_many_inputs(Stack* stack)
     raise_error(stack);
 }
 
-char vm_read_char(Stack* stack)
+inline char vm_read_char(Stack* stack)
 {
     return blob_read_char(stack->bc, &stack->pc);
 }
 
-int vm_read_u32(Stack* stack)
+inline int vm_read_u32(Stack* stack)
 {
     return blob_read_u32(stack->bc, &stack->pc);
 }
 
-u16 vm_read_u16(Stack* stack)
+inline u16 vm_read_u16(Stack* stack)
 {
     return blob_read_u16(stack->bc, &stack->pc);
 }
 
-void* vm_read_pointer(Stack* stack)
+inline float vm_read_float(Stack* stack)
+{
+    return blob_read_float(stack->bc, &stack->pc);
+}
+
+inline void* vm_read_pointer(Stack* stack)
 {
     return blob_read_pointer(stack->bc, &stack->pc);
 }
 
-void vm_skip_bytecode(Stack* stack, size_t size)
+inline void vm_skip_bytecode(Stack* stack, size_t size)
 {
     stack->pc += size;
 }
 
-char* vm_get_bytecode_raw(Stack* stack)
+inline char* vm_get_bytecode_raw(Stack* stack)
 {
     return stack->bc + stack->pc;
 }
@@ -1631,6 +1636,102 @@ void vm_run(Stack* stack, caValue* bytecode)
             continue;
         }
 
+        case bc_SetInt: {
+            int index = vm_read_u32(stack);
+            int value = vm_read_u32(stack);
+
+            Frame* top = stack_top(stack);
+            caValue* slot = frame_register(top, index);
+            set_int(slot, value);
+            continue;
+        }
+        case bc_SetFloat: {
+            int index = vm_read_u32(stack);
+            float value = vm_read_float(stack);
+
+            Frame* top = stack_top(stack);
+            caValue* slot = frame_register(top, index);
+            set_float(slot, value);
+            continue;
+        }
+        case bc_SetTermValue: {
+            int index = vm_read_u32(stack);
+
+            Frame* top = stack_top(stack);
+            Term* term = frame_term(top, index);
+            caValue* slot = frame_register(top, index);
+            copy(term_value(term), slot);
+            continue;
+        }
+
+        #define INLINE_MATH_OP_HEADER \
+            int termIndex = vm_read_u32(stack); \
+            Frame* top = stack_top(stack); \
+            Term* caller = frame_term(top, termIndex); \
+            caValue* slot = frame_register(top, termIndex); \
+            caValue* left = vm_run_single_input(top, caller); \
+            caValue* right = vm_run_single_input(top, caller);
+
+        case bc_Addf: {
+            INLINE_MATH_OP_HEADER;
+            set_float(slot, to_float(left) + to_float(right));
+            continue;
+        }
+        case bc_Addi: {
+            INLINE_MATH_OP_HEADER;
+            set_int(slot, as_int(left) + as_int(right));
+            continue;
+        }
+        case bc_Subf: {
+            INLINE_MATH_OP_HEADER;
+            set_float(slot, to_float(left) - to_float(right));
+            continue;
+        }
+        case bc_Subi: {
+            INLINE_MATH_OP_HEADER;
+            set_int(slot, as_int(left) - as_int(right));
+            continue;
+        }
+        case bc_Multf: {
+            INLINE_MATH_OP_HEADER;
+            set_float(slot, to_float(left) * to_float(right));
+            continue;
+        }
+        case bc_Multi: {
+            INLINE_MATH_OP_HEADER;
+            set_int(slot, as_int(left) * as_int(right));
+            continue;
+        }
+        case bc_Divf: {
+            INLINE_MATH_OP_HEADER;
+            set_float(slot, to_float(left) / to_float(right));
+            continue;
+        }
+        case bc_Divi: {
+            INLINE_MATH_OP_HEADER;
+            set_int(slot, as_int(left) / as_int(right));
+            continue;
+        }
+        case bc_Eqf: {
+            INLINE_MATH_OP_HEADER;
+            set_bool(slot, to_float(left) == to_float(right));
+            continue;
+        }
+        case bc_Neqf: {
+            INLINE_MATH_OP_HEADER;
+            set_bool(slot, to_float(left) != to_float(right));
+            continue;
+        }
+        case bc_EqShallow: {
+            INLINE_MATH_OP_HEADER;
+            set_bool(slot, left->value_data.asint == right->value_data.asint);
+            continue;
+        }
+        case bc_NeqShallow: {
+            INLINE_MATH_OP_HEADER;
+            set_bool(slot, left->value_data.asint != right->value_data.asint);
+            continue;
+        }
         case bc_PackState: {
             u16 declaredStackDistance = vm_read_u16(stack);
             u16 declaredIndex = vm_read_u16(stack);

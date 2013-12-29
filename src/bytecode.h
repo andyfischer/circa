@@ -33,7 +33,7 @@ const char bc_PushLoop = 0x17;
 const char bc_PushWhile = 0x18;
 const char bc_PushRequire = 0x19;
 
-// Pushing inputs to a new frame.
+// Inputs.
 const char bc_InputFromStack = 0x2a;
 const char bc_PushValue = 0x2e;
 const char bc_InputNull = 0x2b;
@@ -65,8 +65,27 @@ const char bc_Loop = 0x47;
 const char bc_MemoizeCheck = 0x50;
 const char bc_MemoizeSave = 0x51;
 
+// Raw values.
+const char bc_SetInt = 0x55;
+const char bc_SetFloat = 0x56;
+const char bc_SetTermValue = 0x57;
+
+// Math.
+const char bc_Addf = 0x60;
+const char bc_Addi = 0x61;
+const char bc_Subf = 0x62;
+const char bc_Subi = 0x63;
+const char bc_Multf = 0x64;
+const char bc_Multi = 0x65;
+const char bc_Divf = 0x66;
+const char bc_Divi = 0x67;
+const char bc_Eqf = 0x68;
+const char bc_Neqf = 0x69;
+const char bc_EqShallow = 0x6a;
+const char bc_NeqShallow = 0x6b;
+
 // Inline state.
-const char bc_PackState = 0x55;
+const char bc_PackState = 0x70;
 
 // Method lookup caching.
 const int c_methodCacheCount = 5;

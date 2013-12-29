@@ -245,6 +245,42 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_MemoizeSave:
         set_string(string, "memoize_save");
         break;
+    case bc_SetInt:
+        set_string(string, "set_int ");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " ");
+        string_append(string, blob_read_u32(bc, pc));
+        break;
+    case bc_SetFloat:
+        set_string(string, "set_float ");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " ");
+        string_append_f(string, blob_read_float(bc, pc));
+        break;
+    case bc_SetTermValue:
+        set_string(string, "set_value ");
+        string_append(string, blob_read_u32(bc, pc));
+        break;
+
+    #define INLINE_MATH_CASE(op, str) \
+        case op: \
+            set_string(string, str " "); \
+            string_append(string, blob_read_u32(bc, pc)); \
+            break;
+
+    INLINE_MATH_CASE(bc_Addf, "add_f");
+    INLINE_MATH_CASE(bc_Addi, "add_i");
+    INLINE_MATH_CASE(bc_Subi, "sub_i");
+    INLINE_MATH_CASE(bc_Subf, "sub_f");
+    INLINE_MATH_CASE(bc_Multi, "mult_i");
+    INLINE_MATH_CASE(bc_Multf, "mult_f");
+    INLINE_MATH_CASE(bc_Divi, "div_i");
+    INLINE_MATH_CASE(bc_Divf, "div_f");
+    INLINE_MATH_CASE(bc_Eqf, "eq_f");
+    INLINE_MATH_CASE(bc_Neqf, "neq_f");
+    INLINE_MATH_CASE(bc_EqShallow, "eq_shallow");
+    INLINE_MATH_CASE(bc_NeqShallow, "neq_shallow");
+
     case bc_PackState:
         set_string(string, "pack_state ");
         for (int i=0; i < 4; i++) {
@@ -371,7 +407,7 @@ void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
         string_append(line, "] ");
 
         circa::Value op;
-        bytecode_op_to_string(as_cstring(bytecode), &pos, &op);
+        bytecode_op_to_string(as_blob(bytecode), &pos, &op);
 
         string_append(line, &op);
     }
@@ -398,6 +434,75 @@ void bytecode_dump_next_op(const char* bc, int pc)
 bool block_contains_memoize(Block* block)
 {
     return find_term_with_function(block, FUNCS.memoize) != NULL;
+}
+
+static bool term_has_two_int_inputs(Term* term)
+{
+    return term->numInputs() == 2
+        && term->input(0) != NULL
+        && term->input(0)->type == TYPES.int_type
+        && term->input(1) != NULL
+        && term->input(1)->type == TYPES.int_type;
+}
+
+static bool type_is_int_or_float(Type* type)
+{
+    return type == TYPES.float_type || type == TYPES.int_type;
+}
+
+static bool term_has_two_floaty_inputs(Term* term)
+{
+    return term->numInputs() == 2
+        && term->input(0) != NULL
+        && type_is_int_or_float(term->input(0)->type)
+        && term->input(1) != NULL
+        && type_is_int_or_float(term->input(1)->type);
+}
+
+static char inline_op_match_number_type(Term* term, int whenInts, int whenFloats)
+{
+    if (term_has_two_int_inputs(term))
+        return whenInts;
+    if (term_has_two_floaty_inputs(term))
+        return whenFloats;
+    else
+        return 0;
+}
+
+static char get_inline_bc_for_term(Term* term)
+{
+    if (term->function == FUNCS.add)
+        return inline_op_match_number_type(term, bc_Addi, bc_Addf);
+    else if (term->function == FUNCS.add_i)
+        return inline_op_match_number_type(term, bc_Addi, 0);
+    else if (term->function == FUNCS.add_f)
+        return inline_op_match_number_type(term, bc_Addf, bc_Addf);
+    else if (term->function == FUNCS.sub)
+        return inline_op_match_number_type(term, bc_Subi, bc_Subf);
+    else if (term->function == FUNCS.sub_i)
+        return inline_op_match_number_type(term, bc_Subi, 0);
+    else if (term->function == FUNCS.sub_f)
+        return inline_op_match_number_type(term, bc_Subf, bc_Subf);
+    else if (term->function == FUNCS.mult)
+        return inline_op_match_number_type(term, bc_Multi, bc_Multf);
+#if 0
+    else if (term->function == FUNCS.mult_i)
+        return inline_op_match_number_type(term, bc_Multi, 0);
+    else if (term->function == FUNCS.mult_f)
+        return inline_op_match_number_type(term, bc_Multf, bc_Multf);
+#endif
+    else if (term->function == FUNCS.div)
+        return inline_op_match_number_type(term, bc_Divf, bc_Divf);
+    else if (term->function == FUNCS.div_i)
+        return inline_op_match_number_type(term, bc_Divi, 0);
+    else if (term->function == FUNCS.div_f)
+        return inline_op_match_number_type(term, bc_Divf, bc_Divf);
+    else if (term->function == FUNCS.equals)
+        return inline_op_match_number_type(term, bc_EqShallow, bc_Eqf);
+    else if (term->function == FUNCS.not_equals)
+        return inline_op_match_number_type(term, bc_NeqShallow, bc_Neqf);
+
+    return 0;
 }
 
 void bytecode_write_term_call(caValue* bytecode, Term* term)
@@ -462,6 +567,14 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
     if (is_value(term))
         return;
+
+    char inlineOp = get_inline_bc_for_term(term);
+    if (inlineOp != 0) {
+        blob_append_char(bytecode, inlineOp);
+        blob_append_u32(bytecode, term->index);
+        bytecode_write_input_instructions(bytecode, term);
+        return;
+    }
 
     if (term->function == FUNCS.lambda
             || term->function == FUNCS.block_unevaluated) {
@@ -532,7 +645,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         // Otherwise if the term has nested contents, then use it.
         referenceTargetBlock = term->nestedContents;
 
-        if (block_is_evaluation_empty(referenceTargetBlock))
+        if (block_is_evaluation_empty(term->nestedContents))
             return;
 
         blob_append_char(bytecode, bc_PushNested);

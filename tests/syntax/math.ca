@@ -11,7 +11,8 @@ print('one minus two is ', 1 - 2)
 print('two times three is ', 2 * 3)
 
 -- division
-print('eight divided by four is ', 8 / 4)
+print('nine divided by four is ', 9 / 4)
+print('nine integer-divided by four is ', 9 // 4)
 
 -- Operator precedence
 print('1 + 2 * 3 = ', 1 + 2 * 3)

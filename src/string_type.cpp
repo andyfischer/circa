@@ -277,6 +277,14 @@ void string_append(caValue* left, int value)
     sprintf(buf, "%d", value);
     string_append(left, buf);
 }
+void string_append_f(caValue* left, float value)
+{
+    ca_assert(is_string(left));
+
+    char buf[64];
+    sprintf(buf, "%f", value);
+    string_append(left, buf);
+}
 void string_append_char(caValue* left, char c)
 {
     char buf[2];

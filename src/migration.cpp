@@ -265,8 +265,10 @@ void migrate_value(caValue* value, Migration* migration)
 
 void migrate_world(World* world, Migration* migration)
 {
+#if 0
     printf("running migrate_world, from = #%d, to = #%d\n",
         migration->oldBlock->id, migration->newBlock->id);
+#endif
 
     // Update references in every module.
     for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {

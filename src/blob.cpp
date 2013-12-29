@@ -117,6 +117,13 @@ void blob_append_u32(caValue* blob, u32 val)
     u32* position = (u32*) &as_blob(blob)[size];
     *position = val;
 }
+void blob_append_float(caValue* blob, float f)
+{
+    int size = blob_size(blob);
+    blob_resize(blob, size + 4);
+    float* position = (float*) &as_blob(blob)[size];
+    *position = f;
+}
 
 void blob_append_space(caValue* blob, size_t additionalSize)
 {
@@ -142,6 +149,13 @@ u16 blob_read_u16(const char* data, int* pos)
 u32 blob_read_u32(const char* data, int* pos)
 {
     u32 value = *((u32*) &data[*pos]);
+    *pos += 4;
+    return value;
+}
+
+float blob_read_float(const char* data, int* pos)
+{
+    float value = *((float*) &data[*pos]);
     *pos += 4;
     return value;
 }

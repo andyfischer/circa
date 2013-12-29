@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "blob.h"
 #include "block.h"
 #include "building.h"
 #include "bytecode.h"
@@ -459,7 +460,7 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out)
         bytecode_to_string_lines(block_bytecode(block), &lines);
         for (int i=0; i < list_length(&lines); i++) {
             print_indent(prefs, out);
-            std::cout << as_cstring(list_get(&lines, i)) << std::endl;
+            std::cout << as_string(list_get(&lines, i)) << std::endl;
         }
     }
 
