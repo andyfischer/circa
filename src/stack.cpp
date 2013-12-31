@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "blob.h"
 #include "bytecode.h"
 #include "hashtable.h"
 #include "inspection.h"
@@ -30,8 +31,8 @@ Stack::Stack()
     set_hashtable(&moduleFrames);
     rand_init(&randState, 0);
 
-    bytecode.blobs = NULL;
-    bytecode.blobCount = 0;
+    bytecode.entries = NULL;
+    bytecode.count = 0;
     set_hashtable(&bytecode.indexMap);
 }
 
@@ -159,10 +160,10 @@ caValue* stack_active_value_for_term(Frame* frame, Term* term)
     return stack_active_value_for_block_id(frame, term->owningBlock->id, term->index);
 }
 
-caValue* stack_bytecode_get_for_index(Stack* stack, int index)
+char* stack_bytecode_get_blob(Stack* stack, int index)
 {
-    ca_assert(index <= stack->bytecode.blobCount);
-    return &stack->bytecode.blobs[index];
+    ca_assert(index < stack->bytecode.count);
+    return as_blob(&stack->bytecode.entries[index].blob);
 }
 
 int stack_bytecode_get_index_for_block(Stack* stack, Block* block)
@@ -186,17 +187,18 @@ int stack_bytecode_get_index(Stack* stack, caValue* key)
 
 void stack_bytecode_erase(Stack* stack)
 {
-    for (int i=0; i < stack->bytecode.blobCount; i++)
-        set_null(&stack->bytecode.blobs[i]);
-    free(stack->bytecode.blobs);
-    stack->bytecode.blobs = NULL;
-    stack->bytecode.blobCount = 0;
+    for (int i=0; i < stack->bytecode.count; i++)
+        set_null(&stack->bytecode.entries[i].blob);
+    free(stack->bytecode.entries);
+    stack->bytecode.entries = NULL;
+    stack->bytecode.count = 0;
+    set_hashtable(&stack->bytecode.indexMap);
 
     for (int i=0; i < stack->frames.count; i++)
         stack->frames.frame[i].bc = NULL;
 }
 
-int stack_bytecode_create_index_for_key(Stack* stack, Value* key)
+int stack_bytecode_create_entry(Stack* stack, Value* key)
 {
     int existing = stack_bytecode_get_index(stack, key);
     if (existing != -1)
@@ -204,22 +206,31 @@ int stack_bytecode_create_index_for_key(Stack* stack, Value* key)
 
     // Doesn't exist, generate bytecode.
     Value bytecode;
-    if (is_block(key))
-        bytecode_write_block(&bytecode, as_block(key));
-    else if (is_list(key)) {
+    Block* block = NULL;
+
+    if (is_block(key)) {
+        bytecode_write_block(stack, &bytecode, as_block(key));
+        block = as_block(key);
+    } else if (is_list(key)) {
         ca_assert(key->index(0)->asSymbol() == sym_OnDemand);
-        bytecode_write_on_demand_block(&bytecode,
+        bytecode_write_on_demand_block(stack, &bytecode,
             key->index(1)->asTerm(), key->index(2)->asBool());
+        block = key->index(1)->asTerm()->owningBlock;
     } else {
         internal_error("unrecognized key");
     }
 
-    int newIndex = stack->bytecode.blobCount++;
-    stack->bytecode.blobs = (caValue*) realloc(stack->bytecode.blobs,
-        sizeof(caValue) * stack->bytecode.blobCount);
+    int newIndex = stack->bytecode.count++;
+    stack->bytecode.entries = (BytecodeCache::Entry*) realloc(stack->bytecode.entries,
+        sizeof(BytecodeCache::Entry) * stack->bytecode.count);
 
-    initialize_null(&stack->bytecode.blobs[newIndex]);
-    move(&bytecode, &stack->bytecode.blobs[newIndex]);
+    BytecodeCache::Entry* entry = &stack->bytecode.entries[newIndex];
+
+    entry->block = block;
+    initialize_null(&entry->blob);
+    move(&bytecode, &entry->blob);
+
+    set_int(hashtable_insert(&stack->bytecode.indexMap, key), newIndex);
 
     return newIndex;
 }

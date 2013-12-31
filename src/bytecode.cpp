@@ -71,11 +71,15 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "pop_frame_and_pause");
         break;
     case bc_PushFunction:
-        set_string(string, "push_function ");
+        set_string(string, "push_function termIndex:");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " bc:");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushNested:
-        set_string(string, "push_nested ");
+        set_string(string, "push_nested termIndex:");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " bc:");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushDynamicMethod:
@@ -152,16 +156,20 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_CaseConditionBool:
-        set_string(string, "case_condition_bool ");
+        set_string(string, "case_condition_bool input:");
         string_append(string, blob_read_u16(bc, pc));
-        string_append(string, " ");
+        string_append(string, "/");
         string_append(string, blob_read_u16(bc, pc));
+        string_append(string, " nextBlockBc:");
+        string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_LoopConditionBool:
-        set_string(string, "loop_condition_bool ");
+        set_string(string, "loop_condition_bool input:");
         string_append(string, blob_read_u16(bc, pc));
-        string_append(string, " ");
+        string_append(string, "/");
         string_append(string, blob_read_u16(bc, pc));
+        string_append(string, " bc:");
+        string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_Loop:
         set_string(string, "loop");
@@ -423,12 +431,19 @@ void bytecode_dump(caValue* bytecode)
     }
 }
 
-void bytecode_dump_next_op(const char* bc, int pc)
+void bytecode_dump(char* data)
 {
+    int pc = 0;
+    while (data[pc] != bc_End)
+        bytecode_dump_next_op(data, &pc);
+}
+
+void bytecode_dump_next_op(const char* bc, int *pc)
+{
+    int originalPc = *pc;
     circa::Value line;
-    int lookahead = pc;
-    bytecode_op_to_string(bc, &lookahead, &line);
-    printf("[%d] %s\n", pc, as_cstring(&line));
+    bytecode_op_to_string(bc, pc, &line);
+    printf("[%d] %s\n", originalPc, as_cstring(&line));
 }
 
 bool block_contains_memoize(Block* block)
@@ -505,7 +520,14 @@ static char get_inline_bc_for_term(Term* term)
     return 0;
 }
 
-void bytecode_write_term_call(caValue* bytecode, Term* term)
+Block* case_condition_get_next_case_block(Block* currentCase)
+{
+    Block* ifBlock = get_parent_block(currentCase);
+    int caseIndex = case_block_get_index(currentCase) + 1;
+    return if_block_get_case(ifBlock, caseIndex);
+}
+
+void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
 {
     INCREMENT_STAT(WriteTermBytecode);
 
@@ -533,6 +555,16 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
     else if (term->function == FUNCS.case_condition_bool) {
         blob_append_char(bytecode, bc_CaseConditionBool);
         bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
+
+        if (stack != NULL) {
+            Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
+            Value bytecodeKey;
+            set_block(&bytecodeKey, nextCase);
+            int nextBlockBcIndex = stack_bytecode_create_entry(stack, &bytecodeKey);
+            blob_append_u32(bytecode, nextBlockBcIndex);
+        } else {
+            blob_append_u32(bytecode, 0xffffffff);
+        }
         return;
     }
 
@@ -638,6 +670,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
         referenceTargetBlock = function_contents(term->function);
         blob_append_char(bytecode, bc_PushFunction);
         blob_append_u32(bytecode, term->index);
+        blob_append_u32(bytecode, 0xffffffff);
     }
 
     else if (term->nestedContents != NULL) {
@@ -650,6 +683,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
         blob_append_char(bytecode, bc_PushNested);
         blob_append_u32(bytecode, term->index);
+        blob_append_u32(bytecode, 0xffffffff);
     } else {
 
         // If no other case applies, use the term's function.
@@ -660,6 +694,7 @@ void bytecode_write_term_call(caValue* bytecode, Term* term)
 
         blob_append_char(bytecode, bc_PushFunction);
         blob_append_u32(bytecode, term->index);
+        blob_append_u32(bytecode, 0xffffffff);
     }
 
     bytecode_write_input_instructions(bytecode, term);
@@ -804,7 +839,7 @@ static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoin
         blob_append_char(bytecode, bc_MemoizeSave);
 }
 
-void bytecode_write_block(caValue* bytecode, Block* block)
+void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block)
 {
     if (!is_blob(bytecode))
         set_blob(bytecode, 0);
@@ -827,7 +862,7 @@ void bytecode_write_block(caValue* bytecode, Block* block)
 
             if (is_exit_point(term) && !is_conditional_exit_point(term)) {
                 write_block_pre_exit(bytecode, block, term);
-                bytecode_write_term_call(bytecode, term);
+                bytecode_write_term_call(stack, bytecode, term);
                 exitAdded = true;
                 break;
             }
@@ -835,7 +870,7 @@ void bytecode_write_block(caValue* bytecode, Block* block)
             if (is_conditional_exit_point(term))
                 write_pre_exit_pack_state(bytecode, block, term);
 
-            bytecode_write_term_call(bytecode, term);
+            bytecode_write_term_call(stack, bytecode, term);
         }
     }
 
@@ -857,7 +892,7 @@ void bytecode_write_block(caValue* bytecode, Block* block)
     blob_append_char(bytecode, bc_End);
 }
 
-void bytecode_write_on_demand_block(caValue* bytecode, Term* term, bool thenStop)
+void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term, bool thenStop)
 {
     Block* block = term->owningBlock;
 
@@ -886,7 +921,7 @@ void bytecode_write_on_demand_block(caValue* bytecode, Term* term, bool thenStop
 
     for (int i=0; i <= term->index; i++) {
         if (involvedTerms[i])
-            bytecode_write_term_call(bytecode, block->get(i));
+            bytecode_write_term_call(stack, bytecode, block->get(i));
     }
 
     free(involvedTerms);

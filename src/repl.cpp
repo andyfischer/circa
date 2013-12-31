@@ -64,7 +64,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     }
     if (string_eq(line, "/dumpbc")) {
         Value bytecode;
-        bytecode_write_block(&bytecode, block);
+        bytecode_write_block(stack, &bytecode, block);
         bytecode_dump(&bytecode);
         return;
     }

@@ -457,7 +457,7 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out)
     if (prefs->showBytecode) {
         circa::Value lines;
         Value bytecode;
-        bytecode_write_block(&bytecode, block);
+        bytecode_write_block(NULL, &bytecode, block);
         bytecode_to_string_lines(&bytecode, &lines);
         for (int i=0; i < list_length(&lines); i++) {
             print_indent(prefs, out);

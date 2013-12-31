@@ -66,7 +66,7 @@ caValue* frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
 caValue* frame_registers(Frame* frame);
 caValue* frame_state(Frame* frame);
-caValue* frame_bytecode_create(Frame* frame);
+char* frame_bytecode_create(Frame* frame);
 Block* frame_block(Frame* frame);
 int frame_get_index(Frame* frame);
 int frame_get_depth(Frame* frame);

@@ -2,7 +2,6 @@
 
 #include "block.h"
 #include "building.h"
-#include "bytecode.h"
 #include "code_iterators.h"
 #include "inspection.h"
 #include "interpreter.h"

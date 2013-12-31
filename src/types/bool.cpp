@@ -10,6 +10,10 @@ namespace bool_t {
     {
         set_bool(value, false);
     }
+    int hashFunc(caValue* a)
+    {
+        return as_bool(a) ? 1 : 0;
+    }
     std::string to_string(caValue* value)
     {
         if (as_bool(value))
@@ -26,6 +30,7 @@ namespace bool_t {
         set_string(&type->name, "bool");
         type->storageType = sym_StorageTypeBool;
         type->reset = reset;
+        type->hashFunc = hashFunc;
         type->toString = to_string;
         type->formatSource = format_source;
     }

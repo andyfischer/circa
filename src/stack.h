@@ -16,10 +16,15 @@ struct FrameList
 
 struct BytecodeCache
 {
-    caValue* blobs;
-    int blobCount;
+    struct Entry {
+        Block* block;
+        Value blob;
+    };
 
-    Value indexMap; // Map of Block* to integer index into 'blobs'.
+    Entry* entries;
+    int count;
+
+    Value indexMap; // Map of Block* to integer index into 'entries'.
 };
 
 struct Stack
@@ -122,11 +127,12 @@ Stack* stack_duplicate(Stack* stack);
 caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termIndex);
 caValue* stack_active_value_for_term(Frame* frame, Term* term);
 
-caValue* stack_bytecode_get_for_index(Stack* stack, int index);
+char* stack_bytecode_get_blob(Stack* stack, int index);
 int stack_bytecode_get_index_for_block(Stack* stack, Block* block);
 int stack_bytecode_get_index(Stack* stack, caValue* key);
+
 void stack_bytecode_erase(Stack* stack);
-int stack_bytecode_create_index_for_key(Stack* stack, Value* key);
+int stack_bytecode_create_entry(Stack* stack, Value* key);
 
 caValue* stack_module_frame_get(Stack* stack, int blockId);
 caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers);
