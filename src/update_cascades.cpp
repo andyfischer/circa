@@ -23,6 +23,7 @@ void mark_static_errors_invalid(Block* block)
 
 void on_block_inputs_changed(Block* block)
 {
+    // This once did something.
 }
 
 void fix_forward_function_references(Block* block)
@@ -42,24 +43,7 @@ void fix_forward_function_references(Block* block)
 
 void dirty_bytecode(Block* block)
 {
-    set_null(&block->bytecode);
-
-    // Dirty nested minor blocks.
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (term->nestedContents != NULL && is_minor_block(term->nestedContents))
-            dirty_bytecode(term->nestedContents);
-    }
-}
-
-void refresh_bytecode(Block* block)
-{
-    // Don't bother touching bytecode if we're still bootstrapping.
-    if (global_world()->bootstrapStatus == sym_Bootstrapping)
-        return;
-
-    if (is_null(&block->bytecode))
-        bytecode_write_block(&block->bytecode, block);
+    // This once did something.
 }
 
 } // namespace circa

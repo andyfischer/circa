@@ -20,7 +20,7 @@ void simple_declared_value()
 
     Stack stack;
     stack_init(&stack, &block);
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_assert(&stack);
 
@@ -37,7 +37,7 @@ void simple_declared_value_2()
 
     Stack stack;
     stack_init(&stack, &block);
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_assert(&stack);
 
@@ -45,11 +45,11 @@ void simple_declared_value_2()
     stack_extract_state(&stack, &state);
     test_equals(&state, "{s: 1}");
 
-    run_interpreter(&stack);
+    stack_run(&stack);
     stack_extract_state(&stack, &state);
     test_equals(&state, "{s: 2}");
 
-    run_interpreter(&stack);
+    stack_run(&stack);
     stack_extract_state(&stack, &state);
     test_equals(&state, "{s: 3}");
 }
@@ -65,7 +65,7 @@ void function_state()
     Stack stack;
     stack_init(&stack, &block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
 
     Value state;
@@ -76,7 +76,7 @@ void function_state()
     test_equals(test_spy_get_results(), "['s = 1', 's = 1', 's = 1']");
 
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
     stack_extract_state(&stack, &state);
     test_equals(hashtable_get(&state, "call1"), "{s: 2}");
@@ -97,7 +97,7 @@ void function_state_2()
     Stack stack;
     stack_init(&stack, &block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
 
     Value state;
@@ -107,7 +107,7 @@ void function_state_2()
 
     // Second call, with existing state.
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
     stack_extract_state(&stack, &state);
     test_equals(&state, "{_h: {_g: {_f: {s: 2}}}}");
@@ -126,7 +126,7 @@ void if_block_state()
     test_oracle_clear();
     set_bool(test_oracle_append(), true);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     // First call on left side.
     Value state;
@@ -138,7 +138,7 @@ void if_block_state()
     test_oracle_clear();
     set_bool(test_oracle_append(), true);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     stack_extract_state(&stack, &state);
     test_equals(&state, "{_if: [{left: {s: 2}}]}");
@@ -148,7 +148,7 @@ void if_block_state()
     test_oracle_clear();
     set_bool(test_oracle_append(), false);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     stack_extract_state(&stack, &state);
     test_equals(&state, "{_if: [null, {right: {s: 1}}]}");
@@ -165,7 +165,7 @@ void for_loop_state_1()
 
     // First call.
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     Value state;
     stack_extract_state(&stack, &state);
@@ -174,7 +174,7 @@ void for_loop_state_1()
 
     // Second call, with existing state.
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
     stack_extract_state(&stack, &state);
     test_equals(&state, "{_for: [{s: 2}, {s: 2}, {s: 2}]}");
@@ -192,7 +192,7 @@ void for_loop_state_2()
 
     // First call.
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     Value state;
     stack_extract_state(&stack, &state);
@@ -201,7 +201,7 @@ void for_loop_state_2()
 
     // Second call, with existing state.
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
     stack_extract_state(&stack, &state);
     test_equals(&state, "{_for: [{_f: {s: 2}}, {_f: {s: 2}}, {_f: {s: 2}}]}");

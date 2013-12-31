@@ -565,7 +565,6 @@ int run_command_line(caWorld* world, caValue* args)
 
     load_script(mainBlock, as_cstring(filename));
     block_finish_changes(mainBlock);
-    refresh_bytecode(mainBlock);
 
     if (printRaw)
         print_block(mainBlock, &rawOutputPrefs, std::cout);
@@ -576,7 +575,7 @@ int run_command_line(caWorld* world, caValue* args)
     Stack* stack = create_stack(world);
     stack_init(stack, mainBlock);
 
-    run_interpreter(stack);
+    stack_run(stack);
 
     if (printState) {
         caValue* state = stack_get_state(stack);

@@ -96,14 +96,14 @@ ListData* as_list_data(caValue* val)
     return (ListData*) val->value_data.ptr;
 }
 
-caValue* list_get(ListData* data, int index)
+Value* list_get(ListData* data, int index)
 {
     ca_assert(data != NULL);
     ca_assert(index < data->count);
     ca_assert(index >= 0);
     return &data->items[index];
 }
-caValue* list_get_from_end(ListData* data, int index)
+Value* list_get_from_end(ListData* data, int index)
 {
     ca_assert(data != NULL);
     ca_assert(index < data->count);

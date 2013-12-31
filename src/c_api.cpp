@@ -23,12 +23,6 @@ using namespace circa;
 
 extern "C" {
 
-void
-caValue::dump()
-{
-    std::cout << to_string(this) << std::endl;
-}
-
 void caBlock::dump()
 {
     circa_dump_b(this);
@@ -371,7 +365,7 @@ caValue* circa_frame_output(caStack* stack, int index)
 
 void circa_run(caStack* stack)
 {
-    run_interpreter(stack);
+    stack_run(stack);
 }
 
 void circa_pop(caStack* stack)

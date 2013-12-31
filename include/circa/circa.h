@@ -27,6 +27,7 @@ namespace circa {
     struct Type;
     struct World;
     struct NativePatch;
+    struct Value;
 }
 
 typedef circa::Actor caActor;
@@ -49,6 +50,7 @@ typedef circa::Type caType;
 typedef circa::World caWorld;
 
 typedef circa::NativePatch caNativePatch;
+typedef circa::Value caValue;
 
 #else
 
@@ -58,8 +60,12 @@ typedef struct caTerm caTerm;
 typedef struct caType caType;
 typedef struct caWorld caWorld;
 typedef struct caNativePatch caNativePatch;
+typedef struct caValue caValue;
 
 #endif
+
+// a Symbol is an alias for an integer, used to reference an interned string.
+typedef int caSymbol;
 
 union caValueData {
     int asint;
@@ -74,45 +80,35 @@ union caValueData {
 //
 // If you allocate caValue yourself then you must call circa_init_value before using it,
 // and call circa_set_null before deallocating it.
-struct caValue
-{
-    caValueData value_data;
-    caType* value_type;
-
-#ifdef __cplusplus
-    // For debugging:
-    void dump();
-
-protected:
-    // Don't use caValue as a C++ type (use circa::Value instead)
-    caValue() {}
-    ~caValue() {}
-
-private:
-    caValue(caValue const&);
-    caValue& operator=(caValue const&);
-#endif
-};
 
 #ifdef __cplusplus
 
 // C++ wrapper on caValue. Provides C++-style initialization and destruction.
 namespace circa {
 
-struct Value : caValue
+struct Value
 {
+    caValueData value_data;
+    caType* value_type;
+
     Value();
     ~Value();
     Value(Value const&);
     Value& operator=(Value const&);
+
+    caTerm* asTerm();
+    bool asBool();
+    caSymbol asSymbol();
+
+    Value* index(int i);
+
+    // For debugging:
+    void dump();
 };
 
 } // namespace circa
 
 #endif // __cplusplus
-
-// a Symbol is an alias for an integer, used to reference an interned string.
-typedef int caName;
 
 // EvaluateFunc is the signature for a C evaluation function. The function will access the
 // stack to read inputs (if any), possibly perform some action, and write output values

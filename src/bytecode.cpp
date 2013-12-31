@@ -857,4 +857,55 @@ void bytecode_write_block(caValue* bytecode, Block* block)
     blob_append_char(bytecode, bc_End);
 }
 
+void bytecode_write_on_demand_block(caValue* bytecode, Term* term, bool thenStop)
+{
+    Block* block = term->owningBlock;
+
+    bool* involvedTerms = (bool*) malloc(sizeof(bool) * block->length());
+    memset(involvedTerms, 0, sizeof(bool) * block->length());
+
+    involvedTerms[term->index] = true;
+
+    for (int searchIndex=term->index; searchIndex >= 0; searchIndex--) {
+
+        if (!involvedTerms[searchIndex])
+            continue;
+
+        Term* involvedTerm = block->get(searchIndex);
+
+        for (int i=0; i < involvedTerm->numInputs(); i++) {
+            Term* input = involvedTerm->input(i);
+            if (input == NULL || input->owningBlock != block || is_value(input))
+                continue;
+
+            involvedTerms[input->index] = true;
+        }
+    }
+    
+    set_blob(bytecode, 0);
+
+    for (int i=0; i <= term->index; i++) {
+        if (involvedTerms[i])
+            bytecode_write_term_call(bytecode, block->get(i));
+    }
+
+    free(involvedTerms);
+
+    blob_append_char(bytecode, bc_SaveInModuleFrames);
+
+    if (thenStop) {
+        blob_append_char(bytecode, bc_PopFrameAndPause);
+        blob_append_char(bytecode, bc_End);
+    } else {
+
+        blob_append_char(bytecode, bc_SetFrameOutput);
+        blob_append_u32(bytecode, term->index);
+
+        blob_append_char(bytecode, bc_FinishDemandFrame);
+        blob_append_char(bytecode, bc_End);
+    }
+
+    //bytecode_dump(bytecode);
+}
+
 } // namespace circa

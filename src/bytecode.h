@@ -102,5 +102,6 @@ void bytecode_dump(caValue* bytecode);
 void bytecode_write_term_call(caValue* bytecode, Term* term);
 void bytecode_write_input_instructions(caValue* bytecode, Term* caller);
 void bytecode_write_block(caValue* bytecode, Block* block);
+void bytecode_write_on_demand_block(caValue* bytecode, Term* term, bool thenStop);
 
 } // namespace circa

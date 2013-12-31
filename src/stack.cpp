@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "bytecode.h"
 #include "hashtable.h"
 #include "inspection.h"
 #include "interpreter.h"
@@ -28,13 +29,19 @@ Stack::Stack()
     
     set_hashtable(&moduleFrames);
     rand_init(&randState, 0);
+
+    bytecode.blobs = NULL;
+    bytecode.blobCount = 0;
+    set_hashtable(&bytecode.indexMap);
 }
 
 Stack::~Stack()
 {
+
     // Clear error, so that stack_pop doesn't complain about losing an errored frame.
     stack_ignore_error(this);
 
+    stack_bytecode_erase(this);
     stack_reset(this);
 
     free(frames.frame);
@@ -72,7 +79,6 @@ void stack_resize_frame_list(Stack* stack, int newCapacity)
         Frame* frame = &stack->frames.frame[i];
         frame->stack = stack;
         initialize_null(&frame->registers);
-        initialize_null(&frame->customBytecode);
         initialize_null(&frame->bindings);
         initialize_null(&frame->dynamicScope);
         initialize_null(&frame->state);
@@ -93,6 +99,7 @@ Frame* stack_push_blank_frame(Stack* stack)
 
     // Prepare frame.
     frame->termIndex = 0;
+    frame->bc = NULL;
     frame->pc = 0;
     frame->exitType = sym_None;
     frame->callType = sym_NormalCall;
@@ -152,6 +159,71 @@ caValue* stack_active_value_for_term(Frame* frame, Term* term)
     return stack_active_value_for_block_id(frame, term->owningBlock->id, term->index);
 }
 
+caValue* stack_bytecode_get_for_index(Stack* stack, int index)
+{
+    ca_assert(index <= stack->bytecode.blobCount);
+    return &stack->bytecode.blobs[index];
+}
+
+int stack_bytecode_get_index_for_block(Stack* stack, Block* block)
+{
+    Value key;
+    set_block(&key, block);
+
+    caValue* indexVal = hashtable_get(&stack->bytecode.indexMap, &key);
+    if (indexVal == NULL)
+        return -1;
+    return as_int(indexVal);
+}
+
+int stack_bytecode_get_index(Stack* stack, caValue* key)
+{
+    caValue* indexVal = hashtable_get(&stack->bytecode.indexMap, key);
+    if (indexVal == NULL)
+        return -1;
+    return as_int(indexVal);
+}
+
+void stack_bytecode_erase(Stack* stack)
+{
+    for (int i=0; i < stack->bytecode.blobCount; i++)
+        set_null(&stack->bytecode.blobs[i]);
+    free(stack->bytecode.blobs);
+    stack->bytecode.blobs = NULL;
+    stack->bytecode.blobCount = 0;
+
+    for (int i=0; i < stack->frames.count; i++)
+        stack->frames.frame[i].bc = NULL;
+}
+
+int stack_bytecode_create_index_for_key(Stack* stack, Value* key)
+{
+    int existing = stack_bytecode_get_index(stack, key);
+    if (existing != -1)
+        return existing;
+
+    // Doesn't exist, generate bytecode.
+    Value bytecode;
+    if (is_block(key))
+        bytecode_write_block(&bytecode, as_block(key));
+    else if (is_list(key)) {
+        ca_assert(key->index(0)->asSymbol() == sym_OnDemand);
+        bytecode_write_on_demand_block(&bytecode,
+            key->index(1)->asTerm(), key->index(2)->asBool());
+    } else {
+        internal_error("unrecognized key");
+    }
+
+    int newIndex = stack->bytecode.blobCount++;
+    stack->bytecode.blobs = (caValue*) realloc(stack->bytecode.blobs,
+        sizeof(caValue) * stack->bytecode.blobCount);
+
+    initialize_null(&stack->bytecode.blobs[newIndex]);
+    move(&bytecode, &stack->bytecode.blobs[newIndex]);
+
+    return newIndex;
+}
+
 caValue* stack_module_frame_get(Stack* stack, int blockId)
 {
     return hashtable_get_int_key(&stack->moduleFrames, blockId);
@@ -179,6 +251,7 @@ caValue* module_frame_get_registers(caValue* moduleFrame)
 void stack_on_migration(Stack* stack)
 {
     set_hashtable(&stack->moduleFrames);
+    stack_bytecode_erase(stack);
 }
 
 Stack* frame_ref_get_stack(caValue* value)
@@ -250,11 +323,11 @@ void frame_copy(Frame* left, Frame* right)
     copy(&left->registers, &right->registers);
     touch(&right->registers);
     copy(&left->state, &right->state);
-    copy(&left->customBytecode, &right->customBytecode);
     copy(&left->bindings, &right->bindings);
     copy(&left->dynamicScope, &right->dynamicScope);
     right->block = left->block;
     right->termIndex = left->termIndex;
+    right->bc = NULL;
     right->pc = left->pc;
     right->callType = left->callType;
     right->exitType = left->exitType;

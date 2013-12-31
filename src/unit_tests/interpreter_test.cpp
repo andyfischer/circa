@@ -34,7 +34,7 @@ void test_cast_first_inputs()
     circa_set_list(in, 1);
     circa_set_int(circa_index(in, 0), 5);
 
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_assert(circa_int(circa_output((caStack*) &stack, 0)) == 5);
 }
@@ -54,7 +54,7 @@ void run_block_after_additions()
     Stack stack;
     stack_init(&stack, &block);
 
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[1, 3]");
 
@@ -66,7 +66,7 @@ void run_block_after_additions()
     block.compile("test_spy(d)");
 
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[4, 8]");
 }
@@ -88,7 +88,7 @@ void test_directly_call_native_override()
     stack_init(&stack, function_contents(my_func));
 
     set_int(circa_input(&stack, 0), 5);
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_equals(circa_output(&stack, 0), "15");
 }
 
@@ -107,13 +107,13 @@ void bug_stale_bytecode_after_migrate()
     stack_init(&stack, &version1);
 
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_equals(test_spy_get_results(), "[1]");
 
     stack_restart(&stack);
     migrate_stack(&stack, &version1, &version2);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_equals(test_spy_get_results(), "[2]");
 }
 
@@ -130,7 +130,7 @@ void bug_restart_dies_after_code_delete()
 
     Stack stack;
     stack_init(&stack, &version1);
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     migrate_stack(&stack, &version1, &version2);
 
@@ -148,7 +148,7 @@ void test_set_context()
 
     set_int(circa_set_context(&stack, "a"), 5);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[10]");
 }
@@ -163,13 +163,13 @@ void test_that_stack_is_implicitly_restarted_in_run_interpreter()
     Stack stack;
     stack_init(&stack, &block);
 
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[1]");
 
-    run_interpreter(&stack);
-    run_interpreter(&stack);
-    run_interpreter(&stack);
+    stack_run(&stack);
+    stack_run(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[1, 1, 1, 1]");
 }

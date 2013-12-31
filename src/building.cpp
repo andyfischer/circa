@@ -893,11 +893,8 @@ void block_start_changes(Block* block)
 
 void block_finish_changes(Block* block)
 {
-    if (!block->inProgress) {
-        // If nothing else, make sure bytecode is up to date.
-        refresh_bytecode(block);
+    if (!block->inProgress)
         return;
-    }
 
     // Perform cleanup
 
@@ -935,7 +932,6 @@ void block_finish_changes(Block* block)
         while_loop_finish_changes(block);
 
     dirty_bytecode(block);
-    refresh_bytecode(block);
 
     block->inProgress = false;
 }

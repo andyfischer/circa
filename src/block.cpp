@@ -330,11 +330,6 @@ Block::compile(std::string const& code)
     return parser::compile(this, parser::statement_list, code);
 }
 
-caValue* block_bytecode(Block* block)
-{
-    return &block->bytecode;
-}
-
 bool has_nested_contents(Term* term)
 {
     return term->nestedContents != NULL;

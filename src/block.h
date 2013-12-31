@@ -71,9 +71,6 @@ struct Block
     // Dictionary with additional metadata.
     Value properties;
 
-    // Compiled interpreter instructions.
-    Value bytecode;
-
     BlockOverrides overrides;
     FunctionAttrs functionAttrs;
 
@@ -154,7 +151,6 @@ void assert_valid_block(Block const* obj);
 
 Block* alloc_block();
 
-caValue* block_bytecode(Block* block);
 bool has_nested_contents(Term* term);
 Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);

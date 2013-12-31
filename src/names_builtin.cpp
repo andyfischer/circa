@@ -135,6 +135,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Primary: return "Primary";
     case sym_Anonymous: return "Anonymous";
     case sym_Entropy: return "Entropy";
+    case sym_OnDemand: return "OnDemand";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -895,6 +896,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'O':
     switch (str[1]) {
+    case 'n':
+        if (strcmp(str + 2, "Demand") == 0)
+            return sym_OnDemand;
+        break;
     case 'p':
         if (strcmp(str + 2, "tional") == 0)
             return sym_Optional;

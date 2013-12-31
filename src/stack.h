@@ -14,6 +14,14 @@ struct FrameList
     int capacity;
 };
 
+struct BytecodeCache
+{
+    caValue* blobs;
+    int blobCount;
+
+    Value indexMap; // Map of Block* to integer index into 'blobs'.
+};
+
 struct Stack
 {
     // Globally unique ID.
@@ -22,11 +30,17 @@ struct Stack
     // Activation frame list.
     FrameList frames;
 
+    // Cached bytecode data.
+    BytecodeCache bytecode;
+
     // Stored frame per module, keyed by block ID.
     Value moduleFrames;
 
     // Top-level context.
     Value topContext;
+
+    // Stack-local random number generator.
+    RandState randState;
 
     // Transient data, used during vm_run.
     char* bc;
@@ -47,8 +61,6 @@ struct Stack
 
     // Value slot, may be used by the stack's owner.
     Value context;
-
-    RandState randState;
 
     Stack();
     ~Stack();
@@ -81,18 +93,20 @@ struct Frame
     // Source block
     Block* block;
 
-    Value customBytecode;
-
     // Map of Term to value, for scope-specific bindings. Used in closure call.
     Value bindings;
 
+    // Map of term->value. Used for a closure call.
     Value dynamicScope;
 
-    // Current program counter (term index)
-    int termIndex;
+    // Bytecode data. Data is owned in Stack.bytecode.
+    char* bc;
 
-    // Program counter (bytecode position).
+    // Bytecode position. Saved when this frame is not the top.
     int pc;
+
+    // PC stored as a termIndex.
+    int termIndex;
 
     // Whether this frame was pushed from a normal call, or Func.apply/Func.call.
     Symbol callType;
@@ -107,6 +121,12 @@ Stack* stack_duplicate(Stack* stack);
 
 caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termIndex);
 caValue* stack_active_value_for_term(Frame* frame, Term* term);
+
+caValue* stack_bytecode_get_for_index(Stack* stack, int index);
+int stack_bytecode_get_index_for_block(Stack* stack, Block* block);
+int stack_bytecode_get_index(Stack* stack, caValue* key);
+void stack_bytecode_erase(Stack* stack);
+int stack_bytecode_create_index_for_key(Stack* stack, Value* key);
 
 caValue* stack_module_frame_get(Stack* stack, int blockId);
 caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers);

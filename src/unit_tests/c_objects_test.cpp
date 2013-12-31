@@ -77,7 +77,7 @@ void test_custom_object()
 
     Stack stack;
     stack_init(&stack, &block);
-    run_interpreter(&stack);
+    stack_run(&stack);
     test_assert(&stack);
     circa_clear_stack(&stack);
 

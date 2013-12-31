@@ -38,7 +38,7 @@ void patch_manually()
     Stack stack;
     stack_init(&stack, &block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[2]");
 
@@ -49,7 +49,7 @@ void patch_manually()
 
     stack_init(&stack, &block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[3]");
 
@@ -70,7 +70,7 @@ void trigger_change()
     Stack stack;
     stack_init(&stack, block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     // First pass, patch not in effect.
     test_equals(test_spy_get_results(), "[1]");
@@ -81,7 +81,7 @@ void trigger_change()
 
     stack_init(&stack, block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[5]");
 
@@ -105,7 +105,7 @@ void new_function_patched_by_world()
     Stack stack;
     stack_init(&stack, block);
     test_spy_clear();
-    run_interpreter(&stack);
+    stack_run(&stack);
 
     test_equals(test_spy_get_results(), "[3]");
 

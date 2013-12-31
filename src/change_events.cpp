@@ -146,7 +146,6 @@ static void commit_append(caWorld* world, caValue* event, bool dryRun, caValue* 
 
     compile(block, as_cstring(change_event_field(event, 0)));
     dirty_bytecode(block);
-    refresh_bytecode(block);
 
     int newRegisterCount = block_locals_count(block);
 
@@ -160,7 +159,7 @@ static void commit_append(caWorld* world, caValue* event, bool dryRun, caValue* 
 
 void change_event_commit(caWorld* world, caValue* event, bool dryRun, caValue* result)
 {
-    caName type = as_symbol(change_event_type(event));
+    Symbol type = as_symbol(change_event_type(event));
 
     switch (type) {
     case sym_ChangeAppend:

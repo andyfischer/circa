@@ -66,7 +66,7 @@ caValue* frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
 caValue* frame_registers(Frame* frame);
 caValue* frame_state(Frame* frame);
-caValue* frame_bytecode(Frame* frame);
+caValue* frame_bytecode_create(Frame* frame);
 Block* frame_block(Frame* frame);
 int frame_get_index(Frame* frame);
 int frame_get_depth(Frame* frame);
@@ -79,12 +79,8 @@ int stack_frame_count(Stack* stack);
 // Retrieve the frame with the given depth.
 Frame* frame_by_depth(Stack* stack, int depth);
 
-// Run the interpreter.
-void run_interpreter(Stack* stack);
-
 void stack_run(Stack* stack);
-
-void vm_run(Stack* stack, caValue* bytecode);
+void vm_run(Stack* stack);
 
 // Deprecated
 void evaluate_block(Stack* stack, Block* block);

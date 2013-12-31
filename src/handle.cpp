@@ -67,7 +67,7 @@ void handle_release(caValue* value)
             // needs to be released.
             swap(value, inputSlot);
 
-            run_interpreter(&stack);
+            stack_run(&stack);
 
             swap(value, inputSlot);
         }

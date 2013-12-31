@@ -41,6 +41,13 @@ Value::operator=(Value const& rhs)
     return *this;
 }
 
+Term* Value::asTerm() { return as_term_ref(this); }
+bool Value::asBool() { return as_bool(this); }
+Symbol Value::asSymbol() { return as_symbol(this); }
+Value* Value::index(int i) { return list_get(this, i); }
+
+void Value::dump() { std::cout << to_string(this) << std::endl; }
+
 void initialize_null(caValue* value)
 {
     ca_assert(TYPES.null != NULL);

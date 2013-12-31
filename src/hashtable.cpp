@@ -254,7 +254,6 @@ caValue* hashtable_get(Hashtable* data, caValue* key)
     return &data->slots[index].value;
 }
 
-
 caValue* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);

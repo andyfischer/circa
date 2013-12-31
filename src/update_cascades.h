@@ -19,6 +19,5 @@ void on_block_inputs_changed(Block* block);
 void fix_forward_function_references(Block* block);
 
 void dirty_bytecode(Block* block);
-void refresh_bytecode(Block* block);
 
 } // namespace circa
