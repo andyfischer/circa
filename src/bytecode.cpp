@@ -560,7 +560,7 @@ void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
             Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
             Value bytecodeKey;
             set_block(&bytecodeKey, nextCase);
-            int nextBlockBcIndex = stack_bytecode_create_entry(stack, &bytecodeKey);
+            int nextBlockBcIndex = stack_block_create_entry(stack, &bytecodeKey);
             blob_append_u32(bytecode, nextBlockBcIndex);
         } else {
             blob_append_u32(bytecode, 0xffffffff);

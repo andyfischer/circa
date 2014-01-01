@@ -114,6 +114,8 @@ void stack_init(Stack* stack, Block* block)
     while (stack_top(stack) != NULL)
         stack_pop(stack);
 
+    stack_block_cache_erase(stack);
+
     vm_push_frame(stack, 0, block);
 }
 
@@ -716,8 +718,8 @@ char* frame_bytecode_create(Frame* frame)
     Stack* stack = frame->stack;
     Value key;
     set_block(&key, frame->block);
-    int index = stack_bytecode_create_entry(stack, &key);
-    return stack_bytecode_get_blob(stack, index);
+    int index = stack_block_create_entry(stack, &key);
+    return stack_block_get_bytecode(stack, index);
 }
 
 Block* frame_block(Frame* frame)
@@ -991,14 +993,14 @@ static char* vm_read_cached_bytecode_data(Stack* stack, Block* block)
     if (bcIndex == 0xffffffff) {
         Value key;
         set_block(&key, block);
-        bcIndex = stack_bytecode_create_entry(stack, &key);
+        bcIndex = stack_block_create_entry(stack, &key);
 
         // Save index back in bytecode.
         int pos = stack->pc - 4;
         blob_write_u32(stack->bc, &pos, bcIndex);
     }
 
-    return stack_bytecode_get_blob(stack, bcIndex);
+    return stack_block_get_bytecode(stack, bcIndex);
 }
 
 void vm_run(Stack* stack)
@@ -1361,18 +1363,16 @@ void vm_run(Stack* stack)
             }
 
             if (!as_bool(condition)) {
-                Block* currentCase = stack_top(stack)->block;
-                int prevCaseIndex = case_block_get_index(currentCase);
                 int parentIndex = stack_top(stack)->parentIndex;
 
                 // Move to the next condition block.
                 stack_pop(stack);
 
-                int caseIndex = prevCaseIndex + 1;
-                Term* caller = stack_top(stack)->block->get(parentIndex);
-                Block* nextCase = if_block_get_case(nested_contents(caller), caseIndex);
+                Block* nextCase = stack_block_get_block(stack, nextBcIndex);
+                int caseIndex = case_block_get_index(nextCase);
+
                 Frame* top = vm_push_frame(stack, parentIndex, nextCase);
-                top->bc = stack_bytecode_get_blob(stack, nextBcIndex);
+                top->bc = stack_block_get_bytecode(stack, nextBcIndex);
                 stack->bc = top->bc;
                 ca_assert(stack->bc != NULL);
                 stack->pc = 0;
@@ -2188,8 +2188,8 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop
     set_term_ref(list_get(&bytecodeKey, 1), term);
     set_bool(list_get(&bytecodeKey, 2), thenStop);
 
-    char* bc = stack_bytecode_get_blob(stack,
-        stack_bytecode_create_entry(stack, &bytecodeKey));
+    char* bc = stack_block_get_bytecode(stack,
+        stack_block_create_entry(stack, &bytecodeKey));
 
     // Find moduleFrame.
     caValue* existingModule = stack_module_frame_get(stack, block->id);

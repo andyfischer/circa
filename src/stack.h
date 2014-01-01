@@ -14,17 +14,19 @@ struct FrameList
     int capacity;
 };
 
-struct BytecodeCache
+struct StackBlockCache
 {
-    struct Entry {
+    // Stores information on each Block used by a Stack. This includes a bytecode
+    // blob (which is specifically tailored and local to a Stack).
+    struct Item {
         Block* block;
-        Value blob;
+        Value bytecode;
     };
 
-    Entry* entries;
+    Item* item;
     int count;
 
-    Value indexMap; // Map of Block* to integer index into 'entries'.
+    Value indexMap; // Map of Block* to integer index into 'item'.
 };
 
 struct Stack
@@ -36,7 +38,7 @@ struct Stack
     FrameList frames;
 
     // Cached bytecode data.
-    BytecodeCache bytecode;
+    StackBlockCache blockCache;
 
     // Stored frame per module, keyed by block ID.
     Value moduleFrames;
@@ -127,13 +129,16 @@ Stack* stack_duplicate(Stack* stack);
 caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termIndex);
 caValue* stack_active_value_for_term(Frame* frame, Term* term);
 
-char* stack_bytecode_get_blob(Stack* stack, int index);
-int stack_bytecode_get_index_for_block(Stack* stack, Block* block);
-int stack_bytecode_get_index(Stack* stack, caValue* key);
+// Stack block cache
+char* stack_block_get_bytecode(Stack* stack, int index);
+Block* stack_block_get_block(Stack* stack, int index);
+int stack_block_get_index_for_block(Stack* stack, Block* block);
+int stack_block_get_index(Stack* stack, caValue* key);
 
-void stack_bytecode_erase(Stack* stack);
-int stack_bytecode_create_entry(Stack* stack, Value* key);
+void stack_block_cache_erase(Stack* stack);
+int stack_block_create_entry(Stack* stack, Value* key);
 
+// Module frames
 caValue* stack_module_frame_get(Stack* stack, int blockId);
 caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers);
 Block* module_frame_get_block(caValue* moduleFrame);

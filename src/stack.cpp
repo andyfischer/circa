@@ -31,9 +31,9 @@ Stack::Stack()
     set_hashtable(&moduleFrames);
     rand_init(&randState, 0);
 
-    bytecode.entries = NULL;
-    bytecode.count = 0;
-    set_hashtable(&bytecode.indexMap);
+    blockCache.item = NULL;
+    blockCache.count = 0;
+    set_hashtable(&blockCache.indexMap);
 }
 
 Stack::~Stack()
@@ -42,7 +42,7 @@ Stack::~Stack()
     // Clear error, so that stack_pop doesn't complain about losing an errored frame.
     stack_ignore_error(this);
 
-    stack_bytecode_erase(this);
+    stack_block_cache_erase(this);
     stack_reset(this);
 
     free(frames.frame);
@@ -160,47 +160,53 @@ caValue* stack_active_value_for_term(Frame* frame, Term* term)
     return stack_active_value_for_block_id(frame, term->owningBlock->id, term->index);
 }
 
-char* stack_bytecode_get_blob(Stack* stack, int index)
+char* stack_block_get_bytecode(Stack* stack, int index)
 {
-    ca_assert(index < stack->bytecode.count);
-    return as_blob(&stack->bytecode.entries[index].blob);
+    ca_assert(index < stack->blockCache.count);
+    return as_blob(&stack->blockCache.item[index].bytecode);
 }
 
-int stack_bytecode_get_index_for_block(Stack* stack, Block* block)
+Block* stack_block_get_block(Stack* stack, int index)
+{
+    ca_assert(index < stack->blockCache.count);
+    return stack->blockCache.item[index].block;
+}
+
+int stack_block_get_index_for_block(Stack* stack, Block* block)
 {
     Value key;
     set_block(&key, block);
 
-    caValue* indexVal = hashtable_get(&stack->bytecode.indexMap, &key);
+    caValue* indexVal = hashtable_get(&stack->blockCache.indexMap, &key);
     if (indexVal == NULL)
         return -1;
     return as_int(indexVal);
 }
 
-int stack_bytecode_get_index(Stack* stack, caValue* key)
+int stack_block_get_index(Stack* stack, caValue* key)
 {
-    caValue* indexVal = hashtable_get(&stack->bytecode.indexMap, key);
+    caValue* indexVal = hashtable_get(&stack->blockCache.indexMap, key);
     if (indexVal == NULL)
         return -1;
     return as_int(indexVal);
 }
 
-void stack_bytecode_erase(Stack* stack)
+void stack_block_cache_erase(Stack* stack)
 {
-    for (int i=0; i < stack->bytecode.count; i++)
-        set_null(&stack->bytecode.entries[i].blob);
-    free(stack->bytecode.entries);
-    stack->bytecode.entries = NULL;
-    stack->bytecode.count = 0;
-    set_hashtable(&stack->bytecode.indexMap);
+    for (int i=0; i < stack->blockCache.count; i++)
+        set_null(&stack->blockCache.item[i].bytecode);
+    free(stack->blockCache.item);
+    stack->blockCache.item = NULL;
+    stack->blockCache.count = 0;
+    set_hashtable(&stack->blockCache.indexMap);
 
     for (int i=0; i < stack->frames.count; i++)
         stack->frames.frame[i].bc = NULL;
 }
 
-int stack_bytecode_create_entry(Stack* stack, Value* key)
+int stack_block_create_entry(Stack* stack, Value* key)
 {
-    int existing = stack_bytecode_get_index(stack, key);
+    int existing = stack_block_get_index(stack, key);
     if (existing != -1)
         return existing;
 
@@ -220,17 +226,17 @@ int stack_bytecode_create_entry(Stack* stack, Value* key)
         internal_error("unrecognized key");
     }
 
-    int newIndex = stack->bytecode.count++;
-    stack->bytecode.entries = (BytecodeCache::Entry*) realloc(stack->bytecode.entries,
-        sizeof(BytecodeCache::Entry) * stack->bytecode.count);
+    int newIndex = stack->blockCache.count++;
+    stack->blockCache.item = (StackBlockCache::Item*) realloc(stack->blockCache.item,
+        sizeof(StackBlockCache::Item) * stack->blockCache.count);
 
-    BytecodeCache::Entry* entry = &stack->bytecode.entries[newIndex];
+    StackBlockCache::Item* entry = &stack->blockCache.item[newIndex];
 
     entry->block = block;
-    initialize_null(&entry->blob);
-    move(&bytecode, &entry->blob);
+    initialize_null(&entry->bytecode);
+    move(&bytecode, &entry->bytecode);
 
-    set_int(hashtable_insert(&stack->bytecode.indexMap, key), newIndex);
+    set_int(hashtable_insert(&stack->blockCache.indexMap, key), newIndex);
 
     return newIndex;
 }
@@ -262,7 +268,7 @@ caValue* module_frame_get_registers(caValue* moduleFrame)
 void stack_on_migration(Stack* stack)
 {
     set_hashtable(&stack->moduleFrames);
-    stack_bytecode_erase(stack);
+    stack_block_cache_erase(stack);
 }
 
 Stack* frame_ref_get_stack(caValue* value)
