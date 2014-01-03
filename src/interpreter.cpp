@@ -1053,26 +1053,6 @@ void vm_run(Stack* stack)
                 return;
             continue;
         }
-        case bc_PushNested: {
-            int termIndex = vm_read_u32(stack);
-            vm_read_u32(stack);
-
-            Frame* top = stack_top(stack);
-            top->termIndex = termIndex;
-            top->pc = stack->pc;
-            Term* caller = frame_term(top, termIndex);
-            Block* block = caller->nestedContents;
-
-            char* bc = vm_read_cached_bytecode_data(stack, block);
-            ca_assert(bc != NULL);
-
-            top = vm_push_frame(stack, termIndex, block);
-            vm_run_input_bytecodes(stack, caller);
-
-            if (stack->step != sym_StackRunning)
-                return;
-            continue;
-        }
         
         case bc_PushNonlocalInput: {
             int termIndex = vm_read_u32(stack);

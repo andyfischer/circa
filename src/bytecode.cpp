@@ -76,12 +76,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, " bc:");
         string_append(string, blob_read_u32(bc, pc));
         break;
-    case bc_PushNested:
-        set_string(string, "push_nested termIndex:");
-        string_append(string, blob_read_u32(bc, pc));
-        string_append(string, " bc:");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
     case bc_PushDynamicMethod:
         set_string(string, "push_dyn_method ");
         string_append(string, blob_read_u32(bc, pc));
@@ -323,8 +317,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_PopFrame:
         return -1;
     case bc_PushFunction:
-        return blob_read_u32(bc, &pc);
-    case bc_PushNested:
         return blob_read_u32(bc, &pc);
     case bc_PushDynamicMethod:
         return blob_read_u32(bc, &pc);
@@ -675,15 +667,8 @@ void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
 
     else if (term->nestedContents != NULL) {
 
-        // Otherwise if the term has nested contents, then use it.
-        referenceTargetBlock = term->nestedContents;
+        internal_error("bytecode_write_term_call: function has nestedContents but isn't recognized as special case");
 
-        if (block_is_evaluation_empty(term->nestedContents))
-            return;
-
-        blob_append_char(bytecode, bc_PushNested);
-        blob_append_u32(bytecode, term->index);
-        blob_append_u32(bytecode, 0xffffffff);
     } else {
 
         // If no other case applies, use the term's function.

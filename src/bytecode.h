@@ -24,7 +24,6 @@ const char bc_SaveInModuleFrames = 0xf;
 
 // Pushing a new frame
 const char bc_PushFunction = 0x10;
-const char bc_PushNested = 0x11;
 const char bc_PushDynamicMethod = 0x12;
 const char bc_PushFuncCall = 0x13;
 const char bc_PushFuncApply = 0x15;
