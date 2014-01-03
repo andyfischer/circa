@@ -81,16 +81,12 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u32(bc, pc));
 
         for (int i=0; i < c_methodCacheCount; i++) {
-            int typeId = blob_read_u32(bc, pc);
-            Block* block = (Block*) blob_read_pointer(bc, pc);
-
+            MethodCallSiteCacheLine* line = (MethodCallSiteCacheLine*) &bc[*pc];
+            *pc += sizeof(*line);
             string_append(string, "\n  ");
-            string_append(string, typeId);
+            string_append(string, line->typeId);
             string_append(string, " -> ");
-            if (block == NULL)
-                string_append(string, "NULL");
-            else
-                string_append(string, block->id);
+            string_append(string, line->blockIndex);
         }
         break;
     case bc_PushFuncCall:

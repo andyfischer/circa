@@ -1114,9 +1114,7 @@ void vm_run(Stack* stack)
             Frame* top = stack_top(stack);
             Frame* parent = stack_top_parent(stack);
 
-            // Temp: If this frame still doesn't have a bc pointer, find it now.
-            if (top->bc == NULL)
-                top->bc = frame_bytecode_create(top);
+            ca_assert(top->bc != NULL);
 
             parent->pc = stack->pc;
             stack->bc = top->bc;
@@ -1283,7 +1281,6 @@ void vm_run(Stack* stack)
         }
         
         case bc_PushDynamicMethod: {
-
             vm_push_dynamic_method(stack);
 
             if (stack->step != sym_StackRunning)
@@ -1985,6 +1982,9 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 
     if (is_function(term)) {
         Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);
+        // TODO: This should be optimized
+        int blockIndex = stack_block_create_entry_for_block(stack, term->nestedContents);
+        top->bc = stack_block_get_bytecode(stack, blockIndex);
         expand_frame(stack_top_parent(stack), top);
         vm_run_input_bytecodes(stack, caller);
         return true;
@@ -2025,8 +2025,10 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
     }
 
     top = vm_push_frame(stack, callerIndex, block);
+
     int blockIndex = stack_block_create_entry_for_block(stack, block);
     top->bc = stack_block_get_bytecode(stack, blockIndex);
+
     expand_frame(stack_top_parent(stack), top);
 
     caValue* bindings = list_get(closure, 1);
@@ -2075,6 +2077,10 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
     }
 
     top = vm_push_frame(stack, callerIndex, block);
+
+    int blockIndex = stack_block_create_entry_for_block(stack, block);
+    top->bc = stack_block_get_bytecode(stack, blockIndex);
+
     expand_frame(stack_top_parent(stack), top);
 
     caValue* bindings = list_get(closure, 1);
