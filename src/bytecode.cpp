@@ -105,11 +105,17 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "fire_native");
         break;
     case bc_PushCase:
-        set_string(string, "push_case ");
+        set_string(string, "push_case termIndex:");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " blockIndex:");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushLoop:
-        set_string(string, "push_loop ");
+        set_string(string, "push_loop termIndex:");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " blockIndex:");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " zeroBlockIndex:");
         string_append(string, blob_read_u32(bc, pc));
         if (blob_read_char(bc, pc))
             string_append(string, " :with_output");
@@ -642,12 +648,18 @@ void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
         referenceTargetBlock = term->nestedContents;
         blob_append_char(bytecode, bc_PushCase);
         blob_append_u32(bytecode, term->index);
+        Block* firstCaseBlock = if_block_get_case(term->nestedContents, 0);
+        u32 blockIndex = stack_block_create_entry_for_block(stack, firstCaseBlock);
+        blob_append_u32(bytecode, blockIndex);
     }
 
     else if (term->function == FUNCS.for_func) {
         referenceTargetBlock = term->nestedContents;
         blob_append_char(bytecode, bc_PushLoop);
         blob_append_u32(bytecode, term->index);
+        blob_append_u32(bytecode, stack_block_create_entry_for_block(stack, term->nestedContents));
+        blob_append_u32(bytecode, stack_block_create_entry_for_block(stack,
+            for_loop_get_zero_block(term->nestedContents)));
         blob_append_char(bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
     }
 

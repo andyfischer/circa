@@ -1313,6 +1313,7 @@ void vm_run(Stack* stack)
 
         case bc_PushCase: {
             int termIndex = vm_read_u32(stack);
+            u32 blockIndex = vm_read_u32(stack);
 
             Frame* top = stack_top(stack);
             top->termIndex = termIndex;
@@ -1320,9 +1321,10 @@ void vm_run(Stack* stack)
             Term* caller = frame_term(top, termIndex);
 
             // Start the first case.
-            Block* block = if_block_get_case(nested_contents(caller), 0);
+            Block* block = stack_block_get_block(stack, blockIndex);
 
             top = vm_push_frame(stack, termIndex, block);
+            top->bc = stack_block_get_bytecode(stack, blockIndex);
             expand_frame_indexed(stack_top_parent(stack), top, 0);
             vm_run_input_bytecodes(stack, caller);
             if (stack->step != sym_StackRunning)
@@ -1360,27 +1362,10 @@ void vm_run(Stack* stack)
             }
             continue;
         }
-        case bc_LoopConditionBool: {
-            caValue* condition = vm_read_local_value(stack);
-
-            if (!is_bool(condition)) {
-                Value msg;
-                set_string(&msg, "Loop expected bool input, found: ");
-                string_append_quoted(&msg, condition);
-                raise_error_msg(stack, as_cstring(&msg));
-                return;
-            }
-
-            if (!as_bool(condition)) {
-                Frame* parent = stack_top_parent(stack);
-                stack->bc = parent->bc;
-                stack->pc = parent->pc;
-                ca_assert(stack->bc != NULL);
-            }
-            continue;
-        }
         case bc_PushLoop: {
             int termIndex = vm_read_u32(stack);
+            u32 mainBlockIndex = vm_read_u32(stack);
+            u32 zeroBlockIndex = vm_read_u32(stack);
             bool loopEnableOutput = vm_read_char(stack) != 0;
 
             Frame* top = stack_top(stack);
@@ -1396,15 +1381,20 @@ void vm_run(Stack* stack)
 
             // If the input list is empty, use the #zero block.
             Block* block = NULL;
+            int blockIndex = 0;
+
             bool zeroBlock = false;
             if (is_list(input) && list_length(input) == 0) {
-                block = for_loop_get_zero_block(caller->nestedContents);
+                blockIndex = zeroBlockIndex;
                 zeroBlock = true;
             } else {
-                block = caller->nestedContents;
+                blockIndex = mainBlockIndex;
             }
 
+            block = stack_block_get_block(stack, blockIndex);
+
             top = vm_push_frame(stack, termIndex, block);
+            top->bc = stack_block_get_bytecode(stack, blockIndex);
             vm_run_input_bytecodes(stack, caller);
             if (stack->step != sym_StackRunning)
                 return;
@@ -1424,6 +1414,25 @@ void vm_run(Stack* stack)
                 }
             }
 
+            continue;
+        }
+        case bc_LoopConditionBool: {
+            caValue* condition = vm_read_local_value(stack);
+
+            if (!is_bool(condition)) {
+                Value msg;
+                set_string(&msg, "Loop expected bool input, found: ");
+                string_append_quoted(&msg, condition);
+                raise_error_msg(stack, as_cstring(&msg));
+                return;
+            }
+
+            if (!as_bool(condition)) {
+                Frame* parent = stack_top_parent(stack);
+                stack->bc = parent->bc;
+                stack->pc = parent->pc;
+                ca_assert(stack->bc != NULL);
+            }
             continue;
         }
         case bc_PushWhile: {
@@ -2186,7 +2195,7 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop
     }
 }
 
-static Block* vm_dynamic_method_search_cache(caValue* object, char* data)
+static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(caValue* object, char* data)
 {
 #if CIRCA_ENABLE_INLINE_DYNAMIC_METHOD_CACHE
 
@@ -2194,11 +2203,12 @@ static Block* vm_dynamic_method_search_cache(caValue* object, char* data)
 
     // Check method lookup cache here.
     for (int i=0; i < c_methodCacheCount; i++) {
-        int typeId = blob_read_u32(data, &pos);
-        Block* block = (Block*) blob_read_pointer(data, &pos);
+        MethodCallSiteCacheLine* line = (MethodCallSiteCacheLine*) &data[pos];
 
-        if (typeId == object->value_type->id)
-            return block;
+        if (line->typeId == object->value_type->id)
+            return line;
+
+        pos += sizeof(*line);
     }
 #endif
 
@@ -2230,52 +2240,58 @@ static void vm_push_dynamic_method(Stack* stack)
         return raise_error(stack);
     }
 
-    Block* block = vm_dynamic_method_search_cache(object, methodCache);
+    MethodCallSiteCacheLine* cache = vm_dynamic_method_search_cache(object, methodCache);
 
     // Not found in cache, do slow lookup.
-    if (block == NULL) {
+    if (cache == NULL) {
         Frame* top = stack_top(stack);
         caValue* elementName = caller->getProp(sym_MethodName);
 
         Term* method = find_method(top->block, (Type*) circa_type_of(object), elementName);
 
-        if (method != NULL) {
-            block = method->nestedContents;
+        if (method == NULL) {
+            // Method still not found.
 
-            // Save method in cache.
-            memmove(methodCache + c_methodCacheLineSize, methodCache,
-                c_methodCacheSize - c_methodCacheLineSize);
+            caValue* elementName = caller->getProp(sym_MethodName);
+            if (is_module_ref(object)
+                    && vm_handle_method_as_module_access(top, termIndex, object, elementName))
+                return;
+            
+            if (is_hashtable(object)
+                    && vm_handle_method_as_hashtable_field(top, caller, object, elementName))
+                return;
 
-            int writePos = 0;
-
-            blob_write_u32(methodCache, &writePos, object->value_type->id);
-            blob_write_pointer(methodCache, &writePos, block);
+            Value msg;
+            set_string(&msg, "Method ");
+            string_append(&msg, elementName);
+            string_append(&msg, " not found on type ");
+            string_append(&msg, &circa_type_of(object)->name);
+            set_error_string(frame_register(top, caller), as_cstring(&msg));
+            raise_error(stack);
+            return;
         }
+
+        // Method found, save in cache.
+        Block* block = method->nestedContents;
+
+        Value key;
+        set_block(&key, block);
+        u32 blockIndex = stack_block_create_entry(stack, &key);
+
+        // Save method in cache.
+        memmove(methodCache + sizeof(MethodCallSiteCacheLine), methodCache,
+            c_methodCacheSize - sizeof(MethodCallSiteCacheLine));
+
+        int writePos = 0;
+
+        cache = (MethodCallSiteCacheLine*) methodCache;
+
+        cache->typeId = object->value_type->id;
+        cache->blockIndex = blockIndex;
     }
 
-    if (block == NULL) {
-        // Method not found.
+    Block* block = stack_block_get_block(stack, cache->blockIndex);
 
-        caValue* elementName = caller->getProp(sym_MethodName);
-        if (is_module_ref(object)
-                && vm_handle_method_as_module_access(top, termIndex, object, elementName))
-            return;
-        
-        if (is_hashtable(object)
-                && vm_handle_method_as_hashtable_field(top, caller, object, elementName))
-            return;
-        
-
-        Value msg;
-        set_string(&msg, "Method ");
-        string_append(&msg, elementName);
-        string_append(&msg, " not found on type ");
-        string_append(&msg, &circa_type_of(object)->name);
-        set_error_string(frame_register(top, caller), as_cstring(&msg));
-        raise_error(stack);
-        return;
-    }
-        
     // Special cases: check for methods that are normally handled with different bytecode.
 
     if (block == FUNCS.func_call->nestedContents) {
@@ -2292,6 +2308,7 @@ static void vm_push_dynamic_method(Stack* stack)
     // Call this method.
     stack->pc = pcBeforeTargetObject;
     top = vm_push_frame(stack, termIndex, block);
+    top->bc = stack_block_get_bytecode(stack, cache->blockIndex);
     expand_frame(stack_top_parent(stack), top);
     vm_run_input_bytecodes(stack, caller);
 }

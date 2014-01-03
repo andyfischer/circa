@@ -210,7 +210,18 @@ int stack_block_create_entry(Stack* stack, Value* key)
     if (existing != -1)
         return existing;
 
-    // Doesn't exist, generate bytecode.
+    // Doesn't exist, new create entry.
+    int newIndex = stack->blockCache.count++;
+    stack->blockCache.item = (StackBlockCache::Item*) realloc(stack->blockCache.item,
+        sizeof(StackBlockCache::Item) * stack->blockCache.count);
+
+    StackBlockCache::Item* entry = &stack->blockCache.item[newIndex];
+    initialize_null(&entry->bytecode);
+    set_int(hashtable_insert(&stack->blockCache.indexMap, key), newIndex);
+
+    // Generate bytecode. We deliberately create the blockCache entry first, to prevent
+    // possible infinite recursion (if the bytecode_write step tries to call
+    // stack_block_create_entry on the entry we just added).
     Value bytecode;
     Block* block = NULL;
 
@@ -219,6 +230,7 @@ int stack_block_create_entry(Stack* stack, Value* key)
         block = as_block(key);
     } else if (is_list(key)) {
         ca_assert(key->index(0)->asSymbol() == sym_OnDemand);
+
         bytecode_write_on_demand_block(stack, &bytecode,
             key->index(1)->asTerm(), key->index(2)->asBool());
         block = key->index(1)->asTerm()->owningBlock;
@@ -226,19 +238,20 @@ int stack_block_create_entry(Stack* stack, Value* key)
         internal_error("unrecognized key");
     }
 
-    int newIndex = stack->blockCache.count++;
-    stack->blockCache.item = (StackBlockCache::Item*) realloc(stack->blockCache.item,
-        sizeof(StackBlockCache::Item) * stack->blockCache.count);
-
-    StackBlockCache::Item* entry = &stack->blockCache.item[newIndex];
-
-    entry->block = block;
-    initialize_null(&entry->bytecode);
+    // Save bytecode. Re-lookup the cache index because the above bytecode_write step
+    // may have reallocatd blockCache.
+    entry = &stack->blockCache.item[newIndex];
     move(&bytecode, &entry->bytecode);
-
-    set_int(hashtable_insert(&stack->blockCache.indexMap, key), newIndex);
+    entry->block = block;
 
     return newIndex;
+}
+
+int stack_block_create_entry_for_block(Stack* stack, Block* block)
+{
+    Value key;
+    set_block(&key, block);
+    return stack_block_create_entry(stack, &key);
 }
 
 caValue* stack_module_frame_get(Stack* stack, int blockId)

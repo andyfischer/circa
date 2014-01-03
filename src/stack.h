@@ -137,6 +137,7 @@ int stack_block_get_index(Stack* stack, caValue* key);
 
 void stack_block_cache_erase(Stack* stack);
 int stack_block_create_entry(Stack* stack, Value* key);
+int stack_block_create_entry_for_block(Stack* stack, Block* block);
 
 // Module frames
 caValue* stack_module_frame_get(Stack* stack, int blockId);
