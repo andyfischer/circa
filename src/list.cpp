@@ -881,13 +881,23 @@ namespace list_t {
         ListData* data = (ListData*) get_pointer(value);
         set_pointer(value, list_touch(data));
     }
+
+    u32 circular_shift(u32 value, int shift)
+    {
+        shift = shift % 32;
+        if (shift == 0)
+            return value;
+        else
+            return (value << shift) | (value >> (32 - shift));
+    }
     
     int list_hash(caValue* value)
     {
         int hash = 0;
         int count = list_length(value);
         for (int i=0; i < count; i++) {
-            hash ^= get_hash_value(list_get(value, i));
+            int itemHash = get_hash_value(list_get(value, i));
+            hash ^= circular_shift(itemHash, i);
         }
         return hash;
     }

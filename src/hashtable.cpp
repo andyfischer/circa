@@ -1,16 +1,22 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "circa/circa.h"
-#include "circa/internal/for_hosted_funcs.h"
+#include "common_headers.h"
 
-#include <algorithm>
+#include "circa/circa.h"
 
 #include "hashtable.h"
+#include "kernel.h"
 #include "names.h"
+#include "string_type.h"
+#include "symbols.h"
+#include "tagged_Value.h"
+#include "type.h"
 
 namespace circa {
 
 struct Slot {
+    u32 hash;
+    int next;
     Value key;
     Value value;
 };
@@ -20,16 +26,17 @@ struct Hashtable {
     bool mut;
     int capacity;
     int count;
-    Slot slots[0];
-    // slots has size [capacity].
+    int buckets[0];
+    // buckets has size [capacity].
+    // after buckets is Slot[capacity]
 };
 
 int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey);
-int hashtable_find_slot(Hashtable* data, caValue* key);
-caValue* hashtable_get(Hashtable* data, caValue* key);
+int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash);
+caValue* hashtable_get(Hashtable* table, caValue* key);
 
 // How many slots to create for a brand new table.
-const int INITIAL_SIZE = 10;
+const int INITIAL_SIZE = 8;
 
 // When reallocating a table, how many slots should initially be filled.
 const float INITIAL_LOAD_FACTOR = 0.3f;
@@ -37,20 +44,29 @@ const float INITIAL_LOAD_FACTOR = 0.3f;
 // The load at which we'll trigger a reallocation.
 const float MAX_LOAD_FACTOR = 0.75f;
 
+static Slot* get_slot(Hashtable* table, int index)
+{
+    ca_assert(index < table->capacity);
+    Slot* firstSlot = (Slot*) &table->buckets[table->capacity];
+    return &firstSlot[index];
+}
+
 Hashtable* create_table(int capacity)
 {
     ca_assert(capacity > 0);
-    Hashtable* result = (Hashtable*) malloc(sizeof(Hashtable) + capacity * sizeof(Slot));
-    result->refCount = 1;
-    result->mut = false;
-    result->capacity = capacity;
-    result->count = 0;
-    memset(result->slots, 0, capacity * sizeof(Slot));
-    for (int s=0; s < capacity; s++) {
-        initialize_null(&result->slots[s].key);
-        initialize_null(&result->slots[s].value);
+    size_t size = sizeof(Hashtable) + capacity * (sizeof(int) + sizeof(Slot));
+    Hashtable* table = (Hashtable*) malloc(size);
+    memset(table, 0, size);
+    table->refCount = 1;
+    table->mut = false;
+    table->capacity = capacity;
+    for (int i=0; i < capacity; i++) {
+        table->buckets[i] = -1;
+        Slot* slot = get_slot(table, i);
+        initialize_null(&slot->key);
+        initialize_null(&slot->value);
     }
-    return result;
+    return table;
 }
 
 Hashtable* create_table()
@@ -58,63 +74,57 @@ Hashtable* create_table()
     return create_table(INITIAL_SIZE);
 }
 
-void free_table(Hashtable* data)
+void free_table(Hashtable* table)
 {
-    if (data == NULL)
+    if (table == NULL)
         return;
 
-    for (int i=0; i < data->capacity; i++) {
-        set_null(&data->slots[i].key);
-        set_null(&data->slots[i].value);
+    for (int i=0; i < table->count; i++) {
+        Slot* slot = get_slot(table, i);
+        set_null(&slot->key);
+        set_null(&slot->value);
     }
-    free(data);
+    free(table);
 }
 
-void hashtable_decref(Hashtable* data)
+void hashtable_decref(Hashtable* table)
 {
-    ca_assert(data->refCount > 0);
-    data->refCount--;
+    ca_assert(table->refCount > 0);
+    table->refCount--;
 
-    if (data->refCount == 0)
-        free_table(data);
+    if (table->refCount == 0)
+        free_table(table);
 }
 
-void hashtable_incref(Hashtable* data)
+void hashtable_incref(Hashtable* table)
 {
-    ca_assert(data->refCount > 0);
-    data->refCount++;
+    ca_assert(table->refCount > 0);
+    table->refCount++;
 }
 
-Hashtable* grow(Hashtable* data, int new_capacity)
+static Hashtable* grow(Hashtable* table)
 {
-    Hashtable* new_data = create_table(new_capacity);
-    new_data->mut = data->mut;
-
-    int existingCapacity = 0;
-    if (data != NULL)
-        existingCapacity = data->capacity;
-
-    // Move all the keys & values over.
-    for (int i=0; i < existingCapacity; i++) {
-        Slot* old_slot = &data->slots[i];
-
-        if (is_null(&old_slot->key))
-            continue;
-
-        int index = hashtable_insert(&new_data, &old_slot->key, true);
-        swap(&old_slot->value, &new_data->slots[index].value);
+    int newCapacity = INITIAL_SIZE;
+    int existingCount = 0;
+    if (table != NULL) {
+        newCapacity = table->count / INITIAL_LOAD_FACTOR;
+        existingCount = table->count;
     }
-    return new_data;
-}
 
-// Grow this dictionary by the default growth rate. This will result in a new Hashtable*
-// object, don't use the old one after calling this.
-void grow(Hashtable** dataPtr)
-{
-    int new_capacity = int((*dataPtr)->count / INITIAL_LOAD_FACTOR);
-    Hashtable* oldData = *dataPtr;
-    *dataPtr = grow(*dataPtr, new_capacity);
-    free_table(oldData);
+    Hashtable* newTable = create_table(newCapacity);
+    newTable->refCount = table->refCount;
+    newTable->mut = table->mut;
+
+    // Move all existing keys & values over.
+    for (int i=0; i < existingCount; i++) {
+        Slot* oldSlot = get_slot(table, i);
+        int index = hashtable_insert(&newTable, &oldSlot->key, true);
+        Slot* newSlot = get_slot(newTable, index);
+        move(&oldSlot->value, &newSlot->value);
+    }
+
+    free(table);
+    return newTable;
 }
 
 Hashtable* duplicate(Hashtable* original)
@@ -131,14 +141,11 @@ Hashtable* duplicate(Hashtable* original)
     dupe->mut = original->mut;
 
     // Copy all items
-    for (int i=0; i < original->capacity; i++) {
-        Slot* slot = &original->slots[i];
-
-        if (is_null(&slot->key))
-            continue;
-
+    for (int i=0; i < original->count; i++) {
+        Slot* slot = get_slot(original, i);
         int index = hashtable_insert(&dupe, &slot->key, false);
-        copy(&slot->value, &dupe->slots[index].value);
+        Slot* dupeSlot = get_slot(dupe, index);
+        copy(&slot->value, &dupeSlot->value);
     }
     return dupe;
 }
@@ -166,13 +173,27 @@ void hashtable_touch(caValue* value)
     value->value_data.ptr = copy;
 }
 
-// Get the 'ideal' slot index, the place we would put this key if there is no
-// collision.
-int find_ideal_slot_index(Hashtable* data, caValue* key)
+int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash)
 {
-    ca_assert(data->capacity > 0);
-    unsigned int hash = get_hash_value(key);
-    return int(hash % data->capacity);
+    if (table == NULL)
+        return -1;
+
+    int bucket = keyHash % table->capacity;
+
+    int slotIndex = table->buckets[bucket];
+
+    while (true) {
+        if (slotIndex == -1)
+            return -1;
+
+        Slot* slot = get_slot(table, slotIndex);
+        if (keyHash == slot->hash && strict_equals(key, &slot->key))
+            return slotIndex;
+
+        slotIndex = slot->next;
+    }
+    
+    return -1; // Unreachable
 }
 
 // Insert the given key into the dictionary, returns the index.
@@ -183,114 +204,132 @@ int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
     if (*dataPtr == NULL)
         *dataPtr = create_table();
 
-    // Check if this key is already here
-    int existing = hashtable_find_slot(*dataPtr, key);
+    u32 hash = get_hash_value(key);
+
+    // Check if this key is already here.
+    int existing = hashtable_find_key_index(*dataPtr, key, hash);
     if (existing != -1)
         return existing;
 
     // Check if it is time to reallocate
     if ((*dataPtr)->count >= MAX_LOAD_FACTOR * ((*dataPtr)->capacity))
-        grow(dataPtr);
+        *dataPtr = grow(*dataPtr);
 
-    Hashtable* data = *dataPtr;
-    int index = find_ideal_slot_index(data, key);
+    Hashtable* table = *dataPtr;
 
-    // Linearly advance if this slot is being used
-    int starting_index = index;
-    while (!is_null(&data->slots[index].key)) {
-        index = (index + 1) % data->capacity;
-
-        // Die if we made it all the way around
-        if (index == starting_index) {
-            ca_assert(false);
-            return 0;
-        }
-    }
-
-    Slot* slot = &data->slots[index];
+    // Allocate slot
+    int newSlotIndex = table->count++;
+    Slot* slot = get_slot(table, newSlotIndex);
+    slot->next = -1;
+    slot->hash = hash;
 
     if (consumeKey)
-        swap(key, &slot->key);
+        move(key, &slot->key);
     else
         copy(key, &slot->key);
 
-    data->count++;
+    // Add slot to bucket list
+    int bucket = hash % table->capacity;
 
-    return index;
+    if (table->buckets[bucket] == -1) {
+        // First key in bucket.
+        table->buckets[bucket] = newSlotIndex;
+    } else {
+        Slot* searchSlot = get_slot(table, table->buckets[bucket]);
+        while (searchSlot->next != -1)
+            searchSlot = get_slot(table, searchSlot->next);
+
+        searchSlot->next = newSlotIndex;
+    }
+
+    return newSlotIndex;
 }
 
 void insert_value(Hashtable** dataPtr, caValue* key, caValue* value)
 {
     int index = hashtable_insert(dataPtr, key, false);
-    copy(value, &(*dataPtr)->slots[index].value);
+    Slot* slot = get_slot(*dataPtr, index);
+    copy(value, &slot->value);
 }
 
-int hashtable_find_slot(Hashtable* data, caValue* key)
+caValue* hashtable_get(Hashtable* table, caValue* key)
 {
-    if (data == NULL)
-        return -1;
-
-    int index = find_ideal_slot_index(data, key);
-    int starting_index = index;
-    while (!equals(key, &data->slots[index].key)) {
-        index = (index + 1) % data->capacity;
-
-        // If we hit an empty slot, then give up.
-        if (is_null(&data->slots[index].key))
-            return -1;
-
-        // Or, if we looped around to the starting index, give up.
-        if (index == starting_index)
-            return -1;
-    }
-
-    return index;
-}
-
-caValue* hashtable_get(Hashtable* data, caValue* key)
-{
-    int index = hashtable_find_slot(data, key);
-    if (index == -1) return NULL;
-    return &data->slots[index].value;
+    int index = hashtable_find_key_index(table, key, get_hash_value(key));
+    if (index == -1)
+        return NULL;
+    Slot* slot = get_slot(table, index);
+    return &slot->value;
 }
 
 caValue* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);
-    return &data->slots[index].value;
+    Slot* slot = get_slot(data, index);
+    return &slot->value;
 }
 
-void remove(Hashtable* data, caValue* key)
+void move_slot(Hashtable* table, int fromIndex, int toIndex)
 {
-    int index = hashtable_find_slot(data, key);
-    if (index == -1)
+    if (fromIndex == toIndex)
         return;
 
-    // Clear out this slot
-    set_null(&data->slots[index].key);
-    set_null(&data->slots[index].value);
-    data->count--;
+    Slot* from = get_slot(table, fromIndex);
+    Slot* to = get_slot(table, toIndex);
 
-    // Check if any following keys would prefer to be moved up to this empty slot.
+    move(&from->key, &to->key);
+    move(&from->value, &to->value);
+    to->hash = from->hash;
+    to->next = from->next;
+
+    // Linear search: find and update whathever was pointing to 'from'
+    for (int i=0; i < table->capacity; i++) {
+        if (table->buckets[i] == fromIndex) {
+            table->buckets[i] = toIndex;
+            return;
+        }
+    }
+    for (int i=0; i < table->count; i++) {
+        if (get_slot(table, i)->next == fromIndex) {
+            get_slot(table, i)->next = toIndex;
+            return;
+        }
+    }
+}
+
+void remove(Hashtable* table, caValue* key)
+{
+    u32 hash = get_hash_value(key);
+    int bucket = hash % table->capacity;
+
+    if (table->buckets[bucket] == -1)
+        return;
+
+    Slot* previousSlot = NULL;
+    int searchIndex = table->buckets[bucket];
+    Slot* searchSlot = get_slot(table, searchIndex);
+
     while (true) {
-        int prevIndex = index;
-        index = (index+1) % data->capacity;
+        if (searchSlot->hash == hash && strict_equals(&searchSlot->key, key)) {
+            // Found key.
 
-        Slot* slot = &data->slots[index];
+            set_null(&searchSlot->key);
+            set_null(&searchSlot->value);
 
-        if (is_null(&slot->key))
-            break;
+            if (previousSlot == NULL)
+                table->buckets[bucket] = searchSlot->next;
+            else
+                previousSlot->next = searchSlot->next;
 
-        // If a slot isn't in its ideal index, then we assume that it would rather be in
-        // this slot.
-        if (find_ideal_slot_index(data, &slot->key) != index) {
-            Slot* prevSlot = &data->slots[prevIndex];
-            move(&slot->key, &prevSlot->key);
-            move(&slot->value, &prevSlot->value);
-            continue;
+            // Fill in the open slot
+            table->count--;
+            move_slot(table, table->count, searchIndex);
+
+            return;
         }
 
-        break;
+        previousSlot = searchSlot;
+        searchIndex = searchSlot->next;
+        searchSlot = get_slot(table, searchIndex);
     }
 }
 
@@ -298,14 +337,6 @@ bool is_empty(Hashtable* data)
 {
     if (data == NULL)
         return true;
-
-#ifdef DEBUG
-    if (data->count == 0) {
-        for (int i=0; i < data->capacity; i++) {
-            ca_assert(is_null(&data->slots[i].key));
-        }
-    }
-#endif
 
     return data->count == 0;
 }
@@ -315,97 +346,47 @@ int count(Hashtable* data)
     return data->count;
 }
 
-void clear(Hashtable* data)
+void clear(Hashtable* table)
 {
-    for (int i=0; i < data->capacity; i++) {
-        Slot* slot = &data->slots[i];
-        if (is_null(&slot->key))
-            continue;
+    for (int i=0; i < table->count; i++) {
+        Slot* slot = get_slot(table, i);
         set_null(&slot->key);
         set_null(&slot->value);
     }
-    data->count = 0;
+    table->count = 0;
 }
 
-struct HashtableToStringEntry {
-    caValue* key;
-    int valueIndex;
-
-    bool operator<(const HashtableToStringEntry& rhs) const {
-        return string_less_than(key, rhs.key);
-    }
-};
-
-std::string to_string(Hashtable* data)
+static std::string hashtable_to_string(caValue* table)
 {
-    if (data == NULL || data->capacity == 0)
+    if (table == NULL || hashtable_count(table) == 0)
         return "{}";
 
-    std::stringstream strm;
+    Value keys;
+    hashtable_get_keys(table, &keys);
+    list_sort(&keys, NULL, NULL);
 
-    int count = data->capacity;
-    Value keyStrings;
-    set_list(&keyStrings, count);
+    Value out;
+    set_string(&out, "{");
 
-    for (int i=0; i < count; i++) {
-        caValue* originalKey = &data->slots[i].key;
-        if (is_null(originalKey))
-            continue;
-        
-        caValue* str = list_get(&keyStrings, i);
+    for (int i=0; i < list_length(&keys); i++) {
+        if (i > 0)
+            string_append(&out, ", ");
 
-        if (is_string(originalKey))
-            copy(originalKey, str);
+        caValue* key = list_get(&keys, i);
+
+        caValue* value = hashtable_get(table, key);
+
+        if (is_string(key))
+            string_append(&out, as_string(key).c_str());
         else
-            set_string(str, circa::to_string(originalKey));
+            string_append(&out, to_string(key).c_str());
+
+        string_append(&out, ": ");
+        string_append(&out, to_string(value).c_str());
     }
 
-    // Short-term solution: use std library for sorting.
-    std::vector<HashtableToStringEntry> entryList;
-
-    for (int i=0; i < count; i++) {
-        caValue* str = list_get(&keyStrings, i);
-        if (is_null(str))
-            continue;
-
-        HashtableToStringEntry entry;
-        entry.key = str;
-        entry.valueIndex = i;
-        entryList.push_back(entry);
-    }
-
-    std::sort(entryList.begin(), entryList.end());
-
-    strm << "{";
-
-    bool first = true;
-    for (int i=0; i < (int) entryList.size(); i++) {
-        caValue* key = entryList[i].key;
-
-        if (is_null(key))
-            continue;
-
-        if (!first)
-            strm << ", ";
-        first = false;
-
-        caValue* value = &data->slots[entryList[i].valueIndex].value;
-
-        strm << circa::as_string(key);
-        strm << ": " << circa::to_string(value);
-    }
-    strm << "}";
-    return strm.str();
-}
-
-void debug_print(Hashtable* data)
-{
-    printf("dict: %p\n", data);
-    printf("count: %d, capacity: %d\n", data->count, data->capacity);
-    for (int i=0; i < data->capacity; i++) {
-        printf("[%d] %s = %s\n", i, circa::to_string(&data->slots[i].key).c_str(),
-                circa::to_string(&data->slots[i].value).c_str());
-    }
+    string_append(&out, "}");
+    return as_string(&out);
 }
 
 namespace tagged_value_wrappers {
@@ -421,10 +402,6 @@ namespace tagged_value_wrappers {
             return;
 
         hashtable_decref(table);
-    }
-    std::string to_string(caValue* value)
-    {
-        return to_string((Hashtable*) value->value_data.ptr);
     }
 } // namespace tagged_value_wrappers
 
@@ -467,8 +444,7 @@ caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     int index = hashtable_insert(&table, key, consumeKey);
 
-    caValue* slot = &table->slots[index].value;
-    return slot;
+    return &get_slot(table, index)->value;
 }
 
 caValue* hashtable_insert(caValue* table, caValue* key)
@@ -510,71 +486,100 @@ void hashtable_remove(caValue* tableTv, caValue* key)
 bool hashtable_is_empty(caValue* value)
 {
     ca_assert(is_hashtable(value));
-    Hashtable*& table = (Hashtable*&) value->value_data.ptr;
+    Hashtable* table = (Hashtable*) value->value_data.ptr;
     return is_empty(table);
 }
 
-void hashtable_get_keys(caValue* table, caValue* keysOut)
+void hashtable_get_keys(caValue* tableVal, caValue* keysOut)
 {
     set_list(keysOut);
 
-    ca_assert(is_hashtable(table));
-    Hashtable* data = (Hashtable*) table->value_data.ptr;
-    if (data == NULL)
+    ca_assert(is_hashtable(tableVal));
+    Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
+    if (table == NULL)
         return;
 
-    for (int i=0; i < data->capacity; i++) {
-        if (is_null(&data->slots[i].key))
-            continue;
-        copy(&data->slots[i].key, list_append(keysOut));
+    for (int i=0; i < table->count; i++) {
+        Slot* slot = get_slot(table, i);
+        copy(&slot->key, list_append(keysOut));
     }
 }
 
-int hashtable_slot_count(caValue* table)
+int hashtable_count(caValue* tableVal)
 {
-    ca_assert(is_hashtable(table));
-    if (hashtable_is_empty(table))
+    ca_assert(is_hashtable(tableVal));
+    Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
+    if (table == NULL)
         return 0;
-    return ((Hashtable*) table->value_data.ptr)->capacity;
+    return table->count;
 }
-caValue* hashtable_key_by_index(caValue* table, int index)
+
+int hashtable_slot_count(caValue* tableVal)
 {
-    ca_assert(is_hashtable(table));
-    return &((Hashtable*) table->value_data.ptr)->slots[index].key;
+    ca_assert(is_hashtable(tableVal));
+    if (hashtable_is_empty(tableVal))
+        return 0;
+    return ((Hashtable*) tableVal->value_data.ptr)->capacity;
 }
-caValue* hashtable_value_by_index(caValue* table, int index)
+caValue* hashtable_key_by_index(caValue* tableVal, int index)
 {
-    ca_assert(is_hashtable(table));
-    return &((Hashtable*) table->value_data.ptr)->slots[index].value;
+    ca_assert(is_hashtable(tableVal));
+    Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
+    return &get_slot(table, index)->key;
+}
+caValue* hashtable_value_by_index(caValue* tableVal, int index)
+{
+    ca_assert(is_hashtable(tableVal));
+    Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
+    return &get_slot(table, index)->value;
 }
 
 bool hashtable_equals(caValue* left, caValue* right)
 {
     if (!is_hashtable(right))
         return false;
-    if (hashtable_is_empty(left))
-        return hashtable_is_empty(right);
-    if (hashtable_is_empty(right))
+    if (hashtable_count(left) != hashtable_count(right))
         return false;
 
-    Hashtable* leftData = (Hashtable*) left->value_data.ptr;
-    Hashtable* rightData = (Hashtable*) right->value_data.ptr;
+    Hashtable* leftTable = (Hashtable*) left->value_data.ptr;
 
-    if (leftData->count != rightData->count)
-        return false;
+    if (leftTable == NULL)
+        return true; // already verified that counts are equal
 
-    for (int i=0; i < leftData->capacity; i++) {
-        if (is_null(&leftData->slots[i].key))
-            continue;
-
-        caValue* leftKey = &leftData->slots[i].key;
-        caValue* leftVal = &leftData->slots[i].value;
-        caValue* rightVal = hashtable_get(right, leftKey);
-
-        if (rightVal == NULL || !equals(leftVal, rightVal))
+    for (int i=0; i < leftTable->count; i++) {
+        Slot* leftSlot = get_slot(leftTable, i);
+        caValue* rightValue = hashtable_get(right, &leftSlot->key);
+        if (rightValue == NULL)
+            return false;
+        if (!equals(&leftSlot->value, rightValue))
             return false;
     }
     return true;
+}
+
+u32 circular_shift(u32 value, int shift)
+{
+    shift = shift % 32;
+    if (shift == 0)
+        return value;
+    else
+        return (value << shift) | (value >> (32 - shift));
+}
+
+int hashtable_hash(caValue* value)
+{
+    int hash = 0;
+    Hashtable* table = (Hashtable*) value->value_data.ptr;
+    if (table == NULL)
+        return 0;
+
+    for (int i=0; i < table->count; i++) {
+        Slot* slot = get_slot(table, i);
+        int itemHash = get_hash_value(&slot->key);
+        itemHash ^= circular_shift(get_hash_value(&slot->value), 16);
+        hash ^= circular_shift(itemHash, i);
+    }
+    return hash;
 }
 
 void hashtable_setup_type(Type* type)
@@ -585,7 +590,8 @@ void hashtable_setup_type(Type* type)
     type->copy = hashtable_copy;
     type->touch = hashtable_touch;
     type->equals = hashtable_equals;
-    type->toString = tagged_value_wrappers::to_string;
+    type->hashFunc = hashtable_hash;
+    type->toString = hashtable_to_string;
     type->storageType = sym_StorageTypeHashtable;
 }
 
@@ -613,19 +619,11 @@ void HashtableIterator::advance()
 
 bool HashtableIterator::finished()
 {
-    return index >= hashtable_slot_count(table);
+    return index >= hashtable_count(table);
 }
 
 void HashtableIterator::_advanceWhileInvalid()
 {
-possibly_invalid:
-    if (finished())
-        return;
-
-    if (is_null(hashtable_key_by_index(table, index))) {
-        index++;
-        goto possibly_invalid;
-    }
 }
 
 // Publich functions
