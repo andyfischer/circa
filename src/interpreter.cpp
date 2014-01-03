@@ -2025,6 +2025,8 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
     }
 
     top = vm_push_frame(stack, callerIndex, block);
+    int blockIndex = stack_block_create_entry_for_block(stack, block);
+    top->bc = stack_block_get_bytecode(stack, blockIndex);
     expand_frame(stack_top_parent(stack), top);
 
     caValue* bindings = list_get(closure, 1);
