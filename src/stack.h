@@ -37,7 +37,7 @@ struct Stack
     // Activation frame list.
     FrameList frames;
 
-    // Cached bytecode data.
+    // Cached per-block data. Can be regenerated.
     StackBlockCache blockCache;
 
     // Stored frame per module, keyed by block ID.

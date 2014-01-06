@@ -20,9 +20,18 @@
 #include "term_list.h"
 
 namespace circa {
+
+
+struct Writer {
+    Stack* stack;
+    caValue* bytecode;
+    bool skipEffects;
+};
     
-void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block);
-static void bytecode_write_local_reference(caValue* bytecode, Block* callingBlock, Term* term);
+    
+static void bytecode_write_input_instructions(Writer* writer, Term* caller);
+static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block);
+static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, Term* term);
 
 static void bc_append_local_reference_string(caValue* string, const char* bc, int* pc)
 {
@@ -521,69 +530,65 @@ Block* case_condition_get_next_case_block(Block* currentCase)
     return if_block_get_case(ifBlock, caseIndex);
 }
 
-void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
+void write_term_call(Writer* writer, Term* term)
 {
     INCREMENT_STAT(WriteTermBytecode);
 
     if (term->function == FUNCS.output) {
 
         if (term->input(0) == NULL) {
-            blob_append_char(bytecode, bc_SetNull);
-            blob_append_u32(bytecode, term->index);
+            blob_append_char(writer->bytecode, bc_SetNull);
+            blob_append_u32(writer->bytecode, term->index);
             return;
         } else {
-            blob_append_char(bytecode, bc_InlineCopy);
-            blob_append_u32(bytecode, term->index);
-            bytecode_write_local_reference(bytecode, term->owningBlock,
+            blob_append_char(writer->bytecode, bc_InlineCopy);
+            blob_append_u32(writer->bytecode, term->index);
+            bytecode_write_local_reference(writer, term->owningBlock,
                 term->input(0));
             return;
         }
     }
 
     else if (term->function == FUNCS.nonlocal) {
-        blob_append_char(bytecode, bc_PushNonlocalInput);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_PushNonlocalInput);
+        blob_append_u32(writer->bytecode, term->index);
         return;
     }
 
     else if (term->function == FUNCS.case_condition_bool) {
-        blob_append_char(bytecode, bc_CaseConditionBool);
-        bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
+        blob_append_char(writer->bytecode, bc_CaseConditionBool);
+        bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
 
-        if (stack != NULL) {
-            Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
-            Value bytecodeKey;
-            set_block(&bytecodeKey, nextCase);
-            int nextBlockBcIndex = stack_block_create_entry(stack, &bytecodeKey);
-            blob_append_u32(bytecode, nextBlockBcIndex);
-        } else {
-            blob_append_u32(bytecode, 0xffffffff);
-        }
+        Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
+        Value bytecodeKey;
+        set_block(&bytecodeKey, nextCase);
+        int nextBlockBcIndex = stack_block_create_entry(writer->stack, &bytecodeKey);
+        blob_append_u32(writer->bytecode, nextBlockBcIndex);
         return;
     }
 
     else if (term->function == FUNCS.loop_condition_bool) {
-        blob_append_char(bytecode, bc_LoopConditionBool);
-        bytecode_write_local_reference(bytecode, term->owningBlock, term->input(0));
+        blob_append_char(writer->bytecode, bc_LoopConditionBool);
+        bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
         return;
     }
 
     if (is_exit_point(term)) {
         if (term->function == FUNCS.return_func) {
-            blob_append_char(bytecode, bc_Return);
-            blob_append_u32(bytecode, term->index);
+            blob_append_char(writer->bytecode, bc_Return);
+            blob_append_u32(writer->bytecode, term->index);
         } else if (term->function == FUNCS.break_func) {
-            blob_append_char(bytecode, bc_Break);
-            blob_append_char(bytecode, enclosing_loop_produces_output_value(term));
-            blob_append_u32(bytecode, term->index);
+            blob_append_char(writer->bytecode, bc_Break);
+            blob_append_char(writer->bytecode, enclosing_loop_produces_output_value(term));
+            blob_append_u32(writer->bytecode, term->index);
         } else if (term->function == FUNCS.continue_func) {
-            blob_append_char(bytecode, bc_Continue);
-            blob_append_char(bytecode, enclosing_loop_produces_output_value(term));
-            blob_append_u32(bytecode, term->index);
+            blob_append_char(writer->bytecode, bc_Continue);
+            blob_append_char(writer->bytecode, enclosing_loop_produces_output_value(term));
+            blob_append_u32(writer->bytecode, term->index);
         } else if (term->function == FUNCS.discard) {
-            blob_append_char(bytecode, bc_Discard);
-            blob_append_char(bytecode, enclosing_loop_produces_output_value(term));
-            blob_append_u32(bytecode, term->index);
+            blob_append_char(writer->bytecode, bc_Discard);
+            blob_append_char(writer->bytecode, enclosing_loop_produces_output_value(term));
+            blob_append_u32(writer->bytecode, term->index);
         } else {
             internal_error("unrecognized exit point function");
         }
@@ -596,9 +601,9 @@ void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
 
     char inlineOp = get_inline_bc_for_term(term);
     if (inlineOp != 0) {
-        blob_append_char(bytecode, inlineOp);
-        blob_append_u32(bytecode, term->index);
-        bytecode_write_input_instructions(bytecode, term);
+        blob_append_char(writer->bytecode, inlineOp);
+        blob_append_u32(writer->bytecode, term->index);
+        bytecode_write_input_instructions(writer, term);
         return;
     }
 
@@ -617,60 +622,60 @@ void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
 
     if (term->function == FUNCS.func_call) {
         referenceTargetBlock = NULL;
-        blob_append_char(bytecode, bc_PushFuncCall);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_PushFuncCall);
+        blob_append_u32(writer->bytecode, term->index);
     }
 
     else if (is_dynamic_func_call(term)) {
         referenceTargetBlock = NULL;
-        blob_append_char(bytecode, bc_PushFuncCall);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_PushFuncCall);
+        blob_append_u32(writer->bytecode, term->index);
     }
 
     else if (term->function == FUNCS.func_apply) {
         referenceTargetBlock = NULL;
-        blob_append_char(bytecode, bc_PushFuncApply);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_PushFuncApply);
+        blob_append_u32(writer->bytecode, term->index);
     }
     
     else if (term->function == FUNCS.dynamic_method) {
         referenceTargetBlock = NULL;
-        blob_append_char(bytecode, bc_PushDynamicMethod);
-        blob_append_u32(bytecode, term->index);
-        blob_append_space(bytecode, c_methodCacheSize);
+        blob_append_char(writer->bytecode, bc_PushDynamicMethod);
+        blob_append_u32(writer->bytecode, term->index);
+        blob_append_space(writer->bytecode, c_methodCacheSize);
     }
 
     else if (term->function == FUNCS.if_block) {
         referenceTargetBlock = term->nestedContents;
-        blob_append_char(bytecode, bc_PushCase);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_PushCase);
+        blob_append_u32(writer->bytecode, term->index);
         Block* firstCaseBlock = if_block_get_case(term->nestedContents, 0);
-        u32 blockIndex = stack_block_create_entry_for_block(stack, firstCaseBlock);
-        blob_append_u32(bytecode, blockIndex);
+        u32 blockIndex = stack_block_create_entry_for_block(writer->stack, firstCaseBlock);
+        blob_append_u32(writer->bytecode, blockIndex);
     }
 
     else if (term->function == FUNCS.for_func) {
         referenceTargetBlock = term->nestedContents;
-        blob_append_char(bytecode, bc_PushLoop);
-        blob_append_u32(bytecode, term->index);
-        blob_append_u32(bytecode, stack_block_create_entry_for_block(stack, term->nestedContents));
-        blob_append_u32(bytecode, stack_block_create_entry_for_block(stack,
+        blob_append_char(writer->bytecode, bc_PushLoop);
+        blob_append_u32(writer->bytecode, term->index);
+        blob_append_u32(writer->bytecode, stack_block_create_entry_for_block(writer->stack, term->nestedContents));
+        blob_append_u32(writer->bytecode, stack_block_create_entry_for_block(writer->stack,
             for_loop_get_zero_block(term->nestedContents)));
-        blob_append_char(bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
+        blob_append_char(writer->bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
     }
 
     else if (term->function == FUNCS.while_loop) {
         referenceTargetBlock = term->nestedContents;
-        blob_append_char(bytecode, bc_PushWhile);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_PushWhile);
+        blob_append_u32(writer->bytecode, term->index);
     }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
         // Call the function, not nested contents.
         referenceTargetBlock = function_contents(term->function);
-        blob_append_char(bytecode, bc_PushFunction);
-        blob_append_u32(bytecode, term->index);
-        blob_append_u32(bytecode, 0xffffffff);
+        blob_append_char(writer->bytecode, bc_PushFunction);
+        blob_append_u32(writer->bytecode, term->index);
+        blob_append_u32(writer->bytecode, 0xffffffff);
     }
 
     else if (term->nestedContents != NULL) {
@@ -685,49 +690,49 @@ void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
         if (block_is_evaluation_empty(referenceTargetBlock))
             return;
 
-        blob_append_char(bytecode, bc_PushFunction);
-        blob_append_u32(bytecode, term->index);
-        blob_append_u32(bytecode, 0xffffffff);
+        blob_append_char(writer->bytecode, bc_PushFunction);
+        blob_append_u32(writer->bytecode, term->index);
+        blob_append_u32(writer->bytecode, 0xffffffff);
     }
 
-    bytecode_write_input_instructions(bytecode, term);
+    bytecode_write_input_instructions(writer, term);
 
-    blob_append_char(bytecode, bc_EnterFrame);
-    bytecode_write_output_instructions(bytecode, term, referenceTargetBlock);
-    blob_append_char(bytecode, bc_PopFrame);
+    blob_append_char(writer->bytecode, bc_EnterFrame);
+    bytecode_write_output_instructions(writer, term, referenceTargetBlock);
+    blob_append_char(writer->bytecode, bc_PopFrame);
 }
 
-void bytecode_write_input_instruction_block_ref(caValue* bytecode, Term* input)
+void bytecode_write_input_instruction_block_ref(Writer* writer, Term* input)
 {
-    blob_append_char(bytecode, bc_InputFromBlockRef);
-    blob_append_u32(bytecode, input->owningBlock->id);
-    blob_append_u32(bytecode, input->index);
+    blob_append_char(writer->bytecode, bc_InputFromBlockRef);
+    blob_append_u32(writer->bytecode, input->owningBlock->id);
+    blob_append_u32(writer->bytecode, input->index);
 }
 
-void bytecode_write_input_instructions(caValue* bytecode, Term* caller)
+static void bytecode_write_input_instructions(Writer* writer, Term* caller)
 {
     if (is_dynamic_func_call(caller))
-        bytecode_write_input_instruction_block_ref(bytecode, caller->function);
+        bytecode_write_input_instruction_block_ref(writer, caller->function);
 
     for (int i=0; i < caller->numInputs(); i++) {
         Term* input = caller->input(i);
         if (input == NULL) {
-            blob_append_char(bytecode, bc_InputNull);
+            blob_append_char(writer->bytecode, bc_InputNull);
         } else if (is_value(input) || input->owningBlock == global_builtins_block()) {
-            blob_append_char(bytecode, bc_InputFromValue);
-            blob_append_u32(bytecode, i);
+            blob_append_char(writer->bytecode, bc_InputFromValue);
+            blob_append_u32(writer->bytecode, i);
         } else {
-            bytecode_write_input_instruction_block_ref(bytecode, input);
+            bytecode_write_input_instruction_block_ref(writer, input);
             //blob_append_char(bytecode, bc_InputFromStack);
             //bytecode_write_local_reference(bytecode, caller->owningBlock, input);
         }
     }
 }
 
-void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* block)
+static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block)
 {
     if (block == NULL) {
-        blob_append_char(bytecode, bc_PopOutputsDynamic);
+        blob_append_char(writer->bytecode, bc_PopOutputsDynamic);
         return;
     }
 
@@ -742,12 +747,12 @@ void bytecode_write_output_instructions(caValue* bytecode, Term* caller, Block* 
 
         Term* placeholder = get_output_placeholder(block, placeholderIndex);
         if (placeholder == NULL) {
-            blob_append_char(bytecode, bc_PopOutputNull);
-            blob_append_u32(bytecode, outputIndex);
+            blob_append_char(writer->bytecode, bc_PopOutputNull);
+            blob_append_u32(writer->bytecode, outputIndex);
         } else {
-            blob_append_char(bytecode, bc_PopOutput);
-            blob_append_u32(bytecode, placeholderIndex);
-            blob_append_u32(bytecode, outputIndex);
+            blob_append_char(writer->bytecode, bc_PopOutput);
+            blob_append_u32(writer->bytecode, placeholderIndex);
+            blob_append_u32(writer->bytecode, outputIndex);
         }
 
         placeholderIndex++;
@@ -771,13 +776,13 @@ static int get_expected_stack_distance(Block* from, Block* to)
     return distance;
 }
 
-static void bytecode_write_local_reference(caValue* bytecode, Block* callingBlock, Term* term)
+static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, Term* term)
 {
-    blob_append_u16(bytecode, get_expected_stack_distance(callingBlock, term->owningBlock));
-    blob_append_u16(bytecode, term->index);
+    blob_append_u16(writer->bytecode, get_expected_stack_distance(callingBlock, term->owningBlock));
+    blob_append_u16(writer->bytecode, term->index);
 }
 
-static void write_pre_exit_pack_state(caValue* bytecode, Block* block, Term* exitPoint)
+static void write_pre_exit_pack_state(Writer* writer, Block* block, Term* exitPoint)
 {
     // Add PackState ops for each minor block.
     bool anyPackState = false;
@@ -802,15 +807,15 @@ static void write_pre_exit_pack_state(caValue* bytecode, Block* block, Term* exi
             else
                 stateResult = find_name(block, &term->nameValue);
 
-            blob_append_char(bytecode, bc_PackState);
-            bytecode_write_local_reference(bytecode, block, term);
-            bytecode_write_local_reference(bytecode, block, stateResult);
+            blob_append_char(writer->bytecode, bc_PackState);
+            bytecode_write_local_reference(writer, block, term);
+            bytecode_write_local_reference(writer, block, stateResult);
             anyPackState = true;
         }
     }
 }
 
-static void write_loop_finish(caValue* bytecode, Block* block)
+static void write_loop_finish(Writer* writer, Block* block)
 {
     // Copy values for looped_inputs.
     for (int i=0;; i++) {
@@ -818,33 +823,30 @@ static void write_loop_finish(caValue* bytecode, Block* block)
         if (term->function != FUNCS.looped_input)
             break;
 
-        blob_append_char(bytecode, bc_LocalCopy);
-        blob_append_u32(bytecode, term->input(1)->index);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_LocalCopy);
+        blob_append_u32(writer->bytecode, term->input(1)->index);
+        blob_append_u32(writer->bytecode, term->index);
     }
 }
 
-static void write_block_pre_exit(caValue* bytecode, Block* block, Term* exitPoint)
+static void write_block_pre_exit(Writer* writer, Block* block, Term* exitPoint)
 {
-    write_pre_exit_pack_state(bytecode, block, exitPoint);
+    write_pre_exit_pack_state(writer, block, exitPoint);
 
     if (block_contains_memoize(block))
-        blob_append_char(bytecode, bc_MemoizeSave);
+        blob_append_char(writer->bytecode, bc_MemoizeSave);
 }
 
-void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block)
+void write_block(Writer* writer, Block* block)
 {
-    if (!is_blob(bytecode))
-        set_blob(bytecode, 0);
-
     bool exitAdded = false;
 
     if (block_contains_memoize(block))
-        blob_append_char(bytecode, bc_MemoizeCheck);
+        blob_append_char(writer->bytecode, bc_MemoizeCheck);
 
     // Check to just trigger a C override.
     if (get_override_for_block(block) != NULL) {
-        blob_append_char(bytecode, bc_FireNative);
+        blob_append_char(writer->bytecode, bc_FireNative);
 
     } else {
         
@@ -854,38 +856,39 @@ void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block)
                 continue;
 
             if (is_exit_point(term) && !is_conditional_exit_point(term)) {
-                write_block_pre_exit(bytecode, block, term);
-                bytecode_write_term_call(stack, bytecode, term);
+                write_block_pre_exit(writer, block, term);
+                write_term_call(writer, term);
                 exitAdded = true;
                 break;
             }
 
             if (is_conditional_exit_point(term))
-                write_pre_exit_pack_state(bytecode, block, term);
+                write_pre_exit_pack_state(writer, block, term);
 
-            bytecode_write_term_call(stack, bytecode, term);
+            write_term_call(writer, term);
         }
     }
 
     if (!exitAdded)
-        write_block_pre_exit(bytecode, block, NULL);
+        write_block_pre_exit(writer, block, NULL);
 
     if (is_while_loop(block)) {
-        write_loop_finish(bytecode, block);
-        blob_append_char(bytecode, bc_Loop);
+        write_loop_finish(writer, block);
+        blob_append_char(writer->bytecode, bc_Loop);
     }
 
     if (is_for_loop(block)) {
-        blob_append_char(bytecode, bc_FinishIteration);
-        blob_append_char(bytecode, loop_produces_output_value(block->owningTerm) ? 0x1 : 0x0);
+        blob_append_char(writer->bytecode, bc_FinishIteration);
+        blob_append_char(writer->bytecode,
+            loop_produces_output_value(block->owningTerm) ? 0x1 : 0x0);
     } else {
-        blob_append_char(bytecode, bc_FinishBlock);
+        blob_append_char(writer->bytecode, bc_FinishBlock);
     }
 
-    blob_append_char(bytecode, bc_End);
+    blob_append_char(writer->bytecode, bc_End);
 }
 
-void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term, bool thenStop)
+void write_on_demand_block(Writer* writer, Term* term, bool thenStop)
 {
     Block* block = term->owningBlock;
 
@@ -909,31 +912,60 @@ void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term,
             involvedTerms[input->index] = true;
         }
     }
-    
-    set_blob(bytecode, 0);
 
     for (int i=0; i <= term->index; i++) {
         if (involvedTerms[i])
-            bytecode_write_term_call(stack, bytecode, block->get(i));
+            write_term_call(writer, block->get(i));
     }
 
     free(involvedTerms);
 
-    blob_append_char(bytecode, bc_SaveInModuleFrames);
+    blob_append_char(writer->bytecode, bc_SaveInModuleFrames);
 
     if (thenStop) {
-        blob_append_char(bytecode, bc_PopFrameAndPause);
-        blob_append_char(bytecode, bc_End);
+        blob_append_char(writer->bytecode, bc_PopFrameAndPause);
+        blob_append_char(writer->bytecode, bc_End);
     } else {
 
-        blob_append_char(bytecode, bc_SetFrameOutput);
-        blob_append_u32(bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_SetFrameOutput);
+        blob_append_u32(writer->bytecode, term->index);
 
-        blob_append_char(bytecode, bc_FinishDemandFrame);
-        blob_append_char(bytecode, bc_End);
+        blob_append_char(writer->bytecode, bc_FinishDemandFrame);
+        blob_append_char(writer->bytecode, bc_End);
     }
 
-    //bytecode_dump(bytecode);
+    //bytecode_dump(writer->bytecode);
+}
+
+void writer_setup_from_stack(Writer* writer, Stack* stack)
+{
+    writer->stack = stack;
+}
+
+void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
+{
+    Writer writer;
+    writer.bytecode = bytecode;
+    writer_setup_from_stack(&writer, stack);
+    set_blob(bytecode, 0);
+    write_term_call(&writer, term);
+}
+
+void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block)
+{
+    Writer writer;
+    writer.bytecode = bytecode;
+    writer_setup_from_stack(&writer, stack);
+    set_blob(bytecode, 0);
+    write_block(&writer, block);
+}
+void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term, bool thenStop)
+{
+    Writer writer;
+    writer.bytecode = bytecode;
+    writer_setup_from_stack(&writer, stack);
+    set_blob(bytecode, 0);
+    write_on_demand_block(&writer, term, thenStop);
 }
 
 } // namespace circa

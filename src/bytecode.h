@@ -103,7 +103,6 @@ void bytecode_dump_next_op(const char* bc, int* pc);
 void bytecode_dump(caValue* bytecode);
 
 void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term);
-void bytecode_write_input_instructions(caValue* bytecode, Term* caller);
 void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block);
 void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term, bool thenStop);
 
