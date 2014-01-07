@@ -424,7 +424,7 @@ void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
     }
 }
 
-void bytecode_dump(caValue* bytecode)
+void bytecode_dump_val(caValue* bytecode)
 {
     circa::Value lines;
     bytecode_to_string_lines(bytecode, &lines);
@@ -562,7 +562,7 @@ void write_term_call(Writer* writer, Term* term)
         Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
         Value bytecodeKey;
         set_block(&bytecodeKey, nextCase);
-        int nextBlockBcIndex = stack_block_create_entry(writer->stack, &bytecodeKey);
+        int nextBlockBcIndex = stack_bytecode_create_entry(writer->stack, &bytecodeKey);
         blob_append_u32(writer->bytecode, nextBlockBcIndex);
         return;
     }
@@ -650,7 +650,7 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PushCase);
         blob_append_u32(writer->bytecode, term->index);
         Block* firstCaseBlock = if_block_get_case(term->nestedContents, 0);
-        u32 blockIndex = stack_block_create_entry_for_block(writer->stack, firstCaseBlock);
+        u32 blockIndex = stack_bytecode_create_entry_for_block(writer->stack, firstCaseBlock);
         blob_append_u32(writer->bytecode, blockIndex);
     }
 
@@ -658,8 +658,8 @@ void write_term_call(Writer* writer, Term* term)
         referenceTargetBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushLoop);
         blob_append_u32(writer->bytecode, term->index);
-        blob_append_u32(writer->bytecode, stack_block_create_entry_for_block(writer->stack, term->nestedContents));
-        blob_append_u32(writer->bytecode, stack_block_create_entry_for_block(writer->stack,
+        blob_append_u32(writer->bytecode, stack_bytecode_create_entry_for_block(writer->stack, term->nestedContents));
+        blob_append_u32(writer->bytecode, stack_bytecode_create_entry_for_block(writer->stack,
             for_loop_get_zero_block(term->nestedContents)));
         blob_append_char(writer->bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
     }
@@ -933,8 +933,6 @@ void write_on_demand_block(Writer* writer, Term* term, bool thenStop)
         blob_append_char(writer->bytecode, bc_FinishDemandFrame);
         blob_append_char(writer->bytecode, bc_End);
     }
-
-    //bytecode_dump(writer->bytecode);
 }
 
 void writer_setup_from_stack(Writer* writer, Stack* stack)

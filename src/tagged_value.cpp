@@ -598,6 +598,13 @@ Type* as_type(caValue* value)
     return (Type*) value->value_data.ptr;
 }
 
+bool as_bool_opt(caValue* value, bool defaultValue)
+{
+    if (value == NULL || !is_bool(value))
+        return defaultValue;
+    return as_bool(value);
+}
+
 void* get_pointer(caValue* value)
 {
     return value->value_data.ptr;

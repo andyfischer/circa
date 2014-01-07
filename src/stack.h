@@ -14,19 +14,27 @@ struct FrameList
     int capacity;
 };
 
-struct StackBlockCache
+struct HacksetBytecodeCache
 {
-    // Stores information on each Block used by a Stack. This includes a bytecode
-    // blob (which is specifically tailored and local to a Stack).
-    struct Item {
+    // Bytecode generated for one specific hackset.
+
+    struct BlockEntry {
         Block* block;
         Value bytecode;
     };
 
-    Item* item;
+    BlockEntry* blocks;
+    int blockCount;
+
+    Value indexMap; // Map of Block* to block index.
+};
+
+struct BytecodeCache
+{
+    HacksetBytecodeCache** byHackset;
     int count;
 
-    Value indexMap; // Map of Block* to integer index into 'item'.
+    Value hacksetMap; // Map of hackset value to index.
 };
 
 struct Stack
@@ -37,8 +45,8 @@ struct Stack
     // Activation frame list.
     FrameList frames;
 
-    // Cached per-block data. Can be regenerated.
-    StackBlockCache blockCache;
+    // Cached bytecode data. Can be regenerated.
+    BytecodeCache bytecode;
 
     // Stored frame per module, keyed by block ID.
     Value moduleFrames;
@@ -50,6 +58,7 @@ struct Stack
     RandState randState;
 
     // Transient data, used during vm_run.
+    HacksetBytecodeCache* currentHacksetBytecode;
     char* bc;
     int pc;
 
@@ -130,14 +139,20 @@ caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termInde
 caValue* stack_active_value_for_term(Frame* frame, Term* term);
 
 // Stack block cache
-char* stack_block_get_bytecode(Stack* stack, int index);
-Block* stack_block_get_block(Stack* stack, int index);
-int stack_block_get_index_for_block(Stack* stack, Block* block);
-int stack_block_get_index(Stack* stack, caValue* key);
+char* stack_bytecode_get_data(Stack* stack, int index);
+Block* stack_bytecode_get_block(Stack* stack, int index);
+int stack_bytecode_get_index_for_block(Stack* stack, Block* block);
+int stack_bytecode_get_index(Stack* stack, caValue* key);
+int stack_bytecode_create_entry(Stack* stack, Value* key);
+int stack_bytecode_create_entry_for_block(Stack* stack, Block* block);
 
-void stack_block_cache_erase(Stack* stack);
-int stack_block_create_entry(Stack* stack, Value* key);
-int stack_block_create_entry_for_block(Stack* stack, Block* block);
+// Prepare stack's bytecode for a VM run. Load/create a cache entry relevant to the
+// current hackset.
+void stack_bytecode_start_run(Stack* stack);
+
+void stack_bytecode_erase(Stack* stack);
+
+void stack_get_hackset(Stack* stack, Value* hackset);
 
 // Module frames
 caValue* stack_module_frame_get(Stack* stack, int blockId);

@@ -136,6 +136,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Anonymous: return "Anonymous";
     case sym_Entropy: return "Entropy";
     case sym_OnDemand: return "OnDemand";
+    case sym_vmNoEffect: return "vmNoEffect";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -2750,6 +2751,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'v':
+        if (strcmp(str + 1, "mNoEffect") == 0)
+            return sym_vmNoEffect;
+        break;
     default: return -1;
     }
 

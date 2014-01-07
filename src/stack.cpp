@@ -31,9 +31,9 @@ Stack::Stack()
     set_hashtable(&moduleFrames);
     rand_init(&randState, 0);
 
-    blockCache.item = NULL;
-    blockCache.count = 0;
-    set_hashtable(&blockCache.indexMap);
+    bytecode.byHackset = NULL;
+    bytecode.count = 0;
+    set_hashtable(&bytecode.hacksetMap);
 }
 
 Stack::~Stack()
@@ -42,7 +42,7 @@ Stack::~Stack()
     // Clear error, so that stack_pop doesn't complain about losing an errored frame.
     stack_ignore_error(this);
 
-    stack_block_cache_erase(this);
+    stack_bytecode_erase(this);
     stack_reset(this);
 
     free(frames.frame);
@@ -160,68 +160,65 @@ caValue* stack_active_value_for_term(Frame* frame, Term* term)
     return stack_active_value_for_block_id(frame, term->owningBlock->id, term->index);
 }
 
-char* stack_block_get_bytecode(Stack* stack, int index)
+char* stack_bytecode_get_data(Stack* stack, int index)
 {
-    ca_assert(index < stack->blockCache.count);
-    return as_blob(&stack->blockCache.item[index].bytecode);
+    HacksetBytecodeCache* cache = stack->currentHacksetBytecode;
+
+    ca_assert(index < cache->blockCount);
+    return as_blob(&cache->blocks[index].bytecode);
 }
 
-Block* stack_block_get_block(Stack* stack, int index)
+Block* stack_bytecode_get_block(Stack* stack, int index)
 {
-    ca_assert(index < stack->blockCache.count);
-    return stack->blockCache.item[index].block;
+    HacksetBytecodeCache* cache = stack->currentHacksetBytecode;
+
+    ca_assert(index < cache->blockCount);
+    return cache->blocks[index].block;
 }
 
-int stack_block_get_index_for_block(Stack* stack, Block* block)
+int stack_bytecode_get_index_for_block(Stack* stack, Block* block)
 {
+    HacksetBytecodeCache* cache = stack->currentHacksetBytecode;
+
     Value key;
     set_block(&key, block);
 
-    caValue* indexVal = hashtable_get(&stack->blockCache.indexMap, &key);
+    caValue* indexVal = hashtable_get(&cache->indexMap, &key);
     if (indexVal == NULL)
         return -1;
     return as_int(indexVal);
 }
 
-int stack_block_get_index(Stack* stack, caValue* key)
+int stack_bytecode_get_index(Stack* stack, caValue* key)
 {
-    caValue* indexVal = hashtable_get(&stack->blockCache.indexMap, key);
+    HacksetBytecodeCache* cache = stack->currentHacksetBytecode;
+
+    caValue* indexVal = hashtable_get(&cache->indexMap, key);
     if (indexVal == NULL)
         return -1;
     return as_int(indexVal);
 }
 
-void stack_block_cache_erase(Stack* stack)
+int stack_bytecode_create_entry(Stack* stack, Value* key)
 {
-    for (int i=0; i < stack->blockCache.count; i++)
-        set_null(&stack->blockCache.item[i].bytecode);
-    free(stack->blockCache.item);
-    stack->blockCache.item = NULL;
-    stack->blockCache.count = 0;
-    set_hashtable(&stack->blockCache.indexMap);
+    HacksetBytecodeCache* cache = stack->currentHacksetBytecode;
 
-    for (int i=0; i < stack->frames.count; i++)
-        stack->frames.frame[i].bc = NULL;
-}
-
-int stack_block_create_entry(Stack* stack, Value* key)
-{
-    int existing = stack_block_get_index(stack, key);
+    int existing = stack_bytecode_get_index(stack, key);
     if (existing != -1)
         return existing;
 
     // Doesn't exist, new create entry.
-    int newIndex = stack->blockCache.count++;
-    stack->blockCache.item = (StackBlockCache::Item*) realloc(stack->blockCache.item,
-        sizeof(StackBlockCache::Item) * stack->blockCache.count);
+    int newIndex = cache->blockCount++;
+    cache->blocks = (HacksetBytecodeCache::BlockEntry*) realloc(cache->blocks,
+        sizeof(*cache->blocks) * cache->blockCount);
 
-    StackBlockCache::Item* entry = &stack->blockCache.item[newIndex];
+    HacksetBytecodeCache::BlockEntry* entry = &cache->blocks[newIndex];
     initialize_null(&entry->bytecode);
-    set_int(hashtable_insert(&stack->blockCache.indexMap, key), newIndex);
+    set_int(hashtable_insert(&cache->indexMap, key), newIndex);
 
     // Generate bytecode. We deliberately create the blockCache entry first, to prevent
     // possible infinite recursion (if the bytecode_write step tries to call
-    // stack_block_create_entry on the entry we just added).
+    // stack_bytecode_create_entry on the entry we just added).
     Value bytecode;
     Block* block = NULL;
 
@@ -240,18 +237,95 @@ int stack_block_create_entry(Stack* stack, Value* key)
 
     // Save bytecode. Re-lookup the cache index because the above bytecode_write step
     // may have reallocatd blockCache.
-    entry = &stack->blockCache.item[newIndex];
+    entry = &cache->blocks[newIndex];
     move(&bytecode, &entry->bytecode);
     entry->block = block;
 
     return newIndex;
 }
 
-int stack_block_create_entry_for_block(Stack* stack, Block* block)
+int stack_bytecode_create_entry_for_block(Stack* stack, Block* block)
 {
     Value key;
     set_block(&key, block);
-    return stack_block_create_entry(stack, &key);
+    return stack_bytecode_create_entry(stack, &key);
+}
+
+int bytecode_cache_insert_hackset(BytecodeCache* cache, Value* hackset)
+{
+    int index = cache->count++;
+    cache->byHackset = (HacksetBytecodeCache**) realloc(cache->byHackset,
+        sizeof(HacksetBytecodeCache*) * cache->count);
+
+    HacksetBytecodeCache* newEntry = (HacksetBytecodeCache*) malloc(sizeof(*newEntry));
+    newEntry->blocks = NULL;
+    newEntry->blockCount = 0;
+    initialize_null(&newEntry->indexMap);
+    set_hashtable(&newEntry->indexMap);
+
+    cache->byHackset[index] = newEntry;
+    set_int(hashtable_insert(&cache->hacksetMap, hackset), index);
+
+    return index;
+}
+
+void stack_bytecode_start_run(Stack* stack)
+{
+    BytecodeCache* cache = &stack->bytecode;
+
+    // Extract the current hackset
+    Value hackset;
+    stack_get_hackset(stack, &hackset);
+
+    // Find the HacksetBytecodeCache
+    Value* hacksetIndexVal = hashtable_get(&cache->hacksetMap, &hackset);
+    int hacksetIndex = 0;
+
+    if (hacksetIndexVal != NULL) {
+        hacksetIndex = as_int(hacksetIndexVal);
+    } else {
+        // New hackset
+        hacksetIndex = bytecode_cache_insert_hackset(cache, &hackset);
+    }
+
+    stack->currentHacksetBytecode = cache->byHackset[hacksetIndex];
+    for (int i=0; i < stack->frames.count; i++)
+        stack->frames.frame[i].bc = NULL;
+    
+}
+
+void stack_bytecode_erase(Stack* stack)
+{
+    BytecodeCache* cache = &stack->bytecode;
+
+    for (int i=0; i < cache->count; i++) {
+        HacksetBytecodeCache* hcache = stack->bytecode.byHackset[i];
+
+        for (int b=0; b < hcache->blockCount; b++) {
+            HacksetBytecodeCache::BlockEntry* blockEntry = &hcache->blocks[b];
+            set_null(&blockEntry->bytecode);
+        }
+        free(hcache->blocks);
+        set_null(&hcache->indexMap);
+        free(hcache);
+    }
+
+    free(cache->byHackset);
+    cache->byHackset = NULL;
+    cache->count = 0;
+    set_hashtable(&cache->hacksetMap);
+    stack->currentHacksetBytecode = NULL;
+}
+
+void stack_get_hackset(Stack* stack, Value* hackset)
+{
+    set_hashtable(hackset);
+
+    if (!is_hashtable(&stack->topContext))
+        return;
+
+    if (as_bool_opt(hashtable_get_symbol_key(&stack->topContext, sym_vmNoEffect), false))
+        set_bool(hashtable_insert_symbol_key(hackset, sym_vmNoEffect), true);
 }
 
 caValue* stack_module_frame_get(Stack* stack, int blockId)
@@ -281,7 +355,7 @@ caValue* module_frame_get_registers(caValue* moduleFrame)
 void stack_on_migration(Stack* stack)
 {
     set_hashtable(&stack->moduleFrames);
-    stack_block_cache_erase(stack);
+    stack_bytecode_erase(stack);
 }
 
 Stack* frame_ref_get_stack(caValue* value)

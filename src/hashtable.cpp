@@ -468,6 +468,20 @@ caValue* hashtable_insert_int_key(caValue* table, int key)
     return hashtable_insert(table, &boxedKey);
 }
 
+caValue* hashtable_get_symbol_key(caValue* table, Symbol key)
+{
+    Value boxedKey;
+    set_symbol(&boxedKey, key);
+    return hashtable_get(table, &boxedKey);
+}
+
+caValue* hashtable_insert_symbol_key(caValue* table, Symbol key)
+{
+    Value boxedKey;
+    set_symbol(&boxedKey, key);
+    return hashtable_insert(table, &boxedKey);
+}
+
 void hashtable_remove_int_key(caValue* table, int key)
 {
     Value boxedKey;

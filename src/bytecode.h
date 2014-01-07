@@ -100,7 +100,8 @@ int bytecode_op_to_term_index(const char* bc, int pc);
 void bytecode_op_to_string(const char* bc, int* pc, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);
 void bytecode_dump_next_op(const char* bc, int* pc);
-void bytecode_dump(caValue* bytecode);
+void bytecode_dump_val(caValue* bytecode);
+void bytecode_dump(char* data);
 
 void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term);
 void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block);

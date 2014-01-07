@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "block.h"
+#include "blob.h"
 #include "bytecode.h"
 #include "change_events.h"
 #include "debug.h"
@@ -65,7 +66,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     if (string_eq(line, "/dumpbc")) {
         Value bytecode;
         bytecode_write_block(stack, &bytecode, block);
-        bytecode_dump(&bytecode);
+        bytecode_dump(as_blob(&bytecode));
         return;
     }
     if (string_eq(line, "/stack")) {

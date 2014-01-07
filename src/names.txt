@@ -140,6 +140,7 @@ Anonymous
 # Interpreter misc
 Entropy
 OnDemand
+vmNoEffect
 
 # Stack steps
 StackReady

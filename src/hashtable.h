@@ -15,6 +15,8 @@ caValue* hashtable_insert(caValue* table, caValue* key);
 
 caValue* hashtable_get_int_key(caValue* table, int key);
 caValue* hashtable_insert_int_key(caValue* table, int key);
+caValue* hashtable_get_symbol_key(caValue* table, Symbol key);
+caValue* hashtable_insert_symbol_key(caValue* table, Symbol key);
 void hashtable_remove_int_key(caValue* table, int key);
 
 void hashtable_remove(caValue* table, caValue* key);

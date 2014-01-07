@@ -128,6 +128,8 @@ Stack*      as_stack(caValue* value);
 Term*       as_term_ref(caValue* val);
 Type*       as_type(caValue* value);
 
+bool as_bool_opt(caValue* value, bool defaultValue);
+
 void set_value(caValue* target, caValue* value);
 
 // Boxing using builtin types.
