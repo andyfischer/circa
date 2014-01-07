@@ -7,9 +7,6 @@ solution "Circa"
     objdir "build/obj"
     includedirs { "include", "src", "3rdparty" }
 
-    configuration "*.cpp"
-        buildoptions { "-std=c++11" }
-
     configuration "Release"
         flags { "OptimizeSpeed" }
 
@@ -27,7 +24,7 @@ solution "Circa"
             "src/generated/all_builtin_types.cpp",
             "src/generated/setup_builtin_functions.cpp",
             "src/generated/stdlib_script_text.cpp",
-            "3rdparty/tinymt/tinymt64.c"
+            "3rdparty/tinymt/tinymt64.cc"
             }
 
         configuration "Debug"

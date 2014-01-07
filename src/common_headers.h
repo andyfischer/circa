@@ -2,6 +2,9 @@
 
 #pragma once
 
+// tinymt include headers need this:
+#define __STDC_CONSTANT_MACROS
+
 #ifdef _MSC_VER
 // Special handling for Windows
 

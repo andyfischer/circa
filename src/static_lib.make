@@ -365,8 +365,8 @@ $(OBJDIR)/setup_builtin_functions.o: generated/setup_builtin_functions.cpp
 $(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/tinymt64.o: ../3rdparty/tinymt/tinymt64.c
+$(OBJDIR)/tinymt64.o: ../3rdparty/tinymt/tinymt64.cc
 	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
