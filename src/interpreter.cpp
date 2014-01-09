@@ -791,8 +791,10 @@ static void start_interpreter_session(Stack* stack)
     // Make sure any existing frames have bytecode.
     for (int i=0; i < stack->frames.count; i++) {
         Frame* frame = &stack->frames.frame[i];
-        if (frame->bc == NULL)
+        if (frame->bc == NULL) {
             frame->bc = frame_bytecode_create(frame);
+            ca_assert(frame->bc != NULL);
+        }
     }
 
     // Cast all inputs, in case they were passed in uncast.
@@ -1015,7 +1017,7 @@ void vm_run(Stack* stack)
 
         INCREMENT_STAT(StepInterpreter);
 
-        #if 1
+        #if 0
         {
             int pc = stack->pc;
             printf("stack %d: ", stack->id);
@@ -2179,10 +2181,9 @@ static void vm_finish_frame(Stack* stack)
 
 static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop)
 {
-    Block* block = term->owningBlock;
+    ca_assert(stack->currentHacksetBytecode != NULL);
 
-    // Make sure currentHacksetBytecode is initialzed
-    stack_bytecode_start_run(stack);
+    Block* block = term->owningBlock;
 
     // Find bytecode.
     Value bytecodeKey;
@@ -2596,6 +2597,10 @@ void Stack__eval_on_demand(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
+
+    // Make sure currentHacksetBytecode is initialzed
+    stack_bytecode_start_run(self);
+
     vm_evaluate_module_on_demand(self, term, true);
     stack_run(self);
     caValue* result = stack_active_value_for_term(stack_top(self), term);

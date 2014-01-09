@@ -291,7 +291,6 @@ void stack_bytecode_start_run(Stack* stack)
     stack->currentHacksetBytecode = cache->byHackset[hacksetIndex];
     for (int i=0; i < stack->frames.count; i++)
         stack->frames.frame[i].bc = NULL;
-    
 }
 
 void stack_bytecode_erase(Stack* stack)
