@@ -8,6 +8,7 @@
 #include "interpreter.h"
 #include "list.h"
 #include "modules.h"
+#include "names.h"
 #include "native_patch.h"
 #include "rand.h"
 #include "stack.h"

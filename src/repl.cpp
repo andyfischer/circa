@@ -11,6 +11,7 @@
 #include "file_watch.h"
 #include "inspection.h"
 #include "kernel.h"
+#include "list.h"
 #include "modules.h"
 #include "parser.h"
 #include "source_repro.h"

@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "hashtable.h"
+#include "list.h"
 #include "names_builtin.h"
 #include "source_repro.h"
 #include "symbols.h"

@@ -2,14 +2,6 @@
 
 #pragma once
 
-#include "circa/circa.h"
-
-#include "common_headers.h"
-
-#include "names.h"
-#include "list.h"
-#include "object.h"
-#include "tagged_value.h"
 #include "term_list.h"
 #include "term_namespace.h"
 
@@ -42,7 +34,7 @@ struct FunctionAttrs
 
 struct Block
 {
-    CircaObject header;
+    // CircaObject header;
 
     // Globally unique ID. Used for debugging.
     int id;
@@ -88,16 +80,9 @@ struct Block
     Term* operator[](int index) { return get(index); }
 
     // Get a term from a name binding.
-    inline Term* get(std::string const& name) {
-        return find_local_name(this, name.c_str());
-    }
-    inline Term* getNamed(const char* name) {
-        return find_local_name(this, name);
-    }
-
-    inline Term* operator[](std::string const& name) {
-        return find_local_name(this, name.c_str());
-    }
+    Term* get(std::string const& name);
+    Term* getNamed(const char* name);
+    Term* operator[](std::string const& name);
 
     // Returns true if there is a term with the given name
     bool contains(std::string const& name);

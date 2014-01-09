@@ -7,6 +7,7 @@
 #include "function.h"
 #include "hashtable.h"
 #include "kernel.h"
+#include "list.h"
 #include "names.h"
 #include "reflection.h"
 #include "string_type.h"

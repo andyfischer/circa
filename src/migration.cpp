@@ -8,6 +8,7 @@
 #include "interpreter.h"
 #include "hashtable.h"
 #include "kernel.h"
+#include "list.h"
 #include "migration.h"
 #include "term.h"
 #include "term_map.h"

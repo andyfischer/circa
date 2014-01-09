@@ -7,6 +7,7 @@
 #include "interpreter.h"
 #include "kernel.h"
 #include "modules.h"
+#include "names.h"
 #include "world.h"
 
 namespace modules_test {

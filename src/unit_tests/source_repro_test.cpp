@@ -2,6 +2,7 @@
 
 #include "unit_test_common.h"
 
+#include "list.h"
 #include "source_repro.h"
 
 namespace source_repro_test {

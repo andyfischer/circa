@@ -4,6 +4,7 @@
 
 #include "building.h"
 #include "kernel.h"
+#include "list.h"
 #include "term.h"
 #include "type.h"
 #include "tagged_value.h"

@@ -6,6 +6,7 @@
 #include "code_iterators.h"
 #include "debug.h"
 #include "inspection.h"
+#include "list.h"
 
 namespace code_iterator_test {
 

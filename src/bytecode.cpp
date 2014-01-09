@@ -11,6 +11,7 @@
 #include "if_block.h"
 #include "inspection.h"
 #include "interpreter.h"
+#include "list.h"
 #include "loops.h"
 #include "names.h"
 #include "stateful_code.h"

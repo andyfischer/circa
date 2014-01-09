@@ -8,6 +8,7 @@
 #include "inspection.h"
 #include "interpreter.h"
 #include "kernel.h"
+#include "list.h"
 #include "stack.h"
 #include "tagged_value.h"
 #include "type.h"

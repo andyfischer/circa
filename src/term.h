@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 #include "block.h"
 #include "term_list.h"
 #include "tagged_value.h"

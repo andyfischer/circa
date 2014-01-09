@@ -2,9 +2,10 @@
 
 #include "common_headers.h"
 
+#include "block.h"
 #include "change_events.h"
 #include "interpreter.h"
-#include "block.h"
+#include "list.h"
 #include "hashtable.h"
 #include "tagged_value.h"
 #include "update_cascades.h"

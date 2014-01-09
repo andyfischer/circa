@@ -2,6 +2,8 @@
 
 #include "unit_test_common.h"
 
+#include "list.h"
+
 namespace list_test {
 
 void set_list_1(caValue* list, int x1)

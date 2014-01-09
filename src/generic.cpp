@@ -10,6 +10,7 @@
 #include "if_block.h"
 #include "inspection.h"
 #include "kernel.h"
+#include "list.h"
 #include "parser.h"
 #include "reflection.h"
 #include "type.h"

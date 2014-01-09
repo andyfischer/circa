@@ -2,6 +2,8 @@
 
 #include "unit_test_common.h"
 
+#include "names.h"
+
 namespace if_block_test {
 
 void dont_rebind_nonlocal_name()

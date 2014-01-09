@@ -1,11 +1,12 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "block.h"
-#include "term.h"
+#include "common_headers.h"
 
+#include "block.h"
 #include "building.h"
 #include "code_iterators.h"
 #include "inspection.h"
+#include "term.h"
 
 namespace circa {
 

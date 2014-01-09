@@ -8,6 +8,7 @@
 #include "interpreter.h"
 #include "inspection.h"
 #include "kernel.h"
+#include "list.h"
 #include "names_builtin.h"
 #include "world.h"
 

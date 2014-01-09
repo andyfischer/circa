@@ -6,6 +6,7 @@
 
 #include "hashtable.h"
 #include "kernel.h"
+#include "list.h"
 #include "names.h"
 #include "string_type.h"
 #include "symbols.h"

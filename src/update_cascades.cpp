@@ -1,5 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"

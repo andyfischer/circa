@@ -117,6 +117,20 @@ Term* Block::getFromEnd(int index)
     return get(length() - index - 1);
 }
 
+Term* Block::get(std::string const& name)
+{
+    return find_local_name(this, name.c_str());
+}
+Term* Block::getNamed(const char* name)
+{
+    return find_local_name(this, name);
+}
+
+Term* Block::operator[](std::string const& name)
+{
+    return find_local_name(this, name.c_str());
+}
+
 Term* Block::last()
 {
     if (length() == 0) return NULL;
@@ -376,9 +390,11 @@ void remove_nested_contents(Term* term)
     Block* block = term->nestedContents;
     clear_block(term->nestedContents);
 
+#if 0
     // Delete this Block immediately, if it's not referenced.
     if (!block->header.referenced)
         delete term->nestedContents;
+#endif
 
     term->nestedContents = NULL;
 }

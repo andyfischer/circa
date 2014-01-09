@@ -15,6 +15,7 @@
 #include "hashtable.h"
 #include "importing.h"
 #include "kernel.h"
+#include "list.h"
 #include "names.h"
 #include "native_patch.h"
 #include "string_type.h"

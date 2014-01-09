@@ -1,5 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
@@ -10,6 +12,7 @@
 #include "inspection.h"
 #include "interpreter.h"
 #include "list.h"
+#include "loops.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "term.h"
@@ -17,7 +20,6 @@
 #include "type_inference.h"
 #include "update_cascades.h"
 
-#include "loops.h"
 
 namespace circa {
 

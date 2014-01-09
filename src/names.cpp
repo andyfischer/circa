@@ -9,6 +9,7 @@
 #include "heap_debugging.h"
 #include "if_block.h"
 #include "inspection.h"
+#include "list.h"
 #include "modules.h"
 #include "names_builtin.h"
 #include "source_repro.h"

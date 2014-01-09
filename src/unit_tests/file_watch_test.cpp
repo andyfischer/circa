@@ -5,6 +5,7 @@
 #include "file_watch.h"
 #include "kernel.h"
 #include "modules.h"
+#include "names.h"
 #include "world.h"
 
 namespace file_watch_test {

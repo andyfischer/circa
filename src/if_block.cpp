@@ -10,6 +10,7 @@
 #include "building.h"
 #include "interpreter.h"
 #include "inspection.h"
+#include "list.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"

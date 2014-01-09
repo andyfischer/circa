@@ -12,6 +12,7 @@
 #include "heap_debugging.h"
 #include "inspection.h"
 #include "interpreter.h"
+#include "list.h"
 #include "names.h"
 #include "string_type.h"
 #include "term.h"
