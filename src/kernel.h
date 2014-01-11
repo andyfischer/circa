@@ -30,6 +30,7 @@ struct BuiltinFuncs {
     Term* div_f;
     Term* div_i;
     Term* dynamic_method;
+    Term* dynamic_term_eval;
     Term* error;
     Term* equals;
     Term* extra_output;

@@ -20,7 +20,7 @@ const char bc_FinishBlock = 0xb;
 const char bc_FinishIteration = 0xc;
 const char bc_FinishDemandFrame = 0xd;
 const char bc_PopRequire = 0xe;
-const char bc_SaveInModuleFrames = 0xf;
+const char bc_DynamicTermEval = 0xf;
 
 // Pushing a new frame
 const char bc_PushFunction = 0x10;

@@ -719,26 +719,21 @@ void bootstrap_kernel()
 void on_new_function_parsed(Term* func, caValue* functionName)
 {
     // Catch certain builtin functions as soon as they are defined.
-    if (FUNCS.add == NULL && string_eq(functionName, "add"))
-        FUNCS.add = func;
-    if (FUNCS.closure_block == NULL && string_eq(functionName, "closure_block"))
-        FUNCS.closure_block = func;
-    if (FUNCS.declared_state == NULL && string_eq(functionName, "_declared_state"))
-        FUNCS.declared_state = func;
-    if (FUNCS.equals == NULL && string_eq(functionName, "equals"))
-        FUNCS.equals = func;
-    if (FUNCS.func_call == NULL && string_eq(functionName, "Func.call"))
-        FUNCS.func_call = func;
-    if (FUNCS.div == NULL && string_eq(functionName, "div"))
-        FUNCS.div = func;
-    if (FUNCS.sub == NULL && string_eq(functionName, "sub"))
-        FUNCS.sub = func;
-    if (FUNCS.mult == NULL && string_eq(functionName, "mult"))
-        FUNCS.mult = func;
-    if (FUNCS.not_equals == NULL && string_eq(functionName, "not_equals"))
-        FUNCS.not_equals = func;
-    if (FUNCS.nonlocal == NULL && string_eq(functionName, "nonlocal"))
-        FUNCS.nonlocal = func;
+    #define STORE_BUILTIN_FUNC(ref, name) \
+        if (ref == NULL && string_eq(functionName, name)) \
+            ref = func;
+
+    STORE_BUILTIN_FUNC(FUNCS.add, "add");
+    STORE_BUILTIN_FUNC(FUNCS.closure_block, "closure_block");
+    STORE_BUILTIN_FUNC(FUNCS.declared_state, "_declared_state");
+    STORE_BUILTIN_FUNC(FUNCS.dynamic_term_eval, "_dynamic_term_eval");
+    STORE_BUILTIN_FUNC(FUNCS.equals, "equals");
+    STORE_BUILTIN_FUNC(FUNCS.func_call, "Func.call");
+    STORE_BUILTIN_FUNC(FUNCS.div, "div");
+    STORE_BUILTIN_FUNC(FUNCS.sub, "sub");
+    STORE_BUILTIN_FUNC(FUNCS.mult, "mult");
+    STORE_BUILTIN_FUNC(FUNCS.not_equals, "not_equals");
+    STORE_BUILTIN_FUNC(FUNCS.nonlocal, "nonlocal");
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

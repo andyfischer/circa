@@ -193,8 +193,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_FinishDemandFrame:
         set_string(string, "finish_demand_frame");
         break;
-    case bc_SaveInModuleFrames:
-        set_string(string, "save_in_module_frames");
+    case bc_DynamicTermEval:
+        set_string(string, "dynamic_term_eval");
         break;
     case bc_PopRequire:
         set_string(string, "pop_require");
@@ -572,6 +572,12 @@ void write_term_call(Writer* writer, Term* term)
         return;
     }
 
+    else if (term->function == FUNCS.dynamic_term_eval) {
+        blob_append_char(writer->bytecode, bc_DynamicTermEval);
+        bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
+        return;
+    }
+
     if (is_exit_point(term)) {
         if (term->function == FUNCS.return_func) {
             blob_append_char(writer->bytecode, bc_Return);
@@ -889,6 +895,7 @@ void write_block(Writer* writer, Block* block)
 
 void write_on_demand_block(Writer* writer, Term* term, bool thenStop)
 {
+#if 0
     Block* block = term->owningBlock;
 
     bool* involvedTerms = (bool*) malloc(sizeof(bool) * block->length());
@@ -932,6 +939,7 @@ void write_on_demand_block(Writer* writer, Term* term, bool thenStop)
         blob_append_char(writer->bytecode, bc_FinishDemandFrame);
         blob_append_char(writer->bytecode, bc_End);
     }
+#endif
 }
 
 void writer_setup_from_stack(Writer* writer, Stack* stack)

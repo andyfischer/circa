@@ -1066,16 +1066,20 @@ void vm_run(Stack* stack)
 
             continue;
         }
-        case bc_SaveInModuleFrames: {
+        case bc_DynamicTermEval: {
+            Frame* top = stack_top(stack);
+            continue;
+        }
 #if 0
+        case bc_SaveInModuleFrames: {
             Frame* top = stack_top(stack);
             Value registers;
             copy(frame_registers(top), &registers);
             touch(&registers);
             stack_module_frame_save(stack, top->block, &registers);
-#endif
             continue;
         }
+#endif
         case bc_PushExplicitState: {
             internal_error("push explicit state is disabled");
 #if 0

@@ -108,8 +108,7 @@ def _declared_state(Type t, Func initializer :optional) -> any
 
 def _get_demand_value(Term t) -> (bool, any)
 def _store_demand_value(Term t, any val)
-
-def _dynamic_eval(Term t, List inputs) -> List
+def _dynamic_term_eval(Term t, List inputs) -> List
 
 def _eval_term_on_demand(Term t) -> any
   -- Internal function, used when a nonlocal() term needs a value.
@@ -122,7 +121,7 @@ def _eval_term_on_demand(Term t) -> any
       val = _eval_term_on_demand(input)
     val
 
-  outputs = _dynamic_eval(t inputs)
+  outputs = _dynamic_term_eval(t inputs)
   result = outputs[0]
   _store_demand_value(t result)
   result
