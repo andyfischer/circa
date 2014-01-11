@@ -2890,6 +2890,26 @@ void reflect_get_frame_state(caStack* stack)
         copy(list_get(&callerFrame->state, frame->parentIndex), circa_output(stack, 0));
 }
 
+void get_demand_value(caStack* stack)
+{
+    Term* key = as_term_ref(circa_input(stack, 0));
+    caValue* value = stack_demand_value_get(stack, key);
+    if (value == NULL) {
+        set_false(circa_output(stack, 0));
+        set_null(circa_output(stack, 1));
+    } else {
+        set_true(circa_output(stack, 0));
+        set_value(circa_output(stack, 1), value);
+    }
+}
+
+void store_demand_value(caStack* stack)
+{
+    Term* key = as_term_ref(circa_input(stack, 0));
+    caValue* value = circa_input(stack, 1);
+    copy(value, stack_demand_value_insert(stack, key));
+}
+
 void interpreter_install_functions(NativePatch* patch)
 {
     module_patch_function(patch, "Frame.active_value", Frame__active_value);
@@ -2939,6 +2959,8 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.toString", Stack__toString);
     module_patch_function(patch, "reflect_caller", reflect__caller);
     module_patch_function(patch, "reflect_get_frame_state", reflect_get_frame_state);
+    module_patch_function(patch, "_get_demand_value", get_demand_value);
+    module_patch_function(patch, "_store_demand_value", store_demand_value);
 }
 
 } // namespace circa

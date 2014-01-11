@@ -464,6 +464,16 @@ void set_bool(caValue* value, bool b)
     make_no_initialize(TYPES.bool_type, value);
     value->value_data.asbool = b;
 }
+void set_true(caValue* value)
+{
+    make_no_initialize(TYPES.bool_type, value);
+    value->value_data.asbool = true;
+}
+void set_false(caValue* value)
+{
+    make_no_initialize(TYPES.bool_type, value);
+    value->value_data.asbool = false;
+}
 
 void set_error_string(caValue* value, const char* s)
 {

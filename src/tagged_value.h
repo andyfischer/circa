@@ -134,6 +134,8 @@ void set_value(caValue* target, caValue* value);
 
 // Boxing using builtin types.
 void set_bool(caValue* value, bool b);
+void set_true(caValue* value);
+void set_false(caValue* value);
 void set_block(caValue* value, Block* block);
 void set_error_string(caValue* value, const char* s);
 void set_float(caValue* value, float f);

@@ -1,0 +1,14 @@
+
+a = 1 + 2
+
+ref = term_ref(a)
+
+found, val = _get_demand_value(ref)
+
+print('value = ' val ', found = ' found)
+
+_store_demand_value(ref, 5)
+
+found, val = _get_demand_value(ref)
+
+print('value = ' val ', found = ' found)
