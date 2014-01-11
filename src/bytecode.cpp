@@ -561,9 +561,7 @@ void write_term_call(Writer* writer, Term* term)
         bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
 
         Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
-        Value bytecodeKey;
-        set_block(&bytecodeKey, nextCase);
-        int nextBlockBcIndex = stack_bytecode_create_entry(writer->stack, &bytecodeKey);
+        int nextBlockBcIndex = stack_bytecode_create_entry(writer->stack, nextCase);
         blob_append_u32(writer->bytecode, nextBlockBcIndex);
         return;
     }
@@ -651,7 +649,7 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PushCase);
         blob_append_u32(writer->bytecode, term->index);
         Block* firstCaseBlock = if_block_get_case(term->nestedContents, 0);
-        u32 blockIndex = stack_bytecode_create_entry_for_block(writer->stack, firstCaseBlock);
+        u32 blockIndex = stack_bytecode_create_entry(writer->stack, firstCaseBlock);
         blob_append_u32(writer->bytecode, blockIndex);
     }
 
@@ -659,8 +657,8 @@ void write_term_call(Writer* writer, Term* term)
         referenceTargetBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushLoop);
         blob_append_u32(writer->bytecode, term->index);
-        blob_append_u32(writer->bytecode, stack_bytecode_create_entry_for_block(writer->stack, term->nestedContents));
-        blob_append_u32(writer->bytecode, stack_bytecode_create_entry_for_block(writer->stack,
+        blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack, term->nestedContents));
+        blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack,
             for_loop_get_zero_block(term->nestedContents)));
         blob_append_char(writer->bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
     }
@@ -706,7 +704,7 @@ void write_term_call(Writer* writer, Term* term)
 void bytecode_write_input_instruction_block_ref(Writer* writer, Term* input)
 {
     blob_append_char(writer->bytecode, bc_InputFromBlockRef);
-    blob_append_u32(writer->bytecode, input->owningBlock->id);
+    blob_append_u32(writer->bytecode, stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
     blob_append_u32(writer->bytecode, input->index);
 }
 

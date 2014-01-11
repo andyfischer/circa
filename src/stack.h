@@ -131,16 +131,15 @@ void stack_resize_frame_list(Stack* stack, int newCapacity);
 Frame* stack_push_blank_frame(Stack* stack);
 Stack* stack_duplicate(Stack* stack);
 
-caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termIndex);
+caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex);
 caValue* stack_active_value_for_term(Frame* frame, Term* term);
 
 // Stack block cache
 char* stack_bytecode_get_data(Stack* stack, int index);
 Block* stack_bytecode_get_block(Stack* stack, int index);
-int stack_bytecode_get_index_for_block(Stack* stack, Block* block);
-int stack_bytecode_get_index(Stack* stack, caValue* key);
-int stack_bytecode_create_entry(Stack* stack, Value* key);
-int stack_bytecode_create_entry_for_block(Stack* stack, Block* block);
+int stack_bytecode_get_index(Stack* stack, Block* block);
+int stack_bytecode_create_empty_entry(Stack* stack, Block* block);
+int stack_bytecode_create_entry(Stack* stack, Block* block);
 
 // Prepare stack's bytecode for a VM run.
 void stack_bytecode_start_run(Stack* stack);

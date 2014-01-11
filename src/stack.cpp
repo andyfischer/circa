@@ -130,15 +130,12 @@ Stack* stack_duplicate(Stack* stack)
     return dupe;
 }
 
-caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termIndex)
+caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex)
 {
     Stack* stack = frame->stack;
 
-    //if (is_value(term))
-    //    return term_value(term);
-
     while (true) {
-        if (frame->block->id == blockId) {
+        if (frame->blockIndex == blockIndex) {
             Term* term = frame_term(frame, termIndex);
             if (is_value(term))
                 return term_value(term);
@@ -152,18 +149,22 @@ caValue* stack_active_value_for_block_id(Frame* frame, int blockId, int termInde
     }
 
     // Check demandValues.
-    #if 0
+    Block* block = stack_bytecode_get_block(stack, blockIndex);
+    Term* term = block->get(termIndex);
+
     caValue* demandValue = stack_demand_value_get(stack, term);
     if (demandValue != NULL)
         return demandValue;
-#endif
 
     return NULL;
 }
 
 caValue* stack_active_value_for_term(Frame* frame, Term* term)
 {
-    return stack_active_value_for_block_id(frame, term->owningBlock->id, term->index);
+    int blockIndex = stack_bytecode_get_index(frame->stack, term->owningBlock);
+    if (blockIndex == -1)
+        return NULL;
+    return stack_active_value_for_block_index(frame, blockIndex, term->index);
 }
 
 char* stack_bytecode_get_data(Stack* stack, int index)
@@ -182,34 +183,40 @@ Block* stack_bytecode_get_block(Stack* stack, int index)
     return cache->blocks[index].block;
 }
 
-int stack_bytecode_get_index_for_block(Stack* stack, Block* block)
+int stack_bytecode_get_index(Stack* stack, Block* block)
 {
     BytecodeCache* cache = &stack->bytecode;
 
     Value key;
     set_block(&key, block);
-
     caValue* indexVal = hashtable_get(&cache->indexMap, &key);
     if (indexVal == NULL)
         return -1;
     return as_int(indexVal);
 }
 
-int stack_bytecode_get_index(Stack* stack, caValue* key)
+void stack_bytecode_generate_bytecode(Stack* stack, int blockIndex)
 {
     BytecodeCache* cache = &stack->bytecode;
+    BytecodeCache::BlockEntry* entry = &cache->blocks[blockIndex];
 
-    caValue* indexVal = hashtable_get(&cache->indexMap, key);
-    if (indexVal == NULL)
-        return -1;
-    return as_int(indexVal);
+    if (!is_null(&entry->bytecode))
+        return;
+
+    Value bytecode;
+    Block* block = NULL;
+    bytecode_write_block(stack, &bytecode, entry->block);
+
+    // Save bytecode. Re-lookup the entry because the above bytecode_write step
+    // may have reallocated cache->blocks.
+    entry = &cache->blocks[blockIndex];
+    move(&bytecode, &entry->bytecode);
 }
 
-int stack_bytecode_create_entry(Stack* stack, Value* key)
+int stack_bytecode_create_empty_entry(Stack* stack, Block* block)
 {
     BytecodeCache* cache = &stack->bytecode;
-
-    int existing = stack_bytecode_get_index(stack, key);
+    int existing = stack_bytecode_get_index(stack, block);
     if (existing != -1)
         return existing;
 
@@ -220,41 +227,20 @@ int stack_bytecode_create_entry(Stack* stack, Value* key)
 
     BytecodeCache::BlockEntry* entry = &cache->blocks[newIndex];
     initialize_null(&entry->bytecode);
-    set_int(hashtable_insert(&cache->indexMap, key), newIndex);
-
-    // Generate bytecode. We deliberately create the blockCache entry first, to prevent
-    // possible infinite recursion (if the bytecode_write step tries to call
-    // stack_bytecode_create_entry on the entry we just added).
-    Value bytecode;
-    Block* block = NULL;
-
-    if (is_block(key)) {
-        bytecode_write_block(stack, &bytecode, as_block(key));
-        block = as_block(key);
-    } else if (is_list(key)) {
-        ca_assert(key->index(0)->asSymbol() == sym_OnDemand);
-
-        bytecode_write_on_demand_block(stack, &bytecode,
-            key->index(1)->asTerm(), key->index(2)->asBool());
-        block = key->index(1)->asTerm()->owningBlock;
-    } else {
-        internal_error("unrecognized key");
-    }
-
-    // Save bytecode. Re-lookup the cache index because the above bytecode_write step
-    // may have reallocatd blockCache.
-    entry = &cache->blocks[newIndex];
-    move(&bytecode, &entry->bytecode);
     entry->block = block;
+
+    Value key;
+    set_block(&key, block);
+    set_int(hashtable_insert(&cache->indexMap, &key), newIndex);
 
     return newIndex;
 }
 
-int stack_bytecode_create_entry_for_block(Stack* stack, Block* block)
+int stack_bytecode_create_entry(Stack* stack, Block* block)
 {
-    Value key;
-    set_block(&key, block);
-    return stack_bytecode_create_entry(stack, &key);
+    int index = stack_bytecode_create_empty_entry(stack, block);
+    stack_bytecode_generate_bytecode(stack, index);
+    return index;
 }
 
 void stack_bytecode_start_run(Stack* stack)

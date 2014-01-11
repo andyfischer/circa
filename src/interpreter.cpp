@@ -45,7 +45,6 @@ static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block);
 static caValue* vm_run_single_input(Frame* frame, Term* caller);
 static void vm_run_input_bytecodes(caStack* stack, Term* caller);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
-static char* vm_read_cached_bytecode_data(Stack* stack, Block* block);
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key);
 static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method);
 static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure);
@@ -780,7 +779,7 @@ static void start_interpreter_session(Stack* stack)
     for (int i=0; i < stack->frames.count; i++) {
         Frame* frame = &stack->frames.frame[i];
         if (frame->bc == NULL) {
-            frame->blockIndex = stack_bytecode_create_entry_for_block(stack, frame->block);
+            frame->blockIndex = stack_bytecode_create_entry(stack, frame->block);
             frame->bc = stack_bytecode_get_data(stack, frame->blockIndex);
             ca_assert(frame->bc != NULL);
         }
@@ -979,21 +978,6 @@ static caValue* vm_read_local_value(Frame* referenceFrame)
     return frame_register(frame, index);
 }
 
-static char* vm_read_cached_bytecode_data(Stack* stack, Block* block)
-{
-    u32 bcIndex = vm_read_u32(stack);
-
-    if (bcIndex == 0xffffffff) {
-        bcIndex = stack_bytecode_create_entry_for_block(stack, block);
-
-        // Save index back in bytecode.
-        int pos = stack->pc - 4;
-        blob_write_u32(stack->bc, &pos, bcIndex);
-    }
-
-    return stack_bytecode_get_data(stack, bcIndex);
-}
-
 void vm_run(Stack* stack)
 {
     stack->errorOccurred = false;
@@ -1035,11 +1019,20 @@ void vm_run(Stack* stack)
             Term* caller = frame_term(top, termIndex);
             Block* block = function_contents(caller->function);
 
-            char* bc = vm_read_cached_bytecode_data(stack, block);
-            ca_assert(bc != NULL);
+            u32 bcIndex = vm_read_u32(stack);
+
+            if (bcIndex == 0xffffffff) {
+                bcIndex = stack_bytecode_create_entry(stack, block);
+
+                // Save index back in bytecode.
+                int pos = stack->pc - 4;
+                blob_write_u32(stack->bc, &pos, bcIndex);
+            }
 
             top = vm_push_frame(stack, termIndex, block);
-            top->bc = bc;
+            top->bc = stack_bytecode_get_data(stack, bcIndex);
+            top->blockIndex = bcIndex;
+            ca_assert(top->bc != NULL);
             
             expand_frame(stack_top_parent(stack), top);
             vm_run_input_bytecodes(stack, caller);
@@ -1791,9 +1784,9 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
         return term_value(input);
     }
     case bc_InputFromBlockRef: {
-        int blockId = vm_read_u32(frame->stack);
+        int blockIndex = vm_read_u32(frame->stack);
         int termIndex = vm_read_u32(frame->stack);
-        return stack_active_value_for_block_id(frame, blockId, termIndex);
+        return stack_active_value_for_block_index(frame, blockIndex, termIndex);
     }
     default:
         frame->stack->pc--; // Rewind.
@@ -1847,9 +1840,9 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
                 break;
             }
             case bc_InputFromBlockRef: {
-                int blockId = vm_read_u32(stack);
+                int blockIndex = vm_read_u32(stack);
                 int termIndex = vm_read_u32(stack);
-                caValue* value = stack_active_value_for_block_id(parent, blockId, termIndex);
+                caValue* value = stack_active_value_for_block_index(parent, blockIndex, termIndex);
                 copy(value, dest);
                 break;
             }
@@ -1981,8 +1974,7 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 
     if (is_function(term)) {
         Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);
-        // TODO: This should be optimized
-        top->blockIndex = stack_bytecode_create_entry_for_block(stack, term->nestedContents);
+        top->blockIndex = stack_bytecode_create_entry(stack, term->nestedContents);
         top->bc = stack_bytecode_get_data(stack, top->blockIndex);
         expand_frame(stack_top_parent(stack), top);
         vm_run_input_bytecodes(stack, caller);
@@ -2025,7 +2017,7 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
 
     top = vm_push_frame(stack, callerIndex, block);
 
-    top->blockIndex = stack_bytecode_create_entry_for_block(stack, block);
+    top->blockIndex = stack_bytecode_create_entry(stack, block);
     top->bc = stack_bytecode_get_data(stack, top->blockIndex);
 
     expand_frame(stack_top_parent(stack), top);
@@ -2077,7 +2069,7 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
 
     top = vm_push_frame(stack, callerIndex, block);
 
-    top->blockIndex = stack_bytecode_create_entry_for_block(stack, block);
+    top->blockIndex = stack_bytecode_create_entry(stack, block);
     top->bc = stack_bytecode_get_data(stack, top->blockIndex);
 
     expand_frame(stack_top_parent(stack), top);
@@ -2284,9 +2276,7 @@ static void vm_push_dynamic_method(Stack* stack)
         // Method found, save in cache.
         Block* block = method->nestedContents;
 
-        Value key;
-        set_block(&key, block);
-        u32 blockIndex = stack_bytecode_create_entry(stack, &key);
+        u32 blockIndex = stack_bytecode_create_entry(stack, block);
 
         // Save method in cache.
         memmove(methodCache + sizeof(MethodCallSiteCacheLine), methodCache,
@@ -2608,8 +2598,7 @@ void Stack__find_active_value(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_active_value_for_block_id(stack_top(self),
-        term->owningBlock->id, term->index);
+    caValue* value = stack_active_value_for_term(stack_top(self), term);
 
     if (value == NULL)
         set_null(circa_output(stack, 0));
