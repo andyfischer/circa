@@ -217,6 +217,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_InputFromValue:
         set_string(string, "input_from_value ");
         string_append(string, blob_read_u32(bc, pc));
+        set_string(string, " ");
+        string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushNonlocalInput:
         set_string(string, "push_nonlocal_input ");
@@ -710,7 +712,8 @@ void write_term_call(Writer* writer, Term* term)
 void bytecode_write_input_instruction_block_ref(Writer* writer, Term* input)
 {
     blob_append_char(writer->bytecode, bc_InputFromBlockRef);
-    blob_append_u32(writer->bytecode, stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
+    blob_append_u32(writer->bytecode,
+        stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
     blob_append_u32(writer->bytecode, input->index);
 }
 
@@ -725,7 +728,9 @@ static void bytecode_write_input_instructions(Writer* writer, Term* caller)
             blob_append_char(writer->bytecode, bc_InputNull);
         } else if (is_value(input) || input->owningBlock == global_builtins_block()) {
             blob_append_char(writer->bytecode, bc_InputFromValue);
-            blob_append_u32(writer->bytecode, i);
+            blob_append_u32(writer->bytecode,
+                stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
+            blob_append_u32(writer->bytecode, input->index);
         } else {
             bytecode_write_input_instruction_block_ref(writer, input);
             //blob_append_char(bytecode, bc_InputFromStack);

@@ -42,8 +42,8 @@ static void retain_stack_top(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 
 static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block);
-static caValue* vm_run_single_input(Frame* frame, Term* caller);
-static void vm_run_input_bytecodes(caStack* stack, Term* caller);
+static caValue* vm_run_single_input(Frame* frame);
+static void vm_run_input_bytecodes(Stack* stack);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key);
 static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method);
@@ -1035,7 +1035,7 @@ void vm_run(Stack* stack)
             ca_assert(top->bc != NULL);
             
             expand_frame(stack_top_parent(stack), top);
-            vm_run_input_bytecodes(stack, caller);
+            vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -1068,6 +1068,9 @@ void vm_run(Stack* stack)
         }
         case bc_DynamicTermEval: {
             Frame* top = stack_top(stack);
+
+            caValue* termVal = vm_run_single_input(top);
+
             continue;
         }
 #if 0
@@ -1317,7 +1320,7 @@ void vm_run(Stack* stack)
             top->blockIndex = blockIndex;
             top->bc = stack_bytecode_get_data(stack, blockIndex);
             expand_frame_indexed(stack_top_parent(stack), top, 0);
-            vm_run_input_bytecodes(stack, caller);
+            vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -1368,7 +1371,7 @@ void vm_run(Stack* stack)
 
             // Peek at the first input.
             int peekPc = stack->pc;
-            caValue* input = vm_run_single_input(top, caller);
+            caValue* input = vm_run_single_input(top);
             stack->pc = peekPc;
 
             // If the input list is empty, use the #zero block.
@@ -1388,7 +1391,7 @@ void vm_run(Stack* stack)
             top = vm_push_frame(stack, termIndex, block);
             top->blockIndex = blockIndex;
             top->bc = stack_bytecode_get_data(stack, blockIndex);
-            vm_run_input_bytecodes(stack, caller);
+            vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
                 return;
 
@@ -1435,7 +1438,7 @@ void vm_run(Stack* stack)
             Term* caller = frame_term(top, index);
             Block* block = caller->nestedContents;
             vm_push_frame(stack, index, block);
-            vm_run_input_bytecodes(stack, caller);
+            vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -1447,7 +1450,7 @@ void vm_run(Stack* stack)
             Frame* top = stack_top(stack);
             Term* caller = frame_term(top, callerIndex);
 
-            caValue* moduleName = vm_run_single_input(top, caller);
+            caValue* moduleName = vm_run_single_input(top);
             Block* module = load_module_by_name(stack->world, top->block, moduleName);
 
             if (module == NULL) {
@@ -1680,8 +1683,8 @@ void vm_run(Stack* stack)
             Frame* top = stack_top(stack); \
             Term* caller = frame_term(top, termIndex); \
             caValue* slot = frame_register(top, termIndex); \
-            caValue* left = vm_run_single_input(top, caller); \
-            caValue* right = vm_run_single_input(top, caller);
+            caValue* left = vm_run_single_input(top); \
+            caValue* right = vm_run_single_input(top);
 
         case bc_Addf: {
             INLINE_MATH_OP_HEADER;
@@ -1768,17 +1771,20 @@ void vm_run(Stack* stack)
     }
 }
 
-static caValue* vm_run_single_input(Frame* frame, Term* caller)
+static caValue* vm_run_single_input(Frame* frame)
 {
+    Stack* stack = frame->stack;
+
     char op = vm_read_char(frame->stack);
     switch (op) {
     case bc_InputFromStack: {
         return vm_read_local_value(frame);
     }
     case bc_InputFromValue: {
-        int index = vm_read_u32(frame->stack);
-        ca_assert(caller != NULL);
-        Term* input = caller->input(index);
+        int blockIndex = vm_read_u32(stack);
+        int termIndex = vm_read_u32(stack);
+        Block* block = stack_bytecode_get_block(stack, blockIndex);
+        Term* input = block->get(termIndex);
 
         // Special case for function values: lazily create closures for these.
         if (input->function == FUNCS.function_decl) {
@@ -1788,17 +1794,17 @@ static caValue* vm_run_single_input(Frame* frame, Term* caller)
         return term_value(input);
     }
     case bc_InputFromBlockRef: {
-        int blockIndex = vm_read_u32(frame->stack);
-        int termIndex = vm_read_u32(frame->stack);
+        int blockIndex = vm_read_u32(stack);
+        int termIndex = vm_read_u32(stack);
         return stack_active_value_for_block_index(frame, blockIndex, termIndex);
     }
     default:
-        frame->stack->pc--; // Rewind.
+        stack->pc--; // Rewind.
         return NULL;
     }
 }
 
-static void vm_run_input_bytecodes(caStack* stack, Term* caller)
+static void vm_run_input_bytecodes(Stack* stack)
 {
     Frame* top = stack_top(stack);
     Frame* parent = stack_top_parent(stack);
@@ -1838,8 +1844,11 @@ static void vm_run_input_bytecodes(caStack* stack, Term* caller)
                 break;
             }
             case bc_InputFromValue: {
-                int index = vm_read_u32(stack);
-                caValue* value = term_value(caller->input(index));
+                int blockIndex = vm_read_u32(stack);
+                int termIndex = vm_read_u32(stack);
+                Block* block = stack_bytecode_get_block(stack, blockIndex);
+                Term* input = block->get(termIndex);
+                caValue* value = term_value(input);
                 copy(value, dest);
                 break;
             }
@@ -1952,7 +1961,6 @@ static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValu
 static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* moduleRef, caValue* method)
 {
     Stack* stack = top->stack;
-    Term* caller = frame_term(top, callerIndex);
 
     ca_assert(is_module_ref(moduleRef));
 
@@ -1972,8 +1980,7 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
         return false;
 
     // Throw away the 'object' input (already have it).
-    Term* caller = frame_term(top, callerIndex);
-    vm_run_single_input(top, caller);
+    vm_run_single_input(top);
 #endif
 
     if (is_function(term)) {
@@ -1981,7 +1988,7 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
         top->blockIndex = stack_bytecode_create_entry(stack, term->nestedContents);
         top->bc = stack_bytecode_get_data(stack, top->blockIndex);
         expand_frame(stack_top_parent(stack), top);
-        vm_run_input_bytecodes(stack, caller);
+        vm_run_input_bytecodes(stack);
         return true;
     }
 
@@ -2009,7 +2016,6 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
     }
     
     Frame* top = stack_top(stack);
-    Term* caller = frame_term(top, callerIndex);
     Block* block = as_block(list_get(closure, 0));
 
     if (block == NULL) {
@@ -2032,15 +2038,14 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
 
     top->callType = sym_FuncCall;
 
-    vm_run_input_bytecodes(stack, caller);
+    vm_run_input_bytecodes(stack);
 }
 
 static void vm_push_func_call(Stack* stack, int callerIndex)
 {
     Frame* top = stack_top(stack);
-    Term* caller = frame_term(top, callerIndex);
 
-    caValue* closure = vm_run_single_input(top, caller);
+    caValue* closure = vm_run_single_input(top);
 
     vm_push_func_call_closure(stack, callerIndex, closure);
 }
@@ -2049,10 +2054,8 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
 {
     Frame* top = stack_top(stack);
 
-    Term* caller = frame_term(top, callerIndex);
-
-    caValue* closure = vm_run_single_input(top, caller);
-    caValue* inputList = vm_run_single_input(top, caller);
+    caValue* closure = vm_run_single_input(top);
+    caValue* inputList = vm_run_single_input(top);
 
     top->termIndex = callerIndex;
     Block* block = as_block(list_get(closure, 0));
@@ -2238,7 +2241,7 @@ static void vm_push_dynamic_method(Stack* stack)
     // Fetch target object.
     int pcBeforeTargetObject = stack->pc;
 
-    caValue* object = vm_run_single_input(top, caller);
+    caValue* object = vm_run_single_input(top);
     if (object == NULL) {
         Value msg;
         set_string(&msg, "Input 0 is null");
@@ -2315,7 +2318,7 @@ static void vm_push_dynamic_method(Stack* stack)
     top->blockIndex = cache->blockIndex;
     top->bc = stack_bytecode_get_data(stack, cache->blockIndex);
     expand_frame(stack_top_parent(stack), top);
-    vm_run_input_bytecodes(stack, caller);
+    vm_run_input_bytecodes(stack);
 }
 
 bool run_memoize_check(Stack* stack)

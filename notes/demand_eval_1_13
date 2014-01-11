@@ -1,0 +1,17 @@
+
+Revisiting the way on-demand eval is done.
+
+In the new scheme:
+
+When a nonlocal() input is encountered.
+If the value is not found
+  Push a call to the builtin func eval_term_on_demand(term)
+  Inside this func:
+    Fetch every module-frame value for this term
+    Call the func
+    Save the result in module-frame
+    Return result
+
+In Stack.eval_on_demand
+  Mostly the same deal
+  Might need a hackset to tell the VM to stop at a certain frame
