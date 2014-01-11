@@ -20,7 +20,6 @@
 #include "type_inference.h"
 #include "update_cascades.h"
 
-
 namespace circa {
 
 Term* for_loop_get_iterator(Block* contents)

@@ -14,9 +14,9 @@ struct FrameList
     int capacity;
 };
 
-struct HacksetBytecodeCache
+struct BytecodeCache
 {
-    // Bytecode generated for one specific hackset.
+    // Cached bytecode, stored in a per-block map.
 
     struct BlockEntry {
         Block* block;
@@ -29,14 +29,6 @@ struct HacksetBytecodeCache
     Value indexMap; // Map of Block* to block index.
 };
 
-struct BytecodeCache
-{
-    HacksetBytecodeCache** byHackset;
-    int count;
-
-    Value hacksetMap; // Map of hackset value to index.
-};
-
 struct Stack
 {
     // Globally unique ID.
@@ -45,20 +37,21 @@ struct Stack
     // Activation frame list.
     FrameList frames;
 
-    // Cached bytecode data. Can be regenerated.
     BytecodeCache bytecode;
 
-    // Stored frame per module, keyed by block ID.
-    Value moduleFrames;
+    // Stored values that were computed on-demand. Keyed by Term reference.
+    Value demandValues;
 
     // Top-level context.
     Value topContext;
+
+    // Hackset that was used for currently cached bytecode & demand values.
+    Value currentHackset;
 
     // Stack-local random number generator.
     RandState randState;
 
     // Transient data, used during vm_run.
-    HacksetBytecodeCache* currentHacksetBytecode;
     char* bc;
     int pc;
 
@@ -146,19 +139,15 @@ int stack_bytecode_get_index(Stack* stack, caValue* key);
 int stack_bytecode_create_entry(Stack* stack, Value* key);
 int stack_bytecode_create_entry_for_block(Stack* stack, Block* block);
 
-// Prepare stack's bytecode for a VM run. Load/create a cache entry relevant to the
-// current hackset.
+// Prepare stack's bytecode for a VM run.
 void stack_bytecode_start_run(Stack* stack);
 
 void stack_bytecode_erase(Stack* stack);
 
-void stack_get_hackset(Stack* stack, Value* hackset);
+void stack_derive_hackset(Stack* stack, Value* hackset);
 
-// Module frames
-caValue* stack_module_frame_get(Stack* stack, int blockId);
-caValue* stack_module_frame_save(Stack* stack, Block* block, caValue* registers);
-Block* module_frame_get_block(caValue* moduleFrame);
-caValue* module_frame_get_registers(caValue* moduleFrame);
+caValue* stack_demand_value_insert(Stack* stack, Term* key);
+caValue* stack_demand_value_get(Stack* stack, Term* key);
 
 void stack_on_migration(Stack* stack);
 

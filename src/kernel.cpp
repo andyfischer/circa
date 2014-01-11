@@ -664,7 +664,7 @@ void bootstrap_kernel()
     block_set_bool_prop(builtins, sym_Builtins, true);
 
     // Fetch refereneces to certain stdlib funcs.
-    FUNCS.declared_state = builtins->get("declared_state");
+    ca_assert(FUNCS.declared_state != NULL);
     block_set_format_source_func(function_contents(FUNCS.declared_state),
         declared_state_format_source);
 
@@ -723,7 +723,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         FUNCS.add = func;
     if (FUNCS.closure_block == NULL && string_eq(functionName, "closure_block"))
         FUNCS.closure_block = func;
-    if (FUNCS.declared_state == NULL && string_eq(functionName, "declared_state"))
+    if (FUNCS.declared_state == NULL && string_eq(functionName, "_declared_state"))
         FUNCS.declared_state = func;
     if (FUNCS.equals == NULL && string_eq(functionName, "equals"))
         FUNCS.equals = func;
@@ -752,6 +752,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
     // Make sure there are no static errors in builtins. This shouldn't happen.
     if (has_static_errors(builtins)) {
         std::cout << "Static errors found in kernel:" << std::endl;
+        dump(builtins);
         print_static_errors_formatted(builtins, std::cout);
     }
 

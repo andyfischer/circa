@@ -86,7 +86,7 @@ def is_null(any) -> bool
 def is_function(any) -> bool
 def is_type(any) -> bool
 
-def declared_state(Type t, Func initializer :optional) -> any
+def _declared_state(Type t, Func initializer :optional) -> any
   -- Internally used function for fetching a stateful value. The parser
   -- adds a call to this function whereever the 'state' keyword is used.
 
@@ -105,6 +105,27 @@ def declared_state(Type t, Func initializer :optional) -> any
 
   -- No initializer. Use the type's default value.
   return make(t)
+
+def _get_root_value(Term t) -> (bool, any)
+def _store_root_value(Term t, any val)
+
+def _dynamic_eval(Term t, List inputs) -> List
+
+def _eval_term_on_demand(Term t) -> any
+  -- Internal function, used when a nonlocal() term needs a value.
+  if t.is_value
+    return t.value
+
+  inputs = for Term input in t.inputs
+    found, val = _get_module_frame_value(input)
+    if not(found)
+      val = _eval_term_on_demand(input)
+    val
+
+  outputs = _dynamic_eval(t inputs)
+  result = outputs[0]
+  _store_module_frame_value(t result)
+  result
 
 -- Primitive math funcs --
 def add(any left, any right) -> any

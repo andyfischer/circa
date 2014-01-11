@@ -335,7 +335,8 @@ caValue* stack_get_state(Stack* stack)
 
 caValue* stack_find_active_value(Frame* frame, Term* term)
 {
-    // TODO: Deprecated in favor of stack_find_nonlocal.
+    // TODO: Delete in favor of stack_find_nonlocal.
+    return stack_find_nonlocal(frame, term);
     
     ca_assert(term != NULL);
 
@@ -383,12 +384,12 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
                 return value;
         }
 
+        if (frame->block == term->owningBlock)
+            return frame_register(frame, term);
+
         frame = frame_parent(frame);
         if (frame == NULL)
             break;
-
-        if (frame->block == term->owningBlock)
-            return frame_register(frame, term);
     }
 
     // Special case for function values that aren't on the stack: allow these
@@ -1085,11 +1086,13 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_SaveInModuleFrames: {
+#if 0
             Frame* top = stack_top(stack);
             Value registers;
             copy(frame_registers(top), &registers);
             touch(&registers);
             stack_module_frame_save(stack, top->block, &registers);
+#endif
             continue;
         }
         case bc_PushExplicitState: {
@@ -2181,6 +2184,7 @@ static void vm_finish_frame(Stack* stack)
 
 static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop)
 {
+#if 0
     ca_assert(stack->currentHacksetBytecode != NULL);
 
     Block* block = term->owningBlock;
@@ -2208,6 +2212,7 @@ static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop
         copy(existingRegisters, &top->registers);
         touch(&top->registers);
     }
+#endif
 }
 
 static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(caValue* object, char* data)
