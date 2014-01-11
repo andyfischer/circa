@@ -102,6 +102,7 @@ Frame* stack_push_blank_frame(Stack* stack)
     // Prepare frame.
     frame->termIndex = 0;
     frame->bc = NULL;
+    frame->blockIndex = -1;
     frame->pc = 0;
     frame->exitType = sym_None;
     frame->callType = sym_NormalCall;
@@ -283,8 +284,10 @@ void stack_bytecode_erase(Stack* stack)
     cache->blockCount = 0;
     set_hashtable(&cache->indexMap);
 
-    for (int i=0; i < stack->frames.count; i++)
+    for (int i=0; i < stack->frames.count; i++) {
         stack->frames.frame[i].bc = NULL;
+        stack->frames.frame[i].blockIndex = -1;
+    }
 }
 
 void stack_derive_hackset(Stack* stack, Value* hackset)

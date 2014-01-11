@@ -108,6 +108,9 @@ struct Frame
     // Map of term->value. Used for a closure call.
     Value dynamicScope;
 
+    // Block index (as stored in BytecodeCache).
+    int blockIndex;
+
     // Bytecode data. Data is owned in Stack.bytecode.
     char* bc;
 
