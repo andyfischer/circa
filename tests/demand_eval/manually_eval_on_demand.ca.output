@@ -1,0 +1,9 @@
+Evaluating c on demand..
+Called f with note: b, i: 3
+Called f with note: c, i: 4
+result = 5
+Evaluating c on demand..
+result = 5
+Evaluating d on demand..
+Called f with note: d, i: 5
+result = 6

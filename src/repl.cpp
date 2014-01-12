@@ -121,7 +121,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     Term* result = block->get(block->length() - 1);
     if (result->type != TYPES.void_type) {
         Frame* frame = stack_top(stack);
-        std::string s = to_string(stack_find_active_value(frame, result));
+        std::string s = to_string(stack_find_nonlocal(frame, result));
         set_string(list_append(output), s.c_str());
     }
 

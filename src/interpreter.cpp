@@ -328,40 +328,6 @@ caValue* stack_get_state(Stack* stack)
         return &top->outgoingState;
 }
 
-caValue* stack_find_active_value(Frame* frame, Term* term)
-{
-    // TODO: Delete in favor of stack_find_nonlocal.
-    return stack_find_nonlocal(frame, term);
-    
-    ca_assert(term != NULL);
-
-    if (is_value(term))
-        return term_value(term);
-
-    Value termRef;
-    set_term_ref(&termRef, term);
-
-    while (true) {
-        if (frame->block == term->owningBlock)
-            return frame_register(frame, term);
-
-        frame = frame_parent(frame);
-
-        if (frame == NULL)
-            break;
-    }
-
-    // Special case for function values that aren't on the stack: allow these
-    // to be accessed as a term value.
-    if (term->function == FUNCS.function_decl) {
-        if (is_null(term_value(term)))
-            set_closure(term_value(term), term->nestedContents, NULL);
-        return term_value(term);
-    }
-
-    return NULL;
-}
-
 caValue* stack_find_nonlocal(Frame* frame, Term* term)
 {
     ca_assert(term != NULL);
@@ -872,7 +838,7 @@ int get_count_of_caller_inputs_for_error(Stack* stack)
     if (callerTerm->function == FUNCS.func_call)
         foundCount--;
     else if (callerTerm->function == FUNCS.func_apply) {
-        caValue* inputs = stack_find_active_value(parentFrame, callerTerm->input(1));
+        caValue* inputs = stack_find_nonlocal(parentFrame, callerTerm->input(1));
         foundCount = list_length(inputs);
     }
 
@@ -1068,8 +1034,20 @@ void vm_run(Stack* stack)
         }
         case bc_DynamicTermEval: {
             Frame* top = stack_top(stack);
+            int termIndex = vm_read_u32(stack);
 
             caValue* termVal = vm_run_single_input(top);
+            caValue* inputsVal = vm_run_single_input(top);
+
+            Term* targetTerm = as_term_ref(termVal);
+            Block* block = term_function(targetTerm);
+
+            top = vm_push_frame(stack, termIndex, block);
+            top->blockIndex = stack_bytecode_create_entry(stack, block);
+            top->bc = stack_bytecode_get_data(stack, top->blockIndex);
+
+            expand_frame(stack_top_parent(stack), top);
+            vm_run_input_instructions_apply(stack, inputsVal);
 
             continue;
         }
@@ -1092,7 +1070,7 @@ void vm_run(Stack* stack)
             Term* caller = frame_caller(top);
             Frame* parent = stack_top_parent(stack);
 
-            caValue* value = stack_find_active_value(parent, caller->input(inputIndex));
+            caValue* value = stack_find_nonlocal(parent, caller->input(inputIndex));
 
             if (is_frame(value)) {
                 Frame* savedFrame = as_frame(value);
@@ -1560,7 +1538,7 @@ void vm_run(Stack* stack)
                 if (caller->input(i) == NULL)
                     set_null(dest);
                 else
-                    copy(stack_find_active_value(top, caller->input(i)), dest);
+                    copy(stack_find_nonlocal(top, caller->input(i)), dest);
             }
 
             // Throw away intermediate frames.
@@ -1597,7 +1575,7 @@ void vm_run(Stack* stack)
                 if (caller->input(i) == NULL)
                     set_null(dest);
                 else
-                    copy(stack_find_active_value(top, caller->input(i)), dest);
+                    copy(stack_find_nonlocal(top, caller->input(i)), dest);
             }
 
             // Throw away intermediate frames.
@@ -1888,7 +1866,7 @@ static void vm_run_input_bytecodes(Stack* stack)
     }
 }
 
-static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs)
+static void vm_run_input_instructions_apply(Stack* stack, caValue* inputs)
 {
     Frame* top = stack_top(stack);
 
@@ -2075,7 +2053,6 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
     }
 
     top = vm_push_frame(stack, callerIndex, block);
-
     top->blockIndex = stack_bytecode_create_entry(stack, block);
     top->bc = stack_bytecode_get_data(stack, top->blockIndex);
 
@@ -2376,7 +2353,7 @@ void Frame__active_value(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_find_active_value(frame, term);
+    caValue* value = stack_find_nonlocal(frame, term);
     if (value == NULL)
         set_null(circa_output(stack, 0));
     else
@@ -2390,7 +2367,7 @@ void Frame__set_active_value(caStack* stack)
         return raise_error_msg(stack, "Bad frame reference");
 
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_find_active_value(frame, term);
+    caValue* value = stack_find_nonlocal(frame, term);
     if (value == NULL)
         return raise_error_msg(stack, "Value not found");
 

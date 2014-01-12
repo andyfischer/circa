@@ -215,6 +215,9 @@ void stack_bytecode_generate_bytecode(Stack* stack, int blockIndex)
 
 int stack_bytecode_create_empty_entry(Stack* stack, Block* block)
 {
+    if (stack == NULL)
+        return -1;
+
     BytecodeCache* cache = &stack->bytecode;
     int existing = stack_bytecode_get_index(stack, block);
     if (existing != -1)

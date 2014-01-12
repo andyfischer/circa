@@ -194,7 +194,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         set_string(string, "finish_demand_frame");
         break;
     case bc_DynamicTermEval:
-        set_string(string, "dynamic_term_eval");
+        set_string(string, "dynamic_term_eval ");
+        string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PopRequire:
         set_string(string, "pop_require");
@@ -217,7 +218,7 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_InputFromValue:
         set_string(string, "input_from_value ");
         string_append(string, blob_read_u32(bc, pc));
-        set_string(string, " ");
+        string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushNonlocalInput:
@@ -574,12 +575,6 @@ void write_term_call(Writer* writer, Term* term)
         return;
     }
 
-    else if (term->function == FUNCS.dynamic_term_eval) {
-        blob_append_char(writer->bytecode, bc_DynamicTermEval);
-        bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
-        return;
-    }
-
     if (is_exit_point(term)) {
         if (term->function == FUNCS.return_func) {
             blob_append_char(writer->bytecode, bc_Return);
@@ -650,6 +645,12 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PushDynamicMethod);
         blob_append_u32(writer->bytecode, term->index);
         blob_append_space(writer->bytecode, c_methodCacheSize);
+    }
+
+    else if (term->function == FUNCS.dynamic_term_eval) {
+        referenceTargetBlock = NULL;
+        blob_append_char(writer->bytecode, bc_DynamicTermEval);
+        blob_append_u32(writer->bytecode, term->index);
     }
 
     else if (term->function == FUNCS.if_block) {

@@ -108,21 +108,21 @@ def _declared_state(Type t, Func initializer :optional) -> any
 
 def _get_demand_value(Term t) -> (bool, any)
 def _store_demand_value(Term t, any val)
-def _dynamic_term_eval(Term t, List inputs) -> List
+def _dynamic_term_eval(Term t, List inputs) -> any
 
 def _eval_term_on_demand(Term t) -> any
   -- Internal function, used when a nonlocal() term needs a value.
   if t.is_value
     return t.value
 
-  inputs = for Term input in t.inputs
-    found, val = _get_demand_value(input)
-    if not(found)
-      val = _eval_term_on_demand(input)
-    val
+  found, val = _get_demand_value(t)
+  if found
+    return val
 
-  outputs = _dynamic_term_eval(t inputs)
-  result = outputs[0]
+  inputs = for Term input in t.inputs
+    _eval_term_on_demand(input)
+
+  result = _dynamic_term_eval(t inputs)
   _store_demand_value(t result)
   result
 
@@ -318,6 +318,7 @@ def Block.statements(self) -> List
   -- Return a list of Terms that are statements.
 def Block.terms(self) -> List
   -- Return a list of this block's terms.
+def Block.term_named(self, String name) -> Term
 def Block.walk_terms(self) -> List
   -- Return a list of this block's terms, and all nested terms.
 

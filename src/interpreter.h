@@ -45,7 +45,6 @@ void stack_clear_error(Stack* stack);
 
 caValue* stack_get_state(Stack* stack);
 
-caValue* stack_find_active_value(Frame* frame, Term* term);
 caValue* stack_find_nonlocal(Frame* frame, Term* term);
 
 // Returns whether evaluation has been stopped due to an error.

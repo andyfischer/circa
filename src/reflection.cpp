@@ -243,6 +243,17 @@ void Block__get_static_errors_formatted(caStack* stack)
 
 // Reflection
 
+void Block__term_named(caStack* stack)
+{
+    Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
+
+    caValue* name = circa_input(stack, 1);
+
+    set_term_ref(circa_output(stack, 0), find_local_name(block, name));
+}
+
 void Block__terms(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
@@ -719,6 +730,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Block.property", Block__property);
     module_patch_function(patch, "Block.properties", Block__properties);
     module_patch_function(patch, "Block.source_filename", Block__source_filename);
+    module_patch_function(patch, "Block.term_named", Block__term_named);
     module_patch_function(patch, "Block.terms", Block__terms);
     module_patch_function(patch, "Block.walk_terms", Block__walk_terms);
     module_patch_function(patch, "Term.assign", Term__assign);

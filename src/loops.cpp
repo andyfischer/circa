@@ -343,7 +343,7 @@ void start_for_loop(caStack* stack, bool enableLoopOutput)
 
     if (enableLoopOutput) {
         // Initialize output value.
-        caValue* outputList = stack_find_active_value(frame, contents->owningTerm);
+        caValue* outputList = stack_find_nonlocal(frame, contents->owningTerm);
         set_list(outputList, 0);
     }
 
