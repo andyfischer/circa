@@ -141,6 +141,7 @@ Anonymous
 Entropy
 OnDemand
 vmNoEffect
+effect
 
 # Stack steps
 StackReady

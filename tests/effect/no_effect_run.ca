@@ -1,0 +1,27 @@
+
+def has_effect()
+  :effect
+  print(' called has_effect')
+
+def no_effect(i)
+  :pretend_no_effect
+  print(' called no_effect')
+  i + 1
+
+def main()
+  i = 0
+  has_effect()
+  no_effect(@i)
+  i + 1
+
+vm = make_stack(main)
+
+print('Regular run:')
+result = vm.call
+print('  result = ' result)
+
+print('No effect run:')
+vm.set_context_val(:vmNoEffect true)
+result = vm.call
+print('  result = ' result)
+

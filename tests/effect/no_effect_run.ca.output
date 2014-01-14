@@ -1,0 +1,7 @@
+Regular run:
+ called has_effect
+ called no_effect
+  result = 2
+No effect run:
+ called no_effect
+  result = 2

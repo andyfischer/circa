@@ -7,15 +7,17 @@
 #include "bytecode.h"
 #include "code_iterators.h"
 #include "control_flow.h"
-#include "kernel.h"
+#include "hashtable.h"
 #include "if_block.h"
 #include "inspection.h"
 #include "interpreter.h"
+#include "kernel.h"
 #include "list.h"
 #include "loops.h"
 #include "names.h"
 #include "stateful_code.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "term_list.h"
@@ -405,10 +407,6 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
     }
 }
 
-void bytecode_advance_op(char* bc, int* pos)
-{
-}
-
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
 {
     int pos = 0;
@@ -457,6 +455,28 @@ void bytecode_dump_next_op(const char* bc, int *pc)
 bool block_contains_memoize(Block* block)
 {
     return find_term_with_function(block, FUNCS.memoize) != NULL;
+}
+
+bool block_contains_literal_symbol(Block* block, Symbol symbol)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (!is_value(term))
+            continue;
+        if (symbol_eq(term_value(term), symbol))
+            return true;
+    }
+    return false;
+}
+
+static bool should_skip_block(Writer* writer, Block* block)
+{
+    if (writer->skipEffects && block_contains_literal_symbol(block, sym_effect))
+        return true;
+    if (block_is_evaluation_empty(block))
+        return true;
+
+    return false;
 }
 
 static bool term_has_two_int_inputs(Term* term)
@@ -624,46 +644,46 @@ void write_term_call(Writer* writer, Term* term)
         return;
     }
 
-    // 'referenceTargetBlock' is a block that describes the expected inputs & outputs.
+    // 'staticallyKnownBlock' is a block that describes the expected inputs & outputs.
     // It might be the exact block that will actually be pushed (such as for PushNested),
     // or it might just be a block that resembles what will be pushed at runtime (such as
     // for PushCase). It also might not be known at all, in the case of dynamic dispatch
     // (Closure calls and dynamic_method), in which case it will remain NULL.
-    Block* referenceTargetBlock = NULL;
+    Block* staticallyKnownBlock = NULL;
 
     if (term->function == FUNCS.func_call) {
-        referenceTargetBlock = NULL;
+        staticallyKnownBlock = NULL;
         blob_append_char(writer->bytecode, bc_PushFuncCall);
         blob_append_u32(writer->bytecode, term->index);
     }
 
     else if (is_dynamic_func_call(term)) {
-        referenceTargetBlock = NULL;
+        staticallyKnownBlock = NULL;
         blob_append_char(writer->bytecode, bc_PushFuncCall);
         blob_append_u32(writer->bytecode, term->index);
     }
 
     else if (term->function == FUNCS.func_apply) {
-        referenceTargetBlock = NULL;
+        staticallyKnownBlock = NULL;
         blob_append_char(writer->bytecode, bc_PushFuncApply);
         blob_append_u32(writer->bytecode, term->index);
     }
     
     else if (term->function == FUNCS.dynamic_method) {
-        referenceTargetBlock = NULL;
+        staticallyKnownBlock = NULL;
         blob_append_char(writer->bytecode, bc_PushDynamicMethod);
         blob_append_u32(writer->bytecode, term->index);
         blob_append_space(writer->bytecode, c_methodCacheSize);
     }
 
     else if (term->function == FUNCS.dynamic_term_eval) {
-        referenceTargetBlock = NULL;
+        staticallyKnownBlock = NULL;
         blob_append_char(writer->bytecode, bc_DynamicTermEval);
         blob_append_u32(writer->bytecode, term->index);
     }
 
     else if (term->function == FUNCS.if_block) {
-        referenceTargetBlock = term->nestedContents;
+        staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushCase);
         blob_append_u32(writer->bytecode, term->index);
         Block* firstCaseBlock = if_block_get_case(term->nestedContents, 0);
@@ -672,7 +692,7 @@ void write_term_call(Writer* writer, Term* term)
     }
 
     else if (term->function == FUNCS.for_func) {
-        referenceTargetBlock = term->nestedContents;
+        staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushLoop);
         blob_append_u32(writer->bytecode, term->index);
         blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack, term->nestedContents));
@@ -682,14 +702,14 @@ void write_term_call(Writer* writer, Term* term)
     }
 
     else if (term->function == FUNCS.while_loop) {
-        referenceTargetBlock = term->nestedContents;
+        staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushWhile);
         blob_append_u32(writer->bytecode, term->index);
     }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
         // Call the function, not nested contents.
-        referenceTargetBlock = function_contents(term->function);
+        staticallyKnownBlock = function_contents(term->function);
         blob_append_char(writer->bytecode, bc_PushFunction);
         blob_append_u32(writer->bytecode, term->index);
         blob_append_u32(writer->bytecode, 0xffffffff);
@@ -702,9 +722,9 @@ void write_term_call(Writer* writer, Term* term)
     } else {
 
         // If no other case applies, use the term's function.
-        referenceTargetBlock = function_contents(term->function);
+        staticallyKnownBlock = function_contents(term->function);
 
-        if (block_is_evaluation_empty(referenceTargetBlock))
+        if (should_skip_block(writer, staticallyKnownBlock))
             return;
 
         blob_append_char(writer->bytecode, bc_PushFunction);
@@ -715,7 +735,7 @@ void write_term_call(Writer* writer, Term* term)
     bytecode_write_input_instructions(writer, term);
 
     blob_append_char(writer->bytecode, bc_EnterFrame);
-    bytecode_write_output_instructions(writer, term, referenceTargetBlock);
+    bytecode_write_output_instructions(writer, term, staticallyKnownBlock);
     blob_append_char(writer->bytecode, bc_PopFrame);
 }
 
@@ -864,28 +884,31 @@ void write_block(Writer* writer, Block* block)
     if (block_contains_memoize(block))
         blob_append_char(writer->bytecode, bc_MemoizeCheck);
 
-    // Check to just trigger a C override.
-    if (get_override_for_block(block) != NULL) {
-        blob_append_char(writer->bytecode, bc_FireNative);
+    if (!should_skip_block(writer, block)) {
 
-    } else {
-        
-        for (int i=0; i < block->length(); i++) {
-            Term* term = block->get(i);
-            if (term == NULL)
-                continue;
+        // Check to just trigger a C override.
+        if (get_override_for_block(block) != NULL) {
+            blob_append_char(writer->bytecode, bc_FireNative);
 
-            if (is_exit_point(term) && !is_conditional_exit_point(term)) {
-                write_block_pre_exit(writer, block, term);
+        } else {
+            
+            for (int i=0; i < block->length(); i++) {
+                Term* term = block->get(i);
+                if (term == NULL)
+                    continue;
+
+                if (is_exit_point(term) && !is_conditional_exit_point(term)) {
+                    write_block_pre_exit(writer, block, term);
+                    write_term_call(writer, term);
+                    exitAdded = true;
+                    break;
+                }
+
+                if (is_conditional_exit_point(term))
+                    write_pre_exit_pack_state(writer, block, term);
+
                 write_term_call(writer, term);
-                exitAdded = true;
-                break;
             }
-
-            if (is_conditional_exit_point(term))
-                write_pre_exit_pack_state(writer, block, term);
-
-            write_term_call(writer, term);
         }
     }
 
@@ -911,6 +934,9 @@ void write_block(Writer* writer, Block* block)
 void writer_setup_from_stack(Writer* writer, Stack* stack)
 {
     writer->stack = stack;
+
+    writer->skipEffects = as_bool_opt(hashtable_get_symbol_key(&stack->currentHackset,
+        sym_vmNoEffect), false);
 }
 
 void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)

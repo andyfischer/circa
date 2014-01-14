@@ -95,7 +95,6 @@ const int c_methodCacheCount = 5;
 const size_t c_methodCacheSize = c_methodCacheCount * sizeof(MethodCallSiteCacheLine);
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
-void bytecode_advance_op(char* bc, int* pos);
 int bytecode_op_to_term_index(const char* bc, int pc);
 void bytecode_op_to_string(const char* bc, int* pc, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);

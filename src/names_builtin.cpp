@@ -137,6 +137,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Entropy: return "Entropy";
     case sym_OnDemand: return "OnDemand";
     case sym_vmNoEffect: return "vmNoEffect";
+    case sym_effect: return "effect";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -1594,6 +1595,10 @@ int builtin_symbol_from_string(const char* str)
     case 'Y':
         if (strcmp(str + 1, "es") == 0)
             return sym_Yes;
+        break;
+    case 'e':
+        if (strcmp(str + 1, "ffect") == 0)
+            return sym_effect;
         break;
     case 's':
     switch (str[1]) {
