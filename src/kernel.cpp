@@ -728,6 +728,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
     STORE_BUILTIN_FUNC(FUNCS.declared_state, "_declared_state");
     STORE_BUILTIN_FUNC(FUNCS.dynamic_term_eval, "_dynamic_term_eval");
     STORE_BUILTIN_FUNC(FUNCS.equals, "equals");
+    STORE_BUILTIN_FUNC(FUNCS.eval_on_demand, "_eval_term_on_demand");
     STORE_BUILTIN_FUNC(FUNCS.func_call, "Func.call");
     STORE_BUILTIN_FUNC(FUNCS.div, "div");
     STORE_BUILTIN_FUNC(FUNCS.sub, "sub");

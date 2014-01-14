@@ -395,6 +395,7 @@ const char* STDLIB_CA_TEXT =
     "def Stack.extract_state(self) -> Map\n"
     "def Stack.find_active_frame_for_term(self, Term term) -> Frame\n"
     "def Stack.id(self) -> int\n"
+    "def Stack.init(self, Func func)\n"
     "def Stack.has_incoming_state(self) -> bool\n"
     "def Stack.set_context(self, Map map)\n"
     "def Stack.set_context_val(self, any name, any val)\n"

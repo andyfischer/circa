@@ -22,14 +22,12 @@
 
 namespace circa {
 
-
 struct Writer {
     Stack* stack;
     caValue* bytecode;
     bool skipEffects;
 };
-    
-    
+
 static void bytecode_write_input_instructions(Writer* writer, Term* caller);
 static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block);
 static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, Term* term);
@@ -190,9 +188,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_FinishBlock:
         set_string(string, "finish_block");
         break;
-    case bc_FinishDemandFrame:
-        set_string(string, "finish_demand_frame");
-        break;
     case bc_DynamicTermEval:
         set_string(string, "dynamic_term_eval ");
         string_append(string, blob_read_u32(bc, pc));
@@ -297,6 +292,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     INLINE_MATH_CASE(bc_Neqf, "neq_f");
     INLINE_MATH_CASE(bc_EqShallow, "eq_shallow");
     INLINE_MATH_CASE(bc_NeqShallow, "neq_shallow");
+
+    #undef INLINE_MATH_CASE
 
     case bc_PackState:
         set_string(string, "pack_state ");
@@ -406,6 +403,10 @@ void bytecode_to_string(caValue* bytecode, caValue* string)
             return;
         }
     }
+}
+
+void bytecode_advance_op(char* bc, int* pos)
+{
 }
 
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines)
@@ -556,6 +557,14 @@ void write_term_call(Writer* writer, Term* term)
     else if (term->function == FUNCS.nonlocal) {
         blob_append_char(writer->bytecode, bc_PushNonlocalInput);
         blob_append_u32(writer->bytecode, term->index);
+
+        blob_append_char(writer->bytecode, bc_EnterFrame);
+
+        blob_append_char(writer->bytecode, bc_PopOutput);
+        blob_append_u32(writer->bytecode, 0);
+        blob_append_u32(writer->bytecode, 0);
+        blob_append_char(writer->bytecode, bc_PopFrame);
+
         return;
     }
 
@@ -899,55 +908,6 @@ void write_block(Writer* writer, Block* block)
     blob_append_char(writer->bytecode, bc_End);
 }
 
-void write_on_demand_block(Writer* writer, Term* term, bool thenStop)
-{
-#if 0
-    Block* block = term->owningBlock;
-
-    bool* involvedTerms = (bool*) malloc(sizeof(bool) * block->length());
-    memset(involvedTerms, 0, sizeof(bool) * block->length());
-
-    involvedTerms[term->index] = true;
-
-    for (int searchIndex=term->index; searchIndex >= 0; searchIndex--) {
-
-        if (!involvedTerms[searchIndex])
-            continue;
-
-        Term* involvedTerm = block->get(searchIndex);
-
-        for (int i=0; i < involvedTerm->numInputs(); i++) {
-            Term* input = involvedTerm->input(i);
-            if (input == NULL || input->owningBlock != block || is_value(input))
-                continue;
-
-            involvedTerms[input->index] = true;
-        }
-    }
-
-    for (int i=0; i <= term->index; i++) {
-        if (involvedTerms[i])
-            write_term_call(writer, block->get(i));
-    }
-
-    free(involvedTerms);
-
-    blob_append_char(writer->bytecode, bc_SaveInModuleFrames);
-
-    if (thenStop) {
-        blob_append_char(writer->bytecode, bc_PopFrameAndPause);
-        blob_append_char(writer->bytecode, bc_End);
-    } else {
-
-        blob_append_char(writer->bytecode, bc_SetFrameOutput);
-        blob_append_u32(writer->bytecode, term->index);
-
-        blob_append_char(writer->bytecode, bc_FinishDemandFrame);
-        blob_append_char(writer->bytecode, bc_End);
-    }
-#endif
-}
-
 void writer_setup_from_stack(Writer* writer, Stack* stack)
 {
     writer->stack = stack;
@@ -969,14 +929,6 @@ void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block)
     writer_setup_from_stack(&writer, stack);
     set_blob(bytecode, 0);
     write_block(&writer, block);
-}
-void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term, bool thenStop)
-{
-    Writer writer;
-    writer.bytecode = bytecode;
-    writer_setup_from_stack(&writer, stack);
-    set_blob(bytecode, 0);
-    write_on_demand_block(&writer, term, thenStop);
 }
 
 } // namespace circa

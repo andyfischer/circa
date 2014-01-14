@@ -18,7 +18,6 @@ const char bc_DoneTransient = 0x9;
 const char bc_FireNative = 0xa;
 const char bc_FinishBlock = 0xb;
 const char bc_FinishIteration = 0xc;
-const char bc_FinishDemandFrame = 0xd;
 const char bc_PopRequire = 0xe;
 const char bc_DynamicTermEval = 0xf;
 
@@ -96,6 +95,7 @@ const int c_methodCacheCount = 5;
 const size_t c_methodCacheSize = c_methodCacheCount * sizeof(MethodCallSiteCacheLine);
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
+void bytecode_advance_op(char* bc, int* pos);
 int bytecode_op_to_term_index(const char* bc, int pc);
 void bytecode_op_to_string(const char* bc, int* pc, caValue* string);
 void bytecode_to_string_lines(caValue* bytecode, caValue* lines);
@@ -105,6 +105,5 @@ void bytecode_dump(char* data);
 
 void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term);
 void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block);
-void bytecode_write_on_demand_block(Stack* stack, caValue* bytecode, Term* term, bool thenStop);
 
 } // namespace circa

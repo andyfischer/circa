@@ -34,6 +34,7 @@ struct BuiltinFuncs {
     Term* error;
     Term* equals;
     Term* extra_output;
+    Term* eval_on_demand;
     Term* feedback;
     Term* for_func;
     Term* func_apply;

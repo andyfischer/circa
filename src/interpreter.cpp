@@ -45,6 +45,7 @@ static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block);
 static caValue* vm_run_single_input(Frame* frame);
 static void vm_run_input_bytecodes(Stack* stack);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
+static void vm_skip_till_pop_frame(Stack* stack);
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key);
 static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method);
 static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure);
@@ -53,7 +54,6 @@ static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
 
-static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop);
 static Block* vm_dynamic_method_lookup(Stack* stack, caValue* object, Term* caller);
 static void vm_push_dynamic_method(Stack* stack);
 
@@ -883,9 +883,12 @@ void raise_error_too_many_inputs(Stack* stack)
     raise_error(stack);
 }
 
-inline char vm_read_char(Stack* stack)
-{
+inline char vm_read_char(Stack* stack) {
     return blob_read_char(stack->bc, &stack->pc);
+}
+inline char vm_peek_char(Stack* stack) {
+    int lookahead = stack->pc;
+    return blob_read_char(stack->bc, &lookahead);
 }
 
 inline int vm_read_u32(Stack* stack)
@@ -1016,19 +1019,22 @@ void vm_run(Stack* stack)
             caValue* value = stack_find_nonlocal(top, input);
             if (value != NULL) {
                 copy(value, frame_register(top, caller));
+                vm_skip_till_pop_frame(stack);
                 continue;
             }
 
             // Evaluate on-demand.
+            Block* block = nested_contents(FUNCS.eval_on_demand);
 
-            top->termIndex = termIndex;
-            top->pc = stack->pc;
+            top = vm_push_frame(stack, termIndex, block);
+            int bcIndex = stack_bytecode_create_entry(stack, block);
+            top->bc = stack_bytecode_get_data(stack, bcIndex);
+            top->blockIndex = bcIndex;
+            ca_assert(top->bc != NULL);
+            
+            expand_frame(stack_top_parent(stack), top);
 
-            vm_evaluate_module_on_demand(stack, input, false);
-            stack->bc = stack_top(stack)->bc;
-            stack->pc = stack_top(stack)->pc;
-
-            ca_assert(stack->bc != NULL);
+            set_term_ref(circa_input(stack, 0), input);
 
             continue;
         }
@@ -1051,16 +1057,6 @@ void vm_run(Stack* stack)
 
             continue;
         }
-#if 0
-        case bc_SaveInModuleFrames: {
-            Frame* top = stack_top(stack);
-            Value registers;
-            copy(frame_registers(top), &registers);
-            touch(&registers);
-            stack_module_frame_save(stack, top->block, &registers);
-            continue;
-        }
-#endif
         case bc_PushExplicitState: {
             internal_error("push explicit state is disabled");
 #if 0
@@ -1108,17 +1104,6 @@ void vm_run(Stack* stack)
             vm_finish_loop_iteration(stack, loopEnableOutput);
             if (stack->step != sym_StackRunning)
                 return;
-            continue;
-        }
-        case bc_FinishDemandFrame: {
-            stack_pop_no_retain(stack);
-            if (stack_frame_count(stack) == 0)
-                return;
-
-            Frame* top = stack_top(stack);
-            stack->pc = top->pc;
-            stack->bc = top->bc;
-            ca_assert(stack->bc != NULL);
             continue;
         }
         
@@ -1224,19 +1209,6 @@ void vm_run(Stack* stack)
 #endif
             continue;
         }
-#if 0
-        case bc_PopAsModule: {
-            int outputIndex = vm_read_u32(stack);
-
-            Frame* top = stack_top(stack);
-            Frame* parent = stack_top_parent(stack);
-            caValue* slot = frame_register(parent, outputIndex);
-
-            module_capture_exports_from_stack(top, slot);
-
-            continue;
-        }
-#endif
         case bc_PopFrame: {
             stack_pop(stack);
             stack->bc = stack_top(stack)->bc;
@@ -1912,6 +1884,32 @@ static void vm_run_input_instructions_apply(Stack* stack, caValue* inputs)
     }
 }
 
+static void vm_skip_till_pop_frame(Stack* stack)
+{
+    while (true) {
+        switch (vm_read_char(stack)) {
+        case bc_PopFrame:
+            return;
+        case bc_InputFromStack:
+            vm_read_u16(stack);
+            vm_read_u16(stack);
+            continue;
+        case bc_InputNull: continue;
+        case bc_InputFromValue:
+            vm_read_u32(stack);
+            vm_read_u32(stack);
+            continue;
+        case bc_EnterFrame: continue;
+        case bc_PopOutput:
+            vm_read_u32(stack);
+            vm_read_u32(stack);
+            continue;
+        default:
+            internal_error("unrecognied op in vm_skip_till_pop_frame");
+        }
+    }
+}
+
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key)
 {
     if (!is_hashtable(table))
@@ -2147,39 +2145,6 @@ static void vm_finish_frame(Stack* stack)
 
     stack->bc = parent->bc;
     stack->pc = parent->pc;
-}
-
-static void vm_evaluate_module_on_demand(Stack* stack, Term* term, bool thenStop)
-{
-#if 0
-    ca_assert(stack->currentHacksetBytecode != NULL);
-
-    Block* block = term->owningBlock;
-
-    // Find bytecode.
-    Value bytecodeKey;
-    set_list(&bytecodeKey, 3);
-    set_symbol(list_get(&bytecodeKey, 0), sym_OnDemand);
-    set_term_ref(list_get(&bytecodeKey, 1), term);
-    set_bool(list_get(&bytecodeKey, 2), thenStop);
-
-    char* bc = stack_bytecode_get_data(stack,
-        stack_bytecode_create_entry(stack, &bytecodeKey));
-
-    // Find moduleFrame.
-    caValue* existingModule = stack_module_frame_get(stack, block->id);
-    caValue* existingRegisters = NULL;
-    if (existingModule != NULL)
-        existingRegisters = module_frame_get_registers(existingModule);
-
-    Frame* top = vm_push_frame(stack, stack_top(stack)->termIndex, block);
-    top->bc = bc;
-
-    if (existingRegisters != NULL) {
-        copy(existingRegisters, &top->registers);
-        touch(&top->registers);
-    }
-#endif
 }
 
 static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(caValue* object, char* data)
@@ -2566,6 +2531,7 @@ void Stack__extract_state(caStack* stack)
 
 void Stack__eval_on_demand(caStack* stack)
 {
+#if 0
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
 
@@ -2576,6 +2542,7 @@ void Stack__eval_on_demand(caStack* stack)
     stack_run(self);
     caValue* result = stack_active_value_for_term(stack_top(self), term);
     copy(result, circa_output(stack, 0));
+#endif
 }
 
 void Stack__find_active_value(caStack* stack)
@@ -2619,6 +2586,13 @@ void Stack__id(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     set_int(circa_output(stack, 0), self->id);
+}
+
+void Stack__init(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    caValue* closure = circa_input(stack, 1);
+    stack_init_with_closure(self, closure);
 }
 
 void Stack__has_incoming_state(caStack* stack)
@@ -2918,6 +2892,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
     module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
     module_patch_function(patch, "Stack.id", Stack__id);
+    module_patch_function(patch, "Stack.init", Stack__init);
     module_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
     module_patch_function(patch, "Stack.set_context", Stack__set_context);
     module_patch_function(patch, "Stack.set_context_val", Stack__set_context_val);
