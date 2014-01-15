@@ -53,6 +53,7 @@ static void vm_push_func_call(Stack* stack, int callerIndex);
 static void vm_push_func_apply(Stack* stack, int callerIndex);
 static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
+static void vm_finish_run(Stack* stack);
 
 static Block* vm_dynamic_method_lookup(Stack* stack, caValue* object, Term* caller);
 static void vm_push_dynamic_method(Stack* stack);
@@ -269,7 +270,6 @@ static void retain_stack_top(Stack* stack)
     copy_stack_frame_outgoing_state_to_retained(stack_top(stack), slot);
 }
 
-
 void stack_reset(Stack* stack)
 {
     stack->errorOccurred = false;
@@ -292,7 +292,6 @@ void stack_restart(Stack* stack)
     Frame* top = stack_top(stack);
     top->termIndex = 0;
     top->pc = 0;
-    move(&top->outgoingState, &top->state);
 
     stack->errorOccurred = false;
     stack->step = sym_StackReady;
@@ -530,7 +529,7 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 void stack_extract_state(Stack* stack, caValue* output)
 {
     Frame* frame = frame_by_index(stack, 0);
-    extract_state(frame->block, &frame->outgoingState, output);
+    extract_state(frame->block, &frame->state, output);
 }
 
 Frame* frame_parent(Frame* frame)
@@ -682,17 +681,11 @@ Block* frame_block(Frame* frame)
 
 caValue* stack_context_insert(Stack* stack, caValue* name)
 {
-    if (!is_hashtable(&stack->topContext))
-        set_hashtable(&stack->topContext);
-
     return hashtable_insert(&stack->topContext, name);
 }
 
 caValue* stack_context_get(Stack* stack, caValue* name)
 {
-    if (!is_hashtable(&stack->topContext))
-        return NULL;
-
     return hashtable_get(&stack->topContext, name);
 }
 
@@ -761,9 +754,7 @@ static void start_interpreter_session(Stack* stack)
     }
 
     // Re-seed random generator.
-    caValue* seed = NULL;
-    if (is_hashtable(&stack->topContext))
-        seed = hashtable_get_int_key(&stack->topContext, sym_Entropy);
+    caValue* seed = hashtable_get_int_key(&stack->topContext, sym_Entropy);
     if (seed != NULL)
         rand_init(&stack->randState, get_hash_value(seed));
 }
@@ -2140,11 +2131,29 @@ static void vm_finish_frame(Stack* stack)
     if (frame_parent(top) == NULL) {
         top->pc = stack->pc;
         stack->step = sym_StackFinished;
+        vm_finish_run(stack);
         return;
     }
 
     stack->bc = parent->bc;
     stack->pc = parent->pc;
+}
+
+static void vm_finish_run(Stack* stack)
+{
+    Frame* top = stack_top(stack);
+
+    if (!stack->errorOccurred) {
+        bool noSaveState = as_bool_opt(hashtable_get_symbol_key(&stack->topContext,
+            sym_vmNoSaveState), false);
+
+        if (!noSaveState) {
+            // Commit state.
+            move(&top->outgoingState, &top->state);
+        }
+    }
+
+    set_null(&top->outgoingState);
 }
 
 static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(caValue* object, char* data)
@@ -2438,7 +2447,7 @@ void Frame__extract_state(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
-    extract_state(frame->block, &frame->outgoingState, output);
+    extract_state(frame->block, &frame->state, output);
 }
 
 void make_stack(caStack* stack)

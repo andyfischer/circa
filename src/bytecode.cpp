@@ -28,6 +28,7 @@ struct Writer {
     Stack* stack;
     caValue* bytecode;
     bool skipEffects;
+    bool noSaveState;
 };
 
 static void bytecode_write_input_instructions(Writer* writer, Term* caller);
@@ -710,6 +711,8 @@ void write_term_call(Writer* writer, Term* term)
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
         // Call the function, not nested contents.
         staticallyKnownBlock = function_contents(term->function);
+        if (should_skip_block(writer, staticallyKnownBlock))
+            return;
         blob_append_char(writer->bytecode, bc_PushFunction);
         blob_append_u32(writer->bytecode, term->index);
         blob_append_u32(writer->bytecode, 0xffffffff);
@@ -824,6 +827,9 @@ static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, 
 
 static void write_pre_exit_pack_state(Writer* writer, Block* block, Term* exitPoint)
 {
+    if (writer->noSaveState)
+        return;
+
     // Add PackState ops for each minor block.
     bool anyPackState = false;
 
@@ -934,9 +940,16 @@ void write_block(Writer* writer, Block* block)
 void writer_setup_from_stack(Writer* writer, Stack* stack)
 {
     writer->stack = stack;
+    writer->skipEffects = false;
+    writer->noSaveState = false;
 
-    writer->skipEffects = as_bool_opt(hashtable_get_symbol_key(&stack->currentHackset,
-        sym_vmNoEffect), false);
+    for (int i=0; i < list_length(&stack->currentHackset); i++) {
+        caValue* hacksetElement = list_get(&stack->currentHackset, i);
+        if (symbol_eq(hacksetElement, sym_vmNoEffect))
+            writer->skipEffects = true;
+        else if (symbol_eq(hacksetElement, sym_vmNoSaveState))
+            writer->noSaveState = true;
+    }
 }
 
 void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)

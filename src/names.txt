@@ -141,6 +141,7 @@ Anonymous
 Entropy
 OnDemand
 vmNoEffect
+vmNoSaveState
 effect
 
 # Stack steps

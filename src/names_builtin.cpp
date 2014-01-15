@@ -137,6 +137,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Entropy: return "Entropy";
     case sym_OnDemand: return "OnDemand";
     case sym_vmNoEffect: return "vmNoEffect";
+    case sym_vmNoSaveState: return "vmNoSaveState";
     case sym_effect: return "effect";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
@@ -2757,9 +2758,29 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'v':
-        if (strcmp(str + 1, "mNoEffect") == 0)
+    switch (str[1]) {
+    case 'm':
+    switch (str[2]) {
+    case 'N':
+    switch (str[3]) {
+    case 'o':
+    switch (str[4]) {
+    case 'E':
+        if (strcmp(str + 5, "ffect") == 0)
             return sym_vmNoEffect;
         break;
+    case 'S':
+        if (strcmp(str + 5, "aveState") == 0)
+            return sym_vmNoSaveState;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     default: return -1;
     }
 

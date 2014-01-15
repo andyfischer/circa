@@ -1,0 +1,18 @@
+
+def main()
+  state s = 0
+  print('Current s is ' s)
+  s += 1
+  s
+
+vm = make_stack(main)
+vm.call
+vm.call
+vm.call
+
+vm.set_context_val(:vmNoSaveState true)
+print(':vmNoSaveState is on')
+
+vm.call
+vm.call
+vm.call

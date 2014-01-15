@@ -29,6 +29,7 @@ Stack::Stack()
     nextStack = NULL;
     prevStack = NULL;
     
+    set_hashtable(&topContext);
     set_hashtable(&demandValues);
     rand_init(&randState, 0);
 
@@ -39,7 +40,6 @@ Stack::Stack()
 
 Stack::~Stack()
 {
-
     // Clear error, so that stack_pop doesn't complain about losing an errored frame.
     stack_ignore_error(this);
 
@@ -275,19 +275,21 @@ void stack_bytecode_erase(Stack* stack)
 
     for (int i=0; i < stack->frames.count; i++) {
         stack->frames.frame[i].bc = NULL;
+        stack->frames.frame[i].pc = 0;
         stack->frames.frame[i].blockIndex = -1;
     }
+    stack->bc = NULL;
+    stack->pc = 0;
 }
 
 void stack_derive_hackset(Stack* stack, Value* hackset)
 {
-    set_hashtable(hackset);
-
-    if (!is_hashtable(&stack->topContext))
-        return;
+    set_list(hackset);
 
     if (as_bool_opt(hashtable_get_symbol_key(&stack->topContext, sym_vmNoEffect), false))
-        set_bool(hashtable_insert_symbol_key(hackset, sym_vmNoEffect), true);
+        set_symbol(list_append(hackset), sym_vmNoEffect);
+    if (as_bool_opt(hashtable_get_symbol_key(&stack->topContext, sym_vmNoSaveState), false))
+        set_symbol(list_append(hackset), sym_vmNoSaveState);
 }
 
 caValue* stack_demand_value_insert(Stack* stack, Term* term)
