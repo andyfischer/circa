@@ -34,6 +34,9 @@ struct Stack
     // Globally unique ID.
     int id;
 
+    int refCount;
+    bool isRefcounted;
+
     // Activation frame list.
     FrameList frames;
 
@@ -127,6 +130,12 @@ struct Frame
     Symbol exitType;
 };
 
+// Allocate a new Stack object.
+Stack* create_stack(World* world);
+void free_stack(Stack* stack);
+void stack_incref(Stack* stack);
+void stack_decref(Stack* stack);
+
 void stack_resize_frame_list(Stack* stack, int newCapacity);
 Frame* stack_push_blank_frame(Stack* stack);
 Stack* stack_duplicate(Stack* stack);
@@ -165,5 +174,7 @@ caValue* retained_frame_get_state(caValue* frame);
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame);
 
 void frame_copy(Frame* left, Frame* right);
+
+void stack_setup_type(Type* stackType);
 
 } // namespace circa

@@ -263,7 +263,7 @@ type Stack;
 type Point { number x, number y }
 type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
-type Rect_i { int x1 int y1 int x2 int y2 }
+type Rect_i { int x1, int y1, int x2, int y2 }
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block

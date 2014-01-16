@@ -711,6 +711,7 @@ void bootstrap_kernel()
     TYPES.mutable_type->initialize = Mutable_initialize;
     TYPES.mutable_type->toString = Mutable_toString;
 
+    stack_setup_type(TYPES.stack);
     color_t::setup_type(TYPES.color);
 
     function_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;

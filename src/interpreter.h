@@ -11,10 +11,6 @@
 
 namespace circa {
 
-// Allocate a new Stack object.
-Stack* create_stack(World* world);
-void free_stack(Stack* stack);
-
 // -- Stack --
 Frame* stack_top(Stack* stack);
 Frame* stack_top_parent(Stack* stack);

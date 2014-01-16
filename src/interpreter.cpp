@@ -62,30 +62,6 @@ bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
 static void retained_frame_extract_state(caValue* frame, caValue* output);
 
-Stack* create_stack(World* world)
-{
-    Stack* stack = new Stack();
-    stack->world = world;
-    
-    // Add to list of stacks in World.
-    if (world != NULL) {
-        if (world->firstStack == NULL)
-            world->firstStack = stack;
-        if (world->lastStack != NULL)
-            world->lastStack->nextStack = stack;
-        stack->prevStack = world->lastStack;
-        stack->nextStack = NULL;
-        world->lastStack = stack;
-    }
-
-    return stack;
-}
-
-void free_stack(Stack* stack)
-{
-    delete stack;
-}
-
 Frame* stack_top(Stack* stack)
 {
     if (stack->frames.count == 0)

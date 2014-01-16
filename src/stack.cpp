@@ -22,6 +22,9 @@ Stack::Stack()
 {
     id = global_world()->nextStackID++;
 
+    refCount = 1;
+    isRefcounted = false;
+
     step = sym_StackReady;
     frames.capacity = 0;
     frames.count = 0;
@@ -64,6 +67,52 @@ void
 Stack::dump()
 {
     circa::dump(this);
+}
+
+Stack* create_stack(World* world)
+{
+    Stack* stack = new Stack();
+
+    stack->world = world;
+
+    stack->isRefcounted = true;
+    stack->refCount = 1;
+    
+    // Add to list of stacks in World.
+    if (world != NULL) {
+        if (world->firstStack == NULL)
+            world->firstStack = stack;
+        if (world->lastStack != NULL)
+            world->lastStack->nextStack = stack;
+        stack->prevStack = world->lastStack;
+        stack->nextStack = NULL;
+        world->lastStack = stack;
+    }
+
+    return stack;
+}
+
+void free_stack(Stack* stack)
+{
+    delete stack;
+}
+
+void stack_incref(Stack* stack)
+{
+    if (stack->isRefcounted) {
+        ca_assert(stack->refCount > 0);
+        stack->refCount++;
+    }
+}
+
+void stack_decref(Stack* stack)
+{
+    if (stack->isRefcounted) {
+        ca_assert(stack->refCount > 0);
+        stack->refCount--;
+        if (stack->refCount == 0)
+            free_stack(stack);
+    }
 }
 
 void stack_resize_frame_list(Stack* stack, int newCapacity)
@@ -389,6 +438,27 @@ void frame_copy(Frame* left, Frame* right)
     right->pc = left->pc;
     right->callType = left->callType;
     right->exitType = left->exitType;
+}
+
+void stack_value_copy(Type*, caValue* source, caValue* dest)
+{
+    Stack* stack = (Stack*) source->value_data.ptr;
+    stack_incref(stack);
+    make_no_initialize(source->value_type, dest);
+    dest->value_data.ptr = stack;
+}
+
+void stack_value_release(caValue* value)
+{
+    Stack* stack = (Stack*) value->value_data.ptr;
+    stack_decref(stack);
+}
+
+void stack_setup_type(Type* type)
+{
+    type->initialize = NULL;
+    type->release = stack_value_release;
+    type->copy = stack_value_copy;
 }
 
 } // namespace circa
