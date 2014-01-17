@@ -1,0 +1,9 @@
+
+
+type CodeChange {
+  Symbol t
+  List args
+}
+
+def codechange_set_value(Term target, any newValue) -> CodeChange
+  [:set_value, [target newValue]]

@@ -390,6 +390,7 @@ def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.id(self) -> int
 def Stack.init(self, Func func)
 def Stack.has_incoming_state(self) -> bool
+def Stack.get_context(self) -> Map
 def Stack.set_context(self, Map map)
 def Stack.set_context_val(self, any name, any val)
 def Stack.stack_push(self, Block b, List inputs)

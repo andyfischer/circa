@@ -7,7 +7,7 @@ Before running the user script:
   Code browsing UI tells us the target term
 
 Change improv
-  Use vm.set_context(Map.make) followed by vm.set_context_val calls.
+  (DONE) Use vm.set_context(Map.make) followed by vm.set_context_val calls.
 
 Run user script
   (TODO) User script includes calls to a guide() function
