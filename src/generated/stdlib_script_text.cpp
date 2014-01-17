@@ -270,7 +270,7 @@ const char* STDLIB_CA_TEXT =
     "type Point { number x, number y }\n"
     "type Point_i { int x, int y }\n"
     "type Rect { number x1, number y1, number x2, number y2 }\n"
-    "type Rect_i { int x1 int y1 int x2 int y2 }\n"
+    "type Rect_i { int x1, int y1, int x2, int y2 }\n"
     "\n"
     "-- Metaprogramming on Block\n"
     "def block_ref(any block :ignore_error) -> Block\n"
