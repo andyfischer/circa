@@ -390,6 +390,10 @@ def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.id(self) -> int
 def Stack.init(self, Func func)
 def Stack.has_incoming_state(self) -> bool
+def Stack.append_hack(self, any hack)
+  self.modify_env({ input().list_append(:_hacks hack) })
+def Stack.modify_env(self, Func func)
+  self.set_env(func.call(self.get_env))
 def Stack.get_env(self) -> Map
 def Stack.set_env(self, Map map)
 def Stack.set_env_val(self, any name, any val)

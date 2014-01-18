@@ -140,8 +140,9 @@ Anonymous
 # Interpreter misc
 Entropy
 OnDemand
-vmNoEffect
-vmNoSaveState
+_hacks
+no_effect
+no_save_state
 effect
 
 # Stack steps

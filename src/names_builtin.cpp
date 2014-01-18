@@ -136,8 +136,9 @@ const char* builtin_symbol_to_string(int name)
     case sym_Anonymous: return "Anonymous";
     case sym_Entropy: return "Entropy";
     case sym_OnDemand: return "OnDemand";
-    case sym_vmNoEffect: return "vmNoEffect";
-    case sym_vmNoSaveState: return "vmNoSaveState";
+    case sym__hacks: return "_hacks";
+    case sym_no_effect: return "no_effect";
+    case sym_no_save_state: return "no_save_state";
     case sym_effect: return "effect";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
@@ -1597,10 +1598,34 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 1, "es") == 0)
             return sym_Yes;
         break;
+    case '_':
+        if (strcmp(str + 1, "hacks") == 0)
+            return sym__hacks;
+        break;
     case 'e':
         if (strcmp(str + 1, "ffect") == 0)
             return sym_effect;
         break;
+    case 'n':
+    switch (str[1]) {
+    case 'o':
+    switch (str[2]) {
+    case '_':
+    switch (str[3]) {
+    case 'e':
+        if (strcmp(str + 4, "ffect") == 0)
+            return sym_no_effect;
+        break;
+    case 's':
+        if (strcmp(str + 4, "ave_state") == 0)
+            return sym_no_save_state;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 's':
     switch (str[1]) {
     case 't':
@@ -2749,30 +2774,6 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    case 'v':
-    switch (str[1]) {
-    case 'm':
-    switch (str[2]) {
-    case 'N':
-    switch (str[3]) {
-    case 'o':
-    switch (str[4]) {
-    case 'E':
-        if (strcmp(str + 5, "ffect") == 0)
-            return sym_vmNoEffect;
-        break;
-    case 'S':
-        if (strcmp(str + 5, "aveState") == 0)
-            return sym_vmNoSaveState;
-        break;
     default: return -1;
     }
     default: return -1;

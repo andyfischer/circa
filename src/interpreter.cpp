@@ -2120,10 +2120,7 @@ static void vm_finish_run(Stack* stack)
     Frame* top = stack_top(stack);
 
     if (!stack->errorOccurred) {
-        bool noSaveState = as_bool_opt(hashtable_get_symbol_key(&stack->env,
-            sym_vmNoSaveState), false);
-
-        if (!noSaveState) {
+        if (!stack->bytecode.noSaveState) {
             // Commit state.
             move(&top->outgoingState, &top->state);
         }

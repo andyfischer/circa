@@ -1,0 +1,12 @@
+
+m = Map.make
+
+-- Remove from empty map
+m.remove(:a)
+print(m)
+
+-- Remove from nonempty map
+@m.set(:b 1)
+m.remove(:a)
+
+print(m)

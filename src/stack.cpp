@@ -10,6 +10,7 @@
 #include "kernel.h"
 #include "list.h"
 #include "stack.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
 #include "world.h"
@@ -308,6 +309,15 @@ void stack_bytecode_start_run(Stack* stack)
     // Hackset has changed.
     stack_bytecode_erase(stack);
     move(&hackset, &stack->currentHackset);
+
+    // Examine hackset, update info on BytecodeCache.
+    for (int i=0; i < list_length(&stack->currentHackset); i++) {
+        caValue* hacksetElement = list_get(&stack->currentHackset, i);
+        if (symbol_eq(hacksetElement, sym_no_effect))
+            stack->bytecode.skipEffects = true;
+        else if (symbol_eq(hacksetElement, sym_no_save_state))
+            stack->bytecode.noSaveState = true;
+    }
 }
 
 void stack_bytecode_erase(Stack* stack)
@@ -322,6 +332,8 @@ void stack_bytecode_erase(Stack* stack)
     cache->blocks = NULL;
     cache->blockCount = 0;
     set_hashtable(&cache->indexMap);
+    cache->noSaveState = false;
+    cache->skipEffects = false;
 
     for (int i=0; i < stack->frames.count; i++) {
         stack->frames.frame[i].bc = NULL;
@@ -336,10 +348,12 @@ void stack_derive_hackset(Stack* stack, Value* hackset)
 {
     set_list(hackset);
 
-    if (as_bool_opt(hashtable_get_symbol_key(&stack->env, sym_vmNoEffect), false))
-        set_symbol(list_append(hackset), sym_vmNoEffect);
-    if (as_bool_opt(hashtable_get_symbol_key(&stack->env, sym_vmNoSaveState), false))
-        set_symbol(list_append(hackset), sym_vmNoSaveState);
+    caValue* hacks = hashtable_get_symbol_key(&stack->env, sym__hacks);
+
+    if (hacks == NULL)
+        return;
+
+    copy(hacks, hackset);
 }
 
 caValue* stack_demand_value_insert(Stack* stack, Term* term)

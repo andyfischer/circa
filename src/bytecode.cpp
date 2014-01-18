@@ -940,16 +940,8 @@ void write_block(Writer* writer, Block* block)
 void writer_setup_from_stack(Writer* writer, Stack* stack)
 {
     writer->stack = stack;
-    writer->skipEffects = false;
-    writer->noSaveState = false;
-
-    for (int i=0; i < list_length(&stack->currentHackset); i++) {
-        caValue* hacksetElement = list_get(&stack->currentHackset, i);
-        if (symbol_eq(hacksetElement, sym_vmNoEffect))
-            writer->skipEffects = true;
-        else if (symbol_eq(hacksetElement, sym_vmNoSaveState))
-            writer->noSaveState = true;
-    }
+    writer->skipEffects = stack->bytecode.skipEffects;
+    writer->noSaveState = stack->bytecode.noSaveState;
 }
 
 void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)

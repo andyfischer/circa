@@ -299,17 +299,21 @@ void move_slot(Hashtable* table, int fromIndex, int toIndex)
 
 void remove(Hashtable* table, caValue* key)
 {
+    if (table == NULL)
+        return;
+
     u32 hash = get_hash_value(key);
     int bucket = hash % table->capacity;
 
-    if (table->buckets[bucket] == -1)
-        return;
-
     Slot* previousSlot = NULL;
     int searchIndex = table->buckets[bucket];
-    Slot* searchSlot = get_slot(table, searchIndex);
 
     while (true) {
+        if (searchIndex == -1)
+            return;
+
+        Slot* searchSlot = get_slot(table, searchIndex);
+
         if (searchSlot->hash == hash && strict_equals(&searchSlot->key, key)) {
             // Found key.
 
@@ -330,7 +334,6 @@ void remove(Hashtable* table, caValue* key)
 
         previousSlot = searchSlot;
         searchIndex = searchSlot->next;
-        searchSlot = get_slot(table, searchIndex);
     }
 }
 

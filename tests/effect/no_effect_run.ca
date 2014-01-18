@@ -21,7 +21,7 @@ result = vm.call
 print('  result = ' result)
 
 print('No effect run:')
-vm.set_env_val(:vmNoEffect true)
+vm.append_hack(:no_effect)
 result = vm.call
 print('  result = ' result)
 

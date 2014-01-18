@@ -27,6 +27,10 @@ struct BytecodeCache
     int blockCount;
 
     Value indexMap; // Map of Block* to block index.
+
+    // Additional information.
+    bool skipEffects;
+    bool noSaveState;
 };
 
 struct Stack

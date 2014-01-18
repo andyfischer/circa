@@ -1,0 +1,4 @@
+{}
+{:_hacks: [:thing1]}
+{:_hacks: [:thing1, :thing2]}
+{}
