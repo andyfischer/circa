@@ -53,14 +53,14 @@ def type(any val) -> Type
 def static_type(any term :meta) -> Type
   -- Returns the static type of a value.
 
-def context(any name) -> any
-  -- Fetch the context variable in the current scope with the given name.
+def env(any name) -> any
+  -- Fetch the env variable in the current scope with the given name.
 
-def context_opt(any name, any default) -> any
-  -- Like context(), but if the value doesn't exist then 'default' is used.
+def env_opt(any name, any default) -> any
+  -- Like env(), but if the value doesn't exist then 'default' is used.
 
-def set_context(any name, any value)
-  -- Set a context var in the current scope.
+def set_env(any name, any value)
+  -- Set an env var in the current scope.
 
 def has_effects()
   -- Annotation, declare that a function has effects. Used in native-patched
@@ -390,9 +390,9 @@ def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.id(self) -> int
 def Stack.init(self, Func func)
 def Stack.has_incoming_state(self) -> bool
-def Stack.get_context(self) -> Map
-def Stack.set_context(self, Map map)
-def Stack.set_context_val(self, any name, any val)
+def Stack.get_env(self) -> Map
+def Stack.set_env(self, Map map)
+def Stack.set_env_val(self, any name, any val)
 def Stack.stack_push(self, Block b, List inputs)
   -- Push a new frame, using the given block and input list.
 def Stack.stack_push2(self, Func func)

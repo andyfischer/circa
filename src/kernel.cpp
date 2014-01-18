@@ -78,7 +78,7 @@ Type* output_placeholder_specializeType(Term* caller)
 }
 
 
-caValue* find_context_value(caStack* stack, caValue* key)
+caValue* find_env_value(caStack* stack, caValue* key)
 {
     Frame* frame = stack_top(stack);
 
@@ -92,8 +92,8 @@ caValue* find_context_value(caStack* stack, caValue* key)
         frame = frame_parent(frame);
     }
 
-    if (!is_null(&stack->topContext)) {
-        caValue* value = hashtable_get(&stack->topContext, key);
+    if (!is_null(&stack->env)) {
+        caValue* value = hashtable_get(&stack->env, key);
         if (value != NULL)
             return value;
     }
@@ -101,35 +101,30 @@ caValue* find_context_value(caStack* stack, caValue* key)
     return NULL;
 }
 
-void get_context(caStack* stack)
+void get_env(caStack* stack)
 {
-    caValue* value = find_context_value(stack, circa_input(stack, 0));
+    caValue* value = find_env_value(stack, circa_input(stack, 0));
     if (value != NULL)
         copy(value, circa_output(stack, 0));
     else
         set_null(circa_output(stack, 0));
 }
 
-void get_context_opt(caStack* stack)
+void get_env_opt(caStack* stack)
 {
-    caValue* value = find_context_value(stack, circa_input(stack, 0));
+    caValue* value = find_env_value(stack, circa_input(stack, 0));
     if (value != NULL)
         copy(value, circa_output(stack, 0));
     else
         copy(circa_input(stack, 1), circa_output(stack, 0));
 }
 
-void set_context(caStack* stack)
+void set_env(caStack* stack)
 {
     caValue* key = circa_input(stack, 0);
     caValue* value = circa_input(stack, 1);
 
-    Frame* frame = stack_top_parent(stack);
-
-    if (!is_hashtable(&frame->dynamicScope))
-        set_hashtable(&frame->dynamicScope);
-
-    copy(value, hashtable_insert(&frame->dynamicScope, key));
+    copy(value, stack_env_insert(stack, key));
 }
 
 void file__exists(caStack* stack)
@@ -629,12 +624,13 @@ void bootstrap_kernel()
     block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
 
     // Install native functions.
-    module_patch_function(world->builtinPatch, "context", get_context);
+    module_patch_function(world->builtinPatch, "env", get_env);
+    module_patch_function(world->builtinPatch, "env_opt", get_env_opt);
     module_patch_function(world->builtinPatch, "file_version", file__version);
     module_patch_function(world->builtinPatch, "file_exists", file__exists);
     module_patch_function(world->builtinPatch, "file_read_text", file__read_text);
     module_patch_function(world->builtinPatch, "from_string", from_string);
-    module_patch_function(world->builtinPatch, "set_context", set_context);
+    module_patch_function(world->builtinPatch, "set_env", set_env);
     module_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
     module_patch_function(world->builtinPatch, "test_spy", test_spy);
     module_patch_function(world->builtinPatch, "test_oracle", test_oracle);

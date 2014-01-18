@@ -1,0 +1,10 @@
+env(a) = 1
+inside f, env(a) = 1
+inside g, env(a) = 2
+env(a) = 3
+inside f, env(a) = 3
+inside g, env(a) = 4
+started with_env_5
+inside f, env(a) = 5
+inside g, env(a) = 6
+finished with_env_5

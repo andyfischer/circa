@@ -45,8 +45,8 @@ struct Stack
     // Stored values that were computed on-demand. Keyed by Term reference.
     Value demandValues;
 
-    // Top-level context.
-    Value topContext;
+    // Top-level env.
+    Value env;
 
     // Hackset that was used for currently cached bytecode & demand values.
     Value currentHackset;

@@ -10,7 +10,7 @@ vm.call
 vm.call
 vm.call
 
-vm.set_context_val(:vmNoSaveState true)
+vm.set_env_val(:vmNoSaveState true)
 print(':vmNoSaveState is on')
 
 vm.call

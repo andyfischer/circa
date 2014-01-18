@@ -1,0 +1,26 @@
+
+def f()
+  print('inside f, env(a) = ' env(:a))
+
+  set_env(:a env(:a) + 1)
+
+  g()
+
+def g()
+  print('inside g, env(a) = ' env(:a))
+
+def with_env_5(Func func)
+  print('started with_env_5')
+  set_env(:a 5)
+  func.call()
+  print('finished with_env_5')
+
+set_env(:a 1)
+print('env(a) = 1')
+f()
+
+set_env(:a 3)
+print('env(a) = 3')
+f()
+
+with_env_5({ f() })

@@ -403,7 +403,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
 
         if (!is_null(&frame->dynamicScope)) {
             indent(strm, frameIndex+2);
-            strm << "context: " << to_string(&frame->dynamicScope) << std::endl;
+            strm << "env: " << to_string(&frame->dynamicScope) << std::endl;
         }
         if (!is_null(&frame->state)) {
             indent(strm, frameIndex+2);
@@ -655,14 +655,14 @@ Block* frame_block(Frame* frame)
     return frame->block;
 }
 
-caValue* stack_context_insert(Stack* stack, caValue* name)
+caValue* stack_env_insert(Stack* stack, caValue* name)
 {
-    return hashtable_insert(&stack->topContext, name);
+    return hashtable_insert(&stack->env, name);
 }
 
-caValue* stack_context_get(Stack* stack, caValue* name)
+caValue* stack_env_get(Stack* stack, caValue* name)
 {
-    return hashtable_get(&stack->topContext, name);
+    return hashtable_get(&stack->env, name);
 }
 
 caValue* frame_register_from_end(Frame* frame, int index)
@@ -730,7 +730,7 @@ static void start_interpreter_session(Stack* stack)
     }
 
     // Re-seed random generator.
-    caValue* seed = hashtable_get_int_key(&stack->topContext, sym_Entropy);
+    caValue* seed = hashtable_get_int_key(&stack->env, sym_Entropy);
     if (seed != NULL)
         rand_init(&stack->randState, get_hash_value(seed));
 }
@@ -2120,7 +2120,7 @@ static void vm_finish_run(Stack* stack)
     Frame* top = stack_top(stack);
 
     if (!stack->errorOccurred) {
-        bool noSaveState = as_bool_opt(hashtable_get_symbol_key(&stack->topContext,
+        bool noSaveState = as_bool_opt(hashtable_get_symbol_key(&stack->env,
             sym_vmNoSaveState), false);
 
         if (!noSaveState) {
@@ -2590,26 +2590,26 @@ void Stack__has_incoming_state(caStack* stack)
         set_bool(circa_output(stack, 0), !is_null(&top->state));
 }
 
-void Stack__get_context(caStack* stack)
+void Stack__get_env(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    copy(&self->topContext, circa_output(stack, 0));
+    copy(&self->env, circa_output(stack, 0));
 }
 
-void Stack__set_context(caStack* stack)
+void Stack__set_env(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     caValue* map = circa_input(stack, 1);
-    copy(map, &self->topContext);
+    copy(map, &self->env);
 }
 
-void Stack__set_context_val(caStack* stack)
+void Stack__set_env_val(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
     caValue* val = circa_input(stack, 2);
 
-    copy(val, stack_context_insert(self, name));
+    copy(val, stack_env_insert(self, name));
 }
 
 void Stack__call(caStack* stack)
@@ -2884,9 +2884,9 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.id", Stack__id);
     module_patch_function(patch, "Stack.init", Stack__init);
     module_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
-    module_patch_function(patch, "Stack.get_context", Stack__get_context);
-    module_patch_function(patch, "Stack.set_context", Stack__set_context);
-    module_patch_function(patch, "Stack.set_context_val", Stack__set_context_val);
+    module_patch_function(patch, "Stack.get_env", Stack__get_env);
+    module_patch_function(patch, "Stack.set_env", Stack__set_env);
+    module_patch_function(patch, "Stack.set_env_val", Stack__set_env_val);
     module_patch_function(patch, "Stack.apply", Stack__call);
     module_patch_function(patch, "Stack.call", Stack__call);
     module_patch_function(patch, "Stack.stack_push", Stack__stack_push);

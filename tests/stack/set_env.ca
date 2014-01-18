@@ -1,10 +1,10 @@
 
 def main() -> String
-  return context(:key)
+  return env(:key)
 
 int = make_stack(main)
 assert(int.call == null)
 
-int.set_context_val(:key 'value')
+int.set_env_val(:key 'value')
 assert(int.call == 'value')
 assert(int.call == 'value')

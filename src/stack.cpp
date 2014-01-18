@@ -32,7 +32,7 @@ Stack::Stack()
     nextStack = NULL;
     prevStack = NULL;
     
-    set_hashtable(&topContext);
+    set_hashtable(&env);
     set_hashtable(&demandValues);
     rand_init(&randState, 0);
 
@@ -176,6 +176,7 @@ Stack* stack_duplicate(Stack* stack)
     dupe->step = stack->step;
     dupe->errorOccurred = stack->errorOccurred;
     set_value(&dupe->context, &stack->context);
+    set_value(&dupe->env, &stack->env);
     return dupe;
 }
 
@@ -335,9 +336,9 @@ void stack_derive_hackset(Stack* stack, Value* hackset)
 {
     set_list(hackset);
 
-    if (as_bool_opt(hashtable_get_symbol_key(&stack->topContext, sym_vmNoEffect), false))
+    if (as_bool_opt(hashtable_get_symbol_key(&stack->env, sym_vmNoEffect), false))
         set_symbol(list_append(hackset), sym_vmNoEffect);
-    if (as_bool_opt(hashtable_get_symbol_key(&stack->topContext, sym_vmNoSaveState), false))
+    if (as_bool_opt(hashtable_get_symbol_key(&stack->env, sym_vmNoSaveState), false))
         set_symbol(list_append(hackset), sym_vmNoSaveState);
 }
 

@@ -187,7 +187,7 @@ void circa_restart(caStack* stack);
 
 caValue* circa_get_state_field(caStack* stack, const char* name);
 
-caValue* circa_set_context(caStack* stack, const char* name);
+caValue* circa_set_env(caStack* stack, const char* name);
 
 void circa_dump_stack_trace(caStack* stack);
 

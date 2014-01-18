@@ -445,11 +445,11 @@ void circa_dump_stack_trace(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-caValue* circa_set_context(caStack* stack, const char* name)
+caValue* circa_set_env(caStack* stack, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);
-    return stack_context_insert(stack, &nameVal);
+    return stack_env_insert(stack, &nameVal);
 }
 
 } // extern "C"

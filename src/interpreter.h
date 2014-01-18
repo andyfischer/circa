@@ -100,8 +100,8 @@ Block* current_block(Stack* stack);
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);
 
-caValue* stack_context_insert(Stack* stack, caValue* name);
-caValue* stack_context_get(Stack* stack, caValue* name);
+caValue* stack_env_insert(Stack* stack, caValue* name);
+caValue* stack_env_get(Stack* stack, caValue* name);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.
