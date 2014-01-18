@@ -587,6 +587,13 @@ def Map.insertPairs(self, List pairs) -> Map
 def Map.empty(self) -> bool
 def Map.map_element(@self, any key, Func func)
   @self.set(key, func.call(self.get(key)))
+def Map.modify(self, any key, Func func)
+  @self.set(key, func.call(self.get(key)))
+def Map.list_append(self, any key, any value) -> Map
+  if self.contains(key)
+    @self.modify(key, { i = input(); i.append(value) })
+  else
+    @self.set(key, [value])
 
 type Set {
   Map m

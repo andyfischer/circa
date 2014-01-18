@@ -390,9 +390,10 @@ bool is_frame_ref(caValue* value)
 
 void set_frame_ref(caValue* value, Frame* frame)
 {
-    make(TYPES.frame, value);
+    set_list(value, 2);
     set_stack(list_get(value, 0), frame->stack);
     set_int(list_get(value, 1), frame_get_index(frame));
+    cast(value, TYPES.frame);
 }
 
 void set_retained_frame(caValue* frame)

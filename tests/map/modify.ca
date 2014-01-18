@@ -1,0 +1,14 @@
+
+m = Map.make
+
+@m.set(:a 1)
+print(m)
+
+@m.modify(:a { input() + 1 })
+print(m)
+
+@m.modify(:a { input() + 1 })
+print(m)
+
+@m.modify(:a { input() + 1 })
+print(m)

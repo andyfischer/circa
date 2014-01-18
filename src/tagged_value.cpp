@@ -10,6 +10,7 @@
 #include "list.h"
 #include "names.h"
 #include "reflection.h"
+#include "stack.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -541,6 +542,7 @@ void set_opaque_pointer(caValue* value, void* addr)
 
 void set_stack(caValue* value, Stack* stack)
 {
+    stack_incref(stack);
     make_no_initialize(TYPES.stack, value);
     value->value_data.ptr = stack;
 }

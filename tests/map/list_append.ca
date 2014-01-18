@@ -1,0 +1,11 @@
+
+m = Map.make
+
+@m.list_append(:a 1)
+print(m)
+
+@m.list_append(:a 2)
+print(m)
+
+@m.list_append(:a 3)
+print(m)
