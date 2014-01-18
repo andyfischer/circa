@@ -2590,11 +2590,16 @@ void Stack__has_incoming_state(caStack* stack)
         set_bool(circa_output(stack, 0), !is_null(&top->state));
 }
 
+void Stack__get_context(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    copy(&self->topContext, circa_output(stack, 0));
+}
+
 void Stack__set_context(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     caValue* map = circa_input(stack, 1);
-
     copy(map, &self->topContext);
 }
 
@@ -2879,6 +2884,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.id", Stack__id);
     module_patch_function(patch, "Stack.init", Stack__init);
     module_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
+    module_patch_function(patch, "Stack.get_context", Stack__get_context);
     module_patch_function(patch, "Stack.set_context", Stack__set_context);
     module_patch_function(patch, "Stack.set_context_val", Stack__set_context_val);
     module_patch_function(patch, "Stack.apply", Stack__call);
