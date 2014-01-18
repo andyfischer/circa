@@ -114,6 +114,8 @@ void raise_error_too_many_inputs(Stack* stack);
 void raise_error_not_enough_inputs(Stack* stack);
 void raise_error_input_type_mismatch(Stack* stack);
 
+void stack_extract_current_path(Stack* stack, caValue* path);
+
 // Kernel setup.
 void interpreter_install_functions(NativePatch* patch);
 

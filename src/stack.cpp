@@ -33,8 +33,9 @@ Stack::Stack()
     nextStack = NULL;
     prevStack = NULL;
     
-    set_hashtable(&env);
     set_hashtable(&demandValues);
+    set_hashtable(&env);
+    set_list(&observations);
     rand_init(&randState, 0);
 
     bytecode.blocks = NULL;

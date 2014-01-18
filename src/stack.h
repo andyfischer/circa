@@ -60,6 +60,9 @@ struct Stack
     // Top-level env.
     Value env;
 
+    // Term value observations. Keyed by stack path.
+    Value observations;
+
     // Stack-local random number generator.
     RandState randState;
 

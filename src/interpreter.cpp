@@ -2419,6 +2419,17 @@ void extract_state(Block* block, caValue* state, caValue* output)
     }
 }
 
+void stack_extract_current_path(Stack* stack, caValue* path)
+{
+    set_list(path);
+
+    for (int i=0; i < stack->frames.count; i++) {
+        Frame* frame = frame_by_index(stack, i);
+
+        caValue* pathElement = list_append(path);
+    }
+}
+
 static void retained_frame_extract_state(caValue* frame, caValue* output)
 {
     Block* block = as_block(retained_frame_get_block(frame));
