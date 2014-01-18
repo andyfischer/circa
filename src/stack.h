@@ -28,9 +28,17 @@ struct BytecodeCache
 
     Value indexMap; // Map of Block* to block index.
 
+    // Hackset that was used in the generation of this bytecode.
+    Value hackset;
+
     // Additional information.
     bool skipEffects;
     bool noSaveState;
+
+    Value hacksByTerm;
+
+    // List of values that can be referenced by InputFromCachedValue.
+    Value cachedValues;
 };
 
 struct Stack
@@ -51,9 +59,6 @@ struct Stack
 
     // Top-level env.
     Value env;
-
-    // Hackset that was used for currently cached bytecode & demand values.
-    Value currentHackset;
 
     // Stack-local random number generator.
     RandState randState;

@@ -1715,6 +1715,10 @@ static caValue* vm_run_single_input(Frame* frame)
         int termIndex = vm_read_u32(stack);
         return stack_active_value_for_block_index(frame, blockIndex, termIndex);
     }
+    case bc_InputFromCachedValue: {
+        int index = vm_read_u32(stack);
+        return list_get(&stack->bytecode.cachedValues, index);
+    }
     default:
         stack->pc--; // Rewind.
         return NULL;
@@ -1773,6 +1777,12 @@ static void vm_run_input_bytecodes(Stack* stack)
                 int blockIndex = vm_read_u32(stack);
                 int termIndex = vm_read_u32(stack);
                 caValue* value = stack_active_value_for_block_index(parent, blockIndex, termIndex);
+                copy(value, dest);
+                break;
+            }
+            case bc_InputFromCachedValue: {
+                int index = vm_read_u32(stack);
+                caValue* value = list_get(&stack->bytecode.cachedValues, index);
                 copy(value, dest);
                 break;
             }
@@ -2870,6 +2880,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
     module_patch_function(patch, "Frame.extract_state", Frame__extract_state);
     module_patch_function(patch, "make_stack", make_stack);
+    module_patch_function(patch, "make_vm", make_stack);
     module_patch_function(patch, "capture_stack", capture_stack);
     module_patch_function(patch, "Stack.block", Stack__block);
     module_patch_function(patch, "Stack.dump", Stack__dump);

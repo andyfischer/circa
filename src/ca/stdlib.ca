@@ -440,7 +440,10 @@ def Stack.error_message(self) -> String
 def Stack.toString(self) -> String
 
 def make_stack(Func func) -> Stack
-  -- Create a new stack
+  -- Create a new stack (deprecated name, see make_vm)
+
+def make_vm(Func func) -> Stack
+  -- Create a new Stack
 
 def make_actor(Func func) -> Stack
   make_stack(func)

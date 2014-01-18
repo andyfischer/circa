@@ -38,6 +38,7 @@ const char bc_InputNull = 0x2b;
 const char bc_InputFromValue = 0x2c;
 const char bc_PushNonlocalInput = 0x25;
 const char bc_InputFromBlockRef = 0x26;
+const char bc_InputFromCachedValue = 0x2d;
 const char bc_PushExplicitState = 0x27;
 const char bc_ErrorNotEnoughInputs = 0x28;
 const char bc_ErrorTooManyInputs = 0x29;

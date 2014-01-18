@@ -26,6 +26,7 @@ namespace circa {
 
 struct Writer {
     Stack* stack;
+    BytecodeCache* cache;
     caValue* bytecode;
     bool skipEffects;
     bool noSaveState;
@@ -229,6 +230,10 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
+    case bc_InputFromCachedValue:
+        set_string(string, "input_from_cached_value ");
+        string_append(string, blob_read_u32(bc, pc));
+        break;
     case bc_PushExplicitState:
         set_string(string, "push_explicit_state ");
         string_append(string, blob_read_u32(bc, pc));
@@ -363,6 +368,7 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_InputFromValue:
     case bc_PushNonlocalInput:
     case bc_InputFromBlockRef:
+    case bc_InputFromCachedValue:
     case bc_PushExplicitState:
     case bc_ErrorNotEnoughInputs:
     case bc_ErrorTooManyInputs:
@@ -750,6 +756,47 @@ void bytecode_write_input_instruction_block_ref(Writer* writer, Term* input)
     blob_append_u32(writer->bytecode, input->index);
 }
 
+static caValue* find_set_value_hack(Writer* writer, Term* term)
+{
+    Value termVal;
+    set_term_ref(&termVal, term);
+
+    caValue* termSpecificHacks = hashtable_get(&writer->cache->hacksByTerm, &termVal);
+    if (termSpecificHacks == NULL)
+        return NULL;
+
+    caValue* desiredValueIndex = hashtable_get_symbol_key(termSpecificHacks, sym_set_value);
+    if (desiredValueIndex == NULL)
+        return NULL;
+
+    return desiredValueIndex;
+}
+
+static void bytecode_write_input_instruction(Writer* writer, Term* input)
+{
+    if (input == NULL) {
+        blob_append_char(writer->bytecode, bc_InputNull);
+        return;
+    }
+
+    // Hack check, look for a :set_value on this input.
+    caValue* setValueIndex = find_set_value_hack(writer, input);
+    if (setValueIndex != NULL) {
+        blob_append_char(writer->bytecode, bc_InputFromCachedValue);
+        blob_append_u32(writer->bytecode, as_int(setValueIndex));
+        return;
+    }
+
+    if (is_value(input) || input->owningBlock == global_builtins_block()) {
+        blob_append_char(writer->bytecode, bc_InputFromValue);
+        blob_append_u32(writer->bytecode,
+            stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
+        blob_append_u32(writer->bytecode, input->index);
+    } else {
+        bytecode_write_input_instruction_block_ref(writer, input);
+    }
+}
+
 static void bytecode_write_input_instructions(Writer* writer, Term* caller)
 {
     if (is_dynamic_func_call(caller))
@@ -757,18 +804,7 @@ static void bytecode_write_input_instructions(Writer* writer, Term* caller)
 
     for (int i=0; i < caller->numInputs(); i++) {
         Term* input = caller->input(i);
-        if (input == NULL) {
-            blob_append_char(writer->bytecode, bc_InputNull);
-        } else if (is_value(input) || input->owningBlock == global_builtins_block()) {
-            blob_append_char(writer->bytecode, bc_InputFromValue);
-            blob_append_u32(writer->bytecode,
-                stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
-            blob_append_u32(writer->bytecode, input->index);
-        } else {
-            bytecode_write_input_instruction_block_ref(writer, input);
-            //blob_append_char(bytecode, bc_InputFromStack);
-            //bytecode_write_local_reference(bytecode, caller->owningBlock, input);
-        }
+        bytecode_write_input_instruction(writer, input);
     }
 }
 
@@ -940,6 +976,7 @@ void write_block(Writer* writer, Block* block)
 void writer_setup_from_stack(Writer* writer, Stack* stack)
 {
     writer->stack = stack;
+    writer->cache = &stack->bytecode;
     writer->skipEffects = stack->bytecode.skipEffects;
     writer->noSaveState = stack->bytecode.noSaveState;
 }

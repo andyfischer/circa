@@ -297,26 +297,45 @@ int stack_bytecode_create_entry(Stack* stack, Block* block)
     return index;
 }
 
+caValue* stack_bytecode_add_cached_value(Stack* stack, int* index)
+{
+    *index = list_length(&stack->bytecode.cachedValues);
+    return list_append(&stack->bytecode.cachedValues);
+}
+
 void stack_bytecode_start_run(Stack* stack)
 {
     // Extract the current hackset
     Value hackset;
     stack_derive_hackset(stack, &hackset);
 
-    if (strict_equals(&stack->currentHackset, &hackset))
+    if (strict_equals(&stack->bytecode.hackset, &hackset))
         return;
 
     // Hackset has changed.
+    BytecodeCache* cache = &stack->bytecode;
+
     stack_bytecode_erase(stack);
-    move(&hackset, &stack->currentHackset);
+    move(&hackset, &cache->hackset);
 
     // Examine hackset, update info on BytecodeCache.
-    for (int i=0; i < list_length(&stack->currentHackset); i++) {
-        caValue* hacksetElement = list_get(&stack->currentHackset, i);
+    for (int i=0; i < list_length(&cache->hackset); i++) {
+        caValue* hacksetElement = list_get(&cache->hackset, i);
         if (symbol_eq(hacksetElement, sym_no_effect))
-            stack->bytecode.skipEffects = true;
+            cache->skipEffects = true;
         else if (symbol_eq(hacksetElement, sym_no_save_state))
-            stack->bytecode.noSaveState = true;
+            cache->noSaveState = true;
+        else if (first_symbol(hacksetElement) == sym_set_value) {
+            caValue* setValueTarget = list_get(list_get(hacksetElement, 1), 0);
+            caValue* setValueNewValue = list_get(list_get(hacksetElement, 1), 1);
+
+            caValue* termHacks = hashtable_insert(&cache->hacksByTerm, setValueTarget);
+            set_hashtable(termHacks);
+
+            int cachedValueIndex = 0;
+            set_value(stack_bytecode_add_cached_value(stack, &cachedValueIndex), setValueNewValue);
+            set_int(hashtable_insert_symbol_key(termHacks, sym_set_value), cachedValueIndex);
+        }
     }
 }
 
@@ -334,6 +353,8 @@ void stack_bytecode_erase(Stack* stack)
     set_hashtable(&cache->indexMap);
     cache->noSaveState = false;
     cache->skipEffects = false;
+    set_hashtable(&cache->hacksByTerm);
+    set_list(&cache->cachedValues);
 
     for (int i=0; i < stack->frames.count; i++) {
         stack->frames.frame[i].bc = NULL;
@@ -352,6 +373,7 @@ void stack_derive_hackset(Stack* stack, Value* hackset)
 
     if (hacks == NULL)
         return;
+    ca_assert(is_list(hacks));
 
     copy(hacks, hackset);
 }

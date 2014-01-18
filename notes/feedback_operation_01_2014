@@ -21,9 +21,9 @@ After:
   Use the pre-run vm for a find-derivative run
   Set :vmNoSaveState and :vmNoEffects (DONE)
   For the target term
-    (TODO) Set a :vmUseDemandValue flag, indicating that the term's demand value
+    (Supported) Set a :vmUseDemandValue flag, indicating that the term's demand value
     should be used instead of the fixed value.
-    (TODO) Manually set the demand value, to equal the term's value + 0.0000001
+    (Supported) Manually set the demand value, to equal the term's value + 0.0000001
       Make sure we are using the term's value with change-events applied
 
   For the desired-value term

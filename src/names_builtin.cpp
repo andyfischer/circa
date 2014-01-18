@@ -140,6 +140,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_no_effect: return "no_effect";
     case sym_no_save_state: return "no_save_state";
     case sym_effect: return "effect";
+    case sym_set_value: return "set_value";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -1628,6 +1629,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 's':
     switch (str[1]) {
+    case 'e':
+        if (strcmp(str + 2, "t_value") == 0)
+            return sym_set_value;
+        break;
     case 't':
     switch (str[2]) {
     case 'a':

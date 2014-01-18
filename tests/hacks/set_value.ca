@@ -1,0 +1,14 @@
+
+def main()
+  a = 1
+  print('  The value of a is: ' a)
+
+vm = make_vm(main)
+
+print('Unhacked run:')
+vm.run
+
+vm.append_hack(codechange_set_value(main.block.find_term('a'), 2))
+
+print('Hacked run:')
+vm.run
