@@ -109,6 +109,7 @@ def _declared_state(Type t, Func initializer :optional) -> any
 def _get_demand_value(Term t) -> (bool, any)
 def _store_demand_value(Term t, any val)
 def _dynamic_term_eval(Term t, List inputs) -> any
+def _extract_stack_path() -> List
 
 def _eval_term_on_demand(Term t) -> any
   -- Internal function, used when a nonlocal() term needs a value.
@@ -683,6 +684,7 @@ def Term.name(self) -> String
 def Term.parent(self) -> Block
 def Term.to_string(self) -> String
 def Term.to_source_string(self) -> String
+def Term.unique_name(self) -> any
 def Term.format_source(self) -> List
     -- Return a list of formatted source phrases for this Term
 def Term.format_source_normal(self) -> List

@@ -389,6 +389,13 @@ void Term__to_source_string(caStack* stack)
         return circa_output_error(stack, "NULL reference");
     set_string(circa_output(stack, 0), get_term_source_text(t));
 }
+void Term__unique_name(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+    set_value(circa_output(stack, 0), unique_name(t));
+}
 void Term__format_source(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
@@ -757,6 +764,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.global_id", Term__global_id);
     module_patch_function(patch, "Term.to_string", Term__to_string);
     module_patch_function(patch, "Term.to_source_string", Term__to_source_string);
+    module_patch_function(patch, "Term.unique_name", Term__unique_name);
     module_patch_function(patch, "Term.properties", Term__properties);
     module_patch_function(patch, "Term.property", Term__property);
     module_patch_function(patch, "Term.is_statement", Term__is_statement);

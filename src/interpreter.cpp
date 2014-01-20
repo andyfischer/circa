@@ -2419,14 +2419,25 @@ void extract_state(Block* block, caValue* state, caValue* output)
     }
 }
 
-void stack_extract_current_path(Stack* stack, caValue* path)
+void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame)
 {
     set_list(path);
 
     for (int i=0; i < stack->frames.count; i++) {
         Frame* frame = frame_by_index(stack, i);
 
-        caValue* pathElement = list_append(path);
+        if (frame == untilFrame)
+            break;
+
+        Block* block = frame->block;
+        if (is_case_block(block)) {
+            set_int(list_append(path), case_block_get_index(block));
+        } else if (is_for_loop(block)) {
+            Term* index = for_loop_find_index(block);
+            set_value(list_append(path), frame_register(frame, index));
+        }
+
+        set_term_ref(list_append(path), frame_current_term(frame));
     }
 }
 
@@ -2502,6 +2513,12 @@ void capture_stack(caStack* stack)
     Stack* newStack = stack_duplicate(stack);
     stack_silently_finish_call(newStack);
     set_pointer(circa_create_default_output(stack, 0), newStack);
+}
+
+void hosted_extract_path(caStack* stack)
+{
+    Frame* untilFrame = stack_top_parent(stack);
+    stack_extract_current_path(stack, circa_output(stack, 0), untilFrame);
 }
 
 void Stack__block(caStack* stack)
@@ -2893,6 +2910,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "make_stack", make_stack);
     module_patch_function(patch, "make_vm", make_stack);
     module_patch_function(patch, "capture_stack", capture_stack);
+    module_patch_function(patch, "_extract_stack_path", hosted_extract_path);
     module_patch_function(patch, "Stack.block", Stack__block);
     module_patch_function(patch, "Stack.dump", Stack__dump);
     module_patch_function(patch, "Stack.dump_with_bytecode", Stack__dump_with_bytecode);
