@@ -8,7 +8,7 @@ vm = make_vm(main)
 print('Unhacked run:')
 vm.run
 
-vm.append_hack(codechange_set_value(main.block.find_term('a'), 2))
+vm.append_hack([:set_value main.block.find_term('a') 2])
 
 print('Hacked run:')
 vm.run

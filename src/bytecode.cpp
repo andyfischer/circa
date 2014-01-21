@@ -36,6 +36,9 @@ static void bytecode_write_input_instructions(Writer* writer, Term* caller);
 static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block);
 static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, Term* term);
 
+static void write_post_term_call(Writer* writer, Term* term);
+static void possibly_write_watch_check(Writer* writer, Term* term);
+
 static void bc_append_local_reference_string(caValue* string, const char* bc, int* pc)
 {
     string_append(string, "frame:");
@@ -310,6 +313,10 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
                 string_append(string, " ");
             string_append(string, blob_read_u16(bc, pc));
         }
+        break;
+    case bc_WatchCheck:
+        set_string(string, "watch_check ");
+        string_append(string, blob_read_u32(bc, pc));
         break;
     default:
         set_string(string, "*unrecognized op: ");
@@ -592,6 +599,8 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_u32(writer->bytecode, 0);
         blob_append_char(writer->bytecode, bc_PopFrame);
 
+        write_post_term_call(writer, term);
+
         return;
     }
 
@@ -602,12 +611,14 @@ void write_term_call(Writer* writer, Term* term)
         Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
         int nextBlockBcIndex = stack_bytecode_create_entry(writer->stack, nextCase);
         blob_append_u32(writer->bytecode, nextBlockBcIndex);
+        write_post_term_call(writer, term);
         return;
     }
 
     else if (term->function == FUNCS.loop_condition_bool) {
         blob_append_char(writer->bytecode, bc_LoopConditionBool);
         bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
+        write_post_term_call(writer, term);
         return;
     }
 
@@ -630,6 +641,7 @@ void write_term_call(Writer* writer, Term* term)
         } else {
             internal_error("unrecognized exit point function");
         }
+        write_post_term_call(writer, term);
 
         return;
     }
@@ -642,6 +654,7 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, inlineOp);
         blob_append_u32(writer->bytecode, term->index);
         bytecode_write_input_instructions(writer, term);
+        write_post_term_call(writer, term);
         return;
     }
 
@@ -746,6 +759,32 @@ void write_term_call(Writer* writer, Term* term)
     blob_append_char(writer->bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(writer, term, staticallyKnownBlock);
     blob_append_char(writer->bytecode, bc_PopFrame);
+    write_post_term_call(writer, term);
+}
+
+static void write_post_term_call(Writer* writer, Term* term)
+{
+    possibly_write_watch_check(writer, term);
+}
+
+static void possibly_write_watch_check(Writer* writer, Term* term)
+{
+    StackBlock* stackBlock = stack_bytecode_find_entry(writer->stack, term->owningBlock);
+    if (stackBlock == NULL || !stackBlock->hasWatch)
+        return;
+
+    // This block has one or more watches, find them.
+    for (HashtableIterator it(&writer->stack->bytecode.watchByKey); it; ++it) {
+        int valueIndex = it.current()->asInt();
+        caValue* watch = writer->stack->bytecode.cachedValues.index(valueIndex);
+        caValue* targetPath = watch->index(1);
+        Term* targetTerm = as_term_ref(list_last(targetPath));
+        if (targetTerm != term)
+            continue;
+
+        blob_append_char(writer->bytecode, bc_WatchCheck);
+        blob_append_u32(writer->bytecode, valueIndex);
+    }
 }
 
 void bytecode_write_input_instruction_block_ref(Writer* writer, Term* input)

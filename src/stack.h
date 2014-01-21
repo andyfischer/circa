@@ -14,16 +14,20 @@ struct FrameList
     int capacity;
 };
 
+struct StackBlock {
+    // Per-block data stored in BytecodeCache.
+    
+    Block* block;
+    Value bytecode;
+    bool hasWatch;
+};
+
 struct BytecodeCache
 {
-    // Cached bytecode, stored in a per-block map.
-
-    struct BlockEntry {
-        Block* block;
-        Value bytecode;
-    };
-
-    BlockEntry* blocks;
+    // Cached information related to running a stack. All of this data is per-stack, and
+    // is erased when the hackset changes.
+    
+    StackBlock* blocks;
     int blockCount;
 
     Value indexMap; // Map of Block* to block index.
@@ -36,6 +40,9 @@ struct BytecodeCache
     bool noSaveState;
 
     Value hacksByTerm;
+
+    // Map of watch key to cachedValue index (containing the watch).
+    Value watchByKey;
 
     // List of values that can be referenced by InputFromCachedValue.
     Value cachedValues;
@@ -158,9 +165,12 @@ caValue* stack_active_value_for_term(Frame* frame, Term* term);
 // Stack block cache
 char* stack_bytecode_get_data(Stack* stack, int index);
 Block* stack_bytecode_get_block(Stack* stack, int index);
+StackBlock* stack_bytecode_get_entry(Stack* stack, int index);
 int stack_bytecode_get_index(Stack* stack, Block* block);
+StackBlock* stack_bytecode_find_entry(Stack* stack, Block* block);
 int stack_bytecode_create_empty_entry(Stack* stack, Block* block);
 int stack_bytecode_create_entry(Stack* stack, Block* block);
+caValue* stack_bytecode_get_watch_observation(Stack* stack, caValue* key);
 
 // Prepare stack's bytecode for a VM run.
 void stack_bytecode_start_run(Stack* stack);

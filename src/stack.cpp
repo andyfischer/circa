@@ -17,6 +17,8 @@
 
 namespace circa {
 
+static void stack_bytecode_prepare_new_hackset(Stack* stack);
+
 Stack::Stack()
  : errorOccurred(false),
    world(NULL)
@@ -235,6 +237,13 @@ Block* stack_bytecode_get_block(Stack* stack, int index)
     return cache->blocks[index].block;
 }
 
+StackBlock* stack_bytecode_get_entry(Stack* stack, int index)
+{
+    BytecodeCache* cache = &stack->bytecode;
+    ca_assert(index < cache->blockCount);
+    return &cache->blocks[index];
+}
+
 int stack_bytecode_get_index(Stack* stack, Block* block)
 {
     BytecodeCache* cache = &stack->bytecode;
@@ -246,11 +255,22 @@ int stack_bytecode_get_index(Stack* stack, Block* block)
         return -1;
     return as_int(indexVal);
 }
+StackBlock* stack_bytecode_find_entry(Stack* stack, Block* block)
+{
+    BytecodeCache* cache = &stack->bytecode;
+    Value key;
+    set_block(&key, block);
+    caValue* indexVal = hashtable_get(&cache->indexMap, &key);
+    if (indexVal == NULL)
+        return NULL;
+
+    return &cache->blocks[as_int(indexVal)];
+}
 
 void stack_bytecode_generate_bytecode(Stack* stack, int blockIndex)
 {
     BytecodeCache* cache = &stack->bytecode;
-    BytecodeCache::BlockEntry* entry = &cache->blocks[blockIndex];
+    StackBlock* entry = &cache->blocks[blockIndex];
 
     if (!is_null(&entry->bytecode))
         return;
@@ -277,12 +297,13 @@ int stack_bytecode_create_empty_entry(Stack* stack, Block* block)
 
     // Doesn't exist, new create entry.
     int newIndex = cache->blockCount++;
-    cache->blocks = (BytecodeCache::BlockEntry*) realloc(cache->blocks,
+    cache->blocks = (StackBlock*) realloc(cache->blocks,
         sizeof(*cache->blocks) * cache->blockCount);
 
-    BytecodeCache::BlockEntry* entry = &cache->blocks[newIndex];
+    StackBlock* entry = &cache->blocks[newIndex];
     initialize_null(&entry->bytecode);
     entry->block = block;
+    entry->hasWatch = false;
 
     Value key;
     set_block(&key, block);
@@ -304,6 +325,39 @@ caValue* stack_bytecode_add_cached_value(Stack* stack, int* index)
     return list_append(&stack->bytecode.cachedValues);
 }
 
+void stack_bytecode_add_watch(Stack* stack, caValue* key, caValue* path)
+{
+    int cachedIndex = 0;
+    caValue* watch = stack_bytecode_add_cached_value(stack, &cachedIndex);
+
+    // Watch value is: [key, path, observation]
+    set_list(watch, 3);
+    set_value(watch->index(0), key);
+    set_value(watch->index(1), path);
+    set_null(watch->index(2));
+
+    // Update watchByKey
+    set_int(hashtable_insert(&stack->bytecode.watchByKey, key), cachedIndex);
+
+    Term* targetTerm = as_term_ref(list_last(path));
+
+    // Update StackBlock
+    StackBlock* stackBlock = stack_bytecode_get_entry(stack,
+        stack_bytecode_create_empty_entry(stack, targetTerm->owningBlock));
+    stackBlock->hasWatch = true;
+}
+
+caValue* stack_bytecode_get_watch_observation(Stack* stack, caValue* key)
+{
+    caValue* index = hashtable_get(&stack->bytecode.watchByKey, key);
+    if (index == NULL)
+        return NULL;
+
+    caValue* watch = list_get(&stack->bytecode.cachedValues, as_int(index));
+
+    return watch->index(2);
+}
+
 void stack_bytecode_start_run(Stack* stack)
 {
     // Extract the current hackset
@@ -318,17 +372,23 @@ void stack_bytecode_start_run(Stack* stack)
 
     stack_bytecode_erase(stack);
     move(&hackset, &cache->hackset);
+    stack_bytecode_prepare_new_hackset(stack);
+}
 
-    // Examine hackset, update info on BytecodeCache.
-    for (int i=0; i < list_length(&cache->hackset); i++) {
-        caValue* hacksetElement = list_get(&cache->hackset, i);
+static void stack_bytecode_prepare_new_hackset(Stack* stack)
+{
+    BytecodeCache* cache = &stack->bytecode;
+    caValue* hackset = &cache->hackset;
+
+    for (int i=0; i < list_length(hackset); i++) {
+        caValue* hacksetElement = hackset->index(i);
         if (symbol_eq(hacksetElement, sym_no_effect))
             cache->skipEffects = true;
         else if (symbol_eq(hacksetElement, sym_no_save_state))
             cache->noSaveState = true;
         else if (first_symbol(hacksetElement) == sym_set_value) {
-            caValue* setValueTarget = list_get(list_get(hacksetElement, 1), 0);
-            caValue* setValueNewValue = list_get(list_get(hacksetElement, 1), 1);
+            caValue* setValueTarget = hacksetElement->index(1);
+            caValue* setValueNewValue = hacksetElement->index(2);
 
             caValue* termHacks = hashtable_insert(&cache->hacksByTerm, setValueTarget);
             set_hashtable(termHacks);
@@ -336,6 +396,10 @@ void stack_bytecode_start_run(Stack* stack)
             int cachedValueIndex = 0;
             set_value(stack_bytecode_add_cached_value(stack, &cachedValueIndex), setValueNewValue);
             set_int(hashtable_insert_symbol_key(termHacks, sym_set_value), cachedValueIndex);
+        } else if (first_symbol(hacksetElement) == sym_watch) {
+            caValue* watchKey = hacksetElement->index(1);
+            caValue* watchPath = hacksetElement->index(2);
+            stack_bytecode_add_watch(stack, watchKey, watchPath);
         }
     }
 }
@@ -345,7 +409,7 @@ void stack_bytecode_erase(Stack* stack)
     BytecodeCache* cache = &stack->bytecode;
 
     for (int b=0; b < cache->blockCount; b++) {
-        BytecodeCache::BlockEntry* blockEntry = &cache->blocks[b];
+        StackBlock* blockEntry = &cache->blocks[b];
         set_null(&blockEntry->bytecode);
     }
     free(cache->blocks);
@@ -355,6 +419,7 @@ void stack_bytecode_erase(Stack* stack)
     cache->noSaveState = false;
     cache->skipEffects = false;
     set_hashtable(&cache->hacksByTerm);
+    set_hashtable(&cache->watchByKey);
     set_list(&cache->cachedValues);
 
     for (int i=0; i < stack->frames.count; i++) {
@@ -445,12 +510,12 @@ bool is_retained_frame(caValue* frame)
 caValue* retained_frame_get_block(caValue* frame)
 {
     ca_assert(is_retained_frame(frame));
-    return list_get(frame, 0);
+    return frame->index(0);
 }
 caValue* retained_frame_get_state(caValue* frame)
 {
     ca_assert(is_retained_frame(frame));
-    return list_get(frame, 1);
+    return frame->index(1);
 }
 
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame)

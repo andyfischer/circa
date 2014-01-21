@@ -145,6 +145,7 @@ no_effect
 no_save_state
 effect
 set_value
+watch
 
 # Stack steps
 StackReady

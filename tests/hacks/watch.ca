@@ -1,0 +1,10 @@
+
+def main()
+  a = 1 + 2
+
+vm = make_vm(main)
+
+vm.append_hack([:watch :key [main.block.find_term('a')]])
+vm.run
+result = vm.get_watch_result(:key)
+assert(result == 3)

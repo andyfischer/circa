@@ -46,7 +46,10 @@ Value::operator=(Value const& rhs)
 Term* Value::asTerm() { return as_term_ref(this); }
 bool Value::asBool() { return as_bool(this); }
 Symbol Value::asSymbol() { return as_symbol(this); }
+int Value::asInt() { return as_int(this); }
+float Value::asFloat()  { return as_float(this); }
 Value* Value::index(int i) { return list_get(this, i); }
+int Value::length() { return list_length(this); }
 
 void Value::dump() { std::cout << to_string(this) << std::endl; }
 

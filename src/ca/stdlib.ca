@@ -398,6 +398,7 @@ def Stack.modify_env(self, Func func)
 def Stack.get_env(self) -> Map
 def Stack.set_env(self, Map map)
 def Stack.set_env_val(self, any name, any val)
+def Stack.get_watch_result(self, key) -> any
 def Stack.stack_push(self, Block b, List inputs)
   -- Push a new frame, using the given block and input list.
 def Stack.stack_push2(self, Func func)

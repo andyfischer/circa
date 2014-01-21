@@ -405,6 +405,7 @@ const char* STDLIB_CA_TEXT =
     "def Stack.get_env(self) -> Map\n"
     "def Stack.set_env(self, Map map)\n"
     "def Stack.set_env_val(self, any name, any val)\n"
+    "def Stack.get_watch_result(self, key) -> any\n"
     "def Stack.stack_push(self, Block b, List inputs)\n"
     "  -- Push a new frame, using the given block and input list.\n"
     "def Stack.stack_push2(self, Func func)\n"
@@ -1094,13 +1095,8 @@ const char* STDLIB_CA_TEXT =
     "\n"
     "\n"
     "\n"
-    "type CodeChange {\n"
-    "  Symbol t\n"
-    "  List args\n"
-    "}\n"
-    "\n"
-    "def codechange_set_value(Term target, any newValue) -> CodeChange\n"
-    "  [:set_value, [target newValue]]\n";
+    "def codechange_set_value(Term target, any newValue) -> List\n"
+    "  [:set_value target newValue]\n";
 
 } // extern "C"
 

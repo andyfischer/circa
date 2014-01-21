@@ -141,6 +141,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_no_save_state: return "no_save_state";
     case sym_effect: return "effect";
     case sym_set_value: return "set_value";
+    case sym_watch: return "watch";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -2787,6 +2788,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'w':
+        if (strcmp(str + 1, "atch") == 0)
+            return sym_watch;
+        break;
     default: return -1;
     }
 

@@ -1,0 +1,29 @@
+
+Outline of adding a vm watch:
+
+  vm.append_hack([:watch_path :key [Term#123]])
+  vm.run
+  vm.get_watch_result(:key)
+
+When running the interpreter:
+
+  When walking through the hack list
+    Store information on the watch in cachedValues
+    Find the target block, load the StackBlock and store a flag "hasWatch"
+    When generating term bytecode, in the post-term step, if the term has a watch
+      on it, then append a CheckWatch instruction.
+
+Inside CheckWatch
+  Generate stack path
+  Load watch value by index
+  Check if stack path equals target
+  If so, copy value to watch
+
+New function Stack.get_watch_result
+  Use byWatchKey to find value inside cachedValues
+
+In BytecodeCache
+  Add byWatchKey
+
+Bytecode
+  New instruction CheckWatch

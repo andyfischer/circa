@@ -46,6 +46,7 @@ static caValue* vm_run_single_input(Frame* frame);
 static void vm_run_input_bytecodes(Stack* stack);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
 static void vm_skip_till_pop_frame(Stack* stack);
+static bool vm_matches_watch_path(Stack* stack, caValue* path);
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key);
 static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caValue* module, caValue* method);
 static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* closure);
@@ -1680,6 +1681,23 @@ void vm_run(Stack* stack)
             copy(result, list_get(outgoingState, declaredIndex));
             continue;
         }
+        case bc_WatchCheck: {
+            u32 valueIndex = vm_read_u32(stack);
+
+            Frame* top = stack_top(stack);
+            caValue* watch = stack->bytecode.cachedValues.index(valueIndex);
+            caValue* watchPath = watch->index(1);
+
+            if (vm_matches_watch_path(stack, watchPath)) {
+                Term* term = list_last(watchPath)->asTerm();
+                caValue* value = frame_register(top, term);
+
+                caValue* observation = watch->index(2);
+                set_value(observation, value);
+            }
+
+            continue;
+        }
 
         default:
             std::cout << "Op not recognized: " << int(stack->bc[stack->pc - 1]) << std::endl;
@@ -1886,6 +1904,22 @@ static void vm_skip_till_pop_frame(Stack* stack)
         }
     }
 }
+
+static bool vm_matches_watch_path(Stack* stack, caValue* path)
+{
+    // Ignore last path element (it's already been matched by hitting the WatchCheck
+    // instruction).
+    
+    Frame* frame = stack_top_parent(stack);
+
+    for (int i=path->length() - 2; i >= 0; i--) {
+        Term* pathElement = path->index(i)->asTerm();
+        if (frame_current_term(frame) != pathElement)
+            return false;
+    }
+    return true;
+}
+
 
 static bool vm_handle_method_as_hashtable_field(Frame* top, Term* caller, caValue* table, caValue* key)
 {
@@ -2647,6 +2681,19 @@ void Stack__set_env_val(caStack* stack)
     copy(val, stack_env_insert(self, name));
 }
 
+void Stack__get_watch_result(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    caValue* key = circa_input(stack, 1);
+
+    caValue* observation = stack_bytecode_get_watch_observation(self, key);
+
+    if (observation == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        set_value(circa_output(stack, 0), observation);
+}
+
 void Stack__call(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2924,6 +2971,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.get_env", Stack__get_env);
     module_patch_function(patch, "Stack.set_env", Stack__set_env);
     module_patch_function(patch, "Stack.set_env_val", Stack__set_env_val);
+    module_patch_function(patch, "Stack.get_watch_result", Stack__get_watch_result);
     module_patch_function(patch, "Stack.apply", Stack__call);
     module_patch_function(patch, "Stack.call", Stack__call);
     module_patch_function(patch, "Stack.stack_push", Stack__stack_push);

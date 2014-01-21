@@ -99,8 +99,11 @@ struct Value
     caTerm* asTerm();
     bool asBool();
     caSymbol asSymbol();
+    int asInt();
+    float asFloat();
 
     Value* index(int i);
+    int length();
 
     // For debugging:
     void dump();

@@ -86,6 +86,9 @@ const char bc_NeqShallow = 0x6b;
 // Inline state
 const char bc_PackState = 0x70;
 
+// Other
+const char bc_WatchCheck = 0x75;
+
 // Method lookup cache
 struct MethodCallSiteCacheLine {
     u32 typeId;
