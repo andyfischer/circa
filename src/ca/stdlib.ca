@@ -375,6 +375,7 @@ def Stack.apply(self, List inputs) -> any
 def Stack.block(self) -> Block
   -- Returns the (topmost) block.
 def Stack.call(self, any inputs :multiple) -> any
+def Stack.copy(self) -> Stack
 def Stack.current_term(self) -> Term
   self.top.current_term
 def Stack.dump(self)

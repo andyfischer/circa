@@ -2717,6 +2717,13 @@ void Stack__call(caStack* stack)
         set_null(circa_output(stack, 0));
 }
 
+void Stack__copy(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+
+    set_stack(circa_output(stack, 0), stack_duplicate(self));
+}
+
 void Stack__stack_push(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -2974,6 +2981,7 @@ void interpreter_install_functions(NativePatch* patch)
     module_patch_function(patch, "Stack.get_watch_result", Stack__get_watch_result);
     module_patch_function(patch, "Stack.apply", Stack__call);
     module_patch_function(patch, "Stack.call", Stack__call);
+    module_patch_function(patch, "Stack.copy", Stack__copy);
     module_patch_function(patch, "Stack.stack_push", Stack__stack_push);
     module_patch_function(patch, "Stack.stack_pop", Stack__stack_pop);
     module_patch_function(patch, "Stack.set_state_input", Stack__set_state_input);

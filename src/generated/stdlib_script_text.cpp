@@ -382,6 +382,7 @@ const char* STDLIB_CA_TEXT =
     "def Stack.block(self) -> Block\n"
     "  -- Returns the (topmost) block.\n"
     "def Stack.call(self, any inputs :multiple) -> any\n"
+    "def Stack.copy(self) -> Stack\n"
     "def Stack.current_term(self) -> Term\n"
     "  self.top.current_term\n"
     "def Stack.dump(self)\n"

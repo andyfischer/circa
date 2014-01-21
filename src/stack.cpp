@@ -177,10 +177,12 @@ Stack* stack_duplicate(Stack* stack)
     }
 
     dupe->frames.count = stack->frames.count;
-    dupe->step = stack->step;
     dupe->errorOccurred = stack->errorOccurred;
     set_value(&dupe->context, &stack->context);
+    set_value(&dupe->demandValues, &stack->demandValues);
     set_value(&dupe->env, &stack->env);
+    dupe->randState = stack->randState;
+    dupe->step = stack->step;
     return dupe;
 }
 
