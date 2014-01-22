@@ -146,7 +146,7 @@ void test_set_env()
     Stack stack;
     stack_init(&stack, &block);
 
-    set_int(circa_set_env(&stack, "a"), 5);
+    set_int(circa_env_insert(&stack, "a"), 5);
     test_spy_clear();
     stack_run(&stack);
 

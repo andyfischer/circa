@@ -38,6 +38,7 @@ static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, 
 
 static void write_post_term_call(Writer* writer, Term* term);
 static void possibly_write_watch_check(Writer* writer, Term* term);
+static caValue* term_effective_value(Writer* writer, Term* term);
 
 static void bc_append_local_reference_string(caValue* string, const char* bc, int* pc)
 {
@@ -493,13 +494,12 @@ static bool should_skip_block(Writer* writer, Block* block)
     return false;
 }
 
-static bool term_has_two_int_inputs(Term* term)
+static Type* term_type(Writer* writer, Term* term)
 {
-    return term->numInputs() == 2
-        && term->input(0) != NULL
-        && term->input(0)->type == TYPES.int_type
-        && term->input(1) != NULL
-        && term->input(1)->type == TYPES.int_type;
+    if (is_value(term))
+        return term_effective_value(writer, term)->value_type;
+
+    return declared_type(term);
 }
 
 static bool type_is_int_or_float(Type* type)
@@ -507,57 +507,42 @@ static bool type_is_int_or_float(Type* type)
     return type == TYPES.float_type || type == TYPES.int_type;
 }
 
-static bool term_has_two_floaty_inputs(Term* term)
+static char get_inline_bc_for_term(Writer* writer, Term* term)
 {
-    return term->numInputs() == 2
-        && term->input(0) != NULL
-        && type_is_int_or_float(term->input(0)->type)
-        && term->input(1) != NULL
-        && type_is_int_or_float(term->input(1)->type);
-}
-
-static char inline_op_match_number_type(Term* term, int whenInts, int whenFloats)
-{
-    if (term_has_two_int_inputs(term))
-        return whenInts;
-    if (term_has_two_floaty_inputs(term))
-        return whenFloats;
-    else
+    if (term->numInputs() != 2)
+        return 0;  // Only have inline BC for binary functions.
+    if (term->input(0) == NULL || term->input(1) == NULL)
         return 0;
-}
 
-static char get_inline_bc_for_term(Term* term)
-{
-    if (term->function == FUNCS.add)
-        return inline_op_match_number_type(term, bc_Addi, bc_Addf);
-    else if (term->function == FUNCS.add_i)
-        return inline_op_match_number_type(term, bc_Addi, 0);
-    else if (term->function == FUNCS.add_f)
-        return inline_op_match_number_type(term, bc_Addf, bc_Addf);
-    else if (term->function == FUNCS.sub)
-        return inline_op_match_number_type(term, bc_Subi, bc_Subf);
-    else if (term->function == FUNCS.sub_i)
-        return inline_op_match_number_type(term, bc_Subi, 0);
-    else if (term->function == FUNCS.sub_f)
-        return inline_op_match_number_type(term, bc_Subf, bc_Subf);
-    else if (term->function == FUNCS.mult)
-        return inline_op_match_number_type(term, bc_Multi, bc_Multf);
-#if 0
-    else if (term->function == FUNCS.mult_i)
-        return inline_op_match_number_type(term, bc_Multi, 0);
-    else if (term->function == FUNCS.mult_f)
-        return inline_op_match_number_type(term, bc_Multf, bc_Multf);
-#endif
-    else if (term->function == FUNCS.div)
-        return inline_op_match_number_type(term, bc_Divf, bc_Divf);
-    else if (term->function == FUNCS.div_i)
-        return inline_op_match_number_type(term, bc_Divi, 0);
-    else if (term->function == FUNCS.div_f)
-        return inline_op_match_number_type(term, bc_Divf, bc_Divf);
-    else if (term->function == FUNCS.equals)
-        return inline_op_match_number_type(term, bc_EqShallow, bc_Eqf);
-    else if (term->function == FUNCS.not_equals)
-        return inline_op_match_number_type(term, bc_NeqShallow, bc_Neqf);
+    Type* leftType = term_type(writer, term->input(0));
+    Type* rightType = term_type(writer, term->input(1));
+
+    bool bothInts = leftType == TYPES.int_type && rightType == TYPES.int_type;
+    bool bothFloaty = type_is_int_or_float(leftType) && type_is_int_or_float(rightType);
+
+#define CASE(func, whenInts, whenFloats) \
+    if (term->function == func) { \
+        if (bothInts) \
+            return whenInts; \
+        if (bothFloaty) \
+            return whenFloats; \
+        return 0; \
+    }
+
+    CASE(FUNCS.add, bc_Addi, bc_Addf);
+    CASE(FUNCS.add_i, bc_Addi, 0);
+    CASE(FUNCS.add_f, bc_Addf, bc_Addf);
+    CASE(FUNCS.sub, bc_Subi, bc_Subf);
+    CASE(FUNCS.sub_i, bc_Subi, 0);
+    CASE(FUNCS.sub_f, bc_Subf, bc_Subf);
+    CASE(FUNCS.mult, bc_Multi, bc_Multf);
+    CASE(FUNCS.div, bc_Divf, bc_Divf);
+    CASE(FUNCS.div_f, bc_Divf, bc_Divf);
+    CASE(FUNCS.div_i, bc_Divi, 0);
+    CASE(FUNCS.equals, bc_EqShallow, bc_Eqf);
+    CASE(FUNCS.not_equals, bc_NeqShallow, bc_Neqf);
+
+#undef CASE
 
     return 0;
 }
@@ -649,7 +634,7 @@ void write_term_call(Writer* writer, Term* term)
     if (is_value(term))
         return;
 
-    char inlineOp = get_inline_bc_for_term(term);
+    char inlineOp = get_inline_bc_for_term(writer, term);
     if (inlineOp != 0) {
         blob_append_char(writer->bytecode, inlineOp);
         blob_append_u32(writer->bytecode, term->index);
@@ -809,6 +794,16 @@ static caValue* find_set_value_hack(Writer* writer, Term* term)
         return NULL;
 
     return desiredValueIndex;
+}
+
+static caValue* term_effective_value(Writer* writer, Term* term)
+{
+    caValue* setValueHackIndex = find_set_value_hack(writer, term);
+    if (setValueHackIndex != NULL) {
+        return writer->stack->bytecode.cachedValues.index(as_int(setValueHackIndex));
+    }
+
+    return term_value(term);
 }
 
 static void bytecode_write_input_instruction(Writer* writer, Term* input)

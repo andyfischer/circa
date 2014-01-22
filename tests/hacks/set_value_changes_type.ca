@@ -1,0 +1,12 @@
+
+def main()
+  x = 1
+  x + 1
+
+vm = make_vm(main)
+
+vm.append_hack([:set_value main.block.find_term('x') 1.1])
+
+result = vm.call
+
+assert(result == 2.1)
