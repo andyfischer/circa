@@ -445,7 +445,7 @@ void circa_dump_stack_trace(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-caValue* circa_set_env(caStack* stack, const char* name)
+caValue* circa_env_insert(caStack* stack, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);

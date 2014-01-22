@@ -3,7 +3,7 @@ Step-by-step of click and drag feedback:
 
 Before running the user script:
   Capture a pre-run copy
-    (TODO: fix VM duplication)
+    (DONE: fix VM duplication)
   Code browsing UI tells us the target term
 
 Change improv
@@ -14,12 +14,12 @@ Run user script
   (TODO) Guide function has click-and-drag support
   (TODO) On a drag event, capture the current stack path and the current value,
     and save this on the VM itself. Needs design.
-  (TODO) Apply pending ChangeEvents to VM
+  (Supported) Apply pending ChangeEvents to VM
     This will probably also use :vmUseDemandValue
 
 After:
   Use the pre-run vm for a find-derivative run
-  Set :vmNoSaveState and :vmNoEffects (DONE)
+  Set :vmNoSaveState and :vmNoEffects (Supported)
   For the target term
     (Supported) Set a :vmUseDemandValue flag, indicating that the term's demand value
     should be used instead of the fixed value.
@@ -27,14 +27,14 @@ After:
       Make sure we are using the term's value with change-events applied
 
   For the desired-value term
-    (TODO) Install a :vm spy, which will save the term's observed value when it
+    (Supported) Install a :vm spy, which will save the term's observed value when it
       matches the given stack path.
 
-  Run the find-derivative vm
+  Run the find-derivative vm (Supported)
 
-  Extract the observed value for the desired-value stack path.
+  Extract the observed value for the desired-value stack path. (Supported)
 
-  Use math and shit to determine a new value for the target term
+  Use math and shit to determine a new value for the target term (Supported)
     TargetDerivativeWithRespectToDesired = (modifiedDesiredValue - originalDesiredValue) 0.0000001
     RecommendedTargetValue = desiredDelta * TargetDerivativeWithRespectToDesired
 

@@ -1,0 +1,41 @@
+
+-- 'main' is our sample code, which could be more complicated.
+def main()
+  x = 3.0
+  y = x * 5.0
+
+-- Create an interpreter to run 'main', and a duplicate
+vm = make_vm(main)
+dvm = vm.copy
+
+-- Code reflection
+x = main.block.find_term('x')
+y = main.block.find_term('y')
+
+-- Set up a watch on term Y
+vm.append_hack([:watch, :y, [y]])
+
+-- Run, and fetch the watched result of Y
+vm.run
+original_y = vm.get_watch_result(:y)
+print('Original y = ' original_y)
+
+small_number = 0.01
+
+-- In the duplicate VM, hack X to a slightly different value
+dvm.append_hack([:set_value, x, x.value + small_number])
+
+-- Also watch Y
+dvm.append_hack([:watch, :y, [y]])
+
+-- Turn off side effects even though this particular program doesn't have any
+dvm.append_hack(:no_effect)
+
+dvm.run
+
+modified_y = dvm.get_watch_result(:y)
+print('Modified y = ' modified_y)
+
+-- The difference is an approximation of a partial derivative: Y with respect to X
+deriv = (modified_y - original_y) / small_number
+print('dY/dX = ' deriv)
