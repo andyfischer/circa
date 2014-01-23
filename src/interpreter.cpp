@@ -359,16 +359,11 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         << ", frames = " << stack->frames.count
         << "]" << std::endl;
 
-    for (int frameIndex = 0; frameIndex < stack->frames.count; frameIndex++) {
+    Frame* frame = first_frame(stack);
+    int frameIndex = 0;
+    for (; frame != NULL; frame = next_frame(stack, frame), frameIndex++) {
 
-        Frame* frame = frame_by_index(stack, frameIndex);
-
-        bool lastFrame = frameIndex == stack->frames.count - 1;
-
-
-        Frame* childFrame = NULL;
-        if (!lastFrame)
-            childFrame = frame_by_index(stack, frameIndex + 1);
+        Frame* childFrame = next_frame(stack, frame);
 
         int activeTermIndex = frame->termIndex;
         if (childFrame != NULL)
@@ -454,9 +449,8 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 {
     std::stringstream strm;
 
-    for (int frameIndex = 0; frameIndex < stack->frames.count; frameIndex++) {
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(stack, frame)) {
 
-        Frame* frame = frame_by_index(stack, frameIndex);
         Term* term = frame_current_term(frame);
 
         if (is_input_placeholder(term) || is_output_placeholder(term))
@@ -489,7 +483,7 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 
 void stack_extract_state(Stack* stack, caValue* output)
 {
-    Frame* frame = frame_by_index(stack, 0);
+    Frame* frame = first_frame(stack);
     extract_state(frame->block, &frame->state, output);
 }
 
@@ -533,6 +527,24 @@ Frame* frame_by_depth(Stack* stack, int depth)
 {
     int index = stack->frames.count - 1 - depth;
     return frame_by_index(stack, index);
+}
+
+Frame* first_frame(Stack* stack)
+{
+    return stack->frames.frame;
+}
+
+Frame* next_frame(Stack* stack, Frame* frame)
+{
+    int index = frame_get_index(frame) + 1;
+    if (index >= stack->frames.count)
+        return NULL;
+    return frame_by_index(stack, index);
+}
+
+Frame* top_frame(Stack* stack)
+{
+    return stack_top(stack);
 }
 
 int frame_get_index(Frame* frame)
@@ -2376,9 +2388,7 @@ void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame)
 {
     set_list(path);
 
-    for (int i=0; i < stack->frames.count; i++) {
-        Frame* frame = frame_by_index(stack, i);
-
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(stack, frame)) {
         if (frame == untilFrame)
             break;
 

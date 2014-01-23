@@ -65,6 +65,10 @@ int stack_frame_count(Stack* stack);
 // Retrieve the frame with the given depth.
 Frame* frame_by_depth(Stack* stack, int depth);
 
+Frame* first_frame(Stack* stack);
+Frame* next_frame(Stack* stack, Frame* frame);
+Frame* top_frame(Stack* stack);
+
 void stack_run(Stack* stack);
 void vm_run(Stack* stack);
 
