@@ -61,7 +61,10 @@ Type* find_common_type(caValue* list)
 Type* find_common_type(Type* type1, Type* type2)
 {
     if (type1 == NULL)
-        return type2;
+        type1 = TYPES.any;
+
+    if (type2 == NULL)
+        type2 = TYPES.any;
 
     if (type1 == type2)
         return type1;

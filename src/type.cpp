@@ -519,7 +519,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
         Term* accessorGetIndex = apply(accessorContents, FUNCS.get_index,
                 TermList(selfInput, accessorIndex));
         Term* accessorOutput = append_output_placeholder(accessorContents, accessorGetIndex);
-        change_declared_type(accessorOutput, as_type(fieldType));
+        set_declared_type(accessorOutput, as_type(fieldType));
     }
 
     // Add setter.
@@ -532,12 +532,12 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
         Block* setterContents = nested_contents(setter);
         Term* selfInput = append_input_placeholder(setterContents);
         Term* valueInput = append_input_placeholder(setterContents);
-        change_declared_type(valueInput, as_type(fieldType));
+        set_declared_type(valueInput, as_type(fieldType));
         Term* indexValue = create_int(setterContents, fieldIndex, "");
         Term* setIndex = apply(setterContents, FUNCS.set_index,
                 TermList(selfInput, indexValue, valueInput));
         Term* output = append_output_placeholder(setterContents, setIndex);
-        change_declared_type(output, owningType);
+        set_declared_type(output, owningType);
     }
 
     return accessor;

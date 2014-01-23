@@ -291,9 +291,12 @@ void change_function(Term* term, Term* function)
     dirty_bytecode(term->owningBlock);
 }
 
-void change_declared_type(Term *term, Type *newType)
+void set_declared_type(Term *term, Type *newType)
 {
-    // Don't allow 'null' to be used as a declared type (use 'any' instead)
+    if (newType == NULL)
+        newType = TYPES.any;
+
+    // Don't allow the null type to be used as a declared type
     if (newType == TYPES.null)
         newType = TYPES.any;
 
@@ -319,7 +322,7 @@ void respecialize_type(Term* term)
 {
     Type* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
-        change_declared_type(term, outputType);
+        set_declared_type(term, outputType);
 }
 
 void rename(Term* termToRename, caValue* name)
@@ -425,7 +428,7 @@ Term* create_duplicate(Block* block, Term* original, caValue* name)
     original->inputsToList(inputs);
 
     Term* term = apply(block, original->function, inputs, name);
-    change_declared_type(term, original->type);
+    set_declared_type(term, original->type);
 
     copy(term_value(original), term_value(term));
 
@@ -457,7 +460,7 @@ Term* create_value(Block* block, Type* type, const char* name)
 
     Term *term = apply(block, FUNCS.value, TermList(), name);
 
-    change_declared_type(term, type);
+    set_declared_type(term, type);
     make(type, term_value(term));
 
     if (type == TYPES.type) {
@@ -863,7 +866,7 @@ void update_extra_outputs(Term* term)
                 extra_output->setIntProp(sym_RebindsInput, rebindsInput);
         }
 
-        change_declared_type(extra_output, placeholder->type);
+        set_declared_type(extra_output, placeholder->type);
     }
 }
 
@@ -1112,19 +1115,28 @@ void check_to_add_primary_output_placeholder(Block* block)
         prepend_output_placeholder(block, find_expression_for_implicit_output(block));
 }
 
+void update_declared_type(Term* term)
+{
+    Block* function = function_contents(term->function);
+
+    Type* outputType = get_output_type(function, 0);
+
+    if (function->overrides.specializeType != NULL)
+        outputType = function->overrides.specializeType(term);
+
+    if (outputType == NULL)
+        outputType = TYPES.any;
+
+    set_declared_type(term, outputType);
+}
+
 void rewrite(Term* term, Term* function, TermList const& inputs)
 {
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
-    Type* outputType = get_output_type(function_contents(function), 0);
 
-    Block* contents = function_contents(function);
-
-    if (contents->overrides.specializeType != NULL)
-        outputType = contents->overrides.specializeType(term);
-
-    change_declared_type(term, outputType);
+    update_declared_type(term);
 }
 
 void rewrite_as_value(Block* block, int index, Type* type)
@@ -1138,7 +1150,7 @@ void rewrite_as_value(Block* block, int index, Type* type)
         Term* term = block->get(index);
 
         change_function(term, FUNCS.value);
-        change_declared_type(term, type);
+        set_declared_type(term, type);
         set_inputs(term, TermList());
     }
 }
@@ -1264,7 +1276,7 @@ void create_inputs_for_outer_references(Term* term)
                     // Need to create a new placeholder
                     int placeholderIndex = term->numInputs();
                     Term* placeholder = apply(block, FUNCS.input, TermList(), &input->nameValue);
-                    change_declared_type(placeholder, input->type);
+                    set_declared_type(placeholder, input->type);
                     block->move(placeholder, placeholderIndex);
                     set_input(term, placeholderIndex, placeholder);
                     remap_pointers_quick(innerTerm, input, placeholder);

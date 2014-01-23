@@ -39,6 +39,8 @@ int user_count(Term* term)
 
 Type* declared_type(Term* term)
 {
+    if (term == NULL)
+        return NULL;
     if (term->type == NULL)
         return NULL;
     else

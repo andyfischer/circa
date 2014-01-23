@@ -1,6 +1,8 @@
 
 Miscellanous (most-recent first)
 
+  Can we delete PreferSpecialize?
+
   Stack capture is broken
     Caused by bytecode changes
     stack_silently_finish_call doesn't work
@@ -27,7 +29,7 @@ Miscellanous (most-recent first)
     Actually quite a lot of syntax errors will mess things up. Syntax error can cause
     a premature end to a block.
 
-  A superfluous @ symbol caused problems:
+  A superfluous @ symbol causes problems:
 
       type A { int i }
       a = make(A)

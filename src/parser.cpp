@@ -635,7 +635,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // Create an input placeholder term
         Term* input = apply(contents, FUNCS.input, TermList(), as_cstring(&name));
-        change_declared_type(input, type);
+        set_declared_type(input, type);
 
         // Save some information on the input as properties.
         if (!explicitType)
@@ -742,7 +742,7 @@ consume_next_output: {
             }
 
             Term* output = append_output_placeholder(contents, NULL);
-            change_declared_type(output, unbox_type(typeTerm));
+            set_declared_type(output, unbox_type(typeTerm));
             output->setBoolProp(sym_ExplicitType, true);
 
             if (expectMultiple && lookahead_next_non_whitespace(tokens, false) == tok_Comma) {
@@ -1260,7 +1260,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
         if (type != declared_type(initialValue) && type != TYPES.any) {
             initialValue = apply(nested_contents(initializer), FUNCS.cast, TermList(initialValue));
             initialValue->setBoolProp(sym_Hidden, true);
-            change_declared_type(initialValue, type);
+            set_declared_type(initialValue, type);
         }
 
         append_output_placeholder(contents, initialValue);
@@ -1277,7 +1277,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     // Create the declared_state() term.
     Term* result = apply(block, FUNCS.declared_state, TermList(), as_cstring(&name));
 
-    change_declared_type(result, type);
+    set_declared_type(result, type);
     set_input(result, 0, type->declaringTerm);
     set_input(result, 1, initializer);
     

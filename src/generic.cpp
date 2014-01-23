@@ -23,9 +23,9 @@ void create_function_vectorized_vs(Block* out, Term* func, Type* lhsType, Type* 
     clear_block(out);
 
     Term* input0 = apply(out, FUNCS.input, TermList(), "in0");
-    change_declared_type(input0, lhsType);
+    set_declared_type(input0, lhsType);
     Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
-    change_declared_type(input1, rhsType);
+    set_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
     start_building_for_loop(loop, "it", NULL);
@@ -44,9 +44,9 @@ void create_function_vectorized_vv(Block* out, Term* func, Type* lhsType, Type* 
     clear_block(out);
 
     Term* input0 = apply(out, FUNCS.input, TermList(), "in0");
-    change_declared_type(input0, lhsType);
+    set_declared_type(input0, lhsType);
     Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
-    change_declared_type(input1, rhsType);
+    set_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
     start_building_for_loop(loop, "it", NULL);

@@ -111,7 +111,7 @@ Term::setDependency(int index, Term* term)
     if (index == 0)
         change_function(this, term);
     else if (index == 1)
-        change_declared_type(this, unbox_type(term));
+        set_declared_type(this, unbox_type(term));
     else
         set_input(this, index - 2, term);
 }

@@ -85,6 +85,23 @@ int BlockIterator::depth()
     return (int) _stack.size() - 1;
 }
 
+MinorBlockIterator::MinorBlockIterator(Block* block)
+  : it(block)
+{
+}
+
+Term* MinorBlockIterator::current() { return it.current(); }
+bool MinorBlockIterator::finished() { return it.finished(); }
+void MinorBlockIterator::advance()
+{
+    Block* nextNested = current()->nestedContents;
+    if (nextNested != NULL && !is_minor_block(nextNested))
+        it.advanceSkippingBlock();
+    else
+        it.advance();
+}
+
+
 // UpwardsIterator
 
 UpwardIterator::UpwardIterator(Term* startingTerm)

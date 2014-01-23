@@ -67,7 +67,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
     if (iteratorType == NULL)
         iteratorType = infer_type_of_get_index(forTerm->input(0));
     
-    change_declared_type(iterator, iteratorType);
+    set_declared_type(iterator, iteratorType);
     hide_from_source(iterator);
 
     // Add the zero block
@@ -106,7 +106,7 @@ void add_implicit_placeholders(Term* forTerm)
         // Create input_placeholder
         Term* input = apply(contents, FUNCS.input, TermList(), name.c_str());
         Type* type = find_common_type(original->type, result->type);
-        change_declared_type(input, type);
+        set_declared_type(input, type);
         contents->move(input, inputIndex);
 
         set_input(forTerm, inputIndex, original);

@@ -192,7 +192,7 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
     Term* set = apply(block, FUNCS.set_with_selector,
             TermList(head, selector, result), &head->nameValue);
 
-    change_declared_type(set, declared_type(head));
+    set_declared_type(set, declared_type(head));
     return set;
 }
 
@@ -256,7 +256,7 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* term)
             Term* set = apply(block, FUNCS.set_with_selector,
                     TermList(head, selector, output), &head->nameValue);
 
-            change_declared_type(set, declared_type(head));
+            set_declared_type(set, declared_type(head));
         }
     }
 }

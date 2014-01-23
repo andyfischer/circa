@@ -119,7 +119,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
 
     Term* placeholder = append_input_placeholder(contents);
     rename(placeholder, term_name(input));
-    change_declared_type(placeholder, input->type);
+    set_declared_type(placeholder, input->type);
 
     set_input(ifBlock, existingInputCount, input);
 
@@ -128,7 +128,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
         Term* term = it.current();
         Block* caseContents = nested_contents(term);
         Term* casePlaceholder = append_input_placeholder(caseContents);
-        change_declared_type(casePlaceholder, placeholder->type);
+        set_declared_type(casePlaceholder, placeholder->type);
         rename(casePlaceholder, term_name(input));
     }
 
@@ -205,7 +205,7 @@ static void if_block_setup_new_case(Block* block, Term* newCase)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL) break;
         Term* localPlaceholder = append_input_placeholder(nested_contents(newCase));
-        change_declared_type(localPlaceholder, placeholder->type);
+        set_declared_type(localPlaceholder, placeholder->type);
         rename(localPlaceholder, term_name(placeholder));
     }
 
@@ -214,7 +214,7 @@ static void if_block_setup_new_case(Block* block, Term* newCase)
         Term* placeholder = get_output_placeholder(block, i);
         if (placeholder == NULL) break;
         Term* localPlaceholder = append_output_placeholder(nested_contents(newCase), NULL);
-        change_declared_type(localPlaceholder, placeholder->type);
+        set_declared_type(localPlaceholder, placeholder->type);
         rename(localPlaceholder, term_name(placeholder));
     }
 }
@@ -425,7 +425,7 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
             set_type(types.append(), placeholder->type);
         }
 
-        change_declared_type(masterPlaceholder, find_common_type(&types));
+        set_declared_type(masterPlaceholder, find_common_type(&types));
     }
 }
 

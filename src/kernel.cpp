@@ -479,7 +479,7 @@ void bootstrap_kernel()
     // Now that output_placeholder is created, fix the value() function.
     {
         Term* output = append_output_placeholder(function_contents(valueFunc), NULL);
-        change_declared_type(output, TYPES.any);
+        set_declared_type(output, TYPES.any);
         finish_building_function(function_contents(valueFunc));
     }
 
@@ -639,9 +639,9 @@ void bootstrap_kernel()
 
     // Fix function_decl now that Func type is available.
     {
-        change_declared_type(append_output_placeholder(function_contents(FUNCS.function_decl), NULL),
+        set_declared_type(append_output_placeholder(function_contents(FUNCS.function_decl), NULL),
             TYPES.func);
-        change_declared_type(FUNCS.function_decl, TYPES.func);
+        set_declared_type(FUNCS.function_decl, TYPES.func);
         finish_building_function(function_contents(FUNCS.function_decl));
     }
 

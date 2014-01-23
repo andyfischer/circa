@@ -19,6 +19,7 @@
 #include "term_list.h"
 #include "token.h"
 #include "type.h"
+#include "type_inference.h"
 #include "update_cascades.h"
 #include "world.h"
 
@@ -31,19 +32,30 @@ Term* create_function(Block* block, const char* name)
     return term;
 }
 
+Type* find_implicit_output_type(Block* block)
+{
+    Type* type = declared_type(get_output_placeholder(block, 0)->input(0));
+
+    // The implicit type must also consider any return statements.
+    for (MinorBlockIterator it(block); it; ++it) {
+        Term* term = *it;
+        if (term->function == FUNCS.return_func)
+            type = find_common_type(type, declared_type(term->input(0)));
+    }
+    return type;
+}
+
 void finish_building_function(Block* contents)
 {
     // Connect the primary output placeholder with the last expression.
     Term* primaryOutput = get_output_placeholder(contents, 0);
     ca_assert(primaryOutput->input(0) == NULL);
     Term* lastExpression = find_expression_for_implicit_output(contents);
-    set_input(primaryOutput, 0, lastExpression);
-
-    // Make output type more specific.
-    if (primaryOutput->type == TYPES.any
-            && lastExpression != NULL
-            && !primaryOutput->boolProp(sym_ExplicitType, false))
-        change_declared_type(primaryOutput, lastExpression->type);
+    if (lastExpression != NULL) {
+        set_input(primaryOutput, 0, lastExpression);
+        if (!primaryOutput->boolProp(sym_ExplicitType, false))
+            set_declared_type(primaryOutput, find_implicit_output_type(contents));
+    }
 
     // Write a list of output_placeholder terms.
 
@@ -58,7 +70,7 @@ void finish_building_function(Block* contents)
             
             Term* output = append_output_placeholder(contents, result);
             rename(output, &input->nameValue);
-            change_declared_type(output, input->type);
+            set_declared_type(output, input->type);
             output->setIntProp(sym_RebindsInput, i);
         }
     }

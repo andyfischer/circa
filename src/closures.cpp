@@ -70,7 +70,7 @@ void insert_nonlocal_terms(Block* block)
             } else {
                 // Create a new nonlocal term.
                 Term* unbound = apply(block, FUNCS.nonlocal, TermList(input), &input->nameValue);
-                change_declared_type(unbound, input->type);
+                set_declared_type(unbound, input->type);
                 block->move(unbound, nextInsertPosition++);
                 remap_pointers_quick(innerTerm, input, unbound);
                 it.advance();

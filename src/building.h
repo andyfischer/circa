@@ -44,7 +44,7 @@ void clear_from_dependencies_of_users(Term* term);
 void change_function(Term* term, Term* function);
 
 // Change a term's declared type
-void change_declared_type(Term* term, Type* type);
+void set_declared_type(Term* term, Type* type);
 void respecialize_type(Term* term);
 
 // Rename term, modify the name binding of the owning block if necessary
@@ -125,6 +125,8 @@ void check_to_add_primary_output_placeholder(Block* block);
 void list_rebound_names_in_major_scope(Block* block);
 
 // Refactoring
+
+void update_declared_type(Term* term);
 
 // Modify term so that it has the given function and inputs.
 void rewrite(Term* term, Term* function, TermList const& _inputs);

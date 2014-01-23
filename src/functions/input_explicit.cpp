@@ -28,8 +28,8 @@ namespace input_explicit_function {
 
         if (input != NULL && is_type(term_value(input))) {
             Type* type = as_type(term_value(term->input(0)));
-            change_declared_type(in, type);
-            change_declared_type(term, type);
+            set_declared_type(in, type);
+            set_declared_type(term, type);
         }
     }
 

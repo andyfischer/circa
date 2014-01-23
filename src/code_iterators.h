@@ -38,6 +38,22 @@ struct BlockIterator
     void operator++() { advance(); }
 };
 
+struct MinorBlockIterator
+{
+    BlockIterator it;
+
+    MinorBlockIterator(Block* block);
+
+    Term* current();
+    void advance();
+    bool finished();
+
+    Term* operator*() { return current(); }
+    void operator++() { advance(); }
+    operator bool() { return !finished(); }
+};
+
+
 struct UpwardIterator
 {
     Block* _block;
