@@ -287,11 +287,6 @@ bool circa_has_error(caStack* stack)
     return stack_errored(stack);
 }
 
-void circa_clear_error(caStack* stack)
-{
-    stack_ignore_error(stack);
-}
-
 void circa_clear_stack(caStack* stack)
 {
     stack_reset(stack);

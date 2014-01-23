@@ -48,7 +48,7 @@ Stack::Stack()
 Stack::~Stack()
 {
     // Clear error, so that stack_pop doesn't complain about losing an errored frame.
-    stack_ignore_error(this);
+    this->errorOccurred = false;
 
     stack_bytecode_erase(this);
     stack_reset(this);

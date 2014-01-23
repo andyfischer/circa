@@ -345,22 +345,6 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
     return NULL;
 }
 
-void stack_ignore_error(Stack* cxt)
-{
-    cxt->errorOccurred = false;
-}
-
-// TODO: Delete this
-void stack_clear_error(Stack* stack)
-{
-    stack_ignore_error(stack);
-    while (stack_top(stack) != NULL)
-        stack_pop(stack);
-
-    Frame* top = stack_top(stack);
-    top->termIndex = top->block->length();
-}
-
 static void indent(std::stringstream& strm, int count)
 {
     for (int x = 0; x < count; x++)
@@ -738,8 +722,6 @@ static void start_interpreter_session(Stack* stack)
 
 void evaluate_block(Stack* stack, Block* block)
 {
-    // Deprecated.
-
     block_finish_changes(block);
 
     stack_init(stack, block);
@@ -752,10 +734,6 @@ void evaluate_block(Stack* stack, Block* block)
 
 void stack_run(Stack* stack)
 {
-    if (stack->step == sym_StackFinished)
-        stack_restart(stack);
-
-    start_interpreter_session(stack);
     vm_run(stack);
 }
 
@@ -917,9 +895,13 @@ static caValue* vm_read_local_value(Frame* referenceFrame)
 
 void vm_run(Stack* stack)
 {
+    if (stack->step == sym_StackFinished)
+        stack_restart(stack);
+
+    start_interpreter_session(stack);
+
     stack->errorOccurred = false;
     stack->step = sym_StackRunning;
-
     stack->pc = stack_top(stack)->pc;
     stack->bc = stack_top(stack)->bc;
 
@@ -1358,58 +1340,6 @@ void vm_run(Stack* stack)
                 return;
             continue;
         }
-#if 0
-        case bc_PushRequire: {
-            int callerIndex = vm_read_u32(stack);
-
-            Frame* top = stack_top(stack);
-            Term* caller = frame_term(top, callerIndex);
-
-            caValue* moduleName = vm_run_single_input(top);
-            Block* module = load_module_by_name(stack->world, top->block, moduleName);
-
-            if (module == NULL) {
-                Value msg;
-                set_string(&msg, "Couldn't find module named: ");
-                string_append_quoted(&msg, moduleName);
-                stack_top(stack)->termIndex = callerIndex;
-                raise_error_msg(stack, as_cstring(&msg));
-                return;
-            }
-
-            // Save a ModuleRef value.
-            caValue* moduleRef = frame_register(top, callerIndex);
-            make(TYPES.module_ref, moduleRef);
-            set_block(list_get(moduleRef, 0), module);
-
-            if (module_is_loaded_in_stack(stack, moduleRef)) {
-                // Skip PushRequire and PopRequire.
-                char op = vm_read_char(stack);
-                ca_assert(op == bc_EnterFrame);
-                op = vm_read_char(stack);
-                ca_assert(op == bc_PopRequire);
-                op = vm_read_char(stack);
-                ca_assert(op == bc_PopFrame);
-            } else {
-                top = vm_push_frame(stack, callerIndex, module);
-                expand_frame(stack_top_parent(stack), top);
-            }
-            continue;
-        }
-        case bc_PopRequire: {
-            Frame* top = stack_top(stack);
-            Frame* parent = stack_top_parent(stack);
-
-            int callerIndex = top->parentIndex;
-            caValue* moduleRef = frame_register(parent, callerIndex);
-            
-            // Save the exports from the topmost frame in moduleSpace.
-            caValue* dest = module_insert_in_stack(stack, moduleRef);
-            module_capture_exports_from_stack(top, dest);
-
-            continue;
-        }
-#endif
         case bc_Loop: {
             // TODO: Save state
             // TODO: Save output
@@ -1954,18 +1884,6 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 
     if (term == NULL)
         return false;
-
-#if 0
-    caValue* moduleContents = module_get_stack_contents(top->stack, moduleRef);
-
-    caValue* value = hashtable_get(moduleContents, method);
-
-    if (value == NULL)
-        return false;
-
-    // Throw away the 'object' input (already have it).
-    vm_run_single_input(top);
-#endif
 
     if (is_function(term)) {
         Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);

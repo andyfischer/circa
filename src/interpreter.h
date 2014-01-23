@@ -30,15 +30,6 @@ void stack_reset(Stack* stack);
 // values. If there is a state register, feed the output back into its input.
 void stack_restart(Stack* stack);
 
-void stack_restart_at(Stack* stack, int termIndex);
-
-// Clear the error flag, but leave the stack as-is. See also stack_clear_error.
-void stack_ignore_error(Stack* stack);
-
-// Clear the error flag and drop any intermediate stack frames. The stack will be
-// cleared up until the 'stop' frame (as if it successfully finished an evaluation).
-void stack_clear_error(Stack* stack);
-
 caValue* stack_get_state(Stack* stack);
 
 caValue* stack_find_nonlocal(Frame* frame, Term* term);
