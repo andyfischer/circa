@@ -40,7 +40,9 @@ void finish_building_function(Block* contents)
     set_input(primaryOutput, 0, lastExpression);
 
     // Make output type more specific.
-    if (primaryOutput->type == TYPES.any && lastExpression != NULL)
+    if (primaryOutput->type == TYPES.any
+            && lastExpression != NULL
+            && !primaryOutput->boolProp(sym_ExplicitType, false))
         change_declared_type(primaryOutput, lastExpression->type);
 
     // Write a list of output_placeholder terms.

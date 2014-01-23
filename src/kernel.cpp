@@ -67,6 +67,10 @@ caValue* g_spyValues;
 
 Type* output_placeholder_specializeType(Term* caller)
 {
+    // Don't specialize if the type was explicitly declared
+    if (caller->boolProp(sym_ExplicitType, false))
+        return declared_type(caller);
+
     // Special case: if we're an accumulatingOutput then the output type is List.
     if (caller->boolProp(sym_AccumulatingOutput, false))
         return TYPES.list;
@@ -75,71 +79,6 @@ Type* output_placeholder_specializeType(Term* caller)
         return NULL;
 
     return declared_type(caller->input(0));
-}
-
-
-caValue* find_env_value(caStack* stack, caValue* key)
-{
-    Frame* frame = stack_top(stack);
-
-    while (frame != NULL) {
-        if (!is_null(&frame->dynamicScope)) {
-            caValue* value = hashtable_get(&frame->dynamicScope, key);
-            if (value != NULL)
-                return value;
-        }
-
-        frame = frame_parent(frame);
-    }
-
-    if (!is_null(&stack->env)) {
-        caValue* value = hashtable_get(&stack->env, key);
-        if (value != NULL)
-            return value;
-    }
-
-    return NULL;
-}
-
-void get_env(caStack* stack)
-{
-    caValue* value = find_env_value(stack, circa_input(stack, 0));
-    if (value != NULL)
-        copy(value, circa_output(stack, 0));
-    else
-        set_null(circa_output(stack, 0));
-}
-
-void get_env_opt(caStack* stack)
-{
-    caValue* value = find_env_value(stack, circa_input(stack, 0));
-    if (value != NULL)
-        copy(value, circa_output(stack, 0));
-    else
-        copy(circa_input(stack, 1), circa_output(stack, 0));
-}
-
-void set_env(caStack* stack)
-{
-    caValue* key = circa_input(stack, 0);
-    caValue* value = circa_input(stack, 1);
-
-    copy(value, stack_env_insert(stack, key));
-}
-
-void file__exists(caStack* stack)
-{
-    set_bool(circa_output(stack, 0),
-        circa_file_exists(stack->world, circa_string_input(stack, 0)));
-}
-void file__version(caStack* stack)
-{
-    set_int(circa_output(stack, 0),
-        circa_file_get_version(stack->world, circa_string_input(stack, 0)));
-}
-void file__read_text(caStack* stack)
-{
-    circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
 }
 
 void from_string(caStack* stack)
@@ -272,6 +211,14 @@ void Mutable_release(void* object)
 {
     caValue* val = (caValue*) object;
     set_null(val);
+}
+
+Type* Type_cast_specializeType(Term* caller)
+{
+    if (is_value(caller->input(0)) && is_type(caller->input(0)))
+        return as_type(term_value(caller->input(0)));
+
+    return NULL;
 }
 
 
@@ -624,13 +571,7 @@ void bootstrap_kernel()
     block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
 
     // Install native functions.
-    module_patch_function(world->builtinPatch, "env", get_env);
-    module_patch_function(world->builtinPatch, "env_opt", get_env_opt);
-    module_patch_function(world->builtinPatch, "file_version", file__version);
-    module_patch_function(world->builtinPatch, "file_exists", file__exists);
-    module_patch_function(world->builtinPatch, "file_read_text", file__read_text);
     module_patch_function(world->builtinPatch, "from_string", from_string);
-    module_patch_function(world->builtinPatch, "set_env", set_env);
     module_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
     module_patch_function(world->builtinPatch, "test_spy", test_spy);
     module_patch_function(world->builtinPatch, "test_oracle", test_oracle);
@@ -679,6 +620,8 @@ void bootstrap_kernel()
     FUNCS.not_func = builtins->get("not");
     FUNCS.output_explicit = builtins->get("output");
     FUNCS.type = builtins->get("type");
+
+    function_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
 
     FUNCS.memoize = builtins->get("memoize");
     block_set_evaluation_empty(function_contents(FUNCS.memoize), true);

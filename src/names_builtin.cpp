@@ -38,6 +38,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Constructor: return "Constructor";
     case sym_Error: return "Error";
     case sym_ExplicitState: return "ExplicitState";
+    case sym_ExplicitType: return "ExplicitType";
     case sym_Field: return "Field";
     case sym_FieldAccessor: return "FieldAccessor";
     case sym_Final: return "Final";
@@ -535,9 +536,37 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'p':
-        if (strcmp(str + 3, "licitState") == 0)
+    switch (str[3]) {
+    case 'l':
+    switch (str[4]) {
+    case 'i':
+    switch (str[5]) {
+    case 'c':
+    switch (str[6]) {
+    case 'i':
+    switch (str[7]) {
+    case 't':
+    switch (str[8]) {
+    case 'S':
+        if (strcmp(str + 9, "tate") == 0)
             return sym_ExplicitState;
         break;
+    case 'T':
+        if (strcmp(str + 9, "ype") == 0)
+            return sym_ExplicitType;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 't':
     switch (str[3]) {
     case 'r':

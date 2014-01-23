@@ -28,6 +28,7 @@ Comment
 Constructor
 Error
 ExplicitState
+ExplicitType
 Field
 FieldAccessor
 Final

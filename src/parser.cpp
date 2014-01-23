@@ -743,6 +743,7 @@ consume_next_output: {
 
             Term* output = append_output_placeholder(contents, NULL);
             change_declared_type(output, unbox_type(typeTerm));
+            output->setBoolProp(sym_ExplicitType, true);
 
             if (expectMultiple && lookahead_next_non_whitespace(tokens, false) == tok_Comma) {
                 tokens.consume(tok_Comma);

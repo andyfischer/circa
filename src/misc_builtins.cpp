@@ -451,6 +451,71 @@ void String__split(caStack* stack)
     string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
 }
 
+caValue* find_env_value(caStack* stack, caValue* key)
+{
+    Frame* frame = stack_top(stack);
+
+    while (frame != NULL) {
+        if (!is_null(&frame->dynamicScope)) {
+            caValue* value = hashtable_get(&frame->dynamicScope, key);
+            if (value != NULL)
+                return value;
+        }
+
+        frame = frame_parent(frame);
+    }
+
+    if (!is_null(&stack->env)) {
+        caValue* value = hashtable_get(&stack->env, key);
+        if (value != NULL)
+            return value;
+    }
+
+    return NULL;
+}
+
+void get_env(caStack* stack)
+{
+    caValue* value = find_env_value(stack, circa_input(stack, 0));
+    if (value != NULL)
+        copy(value, circa_output(stack, 0));
+    else
+        set_null(circa_output(stack, 0));
+}
+
+void get_env_opt(caStack* stack)
+{
+    caValue* value = find_env_value(stack, circa_input(stack, 0));
+    if (value != NULL)
+        copy(value, circa_output(stack, 0));
+    else
+        copy(circa_input(stack, 1), circa_output(stack, 0));
+}
+
+void set_env(caStack* stack)
+{
+    caValue* key = circa_input(stack, 0);
+    caValue* value = circa_input(stack, 1);
+
+    copy(value, stack_env_insert(stack, key));
+}
+
+void file__exists(caStack* stack)
+{
+    set_bool(circa_output(stack, 0),
+        circa_file_exists(stack->world, circa_string_input(stack, 0)));
+}
+void file__version(caStack* stack)
+{
+    set_int(circa_output(stack, 0),
+        circa_file_get_version(stack->world, circa_string_input(stack, 0)));
+}
+
+void file__read_text(caStack* stack)
+{
+    circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
+}
+
 void typeof_func(caStack* stack)
 {
     caValue* in = circa_input(stack, 0);
@@ -575,6 +640,15 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "String.to_camel_case", String__to_camel_case);
     module_patch_function(patch, "String.to_upper", String__to_upper);
     module_patch_function(patch, "String.to_lower", String__to_lower);
+
+    module_patch_function(patch, "env", get_env);
+    module_patch_function(patch, "env_opt", get_env_opt);
+    module_patch_function(patch, "set_env", set_env);
+
+    module_patch_function(patch, "file_version", file__version);
+    module_patch_function(patch, "file_exists", file__exists);
+    module_patch_function(patch, "file_read_text", file__read_text);
+
     module_patch_function(patch, "not_equals", not_equals);
     module_patch_function(patch, "print", print);
     module_patch_function(patch, "rand", rand);
