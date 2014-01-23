@@ -1093,9 +1093,6 @@ void vm_run(Stack* stack)
             // Type check
             bool castSuccess = cast(receiverSlot, declared_type(placeholder));
                 
-            // For now, allow any output value to be null. FIXME
-            castSuccess = castSuccess || is_null(receiverSlot);
-
             if (!castSuccess)
                 return raise_error_output_type_mismatch(stack);
 
