@@ -1,0 +1,10 @@
+
+def f(bool b)
+ if b
+   return [1 0]
+
+ Point.make
+
+result = f(true)
+
+assert(static_type(result) == List)

@@ -1060,23 +1060,26 @@ void vm_run(Stack* stack)
         case bc_PopOutput: {
             int placeholderIndex = vm_read_u32(stack);
             int outputIndex = vm_read_u32(stack);
+            bool typeCheck = vm_read_char(stack);
 
             Frame* top = stack_top(stack);
             Frame* parent = stack_top_parent(stack);
             Term* caller = frame_term(parent, top->parentIndex);
 
             Term* placeholder = get_output_placeholder(top->block, placeholderIndex);
-            caValue* value = frame_register(top, placeholder);
+            caValue* value = frame_register(top, placeholder->index);
 
             Term* receiver = get_output_term(caller, outputIndex);
             caValue* receiverSlot = frame_register(parent, receiver);
             copy(value, receiverSlot);
 
             // Type check
-            bool castSuccess = cast(receiverSlot, declared_type(placeholder));
-                
-            if (!castSuccess)
-                return raise_error_output_type_mismatch(stack);
+            if (typeCheck) {
+                bool castSuccess = cast(receiverSlot, declared_type(placeholder));
+                    
+                if (!castSuccess)
+                    return raise_error_output_type_mismatch(stack);
+            }
 
             continue;
         }
@@ -1825,6 +1828,7 @@ static void vm_skip_till_pop_frame(Stack* stack)
         case bc_PopOutput:
             vm_read_u32(stack);
             vm_read_u32(stack);
+            vm_read_char(stack);
             continue;
         default:
             internal_error("unrecognied op in vm_skip_till_pop_frame");

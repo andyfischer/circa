@@ -18,6 +18,8 @@ caValue* hashtable_insert_int_key(caValue* table, int key);
 caValue* hashtable_get_symbol_key(caValue* table, Symbol key);
 caValue* hashtable_insert_symbol_key(caValue* table, Symbol key);
 void hashtable_remove_int_key(caValue* table, int key);
+caValue* hashtable_insert_string(caValue* table, const char* str);
+caValue* hashtable_get_string(caValue* table, const char* str);
 
 void hashtable_remove(caValue* table, caValue* key);
 bool hashtable_is_empty(caValue* table);

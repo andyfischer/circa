@@ -1,0 +1,13 @@
+
+type T {}
+
+def f(bool b)
+ if b
+   return T.make
+
+ T.make
+
+result = f(true)
+
+assert(static_type(result) == T)
+assert(type(result) == T)

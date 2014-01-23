@@ -1,0 +1,15 @@
+
+type T {}
+
+type U {}
+
+def f(bool b)
+ if b
+   return U.make
+
+ T.make
+
+result = f(true)
+
+assert(static_type(result) != T)
+assert(type(result) == U)

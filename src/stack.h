@@ -90,8 +90,8 @@ struct Stack
     // Owning world
     caWorld* world;
 
-    // Value slot, may be used by the stack's owner.
-    Value context;
+    // Miscellaneous attributes, used by owner.
+    Value attrs;
 
     Stack();
     ~Stack();

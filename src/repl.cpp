@@ -7,8 +7,9 @@
 #include "bytecode.h"
 #include "change_events.h"
 #include "debug.h"
-#include "interpreter.h"
 #include "file_watch.h"
+#include "interpreter.h"
+#include "hashtable.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -16,6 +17,7 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "world.h"
@@ -24,8 +26,11 @@ namespace circa {
 
 void repl_start(Stack* stack)
 {
+    Value sym_displayRaw;
+    set_symbol_from_string(&sym_displayRaw, "displayRaw");
+
     Block* block = fetch_module(stack->world, "main");
-    set_bool(&stack->context, false);
+    set_bool(hashtable_insert(&stack->attrs, &sym_displayRaw), false);
     stack_init(stack, block);
 }
 
@@ -33,7 +38,10 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
 {
     Block* block = stack_top_block(stack);
     set_list(output, 0);
-    caValue* displayRaw = &stack->context;
+
+    Value sym_displayRaw;
+    set_symbol_from_string(&sym_displayRaw, "displayRaw");
+    caValue* displayRaw = hashtable_get(&stack->attrs, &sym_displayRaw);
 
     if (string_eq(line, "exit") || string_eq(line, "/exit")) {
         stack_pop(stack);

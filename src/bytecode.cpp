@@ -247,6 +247,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " ");
+        string_append(string, blob_read_char(bc, pc));
         break;
     case bc_PopOutputNull:
         set_string(string, "pop_output_null ");
@@ -582,6 +584,7 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PopOutput);
         blob_append_u32(writer->bytecode, 0);
         blob_append_u32(writer->bytecode, 0);
+        blob_append_char(writer->bytecode, 0);
         blob_append_char(writer->bytecode, bc_PopFrame);
 
         write_post_term_call(writer, term);
@@ -866,6 +869,9 @@ static void bytecode_write_output_instructions(Writer* writer, Term* caller, Blo
             blob_append_char(writer->bytecode, bc_PopOutput);
             blob_append_u32(writer->bytecode, placeholderIndex);
             blob_append_u32(writer->bytecode, outputIndex);
+
+            blob_append_char(writer->bytecode,
+                placeholder->boolProp(sym_ExplicitType, false) ? 1 : 0);
         }
 
         placeholderIndex++;

@@ -43,6 +43,7 @@ Stack::Stack()
     bytecode.blocks = NULL;
     bytecode.blockCount = 0;
     set_hashtable(&bytecode.indexMap);
+    set_hashtable(&attrs);
 }
 
 Stack::~Stack()
@@ -178,7 +179,7 @@ Stack* stack_duplicate(Stack* stack)
 
     dupe->frames.count = stack->frames.count;
     dupe->errorOccurred = stack->errorOccurred;
-    set_value(&dupe->context, &stack->context);
+    set_value(&dupe->attrs, &stack->attrs);
     set_value(&dupe->demandValues, &stack->demandValues);
     set_value(&dupe->env, &stack->env);
     dupe->randState = stack->randState;

@@ -538,6 +538,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
                 TermList(selfInput, indexValue, valueInput));
         Term* output = append_output_placeholder(setterContents, setIndex);
         set_declared_type(output, owningType);
+        output->setBoolProp(sym_ExplicitType, true);
     }
 
     return accessor;
