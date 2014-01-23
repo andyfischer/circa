@@ -158,6 +158,15 @@ def div(any left, any right) -> any
   else
     left.div(right)
 
+def number.add(left, right) -> number
+  add(left, right)
+def number.sub(left, right) -> number
+  sub(left, right)
+def number.mult(left, right) -> number
+  mult(left, right)
+def number.div(left, right) -> number
+  div(left, right)
+
 -- Misc builtin funcs --
 
 def abs(number n) -> number

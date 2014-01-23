@@ -1,6 +1,16 @@
 
 Miscellanous (most-recent first)
 
+  Assigning an element in a type doesn't cast that element. Example:
+
+    type A {
+      Point p
+    }
+
+    a = A.make
+    a.p = [0 0]
+    -- a.p is still a List instead of Point
+
   Stack capture is broken
     Caused by bytecode changes
     stack_silently_finish_call doesn't work
