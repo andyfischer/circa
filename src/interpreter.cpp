@@ -361,9 +361,9 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
 
     Frame* frame = first_frame(stack);
     int frameIndex = 0;
-    for (; frame != NULL; frame = next_frame(stack, frame), frameIndex++) {
+    for (; frame != NULL; frame = next_frame(frame), frameIndex++) {
 
-        Frame* childFrame = next_frame(stack, frame);
+        Frame* childFrame = next_frame(frame);
 
         int activeTermIndex = frame->termIndex;
         if (childFrame != NULL)
@@ -449,7 +449,7 @@ void stack_trace_to_string(Stack* stack, caValue* out)
 {
     std::stringstream strm;
 
-    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(stack, frame)) {
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
 
         Term* term = frame_current_term(frame);
 
@@ -516,30 +516,52 @@ int stack_frame_count(Stack* stack)
     return stack->frames.count;
 }
 
-Frame* frame_by_index(Stack* stack, int index)
-{
-    ca_assert(index >= 0);
-    ca_assert(index < stack->frames.count);
-    return &stack->frames.frame[index];
-}
-
-Frame* frame_by_depth(Stack* stack, int depth)
-{
-    int index = stack->frames.count - 1 - depth;
-    return frame_by_index(stack, index);
-}
-
 Frame* first_frame(Stack* stack)
 {
     return stack->frames.frame;
 }
 
-Frame* next_frame(Stack* stack, Frame* frame)
+Frame* next_frame(Frame* frame)
 {
-    int index = frame_get_index(frame) + 1;
-    if (index >= stack->frames.count)
+    if (frame == top_frame(frame->stack))
         return NULL;
-    return frame_by_index(stack, index);
+
+    return (Frame*) (((char*) frame) + frame_size(frame));
+}
+
+Frame* next_frame_n(Frame* frame, int distance)
+{
+    for (; distance > 0; distance--) {
+        if (frame == NULL)
+            return NULL;
+
+        frame = next_frame(frame);
+    }
+    return frame;
+}
+
+Frame* prev_frame(Frame* frame)
+{
+    if (frame->prevFrameSize == 0)
+        return NULL;
+
+    return (Frame*) (((char*) frame) - frame->prevFrameSize);
+}
+
+Frame* prev_frame_n(Frame* frame, int distance)
+{
+    for (; distance > 0; distance--) {
+        if (frame == NULL)
+            return NULL;
+
+        frame = prev_frame(frame);
+    }
+    return frame;
+}
+
+size_t frame_size(Frame* frame)
+{
+    return sizeof(Frame);
 }
 
 Frame* top_frame(Stack* stack)
@@ -879,25 +901,12 @@ inline char* vm_get_bytecode_raw(Stack* stack)
     return stack->bc + stack->pc;
 }
 
-static caValue* vm_read_local_value(Stack* stack)
-{
-    u16 stackDistance = vm_read_u16(stack);
-    u16 index = vm_read_u16(stack);
-
-    Frame* frame = frame_by_depth(stack, stackDistance);
-    Term* term = frame->block->get(index);
-    if (is_value(term))
-        return term_value(term);
-    return frame_register(frame, index);
-}
-
 static caValue* vm_read_local_value(Frame* referenceFrame)
 {
     u16 stackDistance = vm_read_u16(referenceFrame->stack);
     u16 index = vm_read_u16(referenceFrame->stack);
 
-    Frame* frame = frame_by_index(referenceFrame->stack,
-        frame_get_index(referenceFrame) - stackDistance);
+    Frame* frame = prev_frame_n(referenceFrame, stackDistance);
 
     Term* term = frame->block->get(index);
     if (is_value(term))
@@ -1238,7 +1247,7 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_CaseConditionBool: {
-            caValue* condition = vm_read_local_value(stack);
+            caValue* condition = vm_read_local_value(top_frame(stack));
             int nextBcIndex = vm_read_u32(stack);
 
             if (!is_bool(condition)) {
@@ -1325,7 +1334,7 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_LoopConditionBool: {
-            caValue* condition = vm_read_local_value(stack);
+            caValue* condition = vm_read_local_value(top_frame(stack));
 
             if (!is_bool(condition)) {
                 Value msg;
@@ -1609,9 +1618,9 @@ void vm_run(Stack* stack)
         case bc_PackState: {
             u16 declaredStackDistance = vm_read_u16(stack);
             u16 declaredIndex = vm_read_u16(stack);
-            caValue* result = vm_read_local_value(stack);
+            caValue* result = vm_read_local_value(top_frame(stack));
 
-            Frame* declaredFrame = frame_by_depth(stack, declaredStackDistance);
+            Frame* declaredFrame = prev_frame_n(top_frame(stack), declaredStackDistance);
 
             caValue* outgoingState = &declaredFrame->outgoingState;
 
@@ -2388,7 +2397,7 @@ void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame)
 {
     set_list(path);
 
-    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(stack, frame)) {
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
         if (frame == untilFrame)
             break;
 
@@ -2769,7 +2778,7 @@ void Stack__frame_from_base(caStack* stack)
     if (index >= self->frames.count)
         return circa_output_error(stack, "Index out of range");
 
-    Frame* frame = frame_by_index(self, index);
+    Frame* frame = next_frame_n(first_frame(self), index);
     set_frame_ref(circa_output(stack, 0), frame);
 }
 void Stack__frame(caStack* stack)
@@ -2780,7 +2789,7 @@ void Stack__frame(caStack* stack)
     if (index >= self->frames.count)
         return circa_output_error(stack, "Index out of range");
 
-    Frame* frame = frame_by_depth(self, index);
+    Frame* frame = prev_frame_n(top_frame(self), index);
     set_frame_ref(circa_output(stack, 0), frame);
 }
 

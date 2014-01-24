@@ -145,6 +145,10 @@ void stack_resize_frame_list(Stack* stack, int newCapacity)
 
 Frame* stack_push_blank_frame(Stack* stack)
 {
+    u32 prevFrameSize = 0;
+    if (top_frame(stack) != NULL)
+        prevFrameSize = frame_size(top_frame(stack));
+
     // Check capacity.
     if ((stack->frames.count + 1) >= stack->frames.capacity)
         stack_resize_frame_list(stack, stack->frames.capacity == 0 ? 8 : stack->frames.capacity * 2);
@@ -154,6 +158,7 @@ Frame* stack_push_blank_frame(Stack* stack)
     Frame* frame = stack_top(stack);
 
     // Prepare frame.
+    frame->prevFrameSize = prevFrameSize;
     frame->termIndex = 0;
     frame->bc = NULL;
     frame->blockIndex = -1;
@@ -486,7 +491,7 @@ Frame* as_frame_ref(caValue* value)
     if (index >= stack->frames.count)
         return NULL;
 
-    return frame_by_index(stack, index);
+    return next_frame_n(first_frame(stack), index);
 }
 
 bool is_frame_ref(caValue* value)

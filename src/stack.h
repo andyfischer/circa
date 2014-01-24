@@ -112,13 +112,16 @@ struct Frame
     // PC (in the parent frame) that this frame was expanded from. Invalid for the first frame.
     int parentIndex;
 
+    // Size of previous frame, used when walking backwards.
+    u32 prevFrameSize;
+
     // Register values.
     Value registers;
 
     // Stack state: data saved between invocations.
     Value state;
 
-    // Outgoing stack state. Data that will be committed upon this frame's complemtion.
+    // Outgoing stack state. Will be committed to parent frame's state.
     Value outgoingState;
 
     // Source block

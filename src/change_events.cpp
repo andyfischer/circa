@@ -47,12 +47,12 @@ struct WorldStacksIterator
 struct WorldFramesIterator
 {
     WorldStacksIterator stacksIterator;
-    int frameIndex;
+    Frame* frame;
 
     WorldFramesIterator(World* world)
       : stacksIterator(world)
     {
-        frameIndex = 0;
+        frame = first_frame(stacksIterator.current());
         advanceWhileInvalid();
     }
 
@@ -62,9 +62,9 @@ struct WorldFramesIterator
         if (finished())
             return;
 
-        if (frameIndex >= stack_frame_count(stacksIterator.current())) {
+        if (frame == NULL) {
             ++stacksIterator;
-            frameIndex = 0;
+            frame = first_frame(stacksIterator.current());
             goto still_invalid;
         }
     }
@@ -77,7 +77,13 @@ struct WorldFramesIterator
     Frame* current()
     {
         ca_assert(!finished());
-        return frame_by_index(stacksIterator.current(), frameIndex);
+        return frame;
+    }
+
+    void advance()
+    {
+        frame = next_frame(frame);
+        advanceWhileInvalid();
     }
 
     operator bool()
@@ -85,12 +91,7 @@ struct WorldFramesIterator
         return !finished();
     }
 
-    WorldFramesIterator& operator++()
-    {
-        frameIndex++;
-        advanceWhileInvalid();
-        return *this;
-    }
+    void operator++() { advance(); }
 };
 
 caValue* change_event_type(caValue* event)

@@ -59,15 +59,21 @@ int frame_get_depth(Frame* frame);
 
 void frame_extract_state(Frame* frame, caValue* output);
 
-Frame* frame_by_index(Stack* stack, int index);
 int stack_frame_count(Stack* stack);
 
-// Retrieve the frame with the given depth.
-Frame* frame_by_depth(Stack* stack, int depth);
-
+// Returns "first" frame; the first one to be executed; the first one in memory.
 Frame* first_frame(Stack* stack);
-Frame* next_frame(Stack* stack, Frame* frame);
+
+// Returns "top" frame; the one that is currently executing; the last one in memory.
 Frame* top_frame(Stack* stack);
+
+Frame* next_frame(Frame* frame);
+Frame* next_frame_n(Frame* frame, int distance);
+
+Frame* prev_frame(Frame* frame);
+Frame* prev_frame_n(Frame* frame, int distance);
+
+size_t frame_size(Frame* frame);
 
 void stack_run(Stack* stack);
 void vm_run(Stack* stack);
