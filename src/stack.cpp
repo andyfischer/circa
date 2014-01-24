@@ -29,9 +29,10 @@ Stack::Stack()
     isRefcounted = false;
 
     step = sym_StackReady;
-    frames.capacity = 0;
-    frames.count = 0;
-    frames.frame = NULL;
+    framesCapacity = 0;
+    framesCount = 0;
+    frameData = NULL;
+    top = NULL;
     nextStack = NULL;
     prevStack = NULL;
     
@@ -54,7 +55,7 @@ Stack::~Stack()
     stack_bytecode_erase(this);
     stack_reset(this);
 
-    free(frames.frame);
+    free(frameData);
 
     if (world != NULL) {
         if (world->firstStack == this)
@@ -120,44 +121,46 @@ void stack_decref(Stack* stack)
     }
 }
 
-void stack_resize_frame_list(Stack* stack, int newCapacity)
+size_t stack_get_required_capacity(Stack* stack)
 {
-    // Currently, the frame list can only be grown.
-    ca_assert(newCapacity >= stack->frames.capacity);
+    if (stack->top == NULL)
+        return 0;
 
-    int oldCapacity = stack->frames.capacity;
-    stack->frames.capacity = newCapacity;
-    stack->frames.frame = (Frame*) realloc(stack->frames.frame,
-        sizeof(Frame) * stack->frames.capacity);
-
-    for (int i = oldCapacity; i < newCapacity; i++) {
-        // Initialize newly allocated frame.
-        Frame* frame = &stack->frames.frame[i];
-        frame->stack = stack;
-        initialize_null(&frame->registers);
-        initialize_null(&frame->bindings);
-        initialize_null(&frame->dynamicScope);
-        initialize_null(&frame->state);
-        initialize_null(&frame->outgoingState);
-        frame->block = 0;
-    }
+    return (char*) stack->top - stack->frameData + frame_size(top_frame(stack));
 }
 
-Frame* stack_push_blank_frame(Stack* stack)
+void stack_reserve_capacity(Stack* stack, size_t capacity)
+{
+    if (stack->framesCapacity >= capacity)
+        return;
+
+    size_t topPointerOffset = (char*) stack->top - stack->frameData;
+
+    stack->frameData = (char*) realloc(stack->frameData, capacity);
+    stack->framesCapacity = capacity;
+
+    if (stack->top != NULL)
+        stack->top = (Frame*) (stack->frameData + topPointerOffset);
+}
+
+Frame* stack_push_blank_frame(Stack* stack, int registerCount)
 {
     u32 prevFrameSize = 0;
-    if (top_frame(stack) != NULL)
+
+    if (stack->top != NULL)
         prevFrameSize = frame_size(top_frame(stack));
 
-    // Check capacity.
-    if ((stack->frames.count + 1) >= stack->frames.capacity)
-        stack_resize_frame_list(stack, stack->frames.capacity == 0 ? 8 : stack->frames.capacity * 2);
+    size_t currentSize = stack_get_required_capacity(stack);
+    size_t newFrameSize = sizeof(Frame) + registerCount * sizeof(Value);
+    stack_reserve_capacity(stack, currentSize + newFrameSize);
 
-    stack->frames.count++;
+    stack->top = (Frame*) (stack->frameData + currentSize);
+    stack->framesCount++;
 
     Frame* frame = stack_top(stack);
 
     // Prepare frame.
+    frame->stack = stack;
     frame->prevFrameSize = prevFrameSize;
     frame->termIndex = 0;
     frame->bc = NULL;
@@ -166,13 +169,211 @@ Frame* stack_push_blank_frame(Stack* stack)
     frame->exitType = sym_None;
     frame->callType = sym_NormalCall;
     frame->block = NULL;
+    frame->registerCount = registerCount;
+    initialize_null(&frame->registersOld);
+    initialize_null(&frame->bindings);
+    initialize_null(&frame->dynamicScope);
+    initialize_null(&frame->state);
+    initialize_null(&frame->outgoingState);
+
+    for (int i=0; i < registerCount; i++)
+        initialize_null(&frame->registersNew[i]);
+
+    ca_assert(frame_size(frame) == newFrameSize);
 
     return frame;
+}
+
+void stack_pop_no_retain(Stack* stack)
+{
+    Frame* frame = stack_top(stack);
+
+    for (int i=0; i < frame->registerCount; i++)
+        set_null(&frame->registersNew[i]);
+
+    set_null(&frame->bindings);
+    set_null(&frame->dynamicScope);
+    set_null(&frame->state);
+    set_null(&frame->outgoingState);
+
+    stack->framesCount--;
+    if (stack->framesCount == 0 || frame->prevFrameSize == 0)
+        stack->top = NULL;
+    else
+        stack->top = (Frame*) (((char*) stack->top) - frame->prevFrameSize);
+}
+
+Frame* stack_resize_frame(Stack* stack, Frame* frame, int newRegisterCount)
+{
+    if (frame->registerCount == newRegisterCount)
+        return frame;
+
+    int oldRegisterCount = frame->registerCount;
+    size_t oldFrameSize = frame_size(frame);
+    size_t newFrameSize = oldFrameSize + sizeof(Value) * (newRegisterCount - frame->registerCount);
+    size_t oldCapacity = stack_get_required_capacity(stack);
+    int sizeDelta = newFrameSize - oldFrameSize;
+
+    size_t framePointerOffset = (char*) frame - stack->frameData;
+
+    stack_reserve_capacity(stack, oldCapacity + sizeDelta);
+    // invalidated pointers: frame
+
+    frame = (Frame*) (stack->frameData + framePointerOffset);
+
+    // Nullify slots that are being removed.
+    for (int i = newRegisterCount; i < oldRegisterCount; i++)
+        set_null(frame_register(frame, i));
+
+    Frame* followingFrame = next_frame(frame);
+    size_t followingFramePointerOffset = (char*) followingFrame - stack->frameData;
+
+    if (followingFrame != NULL) {
+        followingFrame->prevFrameSize = newFrameSize;
+        memmove((char*) followingFrame + sizeDelta, followingFrame,
+            oldCapacity - followingFramePointerOffset);
+        // invalidated pointers: followingFrame, stack->top
+
+        stack->top = (Frame*) ((char*) stack->top + sizeDelta);
+    }
+
+    frame->registerCount = newRegisterCount;
+    ca_assert(frame_size(frame) == newFrameSize);
+
+    // Initialize slots that are added.
+    for (int i = oldRegisterCount; i < newRegisterCount; i++)
+        initialize_null(frame_register(frame, i));
+
+    return frame;
+}
+
+int stack_frame_count(Stack* stack)
+{
+    return stack->framesCount;
+}
+
+Frame* stack_top(Stack* stack)
+{
+    if (stack->framesCount == 0)
+        return NULL;
+    return stack->top;
+}
+
+Frame* stack_top_parent(Stack* stack)
+{
+    Frame* top = top_frame(stack);
+    if (top == NULL)
+        return NULL;
+    return prev_frame(top);
+}
+
+Block* stack_top_block(Stack* stack)
+{
+    Frame* frame = stack_top(stack);
+    if (frame == NULL)
+        return NULL;
+    return frame->block;
+}
+
+Frame* first_frame(Stack* stack)
+{
+    if (stack->framesCount == 0)
+        return NULL;
+    return (Frame*) stack->frameData;
+}
+
+Frame* next_frame(Frame* frame)
+{
+    if (frame == top_frame(frame->stack))
+        return NULL;
+
+    return (Frame*) (((char*) frame) + frame_size(frame));
+}
+
+Frame* next_frame_n(Frame* frame, int distance)
+{
+    for (; distance > 0; distance--) {
+        if (frame == NULL)
+            return NULL;
+
+        frame = next_frame(frame);
+    }
+    return frame;
+}
+
+Frame* prev_frame(Frame* frame)
+{
+    if (frame->prevFrameSize == 0)
+        return NULL;
+
+    return (Frame*) (((char*) frame) - frame->prevFrameSize);
+}
+
+Frame* prev_frame_n(Frame* frame, int distance)
+{
+    for (; distance > 0; distance--) {
+        if (frame == NULL)
+            return NULL;
+
+        frame = prev_frame(frame);
+    }
+    return frame;
+}
+
+size_t frame_size(Frame* frame)
+{
+    return sizeof(Frame) + frame->registerCount * sizeof(Value);
+}
+
+Frame* top_frame(Stack* stack)
+{
+    return stack_top(stack);
+}
+
+caValue* frame_register(Frame* frame, int index)
+{
+    ca_assert(index >= 0 && index < frame->registerCount);
+    return &frame->registersNew[index];
+}
+
+caValue* frame_register(Frame* frame, Term* term)
+{
+    return frame_register(frame, term->index);
+}
+
+caValue* frame_register_from_end(Frame* frame, int index)
+{
+    return frame_register(frame, frame->registerCount - 1 - index);
+}
+
+int frame_register_count(Frame* frame)
+{
+    return frame->registerCount;
+}
+
+void frame_registers_to_list(Frame* frame, caValue* list)
+{
+    set_list(list, frame_register_count(frame));
+    for (int i=0; i < frame_register_count(frame); i++)
+        copy(frame_register(frame, i), list_get(list, i));
+}
+
+int frame_find_index(Frame* frame)
+{
+    int index = 0;
+    frame = prev_frame(frame);
+    while (frame != NULL) {
+        index++;
+        frame = prev_frame(frame);
+    }
+    return index;
 }
 
 Stack* stack_duplicate(Stack* stack)
 {
     Stack* dupe = create_stack(stack->world);
+#if 0
+    FIXME
     stack_resize_frame_list(dupe, stack->frames.capacity);
 
     for (int i=0; i < stack->frames.capacity; i++) {
@@ -182,13 +383,14 @@ Stack* stack_duplicate(Stack* stack)
         frame_copy(sourceFrame, dupeFrame);
     }
 
-    dupe->frames.count = stack->frames.count;
+    dupe->framesCount = stack->framesCount;
     dupe->errorOccurred = stack->errorOccurred;
     set_value(&dupe->attrs, &stack->attrs);
     set_value(&dupe->demandValues, &stack->demandValues);
     set_value(&dupe->env, &stack->env);
     dupe->randState = stack->randState;
     dupe->step = stack->step;
+#endif
     return dupe;
 }
 
@@ -204,7 +406,7 @@ caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int te
             return frame_register(frame, term);
         }
 
-        frame = frame_parent(frame);
+        frame = prev_frame(frame);
 
         if (frame == NULL)
             break;
@@ -430,10 +632,10 @@ void stack_bytecode_erase(Stack* stack)
     set_hashtable(&cache->watchByKey);
     set_list(&cache->cachedValues);
 
-    for (int i=0; i < stack->frames.count; i++) {
-        stack->frames.frame[i].bc = NULL;
-        stack->frames.frame[i].pc = 0;
-        stack->frames.frame[i].blockIndex = -1;
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
+        frame->bc = NULL;
+        frame->pc = 0;
+        frame->blockIndex = -1;
     }
     stack->bc = NULL;
     stack->pc = 0;
@@ -488,7 +690,7 @@ Frame* as_frame_ref(caValue* value)
 
     Stack* stack = frame_ref_get_stack(value);
     int index = frame_ref_get_index(value);
-    if (index >= stack->frames.count)
+    if (index >= stack->framesCount)
         return NULL;
 
     return next_frame_n(first_frame(stack), index);
@@ -503,7 +705,7 @@ void set_frame_ref(caValue* value, Frame* frame)
 {
     set_list(value, 2);
     set_stack(list_get(value, 0), frame->stack);
-    set_int(list_get(value, 1), frame_get_index(frame));
+    set_int(list_get(value, 1), frame_find_index(frame));
     cast(value, TYPES.frame);
 }
 
@@ -539,8 +741,9 @@ void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retaine
 void frame_copy(Frame* left, Frame* right)
 {
     right->parentIndex = left->parentIndex;
-    copy(&left->registers, &right->registers);
-    touch(&right->registers);
+    //FIXME
+    //copy(&left->registers, &right->registers);
+    //touch(&right->registers);
     copy(&left->state, &right->state);
     copy(&left->bindings, &right->bindings);
     copy(&left->dynamicScope, &right->dynamicScope);

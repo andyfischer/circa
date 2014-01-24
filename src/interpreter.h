@@ -12,9 +12,6 @@
 namespace circa {
 
 // -- Stack --
-Frame* stack_top(Stack* stack);
-Frame* stack_top_parent(Stack* stack);
-Block* stack_top_block(Stack* stack);
 
 // (Re)initialize the stack to have just one frame, using 'main' as its block. Existing data
 // is erased.
@@ -44,36 +41,12 @@ void stack_extract_state(Stack* stack, caValue* output);
 
 // -- Frame --
 
-Frame* frame_parent(Frame* frame);
 Term* frame_caller(Frame* frame);
 Term* frame_term(Frame* frame, int index);
-caValue* frame_register(Frame* frame, int index);
-caValue* frame_register(Frame* frame, Term* term);
-caValue* frame_register_from_end(Frame* frame, int index);
-int frame_register_count(Frame* frame);
-caValue* frame_registers(Frame* frame);
 caValue* frame_state(Frame* frame);
 Block* frame_block(Frame* frame);
-int frame_get_index(Frame* frame);
-int frame_get_depth(Frame* frame);
 
 void frame_extract_state(Frame* frame, caValue* output);
-
-int stack_frame_count(Stack* stack);
-
-// Returns "first" frame; the first one to be executed; the first one in memory.
-Frame* first_frame(Stack* stack);
-
-// Returns "top" frame; the one that is currently executing; the last one in memory.
-Frame* top_frame(Stack* stack);
-
-Frame* next_frame(Frame* frame);
-Frame* next_frame_n(Frame* frame, int distance);
-
-Frame* prev_frame(Frame* frame);
-Frame* prev_frame_n(Frame* frame, int distance);
-
-size_t frame_size(Frame* frame);
 
 void stack_run(Stack* stack);
 void vm_run(Stack* stack);

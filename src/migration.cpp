@@ -159,7 +159,7 @@ void migrate_stack(Stack* stack, Migration* migration)
 
     stack_on_migration(stack);
 
-    Frame* frame = stack_top(stack);
+    Frame* frame = top_frame(stack);
 
     while (frame != NULL) {
 
@@ -169,18 +169,19 @@ void migrate_stack(Stack* stack, Migration* migration)
 #if 0
         printf("migrate_stack looking at frame with oldBlock #%d, newBlock = #%d\n",
             oldBlock->id, frame->block->id);
-#endif
 
         if (frame->block != NULL && frame->block != oldBlock)
-            list_resize(frame_registers(frame), block_locals_count(frame->block));
+            frame = stack_resize_frame(stack, frame, block_locals_count(frame->block));
+#endif
 
-        migrate_value(frame_registers(frame), migration);
+        for (int i=0; i < frame_register_count(frame); i++)
+            migrate_value(frame_register(frame, i), migration);
         migrate_value(&frame->bindings, migration);
         migrate_value(&frame->dynamicScope, migration);
         migrate_state_list(&frame->state, oldBlock, frame->block, migration);
         migrate_state_list(&frame->outgoingState, oldBlock, frame->block, migration);
 
-        frame = frame_parent(frame);
+        frame = prev_frame(frame);
     }
 }
 

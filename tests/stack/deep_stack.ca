@@ -1,0 +1,9 @@
+
+def main(int i)
+  if i == 0
+    return 0
+
+  return i + main(i - 1)
+
+vm = make_stack(main)
+vm.call(100000) | print

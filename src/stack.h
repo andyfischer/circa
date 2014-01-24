@@ -7,13 +7,6 @@
 
 namespace circa {
 
-struct FrameList
-{
-    Frame* frame;
-    int count;
-    int capacity;
-};
-
 struct StackBlock {
     // Per-block data stored in BytecodeCache.
     
@@ -56,8 +49,13 @@ struct Stack
     int refCount;
     bool isRefcounted;
 
-    // Activation frame list.
-    FrameList frames;
+    // Activation frame list. Has a list of Frame objects in sequential memory. Each
+    // Frame object has variable size (see frame_size()), so this list can't be indexed.
+    char* frameData;
+    int framesCount;
+    size_t framesCapacity;
+
+    Frame* top;
 
     BytecodeCache bytecode;
 
@@ -116,7 +114,7 @@ struct Frame
     u32 prevFrameSize;
 
     // Register values.
-    Value registers;
+    Value registersOld;
 
     // Stack state: data saved between invocations.
     Value state;
@@ -150,6 +148,9 @@ struct Frame
 
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
+
+    int registerCount;
+    Value registersNew[0]; // Has length of 'registerCount'
 };
 
 // Allocate a new Stack object.
@@ -158,8 +159,38 @@ void free_stack(Stack* stack);
 void stack_incref(Stack* stack);
 void stack_decref(Stack* stack);
 
-void stack_resize_frame_list(Stack* stack, int newCapacity);
-Frame* stack_push_blank_frame(Stack* stack);
+Frame* stack_push_blank_frame(Stack* stack, int registerCount);
+void stack_pop_no_retain(Stack* stack);
+
+// Resize the given frame to have a new register count. This will invalidate your 'frame'
+// pointer, so the return value is a valid pointer to the same frame.
+Frame* stack_resize_frame(Stack* stack, Frame* frame, int newRegisterCount);
+
+int stack_frame_count(Stack* stack);
+
+Frame* stack_top(Stack* stack);
+Frame* stack_top_parent(Stack* stack);
+Block* stack_top_block(Stack* stack);
+
+// Returns "first" frame; the first one to be executed; the first one in memory.
+Frame* first_frame(Stack* stack);
+
+// Returns "top" frame; the one that is currently executing; the last one in memory.
+Frame* top_frame(Stack* stack);
+
+Frame* next_frame(Frame* frame);
+Frame* next_frame_n(Frame* frame, int distance);
+Frame* prev_frame(Frame* frame);
+Frame* prev_frame_n(Frame* frame, int distance);
+size_t frame_size(Frame* frame);
+
+caValue* frame_register(Frame* frame, int index);
+caValue* frame_register(Frame* frame, Term* term);
+caValue* frame_register_from_end(Frame* frame, int index);
+int frame_register_count(Frame* frame);
+void frame_registers_to_list(Frame* frame, caValue* list);
+int frame_find_index(Frame* frame);
+
 Stack* stack_duplicate(Stack* stack);
 
 caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex);

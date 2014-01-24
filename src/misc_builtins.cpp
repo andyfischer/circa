@@ -453,7 +453,7 @@ void String__split(caStack* stack)
 
 caValue* find_env_value(caStack* stack, caValue* key)
 {
-    Frame* frame = stack_top(stack);
+    Frame* frame = top_frame(stack);
 
     while (frame != NULL) {
         if (!is_null(&frame->dynamicScope)) {
@@ -462,7 +462,7 @@ caValue* find_env_value(caStack* stack, caValue* key)
                 return value;
         }
 
-        frame = frame_parent(frame);
+        frame = prev_frame(frame);
     }
 
     if (!is_null(&stack->env)) {

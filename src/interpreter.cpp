@@ -63,28 +63,6 @@ bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
 static void retained_frame_extract_state(caValue* frame, caValue* output);
 
-Frame* stack_top(Stack* stack)
-{
-    if (stack->frames.count == 0)
-        return NULL;
-    return &stack->frames.frame[stack->frames.count - 1];
-}
-
-Frame* stack_top_parent(Stack* stack)
-{
-    if (stack->frames.count <= 1)
-        return NULL;
-    return &stack->frames.frame[stack->frames.count - 2];
-}
-
-Block* stack_top_block(Stack* stack)
-{
-    Frame* frame = stack_top(stack);
-    if (frame == NULL)
-        return NULL;
-    return frame->block;
-}
-
 void stack_init(Stack* stack, Block* block)
 {
     // Pop existing frames.
@@ -108,10 +86,10 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
 
 static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block)
 {
-    Frame* top = stack_push_blank_frame(stack);
+    Frame* top = stack_push_blank_frame(stack, block_locals_count(block));
     top->parentIndex = parentIndex;
     top->block = block;
-    set_list(&top->registers, block_locals_count(block));
+    //set_list(&top->registers, block_locals_count(block));
     return top;
 }
 
@@ -160,19 +138,6 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
     return top;
 }
 
-void stack_pop_no_retain(Stack* stack)
-{
-    Frame* frame = stack_top(stack);
-
-    set_null(&frame->registers);
-    set_null(&frame->bindings);
-    set_null(&frame->dynamicScope);
-    set_null(&frame->state);
-    set_null(&frame->outgoingState);
-
-    stack->frames.count--;
-}
-
 void stack_pop(Stack* stack)
 {
     Frame* frame = stack_top(stack);
@@ -189,7 +154,7 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
     // top stack frame. Handles the creation of lists for iteration/condition state.
 
     Frame* top = stack_top(stack);
-    Frame* parent = frame_parent(top);
+    Frame* parent = prev_frame(top);
     if (parent == NULL)
         return NULL;
 
@@ -324,7 +289,7 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
         if (frame->block == term->owningBlock)
             return frame_register(frame, term);
 
-        frame = frame_parent(frame);
+        frame = prev_frame(frame);
         if (frame == NULL)
             break;
     }
@@ -356,7 +321,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
     std::stringstream strm;
 
     strm << "[Stack #" << stack->id
-        << ", frames = " << stack->frames.count
+        << ", frames = " << stack->framesCount
         << "]" << std::endl;
 
     Frame* frame = first_frame(stack);
@@ -369,7 +334,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         if (childFrame != NULL)
             activeTermIndex = childFrame->parentIndex;
 
-        int depth = stack->frames.count - 1 - frameIndex;
+        int depth = stack->framesCount - 1 - frameIndex;
         Block* block = frame->block;
         strm << " [Frame index " << frameIndex
              << ", depth = " << depth
@@ -487,18 +452,9 @@ void stack_extract_state(Stack* stack, caValue* output)
     extract_state(frame->block, &frame->state, output);
 }
 
-Frame* frame_parent(Frame* frame)
-{
-    Stack* stack = frame->stack;
-    int index = (int) (frame - stack->frames.frame - 1);
-    if (index < 0)
-        return NULL;
-    return &stack->frames.frame[index];
-}
-
 Term* frame_caller(Frame* frame)
 {
-    return frame_term(frame_parent(frame), frame->parentIndex);
+    return frame_term(prev_frame(frame), frame->parentIndex);
 }
 
 Term* frame_current_term(Frame* frame)
@@ -510,71 +466,6 @@ Term* frame_term(Frame* frame, int index)
 {
     return frame->block->get(index);
 }
-
-int stack_frame_count(Stack* stack)
-{
-    return stack->frames.count;
-}
-
-Frame* first_frame(Stack* stack)
-{
-    return stack->frames.frame;
-}
-
-Frame* next_frame(Frame* frame)
-{
-    if (frame == top_frame(frame->stack))
-        return NULL;
-
-    return (Frame*) (((char*) frame) + frame_size(frame));
-}
-
-Frame* next_frame_n(Frame* frame, int distance)
-{
-    for (; distance > 0; distance--) {
-        if (frame == NULL)
-            return NULL;
-
-        frame = next_frame(frame);
-    }
-    return frame;
-}
-
-Frame* prev_frame(Frame* frame)
-{
-    if (frame->prevFrameSize == 0)
-        return NULL;
-
-    return (Frame*) (((char*) frame) - frame->prevFrameSize);
-}
-
-Frame* prev_frame_n(Frame* frame, int distance)
-{
-    for (; distance > 0; distance--) {
-        if (frame == NULL)
-            return NULL;
-
-        frame = prev_frame(frame);
-    }
-    return frame;
-}
-
-size_t frame_size(Frame* frame)
-{
-    return sizeof(Frame);
-}
-
-Frame* top_frame(Stack* stack)
-{
-    return stack_top(stack);
-}
-
-int frame_get_index(Frame* frame)
-{
-    Stack* stack = frame->stack;
-    return (int) (frame - stack->frames.frame);
-}
-
 
 void fetch_stack_outputs(Stack* stack, caValue* outputs)
 {
@@ -600,9 +491,8 @@ void consume_inputs_to_list(Stack* stack, List* list)
 {
     int count = num_inputs(stack);
     list->resize(count);
-    for (int i=0; i < count; i++) {
+    for (int i=0; i < count; i++)
         consume_input(stack, i, list->get(i));
-    }
 }
 
 caValue* get_input(Stack* stack, int index)
@@ -644,26 +534,6 @@ Block* current_block(Stack* stack)
     return top->block;
 }
 
-caValue* frame_register(Frame* frame, int index)
-{
-    return list_get(&frame->registers, index);
-}
-
-caValue* frame_register(Frame* frame, Term* term)
-{
-    return frame_register(frame, term->index);
-}
-
-int frame_register_count(Frame* frame)
-{
-    return list_length(&frame->registers);
-}
-
-caValue* frame_registers(Frame* frame)
-{
-    return &frame->registers;
-}
-
 caValue* frame_state(Frame* frame)
 {
     return &frame->state;
@@ -682,11 +552,6 @@ caValue* stack_env_insert(Stack* stack, caValue* name)
 caValue* stack_env_get(Stack* stack, caValue* name)
 {
     return hashtable_get(&stack->env, name);
-}
-
-caValue* frame_register_from_end(Frame* frame, int index)
-{
-    return list_get(&frame->registers, frame_register_count(frame) - 1 - index);
 }
 
 caValue* get_top_register(Stack* stack, Term* term)
@@ -730,8 +595,7 @@ static void start_interpreter_session(Stack* stack)
     stack_bytecode_start_run(stack);
 
     // Make sure any existing frames have bytecode.
-    for (int i=0; i < stack->frames.count; i++) {
-        Frame* frame = &stack->frames.frame[i];
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
         if (frame->bc == NULL) {
             frame->blockIndex = stack_bytecode_create_entry(stack, frame->block);
             frame->bc = stack_bytecode_get_data(stack, frame->blockIndex);
@@ -1420,8 +1284,8 @@ void vm_run(Stack* stack)
             Frame* toFrame = top;
 
             // Find destination frame, the first parent major block.
-            while (!is_major_block(toFrame->block) && frame_parent(toFrame) != NULL)
-                toFrame = frame_parent(toFrame);
+            while (!is_major_block(toFrame->block) && prev_frame(toFrame) != NULL)
+                toFrame = prev_frame(toFrame);
 
             // Copy outputs to destination frame.
             for (int i=0; i < caller->numInputs(); i++) {
@@ -1457,8 +1321,8 @@ void vm_run(Stack* stack)
             Frame* toFrame = top;
 
             // Find destination frame, the parent for-loop block.
-            while (!is_for_loop(toFrame->block) && frame_parent(toFrame) != NULL)
-                toFrame = frame_parent(toFrame);
+            while (!is_for_loop(toFrame->block) && prev_frame(toFrame) != NULL)
+                toFrame = prev_frame(toFrame);
 
             // Copy outputs to destination frame.
             for (int i=0; i < caller->numInputs(); i++) {
@@ -1514,8 +1378,7 @@ void vm_run(Stack* stack)
 
             // Future: Probably only need to save inputs and outputs here, instead of
             // the entire register list.
-            copy(&top->registers, &top->outgoingState);
-            touch(&top->outgoingState);
+            frame_registers_to_list(top, &top->outgoingState);
             continue;
         }
 
@@ -2088,7 +1951,7 @@ static void vm_finish_frame(Stack* stack)
     Frame* parent = stack_top_parent(stack);
 
     // Stop if we have finished the topmost block
-    if (frame_parent(top) == NULL) {
+    if (prev_frame(top) == NULL) {
         top->pc = stack->pc;
         stack->step = sym_StackFinished;
         vm_finish_run(stack);
@@ -2274,10 +2137,10 @@ void Frame__registers(caStack* stack)
     ca_assert(frame != NULL);
 
     caValue* out = circa_output(stack, 0);
-    copy(&frame->registers, out);
-
-    // Touch 'output', as the interpreter may violate immutability.
-    touch(out);
+    int count = frame_register_count(frame);
+    set_list(out, count);
+    for (int i=0; i < count; i++)
+        copy(frame_register(frame, i), list_get(out, i));
 }
 
 void Frame__active_value(caStack* stack)
@@ -2315,7 +2178,7 @@ void Frame__block(caStack* stack)
 void Frame__parent(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
-    Frame* parent = frame_parent(frame);
+    Frame* parent = prev_frame(frame);
     if (parent == NULL)
         set_null(circa_output(stack, 0));
     else
@@ -2325,13 +2188,13 @@ void Frame__parent(caStack* stack)
 void Frame__height(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
-    set_int(circa_output(stack, 0), frame_get_index(frame));
+    set_int(circa_output(stack, 0), frame_find_index(frame));
 }
 
 void Frame__has_parent(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
-    Frame* parent = frame_parent(frame);
+    Frame* parent = prev_frame(frame);
     set_bool(circa_output(stack, 0), parent != NULL);
 }
 
@@ -2565,7 +2428,7 @@ void Stack__find_active_frame_for_term(caStack* stack)
             return;
         }
 
-        frame = frame_parent(frame);
+        frame = prev_frame(frame);
 
         if (frame == NULL)
             break;
@@ -2775,7 +2638,7 @@ void Stack__frame_from_base(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
-    if (index >= self->frames.count)
+    if (index >= self->framesCount)
         return circa_output_error(stack, "Index out of range");
 
     Frame* frame = next_frame_n(first_frame(self), index);
@@ -2786,7 +2649,7 @@ void Stack__frame(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
-    if (index >= self->frames.count)
+    if (index >= self->framesCount)
         return circa_output_error(stack, "Index out of range");
 
     Frame* frame = prev_frame_n(top_frame(self), index);
@@ -2849,7 +2712,7 @@ void Stack__toString(caStack* stack)
 void reflect__caller(caStack* stack)
 {
     Frame* frame = stack_top_parent(stack);
-    Frame* callerFrame = frame_parent(frame);
+    Frame* callerFrame = prev_frame(frame);
     Term* theirCaller = frame_current_term(callerFrame);
     set_term_ref(circa_output(stack, 0), theirCaller);
 }
@@ -2857,7 +2720,7 @@ void reflect__caller(caStack* stack)
 void reflect_get_frame_state(caStack* stack)
 {
     Frame* frame = stack_top_parent(stack);
-    Frame* callerFrame = frame_parent(frame);
+    Frame* callerFrame = prev_frame(frame);
 
     if (is_null(&callerFrame->state))
         set_null(circa_output(stack, 0));
