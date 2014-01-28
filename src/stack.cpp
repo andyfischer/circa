@@ -371,25 +371,38 @@ int frame_find_index(Frame* frame)
 Stack* stack_duplicate(Stack* stack)
 {
     Stack* dupe = create_stack(stack->world);
-#if 0
-    FIXME
-    stack_resize_frame_list(dupe, stack->frames.capacity);
-
-    for (int i=0; i < stack->frames.capacity; i++) {
-        Frame* sourceFrame = &stack->frames.frame[i];
-        Frame* dupeFrame = &dupe->frames.frame[i];
-
-        frame_copy(sourceFrame, dupeFrame);
-    }
-
-    dupe->framesCount = stack->framesCount;
-    dupe->errorOccurred = stack->errorOccurred;
+    
     set_value(&dupe->attrs, &stack->attrs);
     set_value(&dupe->demandValues, &stack->demandValues);
     set_value(&dupe->env, &stack->env);
-    dupe->randState = stack->randState;
+    set_value(&dupe->observations, &stack->observations);
     dupe->step = stack->step;
-#endif
+    dupe->errorOccurred = stack->errorOccurred;
+    dupe->randState = stack->randState;
+
+    stack_reserve_capacity(dupe, stack_get_required_capacity(stack));
+
+    Frame* sourceFrame = first_frame(stack);
+
+    while (sourceFrame != NULL) {
+        Frame* dupeFrame = stack_push_blank_frame(dupe, frame_register_count(sourceFrame));
+
+        for (int i=0; i < frame_register_count(sourceFrame); i++)
+            set_value(frame_register(dupeFrame, i), frame_register(sourceFrame, i));
+
+        dupeFrame->parentIndex = sourceFrame->parentIndex;
+        dupeFrame->block = sourceFrame->block;
+        dupeFrame->termIndex = sourceFrame->termIndex;
+        dupeFrame->callType = sourceFrame->callType;
+        dupeFrame->exitType = sourceFrame->exitType;
+        set_value(&dupeFrame->state, &sourceFrame->state);
+        set_value(&dupeFrame->outgoingState, &sourceFrame->outgoingState);
+        set_value(&dupeFrame->bindings, &sourceFrame->bindings);
+        set_value(&dupeFrame->dynamicScope, &sourceFrame->dynamicScope);
+
+        sourceFrame = next_frame(sourceFrame);
+    }
+
     return dupe;
 }
 
