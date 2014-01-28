@@ -1815,6 +1815,10 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
         return;
     }
 
+    // Need to hold on to 'closure' because vm_push_frame may invalidate the pointer.
+    Value closureLocal;
+    copy(closure, &closureLocal);
+
     top = vm_push_frame(stack, callerIndex, block);
 
     top->blockIndex = stack_bytecode_create_entry(stack, block);
@@ -1822,7 +1826,7 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
 
     expand_frame(stack_top_parent(stack), top);
 
-    caValue* bindings = list_get(closure, 1);
+    caValue* bindings = list_get(&closureLocal, 1);
     if (!hashtable_is_empty(bindings))
         copy(bindings, &top->bindings);
 
@@ -1864,13 +1868,17 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
         return;
     }
 
+    // Need to hold on to 'closure' because vm_push_frame may invalidate the pointer.
+    Value closureLocal;
+    copy(closure, &closureLocal);
+
     top = vm_push_frame(stack, callerIndex, block);
     top->blockIndex = stack_bytecode_create_entry(stack, block);
     top->bc = stack_bytecode_get_data(stack, top->blockIndex);
 
     expand_frame(stack_top_parent(stack), top);
 
-    caValue* bindings = list_get(closure, 1);
+    caValue* bindings = list_get(&closureLocal, 1);
     if (!hashtable_is_empty(bindings))
         copy(bindings, &top->bindings);
 

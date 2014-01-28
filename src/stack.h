@@ -113,9 +113,6 @@ struct Frame
     // Size of previous frame, used when walking backwards.
     u32 prevFrameSize;
 
-    // Register values.
-    Value registersOld;
-
     // Stack state: data saved between invocations.
     Value state;
 
@@ -150,7 +147,7 @@ struct Frame
     Symbol exitType;
 
     int registerCount;
-    Value registersNew[0]; // Has length of 'registerCount'
+    Value registers[0]; // Has length of 'registerCount'
 };
 
 // Allocate a new Stack object.

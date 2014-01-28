@@ -170,14 +170,13 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     frame->callType = sym_NormalCall;
     frame->block = NULL;
     frame->registerCount = registerCount;
-    initialize_null(&frame->registersOld);
     initialize_null(&frame->bindings);
     initialize_null(&frame->dynamicScope);
     initialize_null(&frame->state);
     initialize_null(&frame->outgoingState);
 
     for (int i=0; i < registerCount; i++)
-        initialize_null(&frame->registersNew[i]);
+        initialize_null(&frame->registers[i]);
 
     ca_assert(frame_size(frame) == newFrameSize);
 
@@ -189,7 +188,7 @@ void stack_pop_no_retain(Stack* stack)
     Frame* frame = stack_top(stack);
 
     for (int i=0; i < frame->registerCount; i++)
-        set_null(&frame->registersNew[i]);
+        set_null(&frame->registers[i]);
 
     set_null(&frame->bindings);
     set_null(&frame->dynamicScope);
@@ -333,7 +332,7 @@ Frame* top_frame(Stack* stack)
 caValue* frame_register(Frame* frame, int index)
 {
     ca_assert(index >= 0 && index < frame->registerCount);
-    return &frame->registersNew[index];
+    return &frame->registers[index];
 }
 
 caValue* frame_register(Frame* frame, Term* term)

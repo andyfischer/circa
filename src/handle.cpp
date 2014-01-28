@@ -69,6 +69,7 @@ void handle_release(caValue* value)
 
             stack_run(&stack);
 
+            inputSlot = get_input(&stack, 0);
             swap(value, inputSlot);
         }
 
