@@ -1,0 +1,8 @@
+
+def fib(int i) -> int
+  if i == 0 or i == 1
+    return 1
+
+  fib(i - 2) + fib(i - 1)
+
+fib(20) | print

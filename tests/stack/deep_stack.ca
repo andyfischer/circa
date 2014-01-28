@@ -1,9 +1,11 @@
 
 def main(int i)
+  1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1
+
   if i == 0
     return 0
 
   return i + main(i - 1)
 
 vm = make_stack(main)
-vm.call(100000) | print
+vm.call(1000) | print
