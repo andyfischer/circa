@@ -169,10 +169,10 @@ void migrate_stack(Stack* stack, Migration* migration)
 #if 0
         printf("migrate_stack looking at frame with oldBlock #%d, newBlock = #%d\n",
             oldBlock->id, frame->block->id);
+#endif
 
         if (frame->block != NULL && frame->block != oldBlock)
             frame = stack_resize_frame(stack, frame, block_locals_count(frame->block));
-#endif
 
         for (int i=0; i < frame_register_count(frame); i++)
             migrate_value(frame_register(frame, i), migration);
