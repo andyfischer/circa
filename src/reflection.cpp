@@ -443,14 +443,6 @@ void Term__assign(caStack* stack)
     // Probably should update term->type at this point.
 }
 
-void Term__is_statement(caStack* stack)
-{
-    Term* target = as_term_ref(circa_input(stack, 0));
-    if (target == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_bool(circa_output(stack, 0), is_statement(target));
-}
-
 void Term__value(caStack* stack)
 {
     Term* target = as_term_ref(circa_input(stack, 0));
@@ -654,6 +646,22 @@ void Term__property(caStack* stack)
         circa::copy(value, circa_output(stack, 0));
 }
 
+void Term__property_opt(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+
+    Symbol key = as_symbol(circa_input(stack, 1));
+    caValue* value = term_get_property(t, key);
+    caValue* defaultValue = circa_input(stack, 2);
+
+    if (value == NULL)
+        copy(defaultValue, circa_output(stack, 0));
+    else
+        copy(value, circa_output(stack, 0));
+}
+
 void Term__trace_dependents(caStack* stack)
 {
     Term* term = as_term_ref(circa_input(stack, 0));
@@ -767,7 +775,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.unique_name", Term__unique_name);
     module_patch_function(patch, "Term.properties", Term__properties);
     module_patch_function(patch, "Term.property", Term__property);
-    module_patch_function(patch, "Term.is_statement", Term__is_statement);
+    module_patch_function(patch, "Term.property_opt", Term__property_opt);
     module_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
     module_patch_function(patch, "Term.value", Term__value);
     module_patch_function(patch, "Term.set_value", Term__set_value);

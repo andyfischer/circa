@@ -689,7 +689,6 @@ def Term.is_input(self) -> bool
 def Term.is_null(self) -> bool
     -- Returns whether this is a null Term reference.
 def Term.is_output(self) -> bool
-def Term.is_statement(self) -> bool
 def Term.name(self) -> String
     -- Return this term's local name. May be blank.
 def Term.parent(self) -> Block
@@ -726,10 +725,19 @@ def Term.global_id(self) -> int
 def Term.properties(self) -> Map
 def Term.property(self, Symbol key) -> any
     -- Fetch a term property.
+def Term.property_opt(self, Symbol key, default) -> any
+    -- Fetch an optional term property.
 def Term.is_value(self) -> bool
     self.function == block_ref(value)
 def Term.is_function(self) -> bool
     self.get_type == Func
+
+def Term.has_name(term) -> bool
+  term.name != ''
+def Term.is_hidden(term) -> bool
+  term.property_opt(:Hidden, false)
+def Term.is_statement(term) -> bool
+  term.property_opt(:Statement, false)
 def Term.is_type(self) -> bool
     self.is_value and is_type(self.value)
 def Term.is_input_placeholder(self) -> bool

@@ -1,0 +1,6 @@
+statements:
+ a = add(...)
+ b = mult(...)
+ value(...)
+ for(...)
+ main(...)
