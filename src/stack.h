@@ -165,9 +165,21 @@ Frame* stack_resize_frame(Stack* stack, Frame* frame, int newRegisterCount);
 
 int stack_frame_count(Stack* stack);
 
-Frame* stack_top(Stack* stack);
 Frame* stack_top_parent(Stack* stack);
 Block* stack_top_block(Stack* stack);
+
+// Returns whether evaluation has been stopped due to an error.
+bool stack_errored(Stack* stack);
+
+caValue* stack_env_insert(Stack* stack, caValue* name);
+caValue* stack_env_get(Stack* stack, caValue* name);
+
+void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame);
+
+Stack* stack_duplicate(Stack* stack);
+
+caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex);
+caValue* stack_active_value_for_term(Frame* frame, Term* term);
 
 // Returns "first" frame; the first one to be executed; the first one in memory.
 Frame* first_frame(Stack* stack);
@@ -187,11 +199,12 @@ caValue* frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
 void frame_registers_to_list(Frame* frame, caValue* list);
 int frame_find_index(Frame* frame);
+Term* frame_caller(Frame* frame);
+Term* frame_term(Frame* frame, int index);
+Term* frame_current_term(Frame* frame);
+caValue* frame_state(Frame* frame);
+Block* frame_block(Frame* frame);
 
-Stack* stack_duplicate(Stack* stack);
-
-caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex);
-caValue* stack_active_value_for_term(Frame* frame, Term* term);
 
 // Stack block cache
 char* stack_bytecode_get_data(Stack* stack, int index);

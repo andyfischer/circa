@@ -5,6 +5,7 @@
 #include "blob.h"
 #include "bytecode.h"
 #include "hashtable.h"
+#include "if_block.h"
 #include "inspection.h"
 #include "interpreter.h"
 #include "kernel.h"
@@ -157,7 +158,7 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     stack->top = (Frame*) (stack->frameData + currentSize);
     stack->framesCount++;
 
-    Frame* frame = stack_top(stack);
+    Frame* frame = top_frame(stack);
 
     // Prepare frame.
     frame->stack = stack;
@@ -185,7 +186,7 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
 
 void stack_pop_no_retain(Stack* stack)
 {
-    Frame* frame = stack_top(stack);
+    Frame* frame = top_frame(stack);
 
     for (int i=0; i < frame->registerCount; i++)
         set_null(&frame->registers[i]);
@@ -251,13 +252,6 @@ int stack_frame_count(Stack* stack)
     return stack->framesCount;
 }
 
-Frame* stack_top(Stack* stack)
-{
-    if (stack->framesCount == 0)
-        return NULL;
-    return stack->top;
-}
-
 Frame* stack_top_parent(Stack* stack)
 {
     Frame* top = top_frame(stack);
@@ -268,104 +262,45 @@ Frame* stack_top_parent(Stack* stack)
 
 Block* stack_top_block(Stack* stack)
 {
-    Frame* frame = stack_top(stack);
+    Frame* frame = top_frame(stack);
     if (frame == NULL)
         return NULL;
     return frame->block;
 }
 
-Frame* first_frame(Stack* stack)
+bool stack_errored(Stack* stack)
 {
-    if (stack->framesCount == 0)
-        return NULL;
-    return (Frame*) stack->frameData;
+    return stack->errorOccurred;
 }
 
-Frame* next_frame(Frame* frame)
+caValue* stack_env_insert(Stack* stack, caValue* name)
 {
-    if (frame == top_frame(frame->stack))
-        return NULL;
-
-    return (Frame*) (((char*) frame) + frame_size(frame));
+    return hashtable_insert(&stack->env, name);
 }
 
-Frame* next_frame_n(Frame* frame, int distance)
+caValue* stack_env_get(Stack* stack, caValue* name)
 {
-    for (; distance > 0; distance--) {
-        if (frame == NULL)
-            return NULL;
+    return hashtable_get(&stack->env, name);
+}
 
-        frame = next_frame(frame);
+void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame)
+{
+    set_list(path);
+
+    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
+        if (frame == untilFrame)
+            break;
+
+        Block* block = frame->block;
+        if (is_case_block(block)) {
+            set_int(list_append(path), case_block_get_index(block));
+        } else if (is_for_loop(block)) {
+            Term* index = for_loop_find_index(block);
+            set_value(list_append(path), frame_register(frame, index));
+        }
+
+        set_term_ref(list_append(path), frame_current_term(frame));
     }
-    return frame;
-}
-
-Frame* prev_frame(Frame* frame)
-{
-    if (frame->prevFrameSize == 0)
-        return NULL;
-
-    return (Frame*) (((char*) frame) - frame->prevFrameSize);
-}
-
-Frame* prev_frame_n(Frame* frame, int distance)
-{
-    for (; distance > 0; distance--) {
-        if (frame == NULL)
-            return NULL;
-
-        frame = prev_frame(frame);
-    }
-    return frame;
-}
-
-size_t frame_size(Frame* frame)
-{
-    return sizeof(Frame) + frame->registerCount * sizeof(Value);
-}
-
-Frame* top_frame(Stack* stack)
-{
-    return stack_top(stack);
-}
-
-caValue* frame_register(Frame* frame, int index)
-{
-    ca_assert(index >= 0 && index < frame->registerCount);
-    return &frame->registers[index];
-}
-
-caValue* frame_register(Frame* frame, Term* term)
-{
-    return frame_register(frame, term->index);
-}
-
-caValue* frame_register_from_end(Frame* frame, int index)
-{
-    return frame_register(frame, frame->registerCount - 1 - index);
-}
-
-int frame_register_count(Frame* frame)
-{
-    return frame->registerCount;
-}
-
-void frame_registers_to_list(Frame* frame, caValue* list)
-{
-    set_list(list, frame_register_count(frame));
-    for (int i=0; i < frame_register_count(frame); i++)
-        copy(frame_register(frame, i), list_get(list, i));
-}
-
-int frame_find_index(Frame* frame)
-{
-    int index = 0;
-    frame = prev_frame(frame);
-    while (frame != NULL) {
-        index++;
-        frame = prev_frame(frame);
-    }
-    return index;
 }
 
 Stack* stack_duplicate(Stack* stack)
@@ -449,6 +384,117 @@ char* stack_bytecode_get_data(Stack* stack, int index)
 
     ca_assert(index < cache->blockCount);
     return as_blob(&cache->blocks[index].bytecode);
+}
+
+Frame* first_frame(Stack* stack)
+{
+    if (stack->framesCount == 0)
+        return NULL;
+    return (Frame*) stack->frameData;
+}
+
+Frame* next_frame(Frame* frame)
+{
+    if (frame == top_frame(frame->stack))
+        return NULL;
+
+    return (Frame*) (((char*) frame) + frame_size(frame));
+}
+
+Frame* next_frame_n(Frame* frame, int distance)
+{
+    for (; distance > 0; distance--) {
+        if (frame == NULL)
+            return NULL;
+
+        frame = next_frame(frame);
+    }
+    return frame;
+}
+
+Frame* prev_frame(Frame* frame)
+{
+    if (frame->prevFrameSize == 0)
+        return NULL;
+
+    return (Frame*) (((char*) frame) - frame->prevFrameSize);
+}
+
+Frame* prev_frame_n(Frame* frame, int distance)
+{
+    for (; distance > 0; distance--) {
+        if (frame == NULL)
+            return NULL;
+
+        frame = prev_frame(frame);
+    }
+    return frame;
+}
+
+size_t frame_size(Frame* frame)
+{
+    return sizeof(Frame) + frame->registerCount * sizeof(Value);
+}
+
+Frame* top_frame(Stack* stack)
+{
+    if (stack->framesCount == 0)
+        return NULL;
+    return stack->top;
+}
+
+caValue* frame_register(Frame* frame, int index)
+{
+    ca_assert(index >= 0 && index < frame->registerCount);
+    return &frame->registers[index];
+}
+
+caValue* frame_register(Frame* frame, Term* term)
+{
+    return frame_register(frame, term->index);
+}
+
+caValue* frame_register_from_end(Frame* frame, int index)
+{
+    return frame_register(frame, frame->registerCount - 1 - index);
+}
+
+int frame_register_count(Frame* frame)
+{
+    return frame->registerCount;
+}
+
+void frame_registers_to_list(Frame* frame, caValue* list)
+{
+    set_list(list, frame_register_count(frame));
+    for (int i=0; i < frame_register_count(frame); i++)
+        copy(frame_register(frame, i), list_get(list, i));
+}
+
+int frame_find_index(Frame* frame)
+{
+    int index = 0;
+    frame = prev_frame(frame);
+    while (frame != NULL) {
+        index++;
+        frame = prev_frame(frame);
+    }
+    return index;
+}
+
+Term* frame_caller(Frame* frame)
+{
+    return frame_term(prev_frame(frame), frame->parentIndex);
+}
+
+Term* frame_current_term(Frame* frame)
+{
+    return frame->block->get(frame->termIndex);
+}
+
+Term* frame_term(Frame* frame, int index)
+{
+    return frame->block->get(index);
 }
 
 Block* stack_bytecode_get_block(Stack* stack, int index)
@@ -786,6 +832,10 @@ void stack_setup_type(Type* type)
     type->initialize = NULL;
     type->release = stack_value_release;
     type->copy = stack_value_copy;
+}
+
+void stack_install_functions(NativePatch* patch)
+{
 }
 
 } // namespace circa

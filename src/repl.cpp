@@ -128,7 +128,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     // Print results of the last expression
     Term* result = block->get(block->length() - 1);
     if (result->type != TYPES.void_type) {
-        Frame* frame = stack_top(stack);
+        Frame* frame = top_frame(stack);
         std::string s = to_string(stack_find_nonlocal(frame, result));
         set_string(list_append(output), s.c_str());
     }

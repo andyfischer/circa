@@ -180,7 +180,7 @@ void closure_save_all_bindings(caValue* closure, Stack* stack)
 
         Value key;
         set_term_ref(&key, input);
-        caValue* value = stack_find_nonlocal(stack_top(stack), input);
+        caValue* value = stack_find_nonlocal(top_frame(stack), input);
 
         // Don't overwrite an existing binding.
         if (hashtable_get(func_bindings(closure), &key) != NULL)

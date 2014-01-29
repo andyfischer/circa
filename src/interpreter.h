@@ -31,20 +31,10 @@ caValue* stack_get_state(Stack* stack);
 
 caValue* stack_find_nonlocal(Frame* frame, Term* term);
 
-// Returns whether evaluation has been stopped due to an error.
-bool stack_errored(Stack* stack);
-
 void stack_to_string(Stack* stack, caValue* out, bool withBytecode);
 void stack_trace_to_string(Stack* stack, caValue* out);
 
 void stack_extract_state(Stack* stack, caValue* output);
-
-// -- Frame --
-
-Term* frame_caller(Frame* frame);
-Term* frame_term(Frame* frame, int index);
-caValue* frame_state(Frame* frame);
-Block* frame_block(Frame* frame);
 
 void frame_extract_state(Frame* frame, caValue* output);
 
@@ -74,9 +64,6 @@ Block* current_block(Stack* stack);
 // Get a register on the topmost frame.
 caValue* get_top_register(Stack* stack, Term* term);
 
-caValue* stack_env_insert(Stack* stack, caValue* name);
-caValue* stack_env_get(Stack* stack, caValue* name);
-
 // Create an output value for the current term, using the declared type's
 // initialize function.
 void create_output(Stack* stack);
@@ -87,8 +74,6 @@ void raise_error_msg(Stack* stack, const char* msg);
 void raise_error_too_many_inputs(Stack* stack);
 void raise_error_not_enough_inputs(Stack* stack);
 void raise_error_input_type_mismatch(Stack* stack);
-
-void stack_extract_current_path(Stack* stack, caValue* path);
 
 // Kernel setup.
 void interpreter_install_functions(NativePatch* patch);

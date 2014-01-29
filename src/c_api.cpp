@@ -332,7 +332,7 @@ void circa_push_module(caStack* stack, const char* name)
 
 caValue* circa_frame_input(caStack* stack, int index)
 {
-    Frame* top = stack_top(stack);
+    Frame* top = top_frame(stack);
     
     if (top == NULL)
         return NULL;
@@ -347,7 +347,7 @@ caValue* circa_frame_input(caStack* stack, int index)
 
 caValue* circa_frame_output(caStack* stack, int index)
 {
-    Frame* top = stack_top(stack);
+    Frame* top = top_frame(stack);
 
     int realIndex = top->block->length() - index - 1;
 
@@ -370,7 +370,7 @@ void circa_pop(caStack* stack)
 
 caBlock* circa_stack_top_block(caStack* stack)
 {
-    return (caBlock*) stack_top(stack)->block;
+    return (caBlock*) top_frame(stack)->block;
 }
 
 caValue* circa_input(caStack* stack, int index)
@@ -411,7 +411,7 @@ caValue* circa_output(caStack* stack, int index)
 void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
-    stack_top(stack)->termIndex = stack_top(stack)->block->length() - 1;
+    top_frame(stack)->termIndex = top_frame(stack)->block->length() - 1;
     raise_error(stack);
 }
 
@@ -430,7 +430,7 @@ caBlock* circa_caller_block(caStack* stack)
 
 caTerm* circa_caller_term(caStack* stack)
 {
-    return frame_caller(stack_top(stack));
+    return frame_caller(top_frame(stack));
 }
 
 void circa_dump_stack_trace(caStack* stack)

@@ -621,12 +621,10 @@ void run_repl_stdin(World* world)
             std::cout << as_cstring(list_get(&output, i)) << std::endl;
 
         // Check if we've finished.
-        if (stack_top(stack) == NULL)
+        if (top_frame(stack) == NULL)
             return;
-
     }
 }
-
 
 int run_command_line(caWorld* world, int argc, const char* args[])
 {
