@@ -1,0 +1,44 @@
+
+def Term.value_to_source(term) -> String
+  -- Todo: improve
+  term.value | to_string
+
+def Term.source_phrases(term) -> List
+  -- Todo: Function special cases
+  out = if term.is_value
+    [term.value_to_source]
+  else
+    term.source_phrases_default
+
+  out.append(term.property_opt(:Syntax_PostWs ''))
+
+def Term.source_phrases_default(term) -> List
+  declarationStyle = term.property_opt(:Syntax_DeclarationStyle, 'function-call')
+  functionName = term.property_opt(:Syntax_FunctionName, term.function.name)
+
+  if declarationStyle == 'infix'
+
+def Term.should_print_source_line(term) -> bool
+
+def Block.source_phrases(block) -> List
+  newlineNeeded = false
+  
+  out = []
+  for term in block.terms
+    if not term.should_print_source_line
+      continue
+
+    if newlineNeeded
+      @out.append('\n')
+      newlineNeeded = false
+
+    @out.append(term.property_opt(:Syntax_PreWs ''))
+
+    @out.concat(term.source_phrases)
+
+    if term.has_property(:Syntax_LineEnding)
+      @out.append(term.property(:Syntax_LineEnding ''))
+    elif term.has_property(:Syntax_PostHeadingWs)
+      -- no newline needed
+    else
+      newlineNeeded = true

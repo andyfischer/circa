@@ -118,6 +118,10 @@ void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migrati
 {
     if (is_null(list))
         return;
+    if (newBlock == NULL) {
+        set_null(list);
+        return;
+    }
 
     Value oldList;
     move(list, &oldList);
