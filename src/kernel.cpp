@@ -51,11 +51,6 @@ namespace circa {
 
 World* g_world = NULL;
 
-// STDLIB_CA_TEXT is defined in generated/stdlib_script_text.cpp
-extern "C" {
-    extern const char* STDLIB_CA_TEXT;
-}
-
 // setup_functions is defined in generated/setup_builtin_functions.cpp
 void setup_builtin_functions(Block*);
 
@@ -583,7 +578,7 @@ void bootstrap_kernel()
     module_patch_function(world->builtinPatch, "global_script_version", global_script_version);
 
     // Load the standard library from stdlib.ca
-    parser::compile(builtins, parser::statement_list, STDLIB_CA_TEXT);
+    parser::compile(builtins, parser::statement_list, find_builtin_module("stdlib"));
 
     closures_install_functions(builtins);
     modules_install_functions(builtins);

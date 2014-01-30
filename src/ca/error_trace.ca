@@ -1,0 +1,39 @@
+
+require indent_writer
+
+def Term.short_location_str(self) -> String
+  loc = self.source_location
+  concat(self.parent.source_filename ':' loc.y1)
+
+def Stack.frames_from_top(self) -> List
+  for i in 0..self.frame_count
+    self.frame(i)
+
+def Stack.frames_from_start(self) -> List
+  for i in self.frame_count..0
+    self.frame(i-1)
+
+def Frame.next(frame) -> any
+  if frame.height + 1 < frame.stack.frame_count
+    frame.stack.frame_from_base(frame.height + 1)
+  else
+    null
+
+def trace_to_string(Stack stack) -> String
+  writer = indent_writer.new
+
+  for frame in stack.frames_from_start
+
+    if frame == stack.top
+      continue
+
+    term = frame.current_term
+
+    @writer.write('[' term.short_location_str '] ')
+
+    @writer.writeln
+    @writer.indent
+
+  @writer.write('Error: ' stack.top.register(stack.top.pc))
+
+  writer.toString

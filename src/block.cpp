@@ -604,6 +604,17 @@ Term* compile(Block* block, const char* str)
     return parser::compile(block, parser::statement_list, str);
 }
 
+void load_script_from_text(Block* block, const char* text)
+{
+    parser::compile(block, parser::statement_list, text);
+
+    // Make sure the block has a primary output.
+    if (get_output_placeholder(block, 0) == NULL)
+        append_output_placeholder(block, NULL);
+
+    update_static_error_list(block);
+}
+
 Symbol load_script(Block* block, const char* filename)
 {
     // Store the filename
@@ -624,6 +635,8 @@ Symbol load_script(Block* block, const char* filename)
     // Make sure the block has a primary output.
     if (get_output_placeholder(block, 0) == NULL)
         append_output_placeholder(block, NULL);
+
+    update_static_error_list(block);
 
     return sym_Success;
 }

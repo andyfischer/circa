@@ -1,0 +1,13 @@
+
+require error_trace
+
+def main()
+  def func()
+    error('an error occurred!')
+
+  func()
+  
+vm = make_vm(main)
+vm.run
+
+error_trace.trace_to_string(vm) | print

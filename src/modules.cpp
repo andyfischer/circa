@@ -135,20 +135,17 @@ static bool find_module_file(World* world, Block* loadedBy,
 Block* load_module_file(World* world, caValue* moduleName, const char* filename)
 {
     Block* existing = find_module(world->root, moduleName);
+    Block* newBlock;
 
     if (existing == NULL) {
         Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
-        Block* newBlock = nested_contents(term);
-        load_script(newBlock, filename);
-        update_static_error_list(newBlock);
-        return newBlock;
+        newBlock = nested_contents(term);
+    } else {
+        newBlock = alloc_block();
+        block_graft_replacement(existing, newBlock);
     }
 
-    Block* newBlock = alloc_block();
-    block_graft_replacement(existing, newBlock);
     load_script(newBlock, filename);
-
-    update_static_error_list(newBlock);
 
     if (existing != NULL) {
         Migration migration;
@@ -183,10 +180,19 @@ Block* load_module_by_name(World* world, Block* loadedBy, caValue* moduleName)
     Value filename;
     bool found = find_module_file(world, loadedBy, moduleName, &filename);
 
-    if (!found)
-        return NULL;
+    if (found)
+        return load_module_file_watched(world, moduleName, as_cstring(&filename));
 
-    return load_module_file_watched(world, moduleName, as_cstring(&filename));
+    const char* builtinText = find_builtin_module(as_cstring(moduleName));
+
+    if (builtinText != NULL) {
+        Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
+        Block* newBlock = nested_contents(term);
+        load_script_from_text(newBlock, builtinText);
+        return newBlock;
+    }
+
+    return NULL;
 }
 
 void module_on_loaded_by_term(Block* module, Term* loadCall)

@@ -1104,3 +1104,6 @@ def Color.darken(self, number factor) -> Color
     max(self.b - factor, 0.0)
     self.a]
 
+-- Codechange objects
+def codechange_set_value(Term target, any newValue) -> List
+  [:set_value target newValue]

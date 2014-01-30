@@ -1,0 +1,4 @@
+
+require indent_writer
+
+indent_writer.new.writeln('Line 1').indent.writeln('Line 2 (indented)').toString | print

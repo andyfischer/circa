@@ -170,10 +170,6 @@ namespace return_function {
     void setup(Block* kernel);
 }
 
-namespace value_function {
-    void evaluate(caStack* stack);
-}
-
 // Interact with special debugging functions test_spy() and test_oracle()
 void test_spy_clear();
 caValue* test_spy_get_results();
@@ -184,5 +180,8 @@ void test_oracle_send(int i);
 
 void install_standard_library(Block* kernel);
 void on_new_function_parsed(Term* func, caValue* functionName);
+
+// find_builtin_module is defined in generated/stdlib_script_text.cpp
+const char* find_builtin_module(const char* name);
 
 } // namespace circa
