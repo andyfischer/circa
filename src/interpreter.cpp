@@ -64,6 +64,8 @@ static void retained_frame_extract_state(caValue* frame, caValue* output);
 
 void stack_init(Stack* stack, Block* block)
 {
+    ca_assert(block != NULL);
+
     // Pop existing frames.
     while (top_frame(stack) != NULL)
         stack_pop(stack);

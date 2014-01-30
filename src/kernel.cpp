@@ -612,9 +612,7 @@ void bootstrap_kernel()
     FUNCS.length = builtins->get("length");
     FUNCS.list_append = builtins->get("List.append");
     FUNCS.native_patch = builtins->get("native_patch");
-    FUNCS.not_func = builtins->get("not");
     FUNCS.output_explicit = builtins->get("output");
-    FUNCS.type = builtins->get("type");
 
     function_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
 
@@ -668,8 +666,10 @@ void on_new_function_parsed(Term* func, caValue* functionName)
     STORE_BUILTIN_FUNC(FUNCS.div, "div");
     STORE_BUILTIN_FUNC(FUNCS.sub, "sub");
     STORE_BUILTIN_FUNC(FUNCS.mult, "mult");
+    STORE_BUILTIN_FUNC(FUNCS.not_func, "not");
     STORE_BUILTIN_FUNC(FUNCS.not_equals, "not_equals");
     STORE_BUILTIN_FUNC(FUNCS.nonlocal, "nonlocal");
+    STORE_BUILTIN_FUNC(FUNCS.type, "type");
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

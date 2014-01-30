@@ -722,16 +722,18 @@ def Term.source_location(self) -> Rect_i
 def Term.location_string(self) -> String
 def Term.global_id(self) -> int
     -- Fetch this term's global identifier.
+
+def Term.has_property(self, Symbol key) -> bool
 def Term.properties(self) -> Map
 def Term.property(self, Symbol key) -> any
     -- Fetch a term property.
 def Term.property_opt(self, Symbol key, default) -> any
     -- Fetch an optional term property.
+
 def Term.is_value(self) -> bool
     self.function == block_ref(value)
 def Term.is_function(self) -> bool
     self.get_type == Func
-
 def Term.has_name(term) -> bool
   term.name != ''
 def Term.is_hidden(term) -> bool
@@ -745,6 +747,13 @@ def Term.is_input_placeholder(self) -> bool
 def Term.is_comment(self) -> bool
     self.function == block_ref(comment)
 def Term.trace_dependents(self, Block untilBlock) -> List
+def Term.output(self, int index) -> Term
+  if index == 0
+    self
+  else
+    self.extra_output(index - 1)
+def Term.extra_output(self, int index)
+  self.owner.get_term(self.index + index + 1)
 
 -- workaround, these functions currently need to be declared after Term:
 def Block.name(self) -> String

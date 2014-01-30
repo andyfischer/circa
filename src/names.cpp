@@ -192,31 +192,22 @@ Term* run_name_search(NameSearch* params)
 
     // Search parent
 
-    // the position is our parent's position plus one, so that we do look
-    // at the parent's block (in case our name has a namespace prefix
-    // that refers back to the inside of this block).
+    // The choice of position is a little weird. For regular name searches,
+    // we start at the parent term's position (ie, search all the terms that
+    // came before the parent).
     //
-    // TODO: This has an issue where, if we do have a qualified name that
-    // refers back to this block as a namespace, the search location will
-    // be wrong later.
-    //
-    // Say we have block:
-    // namespace ns {
-    //   a = 1
-    //   b = 2  <-- search location
-    //   c = 3
-    // }
-    //
-    // We start at location 'b' and search for ns:c. This will fail at first, then
-    // go to the parent block which finds 'ns', which searches inside 'ns' to find 'c'.
-    // However, ns:c is not visible at location 'b'.
+    // For a LookupFunction search, start at the bottom of the branch. It's okay
+    // for a term to use a function that occurs after the term.
     
     NameSearch parentSearch;
 
     Term* parentTerm = block->owningTerm;
     if (parentTerm != NULL) {
         parentSearch.block = parentTerm->owningBlock;
-        set_int(&parentSearch.position, parentTerm->index + 1);
+        if (params->lookupType == sym_LookupFunction)
+            set_symbol(&parentSearch.position, sym_Last);
+        else
+            set_int(&parentSearch.position, parentTerm->index + 1);
     } else {
         parentSearch.block = global_root_block();
         set_symbol(&parentSearch.position, sym_Last);

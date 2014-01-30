@@ -547,7 +547,22 @@ int run_command_line(caWorld* world, caValue* args)
     // Reproduce source text
     if (string_eq(list_get(args, 0), "-source-repro")) {
         load_script(mainBlock, as_cstring(list_get(args, 1)));
-        std::cout << get_block_source_text(mainBlock);
+
+        Value sourceReproStr;
+        set_string(&sourceReproStr, "source_repro");
+        Block* sourceRepro = load_module_by_name(world, NULL, &sourceReproStr);
+        Block* to_source_string = find_function_local(sourceRepro, "Block.to_source_string");
+
+        Stack stack;
+        stack_init(&stack, to_source_string);
+        set_block(circa_input(&stack, 0), mainBlock);
+
+        stack_run(&stack);
+
+        if (stack_errored(&stack))
+            dump(&stack);
+        else
+            std::cout << as_string(circa_output(&stack, 0));
         return 0;
     }
 

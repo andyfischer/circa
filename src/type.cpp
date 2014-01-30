@@ -394,8 +394,8 @@ Term* find_method_with_search_name(Block* block, Type* type, const char* searchN
 {
     // Local name search.
     if (block != NULL) {
-        Term* term = find_name(block, searchName);
-        if (term != NULL && is_function(term))
+        Term* term = find_name(block, searchName, sym_LookupFunction);
+        if (term != NULL)
             return term;
     }
 

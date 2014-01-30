@@ -10,22 +10,53 @@ def Term.source_phrases(term) -> List
   else
     term.source_phrases_default
 
-  out.append(term.property_opt(:Syntax_PostWs ''))
+  @out.append(term.property_opt(:Syntax_PostWs ''))
+  out
+
+def Term.has_implicit_name_binding(term) -> bool
+  if term.name == ""
+    false
+  elif term.property_opt(:Syntax_ImplicitName false)
+    false
+  elif term.property_opt(:Syntax_RedindOperator false)
+    false
+  else
+    true
+
+def Term.name_binding_source(term) -> List
+  if term.name == "" or term.has_implicit_name_binding
+    return []
+
+  if term.has_property(:Syntax_NameBinding)
+    syntax = term.property(:Syntax_NameBinding)
+    for element in syntax
+      if type(element) == int
+        term.output(element).name
+      else
+        element
+  else
+    [term.name " = "]
 
 def Term.source_phrases_default(term) -> List
+  out = []
+
   declarationStyle = term.property_opt(:Syntax_DeclarationStyle, 'function-call')
   functionName = term.property_opt(:Syntax_FunctionName, term.function.name)
 
-  if declarationStyle == 'infix'
+  @out.append(term.name_binding_source)
+
+  -- if declarationStyle == 'infix'
+  out
 
 def Term.should_print_source_line(term) -> bool
+  term.is_statement
 
 def Block.source_phrases(block) -> List
   newlineNeeded = false
   
   out = []
   for term in block.terms
-    if not term.should_print_source_line
+    if not(term.should_print_source_line)
       continue
 
     if newlineNeeded
@@ -37,8 +68,13 @@ def Block.source_phrases(block) -> List
     @out.concat(term.source_phrases)
 
     if term.has_property(:Syntax_LineEnding)
-      @out.append(term.property(:Syntax_LineEnding ''))
+      @out.append(term.property_opt(:Syntax_LineEnding ''))
     elif term.has_property(:Syntax_PostHeadingWs)
       -- no newline needed
     else
       newlineNeeded = true
+
+  out
+
+def Block.to_source_string(block) -> String
+  block.source_phrases.join('')
