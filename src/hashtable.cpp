@@ -486,6 +486,13 @@ caValue* hashtable_insert_symbol_key(caValue* table, Symbol key)
     return hashtable_insert(table, &boxedKey);
 }
 
+void hashtable_remove_symbol_key(caValue* table, Symbol key)
+{
+    Value boxedKey;
+    set_symbol(&boxedKey, key);
+    hashtable_remove(table, &boxedKey);
+}
+
 void hashtable_remove_int_key(caValue* table, int key)
 {
     Value boxedKey;

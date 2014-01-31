@@ -31,7 +31,7 @@ def equals(any a,any b) -> bool
 def from_string(String s) -> any
   -- Parse a string representation to a Circa value
 
-def error(String msg)
+def error(any msg :multiple)
 
 def length(List list) -> int
   -- Return the number of items in the given list
@@ -380,6 +380,7 @@ def Frame.extract_state(self) -> Map
 
 def capture_stack() -> Stack
   -- Returns a frozen copy of the currently executing stack.
+
 def Stack.apply(self, List inputs) -> any
 def Stack.block(self) -> Block
   -- Returns the (topmost) block.
@@ -434,21 +435,29 @@ def Stack.frame(self, int depth) -> Frame
 def Stack.frame_from_base(self, int height) -> Frame
   -- Return the Frame with the given height.
 def Stack.frame_count(self) -> int
+
 def Stack.top(self) -> Frame
   -- Return the topmost Frame.
   self.frame(0)
+
 def Stack.active_value(self, Term term) -> any
   self.top.active_value(term)
+
 def Stack.set_active_value(self, Term term, any val)
   self.top.set_active_value(term, val)
+
 def Stack.output(self, int index) -> any
   -- Fetch the value in the nth output register.
+
 def Stack.errored(self) -> bool
   -- Returns true if the interpreter has stopped due to error.
+
 def Stack.has_error(self) -> bool
   self.errored
+
 def Stack.error_message(self) -> String
   -- If there is a recorded error, returns a human-readable description string.
+
 def Stack.toString(self) -> String
 
 def make_stack(Func func) -> Stack
@@ -465,19 +474,23 @@ def Func.to_stack(self) -> Stack
 
 def empty_list(any initialValue, int size) -> List
 def repeat(any val, int count) -> List
+
 def List.append(self, any item) -> List
   -- Append an item to the end of this list.
+
 def List.clear(self) -> List
   -- Return an empty list.
   []
 
 def List.concat(self, List rightSide) -> List
   -- Concatenate two lists.
+
 def List.contains(self, any val) -> bool
   for i in self
     if i == val
       return true
   return false
+
 def List.resize(self, int length) -> List
   -- Resize the list to have the given length. If the length is increased, then
   -- null values are appended on the right; if the length is decreased then
@@ -493,6 +506,9 @@ def List.insert(self, int index, any val) -> List
   --   a = [1 2 3]
   --   a.insert(1, 'X')
   --   -- a now equals [1 'X' 2 3]
+
+def List.prepend(self, any val) -> List
+  self.insert(0, val)
     
 def List.length(self) -> int
   -- Return the number of elements in this list.
@@ -532,6 +548,7 @@ def List.get_optional(self, int index, any fallback) -> any
 
 def List.set(self, int index, any val) -> List
   -- Set an element by index.
+
 def List.remove(self, int index) -> List
   -- Remove an element at the given index, shrinking the list by 1.
 
@@ -545,11 +562,13 @@ def List.sub(self, any value) -> List
     for i in self { i - value[index()] }
   else
     for i in self { i - value }
+
 def List.mult(self, any value) -> List
   if is_compound(value)
     for i in self { i * value[index()] }
   else
     for i in self { i * value }
+
 def List.div(self, any value) -> List
   if is_compound(value)
     for i in self { i / value[index()] }
@@ -564,9 +583,11 @@ def List.cycle(self, int index) -> any
 def List.empty(self) -> bool
   -- Returns whether the list is empty.
   self.length == 0
+
 def List.first(self) -> any
   -- Returns the first element
   self.get(0)
+
 def List.last(self) -> any
   -- Returns the last element
   self.get(self.length - 1)
@@ -581,6 +602,17 @@ def List.filter(self, Func func) -> List
       result.append(i)
   result
 
+def List.flatten(self) -> List
+  -- Return a flattened list; if any nested elements are lists then they'll all be
+  -- concatenated into one big list.
+  out = []
+  for el in self
+    if type(el) == List
+      @out.concat(el.flatten)
+    else
+      @out.append(el)
+  out
+
 def List.map(self, Func func) -> List
   for i in self
     func.call(i)
@@ -590,24 +622,33 @@ def List.mapItem(self, int index, Func func) -> List
 
 def Map.contains(self, any key) -> bool
   -- Returns true if the map contains the given key.
+
 def Map.remove(self, any key) -> Map
   -- Removes the given key from the map.
+
 def Map.get(self, any key) -> any
   -- Gets the key associated with this value.
+
 def Map.get_optional(self, any key, any default) -> any
   if self.contains(key)
     self.get(key)
   else
     default
+    
 def Map.set(self, any key, any value) -> Map
   -- Sets the value associated with this key.
+
 def Map.insertPairs(self, List pairs) -> Map
   -- Set multiple key-value pairs.
+
 def Map.empty(self) -> bool
+
 def Map.map_element(@self, any key, Func func)
   @self.set(key, func.call(self.get(key)))
+
 def Map.modify(self, any key, Func func)
   @self.set(key, func.call(self.get(key)))
+
 def Map.list_append(self, any key, any value) -> Map
   if self.contains(key)
     @self.modify(key, { i = input(); i.append(value) })
@@ -723,12 +764,17 @@ def Term.location_string(self) -> String
 def Term.global_id(self) -> int
     -- Fetch this term's global identifier.
 
-def Term.has_property(self, Symbol key) -> bool
 def Term.properties(self) -> Map
+
+def Term.has_property(self, Symbol key) -> bool
 def Term.property(self, Symbol key) -> any
     -- Fetch a term property.
 def Term.property_opt(self, Symbol key, default) -> any
     -- Fetch an optional term property.
+
+def Term.input_property(self, int index, Symbol key) -> any
+def Term.input_property_opt(self, int index, Symbol key, any default) -> any
+def Term.has_input_property(self, int index, Symbol key) -> bool
 
 def Term.is_value(self) -> bool
     self.function == block_ref(value)

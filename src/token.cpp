@@ -91,6 +91,7 @@ const char* get_token_text(int match)
         case tok_Case: return "case";
         case tok_While: return "while";
         case tok_Require: return "require";
+        case tok_Import: return "import";
         case tok_Package: return "package";
         case tok_Section: return "section";
         case tok_Unrecognized: return "UNRECOGNIZED";
@@ -311,6 +312,7 @@ void top_level_consume_token(TokenizeContext &context)
             if (try_to_consume_keyword(context, tok_For)) return;
             if (try_to_consume_keyword(context, tok_If)) return;
             if (try_to_consume_keyword(context, tok_In)) return;
+            if (try_to_consume_keyword(context, tok_Import)) return;
             if (try_to_consume_keyword(context, tok_Include)) return;
         } else {
             // n through z

@@ -106,9 +106,8 @@ Term* run_name_search(NameSearch* params)
                 return found;
         }
 
-        // Check for a 'require' statement. If found, continue this search in the designated module.
-        #if 0
-        if (term->function == FUNCS.require) {
+        // Check for an 'import' statement. If found, continue this search in the designated module.
+        if (term->function == FUNCS.require && term->boolProp(sym_Syntax_Import, false)) {
             Block* module = find_module_for_require_statement(term);
             if (module != NULL) {
                 NameSearch moduleSearch;
@@ -123,7 +122,6 @@ Term* run_name_search(NameSearch* params)
                     return found;
             }
         }
-        #endif
     }
 
     // Check if the name is a qualified name.

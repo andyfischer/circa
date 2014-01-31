@@ -542,7 +542,19 @@ void not_equals(caStack* stack)
 
 void error(caStack* stack)
 {
-    circa_output_error(stack, circa_string_input(stack, 0));
+    caValue* args = circa_input(stack, 0);
+
+    std::stringstream out;
+
+    for (int i = 0; i < circa_count(args); i++) {
+        caValue* val = circa_index(args, i);
+        if (is_string(val))
+            out << as_string(val);
+        else
+            out << to_string(val);
+    }
+
+    circa_output_error(stack, out.str().c_str());
 }
 
 void get_with_symbol(caStack* stack)

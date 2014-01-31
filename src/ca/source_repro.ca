@@ -1,80 +1,178 @@
 
+type SourceRepro {
+  List phrases
+}
+
+type Phrase {
+  Symbol id
+  any data
+}
+
+def Phrase.toString(self) -> String
+  if type(self.data) == String
+    self.data
+  elif self.id == :name_ref
+    self.data.name
+  else
+    error('how to turn ' self.id ' into a string?')
+
+def SourceRepro.flatten_to_string(self) -> String
+  strs = for Phrase phrase in self.phrases
+    phrase.toString
+  strs.join('')
+
+def new()
+  SourceRepro.make
+
+def SourceRepro.phrase(self, Symbol id, any val) -> SourceRepro
+  @self.phrases.append(Phrase.make(id val))
+
 def Term.value_to_source(term) -> String
   -- Todo: improve
   term.value | to_string
 
-def Term.source_phrases(term) -> List
-  -- Todo: Function special cases
-  out = if term.is_value
-    [term.value_to_source]
-  else
-    term.source_phrases_default
+def SourceRepro.term(self, Term term) -> SourceRepro
+  if term.has_property(:Comment)
+    return self.phrase(:comment term.property_opt(:Comment ''))
 
-  @out.append(term.property_opt(:Syntax_PostWs ''))
-  out
+  -- Todo: Function special cases
+  if term.is_value
+    @self.phrase(:value term.value_to_source)
+  else
+    @self.term_default(term)
+
+  @self.phrase(:ws term.property_opt(:Syntax_PostWs ''))
 
 def Term.has_implicit_name_binding(term) -> bool
   if term.name == ""
     false
   elif term.property_opt(:Syntax_ImplicitName false)
-    false
-  elif term.property_opt(:Syntax_RedindOperator false)
-    false
-  else
     true
+  elif term.property_opt(:Syntax_RedindOperator false)
+    true
+  else
+    false
 
-def Term.name_binding_source(term) -> List
+def SourceRepro.name_binding_source(self, Term term) -> SourceRepro
   if term.name == "" or term.has_implicit_name_binding
-    return []
+    return self
 
   if term.has_property(:Syntax_NameBinding)
     syntax = term.property(:Syntax_NameBinding)
     for element in syntax
       if type(element) == int
-        term.output(element).name
+        @self.phrase(:name_binding term.output(element).name)
       else
-        element
+        @self.phrase(:text element)
   else
-    [term.name " = "]
+    @self.phrase(:name term.name).phrase(:text " = ")
 
-def Term.source_phrases_default(term) -> List
-  out = []
+  self
+
+def SourceRepro.term_input(self, Term term, int index) -> SourceRepro
+  input = term.input(index)
+
+  defaultPre = cond(index == 0, "", " ")
+  defaultPost = cond(index+1 == term.num_inputs, "", ",")
+
+  @self.phrase(:ws term.input_property_opt(index :Syntax_PreWs defaultPre))
+
+  if input.name == ''
+    @self.phrase(:subexpr input)
+  else
+    @self.phrase(:name_ref input)
+
+  @self.phrase(:ws term.input_property_opt(index :Syntax_PostWs defaultPost))
+
+def SourceRepro.term_default(self, Term term) -> SourceRepro
 
   declarationStyle = term.property_opt(:Syntax_DeclarationStyle, 'function-call')
   functionName = term.property_opt(:Syntax_FunctionName, term.function.name)
 
-  @out.append(term.name_binding_source)
+  -- Check for an infix operator with implicit rebinding (like +=)
+  if declarationStyle == 'infix' and term.property_opt(:Syntax_RebindingInfix false)
+    @self.phrase(:name_binding term)
+    @self.phrase(:ws ' ')
+    @self.phrase(:operator term.property(:InfixOperator))
+    @self.term_input(term 1)
+    return self
 
-  -- if declarationStyle == 'infix'
-  out
+  @self.name_binding_source(term)
+
+  -- Optional parens
+  for i in 0..term.property_opt(:Syntax_Parens 0)
+    @self.phrase(:text '(')
+
+  if declarationStyle == 'function-call'
+    if functionName == ''
+      @self.term(term.function)
+    else
+      @self.phrase(:function_name functionName)
+
+    parens = not term.property_opt(:Syntax_NoParens false)
+
+    if parens
+      @self.phrase(:text '(')
+
+    for i in 0..term.num_inputs
+      @self.term_input(term i)
+
+    if parens
+      @self.phrase(:text ')')
+
+  elif declarationStyle == 'method-call'
+    @self.term_input(term 0)
+  elif declarationStyle == 'dot-access'
+  elif declarationStyle == 'infix'
+    @self.term_input(term 0)
+    @self.phrase(:function_name functionName)
+    @self.term_input(term 1)
+  elif declarationStyle == 'prefix'
+  elif declarationStyle == 'arrow-concat'
+  elif declarationStyle == 'bar-apply'
+  elif declarationStyle == 'method-right-arrow'
+  elif declarationStyle == 'left-arrow'
+  elif declarationStyle == 'bracket-list'
+
+    -- TODO
+  else
+    error('unrecognized declaration style: ' declarationStyle)
+
+  -- Optional parens
+  for i in 0..term.property_opt(:Syntax_Parens 0)
+    @self.phrase(:text ')')
+
+  self
 
 def Term.should_print_source_line(term) -> bool
   term.is_statement
 
-def Block.source_phrases(block) -> List
+def SourceRepro.block(self, Block block) -> SourceRepro
   newlineNeeded = false
   
-  out = []
   for term in block.terms
-    if not(term.should_print_source_line)
+    if not term.should_print_source_line
       continue
 
     if newlineNeeded
-      @out.append('\n')
+      @self.phrase(:ws '\n')
       newlineNeeded = false
 
-    @out.append(term.property_opt(:Syntax_PreWs ''))
+    @self.phrase(:ws term.property_opt(:Syntax_PreWs ''))
 
-    @out.concat(term.source_phrases)
+    @self.term(term)
 
     if term.has_property(:Syntax_LineEnding)
-      @out.append(term.property_opt(:Syntax_LineEnding ''))
+      @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
     elif term.has_property(:Syntax_PostHeadingWs)
       -- no newline needed
     else
       newlineNeeded = true
 
-  out
+  self
 
 def Block.to_source_string(block) -> String
-  block.source_phrases.join('')
+  SourceRepro.make.block(block).flatten_to_string
+
+def term_phrases(Term term) -> List
+  SourceRepro.make.term(term)

@@ -381,7 +381,7 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     }
     
     // Require statement
-    else if (tokens.nextIs(tok_Require)) {
+    else if (tokens.nextIs(tok_Require) || tokens.nextIs(tok_Import)) {
         result = require_statement(block, tokens, context);
     }
 
@@ -1075,7 +1075,9 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(tok_Require);
+    Symbol keyword = tokens.next().match;
+
+    tokens.consume(); // either 'import' or 'require'
     possible_whitespace(tokens);
 
     Term* moduleName = NULL;
@@ -1089,8 +1091,15 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
             "Expected module name (as a string or identifier)");
     }
 
-    Term* term = apply(block, FUNCS.require, TermList(moduleName), term_value(moduleName));
-    term->setBoolProp(sym_Syntax_Require, true);
+    Term* term;
+
+    if (keyword == tok_Import) {
+        term = apply(block, FUNCS.require, TermList(moduleName));
+        term->setBoolProp(sym_Syntax_Import, true);
+    } else {
+        term = apply(block, FUNCS.require, TermList(moduleName), term_value(moduleName));
+        term->setBoolProp(sym_Syntax_Require, true);
+    }
 
     return ParseResult(term);
 }

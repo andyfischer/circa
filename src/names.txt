@@ -64,6 +64,7 @@ Syntax_ExplicitType
 Syntax_FunctionName
 Syntax_IdentifierRebind
 Syntax_ImplicitName
+Syntax_Import
 Syntax_IntegerFormat
 Syntax_LineEnding
 Syntax_LiteralList
@@ -289,6 +290,7 @@ tok_Continue
 tok_Switch
 tok_Case
 tok_Require
+tok_Import
 tok_Package
 tok_Section
 

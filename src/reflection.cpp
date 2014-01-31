@@ -671,6 +671,52 @@ void Term__property_opt(caStack* stack)
         copy(value, circa_output(stack, 0));
 }
 
+void Term__input_property_opt(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+
+    int index = as_int(circa_input(stack, 1));
+    Symbol key = as_symbol(circa_input(stack, 2));
+    caValue* value = term_get_input_property(t, index, key);
+    caValue* defaultValue = circa_input(stack, 3);
+
+    if (value == NULL)
+        copy(defaultValue, circa_output(stack, 0));
+    else
+        copy(value, circa_output(stack, 0));
+}
+
+void Term__input_property(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+
+    int index = as_int(circa_input(stack, 1));
+    Symbol key = as_symbol(circa_input(stack, 2));
+    caValue* value = term_get_input_property(t, index, key);
+    caValue* defaultValue = circa_input(stack, 3);
+
+    if (value == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        copy(value, circa_output(stack, 0));
+}
+
+void Term__has_input_property(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+
+    int index = as_int(circa_input(stack, 1));
+    Symbol key = as_symbol(circa_input(stack, 2));
+
+    set_bool(circa_output(stack, 0), term_get_input_property(t, index, key) == NULL);
+}
+
 void Term__trace_dependents(caStack* stack)
 {
     Term* term = as_term_ref(circa_input(stack, 0));
@@ -786,6 +832,9 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.has_property", Term__has_property);
     module_patch_function(patch, "Term.property", Term__property);
     module_patch_function(patch, "Term.property_opt", Term__property_opt);
+    module_patch_function(patch, "Term.has_input_property", Term__has_input_property);
+    module_patch_function(patch, "Term.input_property", Term__input_property);
+    module_patch_function(patch, "Term.input_property_opt", Term__input_property_opt);
     module_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
     module_patch_function(patch, "Term.value", Term__value);
     module_patch_function(patch, "Term.set_value", Term__set_value);

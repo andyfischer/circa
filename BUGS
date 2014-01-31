@@ -1,6 +1,12 @@
 
 Miscellanous (most-recent first)
 
+  *$#(@*$# Another horrible bug caused by an extra close-parenthesis
+
+  Some issues when using a for-loop as an expression. Example:
+   
+    (for s in [1 2 3] { to_string(s) }).join('')
+
   Assigning an element in a type doesn't cast that element. Example:
 
     type A {
@@ -10,11 +16,6 @@ Miscellanous (most-recent first)
     a = A.make
     a.p = [0 0]
     -- a.p is still a List instead of Point
-
-  Stack capture is broken
-    Caused by bytecode changes
-    stack_silently_finish_call doesn't work
-    Need to change to saving via termIndex instead of pc
 
   Method lookup cache:
     Currently does not cache method-on-module-ref, or hashtable value as method.

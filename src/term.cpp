@@ -240,7 +240,7 @@ void dealloc_term(Term* term)
 
 caValue* term_insert_property(Term* term, Symbol key)
 {
-    return hashtable_insert_int_key(&term->properties, key);
+    return hashtable_insert_symbol_key(&term->properties, key);
 }
 
 void term_set_property(Term* term, Symbol key, caValue* value)
@@ -250,12 +250,12 @@ void term_set_property(Term* term, Symbol key, caValue* value)
 
 caValue* term_get_property(Term* term, Symbol key)
 {
-    return hashtable_get_int_key(&term->properties, key);
+    return hashtable_get_symbol_key(&term->properties, key);
 }
 
 void term_remove_property(Term* term, Symbol key)
 {
-    hashtable_remove_int_key(&term->properties, key);
+    hashtable_remove_symbol_key(&term->properties, key);
 }
 
 void term_move_property(Term* from, Term* to, Symbol key)

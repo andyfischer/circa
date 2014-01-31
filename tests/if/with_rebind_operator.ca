@@ -1,0 +1,16 @@
+
+def int.increment(i)
+  i + 1
+
+def int.decrement(i)
+  i - 1
+
+a = 1
+if true
+  @a.increment
+else
+  @a.decrement
+
+@a.increment
+
+assert(a == 3)

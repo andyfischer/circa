@@ -72,6 +72,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Syntax_FunctionName: return "Syntax_FunctionName";
     case sym_Syntax_IdentifierRebind: return "Syntax_IdentifierRebind";
     case sym_Syntax_ImplicitName: return "Syntax_ImplicitName";
+    case sym_Syntax_Import: return "Syntax_Import";
     case sym_Syntax_IntegerFormat: return "Syntax_IntegerFormat";
     case sym_Syntax_LineEnding: return "Syntax_LineEnding";
     case sym_Syntax_LiteralList: return "Syntax_LiteralList";
@@ -263,6 +264,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_Switch: return "tok_Switch";
     case tok_Case: return "tok_Case";
     case tok_Require: return "tok_Require";
+    case tok_Import: return "tok_Import";
     case tok_Package: return "tok_Package";
     case tok_Section: return "tok_Section";
     case tok_Whitespace: return "tok_Whitespace";
@@ -1256,9 +1258,21 @@ int builtin_symbol_from_string(const char* str)
             return sym_Syntax_IdentifierRebind;
         break;
     case 'm':
-        if (strcmp(str + 9, "plicitName") == 0)
+    switch (str[9]) {
+    case 'p':
+    switch (str[10]) {
+    case 'l':
+        if (strcmp(str + 11, "icitName") == 0)
             return sym_Syntax_ImplicitName;
         break;
+    case 'o':
+        if (strcmp(str + 11, "rt") == 0)
+            return sym_Syntax_Import;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'n':
         if (strcmp(str + 9, "tegerFormat") == 0)
             return sym_Syntax_IntegerFormat;
@@ -2407,6 +2421,10 @@ int builtin_symbol_from_string(const char* str)
         break;
     case 'f':
             return tok_If;
+    case 'm':
+        if (strcmp(str + 6, "port") == 0)
+            return tok_Import;
+        break;
     case 'n':
     switch (str[6]) {
     case 'c':

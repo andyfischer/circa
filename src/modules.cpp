@@ -239,11 +239,15 @@ void require_func_postCompile(Term* term)
 
 void require_formatSource(caValue* source, Term* term)
 {
-    if (!term->boolProp(sym_Syntax_Require, false))
-        return format_term_source_default_formatting(source, term);
-
-    append_phrase(source, "require ", term, tok_Require);
-    append_phrase(source, term->name.c_str(), term, sym_TermName);
+    if (term->boolProp(sym_Syntax_Require, false)) {
+        append_phrase(source, "require ", term, tok_Require);
+        append_phrase(source, term->name.c_str(), term, sym_TermName);
+    } else if (term->boolProp(sym_Syntax_Import, false)) {
+        append_phrase(source, "import ", term, tok_Import);
+        format_source_for_input(source, term, 0);
+    } else {
+        format_term_source_default_formatting(source, term);
+    }
 }
 
 void native_patch_this_postCompile(Term* term)
