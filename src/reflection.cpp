@@ -794,6 +794,7 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Block.link", Block__link);
     module_patch_function(patch, "Block.list_configs", Block__list_configs);
     module_patch_function(patch, "Block.output", Block__output);
+    module_patch_function(patch, "Block.outputs", Block__outputs);
     module_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
     module_patch_function(patch, "Block.owner", Block__owner);
     module_patch_function(patch, "Block.parent", Block__parent);

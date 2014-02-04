@@ -312,6 +312,8 @@ def Block.list_configs(self) -> List
   -- Return a list of Terms that look like configs (named literal values).
 def Block.output(self, int index) -> Term
   -- Return an output term by index.
+def Block.outputs(self) -> List
+  -- List of output placeholder terms.
 def Block.output_placeholder(self, int index) -> Term
   -- Return an output placeholder term by index.
 def Block.owner(self) -> Term
@@ -599,7 +601,7 @@ def List.filter(self, Func func) -> List
   result = []
   for i in self
     if func.call(i)
-      result.append(i)
+      @result.append(i)
   result
 
 def List.flatten(self) -> List

@@ -5,20 +5,26 @@ type SourceRepro {
 
 type Phrase {
   Symbol id
-  any data
+  any val
+  Map attrs
 }
 
-def Phrase.toString(self) -> String
-  if type(self.data) == String
-    self.data
+def Phrase.term(self) -> Term
+  self.val
+
+def Phrase.asString(self) -> String
+  if type(self.val) == String
+    self.val
   elif self.id == :name_ref
-    self.data.name
+    self.val.name
+  elif self.id == :sub_expr
+    self.val | to_string
   else
     error('how to turn ' self.id ' into a string?')
 
 def SourceRepro.flatten_to_string(self) -> String
   strs = for Phrase phrase in self.phrases
-    phrase.toString
+    phrase.asString
   strs.join('')
 
 def new()
@@ -78,7 +84,7 @@ def SourceRepro.term_input(self, Term term, int index) -> SourceRepro
   @self.phrase(:ws term.input_property_opt(index :Syntax_PreWs defaultPre))
 
   if input.name == ''
-    @self.phrase(:subexpr input)
+    @self.phrase(:sub_expr input)
   else
     @self.phrase(:name_ref input)
 
@@ -175,4 +181,5 @@ def Block.to_source_string(block) -> String
   SourceRepro.make.block(block).flatten_to_string
 
 def term_phrases(Term term) -> List
-  SourceRepro.make.term(term)
+  SourceRepro.make.term(term).phrases
+
