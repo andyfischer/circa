@@ -1,6 +1,19 @@
 
 Miscellanous (most-recent first)
 
+  In rewriting for-loop, shouldn't need an explicit name binding.
+
+    This does work:
+
+      for i in @L
+        i = f()
+
+    This doesn't work but we should make it work:
+
+      for i in @L
+        f()
+
+
   *$#(@*$# Another horrible bug caused by an extra close-parenthesis
 
   Some issues when using a for-loop as an expression. Example:

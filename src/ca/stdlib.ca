@@ -897,16 +897,16 @@ def Rect.right(self) -> number
   self.x2
 def Rect.bottom(self) -> number
   self.y2
-def Rect.topleft(self) -> Point
+def Rect.top_left(self) -> Point
   -- Returns the top-left coordinates as a Point.
   [self.x1 self.y1]
-def Rect.topright(self) -> Point
+def Rect.top_right(self) -> Point
   -- Returns the top-rigth coordinates as a Point.
   [self.x2 self.y1]
-def Rect.bottomleft(self) -> Point
+def Rect.bottom_left(self) -> Point
   -- Returns the bottom-left coordinates as a Point.
   [self.x1 self.y2]
-def Rect.bottomright(self) -> Point
+def Rect.bottom_right(self) -> Point
   -- Returns the bottom-right coordinates as a Point.
   [self.x2 self.y2]
 def Rect.center(self) -> Point
@@ -927,6 +927,9 @@ def Rect.contains(self, Point p) -> bool
 
 def Rect.grow(self, Point size) -> Rect
   [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
+
+def Rect.grow_s(self, number size) -> Rect
+  [self.x1 - size, self.y1 - size, self.x2 + size, self.y2 + size]
 
 def Rect.subtractFrom(self, Symbol side, number dimension) -> (Rect, Rect)
   if side == :top
