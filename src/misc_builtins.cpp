@@ -280,18 +280,6 @@ void Map__set(caStack* stack)
     copy(value, hashtable_insert(out, key, false));
 }
 
-void Map__insertPairs(caStack* stack)
-{
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    caValue* pairs = circa_input(stack, 1);
-    for (int i=0; i < list_length(pairs); i++) {
-        caValue* pair = list_get(pairs, i);
-        copy(list_get(pair, 1), hashtable_insert(out, list_get(pair, 0), false));
-    }
-}
-
 void Map__empty(caStack* stack)
 {
     set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
@@ -342,16 +330,19 @@ void String__substr(caStack* stack)
     int start = circa_int_input(stack, 1);
     int length = circa_int_input(stack, 2);
 
-    if (start < 0) return circa_output_error(stack, "Negative start");
-    if (length < 0) return circa_output_error(stack, "Negative length");
+    if (start < 0)
+        start = 0;
 
     int existingLength = string_length(self);
 
-    if (start + length > existingLength) {
+    if (length == -1)
         length = existingLength - start;
-        if (length < 0)
-            length = 0;
-    }
+
+    if (start + length > existingLength)
+        length = existingLength - start;
+
+    if (length < 0)
+        length = 0;
 
     if (start > existingLength)
         start = existingLength;
@@ -638,7 +629,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "Map.remove", Map__remove);
     module_patch_function(patch, "Map.get", Map__get);
     module_patch_function(patch, "Map.set", Map__set);
-    module_patch_function(patch, "Map.insertPairs", Map__insertPairs);
     module_patch_function(patch, "Map.empty", Map__empty);
     module_patch_function(patch, "Mutable.get", Mutable__get);
     module_patch_function(patch, "Mutable.set", Mutable__set);

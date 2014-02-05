@@ -45,7 +45,7 @@ def Layout.addNode(self, int cursor, data) -> Layout
     return self
 
 def Layout.modifyCurrentNode(self, Func f) -> Layout
-    @self.nodes.mapItem(self.cursor, f)
+    @self.nodes.apply(self.cursor, f)
     self
 
 def Layout.setProp(self, name, value) -> Layout
@@ -57,7 +57,7 @@ def Layout.setProp(self, name, value) -> Layout
 
 def Layout.solveDim(self, String dim) -> List
     -- Return a [(Number,Number)] list of pairs for each node.
-    results = empty_list(null, self.nodes.length)
+    results = repeat(null, self.nodes.length)
     results[0] = [0 self.size.x]
 
     for Node node in self.nodes
@@ -87,7 +87,7 @@ def Layout.solveDim(self, String dim) -> List
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
-    positions = empty_list(null, self.nodes.length)
+    positions = repeat(null, self.nodes.length)
 
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)

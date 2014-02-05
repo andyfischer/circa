@@ -5,6 +5,14 @@ type Func {
   Map bindings
 }
 
+def Func.call(self, any inputs :multiple) -> any
+  -- Call the func using the given inputs.
+
+def Func.apply(self, List inputs) -> any
+  -- Like .call, but the inputs are given as one list instead of separate args.
+
+-- Misc builtin functions --
+
 def rand() -> number
 
 def closure_block() -> Func
@@ -13,13 +21,6 @@ def closure_block() -> Func
 def nonlocal(any _) -> any
   -- Internally used function for non-local references.
 
-def Func.call(self, any inputs :multiple) -> any
-  -- Call the func using the given inputs.
-
-def Func.apply(self, List inputs) -> any
-  -- Like .call, but the inputs are given as one list instead of separate args.
-
--- Builtin functions --
 def convert(any value, Type t) -> any
   -- Convert the value to the given type, if possible.
 
@@ -172,14 +173,12 @@ def number.div(left, right) -> number
 def abs(number n) -> number
   -- Absolute value
 def any_true(list) -> bool
-  result = true
   for i in list
     if not(i)
       return false
   true
 
 def get_with_symbol(any lhs, Symbol symbol) -> any
-
 
 def first_symbol(any val) -> Symbol
   if type(val) == Symbol
@@ -195,7 +194,6 @@ def rand_i(int range) -> int
 
 def swap(a, b) -> (any, any)
   return b, a
-
 
 type Mutable;
   -- Container for a mutable value. Future status is undecided, this might
@@ -336,10 +334,32 @@ def Block.walk_terms(self) -> List
 
 def Block.to_func(self) -> Func
   Func.make(self)
+
 def Block.to_stack(self) -> Stack
   make_stack(self.to_func)
 
--- Language defect: out-of-order function definition.
+def Block.name(self) -> String
+    self.owner.name
+
+def Block.is_method(self) -> bool
+  self.owner.property("syntax:methodDecl") == true
+
+def Block.get_top_comments(self) -> List
+  out = []
+  for Term t in self.terms
+    if t.is_input_placeholder
+      continue
+    elif t.is_comment
+      str = t.property('comment')
+      if str == ""
+        break
+
+      out.append(t.property('comment'))
+    else
+      break
+
+  out
+
 def Block.call(self, any inputs :multiple) -> any
   -- Invoke this Block with the given inputs.
   self.to_func.apply(inputs)
@@ -469,12 +489,12 @@ def make_vm(Func func) -> Stack
   -- Create a new Stack
 
 def make_actor(Func func) -> Stack
+  -- 'Actor' support is broken right now
   make_stack(func)
 
 def Func.to_stack(self) -> Stack
   make_stack(self)
 
-def empty_list(any initialValue, int size) -> List
 def repeat(any val, int count) -> List
 
 def List.append(self, any item) -> List
@@ -541,7 +561,7 @@ def List.slice(self, int start, int fin) -> List
 def List.get(self, int index) -> any
   -- Get an element by index.
 
-def List.get_optional(self, int index, any fallback) -> any
+def List.get_opt(self, int index, any fallback) -> any
   -- Get an element by index if it exists, otherwise return 'fallback'.
   if index < 0 or index >= self.length
     fallback
@@ -559,6 +579,7 @@ def List.add(self, any value) -> List
     for i in self { i + value[index()] }
   else
     for i in self { i + value }
+
 def List.sub(self, any value) -> List
   if is_compound(value)
     for i in self { i - value[index()] }
@@ -605,8 +626,7 @@ def List.filter(self, Func func) -> List
   result
 
 def List.flatten(self) -> List
-  -- Return a flattened list; if any nested elements are lists then they'll all be
-  -- concatenated into one big list.
+  -- Return a list where all nested lists are concatenated into one big list.
   out = []
   for el in self
     if type(el) == List
@@ -615,11 +635,11 @@ def List.flatten(self) -> List
       @out.append(el)
   out
 
-def List.map(self, Func func) -> List
+def List.map_all(self, Func func) -> List
   for i in self
     func.call(i)
 
-def List.mapItem(self, int index, Func func) -> List
+def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
 
 def Map.contains(self, any key) -> bool
@@ -631,7 +651,7 @@ def Map.remove(self, any key) -> Map
 def Map.get(self, any key) -> any
   -- Gets the key associated with this value.
 
-def Map.get_optional(self, any key, any default) -> any
+def Map.get_opt(self, any key, any default) -> any
   if self.contains(key)
     self.get(key)
   else
@@ -640,12 +660,10 @@ def Map.get_optional(self, any key, any default) -> any
 def Map.set(self, any key, any value) -> Map
   -- Sets the value associated with this key.
 
-def Map.insertPairs(self, List pairs) -> Map
-  -- Set multiple key-value pairs.
-
 def Map.empty(self) -> bool
+  -- Whether the map has no values
 
-def Map.map_element(@self, any key, Func func)
+def Map.apply(@self, any key, Func func)
   @self.set(key, func.call(self.get(key)))
 
 def Map.modify(self, any key, Func func)
@@ -819,29 +837,6 @@ def Term.output(self, int index) -> Term
 def Term.extra_output(self, int index)
   self.owner.get_term(self.index + index + 1)
 
--- workaround, these functions currently need to be declared after Term:
-def Block.name(self) -> String
-    self.owner.name
-
-def Block.is_method(self) -> bool
-  self.owner.property("syntax:methodDecl") == true
-
-def Block.get_top_comments(self) -> List
-  out = []
-  for Term t in self.terms
-    if t.is_input_placeholder
-      continue
-    elif t.is_comment
-      str = t.property('comment')
-      if str == ""
-        break
-
-      out.append(t.property('comment'))
-    else
-      break
-
-  out
-
 def Point.add(self, Point b) -> Point
   [self.x + b.x, self.y + b.y]
 def Point.sub(self, Point b) -> Point
@@ -980,11 +975,13 @@ def sum(List numbers) -> number
     
 def zip(List left, List right) -> List
   for l in left
-    [l, right.get_optional(index(), null)]
+    [l, right.get_opt(index(), null)]
 
 -- Stateful functions
 
 def cached(Func refresh) -> any
+  -- Cache a function's result, the function will only be (re)evaluated as needed.
+
   state Func _refresh
   state version = global_script_version()
   state _out
@@ -1167,7 +1164,7 @@ def Color.blend(self, Color rhs, number ratio) -> Color
     self + (rhs - self) * ratio
 
 def Color.lighten(self, number factor) -> Color
-  -- Linearly lighte each component of the color.
+  -- Linearly lighten each component of the color.
   [ min(self.r + factor, 1.0)
     min(self.g + factor, 1.0)
     min(self.b + factor, 1.0)

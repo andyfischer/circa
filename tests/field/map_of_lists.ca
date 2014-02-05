@@ -5,7 +5,7 @@ type MapOfLists {
 
 def MapOfLists.add(@self, any key, any val)
     if self.map.contains(key)
-        @self.map.map_element(key, { input().append(val) })
+        @self.map.apply(key, { input().append(val) })
     else
         @self.map.set(key, [val])
 
@@ -13,8 +13,7 @@ def MapOfLists.remove(@self, any key)
     @self.map.remove(key)
 
 def MapOfLists.get(self, any key)
-    self.map.get_optional(key, [])
-    
+    self.map.get_opt(key, [])
 
 m = make(MapOfLists)
 @m.add(:a 1)

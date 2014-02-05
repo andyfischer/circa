@@ -7,4 +7,4 @@ assert(l.set(1, 'B') == ['a' 'B' 'c'])
 
 l = [0 1 2 3]
 
-assert(l.mapItem(2, { input() + 3 }) == [0 1 5 3])
+assert(l.apply(2, { input() + 3 }) == [0 1 5 3])
