@@ -684,23 +684,38 @@ def overload_get_contents(Block block) -> List
     -- Get a list of all the functions that this overloaded function uses.
 
 def String.append(self, String right) -> String
-    -- Append a string to the right side.
-    concat(self, right)
+  -- Append a string to the right side.
+  concat(self, right)
     
 def String.char_at(self, int index) -> String
+  -- Get character at a given index. UTF unsafe.
+
+def String.index_of(self, String substr) -> (bool, int)
+  for i in 0..self.length
+    if self.substr(i, substr.length) == substr
+      return true, i
+  return false, 0
 
 def String.ends_with(self, String suffix) -> bool
-    -- Return true if this string ends with the given substring.
+  -- Return true if this string ends with the given substring.
+
 def String.length(self) -> int
-    -- Returns the string length.
+  -- Returns the string length.
+
 def String.slice(self, int start, int fin) -> String
+
 def String.starts_with(self, String prefix) -> bool
-    -- Returns true if the string starts with the given prefix.
+  -- Returns true if the string starts with the given prefix.
+
 def String.split(self, String sep) -> List
-def String.substr(self, int start, int fin) -> String
+
+def String.substr(self, int start, int length) -> String
+
 def String.to_camel_case(self) -> String
-    -- Deprecated function
+  -- Deprecated function
+
 def String.to_lower(self) -> String
+
 def String.to_upper(self) -> String
 
 def String.characters(self) -> List
@@ -708,6 +723,7 @@ def String.characters(self) -> List
         self.char_at(i)
     return out
 
+-- Type
 def Type.declaringTerm(self) -> Term
 def Type.cast(self, any value) -> any
     value, success = cast(value, self)
@@ -719,7 +735,7 @@ def Type.make(self, any values :multiple) -> any
 def Type.name(self) -> String
 def Type.property(self, String name) -> any
 
--- Metaprogramming on Term
+-- Term
 def term_ref(any term :ignore_error) -> Term
 def Term.assign(self, any val)
 def Term.asint(self) -> int

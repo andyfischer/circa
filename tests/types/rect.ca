@@ -1,9 +1,9 @@
 
 r = Rect.make(0 2 8 10)
 
-assert(r.topleft == [0 2])
-assert(r.topright == [8 2])
-assert(r.bottomleft == [0 10])
-assert(r.bottomright == [8 10])
+assert(r.top_left == [0 2])
+assert(r.top_right == [8 2])
+assert(r.bottom_left == [0 10])
+assert(r.bottom_right == [8 10])
 
 assert(r.center == [4 6])

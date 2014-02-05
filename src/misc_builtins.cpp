@@ -338,25 +338,25 @@ void String__length(caStack* stack)
 
 void String__substr(caStack* stack)
 {
+    caValue* self = circa_input(stack, 0);
     int start = circa_int_input(stack, 1);
-    int end = circa_int_input(stack, 2);
-    std::string const& s = as_string(circa_input(stack, 0));
+    int length = circa_int_input(stack, 2);
 
-    if (start < 0) return circa_output_error(stack, "Negative index");
-    if (end < 0) return circa_output_error(stack, "Negative index");
+    if (start < 0) return circa_output_error(stack, "Negative start");
+    if (length < 0) return circa_output_error(stack, "Negative length");
 
-    if ((unsigned) start > s.length()) {
-        std::stringstream msg;
-        msg << "Start index is too high: " << start;
-        return circa_output_error(stack, msg.str().c_str());
-    }
-    if ((unsigned) (start+end) > s.length()) {
-        std::stringstream msg;
-        msg << "End index is too high: " << start;
-        return circa_output_error(stack, msg.str().c_str());
+    int existingLength = string_length(self);
+
+    if (start + length > existingLength) {
+        length = existingLength - start;
+        if (length < 0)
+            length = 0;
     }
 
-    set_string(circa_output(stack, 0), s.substr(start, end));
+    if (start > existingLength)
+        start = existingLength;
+
+    set_string(circa_output(stack, 0), as_cstring(self) + start, length);
 }
 
 char character_to_lower(char c)

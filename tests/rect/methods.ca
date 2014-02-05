@@ -1,7 +1,7 @@
 
 r = Rect.make(1 2 4 8)
 
-assert(r.topleft == [1 2])
+assert(r.top_left == [1 2])
 assert(r.width == 3)
 assert(r.height == 6)
 assert(r.intersects([1 2 3 4]))

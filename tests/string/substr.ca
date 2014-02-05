@@ -1,0 +1,18 @@
+
+assert("abc".substr(0 0) == "")
+assert("abc".substr(0 1) == "a")
+assert("abc".substr(0 2) == "ab")
+assert("abc".substr(0 3) == "abc")
+assert("abc".substr(0 4) == "abc")
+
+assert("abc".substr(1 0) == "")
+assert("abc".substr(1 1) == "b")
+assert("abc".substr(1 2) == "bc")
+assert("abc".substr(1 3) == "bc")
+
+assert("abc".substr(2 0) == "")
+assert("abc".substr(2 1) == "c")
+assert("abc".substr(2 2) == "c")
+
+assert("abc".substr(3 0) == "")
+assert("abc".substr(3 1) == "")
