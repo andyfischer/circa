@@ -41,9 +41,8 @@ static void parse_value(TokenStream* tokens, caValue* out)
         set_float(out, (float) atof(tokens->nextStr().c_str()));
         tokens->consume(tok_Float);
     } else if (tokens->nextIs(tok_String)) {
-        std::string s = tokens->nextStr();
-        parser::unquote_and_unescape_string(s.c_str(), out);
-        tokens->consume(tok_String);
+        tokens->consumeStr(out, tok_String);
+        string_unquote_and_unescape(out);
     } else if (tokens->nextIs(tok_LBracket)) {
         tokens->consume(tok_LBracket);
         drop_whitespace(tokens);
@@ -116,7 +115,8 @@ void write_string_repr(caValue* value, caValue* out)
 
         string_append(out, "]");
     } else if (is_string(value)) {
-        parser::quote_and_escape_string(as_cstring(value), out);
+        copy(value, out);
+        string_quote_and_escape(out);
     } else {
         set_string(out, "error: no string repr for type ");
         string_append(out, as_cstring(&value->value_type->name));

@@ -43,6 +43,8 @@ void string_prepend(caValue* result, const char* prefix);
 void string_slice(caValue* s, int start, int end, caValue* out);
 int string_find_char(caValue* s, int start, char c);
 int string_find_char_from_end(caValue* s, char c);
+void string_quote_and_escape(caValue* s);
+void string_unquote_and_unescape(caValue* s);
 
 void string_split(caValue* s, char sep, caValue* listOut);
 

@@ -426,6 +426,79 @@ int string_find_char_from_end(caValue* s, char c)
     return -1;
 }
 
+void string_quote_and_escape(caValue* s)
+{
+    const char* input = as_cstring(s);
+
+    std::stringstream result;
+
+    result << '"';
+
+    for (int i=0; input[i] != 0; i++) {
+        if (input[i] == '\n')
+            result << "\\n";
+        else if (input[i] == '\'')
+            result << "\\'";
+        else if (input[i] == '"')
+            result << "\\\"";
+        else if (input[i] == '\\')
+            result << "\\\\";
+        else
+            result << input[i];
+    }
+
+    result << '"';
+
+    set_string(s, result.str());
+}
+
+void string_unquote_and_unescape(caValue* s)
+{
+    if (string_empty(s))
+        return;
+
+    const char* input = as_cstring(s);
+
+    char quote = input[0];
+
+    int quoteSize = 1;
+    if (quote == '<')
+        quoteSize = 3;
+
+    int end = (int) strlen(input) - quoteSize;
+
+    // Unescape any escaped characters
+    std::stringstream result;
+    for (int i=quoteSize; i < end; i++) {
+        char c = input[i];
+        char next = 0;
+        if (i + 1 < end)
+            next = input[i+1];
+
+        if (c == '\\') {
+            if (next == 'n') {
+                result << '\n';
+                i++;
+            } else if (next == '\'') {
+                result << '\'';
+                i++;
+            } else if (next == '\"') {
+                result << '\"';
+                i++;
+            } else if (next == '\\') {
+                result << '\\';
+                i++;
+            } else {
+                result << c;
+            }
+        } else {
+            result << c;
+        }
+    }
+
+    set_string(s, result.str());
+}
+
 void string_split(caValue* s, char sep, caValue* listOut)
 {
     set_list(listOut, 0);

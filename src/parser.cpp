@@ -2323,20 +2323,21 @@ ParseResult literal_string(Block* block, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    std::string text = tokens.consumeStr(tok_String);
+    Value text;
+    tokens.consumeStr(&text, tok_String);
 
-    std::string quoteType = text.substr(0,1);
+    Value quoteType;
+    string_slice(&text, 0, 1, &quoteType);
 
     Value escaped;
-    unquote_and_unescape_string(text.c_str(), &escaped);
+    copy(&text, &escaped);
+    string_unquote_and_unescape(&escaped);
 
     Term* term = create_string(block, as_cstring(&escaped));
     set_source_location(term, startPosition, tokens);
 
-    if (quoteType != "'")
-        term->setStringProp(sym_Syntax_QuoteType, quoteType);
-    if (!string_eq(&escaped, text.c_str()))
-        term->setStringProp(sym_Syntax_OriginalFormat, text);
+    term->setProp(sym_Syntax_QuoteType, &quoteType);
+    term->setProp(sym_Syntax_OriginalFormat, &text);
 
     return ParseResult(term);
 }
@@ -2751,75 +2752,6 @@ int get_number_of_decimal_figures(std::string const& str)
         result = 1;
 
     return result;
-}
-
-void unquote_and_unescape_string(const char* input, caValue* out)
-{
-    if (input[0] == 0)
-        return;
-
-    char quote = input[0];
-
-    int quoteSize = 1;
-    if (quote == '<')
-        quoteSize = 3;
-
-    int end = (int) strlen(input) - quoteSize;
-
-    // Unescape any escaped characters
-    std::stringstream result;
-    for (int i=quoteSize; i < end; i++) {
-        char c = input[i];
-        char next = 0;
-        if (i + 1 < end)
-            next = input[i+1];
-
-        if (c == '\\') {
-            if (next == 'n') {
-                result << '\n';
-                i++;
-            } else if (next == '\'') {
-                result << '\'';
-                i++;
-            } else if (next == '\"') {
-                result << '\"';
-                i++;
-            } else if (next == '\\') {
-                result << '\\';
-                i++;
-            } else {
-                result << c;
-            }
-        } else {
-            result << c;
-        }
-    }
-
-    set_string(out, result.str());
-}
-
-void quote_and_escape_string(const char* input, caValue* out)
-{
-    std::stringstream result;
-
-    result << '"';
-
-    for (int i=0; input[i] != 0; i++) {
-        if (input[i] == '\n')
-            result << "\\n";
-        else if (input[i] == '\'')
-            result << "\\'";
-        else if (input[i] == '"')
-            result << "\\\"";
-        else if (input[i] == '\\')
-            result << "\\\\";
-        else
-            result << input[i];
-    }
-
-    result << '"';
-
-    set_string(out, result.str());
 }
 
 } // namespace parser
