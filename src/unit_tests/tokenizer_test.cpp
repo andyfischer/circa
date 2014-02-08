@@ -122,9 +122,9 @@ void test_misc1()
     tokens.consume();
     test_assert(tokens.nextIs(tok_Question));
     tokens.consume();
-    test_assert(tokens.nextIs(tok_RBracket));
+    test_assert(tokens.nextIs(tok_RSquare));
     tokens.consume();
-    test_assert(tokens.nextIs(tok_LBracket));
+    test_assert(tokens.nextIs(tok_LSquare));
     tokens.consume();
     test_assert(tokens.nextIs(tok_LThanEq));
     tokens.consume();

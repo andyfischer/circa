@@ -305,10 +305,10 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         append_phrase(source, "<-", term, sym_None);
         format_source_for_input(source, term, 0);
     } else if (declarationStyle == "bracket-list") {
-        append_phrase(source, "[", term, tok_LBracket);
+        append_phrase(source, "[", term, tok_LSquare);
         for (int i=0; i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
-        append_phrase(source, "]", term, tok_LBracket);
+        append_phrase(source, "]", term, tok_RSquare);
     }
 
     for (int p=0; p < numParens; p++)

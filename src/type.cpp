@@ -64,7 +64,7 @@ namespace type_t {
 
         append_phrase(source, term->stringProp(sym_Syntax_PreLBracketWs, " "),
                 term, tok_Whitespace);
-        append_phrase(source, "{", term, tok_LBracket);
+        append_phrase(source, "{", term, tok_LBrace);
         append_phrase(source, term->stringProp(sym_Syntax_PostLBracketWs, " "),
                 term, tok_Whitespace);
 
@@ -93,7 +93,7 @@ namespace type_t {
         }
         append_phrase(source, term->stringProp(sym_Syntax_PreRBracketWs,""),
             term, tok_Whitespace);
-        append_phrase(source, "}", term, tok_RBracket);
+        append_phrase(source, "}", term, tok_RBrace);
     }
 
     std::string toString(caValue* value)

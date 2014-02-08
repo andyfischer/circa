@@ -222,8 +222,8 @@ tok_LParen
 tok_RParen
 tok_LBrace
 tok_RBrace
-tok_LBracket
-tok_RBracket
+tok_LSquare
+tok_RSquare
 tok_Comma
 tok_At
 tok_Dot

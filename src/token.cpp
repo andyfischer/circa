@@ -17,8 +17,8 @@ const char* get_token_text(int match)
         case tok_RParen: return ")";
         case tok_LBrace: return "{";
         case tok_RBrace: return "}";
-        case tok_LBracket: return "[";
-        case tok_RBracket: return "]";
+        case tok_LSquare: return "[";
+        case tok_RSquare: return "]";
         case tok_Comma: return ",";
         case tok_At: return "@";
         case tok_Identifier: return "IDENTIFIER";
@@ -370,10 +370,10 @@ void top_level_consume_token(TokenizeContext &context)
             context.consume(tok_RBrace, 1);
             return;
         case '[':
-            context.consume(tok_LBracket, 1);
+            context.consume(tok_LSquare, 1);
             return;
         case ']':
-            context.consume(tok_RBracket, 1);
+            context.consume(tok_RSquare, 1);
             return;
         case ',':
             context.consume(tok_Comma, 1);

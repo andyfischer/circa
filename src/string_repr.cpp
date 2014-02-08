@@ -43,13 +43,13 @@ static void parse_value(TokenStream* tokens, caValue* out)
     } else if (tokens->nextIs(tok_String)) {
         tokens->consumeStr(out, tok_String);
         string_unquote_and_unescape(out);
-    } else if (tokens->nextIs(tok_LBracket)) {
-        tokens->consume(tok_LBracket);
+    } else if (tokens->nextIs(tok_LSquare)) {
+        tokens->consume(tok_LSquare);
         drop_whitespace(tokens);
 
         set_list(out, 0);
 
-        while (!tokens->nextIs(tok_RBracket) && !tokens->finished()) {
+        while (!tokens->nextIs(tok_RSquare) && !tokens->finished()) {
             caValue* element = list_append(out);
             parse_value(tokens, element);
 
@@ -59,7 +59,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
         }
 
         if (!tokens->finished())
-            tokens->consume(tok_RBracket);
+            tokens->consume(tok_RSquare);
     } else if (tokens->nextIs(tok_True)) {
         set_bool(out, true);
         tokens->consume();

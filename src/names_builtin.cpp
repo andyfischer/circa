@@ -197,8 +197,8 @@ const char* builtin_symbol_to_string(int name)
     case tok_RParen: return "tok_RParen";
     case tok_LBrace: return "tok_LBrace";
     case tok_RBrace: return "tok_RBrace";
-    case tok_LBracket: return "tok_LBracket";
-    case tok_RBracket: return "tok_RBracket";
+    case tok_LSquare: return "tok_LSquare";
+    case tok_RSquare: return "tok_RSquare";
     case tok_Comma: return "tok_Comma";
     case tok_At: return "tok_At";
     case tok_Dot: return "tok_Dot";
@@ -2444,30 +2444,16 @@ int builtin_symbol_from_string(const char* str)
     case 'L':
     switch (str[5]) {
     case 'B':
-    switch (str[6]) {
-    case 'r':
-    switch (str[7]) {
-    case 'a':
-    switch (str[8]) {
-    case 'c':
-    switch (str[9]) {
-    case 'e':
+        if (strcmp(str + 6, "race") == 0)
             return tok_LBrace;
-    case 'k':
-        if (strcmp(str + 10, "et") == 0)
-            return tok_LBracket;
         break;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
     case 'P':
         if (strcmp(str + 6, "aren") == 0)
             return tok_LParen;
+        break;
+    case 'S':
+        if (strcmp(str + 6, "quare") == 0)
+            return tok_LSquare;
         break;
     case 'T':
     switch (str[6]) {
@@ -2598,30 +2584,16 @@ int builtin_symbol_from_string(const char* str)
     case 'R':
     switch (str[5]) {
     case 'B':
-    switch (str[6]) {
-    case 'r':
-    switch (str[7]) {
-    case 'a':
-    switch (str[8]) {
-    case 'c':
-    switch (str[9]) {
-    case 'e':
+        if (strcmp(str + 6, "race") == 0)
             return tok_RBrace;
-    case 'k':
-        if (strcmp(str + 10, "et") == 0)
-            return tok_RBracket;
         break;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
     case 'P':
         if (strcmp(str + 6, "aren") == 0)
             return tok_RParen;
+        break;
+    case 'S':
+        if (strcmp(str + 6, "quare") == 0)
+            return tok_RSquare;
         break;
     case 'e':
     switch (str[6]) {

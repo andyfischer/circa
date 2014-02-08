@@ -273,9 +273,9 @@ void selector_format_source(caValue* source, Term* term)
                     input, tok_Identifier);
 
         } else {
-            append_phrase(source, "[", term, tok_LBracket);
+            append_phrase(source, "[", term, tok_LSquare);
             format_source_for_input(source, term, i, "", "");
-            append_phrase(source, "]", term, tok_LBracket);
+            append_phrase(source, "]", term, tok_RSquare);
         }
     }
 }

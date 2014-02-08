@@ -118,21 +118,19 @@ Term* find_and_apply(Block* block, std::string const& functionName,
 // consumed tokens in its syntax hints.
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient=NULL);
 
-// Consume the nearby line, return a newly created compile-error term.
-ParseResult compile_error_for_line(Block* block, TokenStream &tokens, int start,
+// Discard nearby tokens and store a compile error.
+ParseResult compile_error(Block* block, TokenStream &tokens, int start,
+        std::string const& message="");
+ParseResult compile_error(Term* existingTerm, TokenStream &tokens, int start,
         std::string const& message="");
 
-// Consume the nearby line, convert 'existing' into a compile-error term, and
-// return it.
-ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int start,
-        std::string const& message="");
-
-// Helper functions:
+// Helper functions
 bool is_infix_operator_rebinding(int match);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
 bool is_statement_ending(int t);
+bool is_ending_bracket(int token);
 std::string possible_statement_ending(TokenStream& tokens);
 bool is_multiline_block(Term* term);
 

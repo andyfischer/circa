@@ -35,9 +35,9 @@ namespace get_index_function {
         if (term->boolProp(sym_Syntax_Brackets, false)) {
             format_name_binding(source, term);
             format_source_for_input(source, term, 0);
-            append_phrase(source, "[", term, tok_LBracket);
+            append_phrase(source, "[", term, tok_LSquare);
             format_source_for_input(source, term, 1);
-            append_phrase(source, "]", term, tok_LBracket);
+            append_phrase(source, "]", term, tok_RSquare);
         } else {
             format_term_source_default_formatting(source, term);
         }
