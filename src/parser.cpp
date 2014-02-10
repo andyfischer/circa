@@ -31,6 +31,14 @@
 namespace circa {
 namespace parser {
 
+ParseResult syntax_error(Block* block, TokenStream &tokens, int start,
+        std::string const& message="");
+ParseResult syntax_error(Term* existingTerm, TokenStream &tokens, int start,
+        std::string const& message="");
+
+bool is_opening_bracket(int token);
+bool is_closing_bracket(int token);
+
 static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo);
 static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
@@ -49,6 +57,7 @@ Term* compile(Block* block, ParsingStep step, std::string const& input)
 
     TokenStream tokens(input);
     ParserCxt context;
+    context.tokens = &tokens;
     Term* result = step(block, tokens, &context).term;
 
     block_finish_changes(block);
@@ -328,12 +337,6 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     int sourceStartPosition = tokens.getPosition();
     bool foundWhitespace = preWhitespace != "";
 
-    // Push info to the statement stack. (statementStack was once used and is now vestigal).
-    if (!is_list(&context->statementStack))
-        set_list(&context->statementStack);
-
-    list_append(&context->statementStack);
-
     ParseResult result;
 
     // Comment (blank lines count as comments). This should do the same thing
@@ -415,8 +418,6 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     if (initialPosition == tokens.getPosition())
         internal_error("parser::statement is stuck, next token is: " + tokens.nextStr());
 
-    list_pop(&context->statementStack);
-
     return result;
 }
 
@@ -459,7 +460,7 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
     ParseResult result;
 
     if (!tokens.nextIs(tok_Identifier))
-        return compile_error(block, tokens, startPosition);
+        return syntax_error(block, tokens, startPosition);
 
     Value typeName;
     tokens.consumeStr(&typeName);
@@ -507,7 +508,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Value msg;
         set_string(&msg, "Expected identifier after def, found: ");
         string_append(&msg, tokens.nextCStr());
-        return compile_error(block, tokens, startPosition, as_cstring(&msg));
+        return syntax_error(block, tokens, startPosition, as_cstring(&msg));
     }
 
     // Function name
@@ -524,7 +525,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         tokens.consume(tok_Dot);
 
         if (!tokens.nextIs(tok_Identifier))
-            return compile_error(block, tokens, startPosition, "Expected identifier after .");
+            return syntax_error(block, tokens, startPosition, "Expected identifier after .");
 
         Value typeName;
         copy(&functionName, &typeName);
@@ -533,8 +534,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         tokens.consumeStr(&functionName, tok_Identifier);
 
         if (methodType == NULL || !is_type(methodType))
-            return compile_error(block, tokens, startPosition,
-                      "Not a type: " + as_string(&typeName));
+            return syntax_error(block, tokens, startPosition, "Not a type: " + as_string(&typeName));
     }
 
     Term* result = create_function(block, as_cstring(&functionName));
@@ -552,7 +552,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         if (symbolText == ":throws")
             internal_error(":throws has been removed");
         else
-            return compile_error(block, tokens, startPosition,
+            return syntax_error(block, tokens, startPosition,
                     "Unrecognized symbol: "+symbolText);
 
         symbolText += possible_whitespace(tokens);
@@ -562,7 +562,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     if (!tokens.nextIs(tok_LParen))
-        return compile_error(block, tokens, startPosition, "Expected: (");
+        return syntax_error(block, tokens, startPosition, "Expected: (");
 
     tokens.consume(tok_LParen);
 
@@ -627,7 +627,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // Input name.
         if (!tokens.nextIs(tok_Identifier))
-            return compile_error(block, tokens, startPosition, "Expected input name");
+            return syntax_error(block, tokens, startPosition, "Expected input name");
 
         Value name;
         tokens.consumeStr(&name, tok_Identifier);
@@ -665,7 +665,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             } else if (symbolText == ":meta") {
                 input->setBoolProp(sym_Meta, true);
             } else {
-                return compile_error(block, tokens, startPosition,
+                return syntax_error(block, tokens, startPosition,
                     "Unrecognized qualifier: "+symbolText);
             }
             possible_whitespace(tokens);
@@ -673,7 +673,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         if (!tokens.nextIs(tok_RParen)) {
             if (!tokens.nextIs(tok_Comma))
-                return compile_error(result, tokens, startPosition, "Expected: ,");
+                return syntax_error(result, tokens, startPosition, "Expected: ,");
 
             tokens.consume(tok_Comma);
         }
@@ -686,7 +686,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         hide_from_source(contents->get(i));
 
     if (!tokens.nextIs(tok_RParen))
-        return compile_error(result, tokens, startPosition);
+        return syntax_error(result, tokens, startPosition);
 
     tokens.consume(tok_RParen);
 
@@ -698,7 +698,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
         else
         {
-            return compile_error(result, tokens, startPosition,
+            return syntax_error(result, tokens, startPosition,
                 "Unrecognized symbol: " + symbolText);
         }
     }
@@ -722,7 +722,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
 consume_next_output: {
             if (!tokens.nextIs(tok_Identifier)) {
-                return compile_error(result, tokens, startPosition,
+                return syntax_error(result, tokens, startPosition,
                         "Expected type name after ->");
             }
 
@@ -733,11 +733,11 @@ consume_next_output: {
                 std::string msg;
                 msg += "Couldn't find type named: ";
                 msg += typeName;
-                return compile_error(result, tokens, startPosition, msg);
+                return syntax_error(result, tokens, startPosition, msg);
             }
 
             if (!is_type(typeTerm)) {
-                return compile_error(result, tokens, startPosition,
+                return syntax_error(result, tokens, startPosition,
                         typeTerm->name +" is not a type");
             }
 
@@ -754,7 +754,7 @@ consume_next_output: {
 
         if (expectMultiple) {
             if (!tokens.nextIs(tok_RParen))
-                return compile_error(result, tokens, startPosition,
+                return syntax_error(result, tokens, startPosition,
                     "Expected ')'");
             tokens.consume(tok_RParen);
         }
@@ -788,7 +788,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(tok_Identifier))
-        return compile_error(block, tokens, startPosition);
+        return syntax_error(block, tokens, startPosition);
 
     Value name;
     tokens.consumeStr(&name, tok_Identifier);
@@ -803,7 +803,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // There were once type attributes here
         {
-            return compile_error(result, tokens, startPosition,
+            return syntax_error(result, tokens, startPosition,
                 "Unrecognized type attribute: " + s);
         }
 
@@ -816,7 +816,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         tokens.consume(tok_Equals);
         possible_whitespace(tokens);
         if (!tokens.nextIs(tok_ColonString)) {
-            return compile_error(result, tokens, startPosition,
+            return syntax_error(result, tokens, startPosition,
                     "Expected :symbol after =");
         }
 
@@ -828,7 +828,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         } else if (string_eq(&str, ":interface")) {
             setup_interface_type(as_type(result));
         } else {
-            return compile_error(result, tokens, startPosition,
+            return syntax_error(result, tokens, startPosition,
                     "Unrecognized magic symbol for type");
         }
 
@@ -844,7 +844,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     if (!tokens.nextIs(tok_LBrace) && !tokens.nextIs(tok_LSquare))
-        return compile_error(result, tokens, startPosition);
+        return syntax_error(result, tokens, startPosition);
 
     // Parse as compound type.
     list_t::setup_type(unbox_type(result));
@@ -876,7 +876,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
 
         if (!tokens.nextIs(tok_Identifier))
-            return compile_error(result, tokens, startPosition);
+            return syntax_error(result, tokens, startPosition);
 
         Term* fieldType = type_expr(block, tokens, context).term;
 
@@ -941,7 +941,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
         std::string preKeywordWhitespace = possible_whitespace(tokens);
 
         if (tokens.finished())
-            return compile_error(result, tokens, startPosition);
+            return syntax_error(result, tokens, startPosition);
 
         int leadingTokenPosition = tokens.getPosition();
         int leadingToken = tokens.next().match;
@@ -955,7 +955,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // Otherwise expect 'elif' or 'else'
         if (leadingToken != tok_If && leadingToken != tok_Elif && leadingToken != tok_Else)
-            return compile_error(result, tokens, startPosition,
+            return syntax_error(result, tokens, startPosition,
                     "Expected 'if' or 'elif' or 'else'");
 
         tokens.consume();
@@ -1052,7 +1052,7 @@ ParseResult case_statement(Block* block, TokenStream& tokens, ParserCxt* context
     // Find the parent 'switch' block.
     Term* parent = block->owningTerm;
     if (parent == NULL || parent->function != FUNCS.switch_func) {
-        return compile_error(block, tokens, startPosition,
+        return syntax_error(block, tokens, startPosition,
             "'case' keyword must occur inside 'switch' block");
     }
 
@@ -1087,7 +1087,7 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     } else if (tokens.nextIs(tok_String)) {
         moduleName = literal_string(block, tokens, context).term;
     } else {
-        return compile_error(block, tokens, startPosition,
+        return syntax_error(block, tokens, startPosition,
             "Expected module name (as a string or identifier)");
     }
 
@@ -1118,7 +1118,7 @@ ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     } else if (tokens.nextIs(tok_String)) {
         moduleName = literal_string(block, tokens, context).term;
     } else {
-        return compile_error(block, tokens, startPosition,
+        return syntax_error(block, tokens, startPosition,
             "Expected module name (as a string or identifier)");
     }
 
@@ -1135,7 +1135,7 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(tok_Identifier))
-        return compile_error(block, tokens, startPosition);
+        return syntax_error(block, tokens, startPosition);
 
     std::string iterator_name = tokens.consumeStr(tok_Identifier);
     possible_whitespace(tokens);
@@ -1155,7 +1155,7 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     if (!tokens.nextIs(tok_In))
-        return compile_error(block, tokens, startPosition);
+        return syntax_error(block, tokens, startPosition);
 
     tokens.consume(tok_In);
     possible_whitespace(tokens);
@@ -1222,7 +1222,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(tok_Identifier))
-        return compile_error(block, tokens, startPosition,
+        return syntax_error(block, tokens, startPosition,
                 "Expected identifier after 'state'");
 
     Value name;
@@ -1330,7 +1330,7 @@ ParseResult include_statement(Block* block, TokenStream& tokens, ParserCxt* cont
         filename = tokens.consumeStr(tok_String);
         filename = filename.substr(1, filename.length()-2);
     } else {
-        return compile_error(block, tokens, startPosition,
+        return syntax_error(block, tokens, startPosition,
                 "Expected identifier or string after 'include'");
     }
 
@@ -1646,7 +1646,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             // Right-apply. Consume right side as a function name.
             
             if (!tokens.nextIs(tok_Identifier))
-                return compile_error(block, tokens, startPosition, "Expected identifier");
+                return syntax_error(block, tokens, startPosition, "Expected identifier");
 
             ParseResult functionName = identifier_possibly_null(block, tokens, context);
 
@@ -1786,7 +1786,7 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
             possible_whitespace(tokens);
             
             if (!tokens.nextIs(tok_Equals)) {
-                compile_error(block, tokens, tokens.getPosition(), "Expected: =");
+                syntax_error(block, tokens, tokens.getPosition(), "Expected: =");
                 return;
             }
 
@@ -1861,7 +1861,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     }
 
     if (!tokens.nextIs(tok_Identifier)) {
-        return compile_error(block, tokens, startPosition,
+        return syntax_error(block, tokens, startPosition,
                 "Expected identifier or symbol after dot");
     }
 
@@ -1881,7 +1881,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     if (hasParens) {
         function_call_inputs(block, tokens, context, inputs, inputHints);
         if (!tokens.nextIs(tok_RParen))
-            return compile_error(block, tokens, startPosition, "Expected: )");
+            return syntax_error(block, tokens, startPosition, "Expected: )");
         tokens.consume(tok_RParen);
     }
 
@@ -1945,7 +1945,7 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
     function_call_inputs(block, tokens, context, inputs, inputHints);
 
     if (!tokens.nextIs(tok_RParen))
-        return compile_error(block, tokens, startPosition, "Expected: )");
+        return syntax_error(block, tokens, startPosition, "Expected: )");
     tokens.consume(tok_RParen);
 
     // If function isn't found, bail out with unknown_function.
@@ -2027,7 +2027,7 @@ ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* c
             Term* subscript = infix_expression(block, tokens, context, 0).term;
 
             if (!tokens.nextIs(tok_RSquare))
-                return compile_error(block, tokens, startPosition, "Expected: ]");
+                return syntax_error(block, tokens, startPosition, "Expected: ]");
 
             tokens.consume(tok_RSquare);
 
@@ -2249,7 +2249,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
         context->openParens = prevParenCount;
 
         if (!tokens.nextIs(tok_RParen))
-            return compile_error(result.term, tokens, startPosition);
+            return syntax_error(result.term, tokens, startPosition);
         tokens.consume(tok_RParen);
         result.term->setIntProp(sym_Syntax_Parens, result.term->intProp(sym_Syntax_Parens,0) + 1);
     }
@@ -2257,8 +2257,8 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
         std::string next;
         if (!tokens.finished())
             next = tokens.consumeStr();
-        return compile_error(block, tokens, startPosition,
-            "Unrecognized expression, (next token = " + next + ")");
+        return syntax_error(block, tokens, startPosition,
+            "Unrecognized start of expression (next token = '" + next + "')");
     }
 
     if (!result.isIdentifier())
@@ -2445,7 +2445,7 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
     function_call_inputs(block, tokens, context, inputs, listHints);
 
     if (!tokens.nextIs(tok_RSquare))
-        return compile_error(block, tokens, startPosition, "Expected: ]");
+        return syntax_error(block, tokens, startPosition, "Expected: ]");
     tokens.consume(tok_RSquare);
 
     Term* term = apply(block, FUNCS.list, inputs);
@@ -2657,23 +2657,34 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
     return line.str();
 }
 
-ParseResult compile_error(Block* block, TokenStream& tokens, int start,
+ParseResult syntax_error(Block* block, TokenStream& tokens, int start,
         std::string const& message)
 {
-    Term* result = apply(block, FUNCS.unrecognized_expression, TermList());
-    return compile_error(result, tokens, start, message);
+    Term* result = apply(block, FUNCS.syntax_error, TermList());
+    return syntax_error(result, tokens, start, message);
 }
 
-ParseResult compile_error(Term* existing, TokenStream &tokens, int start,
+ParseResult syntax_error(Term* existing, TokenStream &tokens, int start,
         std::string const& message)
 {
-    if (existing->function != FUNCS.unrecognized_expression)
-        change_function(existing, FUNCS.unrecognized_expression);
+    if (existing->function != FUNCS.syntax_error)
+        change_function(existing, FUNCS.syntax_error);
 
-    // 
-    std::string line = consume_line(tokens, start, existing);
+    // Consume & discard nearby tokens. Don't discard ending brackets or newlines
+    // b/c that can have widespread consequences.
+    Value consumed;
+    set_string(&consumed, "");
 
-    existing->setStringProp(sym_OriginalText, line.c_str());
+    while (!tokens.finished()
+            && !is_opening_bracket(tokens.nextMatch())
+            && !is_closing_bracket(tokens.nextMatch())
+            && !tokens.nextIs(tok_Newline)
+            && !tokens.nextIs(tok_Semicolon)) {
+
+        tokens.consumeStr(&consumed);
+    }
+
+    existing->setStringProp(sym_OriginalText, as_cstring(&consumed));
     existing->setStringProp(sym_Message, message.c_str());
 
     ca_assert(has_static_error(existing));
@@ -2712,9 +2723,14 @@ bool is_statement_ending(int t)
     return t == tok_Semicolon || t == tok_Newline;
 }
 
-bool is_ending_bracket(int token)
+bool is_opening_bracket(int token)
 {
-    return (token == tok_RSquare) || (token == tok_RBrace) == (token == tok_RParen);
+    return (token == tok_LSquare) || (token == tok_LBrace) || (token == tok_LParen);
+}
+
+bool is_closing_bracket(int token)
+{
+    return (token == tok_RSquare) || (token == tok_RBrace) || (token == tok_RParen);
 }
 
 std::string possible_statement_ending(TokenStream& tokens)

@@ -854,6 +854,12 @@ TokenStream::consumeStr(caValue* output, int match)
     consume(-1);
 }
 
+void
+TokenStream::dropRemainder()
+{
+    _position = tokens.size();
+}
+
 int
 TokenStream::getPosition() const
 {

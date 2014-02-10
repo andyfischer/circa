@@ -11,12 +11,11 @@ namespace parser {
 
 struct ParserCxt {
 
+    TokenStream* tokens;
+
     // Number of open parenthesis in the current expression. (This affects whether we'll
     // consume newlines as part of an expression).
     int openParens;
-
-    // Stack where each element has information about the statement(s) currently being parsed.
-    Value statementStack;
 
     ParserCxt()
       : openParens(0)
@@ -118,19 +117,12 @@ Term* find_and_apply(Block* block, std::string const& functionName,
 // consumed tokens in its syntax hints.
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient=NULL);
 
-// Discard nearby tokens and store a compile error.
-ParseResult compile_error(Block* block, TokenStream &tokens, int start,
-        std::string const& message="");
-ParseResult compile_error(Term* existingTerm, TokenStream &tokens, int start,
-        std::string const& message="");
-
 // Helper functions
 bool is_infix_operator_rebinding(int match);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
 bool is_statement_ending(int t);
-bool is_ending_bracket(int token);
 std::string possible_statement_ending(TokenStream& tokens);
 bool is_multiline_block(Term* term);
 

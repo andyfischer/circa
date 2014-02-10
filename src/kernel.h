@@ -93,11 +93,11 @@ struct BuiltinFuncs {
     Term* sub_i;
     Term* sub_f;
     Term* switch_func;
+    Term* syntax_error;
     Term* type;
     Term* unbound_input;
     Term* unknown_function;
     Term* unknown_identifier;
-    Term* unrecognized_expression;
     Term* value;
     Term* while_loop;
 };

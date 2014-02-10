@@ -90,9 +90,9 @@ void check_term_for_static_error(List* errors, Term* term)
     if (term->function == FUNCS.unknown_identifier)
         return append_static_error(errors, term, "unknown_identifier");
 
-    // Unrecognized expression
-    if (term->function == FUNCS.unrecognized_expression)
-        return append_static_error(errors, term, "unrecognized_expression");
+    // Syntax error
+    if (term->function == FUNCS.syntax_error)
+        return append_static_error(errors, term, "syntax_error");
 
     if (term->function == FUNCS.static_error)
         return append_static_error(errors, term, to_string(term_value(term->input(0))).c_str());
@@ -156,8 +156,8 @@ void format_static_error(caValue* error, caValue* stringOutput)
         out << "Unknown type: " << term->name;
     else if (strcmp(type, "unknown_identifier") == 0)
         out << "Unknown identifier: " << term->name;
-    else if (strcmp(type, "unrecognized_expression") == 0)
-        out << "Unrecognized expression: " << term->stringProp(sym_Message, "");
+    else if (strcmp(type, "syntax_error") == 0)
+        out << "Syntax error: " << term->stringProp(sym_Message, "");
     else if (strcmp(type, "wrong_input_count") == 0) {
         int funcNumInputs = term_count_input_placeholders(term);
         int actualCount = term->numInputs();
