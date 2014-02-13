@@ -110,13 +110,6 @@ void set_source_location(Term* term, int start, TokenStream& tokens);
 Term* find_and_apply(Block* block, std::string const& functionName,
         TermList const& inputs);
 
-// Consume tokens starting at 'start' and ending at something which might
-// be the end of the statement. Return line as string. This should probably
-// only be used for handling parse errrors.
-// If 'positionRecepient' is not NULL then we will include the positions of the
-// consumed tokens in its syntax hints.
-std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient=NULL);
-
 // Helper functions
 bool is_infix_operator_rebinding(int match);
 std::string possible_whitespace(TokenStream& tokens);

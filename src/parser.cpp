@@ -2629,51 +2629,29 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     term->sourceLoc.grow(loc);
 }
 
-std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)
-{
-    ca_assert(start <= tokens.getPosition());
-
-    int originalPosition = tokens.getPosition();
-
-    tokens.resetPosition(start);
-
-    std::stringstream line;
-    while (!tokens.finished()) {
-
-        // If we've passed our originalPosition and reached a newline, then stop.
-        if (tokens.getPosition() > originalPosition
-                && (tokens.nextIs(tok_Newline) || tokens.nextIs(tok_Semicolon)))
-            break;
-
-        line << tokens.consumeStr();
-    }
-
-    // Make sure we passed our original position.
-    ca_assert(tokens.getPosition() >= originalPosition);
-
-    if (positionRecepient != NULL)
-        set_source_location(positionRecepient, start, tokens);
-
-    return line.str();
-}
-
-ParseResult syntax_error(Block* block, TokenStream& tokens, int start,
+ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
         std::string const& message)
 {
     Term* result = apply(block, FUNCS.syntax_error, TermList());
-    return syntax_error(result, tokens, start, message);
+    return syntax_error(result, tokens, exprStart, message);
 }
 
-ParseResult syntax_error(Term* existing, TokenStream &tokens, int start,
+ParseResult syntax_error(Term* existing, TokenStream &tokens, int exprStart,
         std::string const& message)
 {
     if (existing->function != FUNCS.syntax_error)
         change_function(existing, FUNCS.syntax_error);
 
     // Consume & discard nearby tokens. Don't discard ending brackets or newlines
-    // b/c that can have widespread consequences.
+    // because that can have widespread consequences.
     Value consumed;
     set_string(&consumed, "");
+
+    int erroredPosition = tokens.getPosition();
+
+    tokens.setPosition(exprStart);
+    while (tokens.getPosition() < erroredPosition)
+        tokens.consumeStr(&consumed);
 
     while (!tokens.finished()
             && !is_opening_bracket(tokens.nextMatch())

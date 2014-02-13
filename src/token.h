@@ -103,7 +103,7 @@ struct TokenStream
     }
 
     int getPosition() const;
-    void resetPosition(int loc); 
+    void setPosition(int loc); 
     std::string toString() const;
     void dump();
 };

@@ -867,7 +867,7 @@ TokenStream::getPosition() const
 }
 
 void
-TokenStream::resetPosition(int loc)
+TokenStream::setPosition(int loc)
 {
     ca_assert(loc >= 0);
     _position = loc;
