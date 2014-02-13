@@ -595,6 +595,7 @@ void bootstrap_kernel()
 
     // Load the standard library from stdlib.ca
     parser::compile(builtins, parser::statement_list, find_builtin_module("stdlib"));
+    set_string(block_insert_property(builtins, sym_ModuleName), "stdlib");
 
     closures_install_functions(builtins);
     modules_install_functions(builtins);

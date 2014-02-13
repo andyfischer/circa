@@ -21,6 +21,7 @@ HasControlFlow
 DirtyStateType
 Filename
 Builtins
+ModuleName
 
 # Term properties
 AccumulatingOutput

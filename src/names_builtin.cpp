@@ -33,6 +33,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_DirtyStateType: return "DirtyStateType";
     case sym_Filename: return "Filename";
     case sym_Builtins: return "Builtins";
+    case sym_ModuleName: return "ModuleName";
     case sym_AccumulatingOutput: return "AccumulatingOutput";
     case sym_Comment: return "Comment";
     case sym_Constructor: return "Constructor";
@@ -876,9 +877,21 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'o':
-        if (strcmp(str + 2, "difyList") == 0)
+    switch (str[2]) {
+    case 'd':
+    switch (str[3]) {
+    case 'i':
+        if (strcmp(str + 4, "fyList") == 0)
             return sym_ModifyList;
         break;
+    case 'u':
+        if (strcmp(str + 4, "leName") == 0)
+            return sym_ModuleName;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'u':
     switch (str[2]) {
     case 'l':

@@ -51,10 +51,6 @@ Miscellanous (most-recent first)
       a = make(A)
       @a.i += 4
    
-  This code had an error with no source location:
-    letterSize = [painter.currentFont.width('AAAAAAAAAA') / 10, painter.currentFont.height] -> Point
-  (where width & height both returned null)
-
 Deprecated code to delete
   Unique names (replaced with global names and uniqueOrdinal)
   
@@ -66,4 +62,4 @@ Code reload
 
 Modules
   When compiling a module, the last value is automatically turned into an output (just
-    like a function). This should probably be explicit for modules.
+    like a function). This should probably be explicit for modules?

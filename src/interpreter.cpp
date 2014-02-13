@@ -2025,9 +2025,9 @@ static void vm_push_dynamic_method(Stack* stack)
                 return;
 
             Value msg;
-            set_string(&msg, "Method ");
+            set_string(&msg, "Method '");
             string_append(&msg, elementName);
-            string_append(&msg, " not found on type ");
+            string_append(&msg, "' not found on type ");
             string_append(&msg, &circa_type_of(object)->name);
             set_error_string(frame_register(top, caller), as_cstring(&msg));
             raise_error(stack);

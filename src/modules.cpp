@@ -72,6 +72,11 @@ Block* fetch_module(World* world, const char* name)
     if (existing != NULL)
         return existing;
 
+    return create_module(world, name);
+}
+
+Block* create_module(World* world, const char* name)
+{
     Term* term = apply(world->root, FUNCS.module, TermList(), name);
     return nested_contents(term);
 }
@@ -138,8 +143,7 @@ Block* load_module_file(World* world, caValue* moduleName, const char* filename)
     Block* newBlock;
 
     if (existing == NULL) {
-        Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
-        newBlock = nested_contents(term);
+        newBlock = create_module(world, as_cstring(moduleName));
     } else {
         newBlock = alloc_block();
         block_graft_replacement(existing, newBlock);
@@ -162,7 +166,7 @@ void install_block_as_module(World* world, caValue* moduleName, Block* block)
     Block* existing = find_module(world->root, moduleName);
 
     if (existing == NULL) {
-        Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
+        existing = create_module(world, as_cstring(moduleName));
         block_graft_replacement(existing, block);
 
     } else {
@@ -204,8 +208,7 @@ Block* load_module_by_name(World* world, Block* loadedBy, caValue* moduleName)
     const char* builtinText = find_builtin_module(as_cstring(moduleName));
 
     if (builtinText != NULL) {
-        Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
-        Block* newBlock = nested_contents(term);
+        Block* newBlock = create_module(world, as_cstring(moduleName));
         load_script_from_text(newBlock, builtinText);
         return newBlock;
     }

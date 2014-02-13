@@ -1591,7 +1591,6 @@ InfixOperatorInfo get_infix_operator_info(int tokenMatch)
 ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* context,
         int minimumPrecedence)
 {
-    int startPosition = tokens.getPosition();
 
     ParseResult left = unary_expression(block, tokens, context);
 
@@ -1599,6 +1598,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
     // Loop, consuming as many infix expressions as the minimumPrecedence allows.
     while (true) {
+        int startPosition = tokens.getPosition();
 
         // Special case: if we have an expression that looks like this:
         //
@@ -1716,6 +1716,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 }
             }
 
+            set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
         }
     

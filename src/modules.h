@@ -16,6 +16,8 @@ void module_get_default_name_from_filename(caValue* filename, caValue* moduleNam
 // Add a top-level with the given name, or return an existing one if it exists.
 Block* fetch_module(World* world, const char* name);
 
+Block* create_module(World* world, const char* name);
+
 // Load a module from the given filename. If the module already exists, then we'll replace
 // the existing contents, and we'll update any existing references that point to the replaced
 // code. Does not create a file watch (see load_module_file_watched).

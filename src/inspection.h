@@ -131,6 +131,7 @@ void get_short_location(Term* term, caValue* str);
 
 // Print the source file that this term came from, if any.
 std::string get_source_filename(Term* term);
+caValue* get_parent_module_name(Block* block);
 
 void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &names);
 
