@@ -46,7 +46,6 @@ namespace type_check_function { void setup(Block* kernel); }
 namespace unique_id_function { void setup(Block* kernel); }
 namespace unknown_function_function { void setup(Block* kernel); }
 namespace unknown_identifier_function { void setup(Block* kernel); }
-namespace unrecognized_expr_function { void setup(Block* kernel); }
 namespace write_text_file_function { void setup(Block* kernel); }
 
 void setup_builtin_functions(Block* kernel)
@@ -87,7 +86,6 @@ void setup_builtin_functions(Block* kernel)
     unique_id_function::setup(kernel);
     unknown_function_function::setup(kernel);
     unknown_identifier_function::setup(kernel);
-    unrecognized_expr_function::setup(kernel);
     write_text_file_function::setup(kernel);
 }
 

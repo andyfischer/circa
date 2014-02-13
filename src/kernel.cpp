@@ -76,6 +76,19 @@ Type* output_placeholder_specializeType(Term* caller)
     return declared_type(caller->input(0));
 }
 
+void syntax_error(caStack* stack)
+{
+    Value msg;
+    set_string(&msg, "");
+    string_append(&msg, circa_caller_term(stack)->stringProp(sym_Message,"Syntax error").c_str());
+    circa_output_error(stack, as_cstring(&msg));
+}
+
+void syntax_error_formatSource(caValue* source, Term* term)
+{
+    append_phrase(source, term->stringProp(sym_OriginalText,""), term, sym_None);
+}
+
 void from_string(caStack* stack)
 {
     parse_string_repr(circa_string_input(stack, 0), circa_output(stack, 0));
@@ -498,6 +511,9 @@ void bootstrap_kernel()
     control_flow_setup_funcs(builtins);
     selector_setup_funcs(builtins);
     loop_setup_functions(builtins);
+
+    FUNCS.syntax_error = import_function(builtins, syntax_error, "syntax_error(i :multiple)");
+    block_set_format_source_func(function_contents(FUNCS.syntax_error), syntax_error_formatSource);
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(builtins);
