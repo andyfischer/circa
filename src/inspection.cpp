@@ -479,23 +479,35 @@ std::string get_block_raw(Block* block)
     return out.str();
 }
 
-std::string get_short_location(Term* term)
+void get_short_location(Term* term, caValue* str)
 {
-    std::stringstream out;
-    out << "[";
+    if (!is_string(str))
+        set_string(str, "");
+
+    string_append(str, "[");
+
     std::string filename = get_source_filename(term);
-    if (filename != "")
-        out << filename << ":";
-    if (term->sourceLoc.defined())
-        out << term->sourceLoc.line << "," << term->sourceLoc.col;
-    else
-        out << global_id(term);
+    if (filename != "") {
+        string_append(str, filename.c_str());
+        string_append(str, " ");
+    }
 
-    //out << " ";
-    //out << global_id(term);
+    if (!term->sourceLoc.defined()) {
+        string_append(str, global_id(term).c_str());
+    } else {
+        string_append(str, term->sourceLoc.line);
+        string_append(str, ",");
+        string_append(str, term->sourceLoc.col);
 
-    out << "]";
-    return out.str();
+        if (term->sourceLoc.lineEnd != term->sourceLoc.line) {
+            string_append(str, " - ");
+            string_append(str, term->sourceLoc.lineEnd);
+            string_append(str, ",");
+            string_append(str, term->sourceLoc.colEnd);
+        }
+    }
+
+    string_append(str, "]");
 }
 
 std::string get_source_filename(Term* term)

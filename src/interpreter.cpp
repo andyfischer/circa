@@ -423,7 +423,10 @@ void stack_trace_to_string(Stack* stack, caValue* out)
             continue;
 
         // Print a short location label
-        strm << get_short_location(term) << " ";
+        Value str;
+        get_short_location(term, &str);
+
+        strm << as_cstring(&str) << " ";
         if (term->name != "")
             strm << term->name << " = ";
         strm << term->function->name;

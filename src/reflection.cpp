@@ -614,7 +614,7 @@ void Term__location_string(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    set_string(circa_output(stack, 0), get_short_location(t).c_str());
+    get_short_location(t, circa_output(stack, 0));
 }
 void Term__global_id(caStack* stack)
 {

@@ -127,7 +127,7 @@ std::string get_term_to_string_extended(Term*);
 std::string get_term_to_string_extended_with_props(Term*);
 
 // Print a short source-code location for this term.
-std::string get_short_location(Term* term);
+void get_short_location(Term* term, caValue* str);
 
 // Print the source file that this term came from, if any.
 std::string get_source_filename(Term* term);

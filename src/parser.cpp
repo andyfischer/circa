@@ -33,8 +33,6 @@ namespace parser {
 
 ParseResult syntax_error(Block* block, TokenStream &tokens, int start,
         std::string const& message="");
-ParseResult syntax_error(Term* existingTerm, TokenStream &tokens, int start,
-        std::string const& message="");
 
 bool is_opening_bracket(int token);
 bool is_closing_bracket(int token);
@@ -674,7 +672,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         if (!tokens.nextIs(tok_RParen)) {
             if (!tokens.nextIs(tok_Comma))
-                return syntax_error(result, tokens, startPosition, "Expected: ,");
+                return syntax_error(block, tokens, startPosition, "Expected: ,");
 
             tokens.consume(tok_Comma);
         }
@@ -687,7 +685,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         hide_from_source(contents->get(i));
 
     if (!tokens.nextIs(tok_RParen))
-        return syntax_error(result, tokens, startPosition);
+        return syntax_error(block, tokens, startPosition);
 
     tokens.consume(tok_RParen);
 
@@ -699,7 +697,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
         else
         {
-            return syntax_error(result, tokens, startPosition,
+            return syntax_error(block, tokens, startPosition,
                 "Unrecognized symbol: " + symbolText);
         }
     }
@@ -723,7 +721,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
 consume_next_output: {
             if (!tokens.nextIs(tok_Identifier)) {
-                return syntax_error(result, tokens, startPosition,
+                return syntax_error(block, tokens, startPosition,
                         "Expected type name after ->");
             }
 
@@ -734,12 +732,11 @@ consume_next_output: {
                 std::string msg;
                 msg += "Couldn't find type named: ";
                 msg += typeName;
-                return syntax_error(result, tokens, startPosition, msg);
+                return syntax_error(block, tokens, startPosition, msg);
             }
 
             if (!is_type(typeTerm)) {
-                return syntax_error(result, tokens, startPosition,
-                        typeTerm->name +" is not a type");
+                return syntax_error(block, tokens, startPosition, typeTerm->name +" is not a type");
             }
 
             Term* output = append_output_placeholder(contents, NULL);
@@ -755,8 +752,7 @@ consume_next_output: {
 
         if (expectMultiple) {
             if (!tokens.nextIs(tok_RParen))
-                return syntax_error(result, tokens, startPosition,
-                    "Expected ')'");
+                return syntax_error(block, tokens, startPosition, "Expected ')'");
             tokens.consume(tok_RParen);
         }
     }
@@ -804,8 +800,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // There were once type attributes here
         {
-            return syntax_error(result, tokens, startPosition,
-                "Unrecognized type attribute: " + s);
+            return syntax_error(block, tokens, startPosition, "Unrecognized type attribute: " + s);
         }
 
         possible_whitespace_or_newline(tokens);
@@ -817,8 +812,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         tokens.consume(tok_Equals);
         possible_whitespace(tokens);
         if (!tokens.nextIs(tok_ColonString)) {
-            return syntax_error(result, tokens, startPosition,
-                    "Expected :symbol after =");
+            return syntax_error(block, tokens, startPosition, "Expected :symbol after =");
         }
 
         Value str;
@@ -829,8 +823,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         } else if (string_eq(&str, ":interface")) {
             setup_interface_type(as_type(result));
         } else {
-            return syntax_error(result, tokens, startPosition,
-                    "Unrecognized magic symbol for type");
+            return syntax_error(block, tokens, startPosition, "Unrecognized magic symbol for type");
         }
 
         result->setStringProp(sym_Syntax_TypeMagicSymbol, as_cstring(&str));
@@ -845,7 +838,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     if (!tokens.nextIs(tok_LBrace) && !tokens.nextIs(tok_LSquare))
-        return syntax_error(result, tokens, startPosition);
+        return syntax_error(block, tokens, startPosition);
 
     // Parse as compound type.
     list_t::setup_type(unbox_type(result));
@@ -877,7 +870,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }
 
         if (!tokens.nextIs(tok_Identifier))
-            return syntax_error(result, tokens, startPosition);
+            return syntax_error(block, tokens, startPosition);
 
         Term* fieldType = type_expr(block, tokens, context).term;
 
@@ -942,7 +935,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
         std::string preKeywordWhitespace = possible_whitespace(tokens);
 
         if (tokens.finished())
-            return syntax_error(result, tokens, startPosition);
+            return syntax_error(block, tokens, startPosition);
 
         int leadingTokenPosition = tokens.getPosition();
         int leadingToken = tokens.next().match;
@@ -956,8 +949,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // Otherwise expect 'elif' or 'else'
         if (leadingToken != tok_If && leadingToken != tok_Elif && leadingToken != tok_Else)
-            return syntax_error(result, tokens, startPosition,
-                    "Expected 'if' or 'elif' or 'else'");
+            return syntax_error(block, tokens, startPosition, "Expected 'if' or 'elif' or 'else'");
 
         tokens.consume();
 
@@ -2262,7 +2254,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
             set_string(&msg, "Expected: ')' (to match the '(' at ");
             token_position_to_short_source_location(lparenPosition, tokens, &msg);
             string_append(&msg, ")");
-            return syntax_error(result.term, tokens, startPosition, as_cstring(&msg));
+            return syntax_error(block, tokens, startPosition, as_cstring(&msg));
         }
         tokens.consume(tok_RParen);
         result.term->setIntProp(sym_Syntax_Parens, result.term->intProp(sym_Syntax_Parens,0) + 1);
@@ -2657,14 +2649,6 @@ ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
         std::string const& message)
 {
     Term* result = apply(block, FUNCS.syntax_error, TermList());
-    return syntax_error(result, tokens, exprStart, message);
-}
-
-ParseResult syntax_error(Term* existing, TokenStream &tokens, int exprStart,
-        std::string const& message)
-{
-    if (existing->function != FUNCS.syntax_error)
-        change_function(existing, FUNCS.syntax_error);
 
     // Consume & discard nearby tokens. Don't discard ending brackets or newlines
     // because that can have widespread consequences.
@@ -2686,12 +2670,13 @@ ParseResult syntax_error(Term* existing, TokenStream &tokens, int exprStart,
         tokens.consumeStr(&consumed);
     }
 
-    existing->setStringProp(sym_OriginalText, as_cstring(&consumed));
-    existing->setStringProp(sym_Message, message.c_str());
+    set_source_location(result, erroredPosition, tokens);
+    result->setStringProp(sym_OriginalText, as_cstring(&consumed));
+    result->setStringProp(sym_Message, message.c_str());
 
-    ca_assert(has_static_error(existing));
+    ca_assert(has_static_error(result));
 
-    return ParseResult(existing);
+    return ParseResult(result);
 }
 
 std::string possible_whitespace(TokenStream& tokens)

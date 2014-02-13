@@ -147,7 +147,10 @@ void format_static_error(caValue* error, caValue* stringOutput)
     int inputIndex = as_int(list_get(error, 2));
 
     std::stringstream out;
-    out << get_short_location(term) << " ";
+    Value str;
+    get_short_location(term, &str);
+
+    out << as_cstring(&str) << " ";
     
     // Convert 'type' to a readable string
     if (strcmp(type, "not_a_function") == 0)

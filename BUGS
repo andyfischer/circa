@@ -16,8 +16,6 @@ Miscellanous (most-recent first)
         f()
 
 
-  *$#(@*$# Another horrible bug caused by an extra close-parenthesis
-
   Some issues when using a for-loop as an expression. Example:
    
     (for s in [1 2 3] { to_string(s) }).join('')
@@ -46,35 +44,13 @@ Miscellanous (most-recent first)
   load_module should return Func for consistency
 
   Error trace for dynamic_method: should have the actual method name, when possible.
-    
-  Having a missing ) or ] or } symbol will *really* mess things up. Ditto for an extra ),},]
-    Actually quite a lot of syntax errors will mess things up. Syntax error can cause
-    a premature end to a block.
 
   A superfluous @ symbol causes problems:
 
       type A { int i }
       a = make(A)
       @a.i += 4
-
-  Got unrecognized expression on this string (missing '}'). Worst part is, no error reported.
-
-    clickResolver.call([:add, lineRect, {
-            pos = input()
-            event = input()
-
-            if event == :right_down
-                contextMenu.call(:term_details [line.term pos])
-            ])
-
-  Migration failure
-    Module Cairo defined type Context
-    Another module CodeView used Context as a function argument, like:
-      def CodeView.draw(@self, cairo:Context canvas, Rect rect)
-    After reloading Cairo, the CodeView module kept a reference to the old type?
    
-  Type inference fail in extra_output from if-block
-
   This code had an error with no source location:
     letterSize = [painter.currentFont.width('AAAAAAAAAA') / 10, painter.currentFont.height] -> Point
   (where width & height both returned null)
@@ -86,7 +62,7 @@ Source repro
   Each branch should store the base indent level (instead of having this data in Term)
 
 Code reload
-  Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay.
+  Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay?
 
 Modules
   When compiling a module, the last value is automatically turned into an output (just
