@@ -43,6 +43,7 @@ static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesT
 static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
+static void token_position_to_short_source_location(int position, TokenStream& tokens, caValue* str);
 
 static ParseResult right_apply_to_function(Block* block, Term* lhs, caValue* functionName);
 
@@ -1869,7 +1870,9 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     tokens.consumeStr(&functionName);
 
     bool hasParens = false;
+    int lparenPosition = 0;
     if (tokens.nextIs(tok_LParen)) {
+        lparenPosition = tokens.getPosition();
         tokens.consume(tok_LParen);
         hasParens = true;
     }
@@ -1880,8 +1883,13 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     // Parse inputs
     if (hasParens) {
         function_call_inputs(block, tokens, context, inputs, inputHints);
-        if (!tokens.nextIs(tok_RParen))
-            return syntax_error(block, tokens, startPosition, "Expected: )");
+        if (!tokens.nextIs(tok_RParen)) {
+            Value msg;
+            set_string(&msg, "Expected: ')' (to match the '(' at ");
+            token_position_to_short_source_location(lparenPosition, tokens, &msg);
+            string_append(&msg, ")");
+            return syntax_error(block, tokens, startPosition, as_cstring(&msg));
+        }
         tokens.consume(tok_RParen);
     }
 
@@ -2239,6 +2247,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // parenthesized expression?
     else if (tokens.nextIs(tok_LParen)) {
+        int lparenPosition = tokens.getPosition();
         tokens.consume(tok_LParen);
 
         int prevParenCount = context->openParens;
@@ -2248,8 +2257,13 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
 
         context->openParens = prevParenCount;
 
-        if (!tokens.nextIs(tok_RParen))
-            return syntax_error(result.term, tokens, startPosition);
+        if (!tokens.nextIs(tok_RParen)) {
+            Value msg;
+            set_string(&msg, "Expected: ')' (to match the '(' at ");
+            token_position_to_short_source_location(lparenPosition, tokens, &msg);
+            string_append(&msg, ")");
+            return syntax_error(result.term, tokens, startPosition, as_cstring(&msg));
+        }
         tokens.consume(tok_RParen);
         result.term->setIntProp(sym_Syntax_Parens, result.term->intProp(sym_Syntax_Parens,0) + 1);
     }
@@ -2627,6 +2641,16 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     loc.lineEnd = tokens[end].lineEnd;
 
     term->sourceLoc.grow(loc);
+}
+
+static void token_position_to_short_source_location(int position, TokenStream& tokens, caValue* str)
+{
+    if (!is_string(str))
+        set_string(str, "");
+    string_append(str, "line ");
+    string_append(str, tokens[position].lineStart);
+    string_append(str, ", column ");
+    string_append(str, tokens[position].colStart);
 }
 
 ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
