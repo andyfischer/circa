@@ -167,7 +167,7 @@ void duplicate_block(Block* source, Block* dest);
 Term* compile(Block* block, const char* str);
 
 void load_script_from_text(Block* block, const char* text);
-Symbol load_script(Block* block, const char* filename);
+void load_script(Block* block, const char* filename);
 
 void post_module_load(Block* block);
 

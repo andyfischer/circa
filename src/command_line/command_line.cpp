@@ -481,14 +481,7 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     if (string_eq(list_get(args, 0), "-call")) {
-        Symbol loadResult = load_script(mainBlock, as_cstring(list_get(args, 1)));
-
-        if (loadResult == sym_Failure) {
-            std::cout << "Failed to load file: " <<  as_cstring(list_get(args, 1)) << std::endl;
-            return -1;
-        }
-
-        block_finish_changes(mainBlock);
+        load_script(mainBlock, as_cstring(list_get(args, 1)));
 
         caStack* stack = circa_create_stack(world);
 

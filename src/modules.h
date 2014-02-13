@@ -21,6 +21,8 @@ Block* fetch_module(World* world, const char* name);
 // code. Does not create a file watch (see load_module_file_watched).
 Block* load_module_file(World* world, caValue* moduleName, const char* filename);
 
+void install_block_as_module(World* world, caValue* moduleName, Block* block);
+
 // Loads a module from the given filename, and creates a file watch.
 Block* load_module_file_watched(World* world, caValue* moduleName, const char* filename);
 

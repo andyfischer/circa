@@ -157,6 +157,24 @@ Block* load_module_file(World* world, caValue* moduleName, const char* filename)
     return newBlock;
 }
 
+void install_block_as_module(World* world, caValue* moduleName, Block* block)
+{
+    Block* existing = find_module(world->root, moduleName);
+
+    if (existing == NULL) {
+        Term* term = apply(world->root, FUNCS.module, TermList(), moduleName);
+        block_graft_replacement(existing, block);
+
+    } else {
+        block_graft_replacement(existing, block);
+
+        Migration migration;
+        migration.oldBlock = existing;
+        migration.newBlock = block;
+        migrate_world(world, &migration);
+    }
+}
+
 Block* load_module_file_watched(World* world, caValue* moduleName, const char* filename)
 {
     // Load and parse the script file.

@@ -615,7 +615,7 @@ void load_script_from_text(Block* block, const char* text)
     update_static_error_list(block);
 }
 
-Symbol load_script(Block* block, const char* filename)
+void load_script(Block* block, const char* filename)
 {
     // Store the filename
     set_string(block_insert_property(block, sym_Filename), filename);
@@ -625,9 +625,10 @@ Symbol load_script(Block* block, const char* filename)
     circa_read_file(global_world(), filename, &contents);
 
     if (is_null(&contents)) {
-        Term* msg = create_string(block, "file not found");
+        Term* msg = create_string(block, "File not found: ");
+        string_append(term_value(msg), filename);
         apply(block, FUNCS.static_error, TermList(msg));
-        return sym_Failure;
+        return;
     }
 
     parser::compile(block, parser::statement_list, as_blob(&contents));
@@ -638,7 +639,7 @@ Symbol load_script(Block* block, const char* filename)
 
     update_static_error_list(block);
 
-    return sym_Success;
+    return;
 }
 
 Block* include_script(Block* block, const char* filename)
