@@ -1,4 +1,4 @@
 Error occurred:
-[tests/explicit_input/type_not_found.ca:2,10] NonexistantType = unknown_identifier()
+[tests/explicit_input/type_not_found.ca 2,10] NonexistantType = unknown_identifier()
 Unknown identifier: NonexistantType
 

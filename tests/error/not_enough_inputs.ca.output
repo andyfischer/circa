@@ -1,6 +1,6 @@
 a = 1
 b = 2
 Error occurred:
-[tests/error/not_enough_inputs.ca:7,0] f()
+[tests/error/not_enough_inputs.ca 7,0] f()
 Too few inputs: expected 2, received 1
 

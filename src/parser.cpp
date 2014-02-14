@@ -37,6 +37,7 @@ ParseResult syntax_error(Block* block, TokenStream &tokens, int start,
 bool is_opening_bracket(int token);
 bool is_closing_bracket(int token);
 
+static int lookahead_next_non_whitespace_pos(TokenStream& tokens, bool skipNewlinesToo);
 static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo);
 static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
@@ -1824,6 +1825,8 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 {
     int startPosition = tokens.getPosition();
 
+    possible_whitespace_or_newline(tokens);
+
     bool forceRebindLHS = false;
     Symbol dotOperator = sym_None;
 
@@ -2038,25 +2041,32 @@ ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* c
             term->setBoolProp(sym_Syntax_Brackets, true);
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
-
-        // Check for a.b or a.@b, method call
-        } else if (tokens.nextIs(tok_Dot)
-                    || tokens.nextIs(tok_DotAt)
-                    || tokens.nextIs(tok_At)) {
-
-            result = method_call(block, tokens, context, result);
-
-        } else {
-            // Future: handle a function call of an expression
-
-            finished = true;
+            continue;
         }
+
+        // Look for method call: a.func / a.@func / a@func
+        
+        // The middle dot may be after a newline. (but, for middle '.@' or '@', no 
+        // whitespace allowed).
+        
+        int afterNewline = lookahead_next_non_whitespace_pos(tokens, true);
+        bool dotMatch = (tokens.nextMatch(afterNewline) == tok_Dot)
+            && (tokens.next(afterNewline).precedingIndent >= tokens.next(0).precedingIndent);
+
+        if (dotMatch || tokens.nextIs(tok_At) || tokens.nextIs(tok_DotAt)) {
+            result = method_call(block, tokens, context, result);
+            continue;
+        }
+
+        // No match
+        // Future: handle a function call of an expression
+        finished = true;
     }
 
     return result;
 }
 
-static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo)
+static int lookahead_next_non_whitespace_pos(TokenStream& tokens, bool skipNewlinesToo)
 {
     int lookahead = 0;
     while (tokens.nextIs(tok_Whitespace, lookahead)
@@ -2064,10 +2074,13 @@ static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesT
         lookahead++;
     }
 
-    if (tokens.nextIsEof(lookahead))
-        return tok_Eof;
+    return lookahead;
+}
 
-    return tokens.next(lookahead).match;
+static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo)
+{
+    int pos = lookahead_next_non_whitespace_pos(tokens, skipNewlinesToo);
+    return tokens.nextMatch(pos);
 }
 
 bool lookahead_match_whitespace_statement(TokenStream& tokens)

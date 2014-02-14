@@ -10,5 +10,5 @@ main = {
 int = make_stack(main)
 int.run
 
-assert(int.error_message == "Method hello not found on type T")
+assert(int.error_message == "Method 'hello' not found on type T")
 

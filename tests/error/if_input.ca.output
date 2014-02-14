@@ -1,4 +1,4 @@
 Error occurred:
-[tests/error/if_input.ca:1,0] if()
+[tests/error/if_input.ca 1,0 - 2,16] if()
 Case expected bool input, found: 1
 
