@@ -11,6 +11,7 @@
 #include "selector.h"
 #include "source_repro.h"
 #include "string_type.h"
+#include "type.h"
 
 namespace circa {
 
@@ -33,8 +34,8 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
         }
 
         return get_index(value, selectorIndex);
-    }
-    else if (is_string(selectorElement)) {
+
+    } else if (is_string(selectorElement)) {
         caValue* field = get_field(value, selectorElement, NULL);
         if (field == NULL) {
             set_error_string(error, "Field not found: ");
@@ -47,6 +48,21 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
         string_append_quoted(error, selectorElement);
         return NULL;
     }
+}
+
+Type* element_type_from_selector(Type* type, caValue* selectorElement)
+{
+    if (!is_compound_type(type))
+        return TYPES.any;
+
+    if (is_int(selectorElement)) {
+        return compound_type_get_field_type(type, as_int(selectorElement));
+    } else if (is_string(selectorElement)) {
+        int index = list_find_field_index_by_name(type, as_cstring(selectorElement));
+        return compound_type_get_field_type(type, index);
+    }
+
+    return TYPES.any;
 }
 
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
@@ -65,21 +81,34 @@ caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
     return element;
 }
 
-void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caValue* error)
+void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caValue* error)
 {
-    caValue* element = root;
     ca_assert(is_null(error));
 
-    for (int i=0; i < list_length(selector); i++) {
-        touch(element);
-        caValue* selectorElement = list_get(selector, i);
-        element = selector_advance(element, selectorElement, error);
+    if (list_empty(selector)) {
+        copy(newValue, value);
+        return;
+    }
+
+    for (int selectorIndex=0;; selectorIndex++) {
+        touch(value);
+        caValue* selectorElement = list_get(selector, selectorIndex);
+        caValue* element = selector_advance(value, selectorElement, error);
 
         if (!is_null(error))
             return;
-    }
 
-    copy(newValue, element);
+        if (selectorIndex+1 == list_length(selector)) {
+            copy(newValue, element);
+            if (!cast(element, element_type_from_selector(value->value_type, selectorElement)))
+                set_string(error, "Couldn't cast element");
+            
+            break;
+        }
+
+        value = element;
+        // loop
+    }
 }
 
 void evaluate_selector(caStack* stack)

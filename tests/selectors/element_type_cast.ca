@@ -1,0 +1,14 @@
+
+type A {
+  Point p
+}
+
+a = A.make
+
+assert(type(a.p) == Point)
+
+a.p = [1 2]
+
+assert(type(a.p) == Point)
+
+print(a)

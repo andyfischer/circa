@@ -138,6 +138,8 @@ const char* compound_type_get_field_name(Type* type, int index);
 // For a List-based type, retrieve the type of the given field index.
 Type* compound_type_get_field_type(Type* listType, int index);
 
+bool is_compound_type(Type* type);
+
 // For a List-based type, this returns the list of types that the elements will
 // have. This result is only valid for fixed-size List types, otherwise it will
 // return NULL.
@@ -152,7 +154,7 @@ caValue* list_get_name_list_from_type(Type* type);
 Type* list_get_repeated_type_from_type(Type* type);
 
 // For a List-based type, this returns the index of the field with the given name.
-// Returns NULL if the field is not found.
+// Returns -1 if the field is not found.
 int list_find_field_index_by_name(Type* listType, const char* name);
 
 bool is_list_based_type(Type*);
