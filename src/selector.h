@@ -11,7 +11,7 @@ Term* rebind_possible_accessor(Block* block, Term* possibleAccessor, Term* resul
 
 bool term_is_accessor_traceable(Term* accessor);
 Term* find_or_create_next_unnamed_term_output(Term* term);
-void resolve_rebind_operators_in_inputs(Block* block, Term* result);
+Term* resolve_rebind_operators_in_inputs(Block* block, Term* result);
 
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error);
 void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caValue* error);

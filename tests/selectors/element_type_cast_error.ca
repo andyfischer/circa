@@ -1,0 +1,11 @@
+
+
+type A {
+  int p
+}
+
+a = A.make
+
+a.p = 'hi'
+
+print(a)

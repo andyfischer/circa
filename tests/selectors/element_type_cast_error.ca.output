@@ -1,0 +1,4 @@
+Error occurred:
+[tests/selectors/element_type_cast_error.ca 9,0] a = set_with_selector()
+Couldn't cast value 'hi' to type int (element 'p' of type A)
+

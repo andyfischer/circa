@@ -408,11 +408,18 @@ caValue* circa_output(caStack* stack, int index)
     return get_output(stack, index);
 }
 
-void circa_output_error(caStack* stack, const char* msg)
+void circa_output_error_val(caStack* stack, caValue* val)
 {
-    set_error_string(circa_output(stack, 0), msg);
+    copy(val, circa_output(stack, 0));
     top_frame(stack)->termIndex = top_frame(stack)->block->length() - 1;
     raise_error(stack);
+}
+
+void circa_output_error(caStack* stack, const char* msg)
+{
+    Value val;
+    set_error_string(&val, msg);
+    circa_output_error_val(stack, &val);
 }
 
 caTerm* circa_caller_input_term(caStack* stack, int index)

@@ -100,8 +100,18 @@ void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
 
         if (selectorIndex+1 == list_length(selector)) {
             copy(newValue, element);
-            if (!cast(element, element_type_from_selector(value->value_type, selectorElement)))
-                set_string(error, "Couldn't cast element");
+            Type* elementType = element_type_from_selector(value->value_type, selectorElement);
+            if (!cast(element, elementType)) {
+                set_string(error, "Couldn't cast value ");
+                string_append_quoted(error, newValue);
+                string_append(error, " to type ");
+                string_append(error, &elementType->name);
+                string_append(error, " (element ");
+                string_append_quoted(error, selectorElement);
+                string_append(error, " of type ");
+                string_append(error, &value->value_type->name);
+                string_append(error, ")");
+            }
             
             break;
         }
@@ -240,7 +250,7 @@ Term* find_or_create_next_unnamed_term_output(Term* term)
     return NULL;
 }
 
-void resolve_rebind_operators_in_inputs(Block* block, Term* term)
+Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
 {
     for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
         Term* input = term->input(inputIndex);
@@ -286,8 +296,11 @@ void resolve_rebind_operators_in_inputs(Block* block, Term* term)
                     TermList(head, selector, output), &head->nameValue);
 
             set_declared_type(set, declared_type(head));
+            return set;
         }
     }
+
+    return NULL;
 }
 
 void selector_format_source(caValue* source, Term* term)
@@ -353,8 +366,7 @@ void set_with_selector_evaluate(caStack* stack)
     set_with_selector(out, selector, newValue, &error);
 
     if (!is_null(&error)) {
-        copy(&error, circa_output(stack, 0));
-        raise_error(stack);
+        circa_output_error_val(stack, &error);
         return;
     }
 }

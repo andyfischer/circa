@@ -1454,16 +1454,16 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
     }
 
     ParseResult parseResult = expression(block, tokens, context);
-    Term* term = parseResult.term;
+    Term* result = parseResult.term;
 
-    if (parseResult.isIdentifier()) {
-        term = apply(block, FUNCS.copy, TermList(term));
-        parseResult = ParseResult(term);
-    }
+    if (parseResult.isIdentifier())
+        result = apply(block, FUNCS.copy, TermList(result));
 
     // int outputCountPreRebindOperators = count_outputs(term);
 
-    resolve_rebind_operators_in_inputs(block, term);
+    Term* setWithSelectorTerm = resolve_rebind_operators_in_inputs(block, result);
+    if (setWithSelectorTerm != NULL)
+        set_source_location(setWithSelectorTerm, startPosition, tokens);
 
 #if 0
     // If there were any "implicit" outputs (as in, from rebind operators), then
@@ -1480,12 +1480,10 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
 #endif
 
     if (hasSimpleNameBinding) {
-        term->setProp(sym_Syntax_NameBinding, &nameBindingSyntax);
+        result->setProp(sym_Syntax_NameBinding, &nameBindingSyntax);
 
-        for (int i=0; i < list_length(&names); i++) {
-            rename(find_or_create_next_unnamed_term_output(term), list_get(&names, i));
-        }
-        set_source_location(term, startPosition, tokens);
+        for (int i=0; i < list_length(&names); i++)
+            rename(find_or_create_next_unnamed_term_output(result), list_get(&names, i));
     }
     
     // Check for <complicated selector> = <expression> syntax.
@@ -1496,16 +1494,18 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
 
         Term* right = expression(block, tokens, context).term;
 
-        Term* output = find_or_create_next_unnamed_term_output(term);
+        Term* output = find_or_create_next_unnamed_term_output(result);
         Term* set = rebind_possible_accessor(block, output, right);
 
         set->setStringProp(sym_Syntax_PreEqualsSpace, preEqualsSpace);
         set->setStringProp(sym_Syntax_PostEqualsSpace, postEqualsSpace);
 
-        parseResult = ParseResult(set);
+        result = set;
     }
 
-    return parseResult;
+    set_source_location(result, startPosition, tokens);
+
+    return ParseResult(result);
 }
 
 ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
