@@ -816,6 +816,12 @@ Symbol TokenStream::nextMatch(int lookahead) const
         return tok_Eof;
     return next(lookahead).match;
 }
+int TokenStream::nextIndent(int lookahead) const
+{
+    if ((this->_position + lookahead) >= tokens.size())
+        return 0;
+    return next(lookahead).precedingIndent;
+}
 
 void
 TokenStream::consume(int match)

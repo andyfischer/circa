@@ -1825,8 +1825,6 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 {
     int startPosition = tokens.getPosition();
 
-    possible_whitespace_or_newline(tokens);
-
     bool forceRebindLHS = false;
     Symbol dotOperator = sym_None;
 
@@ -2009,6 +2007,8 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
 
 ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* context)
 {
+    int originalIndent = tokens.nextIndent(0);
+
     ParseResult result = atom(block, tokens, context);
 
     // Now try to parse a subscript to the atom, this could be:
@@ -2051,10 +2051,17 @@ ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* c
         
         int afterNewline = lookahead_next_non_whitespace_pos(tokens, true);
         bool dotMatch = (tokens.nextMatch(afterNewline) == tok_Dot)
-            && (tokens.next(afterNewline).precedingIndent >= tokens.next(0).precedingIndent);
+            && (tokens.next(afterNewline).precedingIndent >= originalIndent);
 
         if (dotMatch || tokens.nextIs(tok_At) || tokens.nextIs(tok_DotAt)) {
+
+            std::string preDotWs = possible_whitespace_or_newline(tokens);
+
             result = method_call(block, tokens, context, result);
+
+            if (preDotWs != "" && result.term != NULL)
+                result.term->setStringProp(sym_Syntax_PreDotWs, preDotWs.c_str());
+            
             continue;
         }
 

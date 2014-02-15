@@ -33,14 +33,6 @@ Miscellanous (most-recent first)
   Method lookup cache:
     Currently does not cache method-on-module-ref, or hashtable value as method.
 
-  Allow for the trailing part of a dot-expression to be on a new line:
-
-     m = Map.make
-       .set(:a 1)
-
-  No source location for the contents of { module.:function }
-    Fixed now, but need a complete test for source location.
-
   load_module should return Func for consistency
 
   Error trace for dynamic_method: should have the actual method name, when possible.

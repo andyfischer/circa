@@ -1,0 +1,10 @@
+
+def int.increment(i)
+  i + 1
+
+def f()
+    a = 1
+      .increment
+  .increment
+
+assert(f() == 3)

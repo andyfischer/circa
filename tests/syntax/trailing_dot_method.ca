@@ -1,0 +1,7 @@
+
+def f()
+    list = []
+      .append(1)
+    .append(2)
+
+assert(f() == [1 2])

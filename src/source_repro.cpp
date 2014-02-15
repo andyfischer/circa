@@ -247,6 +247,9 @@ void format_term_source_default_formatting(caValue* source, Term* term)
     } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
+
+        append_phrase(source, term->stringProp(sym_Syntax_PreDotWs, ""),
+            term, sym_None);
         
         append_phrase(source, term->stringProp(sym_Syntax_Operator, "."),
             term, sym_None);

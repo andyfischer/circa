@@ -56,6 +56,9 @@ struct TokenStream
     Token operator[](int index) {
         return tokens[index];
     }
+    Token get(int index) {
+        return tokens[index];
+    }
 
     void reset(caValue* inputString);
 
@@ -83,6 +86,7 @@ struct TokenStream
     bool nextEqualsString(const char* str, int lookahead=0) const;
 
     Symbol nextMatch(int lookahead=0) const;
+    int nextIndent(int lookahead=0) const;
 
     // Consume the next token. If a token match is provided, and the next token doesn't
     // have this match, then we trigger a fatal error. This matching should be treated

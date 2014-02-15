@@ -78,6 +78,7 @@ Syntax_Operator
 Syntax_OriginalFormat
 Syntax_Parens
 Syntax_PreWs
+Syntax_PreDotWs
 Syntax_PreOperatorWs
 Syntax_PreEndWs
 Syntax_PreEqualsSpace

@@ -86,6 +86,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Syntax_OriginalFormat: return "Syntax_OriginalFormat";
     case sym_Syntax_Parens: return "Syntax_Parens";
     case sym_Syntax_PreWs: return "Syntax_PreWs";
+    case sym_Syntax_PreDotWs: return "Syntax_PreDotWs";
     case sym_Syntax_PreOperatorWs: return "Syntax_PreOperatorWs";
     case sym_Syntax_PreEndWs: return "Syntax_PreEndWs";
     case sym_Syntax_PreEqualsSpace: return "Syntax_PreEqualsSpace";
@@ -1406,6 +1407,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     case 'e':
     switch (str[10]) {
+    case 'D':
+        if (strcmp(str + 11, "otWs") == 0)
+            return sym_Syntax_PreDotWs;
+        break;
     case 'E':
     switch (str[11]) {
     case 'n':
