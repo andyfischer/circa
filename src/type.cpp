@@ -419,15 +419,6 @@ Term* find_method(Block* block, Type* type, caValue* name)
     if (string_eq(&type->name, ""))
         return NULL;
 
-    // First, look inside the type definition, which contains simulated methods and
-    // possibly other stuff.
-    Block* typeDef = type_declaration_block(type);
-    if (typeDef != NULL) {
-        Term* func = find_local_name(typeDef, name);
-        if (func != NULL && is_function(func))
-            return func;
-    }
-
     // Construct the search name, which looks like TypeName.functionName.
     std::string searchName = std::string(as_cstring(&type->name)) + "." + as_cstring(name);
 
@@ -446,6 +437,15 @@ Term* find_method(Block* block, Type* type, caValue* name)
 
         if (result != NULL)
             return result;
+    }
+
+    // Look inside the type definition, which contains simulated methods and
+    // possibly other stuff.
+    Block* typeDef = type_declaration_block(type);
+    if (typeDef != NULL) {
+        Term* func = find_local_name(typeDef, name);
+        if (func != NULL && is_function(func))
+            return func;
     }
 
     return NULL;

@@ -1,8 +1,6 @@
 
 Miscellanous (most-recent first)
 
-  Builtin function Type.set_xxx was taking precedence over a user-defined set_ function
-
   In rewriting for-loop, shouldn't need an explicit name binding.
 
     This does work:
@@ -14,11 +12,6 @@ Miscellanous (most-recent first)
 
       for i in @L
         f()
-
-
-  Some issues when using a for-loop as an expression. Example:
-   
-    (for s in [1 2 3] { to_string(s) }).join('')
 
   Assigning an element in a type doesn't cast that element. Example:
 

@@ -1,0 +1,14 @@
+
+type A {
+  int i
+}
+
+def A.set_i(s, val)
+  mult(@val 2)
+  print('setting i to: ', val)
+  s.i = val
+
+a = A.make
+@a.set_i(3)
+
+print('result: ' a)
