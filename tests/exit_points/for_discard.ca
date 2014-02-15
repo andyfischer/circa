@@ -4,5 +4,6 @@ L = [1 2 3 4]
 for i in @L
     if i == 2
         discard
+    i
 
 print(L)

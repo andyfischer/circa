@@ -6,5 +6,6 @@ print('initial L = ' L)
 for i in @L
     if i == 3
         discard
+    i
 
 print('result L = ' L)

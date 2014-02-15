@@ -230,9 +230,12 @@ Term* loop_get_primary_result(Block* block)
     Term* iterator = for_loop_get_iterator(block);
 
     // For a rebound list, use the last term that has the iterator's
-    // name, even if it's the iterator itself.
-    if (block->owningTerm->boolProp(sym_ModifyList, false))
-        return block->get(iterator->name);
+    // name, if it's been explicitly renamed.
+    if (block->owningTerm->boolProp(sym_ModifyList, false)) {
+        Term* term = block->get(iterator->name);
+        if (term != NULL && term->function != FUNCS.get_index)
+            return term;
+    }
 
     // Otherwise, use the last expression as the output.
     return find_expression_for_implicit_output(block);
