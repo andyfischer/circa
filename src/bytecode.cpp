@@ -33,6 +33,7 @@ struct Writer {
 };
 
 static void bytecode_write_input_instructions(Writer* writer, Term* caller);
+static void bytecode_write_input_instructions_for_looped_inputs(Writer* writer, Block* block);
 static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block);
 static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, Term* term);
 
@@ -713,7 +714,10 @@ void write_term_call(Writer* writer, Term* term)
         staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushWhile);
         blob_append_u32(writer->bytecode, term->index);
-        blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack, term->nestedContents));
+        blob_append_u32(writer->bytecode,
+            stack_bytecode_create_entry(writer->stack, term->nestedContents));
+
+        bytecode_write_input_instructions_for_looped_inputs(writer, staticallyKnownBlock);
     }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
@@ -846,6 +850,17 @@ static void bytecode_write_input_instructions(Writer* writer, Term* caller)
     }
 }
 
+static void bytecode_write_input_instructions_for_looped_inputs(Writer* writer, Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* input = block->get(i);
+        if (input->function != FUNCS.looped_input)
+            break;
+
+        bytecode_write_input_instruction(writer, input->input(0));
+    }
+}
+
 static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block)
 {
     if (block == NULL) {
@@ -878,6 +893,7 @@ static void bytecode_write_output_instructions(Writer* writer, Term* caller, Blo
         placeholderIndex++;
     }
 }
+
 
 static int get_expected_stack_distance(Block* from, Block* to)
 {

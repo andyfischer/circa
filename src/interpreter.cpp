@@ -1201,6 +1201,7 @@ void vm_run(Stack* stack)
             top = vm_push_frame(stack, index, block);
             top->blockIndex = blockIndex;
             top->bc = stack_bytecode_get_data(stack, blockIndex);
+            vm_run_input_bytecodes(stack);
 
             if (stack->step != sym_StackRunning)
                 return;
@@ -1552,7 +1553,7 @@ static void vm_run_input_bytecodes(Stack* stack)
         }
 
         Term* placeholder = top->block->get(placeholderIndex);
-        if (!is_input_placeholder(placeholder))
+        if (!is_input_placeholder(placeholder) && placeholder->function != FUNCS.looped_input)
             return raise_error_too_many_inputs(stack);
 
         caValue* dest = NULL;

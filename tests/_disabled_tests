@@ -11,8 +11,6 @@ state/recursion.ca
 state/recursion_and_for.ca
 state/recursion_and_if.ca
 state/state_arg_recr.ca
-while/*
 closure/state_simple.ca
 parser/omitted_closing_bracket.ca
-while/counter_output.ca
 parser/at_symbol_resolved_first.ca
