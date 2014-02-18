@@ -149,7 +149,7 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     u32 prevFrameSize = 0;
 
     if (stack->top != NULL)
-        prevFrameSize = frame_size(top_frame(stack));
+        prevFrameSize = (u32) frame_size(top_frame(stack));
 
     size_t currentSize = stack_get_required_capacity(stack);
     size_t newFrameSize = sizeof(Frame) + registerCount * sizeof(Value);

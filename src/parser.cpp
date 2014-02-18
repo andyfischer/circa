@@ -2569,8 +2569,6 @@ ParseResult identifier(Block* block, TokenStream& tokens, ParserCxt* context)
 
 ParseResult identifier_possibly_null(Block* block, TokenStream& tokens, ParserCxt* context)
 {
-    int startPosition = tokens.getPosition();
-    
     Value ident;
     tokens.consumeStr(&ident, tok_Identifier);
 

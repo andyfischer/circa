@@ -1,5 +1,7 @@
 
 Miscellanous (most-recent first)
+  
+  Can't use a type before it's defined. Should be able to post-define it like functions.
 
   Method lookup cache:
     Currently does not cache method-on-module-ref, or hashtable value as method.
