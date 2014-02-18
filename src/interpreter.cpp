@@ -1192,15 +1192,19 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_PushWhile: {
-            int index = vm_read_u32(stack);;
+            int index = vm_read_u32(stack);
+            u32 blockIndex = vm_read_u32(stack);
 
             Frame* top = top_frame(stack);
-            Term* caller = frame_term(top, index);
-            Block* block = caller->nestedContents;
-            vm_push_frame(stack, index, block);
-            vm_run_input_bytecodes(stack);
+
+            Block* block = stack_bytecode_get_block(stack, blockIndex);
+            top = vm_push_frame(stack, index, block);
+            top->blockIndex = blockIndex;
+            top->bc = stack_bytecode_get_data(stack, blockIndex);
+
             if (stack->step != sym_StackRunning)
                 return;
+
             continue;
         }
         case bc_Loop: {

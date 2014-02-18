@@ -86,6 +86,7 @@ OBJECTS := \
 	$(OBJDIR)/importing.o \
 	$(OBJDIR)/inspection.o \
 	$(OBJDIR)/interpreter.o \
+	$(OBJDIR)/json.o \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/loops.o \
@@ -249,6 +250,9 @@ $(OBJDIR)/inspection.o: inspection.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/interpreter.o: interpreter.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/json.o: json.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/kernel.o: kernel.cpp

@@ -115,7 +115,7 @@ struct RawOutputPrefs
 };
 
 
-void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out);
+void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* stack=NULL);
 void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out);
 void print_term(Term* term, std::ostream& out);
 

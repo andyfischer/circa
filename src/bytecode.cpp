@@ -137,6 +137,8 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_PushWhile:
         set_string(string, "push_while ");
         string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " blockIndex:");
+        string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushRequire:
         set_string(string, "push_require ");
@@ -180,8 +182,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, "/");
         string_append(string, blob_read_u16(bc, pc));
-        string_append(string, " bc:");
-        string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_Loop:
         set_string(string, "loop");
@@ -713,6 +713,7 @@ void write_term_call(Writer* writer, Term* term)
         staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushWhile);
         blob_append_u32(writer->bytecode, term->index);
+        blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack, term->nestedContents));
     }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {

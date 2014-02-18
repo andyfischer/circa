@@ -574,14 +574,14 @@ int run_command_line(caWorld* world, caValue* args)
     load_script(mainBlock, as_cstring(filename));
     block_finish_changes(mainBlock);
 
+    Stack* stack = create_stack(world);
+    stack_init(stack, mainBlock);
+
     if (printRaw)
-        print_block(mainBlock, &rawOutputPrefs, std::cout);
+        print_block(mainBlock, &rawOutputPrefs, std::cout, stack);
 
     if (dontRunScript)
         return 0;
-
-    Stack* stack = create_stack(world);
-    stack_init(stack, mainBlock);
 
     stack_run(stack);
 
