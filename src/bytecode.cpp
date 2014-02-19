@@ -51,50 +51,53 @@ static void bc_append_local_reference_string(caValue* string, const char* bc, in
 
 void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
 {
+    if (!is_string(string))
+        set_string(string, "");
+
     char op = blob_read_char(bc, pc); 
 
     switch (op) {
     case bc_End:
-        set_string(string, "end");
+        string_append(string, "end");
         break;
     case bc_Pause:
-        set_string(string, "pause");
+        string_append(string, "pause");
         break;
     case bc_SetNull:
-        set_string(string, "set_null ");
+        string_append(string, "set_null ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_InlineCopy:
-        set_string(string, "inline_copy ");
+        string_append(string, "inline_copy ");
         string_append(string, blob_read_u32(bc, pc));
         bc_append_local_reference_string(string, bc, pc);
         break;
     case bc_LocalCopy:
-        set_string(string, "local_copy ");
+        string_append(string, "local_copy ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_NoOp:
-        set_string(string, "noop");
+        string_append(string, "noop");
         break;
     case bc_EnterFrame:
-        set_string(string, "enter_frame");
+        string_append(string, "enter_frame");
         break;
     case bc_PopFrame:
-        set_string(string, "pop_frame");
+        string_append(string, "pop_frame");
         break;
     case bc_PopFrameAndPause:
-        set_string(string, "pop_frame_and_pause");
+        string_append(string, "pop_frame_and_pause");
         break;
     case bc_PushFunction:
-        set_string(string, "push_function termIndex:");
+        string_append(string, "push_function termIndex:");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " bc:");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushDynamicMethod:
-        set_string(string, "push_dyn_method ");
+        string_append(string, "push_dyn_method ");
         string_append(string, blob_read_u32(bc, pc));
 
         for (int i=0; i < c_methodCacheCount; i++) {
@@ -107,24 +110,24 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         }
         break;
     case bc_PushFuncCall:
-        set_string(string, "push_func_call ");
+        string_append(string, "push_func_call ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushFuncApply:
-        set_string(string, "push_func_apply ");
+        string_append(string, "push_func_apply ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_FireNative:
-        set_string(string, "fire_native");
+        string_append(string, "fire_native");
         break;
     case bc_PushCase:
-        set_string(string, "push_case termIndex:");
+        string_append(string, "push_case termIndex:");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " blockIndex:");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushLoop:
-        set_string(string, "push_loop termIndex:");
+        string_append(string, "push_loop termIndex:");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " blockIndex:");
         string_append(string, blob_read_u32(bc, pc));
@@ -136,42 +139,42 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
             string_append(string, " :no_output");
         break;
     case bc_PushWhile:
-        set_string(string, "push_while ");
+        string_append(string, "push_while ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " blockIndex:");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushRequire:
-        set_string(string, "push_require ");
+        string_append(string, "push_require ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_ExitPoint:
-        set_string(string, "exit_point");
+        string_append(string, "exit_point");
         break;
     case bc_Return:
-        set_string(string, "return ");
+        string_append(string, "return ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_Continue:
-        set_string(string, "continue");
+        string_append(string, "continue");
         string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_Break:
-        set_string(string, "break");
+        string_append(string, "break");
         string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_Discard:
-        set_string(string, "discard");
+        string_append(string, "discard");
         string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_CaseConditionBool:
-        set_string(string, "case_condition_bool input:");
+        string_append(string, "case_condition_bool input:");
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, "/");
         string_append(string, blob_read_u16(bc, pc));
@@ -179,72 +182,72 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_LoopConditionBool:
-        set_string(string, "loop_condition_bool input:");
+        string_append(string, "loop_condition_bool input:");
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, "/");
         string_append(string, blob_read_u16(bc, pc));
         break;
     case bc_Loop:
-        set_string(string, "loop");
+        string_append(string, "loop");
         break;
     case bc_FinishIteration:
-        set_string(string, "finish_iteration ");
+        string_append(string, "finish_iteration ");
         if (blob_read_char(bc, pc))
             string_append(string, " :with_output");
         else
             string_append(string, " :no_output");
         break;
     case bc_FinishBlock:
-        set_string(string, "finish_block");
+        string_append(string, "finish_block");
         break;
     case bc_DynamicTermEval:
-        set_string(string, "dynamic_term_eval ");
+        string_append(string, "dynamic_term_eval ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PopRequire:
-        set_string(string, "pop_require");
+        string_append(string, "pop_require");
         break;
     case bc_ErrorNotEnoughInputs:
-        set_string(string, "error_not_enough_inputs");
+        string_append(string, "error_not_enough_inputs");
         break;
     case bc_ErrorTooManyInputs:
-        set_string(string, "error_too_many_inputs");
+        string_append(string, "error_too_many_inputs");
         break;
     case bc_InputFromStack:
-        set_string(string, "input_from_stack ");
+        string_append(string, "input_from_stack ");
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u16(bc, pc));
         break;
     case bc_InputNull:
-        set_string(string, "input_null");
+        string_append(string, "input_null");
         break;
     case bc_InputFromValue:
-        set_string(string, "input_from_value ");
+        string_append(string, "input_from_value ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushNonlocalInput:
-        set_string(string, "push_nonlocal_input ");
+        string_append(string, "push_nonlocal_input ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_InputFromBlockRef:
-        set_string(string, "input_from_block_ref ");
+        string_append(string, "input_from_block_ref ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_InputFromCachedValue:
-        set_string(string, "input_from_cached_value ");
+        string_append(string, "input_from_cached_value ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PushExplicitState:
-        set_string(string, "push_explicit_state ");
+        string_append(string, "push_explicit_state ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PopOutput:
-        set_string(string, "pop_output ");
+        string_append(string, "pop_output ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
@@ -252,46 +255,46 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_char(bc, pc));
         break;
     case bc_PopOutputNull:
-        set_string(string, "pop_output_null ");
+        string_append(string, "pop_output_null ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_PopOutputsDynamic:
-        set_string(string, "pop_outputs_dynamic");
+        string_append(string, "pop_outputs_dynamic");
         break;
     case bc_PopExplicitState:
-        set_string(string, "pop_explicit_state ");
+        string_append(string, "pop_explicit_state ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_SetFrameOutput:
-        set_string(string, "set_frame_output ");
+        string_append(string, "set_frame_output ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_MemoizeCheck:
-        set_string(string, "memoize_check");
+        string_append(string, "memoize_check");
         break;
     case bc_MemoizeSave:
-        set_string(string, "memoize_save");
+        string_append(string, "memoize_save");
         break;
     case bc_SetInt:
-        set_string(string, "set_int ");
+        string_append(string, "set_int ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_SetFloat:
-        set_string(string, "set_float ");
+        string_append(string, "set_float ");
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append_f(string, blob_read_float(bc, pc));
         break;
     case bc_SetTermValue:
-        set_string(string, "set_value ");
+        string_append(string, "set_value ");
         string_append(string, blob_read_u32(bc, pc));
         break;
 
     #define INLINE_MATH_CASE(op, str) \
         case op: \
-            set_string(string, str " "); \
+            string_append(string, str " "); \
             string_append(string, blob_read_u32(bc, pc)); \
             break;
 
@@ -311,7 +314,7 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     #undef INLINE_MATH_CASE
 
     case bc_PackState:
-        set_string(string, "pack_state ");
+        string_append(string, "pack_state ");
         for (int i=0; i < 4; i++) {
             if (i > 0)
                 string_append(string, " ");
@@ -319,11 +322,11 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         }
         break;
     case bc_WatchCheck:
-        set_string(string, "watch_check ");
+        string_append(string, "watch_check ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     default:
-        set_string(string, "*unrecognized op: ");
+        string_append(string, "*unrecognized op: ");
         string_append(string, int(op));
     }
 }

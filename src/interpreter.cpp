@@ -397,6 +397,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
                         break;
 
                     Value str;
+                    set_string(&str, "");
                     bytecode_op_to_string(bytecode, &bytecodePc, &str);
                     strm << std::endl;
                     indent(strm, frameIndex+4);

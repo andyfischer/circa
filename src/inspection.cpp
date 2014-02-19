@@ -440,6 +440,12 @@ void print_indent(RawOutputPrefs* prefs, std::ostream& out)
 void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* stack)
 {
     int prevIndent = prefs->indentLevel;
+    int bytecodePc = 0;
+    char* bytecodeData = NULL;
+    if (stack != NULL) {
+        int blockIndex = stack_bytecode_create_entry(stack, block);
+        bytecodeData = stack_bytecode_get_data(stack, blockIndex);
+    }
 
     print_indent(prefs, out);
 
@@ -450,22 +456,30 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* 
         print_term(term, prefs, out);
         out << std::endl;
 
+        prefs->indentLevel += 2;
         if (term->nestedContents != NULL) {
-            prefs->indentLevel += 2;
             print_block(term->nestedContents, prefs, out, stack);
-            prefs->indentLevel -= 2;
         }
-    }
 
-    if (prefs->showBytecode) {
-        circa::Value lines;
-        Value bytecode;
-        bytecode_write_block(stack, &bytecode, block);
-        bytecode_to_string_lines(&bytecode, &lines);
-        for (int i=0; i < list_length(&lines); i++) {
-            print_indent(prefs, out);
-            std::cout << as_string(list_get(&lines, i)) << std::endl;
+        if (prefs->showBytecode && bytecodeData) {
+            while (bytecodeData[bytecodePc] != bc_End) {
+                int currentTermIndex = bytecode_op_to_term_index(bytecodeData, bytecodePc);
+                if (currentTermIndex != -1 && currentTermIndex != i)
+                    break;
+
+                Value str;
+                set_string(&str, "");
+                string_append(&str, "[");
+                string_append(&str, bytecodePc);
+                string_append(&str, "] ");
+                bytecode_op_to_string(bytecodeData, &bytecodePc, &str);
+                print_indent(prefs, out);
+                out << as_cstring(&str);
+                out << std::endl;
+            }
         }
+
+        prefs->indentLevel -= 2;
     }
 
     prefs->indentLevel = prevIndent;
