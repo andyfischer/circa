@@ -1,0 +1,73 @@
+
+def is_digit(String s)
+  (s.ord >= '0'.ord) and (s.ord <= '9'.ord)
+
+type Reader {
+  String str
+  int pos
+}
+
+def Reader.empty(self) -> bool
+  self.pos >= self.str.length
+
+def Reader.char(self, i) -> String
+  self.str.char_at(i + self.pos)
+
+def Reader.advance(@self)
+  self.pos += 1
+
+def Reader.consumeWhitespace(@self)
+  print('self aa = ' self)
+  while self.char(0) == ' '
+    print('self a = ' self)
+    @self.advance
+    print('self b = ' self)
+
+  print('self c = ' self)
+  self
+
+def Reader.parse_value(self) -> (Reader, any)
+  print('self3 = ' self)
+  @self.consumeWhitespace
+
+  result = null
+  print('self2 = ' self)
+
+  if self.char(0) == '['
+    @self.advance
+    
+    result = []
+    print('self1 = ' self)
+
+    while self.char(0) != ']'
+      print('self = ' self)
+      if self.empty
+        error("Unexpected end of string, looking for ']'")
+
+      val = @self.parse_value
+      print('parsed list element: ' val)
+      @result.append(val)
+  elif is_digit(self.char(0))
+
+    p = self.pos
+    error('hi')
+    while is_digit(self.char(0))
+      @self.advance
+
+    result = self.str.substr(p, self.pos)
+
+  return self, result
+
+def parse(String str) -> any
+  Reader.make(str 0).parse_value
+
+def write(val) -> String
+  if is_list(val)
+    concat('[' (for el in val { write(val) }).join(', ') ']')
+  elif is_map(val)
+    "{}"
+  else
+    to_string(val)
+
+
+parse("[1, 2, 3]") | print

@@ -20,6 +20,7 @@
 #include "../importing.cpp"
 #include "../inspection.cpp"
 #include "../interpreter.cpp"
+#include "../json.cpp"
 #include "../kernel.cpp"
 #include "../list.cpp"
 #include "../loops.cpp"

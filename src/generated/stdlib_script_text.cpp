@@ -724,6 +724,8 @@ const char* BUILTIN_MODULE_stdlib =
     "def String.ends_with(self, String suffix) -> bool\n"
     "  -- Return true if this string ends with the given substring.\n"
     "\n"
+    "def String.ord(self) -> int\n"
+    "\n"
     "def String.length(self) -> int\n"
     "  -- Returns the string length.\n"
     "\n"

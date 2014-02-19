@@ -324,6 +324,15 @@ void String__length(caStack* stack)
     set_int(circa_output(stack, 0), (int) strlen(str));
 }
 
+void String__ord(caStack* stack)
+{
+    const char* str = circa_string_input(stack, 0);
+    if (strlen(str) != 1)
+        return circa_output_error(stack, "Expected a string of length 1");
+    
+    set_int(circa_output(stack, 0), (int) str[0]);
+}
+
 void String__substr(caStack* stack)
 {
     caValue* self = circa_input(stack, 0);
@@ -635,6 +644,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "String.char_at", String__char_at);
     module_patch_function(patch, "String.ends_with", String__ends_with);
     module_patch_function(patch, "String.length", String__length);
+    module_patch_function(patch, "String.ord", String__ord);
     module_patch_function(patch, "String.substr", String__substr);
     module_patch_function(patch, "String.slice", String__slice);
     module_patch_function(patch, "String.starts_with", String__starts_with);

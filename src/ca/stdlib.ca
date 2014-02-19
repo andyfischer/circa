@@ -717,6 +717,8 @@ def String.index_of(self, String substr) -> (bool, int)
 def String.ends_with(self, String suffix) -> bool
   -- Return true if this string ends with the given substring.
 
+def String.ord(self) -> int
+
 def String.length(self) -> int
   -- Returns the string length.
 
