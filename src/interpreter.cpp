@@ -57,6 +57,7 @@ static void vm_finish_run(Stack* stack);
 
 static Block* vm_dynamic_method_lookup(Stack* stack, caValue* object, Term* caller);
 static void vm_push_dynamic_method(Stack* stack);
+static void vm_finish_while_loop(Stack* stack);
 
 bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
@@ -1185,7 +1186,12 @@ void vm_run(Stack* stack)
             }
 
             if (!as_bool(condition)) {
+                Frame* top = top_frame(stack);
                 Frame* parent = stack_top_parent(stack);
+                
+                // Copy locals
+                vm_finish_while_loop(stack);
+
                 stack->bc = parent->bc;
                 stack->pc = parent->pc;
                 ca_assert(stack->bc != NULL);
@@ -1197,6 +1203,7 @@ void vm_run(Stack* stack)
             u32 blockIndex = vm_read_u32(stack);
 
             Frame* top = top_frame(stack);
+            top->termIndex = index;
 
             Block* block = stack_bytecode_get_block(stack, blockIndex);
             top = vm_push_frame(stack, index, block);
@@ -1238,6 +1245,13 @@ void vm_run(Stack* stack)
             Frame* top = top_frame(stack);
             caValue* source = frame_register(top, sourceIndex);
             caValue* dest = frame_register(top, destIndex);
+            copy(source, dest);
+            continue;
+        }
+        case bc_Copy: {
+            Frame* top = top_frame(stack);
+            caValue* source = vm_read_local_value(top);
+            caValue* dest = vm_read_local_value(top);
             copy(source, dest);
             continue;
         }
@@ -1334,6 +1348,26 @@ void vm_run(Stack* stack)
             ca_assert(stack->bc != NULL);
 
             vm_finish_loop_iteration(stack, loopEnableOutput);
+            if (stack->step != sym_StackRunning)
+                return;
+            continue;
+        }
+
+        case bc_Continue2:
+            continue;
+        case bc_Break2: {
+            Frame* top = top_frame(stack);
+            Frame* toFrame = top;
+            while (!is_while_loop(toFrame->block) && prev_frame(toFrame) != NULL)
+                toFrame = prev_frame(toFrame);
+            // Throw away intermediate frames.
+            while (top_frame(stack) != toFrame)
+                stack_pop(stack);
+
+            vm_finish_while_loop(stack);
+            Frame* parent = stack_top_parent(stack);
+            stack->pc = parent->pc;
+            stack->bc = parent->bc;
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -2079,6 +2113,23 @@ static void vm_push_dynamic_method(Stack* stack)
     top->bc = stack_bytecode_get_data(stack, cache->blockIndex);
     expand_frame(stack_top_parent(stack), top);
     vm_run_input_bytecodes(stack);
+}
+
+static void vm_finish_while_loop(Stack* stack)
+{
+    Frame* top = top_frame(stack);
+    Frame* parent = stack_top_parent(stack);
+
+    Term* whileTerm = frame_current_term(parent);
+    ca_assert(whileTerm->function == FUNCS.while_loop);
+
+    for (int i=0;; i++) {
+        Term* output = get_extra_output(whileTerm, i);
+        if (output == NULL)
+            break;
+
+        copy(frame_register(top, i), frame_register(parent, output));
+    }
 }
 
 bool run_memoize_check(Stack* stack)

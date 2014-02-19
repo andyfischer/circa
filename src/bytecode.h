@@ -10,6 +10,7 @@ const char bc_Pause = 0x1;
 const char bc_SetNull = 0x2;
 const char bc_InlineCopy = 0x3;
 const char bc_LocalCopy = 0x4;
+const char bc_Copy = 0x76;
 const char bc_NoOp = 0x5;
 const char bc_EnterFrame = 0x6;
 const char bc_PopFrame = 0x7;
@@ -59,6 +60,9 @@ const char bc_Discard = 0x44;
 const char bc_CaseConditionBool = 0x45;
 const char bc_LoopConditionBool = 0x46;
 const char bc_Loop = 0x47;
+const char bc_Continue2 = 0x48;
+const char bc_Break2 = 0x49;
+const char bc_Discard2 = 0x4a;
 
 // Memoization
 const char bc_MemoizeCheck = 0x50;

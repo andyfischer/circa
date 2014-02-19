@@ -1,0 +1,17 @@
+
+
+a = 1
+b = 2
+c = 3
+
+while true
+  a = 4
+  b = 5
+  c = 6
+
+  break
+
+
+print('a = ' a)
+print('b = ' b)
+print('c = ' c)

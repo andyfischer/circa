@@ -109,6 +109,7 @@ struct BlockIteratorFlat
 
     Term* operator*() { return current(); }
     bool unfinished() { return !finished(); }
+    operator bool() { return !finished(); }
     void operator++() { advance(); }
 };
 

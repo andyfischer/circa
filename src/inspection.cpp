@@ -166,17 +166,17 @@ Block* find_nearest_compilation_unit(Block* block)
 
 bool is_for_loop(Block* block)
 {
-    if (block->owningTerm == NULL)
+    if (block == NULL || block->owningTerm == NULL || FUNCS.for_func == NULL)
         return false;
-    if (FUNCS.for_func == NULL)
-        return false;
+
     return block->owningTerm->function == FUNCS.for_func;
 }
 
 bool is_while_loop(Block* block)
 {
-    if (block->owningTerm == NULL)
+    if (block == NULL || block->owningTerm == NULL || FUNCS.while_loop == NULL)
         return false;
+
     return block->owningTerm->function == FUNCS.while_loop;
 }
 

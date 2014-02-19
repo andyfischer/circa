@@ -13,6 +13,7 @@ Term* for_loop_find_index(Block* contents);
 // for the iterator. If it's NULL then we'll infer a type from the term's input.
 Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType);
 void finish_for_loop(Term* forTerm);
+void finish_while_loop(Block* block);
 
 Term* find_enclosing_for_loop(Term* term);
 Block* find_enclosing_for_loop_contents(Term* term);

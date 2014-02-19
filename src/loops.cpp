@@ -153,29 +153,20 @@ void repoint_terms_to_use_input_placeholders(Block* contents)
 
 void list_names_that_must_be_looped(Block* contents, caValue* names)
 {
-    // Find all names within 'contents' that must be looped. A name must be looped when:
-    //  (1) a term outside 'contents' has the name (the initial value).
-    //  and (2) a term inside 'contents' actually uses the term that satisfies 1.
-    //  and (3) a term inside 'contents' has the name (the 'modified' value)
+    // Find all names within 'contents' that must be looped. A name must be looped when
+    // a term inside the loop binds a name that was already used outside the loop.
 
     Value namesMap;
     set_hashtable(&namesMap);
 
-    for (BlockInputIterator it(contents); it; ++it) {
-        Term* input = it.currentInput();
+    for (BlockIteratorFlat it(contents); it; ++it) {
+        Term* term = it.current();
 
-        if (has_empty_name(input))
+        if (has_empty_name(term))
             continue;
 
-        // Check condition (2). The input must be from outside 'contents'.
-        if (input->owningBlock == contents || block_is_child_of(input->owningBlock, contents))
-            continue;
-
-        caValue* name = term_name(input);
-        Term* local = find_local_name(contents, name);
-
-        if (local != NULL)
-            set_bool(hashtable_insert(&namesMap, name), true);
+        if (find_name_at(contents->owningTerm, term_name(term)) != NULL)
+            set_bool(hashtable_insert(&namesMap, term_name(term)), true);
     }
 
     hashtable_get_keys(&namesMap, names);
@@ -239,6 +230,20 @@ Term* loop_get_primary_result(Block* block)
 
     // Otherwise, use the last expression as the output.
     return find_expression_for_implicit_output(block);
+}
+
+void finish_while_loop(Block* block)
+{
+    block_finish_changes(block);
+
+    for (int i=0; i < block->length(); i++) {
+        Term* looped_input = block->get(i);
+        if (looped_input->function != FUNCS.looped_input)
+            break;
+
+        Term* output = find_or_create_output_term(block->owningTerm, 1 + i);
+        rename(output, term_name(looped_input));
+    }
 }
 
 void finish_for_loop(Term* forTerm)
