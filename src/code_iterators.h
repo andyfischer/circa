@@ -113,12 +113,11 @@ struct BlockIteratorFlat
     void operator++() { advance(); }
 };
 
-// This iterator steps over each input of each term in the block. It will skip
+// This iterator steps over each input of each nested term in the block. It will skip
 // over any NULL terms, and it will skip over NULL inputs.
 struct BlockInputIterator
 {
-    Block* block;
-    int index;
+    BlockIterator blockIterator;
     int inputIndex;
 
     BlockInputIterator(Block* block);
@@ -141,6 +140,7 @@ struct BlockInputIterator
 struct OuterInputIterator
 {
     BlockInputIterator blockInputIterator;
+    Block* block;
 
     OuterInputIterator(Block* block);
 

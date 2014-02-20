@@ -195,9 +195,12 @@ void update_looped_inputs(Block* contents)
         rename(looped, as_cstring(name));
 
         // Now repoint inputs from the outside version to the looped input.
-        for (BlockInputIterator it(contents); it; ++it)
+        for (BlockInputIterator it(contents); it; ++it) {
+            Term* term = it.currentTerm();
+            Term* input = it.currentInput();
             if (it.currentInput() == outside && it.currentTerm() != looped)
                 set_input(it.currentTerm(), it.currentInputIndex(), looped);
+        }
     }
 
     // Delete any remaining looped terms.

@@ -19,7 +19,7 @@ void test_list_names_that_must_be_looped()
     clear_block(&block);
     block.compile("x = 1; section { x = 2 }");
     list_names_that_must_be_looped(find_block_from_path(&block, "function=section"), &names);
-    test_equals(&names, "[]");
+    test_equals(&names, "['x']");
 
     clear_block(&block);
     block.compile("section { x = 0; x = x + 1 }");
@@ -29,7 +29,7 @@ void test_list_names_that_must_be_looped()
     clear_block(&block);
     block.compile("x = 0; section { x = 0; x = x + 1 }");
     list_names_that_must_be_looped(find_block_from_path(&block, "function=section"), &names);
-    test_equals(&names, "[]");
+    test_equals(&names, "['x']");
 
     clear_block(&block);
     block.compile("x = 0; section { x = x + 1 }");

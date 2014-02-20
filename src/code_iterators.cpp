@@ -258,10 +258,9 @@ Term* BlockIteratorFlat::current()
     return block->get(index);
 }
 
-BlockInputIterator::BlockInputIterator(Block* blockIn)
- : block(blockIn)
+BlockInputIterator::BlockInputIterator(Block* block)
+ : blockIterator(block)
 {
-    index = 0;
     inputIndex = 0;
     advanceWhileInvalid();
 }
@@ -269,7 +268,7 @@ BlockInputIterator::BlockInputIterator(Block* blockIn)
 bool
 BlockInputIterator::finished()
 {
-    return index >= block->length();
+    return blockIterator.finished();
 }
 
 void BlockInputIterator::advance()
@@ -285,16 +284,16 @@ possibly_invalid:
     if (finished())
         return;
 
-    Term* current = block->get(index);
+    Term* current = blockIterator.current();
 
     if (current == NULL) {
-        index++;
+        blockIterator.advance();
         inputIndex = 0;
         goto possibly_invalid;
     }
 
     if (inputIndex >= current->numInputs()) {
-        index++;
+        blockIterator.advance();
         inputIndex = 0;
         goto possibly_invalid;
     }
@@ -307,12 +306,12 @@ possibly_invalid:
 
 Term* BlockInputIterator::currentTerm()
 {
-    return block->get(index);
+    return blockIterator.current();
 }
 
 Term* BlockInputIterator::currentInput()
 {
-    return block->get(index)->input(inputIndex);
+    return blockIterator.current()->input(inputIndex);
 }
 
 int BlockInputIterator::currentInputIndex()
@@ -320,8 +319,8 @@ int BlockInputIterator::currentInputIndex()
     return inputIndex;
 }
 
-OuterInputIterator::OuterInputIterator(Block* block)
- : blockInputIterator(block)
+OuterInputIterator::OuterInputIterator(Block* _block)
+ : blockInputIterator(block), block(_block)
 {
     advanceWhileInvalid();
 }
@@ -347,7 +346,7 @@ possibly_invalid:
         return;
 
     // Only stop on outer inputs
-    if (blockInputIterator.currentInput()->owningBlock == blockInputIterator.block) {
+    if (blockInputIterator.currentInput()->owningBlock == block) {
         blockInputIterator.inputIndex++;
         goto possibly_invalid;
     }

@@ -584,10 +584,13 @@ Block* find_enclosing_loop(Block* block)
     return NULL;
 }
 
-void write_pre_exit_point_for_while_loop(Writer* writer, Term* exitPoint, Block* block)
+void write_pre_exit_point_for_while_loop(Writer* writer, Term* exitPoint)
 {
-    for (int i=0; i < block->length(); i++) {
-        Term* input = block->get(i);
+    Block* callingBlock = exitPoint->owningBlock;
+    Block* loopBlock = find_enclosing_loop(callingBlock);
+
+    for (int i=0; i < loopBlock->length(); i++) {
+        Term* input = loopBlock->get(i);
         if (input->function != FUNCS.looped_input)
             return;
 
@@ -596,7 +599,7 @@ void write_pre_exit_point_for_while_loop(Writer* writer, Term* exitPoint, Block*
             continue;
 
         blob_append_char(writer->bytecode, bc_Copy);
-        bytecode_write_local_reference(writer, block, input);
+        bytecode_write_local_reference(writer, callingBlock, input);
         bytecode_write_input_instruction(writer, latestValue);
     }
 }
@@ -663,9 +666,10 @@ void write_term_call(Writer* writer, Term* term)
                 blob_append_char(writer->bytecode, bc_Return);
                 blob_append_u32(writer->bytecode, term->index);
             } else if (term->function == FUNCS.break_func) {
-                write_pre_exit_point_for_while_loop(writer, term, enclosingLoop);
+                write_pre_exit_point_for_while_loop(writer, term);
                 blob_append_char(writer->bytecode, bc_Break2);
             } else if (term->function == FUNCS.continue_func) {
+                write_pre_exit_point_for_while_loop(writer, term);
                 blob_append_char(writer->bytecode, bc_Continue2);
             }
 

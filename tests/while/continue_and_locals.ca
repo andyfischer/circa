@@ -1,0 +1,16 @@
+
+
+i = 0
+while i < 6
+  print('value of i at loop start: ' i)
+  if i % 2 == 1
+    print('odd: ' i)
+    i += 1
+    continue
+
+  print('value of i after if: ' i)
+
+  print('even: ' i)
+  i += 1
+
+  print('value of i at loop end: ' i)

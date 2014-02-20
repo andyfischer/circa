@@ -1,0 +1,18 @@
+value of i at loop start: 0
+value of i after if: 0
+even: 0
+value of i at loop end: 1
+value of i at loop start: 1
+odd: 1
+value of i at loop start: 2
+value of i after if: 2
+even: 2
+value of i at loop end: 3
+value of i at loop start: 3
+odd: 3
+value of i at loop start: 4
+value of i after if: 4
+even: 4
+value of i at loop end: 5
+value of i at loop start: 5
+odd: 5
