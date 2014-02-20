@@ -57,7 +57,7 @@ static void vm_finish_run(Stack* stack);
 
 static Block* vm_dynamic_method_lookup(Stack* stack, caValue* object, Term* caller);
 static void vm_push_dynamic_method(Stack* stack);
-static void vm_finish_while_loop(Stack* stack);
+static void vm_while_loop_finish_early(Stack* stack);
 
 bool run_memoize_check(Stack* stack);
 void extract_state(Block* block, caValue* state, caValue* output);
@@ -1189,12 +1189,9 @@ void vm_run(Stack* stack)
                 Frame* top = top_frame(stack);
                 Frame* parent = stack_top_parent(stack);
                 
-                // Copy locals
-                vm_finish_while_loop(stack);
-
-                stack->bc = parent->bc;
-                stack->pc = parent->pc;
-                ca_assert(stack->bc != NULL);
+                vm_while_loop_finish_early(stack);
+                if (stack->step != sym_StackRunning)
+                    return;
             }
             continue;
         }
@@ -1353,17 +1350,21 @@ void vm_run(Stack* stack)
             continue;
         }
 
-        case bc_Continue2:
+        case bc_Continue2: {
+            while (!is_while_loop(top_frame(stack)->block) && stack_top_parent(stack) != NULL)
+                stack_pop(stack);
+            Frame* top = top_frame(stack);
+            top->termIndex = 0;
+            stack->pc = 0;
+            stack->bc = top->bc;
             continue;
+        }
         case bc_Break2: {
             while (!is_while_loop(top_frame(stack)->block) && stack_top_parent(stack) != NULL)
                 stack_pop(stack);
             Frame* top = top_frame(stack);
 
-            vm_finish_while_loop(stack);
-            Frame* parent = stack_top_parent(stack);
-            stack->pc = parent->pc;
-            stack->bc = parent->bc;
+            vm_while_loop_finish_early(stack);
             if (stack->step != sym_StackRunning)
                 return;
             continue;
@@ -2111,7 +2112,7 @@ static void vm_push_dynamic_method(Stack* stack)
     vm_run_input_bytecodes(stack);
 }
 
-static void vm_finish_while_loop(Stack* stack)
+static void vm_while_loop_finish_early(Stack* stack)
 {
     Frame* top = top_frame(stack);
     Frame* parent = stack_top_parent(stack);
@@ -2126,6 +2127,10 @@ static void vm_finish_while_loop(Stack* stack)
 
         copy(frame_register(top, i), frame_register(parent, output));
     }
+
+    stack->bc = parent->bc;
+    stack->pc = parent->pc;
+    ca_assert(stack->bc != NULL);
 }
 
 bool run_memoize_check(Stack* stack)

@@ -759,6 +759,11 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_u32(writer->bytecode, blockIndex);
     }
 
+    else if (term->function == FUNCS.case_func) {
+        // Handled by the if_block case.
+        return;
+    }
+
     else if (term->function == FUNCS.for_func) {
         staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushLoop);
