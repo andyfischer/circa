@@ -1,0 +1,16 @@
+parsed string '1' as 1
+parsed string '1.0' as 1.0
+parsed string '"a"' as a
+parsed string '"abc"' as abc
+parsed string '[1]' as [1]
+parsed string '[1, 2]' as [1, 2]
+parsed string ' [ 1 , 2 ] ' as [1, 2]
+parsed string '["a", "b", 1.0, 2.0]' as ['a', 'b', 1.0, 2.0]
+parsed string '-1' as -1
+parsed string '[-1, -2]' as [-1, -2]
+parsed string 'true' as true
+parsed string 'false' as false
+parsed string 'null' as null
+parsed string '{}' as {}
+parsed string '{"a":"b"}' as {a: 'b'}
+parsed string '{"a":"b", "c":"d"}' as {a: 'b', c: 'd'}

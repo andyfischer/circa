@@ -395,6 +395,18 @@ void String__to_lower(caStack* stack)
     }
 }
 
+void String__to_number(caStack* stack)
+{
+    float n = atof(circa_string_input(stack, 0));
+    set_float(circa_output(stack, 0), n);
+}
+
+void String__to_int(caStack* stack)
+{
+    int n = atoi(circa_string_input(stack, 0));
+    set_int(circa_output(stack, 0), n);
+}
+
 void String__to_upper(caStack* stack)
 {
     const char* in = circa_string_input(stack, 0);
@@ -652,6 +664,8 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "String.to_camel_case", String__to_camel_case);
     module_patch_function(patch, "String.to_upper", String__to_upper);
     module_patch_function(patch, "String.to_lower", String__to_lower);
+    module_patch_function(patch, "String.to_number", String__to_number);
+    module_patch_function(patch, "String.to_int", String__to_int);
 
     module_patch_function(patch, "env", get_env);
     module_patch_function(patch, "env_opt", get_env_opt);

@@ -1,0 +1,22 @@
+
+require json
+
+def print_parse(str)
+  print("parsed string '" str "' as " json.parse(str))
+
+print_parse("1")
+print_parse("1.0")
+print_parse('"a"')
+print_parse('"abc"')
+print_parse("[1]")
+print_parse("[1, 2]")
+print_parse(" [ 1 , 2 ] ")
+print_parse('["a", "b", 1.0, 2.0]')
+print_parse("-1")
+print_parse("[-1, -2]")
+print_parse("true")
+print_parse("false")
+print_parse("null")
+print_parse('{}')
+print_parse('{"a":"b"}')
+print_parse('{"a":"b", "c":"d"}')

@@ -675,6 +675,8 @@ def Map.list_append(self, any key, any value) -> Map
   else
     @self.set(key, [value])
 
+def Map.keys(self) -> List
+
 type Set {
   Map m
 }
@@ -737,6 +739,9 @@ def String.to_camel_case(self) -> String
 def String.to_lower(self) -> String
 
 def String.to_upper(self) -> String
+
+def String.to_number(self) -> number
+def String.to_int(self) -> int
 
 def String.characters(self) -> List
     out = for i in 0..(self.length)

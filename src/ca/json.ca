@@ -1,5 +1,7 @@
 
 def is_digit(String s)
+  if s.length < 1
+    return false
   (s.ord >= '0'.ord) and (s.ord <= '9'.ord)
 
 type Reader {
@@ -10,56 +12,147 @@ type Reader {
 def Reader.empty(self) -> bool
   self.pos >= self.str.length
 
-def Reader.char(self, i) -> String
-  self.str.char_at(i + self.pos)
+def Reader.next(self) -> String
+  self.str.char_at(self.pos)
 
 def Reader.advance(@self)
   self.pos += 1
 
 def Reader.consumeWhitespace(@self)
-  print('self aa = ' self)
-  while self.char(0) == ' '
-    print('self a = ' self)
+  while self.next == ' '
     @self.advance
-    print('self b = ' self)
 
-  print('self c = ' self)
   self
 
+def Reader.matches(self, str) -> bool
+  self.str.substr(self.pos, str.length) == str
+
+def Reader.consume(@self, str)
+  self.pos += str.length
+
+def Reader.parse_string(self) -> (Reader, any)
+  @self.advance
+
+  p = self.pos
+  while self.next != '"'
+    if self.empty
+      error("Unexpected end of string, looking for: \"")
+    @self.advance
+
+  result = self.str.slice(p, self.pos)
+  @self.advance
+  return self, result
+
 def Reader.parse_value(self) -> (Reader, any)
-  print('self3 = ' self)
   @self.consumeWhitespace
 
   result = null
-  print('self2 = ' self)
 
-  if self.char(0) == '['
+  if self.next == '['
     @self.advance
+    @self.consumeWhitespace
     
     result = []
-    print('self1 = ' self)
 
-    while self.char(0) != ']'
-      print('self = ' self)
+    first = true
+    while self.next != ']'
+      @self.consumeWhitespace
       if self.empty
-        error("Unexpected end of string, looking for ']'")
+        error("Unexpected end of string, looking for: ] or ,")
+
+      if not first
+        if self.next != ','
+          error("Expected: ," self)
+        @self.advance
+        @self.consumeWhitespace
 
       val = @self.parse_value
-      print('parsed list element: ' val)
       @result.append(val)
-  elif is_digit(self.char(0))
+      first = false
+
+      @self.consumeWhitespace
+
+    @self.advance
+  if self.next == '{'
+    @self.advance
+    @self.consumeWhitespace
+
+    result = Map.make
+
+    first = true
+    while self.next != '}'
+      @self.consumeWhitespace
+      if self.empty
+        error("Unexpected end of string, looking for: } or ,")
+
+      if not first
+        if self.next != ','
+          error('Expected ,' self)
+        @self.advance
+        @self.consumeWhitespace
+
+      key = @self.parse_string
+      @self.consumeWhitespace
+
+      if self.next != ':'
+        error('Expected :')
+      @self.advance
+      @self.consumeWhitespace
+
+      val = @self.parse_value
+
+      @result.set(key,val)
+      first = false
+
+    @self.advance
+
+  elif self.matches("true")
+    @self.consume("true")
+    result = true
+
+  elif self.matches("false")
+    @self.consume("false")
+    result = false
+
+  elif self.matches("null")
+    @self.consume("null")
+    result = null
+
+  elif is_digit(self.next) or self.next == '-'
 
     p = self.pos
-    error('hi')
-    while is_digit(self.char(0))
+
+    @self.advance
+    while is_digit(self.next)
       @self.advance
 
-    result = self.str.substr(p, self.pos)
+    foundDot = false
+    if self.next == "."
+      foundDot = true
+      @self.advance
+
+      while is_digit(self.next)
+        @self.advance
+
+    -- TODO: exponent notation
+
+    result = self.str.slice(p, self.pos)
+    assert(is_string(result))
+
+    if foundDot
+      @result.to_number
+    else
+      @result.to_int
+
+  elif self.next == '"'
+    result = @self.parse_string
 
   return self, result
 
 def parse(String str) -> any
-  Reader.make(str 0).parse_value
+  reader = Reader.make(str 0)
+  result = @reader.parse_value
+  return result
 
 def write(val) -> String
   if is_list(val)
@@ -68,6 +161,3 @@ def write(val) -> String
     "{}"
   else
     to_string(val)
-
-
-parse("[1, 2, 3]") | print
