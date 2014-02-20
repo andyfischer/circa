@@ -120,7 +120,7 @@ typedef void (*caEvaluateFunc)(caStack* stack);
 
 // ReleaseFunc is the signature for a C function that runs when a user object is about to
 // be destroyed. This is used for 'handle' values.
-typedef void (*caReleaseFunc)(caValue* value);
+typedef void (*caReleaseFunc)(caValue* container, void* value);
 
 typedef void (*caLogFunc)(void* context, const char* msg);
 
@@ -425,10 +425,7 @@ caValue* circa_map_insert(caValue* map, caValue* key);
 
 // -- Handle Values --
 
-// Retrive a value from a Handle
-caValue* circa_handle_get_value(caValue* handle);
-
-void circa_handle_set_object(caValue* handle, void* object);
+void circa_set_handle(caValue* handle, void* object, caReleaseFunc release);
 void* circa_handle_get_object(caValue* handle);
 
 // -- String Representation --

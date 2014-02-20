@@ -820,7 +820,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         tokens.consumeStr(&str, tok_ColonString);
 
         if (string_eq(&str, ":handle")) {
-            setup_handle_type(as_type(result));
+            handle_setup_type(as_type(result));
         } else if (string_eq(&str, ":interface")) {
             setup_interface_type(as_type(result));
         } else {

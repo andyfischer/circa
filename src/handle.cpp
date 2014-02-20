@@ -15,7 +15,8 @@ namespace circa {
 struct HandleData
 {
     int refCount;
-    caValue value;
+    void* value;
+    caReleaseFunc release;
 };
 
 bool is_handle(caValue* value)
@@ -29,17 +30,25 @@ HandleData* as_handle(caValue* handle)
     return (HandleData*) handle->value_data.ptr;
 }
 
-caValue* handle_get_value(caValue* handle)
+void* handle_get_value(caValue* handle)
 {
     HandleData* container = as_handle(handle);
-    return &container->value;
+    return container->value;
+}
+
+void handle_set(caValue* handle, void* value, caReleaseFunc release)
+{
+    HandleData* container = as_handle(handle);
+    container->value = value;
+    container->release = release;
 }
 
 void handle_initialize(Type* type, caValue* value)
 {
     HandleData* c = (HandleData*) malloc(sizeof(HandleData));
     c->refCount = 1;
-    initialize_null(&c->value);
+    c->value = NULL;
+    c->release = NULL;
     value->value_data.ptr = c;
 }
 
@@ -54,6 +63,10 @@ void handle_release(caValue* value)
     // Release data, if this is the last reference.
     if (container->refCount == 0) {
 
+        if (container->release != NULL)
+            container->release(value, container->value);
+
+        #if 0
         // Find the type's release function (if any), and call it.
         Value releaseStr;
         set_string(&releaseStr, "release");
@@ -65,13 +78,13 @@ void handle_release(caValue* value)
 
             // Don't copy this value, otherwise we'll get in trouble when the copy
             // needs to be released.
-            swap(value, inputSlot);
+            set_pointer(inputSlot, container->value);
 
             stack_run(&stack);
 
             inputSlot = get_input(&stack, 0);
-            swap(value, inputSlot);
         }
+        #endif
 
         free(container);
     }
@@ -96,10 +109,10 @@ bool handle_equals(caValue* left, caValue* right)
 
 int handle_hash(caValue* val)
 {
-    return val->value_data.asint;
+    return (int64_t) as_handle(val)->value;
 }
 
-void setup_handle_type(Type* type)
+void handle_setup_type(Type* type)
 {
     type->storageType = sym_StorageTypeHandle;
     type->initialize = handle_initialize;

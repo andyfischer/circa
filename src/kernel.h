@@ -113,6 +113,7 @@ struct BuiltinTypes {
     Type* frame;
     Type* float_type;
     Type* func;
+    Type* handle;
     Type* int_type;
     Type* list;
     Type* map;
