@@ -2,7 +2,9 @@
 require json
 
 def print_parse(str)
-  print("parsed string '" str "' as " json.parse(str))
+  parsed = json.parse(str)
+  unparsed = json.write(parsed)
+  print(str " -> " parsed " -> " unparsed)
 
 print_parse("1")
 print_parse("1.0")

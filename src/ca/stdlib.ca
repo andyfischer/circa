@@ -79,6 +79,7 @@ def reflect_get_frame_state() -> any
 -- Type checking
 def is_compound(any) -> bool
 def is_list(any) -> bool
+def is_map(any) -> bool
 def is_int(any) -> bool
 def is_number(any) -> bool
 def is_bool(any) -> bool

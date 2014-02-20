@@ -37,6 +37,8 @@ def Reader.parse_string(self) -> (Reader, any)
   while self.next != '"'
     if self.empty
       error("Unexpected end of string, looking for: \"")
+
+    -- TODO: handle escapes and unicode
     @self.advance
 
   result = self.str.slice(p, self.pos)
@@ -154,10 +156,16 @@ def parse(String str) -> any
   result = @reader.parse_value
   return result
 
+def String.quote(self) -> String
+  -- TODO: insert escapes as needed
+  concat('"' self '"')
+
 def write(val) -> String
   if is_list(val)
-    concat('[' (for el in val { write(val) }).join(', ') ']')
+    concat('[' (for el in val { write(el) }).join(', ') ']')
   elif is_map(val)
-    "{}"
+    concat('{' (for k in val.keys { concat(k.quote, ": ", write(val.get(k))) }).join(', ') '}')
+  elif is_string(val)
+    val.quote
   else
     to_string(val)

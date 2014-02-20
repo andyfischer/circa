@@ -60,6 +60,10 @@ void hosted_is_int(caStack* stack)
 {
     set_bool(circa_output(stack, 0), is_int2(circa_input(stack, 0)));
 }
+void hosted_is_map(caStack* stack)
+{
+    set_bool(circa_output(stack, 0), is_hashtable(circa_input(stack, 0)));
+}
 void hosted_is_number(caStack* stack)
 {
     set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
@@ -247,6 +251,12 @@ void Map__contains(caStack* stack)
 {
     caValue* value = hashtable_get(circa_input(stack, 0), circa_input(stack, 1));
     set_bool(circa_output(stack, 0), value != NULL);
+}
+
+void Map__keys(caStack* stack)
+{
+    caValue* table = circa_input(stack, 0);
+    hashtable_get_keys(table, circa_output(stack, 0));
 }
 
 void Map__remove(caStack* stack)
@@ -628,6 +638,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "is_compound", hosted_is_compound);
     module_patch_function(patch, "is_list", hosted_is_list);
     module_patch_function(patch, "is_int", hosted_is_int);
+    module_patch_function(patch, "is_map", hosted_is_map);
     module_patch_function(patch, "is_number", hosted_is_number);
     module_patch_function(patch, "is_bool", hosted_is_bool);
     module_patch_function(patch, "is_string", hosted_is_string);
@@ -647,6 +658,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "List.set", List__set);
     module_patch_function(patch, "List.remove", List__remove);
     module_patch_function(patch, "Map.contains", Map__contains);
+    module_patch_function(patch, "Map.keys", Map__keys);
     module_patch_function(patch, "Map.remove", Map__remove);
     module_patch_function(patch, "Map.get", Map__get);
     module_patch_function(patch, "Map.set", Map__set);
