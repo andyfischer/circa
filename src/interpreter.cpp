@@ -1250,8 +1250,8 @@ void vm_run(Stack* stack)
         }
         case bc_Copy: {
             Frame* top = top_frame(stack);
-            caValue* source = vm_read_local_value(top);
             caValue* dest = vm_read_local_value(top);
+            caValue* source = vm_run_single_input(top);
             copy(source, dest);
             continue;
         }
@@ -1356,13 +1356,9 @@ void vm_run(Stack* stack)
         case bc_Continue2:
             continue;
         case bc_Break2: {
-            Frame* top = top_frame(stack);
-            Frame* toFrame = top;
-            while (!is_while_loop(toFrame->block) && prev_frame(toFrame) != NULL)
-                toFrame = prev_frame(toFrame);
-            // Throw away intermediate frames.
-            while (top_frame(stack) != toFrame)
+            while (!is_while_loop(top_frame(stack)->block) && stack_top_parent(stack) != NULL)
                 stack_pop(stack);
+            Frame* top = top_frame(stack);
 
             vm_finish_while_loop(stack);
             Frame* parent = stack_top_parent(stack);

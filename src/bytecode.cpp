@@ -32,6 +32,7 @@ struct Writer {
     bool noSaveState;
 };
 
+static void bytecode_write_input_instruction(Writer* writer, Term* input);
 static void bytecode_write_input_instructions(Writer* writer, Term* caller);
 static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block);
 static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, Term* term);
@@ -78,9 +79,7 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_Copy:
-        string_append(string, "copy ");
-        bc_append_local_reference_string(string, bc, pc);
-        string_append(string, " to ");
+        string_append(string, "copy to ");
         bc_append_local_reference_string(string, bc, pc);
         break;
     case bc_NoOp:
@@ -597,8 +596,8 @@ void write_pre_exit_point_for_while_loop(Writer* writer, Term* exitPoint, Block*
             continue;
 
         blob_append_char(writer->bytecode, bc_Copy);
-        bytecode_write_local_reference(writer, block, latestValue);
         bytecode_write_local_reference(writer, block, input);
+        bytecode_write_input_instruction(writer, latestValue);
     }
 }
 
@@ -1020,13 +1019,13 @@ static void write_loop_finish(Writer* writer, Block* block)
 {
     // Copy values for looped_inputs.
     for (int i=0;; i++) {
-        Term* term = block->get(i);
-        if (term->function != FUNCS.looped_input)
+        Term* looped_input = block->get(i);
+        if (looped_input->function != FUNCS.looped_input)
             break;
 
-        blob_append_char(writer->bytecode, bc_LocalCopy);
-        blob_append_u32(writer->bytecode, term->input(1)->index);
-        blob_append_u32(writer->bytecode, term->index);
+        blob_append_char(writer->bytecode, bc_Copy);
+        bytecode_write_local_reference(writer, block, looped_input);
+        bytecode_write_input_instruction(writer, looped_input->input(1));
     }
 }
 
