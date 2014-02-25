@@ -38,6 +38,9 @@ void* handle_get_value(caValue* handle)
 
 void handle_set(caValue* handle, void* value, caReleaseFunc release)
 {
+    if (!is_handle(handle))
+        make_no_initialize(TYPES.handle, handle);
+        
     HandleData* container = as_handle(handle);
     container->value = value;
     container->release = release;
