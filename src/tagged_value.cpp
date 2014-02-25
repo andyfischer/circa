@@ -92,6 +92,8 @@ void set_null(caValue* value)
     if (value->value_type == NULL || value->value_type == TYPES.null)
         return;
 
+    if (value->value_type->userRelease != NULL)
+
     if (value->value_type->release != NULL)
         value->value_type->release(value);
 

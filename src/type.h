@@ -87,6 +87,8 @@ struct Type
     VisitHeap visitHeap;
     ChecksumFunc checksum;
 
+    ReleaseFunc userRelease;
+
     // Parent type, may be null.
     Type* parent;
 

@@ -353,6 +353,7 @@ void reset_type(Type* type)
     type->storageType = sym_StorageTypeNull;
     type->initialize = NULL;
     type->release = NULL;
+    type->userRelease = NULL;
     type->copy = NULL;
     type->reset = NULL;
     type->equals = NULL;
