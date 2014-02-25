@@ -746,14 +746,7 @@ Term* find_from_unique_name(Block* block, caValue* name)
     return NULL;
 }
 
-Type* find_type(World* world, const char* name)
-{
-    caTerm* term = find_name(world->root, name, sym_LookupType);
-    if (term == NULL)
-        return NULL;
-    return circa_type(circa_term_value(term));
-}
-Type* find_type_local(Block* block, const char* name)
+Type* find_type(Block* block, const char* name)
 {
     caTerm* term = find_name(block, name, sym_LookupType);
     if (term == NULL)

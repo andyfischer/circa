@@ -174,6 +174,9 @@ Type* get_type_of_input(Term* term, int inputIndex)
 
 caValue* get_type_property(Type* type, const char* name)
 {
+    if (!is_hashtable(&type->properties))
+        return NULL;
+
     Value str;
     set_string(&str, name);
     return hashtable_get(&type->properties, &str);
@@ -183,6 +186,8 @@ caValue* type_property_insert(Type* type, const char* name)
 {
     Value str;
     set_string(&str, name);
+    if (!is_hashtable(&type->properties))
+        set_hashtable(&type->properties);
     return hashtable_insert(&type->properties, &str);
 }
 
@@ -456,16 +461,6 @@ void install_type(Term* term, Type* type)
 {
     // Type* oldType = as_type(term);
     set_type(term_value(term), type);
-}
-
-Type* find_type(Block* block, const char* name)
-{
-    Term* term = block->get(name);
-    if (term == NULL)
-        return NULL;
-    if (!is_type(term))
-        return NULL;
-    return as_type(term);
 }
 
 void set_type_list(caValue* value, Type* type1)

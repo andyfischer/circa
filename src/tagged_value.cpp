@@ -82,6 +82,12 @@ void make_no_initialize(Type* type, caValue* value)
     type_incref(type);
 }
 
+void make_no_initialize_ptr(Type* type, caValue* value, void* ptr)
+{
+    make_no_initialize(type, value);
+    value->value_data.ptr = ptr;
+}
+
 Type* get_value_type(caValue* v)
 {
     return v->value_type;
@@ -91,8 +97,6 @@ void set_null(caValue* value)
 {
     if (value->value_type == NULL || value->value_type == TYPES.null)
         return;
-
-    if (value->value_type->userRelease != NULL)
 
     if (value->value_type->release != NULL)
         value->value_type->release(value);
@@ -148,6 +152,13 @@ void copy(caValue* source, caValue* dest)
 
     ca_assert(source);
     ca_assert(dest);
+
+#ifdef DEBUG
+    caValue* nocopy = get_type_property(source->value_type, "nocopy");
+    if (nocopy != NULL && as_bool(nocopy))
+        internal_error("Tried to copy a :nocopy type");
+    
+#endif
 
     if (source == dest)
         return;

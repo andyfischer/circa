@@ -30,25 +30,25 @@ void manually_create_compound_type()
 void reference_counting()
 {
     Type* type = create_type();
-    test_assert(type->header.refcount == 1);
+    test_equals(type->header.refcount, 1);
 
     Value value;
     set_type(&value, type);
-    test_assert(type->header.refcount == 2);
+    test_equals(type->header.refcount, 2);
 
     set_null(&value);
-    test_assert(type->header.refcount == 1);
+    test_equals(type->header.refcount, 1);
 
     {
         Block block;
         Term* value = create_value(&block, type, "my_value");
-        test_assert(type->header.refcount == 3);
+        test_equals(type->header.refcount, 3);
 
         set_null(term_value(value));
-        test_assert(type->header.refcount == 2);
+        test_equals(type->header.refcount, 2);
     }
 
-    test_assert(type->header.refcount == 1);
+    test_equals(type->header.refcount, 1);
 
     set_type(&value, type);
     test_assert(type->header.refcount == 2);

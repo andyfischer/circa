@@ -13,7 +13,6 @@
 #include "../filepack.cpp"
 #include "../function.cpp"
 #include "../generic.cpp"
-#include "../handle.cpp"
 #include "../hashtable.cpp"
 #include "../heap_debugging.cpp"
 #include "../if_block.cpp"

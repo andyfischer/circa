@@ -428,6 +428,9 @@ caValue* circa_map_insert(caValue* map, caValue* key);
 void circa_set_handle(caValue* handle, void* object, caReleaseFunc release);
 void* circa_handle_get_object(caValue* handle);
 
+void* circa_raw_pointer(caValue* value);
+void circa_set_raw_pointer(caValue* value, void* ptr);
+
 // -- String Representation --
 
 // Load a Circa value from a string representation. The result will be written to 'out'.
@@ -452,10 +455,7 @@ caTerm* circa_find_global(caWorld* world, const char* name);
 caBlock* circa_find_function_local(caBlock* block, const char* name);
 
 // Find a Type by name, looking in the given block.
-caType* circa_find_type_local(caBlock* block, const char* name);
-
-caBlock* circa_find_function(caWorld* world, const char* name);
-caType* circa_find_type(caWorld* world, const char* name);
+caType* circa_find_type(caBlock* block, const char* name);
 
 // Retreive the nth input Term to the caller Term. May return NULL if the caller term
 // doesn't have that many inputs, or if there is no caller term.

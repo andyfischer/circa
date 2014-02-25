@@ -6,7 +6,6 @@
 #include "block.h"
 #include "building.h"
 #include "interpreter.h"
-#include "handle.h"
 #include "importing.h"
 #include "inspection.h"
 #include "kernel.h"
@@ -127,12 +126,22 @@ void circa_set_point(caValue* point, float x, float y)
 
 void circa_set_handle(caValue* handle, void* object, caReleaseFunc release)
 {
-    handle_set(handle, object, release);
+    // TODO: delete
 }
 
 void* circa_handle_get_object(caValue* handle)
 {
-    return handle_get_value(handle);
+    // TODO: delete
+    return NULL;
+}
+
+void* circa_raw_pointer(caValue* value)
+{
+    return value->value_data.ptr;
+}
+void circa_set_raw_pointer(caValue* value, void* ptr)
+{
+    value->value_data.ptr = ptr;
 }
 
 void circa_make(caValue* value, caType* type)
@@ -165,17 +174,13 @@ caBlock* circa_find_function_local(caBlock* block, const char* name)
 {
     return find_function_local(block, name);
 }
-caType* circa_find_type_local(caBlock* block, const char* name)
+caType* circa_find_type(caBlock* block, const char* name)
 {
-    return find_type_local(block, name);
+    return find_type(block, name);
 }
 caBlock* circa_find_function(caWorld* world, const char* name)
 {
     return find_function(world, name);
-}
-caType* circa_find_type(caWorld* world, const char* name)
-{
-    return find_type(world, name);
 }
 
 int circa_term_num_inputs(caTerm* term)

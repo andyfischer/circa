@@ -4,7 +4,6 @@
 #include "../../../src/block.h"
 #include "../../../src/building.h"
 #include "../../../src/interpreter.h"
-#include "../../../src/handle.h"
 #include "../../../src/if_block.h"
 #include "../../../src/importing.h"
 #include "../../../src/inspection.h"

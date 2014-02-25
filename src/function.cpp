@@ -91,7 +91,7 @@ void finish_building_function(Block* contents)
     insert_nonlocal_terms(contents);
 
     // Possibly apply a native patch
-    module_possibly_patch_new_function(global_world(), contents);
+    native_patch_apply_to_new_function(global_world(), contents);
 
     block_finish_changes(contents);
 }

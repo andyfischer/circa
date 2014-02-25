@@ -47,6 +47,9 @@ struct HashtableIterator
     void advance();
     bool finished();
 
+    caValue* key() { return currentKey(); }
+    caValue* value() { return current(); }
+
     operator bool() { return !finished(); }
     void operator++() { advance(); }
 

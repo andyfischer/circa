@@ -110,6 +110,9 @@ Wildcard
 RecursiveWildcard
 Function
 
+# Native patch
+TypeRelease
+
 # Misc errors
 FileNotFound
 NotEnoughInputs

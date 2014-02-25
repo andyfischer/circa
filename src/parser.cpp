@@ -8,12 +8,12 @@
 #include "loops.h"
 #include "function.h"
 #include "if_block.h"
-#include "handle.h"
 #include "hashtable.h"
 #include "inspection.h"
 #include "interpreter.h"
 #include "list.h"
 #include "kernel.h"
+#include "native_patch.h"
 #include "modules.h"
 #include "parser.h"
 #include "selector.h"
@@ -797,11 +797,19 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             possible_whitespace_or_newline(tokens));
 
     while (tokens.nextIs(tok_ColonString)) {
-        std::string s = tokens.consumeStr();
+        Value attr;
+        tokens.consumeStr(&attr);
 
-        // There were once type attributes here
-        {
-            return syntax_error(block, tokens, startPosition, "Unrecognized type attribute: " + s);
+        if (string_eq(&attr, ":nocopy")) {
+            set_bool(type_property_insert(unbox_type(result), "nocopy"), true);
+        }
+
+        else {
+
+            Value msg;
+            set_string(&msg, "Unrecognized type attribute: ");
+            string_append(&msg, &attr);
+            return syntax_error(block, tokens, startPosition, as_cstring(&msg));
         }
 
         possible_whitespace_or_newline(tokens);
@@ -819,9 +827,12 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Value str;
         tokens.consumeStr(&str, tok_ColonString);
 
+#if 0
         if (string_eq(&str, ":handle")) {
             handle_setup_type(as_type(result));
-        } else if (string_eq(&str, ":interface")) {
+        } else
+#endif
+        if (string_eq(&str, ":interface")) {
             setup_interface_type(as_type(result));
         } else {
             return syntax_error(block, tokens, startPosition, "Unrecognized magic symbol for type");
@@ -831,6 +842,8 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         result->setBoolProp(sym_Syntax_NoBrackets, true);
         return ParseResult(result);
     }
+
+    native_patch_apply_to_new_type(global_world(), unbox_type(result));
 
     // if there's a semicolon, or we've run out of tokens, then finish here.
     if (tokens.nextIs(tok_Semicolon) || tokens.finished()) {

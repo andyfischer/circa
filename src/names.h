@@ -95,8 +95,7 @@ void get_global_name(Block* term, caValue* nameOut);
 
 Term* find_term_from_global_name(const char* name);
 
-Type* find_type(World* world, const char* name);
-Type* find_type_local(Block* block, const char* name);
+Type* find_type(Block* block, const char* name);
 Block* find_function(World* world, const char* name);
 Block* find_function_local(Block* block, const char* name);
 

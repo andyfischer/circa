@@ -16,6 +16,8 @@ void make(Type* type, caValue* value);
 // The value_data is left NULL, and the caller is expected to fill in value_data.
 void make_no_initialize(Type* type, caValue* value);
 
+void make_no_initialize_ptr(Type* type, caValue* value, void* ptr);
+
 Type* get_value_type(caValue* v);
 
 // Set this value to null. This will call the type's destructor if necessary.

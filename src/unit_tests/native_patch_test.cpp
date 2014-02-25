@@ -43,7 +43,7 @@ void patch_manually()
     test_equals(test_spy_get_results(), "[2]");
 
     // Create a patch for my_add
-    NativePatch* patch = add_native_patch(world, "patch_manually");
+    NativePatch* patch = insert_native_patch(world, "patch_manually");
     module_patch_function(patch, "my_add", my_add);
     native_patch_apply_patch(patch, &block);
 
@@ -65,7 +65,7 @@ void trigger_change()
     block->compile("def f() -> int { 1 }");
     block->compile("test_spy(f())");
 
-    NativePatch* patch = add_native_patch(world, "trigger_change_test");
+    NativePatch* patch = insert_native_patch(world, "trigger_change_test");
 
     Stack stack;
     stack_init(&stack, block);
@@ -93,7 +93,7 @@ void new_function_patched_by_world()
     World* world = global_world();
 
     // First create the patch, as part of the global world.
-    NativePatch* patch = add_native_patch(global_world(), "nativemod_block");
+    NativePatch* patch = insert_native_patch(global_world(), "nativemod_block");
     module_patch_function(patch, "my_add", my_add);
     native_patch_finish_change(patch);
 

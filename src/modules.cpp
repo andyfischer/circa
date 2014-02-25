@@ -301,7 +301,7 @@ void native_patch_this_postCompile(Term* term)
     FileWatch* watch = add_file_watch_native_patch(global_world(),
             as_cstring(&filename), as_cstring(&blockName));
 
-    add_native_patch(global_world(), as_cstring(&blockName));
+    insert_native_patch(global_world(), as_cstring(&blockName));
 
     file_watch_check_now(global_world(), watch);
 }

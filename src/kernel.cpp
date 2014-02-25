@@ -13,7 +13,6 @@
 #include "code_iterators.h"
 #include "function.h"
 #include "generic.h"
-#include "handle.h"
 #include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
@@ -386,7 +385,6 @@ void bootstrap_kernel()
     TYPES.bool_type = create_type();
     TYPES.error = create_type();
     TYPES.float_type = create_type();
-    TYPES.handle = create_type();
     TYPES.int_type = create_type();
     TYPES.list = create_type();
     TYPES.map = create_type();
@@ -402,7 +400,6 @@ void bootstrap_kernel()
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
     hashtable_setup_type(TYPES.map);
-    handle_setup_type(TYPES.handle);
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
     symbol_setup_type(TYPES.symbol);

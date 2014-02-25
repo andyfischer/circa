@@ -79,7 +79,6 @@ OBJECTS := \
 	$(OBJDIR)/filepack.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/generic.o \
-	$(OBJDIR)/handle.o \
 	$(OBJDIR)/hashtable.o \
 	$(OBJDIR)/heap_debugging.o \
 	$(OBJDIR)/if_block.o \
@@ -229,9 +228,6 @@ $(OBJDIR)/function.o: function.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/generic.o: generic.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/handle.o: handle.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/hashtable.o: hashtable.cpp

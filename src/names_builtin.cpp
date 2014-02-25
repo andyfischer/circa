@@ -115,6 +115,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Wildcard: return "Wildcard";
     case sym_RecursiveWildcard: return "RecursiveWildcard";
     case sym_Function: return "Function";
+    case sym_TypeRelease: return "TypeRelease";
     case sym_FileNotFound: return "FileNotFound";
     case sym_NotEnoughInputs: return "NotEnoughInputs";
     case sym_TooManyInputs: return "TooManyInputs";
@@ -1590,9 +1591,25 @@ int builtin_symbol_from_string(const char* str)
             return sym_TooManyInputs;
         break;
     case 'y':
-        if (strcmp(str + 2, "peName") == 0)
+    switch (str[2]) {
+    case 'p':
+    switch (str[3]) {
+    case 'e':
+    switch (str[4]) {
+    case 'N':
+        if (strcmp(str + 5, "ame") == 0)
             return sym_TypeName;
         break;
+    case 'R':
+        if (strcmp(str + 5, "elease") == 0)
+            return sym_TypeRelease;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     default: return -1;
     }
     case 'U':

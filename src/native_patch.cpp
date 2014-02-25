@@ -14,31 +14,33 @@
 #include "function.h"
 #include "hashtable.h"
 #include "importing.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "names.h"
 #include "native_patch.h"
 #include "string_type.h"
 #include "term.h"
+#include "type.h"
 #include "update_cascades.h"
 #include "world.h"
 
 namespace circa {
 
+typedef std::map<std::string, NativePatch*> StringToNativePatchMap;
+
 struct NativePatchWorld
 {
-    // Map of names to NativePatchs.
-    std::map<std::string, NativePatch*> nativeModules;
-
-    // Map of every function's global name -> native module name.
-    Value everyPatchedFunction;
+    // Map of names to NativePatches.
+    StringToNativePatchMap nativeModules;
 };
 
 struct NativePatch
 {
     World* world;
 
-    std::map<std::string, EvaluateFunc> patches;
+    // Hashtable, maps names to patches.
+    Value patches;
 
     // Target block name.
     Value targetName;
@@ -51,7 +53,6 @@ struct NativePatch
 NativePatchWorld* alloc_native_patch_world()
 {
     NativePatchWorld* world = new NativePatchWorld();
-    set_hashtable(&world->everyPatchedFunction);
     return world;
 }
 
@@ -68,6 +69,7 @@ void free_native_patch_world(NativePatchWorld* world)
 NativePatch* alloc_native_patch(World* world)
 {
     NativePatch* patch = new NativePatch();
+    set_hashtable(&patch->patches);
     patch->world = world;
     patch->dll = NULL;
     return patch;
@@ -92,7 +94,7 @@ NativePatch* get_existing_native_patch(World* world, const char* name)
     return NULL;
 }
 
-NativePatch* add_native_patch(World* world, const char* targetName)
+NativePatch* insert_native_patch(World* world, const char* targetName)
 {
     NativePatchWorld* nativeWorld = world->nativePatchWorld;
 
@@ -101,7 +103,7 @@ NativePatch* add_native_patch(World* world, const char* targetName)
     if (module != NULL)
         return module;
 
-    // Create new module with this name.
+    // Create new NativePatch with this name.
     module = alloc_native_patch(world);
     set_string(&module->targetName, targetName);
     nativeWorld->nativeModules[targetName] = module;
@@ -121,79 +123,72 @@ void remove_native_patch(World* world, const char* name)
     }
 }
 
+static void function_key(const char* name, caValue* out)
+{
+    set_list(out, 2);
+    set_symbol(out->index(0), sym_Function);
+    set_string(out->index(1), name);
+}
+
+static void type_release_key(const char* typeName, caValue* out)
+{
+    set_list(out, 2);
+    set_symbol(list_get(out, 0), sym_TypeRelease);
+    set_string(list_get(out, 1), typeName);
+}
+
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func)
 {
-    module->patches[name] = func;
+    Value key;
+    function_key(name, &key);
+    set_opaque_pointer(hashtable_insert(&module->patches, &key), (void*) func);
+}
+
+void module_patch_type_release(NativePatch* module, const char* typeName, ReleaseFunc func)
+{
+    Value key;
+    type_release_key(typeName, &key);
+    set_opaque_pointer(hashtable_insert(&module->patches, &key), (void*) func);
 }
 
 void native_patch_apply_patch(NativePatch* module, Block* block)
 {
-    // Walk through list of patches, and try to find any functions to apply them to.
-    std::map<std::string, EvaluateFunc>::const_iterator it;
-    for (it = module->patches.begin(); it != module->patches.end(); ++it) {
-        std::string const& name = it->first;
-        EvaluateFunc evaluateFunc = it->second;
+    // Walk through list of patches, and apply them to block terms as appropriate.
+    
+    for (HashtableIterator it(&module->patches); it; ++it) {
+        caValue* patchType = it.key()->index(0);
+        caValue* name = it.key()->index(1);
 
-        Term* term = find_local_name(block, name.c_str());
+        Term* term = find_local_name(block, name);
 
         if (term == NULL)
             continue;
-        if (!is_function(term))
-            continue;
 
-        install_function(term, evaluateFunc);
-    }
-}
+        switch (as_symbol(patchType)) {
+        case sym_Function: {
+            if (!is_function(term))
+                break;
 
-static void update_patch_function_lookup_for_module(NativePatch* module)
-{
-    World* world = module->world;
-    caValue* everyPatchedFunction = &world->nativePatchWorld->everyPatchedFunction;
+            EvaluateFunc func = (EvaluateFunc) as_opaque_pointer(it.value());
+            install_function(term, func);
+            break;
+        }
 
-    caValue* targetName = &module->targetName;
+        case sym_TypeRelease: {
+            if (!is_type(term))
+                break;
 
-    // Look at every function that this module patches.
-    std::map<std::string, EvaluateFunc>::const_iterator it;
-
-    for (it = module->patches.begin(); it != module->patches.end(); it++) {
-
-        Value functionName;
-        set_string(&functionName, it->first.c_str());
-
-        // Construct a global name for this function, using the block's global name.
-
-        Value globalName;
-        copy(targetName, &globalName);
-        string_append_qualified_name(&globalName, &functionName);
-
-        // Save this line.
-        caValue* entry = hashtable_insert(everyPatchedFunction, &globalName);
-        set_list(entry, 2);
-        copy(&module->targetName, list_get(entry, 0));
-        copy(&functionName, list_get(entry, 1));
-    }
-}
-
-static void update_patch_function_lookup(World* world)
-{
-    NativePatchWorld* nativeWorld = world->nativePatchWorld;
-    set_hashtable(&nativeWorld->everyPatchedFunction);
-
-    // For every native module.
-    std::map<std::string, NativePatch*>::const_iterator it;
-    for (it = nativeWorld->nativeModules.begin(); it != nativeWorld->nativeModules.end(); ++it) {
-
-        NativePatch* module = it->second;
-
-        update_patch_function_lookup_for_module(module);
+            ReleaseFunc func = (ReleaseFunc) as_opaque_pointer(it.value());
+            as_type(term_value(term))->release = func;
+            break;
+        }
+        }
     }
 }
 
 void native_patch_finish_change(NativePatch* module)
 {
     World* world = module->world;
-
-    update_patch_function_lookup(world);
 
     // Apply changes to the target module.
     caValue* targetName = &module->targetName;
@@ -210,53 +205,92 @@ CIRCA_EXPORT void circa_finish_native_patch(caNativePatch* module)
     native_patch_finish_change(module);
 }
 
-void module_possibly_patch_new_function(World* world, Block* function)
+static NativePatch* find_native_patch_for_module(NativePatchWorld* world, Block* module)
 {
+    if (module == NULL)
+        return NULL;
+
+    StringToNativePatchMap::const_iterator it = world->nativeModules.find(
+        as_cstring(term_name(module->owningTerm)));
+
+    if (it == world->nativeModules.end())
+        return NULL;
+
+    return it->second;
+}
+
+static bool term_can_be_patched(Term* term)
+{
+    // Currently, only functions & types at the module level can be patched.
+    return is_module(term->owningBlock);
+}
+
+Block* find_enclosing_module(Block* block)
+{
+    while (true) {
+        if (block == NULL)
+            return NULL;
+        if (is_module(block))
+            return block;
+        block = get_parent_block(block);
+    }
+}
+
+void native_patch_apply_to_new_function(World* world, Block* function)
+{
+    Term* term = function->owningTerm;
+    if (!term_can_be_patched(term))
+        return;
+
     NativePatchWorld* moduleWorld = world->nativePatchWorld;
 
-    Value globalName;
-    get_global_name(function, &globalName);
-
-    // No global name: no patch.
-    if (!is_string(&globalName))
+    Block* module = find_enclosing_module(function);
+    if (module == NULL)
         return;
 
-    // Lookup in the global table.
-    caValue* patchEntry = hashtable_get(&moduleWorld->everyPatchedFunction, &globalName);
-
-    if (patchEntry == NULL) {
-        // No patch for this function.
+    NativePatch* nativePatch = find_native_patch_for_module(moduleWorld, module);
+    if (nativePatch == NULL)
         return;
-    }
 
-    caValue* nativeModuleName = list_get(patchEntry, 0);
-    caValue* functionName = list_get(patchEntry, 1);
-
-    // Found a patch; apply it.
-    NativePatch* module = get_existing_native_patch(world, as_cstring(nativeModuleName));
-
-    if (module == NULL) {
-        std::cout << "in module_possibly_patch_new_function, couldn't find module: "
-            << as_cstring(nativeModuleName) << std::endl;
+    Value key;
+    function_key(as_cstring(term_name(term)), &key);
+    caValue* patch = hashtable_get(&nativePatch->patches, &key);
+    if (patch == NULL)
         return;
-    }
+        
+    EvaluateFunc evaluateFunc = (EvaluateFunc) as_opaque_pointer(patch);
+    install_function(term, evaluateFunc);
+}
 
-    std::map<std::string, EvaluateFunc>::const_iterator it;
-    it = module->patches.find(as_cstring(functionName));
-
-    if (it == module->patches.end()) {
-        std::cout << "in module_possibly_patch_new_function, couldn't find function: "
-            << as_cstring(functionName) << std::endl;
+void native_patch_apply_to_new_type(World* world, Type* type)
+{
+    Term* term = type->declaringTerm;
+    if (!term_can_be_patched(term))
         return;
-    }
-    
-    EvaluateFunc evaluateFunc = it->second;
 
-    install_function(function->owningTerm, evaluateFunc);
+    NativePatchWorld* moduleWorld = world->nativePatchWorld;
+
+    Block* module = find_enclosing_module(term->owningBlock);
+    if (module == NULL)
+        return;
+
+    NativePatch* nativePatch = find_native_patch_for_module(moduleWorld, module);
+    if (nativePatch == NULL)
+        return;
+
+    Value key;
+    type_release_key(as_cstring(term_name(term)), &key);
+    caValue* patch = hashtable_get(&nativePatch->patches, &key);
+    if (patch == NULL)
+        return;
+        
+    ReleaseFunc releaseFunc = (ReleaseFunc) as_opaque_pointer(patch);
+    type->release = releaseFunc;
 }
 
 void native_patch_add_platform_specific_suffix(caValue* filename)
 {
+    // Future: Windows support.
     string_append(filename, ".so");
 }
 
@@ -301,7 +335,7 @@ void native_patch_load_from_file(NativePatch* module, const char* filename)
 
 CIRCA_EXPORT caNativePatch* circa_create_native_patch(caWorld* world, const char* name)
 {
-    return add_native_patch(world, name);
+    return insert_native_patch(world, name);
 }
 
 CIRCA_EXPORT void circa_patch_function(caNativePatch* module, const char* name,
