@@ -120,7 +120,7 @@ typedef void (*caEvaluateFunc)(caStack* stack);
 
 // ReleaseFunc is the signature for a C function that runs when a user object is about to
 // be destroyed. This is used for 'handle' values.
-typedef void (*caReleaseFunc)(caValue* container, void* value);
+typedef void (*caReleaseFunc)(caValue* container);
 
 typedef void (*caLogFunc)(void* context, const char* msg);
 
@@ -425,8 +425,10 @@ caValue* circa_map_insert(caValue* map, caValue* key);
 
 // -- Handle Values --
 
+#if 0
 void circa_set_handle(caValue* handle, void* object, caReleaseFunc release);
 void* circa_handle_get_object(caValue* handle);
+#endif
 
 void* circa_raw_pointer(caValue* value);
 void circa_set_raw_pointer(caValue* value, void* ptr);
@@ -523,6 +525,7 @@ caValue* circa_declare_value(caBlock* block, const char* name);
 // -- Native module support --
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
+void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func);
 void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --

@@ -343,5 +343,9 @@ CIRCA_EXPORT void circa_patch_function(caNativePatch* module, const char* name,
 {
     module_patch_function((NativePatch*) module, name, func);
 }
+CIRCA_EXPORT void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func)
+{
+    module_patch_type_release((NativePatch*) module, typeName, func);
+}
 
 } // namespace circa
