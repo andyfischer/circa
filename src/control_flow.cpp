@@ -20,8 +20,6 @@
 namespace circa {
 
 static Symbol max_exit_level(Symbol left, Symbol right);
-static void update_inputs_for_exit_point(Term* exitCall, Term* exitPoint);
-static void create_implicit_outputs_for_exit_point(Term* exitCall, Term* exitPoint);
 
 bool is_exit_point(Term* term)
 {
@@ -230,53 +228,6 @@ void update_for_control_flow(Block* block)
         if (nestedBlock != NULL && is_minor_block(nestedBlock))
             update_for_control_flow(nestedBlock);
     }
-}
-
-static void update_inputs_for_exit_point(Term* exitCall, Term* exitPoint)
-{
-    // Each input to the exit_point should correspond with an output from this
-    // block. Our goal is to capture the "in progress" value for each output.
-    
-    Block* block = exitPoint->owningBlock;
-
-    set_inputs(exitPoint, TermList());
-
-    for (int i=0;; i++) {
-
-        Term* output = get_output_placeholder(block, i);
-        if (output == NULL)
-            break;
-
-        // For 'return', check for outputs that are directly given as return() args.
-        if (exitCall->function == FUNCS.return_func) {
-            if (i < exitCall->numInputs()) {
-                set_input(exitPoint, i, exitCall->input(i));
-                continue;
-            }
-        }
-
-        Term* intermediateValue = find_intermediate_result_for_output(exitPoint, output);
-        set_input(exitPoint, i, intermediateValue);
-    }
-}
-
-static void create_implicit_outputs_for_exit_point(Term* exitCall, Term* exitPoint)
-{
-    Block* block = exitPoint->owningBlock;
-
-    // For a return(), make sure there are enough anonymous outputs.
-    int returnOutputs = 0;
-    if (exitCall->function == FUNCS.return_func)
-        returnOutputs = exitCall->numInputs();
-
-    int existingAnonOutputs = count_anonymous_outputs(block);
-    for (int outputIndex = returnOutputs; outputIndex < existingAnonOutputs; outputIndex++) {
-        insert_output_placeholder(block, NULL, outputIndex);
-    }
-
-    // Named outputs.
-    
-    // exitLevel value.
 }
 
 void controlFlow_postCompile(Term* term)

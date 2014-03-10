@@ -863,7 +863,7 @@ TokenStream::consumeStr(caValue* output, int match)
 void
 TokenStream::dropRemainder()
 {
-    _position = tokens.size();
+    _position = (unsigned) tokens.size();
 }
 
 int

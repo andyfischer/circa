@@ -55,7 +55,6 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
 static void vm_finish_run(Stack* stack);
 
-static Block* vm_dynamic_method_lookup(Stack* stack, caValue* object, Term* caller);
 static void vm_push_dynamic_method(Stack* stack);
 static void vm_while_loop_finish_early(Stack* stack);
 
@@ -1073,7 +1072,6 @@ void vm_run(Stack* stack)
             Frame* top = top_frame(stack);
             top->termIndex = termIndex;
             top->pc = stack->pc;
-            Term* caller = frame_term(top, termIndex);
 
             // Start the first case.
             Block* block = stack_bytecode_get_block(stack, blockIndex);
@@ -1129,7 +1127,6 @@ void vm_run(Stack* stack)
 
             top->termIndex = termIndex;
             top->pc = stack->pc;
-            Term* caller = frame_term(top, termIndex);
 
             // Peek at the first input.
             int peekPc = stack->pc;
@@ -1186,8 +1183,6 @@ void vm_run(Stack* stack)
             }
 
             if (!as_bool(condition)) {
-                Frame* top = top_frame(stack);
-                Frame* parent = stack_top_parent(stack);
                 
                 vm_while_loop_finish_early(stack);
                 if (stack->step != sym_StackRunning)
@@ -1362,7 +1357,6 @@ void vm_run(Stack* stack)
         case bc_Break2: {
             while (!is_while_loop(top_frame(stack)->block) && stack_top_parent(stack) != NULL)
                 stack_pop(stack);
-            Frame* top = top_frame(stack);
 
             vm_while_loop_finish_early(stack);
             if (stack->step != sym_StackRunning)
@@ -1425,7 +1419,6 @@ void vm_run(Stack* stack)
         #define INLINE_MATH_OP_HEADER \
             int termIndex = vm_read_u32(stack); \
             Frame* top = top_frame(stack); \
-            Term* caller = frame_term(top, termIndex); \
             caValue* slot = frame_register(top, termIndex); \
             caValue* left = vm_run_single_input(top); \
             caValue* right = vm_run_single_input(top);
@@ -2079,8 +2072,6 @@ static void vm_push_dynamic_method(Stack* stack)
         // Save method in cache.
         memmove(methodCache + sizeof(MethodCallSiteCacheLine), methodCache,
             c_methodCacheSize - sizeof(MethodCallSiteCacheLine));
-
-        int writePos = 0;
 
         cache = (MethodCallSiteCacheLine*) methodCache;
 

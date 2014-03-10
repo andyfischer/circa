@@ -700,7 +700,7 @@ void Term__input_property(caStack* stack)
     caValue* defaultValue = circa_input(stack, 3);
 
     if (value == NULL)
-        set_null(circa_output(stack, 0));
+        copy(defaultValue, circa_output(stack, 0));
     else
         copy(value, circa_output(stack, 0));
 }

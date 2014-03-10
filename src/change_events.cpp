@@ -148,10 +148,10 @@ static void commit_append(caWorld* world, caValue* event, bool dryRun, caValue* 
 
     compile(block, as_cstring(change_event_field(event, 0)));
     dirty_bytecode(block);
-
+    
+#if 0
     int newRegisterCount = block_locals_count(block);
 
-#if 0
     // Grow register lists. (fixme)
     for (WorldFramesIterator it(world); it; ++it) {
         Frame* frame = it.current();

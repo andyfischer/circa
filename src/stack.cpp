@@ -544,7 +544,6 @@ void stack_bytecode_generate_bytecode(Stack* stack, int blockIndex)
         return;
 
     Value bytecode;
-    Block* block = NULL;
     bytecode_write_block(stack, &bytecode, entry->block);
 
     // Save bytecode. Re-lookup the entry because the above bytecode_write step

@@ -198,8 +198,8 @@ void update_looped_inputs(Block* contents)
         for (BlockInputIterator it(contents); it; ++it) {
             Term* term = it.currentTerm();
             Term* input = it.currentInput();
-            if (it.currentInput() == outside && it.currentTerm() != looped)
-                set_input(it.currentTerm(), it.currentInputIndex(), looped);
+            if (input == outside && term != looped)
+                set_input(term, it.currentInputIndex(), looped);
         }
     }
 

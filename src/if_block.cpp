@@ -20,8 +20,6 @@
 
 namespace circa {
 
-static Term* if_block_add_input(Term* ifCall, Term* input);
-
 struct CaseIterator
 {
     BlockIteratorFlat blockIterator;
@@ -109,30 +107,6 @@ Term* case_find_condition(Block* block)
     if (conditionCheck != NULL)
         return conditionCheck->input(0);
     return NULL;
-}
-
-Term* if_block_add_input(Term* ifBlock, Term* input)
-{
-    Block* contents = nested_contents(ifBlock);
-
-    int existingInputCount = ifBlock->numInputs();
-
-    Term* placeholder = append_input_placeholder(contents);
-    rename(placeholder, term_name(input));
-    set_declared_type(placeholder, input->type);
-
-    set_input(ifBlock, existingInputCount, input);
-
-    // Add a corresponding input placeholder to each case
-    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        Block* caseContents = nested_contents(term);
-        Term* casePlaceholder = append_input_placeholder(caseContents);
-        set_declared_type(casePlaceholder, placeholder->type);
-        rename(casePlaceholder, term_name(input));
-    }
-
-    return placeholder;
 }
 
 Term* if_block_prepend_primary_output(Term* ifBlock)

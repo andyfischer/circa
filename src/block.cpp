@@ -387,7 +387,6 @@ void remove_nested_contents(Term* term)
     if (term->nestedContents == NULL)
         return;
 
-    Block* block = term->nestedContents;
     clear_block(term->nestedContents);
 
 #if 0
