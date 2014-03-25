@@ -60,9 +60,9 @@ void test_assert_function(Block* block, int line, const char* file)
         declare_current_test_failed();
     }
 
-    List errors;
+    Value errors;
     check_for_static_errors(&errors, block);
-    if (!errors.empty()) {
+    if (!errors.isEmpty()) {
         std::cout << "Block has static errors at " << file << ", line " << line << std::endl;
         print_static_errors_formatted(&errors, std::cout);
         declare_current_test_failed();

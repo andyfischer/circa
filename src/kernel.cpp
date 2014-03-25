@@ -192,7 +192,7 @@ Type* List__append_specializeType(Term* term)
     case sym_AnonStructType:
     case sym_StructType:
     {    
-        List elementTypes;
+        Value elementTypes;
         copy(list_get_type_list_from_type(listInput->type), &elementTypes);
         set_type(elementTypes.append(), term->input(1)->type);
         return create_typed_unsized_list_type(find_common_type(&elementTypes));

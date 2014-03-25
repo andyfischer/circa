@@ -100,6 +100,7 @@ OBJECTS := \
 	$(OBJDIR)/rand.o \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/repl.o \
+	$(OBJDIR)/replication.o \
 	$(OBJDIR)/selector.o \
 	$(OBJDIR)/source_repro.o \
 	$(OBJDIR)/stack.o \
@@ -291,6 +292,9 @@ $(OBJDIR)/reflection.o: reflection.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/repl.o: repl.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/replication.o: replication.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/selector.o: selector.cpp

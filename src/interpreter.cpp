@@ -477,12 +477,12 @@ int num_inputs(Stack* stack)
     return count_input_placeholders(top_frame(stack)->block);
 }
 
-void consume_inputs_to_list(Stack* stack, List* list)
+void consume_inputs_to_list(Stack* stack, Value* list)
 {
     int count = num_inputs(stack);
     list->resize(count);
     for (int i=0; i < count; i++)
-        consume_input(stack, i, list->get(i));
+        consume_input(stack, i, list->element(i));
 }
 
 caValue* get_input(Stack* stack, int index)
@@ -1504,15 +1504,13 @@ void vm_run(Stack* stack)
             u32 valueIndex = vm_read_u32(stack);
 
             Frame* top = top_frame(stack);
-            caValue* watch = stack->bytecode.cachedValues.index(valueIndex);
-            caValue* watchPath = watch->index(1);
+            caValue* watch = stack->bytecode.cachedValues.element(valueIndex);
+            caValue* watchPath = watch->element(1);
 
             if (vm_matches_watch_path(stack, watchPath)) {
                 Term* term = list_last(watchPath)->asTerm();
                 caValue* value = frame_register(top, term);
-
-                caValue* observation = watch->index(2);
-                set_value(observation, value);
+                watch->set_element(2, value);
             }
 
             continue;
@@ -1733,7 +1731,7 @@ static bool vm_matches_watch_path(Stack* stack, caValue* path)
     Frame* frame = stack_top_parent(stack);
 
     for (int i=path->length() - 2; i >= 0; i--) {
-        Term* pathElement = path->index(i)->asTerm();
+        Term* pathElement = path->element(i)->asTerm();
         if (frame_current_term(frame) != pathElement)
             return false;
     }

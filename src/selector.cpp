@@ -52,7 +52,7 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
 
 Type* element_type_from_selector(Type* type, caValue* selectorElement)
 {
-    if (!is_compound_type(type))
+    if (!is_struct_type(type))
         return TYPES.any;
 
     if (is_int(selectorElement)) {

@@ -125,16 +125,12 @@ void remove_native_patch(World* world, const char* name)
 
 static void function_key(const char* name, caValue* out)
 {
-    set_list(out, 2);
-    set_symbol(out->index(0), sym_Function);
-    set_string(out->index(1), name);
+    set_list(out, 2)->set_element_sym(0, sym_Function)->set_element_str(1, name);
 }
 
 static void type_release_key(const char* typeName, caValue* out)
 {
-    set_list(out, 2);
-    set_symbol(list_get(out, 0), sym_TypeRelease);
-    set_string(list_get(out, 1), typeName);
+    set_list(out, 2)->set_element_sym(0, sym_TypeRelease)->set_element_str(1, typeName);
 }
 
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func)
@@ -156,8 +152,8 @@ void native_patch_apply_patch(NativePatch* module, Block* block)
     // Walk through list of patches, and apply them to block terms as appropriate.
     
     for (HashtableIterator it(&module->patches); it; ++it) {
-        caValue* patchType = it.key()->index(0);
-        caValue* name = it.key()->index(1);
+        caValue* patchType = it.key()->element(0);
+        caValue* name = it.key()->element(1);
 
         Term* term = find_local_name(block, name);
 

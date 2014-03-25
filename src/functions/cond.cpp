@@ -13,7 +13,7 @@ namespace cond_function {
 
     Type* specializeType(Term* caller)
     {
-        List choices;
+        Value choices;
         set_type_list(&choices, caller->input(1)->type, caller->input(2)->type);
         return find_common_type(&choices);
     }

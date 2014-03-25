@@ -102,8 +102,21 @@ struct Value
     int asInt();
     float asFloat();
 
-    Value* index(int i);
+    Value* element(int i);
     int length();
+
+    // Chainable setters.
+    Value* set_element_int(int index, int i);
+    Value* set_element_null(int index);
+    Value* set_element_str(int index, const char* s);
+    Value* set_element_sym(int index, caSymbol s);
+    Value* set_element(int index, Value* val);
+
+    // List
+    Value* set_list(int size);
+    Value* append();
+    Value* resize(int size);
+    bool isEmpty();
 
     // For debugging:
     void dump();

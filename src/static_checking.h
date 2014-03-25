@@ -6,7 +6,7 @@
 
 namespace circa {
 
-void check_for_static_errors(List* result, Block* block);
+void check_for_static_errors(Value* result, Block* block);
 void update_static_error_list(Block* block);
 
 void format_static_error(caValue* error, caValue* stringOutput);

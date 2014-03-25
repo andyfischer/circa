@@ -84,11 +84,14 @@ void read_stdin_line(caValue* line)
     free(buf);
 }
 
-void parse_string_as_argument_list(caValue* str, List* output)
+void parse_string_as_argument_list(caValue* str, Value* output)
 {
     // Read the tokens as a space-seperated list of strings.
     // TODO is to be more smart about word boundaries: spaces inside
     // quotes or parentheses shouldn't break apart items.
+
+    if (!is_list(output))
+        set_list(output, 0);
 
     TokenStream tokens;
     tokens.reset(as_cstring(str));
@@ -117,12 +120,12 @@ void parse_string_as_argument_list(caValue* str, List* output)
     }
 }
 
-void do_echo(List* args, caValue* reply)
+void do_echo(Value* args, caValue* reply)
 {
     set_string(reply, to_string(args));
 }
 
-void do_file_command(caWorld* world, List* args, caValue* reply)
+void do_file_command(caWorld* world, Value* args, caValue* reply)
 {
     RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
@@ -139,37 +142,37 @@ void do_file_command(caWorld* world, List* args, caValue* reply)
             return;
         }
 
-        if (string_eq(args->get(argIndex), "-p")) {
+        if (string_eq(args->element(argIndex), "-p")) {
             printRaw = true;
             argIndex++;
             continue;
         }
 
-        if (string_eq(args->get(argIndex), "-pp")) {
+        if (string_eq(args->element(argIndex), "-pp")) {
             printRaw = true;
             rawOutputPrefs.showProperties = true;
             argIndex++;
             continue;
         }
         
-        if (string_eq(args->get(argIndex), "-b") || string_eq(args->get(argIndex), "-pb")) {
+        if (string_eq(args->element(argIndex), "-b") || string_eq(args->element(argIndex), "-pb")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             argIndex++;
             continue;
         }
 
-        if (string_eq(args->get(argIndex), "-s")) {
+        if (string_eq(args->element(argIndex), "-s")) {
             printSource = true;
             argIndex++;
             continue;
         }
-        if (string_eq(args->get(argIndex), "-print-state")) {
+        if (string_eq(args->element(argIndex), "-print-state")) {
             printState = true;
             argIndex++;
             continue;
         }
-        if (string_eq(args->get(argIndex), "-n")) {
+        if (string_eq(args->element(argIndex), "-n")) {
             dontRunScript = true;
             argIndex++;
             continue;
@@ -178,7 +181,7 @@ void do_file_command(caWorld* world, List* args, caValue* reply)
     }
 
     Block block;
-    load_script(&block, as_cstring(args->get(argIndex)));
+    load_script(&block, as_cstring(args->element(argIndex)));
 
     if (printSource)
         std::cout << get_block_source_text(&block);
@@ -260,18 +263,18 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
     set_null(reply);
 
     if (equals_string(&command, "add_lib_path")) {
-        //List args;
+        //Value args;
         //parse_tokens_as_argument_list(&tokens, &args);
 
     } else if (equals_string(&command, "file")) {
 
-        List args;
+        Value args;
         parse_string_as_argument_list(input, &args);
         do_file_command(world, &args, reply);
 
     } else if (equals_string(&command, "echo")) {
 
-        List args;
+        Value args;
         parse_string_as_argument_list(input, &args);
         do_echo(&args, reply);
 
@@ -308,10 +311,10 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         do_update_file(&filename, &contents, reply);
 
     } else if (equals_string(&command, "source_repro")) {
-        List args;
+        Value args;
         parse_string_as_argument_list(input, &args);
         Block block;
-        load_script(&block, as_cstring(args[1]));
+        load_script(&block, as_cstring(args.element(1)));
         std::cout << get_block_source_text(&block);
     } else if (equals_string(&command, "dump_stats")) {
 

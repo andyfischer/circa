@@ -54,7 +54,7 @@ caValue* get_input(Stack* stack, int index);
 void consume_input(Stack* stack, Term* term, caValue* dest);
 void consume_input(Stack* stack, int index, caValue* dest);
 int num_inputs(Stack* stack);
-void consume_inputs_to_list(Stack* stack, List* list);
+void consume_inputs_to_list(Stack* stack, Value* list);
 caValue* get_output(Stack* stack, int index);
 caValue* get_caller_output(Stack* stack, int index);
 

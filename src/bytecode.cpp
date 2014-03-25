@@ -835,8 +835,8 @@ static void possibly_write_watch_check(Writer* writer, Term* term)
     // This block has one or more watches, find them.
     for (HashtableIterator it(&writer->stack->bytecode.watchByKey); it; ++it) {
         int valueIndex = it.current()->asInt();
-        caValue* watch = writer->stack->bytecode.cachedValues.index(valueIndex);
-        caValue* targetPath = watch->index(1);
+        caValue* watch = writer->stack->bytecode.cachedValues.element(valueIndex);
+        caValue* targetPath = watch->element(1);
         Term* targetTerm = as_term_ref(list_last(targetPath));
         if (targetTerm != term)
             continue;
@@ -873,9 +873,8 @@ static caValue* find_set_value_hack(Writer* writer, Term* term)
 static caValue* term_effective_value(Writer* writer, Term* term)
 {
     caValue* setValueHackIndex = find_set_value_hack(writer, term);
-    if (setValueHackIndex != NULL) {
-        return writer->stack->bytecode.cachedValues.index(as_int(setValueHackIndex));
-    }
+    if (setValueHackIndex != NULL)
+        return writer->stack->bytecode.cachedValues.element(as_int(setValueHackIndex));
 
     return term_value(term);
 }

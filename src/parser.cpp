@@ -78,11 +78,15 @@ Term* compile(Block* block, ParsingStep step, std::string const& input)
 // arguments, so you need to temporarily store syntax hints until you create one.
 
 struct ListSyntaxHints {
-    List inputs;
+    Value inputs;
+
+    ListSyntaxHints() {
+        set_list(&inputs, 0);
+    }
 
     void insert(int index)
     {
-        set_hashtable(inputs.insert(index));
+        set_hashtable(list_insert(&inputs, index));
     }
 
     void set(int index, Symbol key, std::string const& value)
@@ -90,14 +94,14 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        set_string(hashtable_insert_int_key(inputs[index], key), value.c_str());
+        set_string(hashtable_insert_int_key(inputs.element(index), key), value.c_str());
     }
     void set(int index, Symbol key, caValue* value)
     {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        copy(value, hashtable_insert_int_key(inputs[index], key));
+        copy(value, hashtable_insert_int_key(inputs.element(index), key));
     }
 
     void append(int index, Symbol key, std::string const& value)
@@ -105,7 +109,7 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        caValue* existing = hashtable_insert_int_key(inputs[index], key);
+        caValue* existing = hashtable_insert_int_key(inputs.element(index), key);
         if (!is_string(existing))
             set_string(existing, "");
 
@@ -115,7 +119,7 @@ struct ListSyntaxHints {
     void apply(Term* term)
     {
         for (int i=0; i < inputs.length(); i++) {
-            for (HashtableIterator it(inputs[i]); it; ++it) {
+            for (HashtableIterator it(inputs.element(i)); it; ++it) {
                 set_input_syntax_hint(term, i, as_symbol(it.currentKey()), it.current());
             }
         }

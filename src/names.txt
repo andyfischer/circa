@@ -209,6 +209,15 @@ StorageTypeHashtable
 StorageTypeObject
 InterfaceType
 
+# Patches
+Delete
+Insert
+Element
+Key
+Replace
+Append
+Truncate
+
 # Change types
 ChangeAppend
 ChangeRename

@@ -242,7 +242,7 @@ void migrate_value(caValue* value, Migration* migration)
         migrate_value(boxedValue, migration);
     } else if (is_retained_frame(value)) {
         migrate_retained_frame(value, migration);
-    } else if (is_list(value)) {
+    } else if (is_list_based(value)) {
         migrate_list_value(value, migration);
 
     } else if (is_hashtable(value)) {

@@ -14,7 +14,7 @@
 
 namespace circa {
 
-Type* find_common_type(caValue* list)
+Type* find_common_type(Value* list)
 {
     if (list_length(list) == 0)
         return TYPES.any;
@@ -80,7 +80,7 @@ Type* find_common_type(Type* type1, Type* type2)
 
 Type* find_common_type(Type* type1, Type* type2, Type* type3)
 {
-    List list;
+    Value list;
     set_type_list(&list, type1, type2, type3);
     return find_common_type(&list);
 }

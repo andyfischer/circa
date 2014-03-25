@@ -17,7 +17,7 @@
 
 namespace circa {
 
-void append_static_error(List* errors, Term* term, const char* type)
+void append_static_error(Value* errors, Term* term, const char* type)
 {
     caValue* item = set_list(list_append(errors), 3);
     set_term_ref(list_get(item, 0), term);
@@ -25,7 +25,7 @@ void append_static_error(List* errors, Term* term, const char* type)
     set_int(list_get(item, 2), -1);
 }
 
-void append_static_error_for_input(List* errors, Term* term, const char* type,
+void append_static_error_for_input(Value* errors, Term* term, const char* type,
         int inputIndex)
 {
     caValue* item = set_list(list_append(errors), 3);
@@ -34,7 +34,7 @@ void append_static_error_for_input(List* errors, Term* term, const char* type,
     set_int(list_get(item, 2), inputIndex);
 }
 
-void check_input_for_static_error(List* errors, Term* term, int index)
+void check_input_for_static_error(Value* errors, Term* term, int index)
 {
     int effectiveIndex = index;
 
@@ -62,7 +62,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
 #endif
 }
 
-void check_term_for_static_error(List* errors, Term* term)
+void check_term_for_static_error(Value* errors, Term* term)
 {
     if (term->function == NULL)
         return append_static_error(errors, term, "null_function");
@@ -98,17 +98,19 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, to_string(term_value(term->input(0))).c_str());
 }
 
-void check_for_static_errors(List* errors, Block* block)
+void check_for_static_errors(Value* errors, Block* block)
 {
+    if (!is_list(errors))
+        set_list(errors, 0);
     for (BlockIterator it(block); it.unfinished(); ++it)
         check_term_for_static_error(errors, *it);
 }
 
 void update_static_error_list(Block* block)
 {
-    List errors;
+    Value errors;
     check_for_static_errors(&errors, block);
-    if (errors.empty())
+    if (errors.isEmpty())
         set_null(&block->staticErrors);
     else
         swap(&errors, &block->staticErrors);
@@ -116,9 +118,10 @@ void update_static_error_list(Block* block)
 
 bool has_static_error(Term* term)
 {
-    List errors;
+    Value errors;
+    set_list(&errors, 0);
     check_term_for_static_error(&errors, term);
-    return !errors.empty();
+    return !errors.isEmpty();
 }
 
 bool has_static_errors(Block* block)
@@ -246,10 +249,10 @@ bool print_static_errors_formatted(Block* block)
 void print_static_error(Term* term, std::ostream& out)
 {
     // delete this
-    List result;
+    Value result;
     check_term_for_static_error(&result, term);
-    if (!result.empty())
-        print_static_error(result[0], out);
+    if (!result.isEmpty())
+        print_static_error(result.element(0), out);
 }
 
 std::string get_static_errors_formatted(Block* block)

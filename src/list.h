@@ -138,7 +138,7 @@ const char* compound_type_get_field_name(Type* type, int index);
 // For a List-based type, retrieve the type of the given field index.
 Type* compound_type_get_field_type(Type* listType, int index);
 
-bool is_compound_type(Type* type);
+bool is_struct_type(Type* type);
 
 // For a List-based type, this returns the list of types that the elements will
 // have. This result is only valid for fixed-size List types, otherwise it will
@@ -165,42 +165,5 @@ namespace list_t {
     void tv_initialize(Type*, caValue*);
     std::string tv_to_string(caValue* value);
 }
-
-// Wrapper type to use a caValue as a List.
-struct List : Value
-{
-    List();
-
-    caValue* append();
-    caValue* prepend();
-    void append(caValue* val);
-    caValue* insert(int index);
-    void clear();
-    int length();
-    bool empty();
-    caValue* get(int index);
-    void set(int index, caValue* value);
-    caValue* operator[](int index) { return get(index); }
-    void resize(int size);
-
-    // get the item at length - 1
-    caValue* getLast();
-
-    // remove the item at length - 1
-    void pop();
-
-    // remove the item at the given index
-    void remove(int index);
-
-    void removeNulls();
-
-    // Convenience methods
-    void appendString(const char* str);
-    void appendString(const std::string& str);
-
-    static List* checkCast(caValue* v);
-    static List* lazyCast(caValue* v);
-    static List* cast(caValue* v, int length);
-};
 
 } // namespace circa

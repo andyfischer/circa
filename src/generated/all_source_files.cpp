@@ -34,6 +34,7 @@
 #include "../rand.cpp"
 #include "../reflection.cpp"
 #include "../repl.cpp"
+#include "../replication.cpp"
 #include "../selector.cpp"
 #include "../source_repro.cpp"
 #include "../stack.cpp"

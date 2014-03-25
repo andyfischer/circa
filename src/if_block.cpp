@@ -330,7 +330,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
     }
 }
 
-void write_all_names_to_list(Block* block, List* names)
+void write_all_names_to_list(Block* block, Value* names)
 {
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
@@ -345,7 +345,8 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
     Block* contents = nested_contents(ifCall);
 
     bool firstBlock = true;
-    List names;
+    Value names;
+    set_list(&names, 0);
 
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Block* caseBlock = nested_contents(it.current());
@@ -358,17 +359,17 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
 
         // search through 'names' and remove any not in this block.
         for (int i=0; i < names.length(); i++) {
-            if (is_null(names[i]))
+            if (is_null(names.element(i)))
                 continue;
-            if (caseBlock->get(as_cstring(names[i])) == NULL)
-                set_null(names[i]);
+            if (caseBlock->get(as_cstring(names.element(i))) == NULL)
+                set_null(names.element(i));
         }
     }
 
-    names.removeNulls();
+    list_remove_nulls(&names);
 
     for (int i=0; i < names.length(); i++) {
-        caValue* name = names[i];
+        caValue* name = names.element(i);
 
         // Skip if name is already bound
         if (find_output_placeholder_with_name(contents, name) != NULL)
@@ -387,7 +388,8 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
         if (masterPlaceholder == NULL)
             return;
 
-        List types;
+        Value types;
+        set_list(&types, 0);
 
         // Iterate through each case, and collect the output types
         for (int i=0; i < masterContents->length(); i++) {

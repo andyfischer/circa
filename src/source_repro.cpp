@@ -456,11 +456,10 @@ void append_phrase(caValue* source, const char* str, Term* term, Symbol type)
     if (strcmp(str, "\n") == 0)
         type = tok_Newline;
 
-    List* list = (List*) set_list(list_append(source));
-    list->resize(3);
-    set_string((*list)[0], str);
-    set_term_ref((*list)[1], term);
-    set_symbol((*list)[2], type);
+    Value* list = set_list(list_append(source), 3);
+    list->set_element_str(0, str);
+    set_term_ref(list->element(1), term);
+    list->set_element_sym(2, type);
 }
 
 void append_phrase(caValue* source, caValue* str, Term* term, Symbol type)

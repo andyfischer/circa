@@ -409,17 +409,6 @@ namespace tagged_value_wrappers {
     }
 } // namespace tagged_value_wrappers
 
-// Public API
-bool is_hashtable(caValue* value)
-{
-    return value->value_type->storageType == sym_StorageTypeHashtable;
-}
-
-void set_hashtable(caValue* value)
-{
-    make(TYPES.map, value);
-}
-
 void set_mutable_hashtable(caValue* value)
 {
     make_no_initialize(TYPES.map, value);

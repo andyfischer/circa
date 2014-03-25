@@ -320,7 +320,7 @@ int BlockInputIterator::currentInputIndex()
 }
 
 OuterInputIterator::OuterInputIterator(Block* _block)
- : blockInputIterator(block), block(_block)
+ : blockInputIterator(_block), block(_block)
 {
     advanceWhileInvalid();
 }

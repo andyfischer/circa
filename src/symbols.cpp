@@ -30,7 +30,7 @@ Symbol symbol_from_string(const char* str)
 
     caValue* foundRuntime = hashtable_get(g_runtimeSymbolMap, &strVal);
     if (foundRuntime != NULL)
-        return as_int(foundRuntime);
+        return as_symbol(foundRuntime);
 
     // Create a new runtime symbol.
     caValue* newRuntime = hashtable_insert(g_runtimeSymbolMap, &strVal);
@@ -53,13 +53,13 @@ void set_symbol_from_string(caValue* val, const char* str)
 
 void symbol_as_string(caValue* symbol, caValue* str)
 {
-    const char* builtinName = builtin_symbol_to_string(as_int(symbol));
+    const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));
     if (builtinName != NULL) {
         set_string(str, builtinName);
         return;
     }
 
-    caValue* tableVal = list_get(g_runtimeSymbolTable, as_int(symbol));
+    caValue* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
     if (tableVal != NULL) {
         ca_assert(is_string(tableVal));
         copy(tableVal, str);
@@ -84,7 +84,7 @@ static void format_source(caValue* source, Term* term)
 
 static int hash_func(caValue* value)
 {
-    return as_int(value);
+    return as_symbol(value);
 }
 
 bool symbol_eq(caValue* val, Symbol s)

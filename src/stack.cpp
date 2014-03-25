@@ -599,9 +599,9 @@ void stack_bytecode_add_watch(Stack* stack, caValue* key, caValue* path)
 
     // Watch value is: [key, path, observation]
     set_list(watch, 3);
-    set_value(watch->index(0), key);
-    set_value(watch->index(1), path);
-    set_null(watch->index(2));
+    watch->set_element(0, key);
+    watch->set_element(1, path);
+    watch->set_element_null(2);
 
     // Update watchByKey
     set_int(hashtable_insert(&stack->bytecode.watchByKey, key), cachedIndex);
@@ -622,7 +622,7 @@ caValue* stack_bytecode_get_watch_observation(Stack* stack, caValue* key)
 
     caValue* watch = list_get(&stack->bytecode.cachedValues, as_int(index));
 
-    return watch->index(2);
+    return watch->element(2);
 }
 
 void stack_bytecode_start_run(Stack* stack)
@@ -648,14 +648,14 @@ static void stack_bytecode_prepare_new_hackset(Stack* stack)
     caValue* hackset = &cache->hackset;
 
     for (int i=0; i < list_length(hackset); i++) {
-        caValue* hacksetElement = hackset->index(i);
+        caValue* hacksetElement = hackset->element(i);
         if (symbol_eq(hacksetElement, sym_no_effect))
             cache->skipEffects = true;
         else if (symbol_eq(hacksetElement, sym_no_save_state))
             cache->noSaveState = true;
         else if (first_symbol(hacksetElement) == sym_set_value) {
-            caValue* setValueTarget = hacksetElement->index(1);
-            caValue* setValueNewValue = hacksetElement->index(2);
+            caValue* setValueTarget = hacksetElement->element(1);
+            caValue* setValueNewValue = hacksetElement->element(2);
 
             caValue* termHacks = hashtable_insert(&cache->hacksByTerm, setValueTarget);
             set_hashtable(termHacks);
@@ -664,8 +664,8 @@ static void stack_bytecode_prepare_new_hackset(Stack* stack)
             set_value(stack_bytecode_add_cached_value(stack, &cachedValueIndex), setValueNewValue);
             set_int(hashtable_insert_symbol_key(termHacks, sym_set_value), cachedValueIndex);
         } else if (first_symbol(hacksetElement) == sym_watch) {
-            caValue* watchKey = hacksetElement->index(1);
-            caValue* watchPath = hacksetElement->index(2);
+            caValue* watchKey = hacksetElement->element(1);
+            caValue* watchPath = hacksetElement->element(2);
             stack_bytecode_add_watch(stack, watchKey, watchPath);
         }
     }
@@ -777,12 +777,12 @@ bool is_retained_frame(caValue* frame)
 caValue* retained_frame_get_block(caValue* frame)
 {
     ca_assert(is_retained_frame(frame));
-    return frame->index(0);
+    return frame->element(0);
 }
 caValue* retained_frame_get_state(caValue* frame)
 {
     ca_assert(is_retained_frame(frame));
-    return frame->index(1);
+    return frame->element(1);
 }
 
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame)

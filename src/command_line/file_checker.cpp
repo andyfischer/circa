@@ -22,17 +22,18 @@ namespace circa {
 
 int run_file_checker_for_directory(const char* dir);
 
-void run_file_checker(const char* filename, List* errors)
+void run_file_checker(const char* filename, Value* errors)
 {
     Block block;
     load_script(&block, filename);
 
     // Catch static errors
     {
-        List staticErrors;
+        Value staticErrors;
+        set_list(&staticErrors, 0);
         check_for_static_errors(&staticErrors, &block);
         for (int i=0; i < staticErrors.length(); i++)
-            format_static_error(staticErrors[i], errors->append());
+            format_static_error(staticErrors.element(i), errors->append());
     }
 
     // Fetch the file as a string
@@ -45,7 +46,7 @@ void run_file_checker(const char* filename, List* errors)
         if (is_null(&fileContents)) {
             std::stringstream msg;
             msg << "File not found: " << filename;
-            errors->appendString(msg.str());
+            set_string(errors->append(), msg.str());
             return;
         }
         actualSource = as_cstring(&fileContents);
@@ -56,7 +57,7 @@ void run_file_checker(const char* filename, List* errors)
 
     if (actualSource != reproducedSource) {
         // TODO: Provide more details about the source repro problem.
-        errors->appendString("Source reproduction failed");
+        set_string(errors->append(), "Source reproduction failed");
     }
 }
 
@@ -68,15 +69,16 @@ int run_file_checker(const char* filename)
     if ((status == 0) && S_ISDIR(st_buf.st_mode))
         return run_file_checker_for_directory(filename);
 
-    List errors;
+    Value errors;
+    set_list(&errors, 0);
     run_file_checker(filename, &errors);
-    if (is_null(&errors) || errors.empty())
+    if (is_null(&errors) || errors.isEmpty())
         return 0;
 
     std::cout << filename << " had " << errors.length() << " error(s):\n";
 
     for (int i=0; i < errors.length(); i++)
-        std::cout << as_cstring(errors[i]) << std::endl;
+        std::cout << as_cstring(errors.element(i)) << std::endl;
 
     return -1;
 }

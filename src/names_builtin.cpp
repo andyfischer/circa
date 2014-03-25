@@ -186,6 +186,13 @@ const char* builtin_symbol_to_string(int name)
     case sym_StorageTypeHashtable: return "StorageTypeHashtable";
     case sym_StorageTypeObject: return "StorageTypeObject";
     case sym_InterfaceType: return "InterfaceType";
+    case sym_Delete: return "Delete";
+    case sym_Insert: return "Insert";
+    case sym_Element: return "Element";
+    case sym_Key: return "Key";
+    case sym_Replace: return "Replace";
+    case sym_Append: return "Append";
+    case sym_Truncate: return "Truncate";
     case sym_ChangeAppend: return "ChangeAppend";
     case sym_ChangeRename: return "ChangeRename";
     case tok_Identifier: return "tok_Identifier";
@@ -356,6 +363,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'p':
+        if (strcmp(str + 2, "pend") == 0)
+            return sym_Append;
+        break;
     default: return -1;
     }
     case 'B':
@@ -449,9 +460,17 @@ int builtin_symbol_from_string(const char* str)
     case 'D':
     switch (str[1]) {
     case 'e':
-        if (strcmp(str + 2, "fault") == 0)
+    switch (str[2]) {
+    case 'f':
+        if (strcmp(str + 3, "ault") == 0)
             return sym_Default;
         break;
+    case 'l':
+        if (strcmp(str + 3, "ete") == 0)
+            return sym_Delete;
+        break;
+    default: return -1;
+    }
     case 'i':
     switch (str[2]) {
     case 'r':
@@ -472,6 +491,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'E':
     switch (str[1]) {
+    case 'l':
+        if (strcmp(str + 2, "ement") == 0)
+            return sym_Element;
+        break;
     case 'n':
         if (strcmp(str + 2, "tropy") == 0)
             return sym_Entropy;
@@ -772,6 +795,10 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 3, "ixOperator") == 0)
             return sym_InfixOperator;
         break;
+    case 's':
+        if (strcmp(str + 3, "ert") == 0)
+            return sym_Insert;
+        break;
     case 't':
         if (strcmp(str + 3, "erfaceType") == 0)
             return sym_InterfaceType;
@@ -785,9 +812,23 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'K':
-        if (strcmp(str + 1, "eyword") == 0)
+    switch (str[1]) {
+    case 'e':
+    switch (str[2]) {
+    case 'y':
+    switch (str[3]) {
+    case 'w':
+        if (strcmp(str + 4, "ord") == 0)
             return sym_Keyword;
         break;
+    case 0:
+            return sym_Key;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'L':
     switch (str[1]) {
     case 'a':
@@ -1031,9 +1072,17 @@ int builtin_symbol_from_string(const char* str)
             return sym_RecursiveWildcard;
         break;
     case 'p':
-        if (strcmp(str + 3, "eat") == 0)
+    switch (str[3]) {
+    case 'e':
+        if (strcmp(str + 4, "at") == 0)
             return sym_Repeat;
         break;
+    case 'l':
+        if (strcmp(str + 4, "ace") == 0)
+            return sym_Replace;
+        break;
+    default: return -1;
+    }
     case 't':
         if (strcmp(str + 3, "urn") == 0)
             return sym_Return;
@@ -1589,6 +1638,10 @@ int builtin_symbol_from_string(const char* str)
     case 'o':
         if (strcmp(str + 2, "oManyInputs") == 0)
             return sym_TooManyInputs;
+        break;
+    case 'r':
+        if (strcmp(str + 2, "uncate") == 0)
+            return sym_Truncate;
         break;
     case 'y':
     switch (str[2]) {

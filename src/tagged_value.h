@@ -99,15 +99,12 @@ bool is_block(caValue* value);
 bool is_error(caValue* value);
 bool is_float(caValue* value);
 bool is_func(caValue* value);
+bool is_hashtable(caValue* value);
 bool is_int(caValue* value);
-bool is_int2(caValue* value); // is_int2 has the same story as is_list2
 bool is_stack(caValue* value);
 bool is_list(caValue* value);
-bool is_list_storage(caValue* value);
-
-// is_list2 checks if the value actually has type List, whereas is_list checks if the
-// type is list-based. Should replace is_list with is_list2.
-bool is_list2(caValue* value);
+bool is_list_based(caValue* value);
+bool is_struct(caValue* value);
 
 bool is_null(caValue* value);
 bool is_number(caValue* value);
@@ -141,6 +138,7 @@ void set_false(caValue* value);
 void set_block(caValue* value, Block* block);
 void set_error_string(caValue* value, const char* s);
 void set_float(caValue* value, float f);
+void set_hashtable(caValue* value);
 void set_int(caValue* value, int i);
 caValue* set_list(caValue* value);
 caValue* set_list(caValue* value, int size);

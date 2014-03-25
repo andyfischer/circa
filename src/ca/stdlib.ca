@@ -24,6 +24,12 @@ def nonlocal(any _) -> any
 def convert(any value, Type t) -> any
   -- Convert the value to the given type, if possible.
 
+def compute_patch(existing, new) -> any
+  -- Compute a patch, which when applied to 'existing' will equal 'new'
+
+def apply_patch(existing, patch) -> any
+  -- Apply a patch
+
 def assert(bool condition)
   -- Raises an error if 'condition' is false.
 

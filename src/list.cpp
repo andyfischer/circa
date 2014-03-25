@@ -336,7 +336,7 @@ std::string list_to_string(ListData* value)
 
 int list_length(caValue* value)
 {
-    ca_assert(is_list(value));
+    ca_assert(is_list_based(value));
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
         return 0;
@@ -489,18 +489,18 @@ void list_sort(caValue* list, SortCompareFunc func, void* context)
 
 caValue* list_get(caValue* value, int index)
 {
-    ca_assert(value->value_type->storageType == sym_StorageTypeList);
+    ca_assert(is_list_based(value));
     return list_get((ListData*) value->value_data.ptr, index);
 }
 
 caValue* list_get_from_end(caValue* value, int reverseIndex)
 {
-    ca_assert(value->value_type->storageType == sym_StorageTypeList);
+    ca_assert(is_list_based(value));
     return list_get_from_end((ListData*) value->value_data.ptr, reverseIndex);
 }
 caValue* list_get_safe(caValue* value, int index)
 {
-    if (!is_list(value) || index < 0 || index >= list_length(value))
+    if (!is_list_based(value) || index < 0 || index >= list_length(value))
         return NULL;
     return list_get(value, index);
 }
@@ -526,7 +526,7 @@ void list_remove_index(caValue* list, int index)
 
 void list_resize(caValue* list, int size)
 {
-    ca_assert(is_list(list));
+    ca_assert(is_list_based(list));
     ListData* data = (ListData*) list->value_data.ptr;
     data = list_resize(data, size);
     list->value_data.ptr = data;
@@ -558,9 +558,9 @@ caValue* list_insert(caValue* list, int index)
 
 bool list_equals(caValue* left, caValue* right)
 {
-    ca_assert(is_list(left));
+    ca_assert(is_list_based(left));
 
-    if (!is_list_based_type(right->value_type))
+    if (!is_list_based(right))
         return false;
 
     // Shortcut: lists are equal if they have the same address.
@@ -664,7 +664,7 @@ Type* compound_type_get_field_type(Type* type, int index)
     return as_type(list_get(types, index));
 }
 
-bool is_compound_type(Type* type)
+bool is_struct_type(Type* type)
 {
     return list_get_parameter_type(&type->parameter) == sym_StructType;
 }
@@ -796,7 +796,7 @@ namespace list_t {
 
     void tv_release(caValue* value)
     {
-        ca_assert(is_list(value));
+        ca_assert(is_list_based(value));
         ListData* data = (ListData*) get_pointer(value);
         if (data == NULL)
             return;
@@ -813,7 +813,7 @@ namespace list_t {
     {
         ca_assert(value->value_type != type);
 
-        if (!is_list(value)) {
+        if (!is_list_based(value)) {
             result->success = false;
             return;
         }
@@ -861,15 +861,14 @@ namespace list_t {
 
     void tv_set_index(caValue* value, int index, caValue* element)
     {
-        ca_assert(is_list(value));
+        ca_assert(is_list_based(value));
         list_touch(value);
         copy(element, list_get(value, index));
     }
 
     std::string tv_to_string(caValue* value)
     {
-        ca_assert(is_list(value));
-        if (is_compound_type(value->value_type))
+        if (is_struct_type(value->value_type))
             return compound_type_to_string(value);
 
         return list_to_string((ListData*) get_pointer(value));
@@ -877,7 +876,7 @@ namespace list_t {
 
     void tv_touch(caValue* value)
     {
-        ca_assert(is_list(value));
+        ca_assert(is_list_based(value));
         ListData* data = (ListData*) get_pointer(value);
         set_pointer(value, list_touch(data));
     }
@@ -995,132 +994,5 @@ namespace list_t {
     }
 
 } // namespace list_t
-
-
-List::List()
-  : Value()
-{
-    make(TYPES.list, this);
-}
-
-caValue*
-List::append()
-{
-    return list_append(this);
-}
-void
-List::append(caValue* val)
-{
-    copy(val, append());
-}
-
-caValue* List::insert(int index)
-{
-    return list_insert((ListData**) &this->value_data.ptr, index);
-}
-
-caValue*
-List::prepend()
-{
-    return list_insert(this, 0);
-}
-
-void
-List::clear()
-{
-    list_resize(this, 0);
-}
-
-int
-List::length()
-{
-    return list_length(this);
-}
-
-bool
-List::empty()
-{
-    return length() == 0;
-}
-
-caValue*
-List::get(int index)
-{
-    return list_get(this, index);
-}
-
-void
-List::set(int index, caValue* value)
-{
-    list_touch(this);
-    copy(value, list_get(this, index));
-}
-
-void
-List::resize(int newSize)
-{
-    list_resize(this, newSize); 
-}
-
-caValue*
-List::getLast()
-{
-    return get(length() - 1);
-}
-
-void
-List::pop()
-{
-    resize(length() - 1);
-}
-
-void
-List::remove(int index)
-{
-    list_remove_index(this, index);
-}
-
-void
-List::removeNulls()
-{
-    list_remove_nulls(this);
-}
-void
-List::appendString(const char* str)
-{
-    Value val;
-    set_string(&val, str);
-    swap(&val, append());
-}
-void
-List::appendString(const std::string& str)
-{
-    Value val;
-    set_string(&val, str);
-    swap(&val, append());
-}
-
-List*
-List::checkCast(caValue* v)
-{
-    if (is_list(v))
-        return (List*) v;
-    else
-        return NULL;
-}
-
-List*
-List::lazyCast(caValue* v)
-{
-    if (!is_list(v))
-        set_list(v, 0);
-    return (List*) v;
-}
-List*
-List::cast(caValue* v, int length)
-{
-    set_list(v, length);
-    return (List*) v;
-}
 
 } // namespace circa

@@ -11,6 +11,7 @@
 #include "names.h"
 #include "native_patch.h"
 #include "rand.h"
+#include "replication.h"
 #include "stack.h"
 #include "string_type.h"
 #include "symbols.h"
@@ -49,16 +50,16 @@ void equals_func(caStack* stack)
 
 void hosted_is_compound(caStack* stack)
 {
-    set_bool(circa_output(stack, 0), is_list_storage(circa_input(stack, 0)));
+    set_bool(circa_output(stack, 0), is_struct(circa_input(stack, 0)));
 }
 
 void hosted_is_list(caStack* stack)
 {
-    set_bool(circa_output(stack, 0), is_list2(circa_input(stack, 0)));
+    set_bool(circa_output(stack, 0), is_list(circa_input(stack, 0)));
 }
 void hosted_is_int(caStack* stack)
 {
-    set_bool(circa_output(stack, 0), is_int2(circa_input(stack, 0)));
+    set_bool(circa_output(stack, 0), is_int(circa_input(stack, 0)));
 }
 void hosted_is_map(caStack* stack)
 {
@@ -627,6 +628,24 @@ void to_string(caStack* stack)
         set_string(out, to_string(in));
 }
 
+void compute_patch_hosted(caStack* stack)
+{
+    Value error;
+
+    compute_value_patch(circa_input(stack, 0), circa_input(stack, 1),
+        circa_output(stack, 0), &error);
+
+    if (!is_null(&error))
+        circa_output_error_val(stack, &error);
+}
+
+void apply_patch_hosted(caStack* stack)
+{
+    Value* result = circa_output(stack, 0);
+    copy(circa_input(stack, 0), result);
+    apply_patch(result, circa_input(stack, 1));
+}
+
 void misc_builtins_setup_functions(NativePatch* patch)
 {
     module_patch_function(patch, "abs", abs);
@@ -695,6 +714,8 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "trace", print);
     module_patch_function(patch, "type", typeof_func);
     module_patch_function(patch, "static_type", static_type_func);
+    module_patch_function(patch, "compute_patch", compute_patch_hosted);
+    module_patch_function(patch, "apply_patch", apply_patch_hosted);
 }
 
 } // namespace circa

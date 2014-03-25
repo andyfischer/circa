@@ -48,8 +48,58 @@ bool Value::asBool() { return as_bool(this); }
 Symbol Value::asSymbol() { return as_symbol(this); }
 int Value::asInt() { return as_int(this); }
 float Value::asFloat()  { return as_float(this); }
-Value* Value::index(int i) { return list_get(this, i); }
+Value* Value::element(int i) { return list_get(this, i); }
 int Value::length() { return list_length(this); }
+
+Value* Value::set_element_str(int index, const char* s)
+{
+    set_string(list_get(this, index), s);
+    return this;
+}
+
+Value* Value::set_element_sym(int index, Symbol s)
+{
+    set_symbol(list_get(this, index), s);
+    return this;
+}
+
+Value* Value::set_element_int(int index, int i)
+{
+    set_int(list_get(this, index), i);
+    return this;
+}
+
+Value* Value::set_element(int index, Value* val)
+{
+    set_value(list_get(this, index), val);
+    return this;
+}
+Value* Value::set_element_null(int index)
+{
+    set_null(list_get(this, index));
+    return this;
+}
+Value* Value::set_list(int size)
+{
+    ::set_list(this, size);
+    return this;
+}
+
+Value* Value::append()
+{
+    return list_append(this);
+}
+
+Value* Value::resize(int size)
+{
+    list_resize(this, size);
+    return this;
+}
+
+bool Value::isEmpty()
+{
+    return list_empty(this);
+}
 
 void Value::dump() { std::cout << to_string(this) << std::endl; }
 
@@ -498,6 +548,11 @@ void set_error_string(caValue* value, const char* s)
     value->value_type = TYPES.error;
 }
 
+void set_hashtable(caValue* value)
+{
+    make(TYPES.map, value);
+}
+
 void set_int(caValue* value, int i)
 {
     make_no_initialize(TYPES.int_type, value);
@@ -663,12 +718,11 @@ bool is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
 bool is_func(caValue* value) { return value->value_type == TYPES.func; }
-bool is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
-bool is_int2(caValue* value) { return value->value_type == TYPES.int_type; }
+bool is_int(caValue* value) { return value->value_type == TYPES.int_type; }
 bool is_stack(caValue* value) { return value->value_type == TYPES.stack; }
-bool is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
-bool is_list_storage(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
-bool is_list2(caValue* value) { return value->value_type == TYPES.list; }
+bool is_hashtable(caValue* value) { return value->value_type->storageType == sym_StorageTypeHashtable; }
+bool is_list(caValue* value) { return value->value_type == TYPES.list; }
+bool is_list_based(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
 bool is_null(caValue* value) { return value->value_type == TYPES.null; }
 bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }
 bool is_ref(caValue* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
@@ -676,6 +730,11 @@ bool is_string(caValue* value) { return value->value_type->storageType == sym_St
 bool is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
 bool is_term_ref(caValue* val) { return val->value_type == TYPES.term; }
 bool is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
+
+bool is_struct(caValue* value)
+{
+    return is_struct_type(value->value_type);
+}
 
 bool is_number(caValue* value)
 {
