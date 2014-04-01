@@ -3,8 +3,11 @@ require zmq
 
 state server = zmq.create_responder(2222)
 
+if once()
+  print("Listening on port 2222")
+
 msg = server.read()
 
 if msg != null
-    print('received: ' msg)
-    server.reply('reply')
+  print('received: ' msg)
+  server.reply('reply')

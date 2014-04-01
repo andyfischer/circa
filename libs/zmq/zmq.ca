@@ -28,7 +28,7 @@ def Requester.receive(_) -> any
 def Requester.receive_blocking(_) -> any
 
 def create_responder(int port) -> Responder
-def Responder.read(_) -> any
+def Responder.read(_) -> List
 def Responder.reply(_, any msg)
 
 def create_publisher(int port) -> Publisher

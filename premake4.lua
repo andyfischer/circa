@@ -43,9 +43,8 @@ solution "Circa"
             "src/command_line/exporting_parser.cpp",
             "src/command_line/file_checker.cpp",
             "3rdparty/linenoise/linenoise.c",
-            "libs/zmq/zmq.cpp"
         }
-        links {"static_lib","dl", "zmq"}
+        links {"static_lib","dl"}
 
         configuration "Debug"
             targetname "circa_d"
