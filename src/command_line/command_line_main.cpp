@@ -7,9 +7,13 @@
 
 #include "fs/read_tar.h"
 
+// Defined in libs/zmq/zmq.cpp:
+void zmq_native_patch(caNativePatch* module);
+
 int main(int argc, const char * args[])
 {
     caWorld* world = circa_initialize();
+    zmq_native_patch(circa_create_native_patch(world, "zmq"));
 
     circa_use_local_filesystem(world, "");
 

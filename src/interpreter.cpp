@@ -1637,7 +1637,11 @@ static void vm_run_input_bytecodes(Stack* stack)
         placeholderIndex = nextPlaceholderIndex;
     }
 
-    Term* placeholder = top->block->get(placeholderIndex);
+    Term* placeholder = top->block->getSafe(placeholderIndex);
+
+    if (placeholder == NULL)
+        return;
+
     if (is_input_placeholder(placeholder)
             && !placeholder->boolProp(sym_Multiple, false))
         return raise_error_not_enough_inputs(stack);

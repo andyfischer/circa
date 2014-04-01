@@ -214,10 +214,6 @@ type ModuleRef {
   Block block
 }
 
-def native_patch_this(String filename)
-  -- Annotation, declare that the current module should be patched by a native
-  -- module with the given filename.
-
 def load_module(String moduleName) -> Block
   -- Look for a loaded module with the given name, and load it if necessary.
   -- The module search path will be used, and the result is stored in module

@@ -10,10 +10,10 @@ void check_for_static_errors(Value* result, Block* block);
 void update_static_error_list(Block* block);
 
 void format_static_error(caValue* error, caValue* stringOutput);
+void format_static_errors(caValue* errorList, caValue* output);
 
 // Print each static error to 'out'. Returns true if there were any static errors.
 bool print_static_errors_formatted(caValue* result, std::ostream& out);
-
 
 bool has_static_error(Term* term);
 bool has_static_errors(Block* block);

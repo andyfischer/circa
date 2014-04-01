@@ -128,4 +128,9 @@ CIRCA_EXPORT void circa_to_string(caValue* value, caValue* out)
     write_string_repr(value, out);
 }
 
+CIRCA_EXPORT void circa_parse_string(const char* str, caValue* valueOut)
+{
+    parse_string_repr(str, valueOut);
+}
+
 } // namespace circa

@@ -5,7 +5,8 @@ solution "Circa"
     flags { "Symbols" }
     targetdir "build"
     objdir "build/obj"
-    includedirs { "include", "src", "3rdparty" }
+    includedirs { "include", "src", "3rdparty", "/usr/local/include" }
+    libdirs { "/usr/local/lib" }
 
     configuration "Release"
         flags { "OptimizeSpeed" }
@@ -41,9 +42,10 @@ solution "Circa"
             "src/command_line/debugger_repl.cpp",
             "src/command_line/exporting_parser.cpp",
             "src/command_line/file_checker.cpp",
-            "3rdparty/linenoise/linenoise.c"
+            "3rdparty/linenoise/linenoise.c",
+            "libs/zmq/zmq.cpp"
         }
-        links {"static_lib","dl"}
+        links {"static_lib","dl", "zmq"}
 
         configuration "Debug"
             targetname "circa_d"

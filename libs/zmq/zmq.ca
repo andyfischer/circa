@@ -1,0 +1,38 @@
+
+package zmq
+
+type nativeRequester :nocopy;
+type nativeResponder :nocopy;
+type nativePublisher :nocopy;
+type nativeSubscriber :nocopy;
+
+type Requester {
+  nativeRequester _
+}
+
+type Responder {
+  nativeResponder _
+}
+
+type Publisher {
+  nativePublisher _
+}
+
+type Subscriber {
+  nativeSubscriber _
+}
+
+def create_requester(String addr) -> Requester
+def Requester.send(_, any msg)
+def Requester.receive(_) -> any
+def Requester.receive_blocking(_) -> any
+
+def create_responder(int port) -> Responder
+def Responder.read(_) -> any
+def Responder.reply(_, any msg)
+
+def create_publisher(int port) -> Publisher
+def Publisher.send(_, any msg)
+
+def create_subscriber(String addr) -> Subscriber
+def Subscriber.poll(_) -> any

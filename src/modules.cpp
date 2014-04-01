@@ -271,41 +271,6 @@ void require_formatSource(caValue* source, Term* term)
     }
 }
 
-void native_patch_this_postCompile(Term* term)
-{
-    Block* block = term->owningBlock;
-    Value blockName;
-    get_global_name(block->owningTerm, &blockName);
-
-    if (!is_string(&blockName)) {
-        std::cout << "term doesn't have global name in native_patch_this_postCompile"
-            << std::endl;
-        return;
-    }
-
-    // Fetch the native module's filename, this might require parse-time eval.
-    Term* filenameInput = term->input(0);
-    Value filename;
-    copy(term_value(filenameInput), &filename);
-
-    if (!is_string(&filename)) {
-        std::cout << "input is not a string value in native_patch_this_postCompile"
-            << std::endl;
-        return;
-    }
-
-    string_remove_suffix(&filename, ".ca");
-    native_patch_add_platform_specific_suffix(&filename);
-
-    // Add a file watch that will update the NativePatch on file change.
-    FileWatch* watch = add_file_watch_native_patch(global_world(),
-            as_cstring(&filename), as_cstring(&blockName));
-
-    insert_native_patch(global_world(), as_cstring(&blockName));
-
-    file_watch_check_now(global_world(), watch);
-}
-
 void load_module_eval(caStack* stack)
 {
     Term* caller = circa_caller_term(stack);
@@ -364,6 +329,19 @@ void require_eval(caStack* stack)
         return;
     }
 
+    if (has_static_errors_cached(module)) {
+        Value msg;
+        set_string(&msg, "Module '");
+        string_append(&msg, moduleName);
+        string_append(&msg, "' has static errors: \n");
+
+        Value errors;
+        format_static_errors(&module->staticErrors, &errors);
+        string_append(&msg, &errors);
+        circa_output_error(stack, as_cstring(&msg));
+        return;
+    }
+
     // Save a ModuleRef value.
     caValue* moduleRef = circa_output(stack, 0);
     make(TYPES.module_ref, moduleRef);
@@ -377,10 +355,6 @@ void modules_install_functions(Block* kernel)
     block_set_format_source_func(function_contents(FUNCS.require), require_formatSource);
 
     FUNCS.package = install_function(kernel, "package", NULL);
-
-    Term* native_patch_this = install_function(kernel, "native_patch_this", NULL);
-    block_set_post_compile_func(function_contents(native_patch_this),
-        native_patch_this_postCompile);
 
     FUNCS.module = import_function(kernel, NULL, "module()");
 

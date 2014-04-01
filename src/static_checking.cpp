@@ -10,6 +10,7 @@
 #include "inspection.h"
 #include "list.h"
 #include "static_checking.h"
+#include "string_type.h"
 #include "reflection.h"
 #include "names.h"
 #include "term.h"
@@ -197,6 +198,17 @@ void format_static_error(caValue* error, caValue* stringOutput)
         out << type;
 
     set_string(stringOutput, out.str());
+}
+
+void format_static_errors(caValue* errorList, caValue* output)
+{
+    set_string(output, "");
+    for (int i=0; i < list_length(errorList); i++) {
+        Value line;
+        format_static_error(errorList->element(i), &line);
+        string_append(output, &line);
+        string_append(output, "\n");
+    }
 }
 
 void print_static_error(caValue* value, std::ostream& out)

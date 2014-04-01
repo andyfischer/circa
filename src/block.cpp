@@ -626,7 +626,7 @@ void load_script(Block* block, const char* filename)
     if (is_null(&contents)) {
         Term* msg = create_string(block, "File not found: ");
         string_append(term_value(msg), filename);
-        apply(block, FUNCS.static_error, TermList(msg));
+        apply(block, FUNCS.error, TermList(msg));
         return;
     }
 

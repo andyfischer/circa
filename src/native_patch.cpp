@@ -1,5 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#define NATIVE_PATCH_VERBOSE 0
+
 #include "common_headers.h"
 
 #ifndef CIRCA_DISABLE_DLL
@@ -166,6 +168,9 @@ void native_patch_apply_patch(NativePatch* module, Block* block)
                 break;
 
             EvaluateFunc func = (EvaluateFunc) as_opaque_pointer(it.value());
+            #if NATIVE_PATCH_VERBOSE
+                printf("Patching with native func: %s\n", as_cstring(name));
+            #endif
             install_function(term, func);
             break;
         }
@@ -176,6 +181,9 @@ void native_patch_apply_patch(NativePatch* module, Block* block)
 
             ReleaseFunc func = (ReleaseFunc) as_opaque_pointer(it.value());
             as_type(term_value(term))->release = func;
+            #if NATIVE_PATCH_VERBOSE
+                printf("Patching with native release func: %s\n", as_cstring(name));
+            #endif
             break;
         }
         }
@@ -256,6 +264,9 @@ void native_patch_apply_to_new_function(World* world, Block* function)
         
     EvaluateFunc evaluateFunc = (EvaluateFunc) as_opaque_pointer(patch);
     install_function(term, evaluateFunc);
+    #if NATIVE_PATCH_VERBOSE
+        printf("Patching with native func (on creation): %s\n", as_cstring(term_name(term)));
+    #endif
 }
 
 void native_patch_apply_to_new_type(World* world, Type* type)

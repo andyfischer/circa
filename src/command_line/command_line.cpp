@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include "unistd.h"
+
 #include "block.h"
 #include "building.h"
 #include "bytecode.h"
@@ -372,6 +374,7 @@ void print_usage()
         "Available commands:\n"
         "  -call <filename> <func name> <args>\n"
         "                    : Call a function in a script file, print results\n"
+        "  -loop <filename>  : Run the script in an endless loop\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
         "  -check <filename> : Statically check the script for errors\n"
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
@@ -513,6 +516,31 @@ int run_command_line(caWorld* world, caValue* args)
         }
         
         circa_free_stack(stack);
+        return 0;
+    }
+
+    if (string_eq(list_get(args, 0), "-loop")) {
+        caValue* filename = list_get(args, 1);
+        load_script(mainBlock, as_cstring(filename));
+        Stack* stack = create_stack(world);
+        stack_init(stack, mainBlock);
+        while (true) {
+
+            stack_run(stack);
+
+            // 16ms delay
+            usleep(16 * 1000);
+
+            if (stack_errored(stack)) {
+                std::cout << "Error occurred:\n";
+                circa_dump_stack_trace(stack);
+                std::cout << std::endl;
+                std::cout << "Stack:\n";
+                dump(stack);
+                return 1;
+            }
+        }
+        return 0;
     }
 
     // Start debugger repl
@@ -575,7 +603,6 @@ int run_command_line(caWorld* world, caValue* args)
     caValue* filename = list_get(args, 0);
 
     load_script(mainBlock, as_cstring(filename));
-    block_finish_changes(mainBlock);
 
     Stack* stack = create_stack(world);
     stack_init(stack, mainBlock);

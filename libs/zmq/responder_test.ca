@@ -1,0 +1,10 @@
+
+require zmq
+
+state server = zmq.create_responder(2222)
+
+msg = server.read()
+
+if msg != null
+    print('received: ' msg)
+    server.reply('reply')

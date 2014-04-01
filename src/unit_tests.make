@@ -24,11 +24,11 @@ ifeq ($(config),debug)
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/circa_test
   DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I. -I../3rdparty
+  INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L../build
+  LDFLAGS   += -L/usr/local/lib -L../build
   LIBS      += -lcirca_d -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca_d.a
@@ -46,11 +46,11 @@ ifeq ($(config),release)
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/circa_test_r
   DEFINES   += 
-  INCLUDES  += -I../include -I. -I../3rdparty
+  INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L../build
+  LDFLAGS   += -L/usr/local/lib -L../build
   LIBS      += -lcirca -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca.a
