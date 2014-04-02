@@ -29,7 +29,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca_d -ldl -lzmq
+  LIBS      += -lcirca_d -ldl -luv
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca_d.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca -ldl -lzmq
+  LIBS      += -lcirca -ldl -luv
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -70,7 +70,6 @@ OBJECTS := \
 	$(OBJDIR)/exporting_parser.o \
 	$(OBJDIR)/file_checker.o \
 	$(OBJDIR)/linenoise.o \
-	$(OBJDIR)/zmq.o \
 
 RESOURCES := \
 
@@ -149,8 +148,5 @@ $(OBJDIR)/file_checker.o: command_line/file_checker.cpp
 $(OBJDIR)/linenoise.o: ../3rdparty/linenoise/linenoise.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/zmq.o: ../libs/zmq/zmq.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

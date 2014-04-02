@@ -2,12 +2,15 @@
 
 #include "common_headers.h"
 
-#include "circa/circa.h"
+#include "ext/libuv.h"
 #include "command_line.h"
 
 int main(int argc, const char * args[])
 {
     caWorld* world = circa_initialize();
+
+    // Install extensions.
+    libuv_native_patch(world);
 
     circa_use_local_filesystem(world, "");
 

@@ -134,7 +134,7 @@ void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue*
 
     set_string(result, scriptLocation.c_str());
 
-    if (!string_eq(relPath,"")) {
+    if (!string_equals(relPath,"")) {
         string_append(result, "/");
         string_append(result, relPath);
     }
@@ -149,12 +149,12 @@ void join_path(caValue* left, caValue* right)
     int left_len = (int) strlen(leftStr);
     int right_len = (int) strlen(leftStr);
 
-    if (string_eq(left, "") || string_eq(left, ".")) {
+    if (string_equals(left, "") || string_equals(left, ".")) {
         copy(right, left);
         return;
     }
 
-    if (string_eq(right, ""))
+    if (string_equals(right, ""))
         return;
 
     int seperatorCount = 0;

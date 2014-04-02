@@ -40,7 +40,7 @@ namespace int_t {
     }
     void setup_type(Type* type)
     {
-        if (string_eq(&type->name, ""))
+        if (string_equals(&type->name, ""))
             set_string(&type->name, "int");
         type->storageType = sym_StorageTypeInt;
         type->reset = reset;

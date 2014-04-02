@@ -29,6 +29,7 @@
 #include "../names.cpp"
 #include "../names_builtin.cpp"
 #include "../native_patch.cpp"
+#include "../native_ptr.cpp"
 #include "../object.cpp"
 #include "../parser.cpp"
 #include "../rand.cpp"

@@ -43,15 +43,15 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     set_symbol_from_string(&sym_displayRaw, "displayRaw");
     caValue* displayRaw = hashtable_get(&stack->attrs, &sym_displayRaw);
 
-    if (string_eq(line, "exit") || string_eq(line, "/exit")) {
+    if (string_equals(line, "exit") || string_equals(line, "/exit")) {
         stack_pop(stack);
         return;
     }
 
-    if (string_eq(line, ""))
+    if (string_equals(line, ""))
         return;
 
-    if (string_eq(line, "/raw")) {
+    if (string_equals(line, "/raw")) {
         set_bool(displayRaw, !as_bool(displayRaw));
         if (as_bool(displayRaw))
             set_string(list_append(output), "Displaying raw format for new expressions.");
@@ -59,31 +59,31 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
             set_string(list_append(output), "Not displaying raw format.");
         return;
     }
-    if (string_eq(line, "/clear")) {
+    if (string_equals(line, "/clear")) {
         clear_block(block);
         set_string(list_append(output), "Cleared working area.");
         return;
     }
-    if (string_eq(line, "/show")) {
+    if (string_equals(line, "/show")) {
         std::cout << get_block_source_text(block);
         return;
     }
-    if (string_eq(line, "/dump")) {
+    if (string_equals(line, "/dump")) {
         print_block(block, std::cout);
         return;
     }
-    if (string_eq(line, "/dumpbc")) {
+    if (string_equals(line, "/dumpbc")) {
         Value bytecode;
         bytecode_write_block(stack, &bytecode, block);
         bytecode_dump(as_blob(&bytecode));
         return;
     }
-    if (string_eq(line, "/stack")) {
+    if (string_equals(line, "/stack")) {
         stack_to_string(stack, list_append(output), false);
         return;
     }
 
-    if (string_eq(line, "/help")) {
+    if (string_equals(line, "/help")) {
         set_string(list_append(output), "Enter any Circa expression to evaluate it and print the result.");
         set_string(list_append(output), "All commands are appended to a 'working area' block, which can");
         set_string(list_append(output), "be inspected.");

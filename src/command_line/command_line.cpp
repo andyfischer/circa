@@ -144,37 +144,37 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
             return;
         }
 
-        if (string_eq(args->element(argIndex), "-p")) {
+        if (string_equals(args->element(argIndex), "-p")) {
             printRaw = true;
             argIndex++;
             continue;
         }
 
-        if (string_eq(args->element(argIndex), "-pp")) {
+        if (string_equals(args->element(argIndex), "-pp")) {
             printRaw = true;
             rawOutputPrefs.showProperties = true;
             argIndex++;
             continue;
         }
         
-        if (string_eq(args->element(argIndex), "-b") || string_eq(args->element(argIndex), "-pb")) {
+        if (string_equals(args->element(argIndex), "-b") || string_equals(args->element(argIndex), "-pb")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             argIndex++;
             continue;
         }
 
-        if (string_eq(args->element(argIndex), "-s")) {
+        if (string_equals(args->element(argIndex), "-s")) {
             printSource = true;
             argIndex++;
             continue;
         }
-        if (string_eq(args->element(argIndex), "-print-state")) {
+        if (string_equals(args->element(argIndex), "-print-state")) {
             printState = true;
             argIndex++;
             continue;
         }
-        if (string_eq(args->element(argIndex), "-n")) {
+        if (string_equals(args->element(argIndex), "-n")) {
             dontRunScript = true;
             argIndex++;
             continue;
@@ -391,13 +391,16 @@ int run_command_line(caWorld* world, caValue* args)
     bool dontRunScript = false;
     bool printTrace = false;
 
+    Value mainModuleName;
+    set_string(&mainModuleName, "main");
+
     // Prepended options
     while (true) {
 
         if (list_length(args) == 0)
             break;
 
-        if (string_eq(list_get(args, 0), "-break-on")) {
+        if (string_equals(list_get(args, 0), "-break-on")) {
             DEBUG_BREAK_ON_TERM = atoi(as_cstring(list_get(args, 1)));
 
             list_remove_index(args, 0);
@@ -406,7 +409,7 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-path")) {
+        if (string_equals(list_get(args, 0), "-path")) {
             // Add a module path
             module_add_search_path(world, as_cstring(list_get(args, 1)));
             list_remove_index(args, 0);
@@ -414,43 +417,43 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-p")) {
+        if (string_equals(list_get(args, 0), "-p")) {
             printRaw = true;
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-pp")) {
+        if (string_equals(list_get(args, 0), "-pp")) {
             printRaw = true;
             rawOutputPrefs.showProperties = true;
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-b") || string_eq(list_get(args, 0), "-pb")) {
+        if (string_equals(list_get(args, 0), "-b") || string_equals(list_get(args, 0), "-pb")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-n")) {
+        if (string_equals(list_get(args, 0), "-n")) {
             dontRunScript = true;
             list_remove_index(args, 0);
             continue;
         }
-        if (string_eq(list_get(args, 0), "-print-state")) {
+        if (string_equals(list_get(args, 0), "-print-state")) {
             printState = true;
             list_remove_index(args, 0);
             continue;
         }
-        if (string_eq(list_get(args, 0), "-t")) {
+        if (string_equals(list_get(args, 0), "-t")) {
             printTrace = true;
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-load")) {
+        if (string_equals(list_get(args, 0), "-load")) {
             caValue* filename = list_get(args, 1);
 
             Value moduleName;
@@ -470,35 +473,33 @@ int run_command_line(caWorld* world, caValue* args)
         return 0;
     }
     
-    Block* mainBlock = fetch_module(world, "main");
-
     // Check to handle args[0] as a dash-command.
 
     // Print help
-    if (string_eq(list_get(args, 0), "-help")) {
+    if (string_equals(list_get(args, 0), "-help")) {
         print_usage();
         return 0;
     }
 
     // Start repl
-    if (string_eq(list_get(args, 0), "-repl")) {
+    if (string_equals(list_get(args, 0), "-repl")) {
         run_repl_stdin(world);
         return 0;
     }
 
-    if (string_eq(list_get(args, 0), "-call")) {
-        load_script(mainBlock, as_cstring(list_get(args, 1)));
+    if (string_equals(list_get(args, 0), "-call")) {
+        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(list_get(args, 1)));
 
         caStack* stack = circa_create_stack(world);
 
         // Push function
-        caBlock* func = circa_find_function_local(mainBlock, as_cstring(list_get(args, 2)));
+        caBlock* func = circa_find_function_local(block, as_cstring(list_get(args, 2)));
         circa_push_function(stack, func);
 
         // Push inputs
         for (int i=3, inputIndex = 0; i < circa_count(args); i++) {
             caValue* val = circa_input(stack, inputIndex++);
-            parse_string_repr(as_cstring(list_get(args, i)), val);
+            parse_string_repr(list_get(args, i), val);
         }
 
         circa_run(stack);
@@ -519,16 +520,23 @@ int run_command_line(caWorld* world, caValue* args)
         return 0;
     }
 
-    if (string_eq(list_get(args, 0), "-loop")) {
+    if (string_equals(list_get(args, 0), "-loop")) {
+        if (list_length(args) < 2) {
+            std::cout << "Expected a filename after -loop" << std::endl;
+            return 1;
+        }
+
         caValue* filename = list_get(args, 1);
-        load_script(mainBlock, as_cstring(filename));
+        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(filename));
         Stack* stack = create_stack(world);
-        stack_init(stack, mainBlock);
+        stack_init(stack, block);
         while (true) {
 
             stack_run(stack);
 
-            // 16ms delay
+            world_tick(world);
+
+            // 16ms delay. TODO: Replace with libuv timer.
             usleep(16 * 1000);
 
             if (stack_errored(stack)) {
@@ -544,15 +552,15 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     // Start debugger repl
-    if (string_eq(list_get(args, 0), "-d"))
+    if (string_equals(list_get(args, 0), "-d"))
         return run_debugger_repl(as_cstring(list_get(args, 1)));
 
     // Run file checker
-    if (string_eq(list_get(args, 0), "-check"))
+    if (string_equals(list_get(args, 0), "-check"))
         return run_file_checker(as_cstring(list_get(args, 1)));
 
     // Export parsed information
-    if (string_eq(list_get(args, 0), "-export")) {
+    if (string_equals(list_get(args, 0), "-export")) {
         const char* filename = "";
         const char* format = "";
         if (list_length(args) >= 2)
@@ -563,14 +571,14 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     // Command reader (from stdin)
-    if (string_eq(list_get(args, 0), "-run-stdin")) {
+    if (string_equals(list_get(args, 0), "-run-stdin")) {
         run_commands_from_stdin(world);
         return 0;
     }
 
     // Reproduce source text
-    if (string_eq(list_get(args, 0), "-source-repro")) {
-        load_script(mainBlock, as_cstring(list_get(args, 1)));
+    if (string_equals(list_get(args, 0), "-source-repro")) {
+        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(list_get(args, 1)));
 
         Value sourceReproStr;
         set_string(&sourceReproStr, "source_repro");
@@ -579,7 +587,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         Stack stack;
         stack_init(&stack, to_source_string);
-        set_block(circa_input(&stack, 0), mainBlock);
+        set_block(circa_input(&stack, 0), block);
 
         stack_run(&stack);
 
@@ -591,9 +599,9 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     // Rewrite source, this is useful for upgrading old source
-    if (string_eq(list_get(args, 0), "-rewrite-source")) {
-        load_script(mainBlock, as_cstring(list_get(args, 1)));
-        std::string contents = get_block_source_text(mainBlock);
+    if (string_equals(list_get(args, 0), "-rewrite-source")) {
+        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(list_get(args, 1)));
+        std::string contents = get_block_source_text(block);
         write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
@@ -602,13 +610,13 @@ int run_command_line(caWorld* world, caValue* args)
 
     caValue* filename = list_get(args, 0);
 
-    load_script(mainBlock, as_cstring(filename));
+    Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(filename));
 
     Stack* stack = create_stack(world);
-    stack_init(stack, mainBlock);
+    stack_init(stack, block);
 
     if (printRaw)
-        print_block(mainBlock, &rawOutputPrefs, std::cout, stack);
+        print_block(block, &rawOutputPrefs, std::cout, stack);
 
     if (dontRunScript)
         return 0;

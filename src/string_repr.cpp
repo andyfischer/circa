@@ -89,9 +89,15 @@ static void parse_value(TokenStream* tokens, caValue* out)
     drop_whitespace(tokens);
 }
 
-void parse_string_repr(const char* str, caValue* out)
+void parse_string_repr(const char* str, int len, caValue* out)
 {
-    TokenStream tokens(str);
+    TokenStream tokens(str, len);
+    parse_value(&tokens, out);
+}
+
+void parse_string_repr(caValue* str, caValue* out)
+{
+    TokenStream tokens(as_cstring(str), string_length(str));
     parse_value(&tokens, out);
 }
 
@@ -130,7 +136,12 @@ CIRCA_EXPORT void circa_to_string(caValue* value, caValue* out)
 
 CIRCA_EXPORT void circa_parse_string(const char* str, caValue* valueOut)
 {
-    parse_string_repr(str, valueOut);
+    parse_string_repr(str, strlen(str), valueOut);
+}
+
+CIRCA_EXPORT void circa_parse_string_len(const char* str, int len, caValue* valueOut)
+{
+    parse_string_repr(str, len, valueOut);
 }
 
 } // namespace circa

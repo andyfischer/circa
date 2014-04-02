@@ -142,12 +142,14 @@ void module_patch_function(NativePatch* module, const char* name, EvaluateFunc f
     set_opaque_pointer(hashtable_insert(&module->patches, &key), (void*) func);
 }
 
+#if 0
 void module_patch_type_release(NativePatch* module, const char* typeName, ReleaseFunc func)
 {
     Value key;
     type_release_key(typeName, &key);
     set_opaque_pointer(hashtable_insert(&module->patches, &key), (void*) func);
 }
+#endif
 
 void native_patch_apply_patch(NativePatch* module, Block* block)
 {
@@ -271,6 +273,7 @@ void native_patch_apply_to_new_function(World* world, Block* function)
 
 void native_patch_apply_to_new_type(World* world, Type* type)
 {
+#if 0
     Term* term = type->declaringTerm;
     if (!term_can_be_patched(term))
         return;
@@ -293,6 +296,7 @@ void native_patch_apply_to_new_type(World* world, Type* type)
         
     ReleaseFunc releaseFunc = (ReleaseFunc) as_opaque_pointer(patch);
     type->release = releaseFunc;
+#endif
 }
 
 void native_patch_add_platform_specific_suffix(caValue* filename)
@@ -350,9 +354,12 @@ CIRCA_EXPORT void circa_patch_function(caNativePatch* module, const char* name,
 {
     module_patch_function((NativePatch*) module, name, func);
 }
+
+#if 0
 CIRCA_EXPORT void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func)
 {
     module_patch_type_release((NativePatch*) module, typeName, func);
 }
+#endif
 
 } // namespace circa

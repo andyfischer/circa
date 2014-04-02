@@ -693,6 +693,9 @@ def Set.contains(self, element) -> bool
 def Set.remove(self, element) -> Set
   @self.m.remove(element)
 
+def Set.elements(self) -> List
+  self.m.keys
+
 def List.to_set(self) -> Set
   set = make(Set)
   for item in self

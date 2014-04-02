@@ -12,6 +12,7 @@ struct World {
     // Private data.
     NativePatchWorld* nativePatchWorld;
     FileWatchWorld* fileWatchWorld;
+    LibuvWorld* libuvWorld;
 
     // Global IDs.
     int nextActorID;
@@ -56,6 +57,6 @@ void world_clear_file_sources(World* world);
 caValue* world_append_file_source(World* world);
 void world_use_local_filesystem(World* world, const char* rootDir);
 
-void refresh_all_modules(caWorld* world);
+void world_tick(caWorld* world);
 
 } // namespace circa

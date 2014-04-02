@@ -95,6 +95,16 @@ void circa_string_append(caValue* container, const char* str)
     string_append(container, str);
 }
 
+void circa_string_append_val(caValue* str, caValue* suffix)
+{
+    string_append(str, suffix);
+}
+
+void circa_string_append_len(caValue* container, const char* str, int len)
+{
+    string_append_len(container, str, len);
+}
+
 void circa_string_append_char(caValue* container, char c)
 {
     string_append(container, c);
@@ -102,7 +112,7 @@ void circa_string_append_char(caValue* container, char c)
 
 bool circa_string_equals(caValue* container, const char* str)
 {
-    return string_eq(container, str);
+    return string_equals(container, str);
 }
 void circa_set_list(caValue* list, int numElements)
 {
@@ -122,17 +132,6 @@ void circa_set_point(caValue* point, float x, float y)
     list_resize(point, 2);
     set_float(get_index(point, 0), x);
     set_float(get_index(point, 1), y);
-}
-
-void circa_set_handle(caValue* handle, void* object, caReleaseFunc release)
-{
-    // TODO: delete
-}
-
-void* circa_handle_get_object(caValue* handle)
-{
-    // TODO: delete
-    return NULL;
 }
 
 void* circa_raw_pointer(caValue* value)

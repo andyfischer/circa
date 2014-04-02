@@ -1,6 +1,8 @@
 
 Miscellanous (most-recent first)
 
+  Rename circa_create_default_output to circa_set_default_output
+
   Can't use a type before it's defined. Should be able to post-define it like functions.
 
   Method lookup cache:

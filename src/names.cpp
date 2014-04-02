@@ -62,7 +62,7 @@ Block* find_builtins_block(Block* block)
 
 Term* run_name_search(NameSearch* params)
 {
-    if (is_null(&params->name) || string_eq(&params->name, ""))
+    if (is_null(&params->name) || string_equals(&params->name, ""))
         return NULL;
 
     Block* block = params->block;
@@ -701,7 +701,7 @@ void update_unique_name(Term* term)
 
             // If another term shares the same base, then make sure our ordinal is
             // higher. This turns some O(n) cases into O(1)
-            if (string_eq(&other->uniqueName.base, &name.base)
+            if (string_equals(&other->uniqueName.base, &name.base)
                     && (other->uniqueName.ordinal >= name.ordinal)) {
                 name.ordinal = other->uniqueName.ordinal + 1;
                 updatedName = true;
@@ -709,7 +709,7 @@ void update_unique_name(Term* term)
             // If this name is already used, then just try the next ordinal. This
             // case results in more blind searching, but it's necessary to handle
             // the situation where a generated name is already taken.
-            } else if (string_eq(&other->uniqueName.name, &name.name)) {
+            } else if (string_equals(&other->uniqueName.name, &name.name)) {
                 name.ordinal++;
                 updatedName = true;
             }
@@ -739,7 +739,7 @@ Term* find_from_unique_name(Block* block, caValue* name)
         Term* term = block->get(i);
         if (term == NULL)
             continue;
-        if (string_eq(unique_name(term), name)) {
+        if (string_equals(unique_name(term), name)) {
             return term;
         }
     }

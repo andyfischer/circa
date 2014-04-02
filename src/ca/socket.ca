@@ -1,0 +1,42 @@
+
+type Server {
+    native_ptr native
+}
+
+type Connection {
+    native_ptr native
+}
+
+type ServerRequest {
+    Connection conn
+    any data
+}
+
+type WebsockServer {
+    native_ptr native
+}
+
+def ServerRequest.reply(self, msg)
+  self.conn.send(msg)
+
+def make_server(String ip, int port, Symbol t) -> Server
+def make_tcp_server(String ip, int port) -> Server
+  make_server(ip port :tcp)
+def make_websock_server(String ip, int port) -> Server
+  make_server(ip port :websock)
+
+def Server.connections(self) -> List
+
+def Server.listen(self) -> List
+  -- returns list of ServerRequest
+  reqs = []
+  for Connection c in self.connections
+    for msg in c.receive
+      @reqs.append(ServerRequest.make(c msg))
+  reqs
+
+def make_tcp_client(String ip, int port) -> Connection
+def Connection.send(self, any msg)
+def Connection.outgoing_queue(self) -> List
+def Connection.receive(self) -> List
+def Connection.is_open(self) -> bool

@@ -164,7 +164,8 @@ write_text_file('src/generated/stdlib_script_text.cpp',
             {'name': "json", 'filename':"src/ca/json.ca"},
             {'name': "error_trace", 'filename':"src/ca/error_trace.ca"},
             {'name': "source_repro", 'filename':"src/ca/source_repro.ca"},
-            {'name': "indent_writer", 'filename':"src/ca/indent_writer.ca"}]
+            {'name': "indent_writer", 'filename':"src/ca/indent_writer.ca"},
+            {'name': "socket", 'filename':"src/ca/socket.ca"}]
         ))
 
 # generate all_tests.cpp, all_builtin_functions.cpp, and all_builtin_types.cpp

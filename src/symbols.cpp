@@ -51,6 +51,19 @@ void set_symbol_from_string(caValue* val, const char* str)
     set_symbol(val, symbol_from_string(str));
 }
 
+const char* symbol_as_string(caValue* symbol)
+{
+    const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));
+    if (builtinName != NULL)
+        return builtinName;
+
+    caValue* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
+    if (tableVal != NULL)
+        return as_cstring(tableVal);
+
+    return NULL;
+}
+
 void symbol_as_string(caValue* symbol, caValue* str)
 {
     const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));

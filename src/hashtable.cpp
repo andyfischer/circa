@@ -32,7 +32,7 @@ struct Hashtable {
     // after buckets is Slot[capacity]
 };
 
-int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey);
+int hashtable_insert(Hashtable** dataPtr, caValue* key, bool moveKey);
 int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash);
 caValue* hashtable_get(Hashtable* table, caValue* key);
 
@@ -174,6 +174,12 @@ void hashtable_touch(caValue* value)
     value->value_data.ptr = copy;
 }
 
+bool hashtable_touch_is_necessary(caValue* value)
+{
+    Hashtable* table = (Hashtable*) value->value_data.ptr;
+    return !(table == NULL || table->mut || table->refCount == 1);
+}
+
 int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash)
 {
     if (table == NULL)
@@ -200,7 +206,7 @@ int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash)
 // Insert the given key into the dictionary, returns the index.
 // This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
+int hashtable_insert(Hashtable** dataPtr, caValue* key, bool moveKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
@@ -224,7 +230,7 @@ int hashtable_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
     slot->next = -1;
     slot->hash = hash;
 
-    if (consumeKey)
+    if (moveKey)
         move(key, &slot->key);
     else
         copy(key, &slot->key);
@@ -430,19 +436,18 @@ caValue* hashtable_get(caValue* table, const char* keystr)
     return hashtable_get(table, &str);
 }
 
-caValue* hashtable_insert(caValue* tableTv, caValue* key, bool consumeKey)
+caValue* hashtable_insert(caValue* tableTv, caValue* key, bool moveKey)
 {
-    ca_assert(tableTv->value_type->storageType == sym_StorageTypeHashtable);
+    ca_assert(is_hashtable(tableTv));
     hashtable_touch(tableTv);
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
-    int index = hashtable_insert(&table, key, consumeKey);
+    int index = hashtable_insert(&table, key, moveKey);
 
     return &get_slot(table, index)->value;
 }
 
 caValue* hashtable_insert(caValue* table, caValue* key)
 {
-    hashtable_touch(table);
     return hashtable_insert(table, key, false);
 }
 
@@ -602,7 +607,6 @@ void hashtable_setup_type(Type* type)
     type->initialize = tagged_value_wrappers::initialize;
     type->release = tagged_value_wrappers::release;
     type->copy = hashtable_copy;
-    type->touch = hashtable_touch;
     type->equals = hashtable_equals;
     type->hashFunc = hashtable_hash;
     type->toString = hashtable_to_string;
@@ -641,9 +645,14 @@ void HashtableIterator::_advanceWhileInvalid()
 }
 
 // Publich functions
-CIRCA_EXPORT caValue* circa_map_insert(caValue* table, caValue* key)
+CIRCA_EXPORT caValue* circa_map_insert(caValue* map, caValue* key)
 {
-    return hashtable_insert(table, key);
+    return hashtable_insert(map, key, false);
+}
+
+CIRCA_EXPORT caValue* circa_map_insert_move(caValue* map, caValue* key)
+{
+    return hashtable_insert(map, key, true);
 }
 
 CIRCA_EXPORT void circa_set_map(caValue* value)

@@ -29,6 +29,7 @@ struct Token
 typedef std::vector<Token> TokenList;
 
 const char* get_token_text(int match);
+void tokenize(const char* input, int len, TokenList* results);
 void tokenize(std::string const &input, TokenList* results);
 
 struct TokenStream
@@ -51,6 +52,12 @@ struct TokenStream
       : _sourceText(input), _position(0)
     {
         tokenize(input, &tokens);
+    }
+
+    TokenStream(const char* input, int len)
+      : _sourceText(input, len), _position(0)
+    {
+        tokenize(input, len, &tokens);
     }
 
     Token operator[](int index) {
@@ -76,7 +83,6 @@ struct TokenStream
 
     Token const& next(int lookahead=0) const;
     std::string nextStr(int lookahead=0) const;
-    const char* nextCStr(int lookahead=0) const;
     void getNextStr(caValue* value, int lookahead=0) const;
 
     // Return true if the given lookahead is past the end of the list.

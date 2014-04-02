@@ -5,10 +5,12 @@
 namespace circa {
 
 void set_mutable_hashtable(caValue* value);
+void hashtable_touch(caValue* value);
+bool hashtable_touch_is_necessary(caValue* value);
 
 caValue* hashtable_get(caValue* table, caValue* key);
 caValue* hashtable_get(caValue* table, const char* keyStr);
-caValue* hashtable_insert(caValue* table, caValue* key, bool consumeKey);
+caValue* hashtable_insert(caValue* table, caValue* key, bool moveKey);
 caValue* hashtable_insert(caValue* table, caValue* key);
 
 caValue* hashtable_get_int_key(caValue* table, int key);

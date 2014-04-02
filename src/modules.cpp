@@ -238,7 +238,7 @@ Block* find_module_from_filename(const char* filename)
         if (blockFilename == NULL)
             continue;
 
-        if (string_eq(blockFilename, filename))
+        if (string_equals(blockFilename, filename))
             return nested_contents(term);
     }
 

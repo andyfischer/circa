@@ -18,6 +18,23 @@
 
 namespace circa {
 
+bool value_may_need_migration(caValue* value, Migration* migration);
+bool list_value_may_need_migration(caValue* value, Migration* migration);
+
+bool value_may_need_migration(caValue* value, Migration* migration)
+{
+    if (is_list_based(value))
+        return list_value_may_need_migration(value, migration);
+
+    if (is_hashtable(value))
+        return true; // todo
+
+    if (is_leaf_value(value))
+        return false;
+
+    return true;
+}
+
 void migrate_block(Block* target, Migration* migration)
 {
     ca_assert(target != migration->oldBlock);
@@ -205,9 +222,26 @@ void migrate_retained_frame(caValue* retainedFrame, Migration* migration)
     set_block(retained_frame_get_block(retainedFrame), newBlock);
 }
 
+bool list_value_may_need_migration(caValue* value, Migration* migration)
+{
+    for (int i=0; i < list_length(value); i++)
+        if (value_may_need_migration(value->element(i), migration))
+            return true;
+
+    Type* newType = migrate_type(value->value_type, migration);
+    if (newType != value->value_type)
+        return true;
+
+    return false;
+}
+
 void migrate_list_value(caValue* value, Migration* migration)
 {
+    if (!list_value_may_need_migration(value, migration))
+        return;
+
     touch(value);
+
     for (int i=0; i < list_length(value); i++) {
         caValue* element = list_get(value, i);
         migrate_value(element, migration);
@@ -277,7 +311,7 @@ void migrate_world(World* world, Migration* migration)
 #endif
 
     // Update references in every module.
-    for (BlockIteratorFlat it(world->root); it.unfinished(); it.advance()) {
+    for (BlockIteratorFlat it(world->root); it; ++it) {
         Term* term = it.current();
         if (term->function == FUNCS.module)
             migrate_block(term->nestedContents, migration);

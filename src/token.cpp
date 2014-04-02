@@ -224,13 +224,18 @@ void consume_string_literal(TokenizeContext &context);
 void consume_triple_quoted_string_literal(TokenizeContext &context);
 void consume_color_literal(TokenizeContext &context);
 
-void tokenize(std::string const &input, TokenList* results)
+void tokenize(const char* input, int len, TokenList* results)
 {
-    TokenizeContext context(input.c_str(), input.size(), results);
+    TokenizeContext context(input, len, results);
 
     while (!context.finished()) {
         top_level_consume_token(context);
     }
+}
+
+void tokenize(std::string const& input, TokenList* results)
+{
+    return tokenize(input.c_str(), input.size(), results);
 }
 
 bool is_letter(char c)
@@ -773,11 +778,6 @@ std::string TokenStream::nextStr(int lookahead) const
 
     ca_assert(length > 0);
     return std::string(_sourceText.c_str() + startPos, length);
-}
-
-const char* TokenStream::nextCStr(int lookahead) const
-{
-    return nextStr().c_str();
 }
 
 void TokenStream::getNextStr(caValue* value, int lookahead) const

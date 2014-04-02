@@ -11,6 +11,7 @@
 #include "list.h"
 #include "string_type.h"
 #include "source_repro.h"
+#include "symbols.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "token.h"
@@ -86,6 +87,7 @@ void string_resize(StringData** data, int newLength)
 
         // Modify in-place
         *data = (StringData*) realloc(*data, sizeof(StringData) + newLength + 1);
+        (*data)->str[newLength] = 0;
         (*data)->length = newLength;
         return;
     }
@@ -94,7 +96,8 @@ void string_resize(StringData** data, int newLength)
 
     StringData* oldData = *data;
     StringData* newData = string_create(newLength);
-    memcpy(newData->str, oldData->str, std::min(newLength, oldData->length) + 1);
+    memcpy(newData->str, oldData->str, newLength);
+    newData->str[newLength] = 0;
     decref(oldData);
     *data = newData;
 }
@@ -240,21 +243,32 @@ const char* as_cstring(caValue* value)
 
 void string_append(caValue* left, const char* right)
 {
+    string_append_len(left, right, strlen(right));
+}
+
+void string_append_len(caValue* left, const char* right, int len)
+{
+    if (is_null(left))
+        set_string(left, "");
+
     ca_assert(is_string(left));
 
     StringData** data = (StringData**) &left->value_data.ptr;
     
     int leftLength = string_length(*data);
-    int rightLength = (int) strlen(right);
-    int newLength = leftLength + rightLength;
+    int newLength = leftLength + len;
 
     string_resize(data, newLength);
 
-    memcpy((*data)->str + leftLength, right, rightLength + 1);
+    memcpy((*data)->str + leftLength, right, len);
+    (*data)->str[newLength] = 0;
 }
 
 void string_append(caValue* left, caValue* right)
 {
+    if (is_null(left))
+        set_string(left, "");
+
     ca_assert(is_string(left));
 
     if (is_string(right))
@@ -264,6 +278,7 @@ void string_append(caValue* left, caValue* right)
         string_append(left, s.c_str());
     }
 }
+
 void string_append_quoted(caValue* left, caValue* right)
 {
     std::string s = to_string(right);
@@ -295,11 +310,11 @@ void string_append_char(caValue* left, char c)
 
 void string_append_qualified_name(caValue* left, caValue* right)
 {
-    if (string_eq(left, "")) {
+    if (string_equals(left, "")) {
         copy(right, left);
         return;
     }
-    if (string_eq(right, ""))
+    if (string_equals(right, ""))
         return;
     string_append(left, ":");
     string_append(left, right);
@@ -313,19 +328,24 @@ void string_resize(caValue* s, int length)
     StringData** data = (StringData**) &s->value_data.ptr;
     string_resize(data, length);
 }
-bool string_eq(caValue* s, const char* str)
+bool string_equals(caValue* s, const char* str)
 {
-    if (!is_string(s))
-        return false;
-    return strcmp(as_cstring(s), str) == 0;
-}
-bool string_eq(caValue* s, caValue* rhs)
-{
-    return string_equals(s, rhs);
+    if (is_string(s))
+        return strcmp(as_cstring(s), str) == 0;
+
+    // Preparing for the future, strings and symbols will be one data type.
+    if (is_symbol(s)) {
+        if (str[0] != ':')
+            return false;
+
+        return strcmp(symbol_as_string(s), str + 1) == 0;
+    }
+
+    return false;
 }
 bool string_empty(caValue* s)
 {
-    return is_null(s) || string_eq(s, "");
+    return is_null(s) || string_equals(s, "");
 }
 
 bool string_starts_with(caValue* s, const char* beginning)
@@ -404,6 +424,21 @@ void string_slice(caValue* s, int start, int end, caValue* out)
     int len = end - start;
 
     set_string(out, as_cstring(s) + start, len);
+}
+
+void string_slice(caValue* str, int start, int end)
+{
+    touch(str);
+
+    if (end == -1)
+        end = string_length(str);
+
+    int newSize = end - start;
+
+    if (start > 0)
+        memmove((char*) as_cstring(str), as_cstring(str) + start, newSize);
+
+    string_resize(str, newSize);
 }
 
 int string_find_char(caValue* s, int start, char c)

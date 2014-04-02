@@ -97,7 +97,7 @@ bool is_hidden(Term* term)
 
 bool has_empty_name(Term* term)
 {
-    return is_null(&term->nameValue) || string_eq(&term->nameValue, "");
+    return is_null(&term->nameValue) || string_equals(&term->nameValue, "");
 }
 
 bool is_copying_call(Term* term)

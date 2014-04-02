@@ -57,6 +57,7 @@ ListData* list_resize(ListData* original, int numElements);
 // holds an immutable shared copy, then this function will create a
 // duplicate list which is safe to modify.
 void list_touch(caValue* list);
+bool list_touch_is_necessary(caValue* list);
 
 // Get an element by index. If the caller plans to modify the returned value,
 // or pass the value somewhere that may modify it (without making a copy),

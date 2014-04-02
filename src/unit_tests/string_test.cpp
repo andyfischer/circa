@@ -37,10 +37,20 @@ void test_prepend()
     test_equals(&hello, "hello");
 }
 
+void test_equality_with_symbol()
+{
+    Value val;
+    set_symbol(&val, sym_Append);
+    test_assert(string_equals(&val, ":Append"));
+    test_assert(!string_equals(&val, "Append"));
+    test_assert(!string_equals(&val, "Appen"));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(string_test::test_sneaky_equals);
     REGISTER_TEST_CASE(string_test::test_prepend);
+    REGISTER_TEST_CASE(string_test::test_equality_with_symbol);
 }
 
 } // namespace string_test

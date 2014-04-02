@@ -119,6 +119,9 @@ ListData* list_touch(ListData* original)
     if (!original->immutable)
         return original;
 
+    if (original->refCount == 1)
+        return original;
+
     ListData* copy = list_duplicate(original);
     list_decref(original);
     return copy;
@@ -487,6 +490,19 @@ void list_sort(caValue* list, SortCompareFunc func, void* context)
     list_sort_mergesort(list, func, context);
 }
 
+void list_touch(caValue* value)
+{
+    ca_assert(is_list_based(value));
+    ListData* data = (ListData*) get_pointer(value);
+    set_pointer(value, list_touch(data));
+}
+
+bool list_touch_is_necessary(caValue* value)
+{
+    ListData* data = (ListData*) get_pointer(value);
+    return !(data == NULL || data->refCount == 1);
+}
+
 caValue* list_get(caValue* value, int index)
 {
     ca_assert(is_list_based(value));
@@ -580,11 +596,6 @@ bool list_equals(caValue* left, caValue* right)
     }
 
     return true;
-}
-
-void list_touch(caValue* list)
-{
-    list->value_data.ptr = (ListData*) list_touch((ListData*) list->value_data.ptr);
 }
 
 void list_remove_and_replace_with_last_element(caValue* value, int index)
@@ -756,7 +767,7 @@ int list_find_field_index_by_name(Type* listType, const char* name)
         return -1;
 
     for (int i=0; i < circa_count(names); i++)
-        if (string_eq(circa_index(names, i), name))
+        if (string_equals(circa_index(names, i), name))
             return i;
 
     // Not found
@@ -769,9 +780,6 @@ bool is_list_based_type(Type* type)
 }
 
 namespace list_t {
-
-    // caValue wrappers
-    void tv_touch(caValue* value);
 
     void resize(caValue* list, int newSize)
     {
@@ -874,12 +882,6 @@ namespace list_t {
         return list_to_string((ListData*) get_pointer(value));
     }
 
-    void tv_touch(caValue* value)
-    {
-        ca_assert(is_list_based(value));
-        ListData* data = (ListData*) get_pointer(value);
-        set_pointer(value, list_touch(data));
-    }
 
     u32 circular_shift(u32 value, int shift)
     {
@@ -975,7 +977,7 @@ namespace list_t {
 
     void setup_type(Type* type)
     {
-        if (string_eq(&type->name, ""))
+        if (string_equals(&type->name, ""))
             set_string(&type->name, "List");
         type->storageType = sym_StorageTypeList;
         type->initialize = tv_initialize;
@@ -987,7 +989,6 @@ namespace list_t {
         type->getIndex = list_get;
         type->setIndex = tv_set_index;
         type->numElements = list_length;
-        type->touch = tv_touch;
         type->hashFunc = list_hash;
         type->staticTypeQuery = tv_static_type_query;
         type->visitHeap = tv_visit_heap;

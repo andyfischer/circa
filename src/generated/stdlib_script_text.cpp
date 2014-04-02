@@ -700,6 +700,9 @@ const char* BUILTIN_MODULE_stdlib =
     "def Set.remove(self, element) -> Set\n"
     "  @self.m.remove(element)\n"
     "\n"
+    "def Set.elements(self) -> List\n"
+    "  self.m.keys\n"
+    "\n"
     "def List.to_set(self) -> Set\n"
     "  set = make(Set)\n"
     "  for item in self\n"
@@ -1634,6 +1637,50 @@ const char* BUILTIN_MODULE_indent_writer =
     "def new() -> IndentWriter\n"
     "    IndentWriter.make\n";
 
+const char* BUILTIN_MODULE_socket = 
+    "\n"
+    "type Server {\n"
+    "    native_ptr native\n"
+    "}\n"
+    "\n"
+    "type Connection {\n"
+    "    native_ptr native\n"
+    "}\n"
+    "\n"
+    "type ServerRequest {\n"
+    "    Connection conn\n"
+    "    any data\n"
+    "}\n"
+    "\n"
+    "type WebsockServer {\n"
+    "    native_ptr native\n"
+    "}\n"
+    "\n"
+    "def ServerRequest.reply(self, msg)\n"
+    "  self.conn.send(msg)\n"
+    "\n"
+    "def make_server(String ip, int port, Symbol t) -> Server\n"
+    "def make_tcp_server(String ip, int port) -> Server\n"
+    "  make_server(ip port :tcp)\n"
+    "def make_websock_server(String ip, int port) -> Server\n"
+    "  make_server(ip port :websock)\n"
+    "\n"
+    "def Server.connections(self) -> List\n"
+    "\n"
+    "def Server.listen(self) -> List\n"
+    "  -- returns list of ServerRequest\n"
+    "  reqs = []\n"
+    "  for Connection c in self.connections\n"
+    "    for msg in c.receive\n"
+    "      @reqs.append(ServerRequest.make(c msg))\n"
+    "  reqs\n"
+    "\n"
+    "def make_tcp_client(String ip, int port) -> Connection\n"
+    "def Connection.send(self, any msg)\n"
+    "def Connection.outgoing_queue(self) -> List\n"
+    "def Connection.receive(self) -> List\n"
+    "def Connection.is_open(self) -> bool\n";
+
 const char* find_builtin_module(const char* name) {
     if (strcmp(name, "stdlib") == 0)
         return BUILTIN_MODULE_stdlib;
@@ -1645,6 +1692,8 @@ const char* find_builtin_module(const char* name) {
         return BUILTIN_MODULE_source_repro;
     if (strcmp(name, "indent_writer") == 0)
         return BUILTIN_MODULE_indent_writer;
+    if (strcmp(name, "socket") == 0)
+        return BUILTIN_MODULE_socket;
     return NULL;
 }
 

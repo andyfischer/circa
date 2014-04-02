@@ -366,7 +366,6 @@ void reset_type(Type* type)
     type->staticTypeQuery = NULL;
     type->toString = NULL;
     type->formatSource = NULL;
-    type->touch = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;
     type->numElements = NULL;
@@ -422,7 +421,7 @@ Term* find_method_with_search_name(Block* block, Type* type, const char* searchN
 
 Term* find_method(Block* block, Type* type, caValue* name)
 {
-    if (string_eq(&type->name, ""))
+    if (string_equals(&type->name, ""))
         return NULL;
 
     // Construct the search name, which looks like TypeName.functionName.

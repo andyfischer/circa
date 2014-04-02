@@ -11,6 +11,7 @@ void string_setup_type(Type* type);
 // Append the two strings, saving the result in 'left'.
 void string_append(caValue* left, caValue* right);
 void string_append(caValue* left, const char* right);
+void string_append_len(caValue* left, const char* right, int len);
 
 // Convert 'right' to a string (if necessary) and append it. If 'right' is
 // itself a string value, it will appear with quote marks.
@@ -25,8 +26,7 @@ void string_append_char(caValue* left, char c);
 void string_append_qualified_name(caValue* left, caValue* right);
 
 void string_resize(caValue* s, int length);
-bool string_eq(caValue* s, const char* str);
-bool string_eq(caValue* s, caValue* rhs);
+bool string_equals(caValue* s, const char* str);
 bool string_equals(caValue* left, caValue* right);
 
 // Return true if s equals the empty string, or is a null value.
@@ -41,6 +41,7 @@ bool string_less_than(caValue* left, caValue* right);
 void string_prepend(caValue* result, caValue* prefix);
 void string_prepend(caValue* result, const char* prefix);
 void string_slice(caValue* s, int start, int end, caValue* out);
+void string_slice(caValue* str, int start, int end);
 int string_find_char(caValue* s, int start, char c);
 int string_find_char_from_end(caValue* s, char c);
 void string_quote_and_escape(caValue* s);

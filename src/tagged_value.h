@@ -48,8 +48,12 @@ void swap(caValue* left, caValue* right);
 // Move the value in 'source' to 'dest', destroying the value previously in 'dest'.
 void move(caValue* source, caValue* dest);
 
-// Obtain a deep-write-safe reference to 'value'.
+// Modify 'value' to be a copy that is safe to deeply modify.
 void touch(caValue* value);
+
+// Return whether a touch() is actually necessary for this value. If this returns false,
+// the value is already safe to deeply modify.
+bool touch_is_necessary(caValue* value);
 
 // Return a string representation of the value.
 std::string to_string(caValue* value);
@@ -114,6 +118,9 @@ bool is_string(caValue* value);
 bool is_symbol(caValue* value);
 bool is_term_ref(caValue* val);
 bool is_type(caValue* value);
+
+// A 'leaf' value does not contain or reference any other values. Examples: int,float,bool,string.
+bool is_leaf_value(caValue* value);
 
 // Unboxing using builtin types.
 bool        as_bool(caValue* value);

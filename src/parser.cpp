@@ -511,7 +511,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         Value msg;
         set_string(&msg, "Expected identifier after def, found: ");
-        string_append(&msg, tokens.nextCStr());
+        tokens.consumeStr(&msg);
         return syntax_error(block, tokens, startPosition, as_cstring(&msg));
     }
 
@@ -804,7 +804,7 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Value attr;
         tokens.consumeStr(&attr);
 
-        if (string_eq(&attr, ":nocopy")) {
+        if (string_equals(&attr, ":nocopy")) {
             set_bool(type_property_insert(unbox_type(result), "nocopy"), true);
         }
 
@@ -832,11 +832,11 @@ ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         tokens.consumeStr(&str, tok_ColonString);
 
 #if 0
-        if (string_eq(&str, ":handle")) {
+        if (string_equals(&str, ":handle")) {
             handle_setup_type(as_type(result));
         } else
 #endif
-        if (string_eq(&str, ":interface")) {
+        if (string_equals(&str, ":interface")) {
             setup_interface_type(as_type(result));
         } else {
             return syntax_error(block, tokens, startPosition, "Unrecognized magic symbol for type");
@@ -1254,7 +1254,7 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
     Type* type = TYPES.any;
 
     bool unknownType = false;
-    if (!string_eq(&typeName, "")) {
+    if (!string_equals(&typeName, "")) {
         Term* typeTerm = find_name(block, &typeName, sym_LookupType);
 
         if (typeTerm == NULL) {

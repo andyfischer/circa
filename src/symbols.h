@@ -9,6 +9,7 @@ void set_symbol_from_string(caValue* val, caValue* str);
 void set_symbol_from_string(caValue* val, const char* str);
 
 void symbol_as_string(caValue* symbol, caValue* str);
+const char* symbol_as_string(caValue* symol);
 
 bool symbol_eq(caValue* val, Symbol s);
 

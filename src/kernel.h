@@ -113,13 +113,13 @@ struct BuiltinTypes {
     Type* frame;
     Type* float_type;
     Type* func;
-    Type* handle;
     Type* int_type;
     Type* list;
     Type* map;
     Type* module_ref;
     Type* module_frame;
     Type* mutable_type;
+    Type* native_ptr;
     Type* null;
     Type* opaque_pointer;
     Type* point;

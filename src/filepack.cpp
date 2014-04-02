@@ -75,7 +75,7 @@ Some design thoughts:
 #include "string.h"
 #include "tagged_value.h"
 #include "world.h"
-#include "fs/read_tar.h"
+#include "ext/read_tar.h"
 
 namespace circa {
 

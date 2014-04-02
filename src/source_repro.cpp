@@ -114,7 +114,7 @@ void block_to_code_lines(Block* block, caValue* out)
             }
 
             caValue* phraseText = list_get(phrase, 0);
-            if (string_eq(phraseText, "\n")) {
+            if (string_equals(phraseText, "\n")) {
                 currentLine = NULL;
                 lineNumberDelta++;
             } else {

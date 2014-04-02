@@ -16,7 +16,7 @@ namespace opaque_pointer_t {
 
     void setup_type(Type* type)
     {
-        if (string_eq(&type->name, ""))
+        if (string_equals(&type->name, ""))
             set_string(&type->name, "opaque_pointer");
         type->storageType = sym_StorageTypeOpaquePointer;
         type->toString = toString;

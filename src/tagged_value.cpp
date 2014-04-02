@@ -269,11 +269,20 @@ void touch(caValue* value)
 {
     INCREMENT_STAT(ValueTouch);
 
-    Type::Touch touch = value->value_type->touch;
-    if (touch != NULL)
-        touch(value);
+    if (is_list_based(value))
+        list_touch(value);
+    else if (is_hashtable(value))
+        hashtable_touch(value);
+}
 
-    // Default behavior: no-op.
+bool touch_is_necessary(caValue* value)
+{
+    if (is_list_based(value))
+        return list_touch_is_necessary(value);
+    else if (is_hashtable(value))
+        return hashtable_touch_is_necessary(value);
+
+    return false;
 }
 
 std::string to_string(caValue* value)
@@ -730,6 +739,17 @@ bool is_string(caValue* value) { return value->value_type->storageType == sym_St
 bool is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
 bool is_term_ref(caValue* val) { return val->value_type == TYPES.term; }
 bool is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
+
+bool is_leaf_value(caValue* value)
+{
+    return is_int(value)
+        || is_float(value)
+        || is_string(value)
+        || is_bool(value)
+        || is_null(value)
+        || is_symbol(value)
+        || is_opaque_pointer(value);
+}
 
 bool is_struct(caValue* value)
 {

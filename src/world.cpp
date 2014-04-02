@@ -12,6 +12,7 @@
 #include "file_watch.h"
 #include "kernel.h"
 #include "inspection.h"
+#include "ext/libuv.h"
 #include "list.h"
 #include "modules.h"
 #include "native_patch.h"
@@ -57,6 +58,7 @@ void world_initialize(World* world)
 
     world->nativePatchWorld = alloc_native_patch_world();
     world->fileWatchWorld = alloc_file_watch_world();
+    world->libuvWorld = alloc_libuv_world();
 
     world->builtinPatch = alloc_native_patch(world);
 }
@@ -84,6 +86,12 @@ void world_clear_file_sources(World* world)
 caValue* world_append_file_source(World* world)
 {
     return list_append(&world->fileSources);
+}
+
+void world_tick(caWorld* world)
+{
+    file_watch_check_all(world);
+    libuv_process_events(world->libuvWorld);
 }
 
 extern "C" {

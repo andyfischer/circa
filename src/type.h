@@ -41,7 +41,6 @@ struct Type
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef std::string (*ToString)(caValue* value);
     typedef void (*FormatSource)(caValue*, Term* term);
-    typedef void (*Touch)(caValue* value);
     typedef caValue* (*GetIndex)(caValue* value, int index);
     typedef void (*SetIndex)(caValue* value, int index, caValue* element);
     typedef int (*NumElements)(caValue* value);
@@ -77,7 +76,6 @@ struct Type
     StaticTypeQueryFunc staticTypeQuery;
     ToString toString;
     FormatSource formatSource;
-    Touch touch;
     GetIndex getIndex;
     SetIndex setIndex;
     NumElements numElements;

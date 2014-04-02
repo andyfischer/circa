@@ -49,6 +49,7 @@ struct FileWatch;
 struct FileWatchWorld;
 struct GCReferenceList;
 struct ListData;
+struct LibuvWorld;
 struct NativePatchWorld;
 struct NativePatch;
 struct NativePatchFunction;

@@ -95,6 +95,7 @@ OBJECTS := \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/names_builtin.o \
 	$(OBJDIR)/native_patch.o \
+	$(OBJDIR)/native_ptr.o \
 	$(OBJDIR)/object.o \
 	$(OBJDIR)/parser.o \
 	$(OBJDIR)/rand.o \
@@ -120,12 +121,14 @@ OBJECTS := \
 	$(OBJDIR)/type_inference.o \
 	$(OBJDIR)/update_cascades.o \
 	$(OBJDIR)/world.o \
+	$(OBJDIR)/libuv.o \
 	$(OBJDIR)/read_tar.o \
 	$(OBJDIR)/all_builtin_functions.o \
 	$(OBJDIR)/all_builtin_types.o \
 	$(OBJDIR)/setup_builtin_functions.o \
 	$(OBJDIR)/stdlib_script_text.o \
 	$(OBJDIR)/tinymt64.o \
+	$(OBJDIR)/http_parser.o \
 
 RESOURCES := \
 
@@ -279,6 +282,9 @@ $(OBJDIR)/names_builtin.o: names_builtin.cpp
 $(OBJDIR)/native_patch.o: native_patch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/native_ptr.o: native_ptr.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/object.o: object.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -354,7 +360,10 @@ $(OBJDIR)/update_cascades.o: update_cascades.cpp
 $(OBJDIR)/world.o: world.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/read_tar.o: fs/read_tar.cpp
+$(OBJDIR)/libuv.o: ext/libuv.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/read_tar.o: ext/read_tar.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/all_builtin_functions.o: generated/all_builtin_functions.cpp
@@ -372,5 +381,8 @@ $(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp
 $(OBJDIR)/tinymt64.o: ../3rdparty/tinymt/tinymt64.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/http_parser.o: ../3rdparty/http-parser/http_parser.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

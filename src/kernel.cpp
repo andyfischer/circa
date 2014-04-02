@@ -22,6 +22,7 @@
 #include "modules.h"
 #include "misc_builtins.h"
 #include "native_patch.h"
+#include "native_ptr.h"
 #include "parser.h"
 #include "reflection.h"
 #include "selector.h"
@@ -91,7 +92,7 @@ void syntax_error_formatSource(caValue* source, Term* term)
 
 void from_string(caStack* stack)
 {
-    parse_string_repr(circa_string_input(stack, 0), circa_output(stack, 0));
+    parse_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
 void to_string_repr(caStack* stack)
@@ -347,6 +348,7 @@ void for_each_root_type(void (*callback)(Type* type))
     (*callback)(TYPES.list);
     (*callback)(TYPES.map);
     (*callback)(TYPES.opaque_pointer);
+    (*callback)(TYPES.native_ptr);
     (*callback)(TYPES.null);
     (*callback)(TYPES.string);
     (*callback)(TYPES.symbol);
@@ -387,6 +389,7 @@ void bootstrap_kernel()
     TYPES.float_type = create_type();
     TYPES.int_type = create_type();
     TYPES.list = create_type();
+    TYPES.native_ptr = create_type();
     TYPES.map = create_type();
     TYPES.opaque_pointer = create_type();
     TYPES.symbol = create_type();
@@ -403,6 +406,7 @@ void bootstrap_kernel()
     int_t::setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
     symbol_setup_type(TYPES.symbol);
+    native_ptr_setup_type(TYPES.native_ptr);
     null_t::setup_type(TYPES.null);
     number_t::setup_type(TYPES.float_type);
     opaque_pointer_t::setup_type(TYPES.opaque_pointer);
@@ -466,6 +470,7 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.int_type, "int");
     create_type_value(builtins, TYPES.list, "List");
     create_type_value(builtins, TYPES.opaque_pointer, "opaque_pointer");
+    create_type_value(builtins, TYPES.native_ptr, "native_ptr");
     create_type_value(builtins, TYPES.string, "String");
     create_type_value(builtins, TYPES.symbol, "Symbol");
     create_type_value(builtins, TYPES.term, "Term");
@@ -670,7 +675,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
 {
     // Catch certain builtin functions as soon as they are defined.
     #define STORE_BUILTIN_FUNC(ref, name) \
-        if (ref == NULL && string_eq(functionName, name)) \
+        if (ref == NULL && string_equals(functionName, name)) \
             ref = func;
 
     STORE_BUILTIN_FUNC(FUNCS.add, "add");
@@ -716,7 +721,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
         for (int i=0; i < list_length(&libPaths); i++) {
             caValue* path = list_get(&libPaths, i);
-            if (string_eq(path, ""))
+            if (string_equals(path, ""))
                 continue;
             module_add_search_path(world, as_cstring(path));
         }

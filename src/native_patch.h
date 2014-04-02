@@ -24,7 +24,7 @@ void remove_native_patch(World* world, const char* name);
 
 // Add a function patch on the given module.
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func);
-void module_patch_type_release(NativePatch* module, const char* typeName, ReleaseFunc func);
+// void module_patch_type_release(NativePatch* module, const char* typeName, ReleaseFunc func);
 
 // Manually apply a module's patches to the given block. This function isn't commonly used.
 // (the common way is to allow patches on the World to be automatically applied).

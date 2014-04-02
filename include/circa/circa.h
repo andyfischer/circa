@@ -131,9 +131,7 @@ struct Value
 // (if any) back to the stack.
 typedef void (*caEvaluateFunc)(caStack* stack);
 
-// ReleaseFunc is the signature for a C function that runs when a user object is about to
-// be destroyed. This is used for 'handle' values.
-typedef void (*caReleaseFunc)(caValue* container);
+typedef void (*caNativePtrRelease)(void* ptr);
 
 typedef void (*caLogFunc)(void* context, const char* msg);
 
@@ -309,9 +307,8 @@ void circa_copy(caValue* source, caValue* dest);
 //   Effect on safety: none.
 void circa_swap(caValue* left, caValue* right);
 
-// Move a value from 'source' to 'dest'. The existing value at 'dest' will be deallocated,
-// and 'source' will contain null.
-//   Effect on safety: none.
+// Move a value from 'source' to 'dest', so that no copy takes place. The preexisting value
+// at 'dest' is released. After this call, 'source' will be null.
 void circa_move(caValue* source, caValue* dest);
 
 // Obtain a deep-write-safe reference to 'value'.
@@ -349,7 +346,7 @@ char*       circa_blob(caValue* value);
 caBlock*    circa_block(caValue* value);
 float       circa_float(caValue* value);
 int         circa_int(caValue* value);
-void*       circa_object(caValue* value);
+void*       circa_native_ptr(caValue* val);
 caStack*    circa_stack(caValue* value);
 const char* circa_string(caValue* value);
 caType*     circa_type(caValue* value);
@@ -389,6 +386,7 @@ void circa_set_bool(caValue* container, bool value);
 void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);
 void circa_set_int(caValue* container, int value);
+void circa_set_native_ptr(caValue* val, void* ptr, caNativePtrRelease release);
 void circa_set_null(caValue* container);
 void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);
@@ -410,10 +408,12 @@ int circa_string_length(caValue* string);
 int circa_blob_length(caValue* string);
 
 // Append to a string
-void circa_string_append(caValue* container, const char* str);
-void circa_string_append_char(caValue* container, char c);
+void circa_string_append(caValue* str, const char* suffix);
+void circa_string_append_val(caValue* str, caValue* suffix);
+void circa_string_append_len(caValue* str, const char* suffix, int len);
+void circa_string_append_char(caValue* str, char suffix);
 
-bool circa_string_equals(caValue* container, const char* str);
+bool circa_string_equals(caValue* value, const char* str);
 
 // Initialize a list. The container will have length 'numElements' and each element will
 // be NULL.
@@ -436,12 +436,8 @@ void circa_set_map(caValue* map);
 //   Effect on safety: Existing deep pointers are invalid.
 caValue* circa_map_insert(caValue* map, caValue* key);
 
-// -- Handle Values --
-
-#if 0
-void circa_set_handle(caValue* handle, void* object, caReleaseFunc release);
-void* circa_handle_get_object(caValue* handle);
-#endif
+// Like circa_map_insert, but the 'key' value is moved instead of copied. (see circa_move)
+caValue* circa_map_insert_move(caValue* map, caValue* key);
 
 void* circa_raw_pointer(caValue* value);
 void circa_set_raw_pointer(caValue* value, void* ptr);
@@ -452,6 +448,7 @@ void circa_set_raw_pointer(caValue* value, void* ptr);
 // If there is a parsing error, an error value will be saved to 'out'. (the caller should
 // check for this).
 void circa_parse_string(const char* str, caValue* out);
+void circa_parse_string_len(const char* str, int len, caValue* out);
 
 // Write a string representation of 'value' to 'out'.
 void circa_to_string(caValue* value, caValue* out);
@@ -538,7 +535,7 @@ caValue* circa_declare_value(caBlock* block, const char* name);
 // -- Native module support --
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
 void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
-void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func);
+// void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func);
 void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --

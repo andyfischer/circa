@@ -29,7 +29,7 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca_d -ldl
+  LIBS      += -lcirca_d -ldl -luv
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca_d.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca -ldl
+  LIBS      += -lcirca -ldl -luv
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -76,7 +76,6 @@ OBJECTS := \
 	$(OBJDIR)/file_test.o \
 	$(OBJDIR)/file_watch_test.o \
 	$(OBJDIR)/function_test.o \
-	$(OBJDIR)/handle_test.o \
 	$(OBJDIR)/hashtable_test.o \
 	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing_test.o \
@@ -192,9 +191,6 @@ $(OBJDIR)/file_watch_test.o: unit_tests/file_watch_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/function_test.o: unit_tests/function_test.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/handle_test.o: unit_tests/handle_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/hashtable_test.o: unit_tests/hashtable_test.cpp
