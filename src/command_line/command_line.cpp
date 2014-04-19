@@ -124,7 +124,7 @@ void parse_string_as_argument_list(caValue* str, Value* output)
 
 void do_echo(Value* args, caValue* reply)
 {
-    set_string(reply, to_string(args));
+    to_string(args, reply);
 }
 
 void do_file_command(caWorld* world, Value* args, caValue* reply)
@@ -199,7 +199,7 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
         if (state == NULL)
             std::cout << "state = null";
         else
-            std::cout << to_string(state) << std::endl;
+            dump(state);
     }
 
     if (stack_errored(stack)) {
@@ -341,12 +341,14 @@ void run_commands_from_stdin(caWorld* world)
         Value reply;
         do_admin_command(world, &line, &reply);
 
+        Value str;
+
         if (is_null(&reply))
             ; // no op
-        else if (is_string(&reply))
-            std::cout << as_string(&reply) << std::endl;
-        else
-            std::cout << to_string(&reply) << std::endl;
+        else {
+            to_string(&reply, &str);
+            std::cout << as_cstring(&str) << std::endl;
+        }
 
         // We need to tell the stdout reader that we have finished. The proper
         // way to do this would probably be to format the entire output as an
@@ -513,7 +515,7 @@ int run_command_line(caWorld* world, caValue* args)
             if (out == NULL)
                 break;
 
-            std::cout << to_string(circa_output(stack, i)) << std::endl;
+            dump(circa_output(stack, i));
         }
         
         circa_free_stack(stack);
@@ -615,8 +617,11 @@ int run_command_line(caWorld* world, caValue* args)
     Stack* stack = create_stack(world);
     stack_init(stack, block);
 
-    if (printRaw)
-        print_block(block, &rawOutputPrefs, std::cout, stack);
+    if (printRaw) {
+        Value str;
+        print_block(block, &rawOutputPrefs, &str, stack);
+        printf("%s\n", as_cstring(&str));
+    }
 
     if (dontRunScript)
         return 0;
@@ -628,7 +633,7 @@ int run_command_line(caWorld* world, caValue* args)
         if (state == NULL)
             std::cout << "state = null";
         else
-            std::cout << to_string(state) << std::endl;
+            dump(state);
     }
 
     if (stack_errored(stack)) {

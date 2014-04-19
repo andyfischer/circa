@@ -2,7 +2,6 @@
 
 #include "common_headers.h"
 
-#include "blob.h"
 #include "bytecode.h"
 #include "hashtable.h"
 #include "if_block.h"
@@ -11,6 +10,7 @@
 #include "kernel.h"
 #include "list.h"
 #include "stack.h"
+#include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"

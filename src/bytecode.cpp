@@ -2,7 +2,6 @@
 
 #include "common_headers.h"
 
-#include "blob.h"
 #include "building.h"
 #include "bytecode.h"
 #include "code_iterators.h"

@@ -5,9 +5,9 @@
 namespace circa {
 namespace null_t {
 
-    std::string toString(caValue* value)
+    void toString(caValue* value, caValue* out)
     {
-        return "null";
+        string_append(out, "null");
     }
     void formatSource(caValue* source, Term* term)
     {

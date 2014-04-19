@@ -2,7 +2,6 @@
 
 #include "unit_test_common.h"
 
-#include "blob.h"
 #include "hashtable.h"
 #include "interpreter.h"
 #include "inspection.h"
@@ -40,8 +39,9 @@ void test_assert_function(Term* term, int line, const char* file)
 
     if (has_static_error(term)) {
         std::cout << "Compile error on term " << global_id(term) << std::endl;
-        print_static_error(term, std::cout);
-        std::cout << std::endl;
+        Value str;
+        format_static_error(term, &str);
+        std::cout << as_cstring(&str) << std::endl;
         std::cout << "Occurred in " << file << ", line " << line << std::endl;
         declare_current_test_failed();
     }
@@ -55,7 +55,9 @@ void test_assert_function(Term* term, int line, const char* file)
 
 void test_assert_function(Block* block, int line, const char* file)
 {
-    if (!block_check_invariants_print_result(block, std::cout)) {
+    Value str;
+    if (!block_check_invariants_print_result(block, &str)) {
+        std::cout << as_cstring(&str) << std::endl;
         std::cout << "Block failed invariant check in " << file << ", line " << line << std::endl;
         declare_current_test_failed();
     }
@@ -64,7 +66,8 @@ void test_assert_function(Block* block, int line, const char* file)
     check_for_static_errors(&errors, block);
     if (!errors.isEmpty()) {
         std::cout << "Block has static errors at " << file << ", line " << line << std::endl;
-        print_static_errors_formatted(&errors, std::cout);
+        print_static_errors_formatted(&errors, &str);
+        std::cout << as_cstring(&str) << std::endl;
         declare_current_test_failed();
     }
 }
@@ -136,8 +139,9 @@ void test_equals_function(caValue* a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
-    return test_equals_function(is_string(a) ? as_string(a) : to_string(a),
-            b, aText, bText, line, file);
+    Value a_str;
+    string_append(&a_str, a);
+    return test_equals_function(as_string(&a_str), b, aText, bText, line, file);
 }
 
 void test_equals_function(caValue* a, float b,
@@ -151,8 +155,9 @@ bool test_fail_on_static_error(Block* block)
 {
     if (has_static_errors(block)) {
         std::cout << "Static error in " << get_current_test_name() << std::endl;
-        print_static_errors_formatted(block, std::cout);
-        std::cout << std::endl;
+        Value str;
+        print_static_errors_formatted(block, &str);
+        std::cout << as_cstring(&str) << std::endl;
         declare_current_test_failed();
         return true;
     }
@@ -186,7 +191,7 @@ void test_write_fake_file(const char* filename, int version, const char* content
     caValue* entry = hashtable_insert(gFakeFileMap, &key);
     set_list(entry, 2);
     set_int(list_get(entry, 0), version);
-    set_blob_from_string(list_get(entry, 1), contents);
+    set_string(list_get(entry, 1), contents);
 }
 
 void before_each_test()
@@ -309,15 +314,17 @@ void test_block_as_assertions_list(Block* block, std::string const& contextStr)
 {
     if (has_static_errors(block)) {
         std::cout << "Static error " << contextStr << ":" << std::endl;
-        print_static_errors_formatted(block, std::cout);
+        Value str;
+        print_static_errors_formatted(block, &str);
+        std::cout << as_cstring(&str) << std::cout;
         declare_current_test_failed();
         return;
     }
 
-    std::stringstream checkInvariantsOutput;
-    if (!block_check_invariants_print_result(block, checkInvariantsOutput)) {
+    Value checkInvariantsOutput;
+    if (!block_check_invariants_print_result(block, &checkInvariantsOutput)) {
         std::cout << "Failed invariant " << contextStr << std::endl;
-        std::cout << checkInvariantsOutput.str() << std::endl;
+        std::cout << as_cstring(&checkInvariantsOutput) << std::endl;
         declare_current_test_failed();
         return;
     }

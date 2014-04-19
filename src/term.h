@@ -98,7 +98,7 @@ struct Term
     // Shorthand for nested_contents()[name]
     Term* contents(const char* name);
 
-    std::string toString();
+    void toString(caValue* out);
 
     bool hasProperty(Symbol key);
     void removeProperty(Symbol key);

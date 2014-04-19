@@ -1,0 +1,11 @@
+
+em++ -I../../include -I../../src -I../../3rdparty \
+            -DCIRCA_EMSCRIPTEN \
+            ../../src/*.cpp  \
+            ../../src/generated/all_builtin_functions.cpp \
+            ../../src/generated/all_builtin_types.cpp \
+            ../../src/generated/setup_builtin_functions.cpp \
+            ../../src/generated/stdlib_script_text.cpp \
+            ../../3rdparty/tinymt/tinymt64.cc \
+            -o project.html \
+            -s EXPORTED_FUNCTIONS="['_circa_initialize']"

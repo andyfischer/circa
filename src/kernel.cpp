@@ -5,7 +5,6 @@
 #include "circa/circa.h"
 #include "circa/file.h"
 
-#include "blob.h"
 #include "block.h"
 #include "building.h"
 #include "closures.h"
@@ -211,9 +210,11 @@ void Mutable_initialize(Type* type, caValue* value)
     initialize_null(val);
 }
 
-std::string Mutable_toString(caValue* value)
+void Mutable_toString(caValue* value, caValue* out)
 {
-    return "Mutable[" + to_string((caValue*) object_get_body(value)) + "]";
+    string_append(out, "Mutable[");
+    string_append_ptr(out, object_get_body(value));
+    string_append(out, "]");
 }
 
 void Mutable_release(void* object)
@@ -246,16 +247,14 @@ Block* global_builtins_block()
     return global_world()->builtins;
 }
 
-std::string term_toString(caValue* val)
+void term_toString(caValue* val, caValue* out)
 {
     Term* t = as_term_ref(val);
     if (t == NULL)
-        return "Term#null";
+        set_string(out, "Term#null");
     else {
-        std::stringstream s;
-        s << "Term#";
-        s << t->id;
-        return s.str();
+        string_append(out, "Term#");
+        string_append(out, t->id);
     }
 }
 
@@ -339,7 +338,6 @@ void nonlocal_formatSource(caValue* source, Term* term)
 void for_each_root_type(void (*callback)(Type* type))
 {
     (*callback)(TYPES.any);
-    (*callback)(TYPES.blob);
     (*callback)(TYPES.block);
     (*callback)(TYPES.bool_type);
     (*callback)(TYPES.error);
@@ -382,7 +380,6 @@ void bootstrap_kernel()
 
     // Initialize remaining global types.
     TYPES.any = create_type();
-    TYPES.blob = create_type();
     TYPES.block = create_type();
     TYPES.bool_type = create_type();
     TYPES.error = create_type();
@@ -399,7 +396,6 @@ void bootstrap_kernel()
     for_each_root_type(type_set_root);
 
     any_t::setup_type(TYPES.any);
-    blob_setup_type(TYPES.blob);
     block_setup_type(TYPES.block);
     bool_t::setup_type(TYPES.bool_type);
     hashtable_setup_type(TYPES.map);
@@ -464,7 +460,6 @@ void bootstrap_kernel()
 
     // Initialize primitive types (this requires value() function)
     create_type_value(builtins, TYPES.bool_type, "bool");
-    create_type_value(builtins, TYPES.blob, "blob");
     create_type_value(builtins, TYPES.block, "Block");
     create_type_value(builtins, TYPES.float_type, "number");
     create_type_value(builtins, TYPES.int_type, "int");
@@ -707,7 +702,9 @@ CIRCA_EXPORT caWorld* circa_initialize()
     if (has_static_errors(builtins)) {
         std::cout << "Static errors found in kernel:" << std::endl;
         dump(builtins);
-        print_static_errors_formatted(builtins, std::cout);
+        Value msg;
+        print_static_errors_formatted(builtins, &msg);
+        dump(&msg);
     }
 
     // Load library paths from CIRCA_LIB_PATH

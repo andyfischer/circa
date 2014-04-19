@@ -39,7 +39,7 @@ struct Type
     typedef void (*Cast)(CastResult* result, caValue* value, Type* type, bool checkOnly);
 
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
-    typedef std::string (*ToString)(caValue* value);
+    typedef void (*ToString)(caValue* value, caValue* asStr);
     typedef void (*FormatSource)(caValue*, Term* term);
     typedef caValue* (*GetIndex)(caValue* value, int index);
     typedef void (*SetIndex)(caValue* value, int index, caValue* element);

@@ -96,9 +96,11 @@ namespace type_t {
         append_phrase(source, "}", term, tok_RBrace);
     }
 
-    std::string toString(caValue* value)
+    void toString(caValue* value, caValue* out)
     {
-        return std::string("<Type ")+ as_cstring(&as_type(value)->name)+">";
+        string_append(out, "<Type ");
+        string_append(out, &as_type(value)->name);
+        string_append(out, ">");
     }
     void setup_type(Type* type)
     {

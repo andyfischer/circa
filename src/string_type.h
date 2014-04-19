@@ -10,6 +10,7 @@ void string_setup_type(Type* type);
 
 // Append the two strings, saving the result in 'left'.
 void string_append(caValue* left, caValue* right);
+void string_append(caValue* left, const std::string& right);
 void string_append(caValue* left, const char* right);
 void string_append_len(caValue* left, const char* right, int len);
 
@@ -22,6 +23,7 @@ void string_append(caValue* left, int value);
 void string_append_f(caValue* left, float value);
 
 void string_append_char(caValue* left, char c);
+void string_append_ptr(caValue* left, void* ptr);
 
 void string_append_qualified_name(caValue* left, caValue* right);
 
@@ -60,6 +62,27 @@ std::string as_string(caValue* value);
 
 void set_string(caValue* value, const char* s);
 void set_string(caValue* value, const char* s, int length);
+
+// Manipulate a string as a blob
+char* set_blob(caValue* value, int len);
+char* as_blob(caValue* val);
+int blob_size(caValue* val);
+void blob_append_char(caValue* blob, char c);
+void blob_append_u16(caValue* blob, u16 val);
+void blob_append_u32(caValue* blob, u32 val);
+void blob_append_float(caValue* blob, float f);
+void blob_append_space(caValue* blob, size_t size);
+
+char blob_read_char(const char* data, int* pos);
+u16 blob_read_u16(const char* data, int* pos);
+u32 blob_read_u32(const char* data, int* pos);
+float blob_read_float(const char* data, int* pos);
+void* blob_read_pointer(const char* data, int* pos);
+
+void blob_write_u32(char* data, int* pos, u32 value);
+void blob_write_pointer(char* data, int* pos, void* value);
+
+void blob_to_hex_string(caValue* blob, caValue* str);
 
 char* circa_strdup(const char* s);
 

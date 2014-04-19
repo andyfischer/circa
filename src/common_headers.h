@@ -155,3 +155,13 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 #define CIRCA_ENABLE_SNEAKY_EQUALS 1
 
 #define CIRCA_ENABLE_INLINE_DYNAMIC_METHOD_CACHE 1
+
+#if CIRCA_EMSCRIPTEN
+
+#define CIRCA_ENABLE_LIBUV 0
+
+#else
+
+#define CIRCA_ENABLE_LIBUV 1
+
+#endif

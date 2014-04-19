@@ -27,22 +27,9 @@ namespace number_t {
             return false;
         return to_float(a) == to_float(b);
     }
-    std::string to_string(caValue* value)
+    void to_string(caValue* value, caValue* out)
     {
-        std::stringstream out;
-        out << as_float(value);
-        std::string result = out.str();
-
-        // Check this string and make sure there is a decimal point. If not, append one.
-        bool decimalFound = false;
-        for (unsigned i=0; i < result.length(); i++)
-            if (result[i] == '.')
-                decimalFound = true;
-
-        if (!decimalFound)
-            return result + ".0";
-        else
-            return result;
+        string_append_f(out, as_float(value));
     }
     void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {

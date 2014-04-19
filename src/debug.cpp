@@ -25,36 +25,50 @@ uint64 PERF_STATS[c_numPerfStats];
 
 void dump(Block& block)
 {
-    print_block(&block, std::cout);
+    Value str;
+    print_block(&block, &str);
+    std::cout << as_cstring(&str);
 }
 void dump(Block* block)
 {
-    print_block(block, std::cout);
+    Value str;
+    print_block(block, &str);
+    std::cout << as_cstring(&str);
 }
 void dump_bytecode(Block* block)
 {
+    Value str;
     RawOutputPrefs prefs;
     prefs.showBytecode = true;
-    print_block(block, &prefs, std::cout);
+    print_block(block, &prefs, &str);
+    std::cout << as_cstring(&str);
 }
 
 void dump_with_props(Block& block)
 {
-    print_block_with_properties(&block, std::cout);
+    Value str;
+    print_block_with_properties(&block, &str);
+    std::cout << as_cstring(&str);
 }
 
 void dump(Term* term)
 {
-    print_term(term, std::cout);
+    Value str;
+    print_term(term, &str);
+    std::cout << as_cstring(&str);
 }
 
 void dump(caValue& value)
 {
-    std::cout << to_string(&value) << std::endl;
+    Value str;
+    to_string(&value, &str);
+    std::cout << as_cstring(&str) << std::endl;
 }
 void dump(caValue* value)
 {
-    std::cout << to_string(value) << std::endl;
+    Value str;
+    to_string(value, &str);
+    std::cout << as_cstring(&str) << std::endl;
 }
 
 void dump(Stack* stack)

@@ -4,9 +4,9 @@
 
 namespace circa {
 namespace void_t {
-    std::string to_string(caValue*)
+    void to_string(caValue*, caValue* out)
     {
-        return "<void>";
+        string_append(out, "<void>");
     }
     void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     {

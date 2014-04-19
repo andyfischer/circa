@@ -7,11 +7,11 @@
 namespace circa {
 namespace opaque_pointer_t {
 
-    std::string toString(caValue* val)
+    void toString(caValue* val, caValue* out)
     {
         char buf[17];
         sprintf(buf, "%p", as_opaque_pointer(val));
-        return buf;
+        string_append(out, buf);
     }
 
     void setup_type(Type* type)

@@ -19,8 +19,11 @@ int run_exporting_parser(const char* format, const char* filename)
     Block block;
     load_script(&block, filename);
 
-    if (print_static_errors_formatted(&block, std::cout))
+    Value str;
+    if (print_static_errors_formatted(&block, &str)) {
+        dump(&str);
         return -1;
+    }
 
     if (strcmp(format, "json") == 0) {
         std::cout << "{\n";
@@ -36,9 +39,11 @@ int run_exporting_parser(const char* format, const char* filename)
             std::cout << "'" << term->name << "': ";
 
             caValue* value = term_value(term);
-            if (is_int(value) || is_float(value) || is_bool(value))
-                std::cout << to_string(value);
-            else
+            if (is_int(value) || is_float(value) || is_bool(value)) {
+                Value str;
+                to_string(value, &str);
+                std::cout << as_cstring(&str);
+            } else
                 std::cout << "null";
 
             needsComma = true;

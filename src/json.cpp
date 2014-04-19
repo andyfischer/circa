@@ -97,9 +97,12 @@ void json_parse(const char* in, caValue* out)
 
 void json_write(caValue* in, caValue* out)
 {
+    if (!is_string(out))
+        set_string(out, "");
+
     // For certain types, just use to_string
     if (is_int(in) || is_float(in) || is_bool(in)) {
-        set_string(out, to_string(in).c_str());
+        string_append(out, in);
     } else if (is_list(in)) {
         set_string(out, "");
         string_append(out, "[");

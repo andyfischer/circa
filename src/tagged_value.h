@@ -55,8 +55,8 @@ void touch(caValue* value);
 // the value is already safe to deeply modify.
 bool touch_is_necessary(caValue* value);
 
-// Return a string representation of the value.
-std::string to_string(caValue* value);
+// Obtain a string representation of a value
+void to_string(caValue* value, caValue* out);
 
 // For a list type, return a string representation where each element is annotated with its
 // type name.

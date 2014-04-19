@@ -380,7 +380,7 @@ void Term__to_string(caStack* stack)
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
-    set_string(circa_output(stack, 0), circa::to_string(term_value(t)));
+    circa::to_string(term_value(t), circa_output(stack, 0));
 }
 void Term__to_source_string(caStack* stack)
 {

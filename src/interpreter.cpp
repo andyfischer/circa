@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "building.h"
-#include "blob.h"
 #include "block.h"
 #include "bytecode.h"
 #include "closures.h"
@@ -311,19 +310,19 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
     return NULL;
 }
 
-static void indent(std::stringstream& strm, int count)
+static void indent(caValue* out, int count)
 {
     for (int x = 0; x < count; x++)
-        strm << " ";
+        string_append(out, count);
 }
 
 void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
 {
-    std::stringstream strm;
-
-    strm << "[Stack #" << stack->id
-        << ", frames = " << stack->framesCount
-        << "]" << std::endl;
+    string_append(out, "[Stack #");
+    string_append(out, stack->id);
+    string_append(out, ", frames = ");
+    string_append(out, stack->framesCount);
+    string_append(out, "]\n");
 
     Frame* frame = first_frame(stack);
     int frameIndex = 0;
@@ -337,27 +336,38 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
 
         int depth = stack->framesCount - 1 - frameIndex;
         Block* block = frame->block;
-        strm << " [Frame index " << frameIndex
-             << ", depth = " << depth
-             << ", block = #" << block->id
-             << ", termIndex = " << frame->termIndex
-             << ", pc = " << frame->pc
-             << "]" << std::endl;
+        string_append(out, " [Frame index ");
+        string_append(out, frameIndex);
+        string_append(out, ", depth = ");
+        string_append(out, depth);
+        string_append(out, ", block = #");
+        string_append(out, block->id);
+        string_append(out, ", termIndex = ");
+        string_append(out, frame->termIndex);
+        string_append(out, ", pc = ");
+        string_append(out, frame->pc);
+        string_append(out, "]\n");
 
         if (block == NULL)
             continue;
 
         if (!is_null(&frame->dynamicScope)) {
-            indent(strm, frameIndex+2);
-            strm << "env: " << to_string(&frame->dynamicScope) << std::endl;
+            indent(out, frameIndex+2);
+            string_append(out, "env: ");
+            to_string(&frame->dynamicScope, out);
+            string_append(out, "\n");
         }
         if (!is_null(&frame->state)) {
-            indent(strm, frameIndex+2);
-            strm << "state: " << to_string(&frame->state) << std::endl;
+            indent(out, frameIndex+2);
+            string_append(out, "state: ");
+            to_string(&frame->state, out);
+            string_append(out, "\n");
         }
         if (!is_null(&frame->outgoingState)) {
-            indent(strm, frameIndex+2);
-            strm << "outgoingState: " << to_string(&frame->outgoingState) << std::endl;
+            indent(out, frameIndex+2);
+            string_append(out, "outgoingState: ");
+            to_string(&frame->outgoingState, out);
+            string_append(out, "\n");
         }
 
         char* bytecode = frame->bc;
@@ -366,14 +376,14 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         for (int i=0; i < frame->block->length(); i++) {
             Term* term = block->get(i);
 
-            indent(strm, frameIndex+1);
+            indent(out, frameIndex+1);
 
             if (i == activeTermIndex)
-                strm << ">";
+                string_append(out, ">");
             else
-                strm << " ";
+                string_append(out, " ");
 
-            print_term(term, strm);
+            print_term(term, out);
 
             // current value
             if (term != NULL && !is_value(term)) {
@@ -383,9 +393,11 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
                     value = frame_register(frame, term->index);
 
                 if (value == NULL)
-                    strm << " <register OOB>";
-                else
-                    strm << " = " << to_string(value);
+                    string_append(out, " <register OOB>");
+                else {
+                    string_append(out, " = ");
+                    to_string(value, out);
+                }
             }
 
 
@@ -396,26 +408,20 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
                     if (currentTermIndex != -1 && currentTermIndex != i)
                         break;
 
-                    Value str;
-                    set_string(&str, "");
-                    bytecode_op_to_string(bytecode, &bytecodePc, &str);
-                    strm << std::endl;
-                    indent(strm, frameIndex+4);
-                    strm << as_cstring(&str);
+                    string_append(out, "\n");
+                    indent(out, frameIndex+4);
+                    bytecode_op_to_string(bytecode, &bytecodePc, out);
+                    string_append(out, "\n");
                 }
             }
 
-            strm << std::endl;
+            string_append(out, "\n");
         }
     }
-
-    set_string(out, strm.str().c_str());
 }
 
 void stack_trace_to_string(Stack* stack, caValue* out)
 {
-    std::stringstream strm;
-
     for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
 
         Term* term = frame_current_term(frame);
@@ -424,31 +430,29 @@ void stack_trace_to_string(Stack* stack, caValue* out)
             continue;
 
         // Print a short location label
-        Value str;
-        get_short_location(term, &str);
+        get_short_location(term, out);
 
-        strm << as_cstring(&str) << " ";
-        if (term->name != "")
-            strm << term->name << " = ";
-        strm << term->function->name;
-        strm << "()";
-        strm << std::endl;
+        string_append(out, " ");
+        if (term->name != "") {
+            string_append(out, term->name);
+            string_append(out, " = ");
+        }
+        string_append(out, term->function->name);
+        string_append(out, "()\n");
     }
 
     // Print the error value
     Frame* top = top_frame(stack);
     caValue* msg = frame_register(top, top->termIndex);
     Term* errorLocation = top->block->get(top->termIndex);
-    if (is_input_placeholder(errorLocation))
-        strm << "(input " << errorLocation->index << ") ";
+    if (is_input_placeholder(errorLocation)) {
+        string_append(out, "(input ");
+        string_append(out, errorLocation->index);
+        string_append(out, ") ");
+    }
 
-    if (is_string(msg))
-        strm << as_cstring(msg);
-    else
-        strm << to_string(msg);
-    strm << std::endl;
-
-    set_string(out, strm.str().c_str());
+    string_append(out, msg);
+    string_append(out, "\n");
 }
 
 void stack_extract_state(Stack* stack, caValue* output)
@@ -1517,7 +1521,7 @@ void vm_run(Stack* stack)
         }
 
         default:
-            std::cout << "Op not recognized: " << int(stack->bc[stack->pc - 1]) << std::endl;
+            printf("Op not recognized: %d\n", int(stack->bc[stack->pc - 1]));
             ca_assert(false);
         }
     }
@@ -2709,10 +2713,8 @@ void Stack__error_message(caStack* stack)
 
     caValue* errorReg = frame_register(frame, frame->termIndex);
 
-    if (is_string(errorReg))
-        set_string(circa_output(stack, 0), as_cstring(errorReg));
-    else
-        set_string(circa_output(stack, 0), to_string(errorReg).c_str());
+    set_string(circa_output(stack, 0), "");
+    string_append(circa_output(stack, 0), errorReg);
 }
 
 void Stack__toString(caStack* stack)

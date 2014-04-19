@@ -120,7 +120,6 @@ struct Block
     // Compile the given statement, return the result term.
     Term* compile(std::string const& statement);
 
-    std::string toString();
     void dump();
     Term* owner();
     Block* parent();
@@ -214,7 +213,7 @@ void block_set_post_compile_func(Block* block, PostCompileFunc postCompile);
 void block_set_function_has_nested(Block* block, bool hasNestedContents);
 
 void block_check_invariants(caValue* result, Block* block);
-bool block_check_invariants_print_result(Block* block, std::ostream& out);
+bool block_check_invariants_print_result(Block* block, caValue* out);
 
 void block_link_missing_functions(Block* block, Block* source);
 

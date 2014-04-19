@@ -95,8 +95,11 @@ void check_term_for_static_error(Value* errors, Term* term)
     if (term->function == FUNCS.syntax_error)
         return append_static_error(errors, term, "syntax_error");
 
-    if (term->function == FUNCS.static_error)
-        return append_static_error(errors, term, to_string(term_value(term->input(0))).c_str());
+    if (term->function == FUNCS.static_error) {
+        Value msg;
+        to_string(term_value(term->input(0)), &msg);
+        return append_static_error(errors, term, as_cstring(&msg));
+    }
 }
 
 void check_for_static_errors(Value* errors, Block* block)
@@ -191,13 +194,25 @@ void format_static_error(caValue* error, caValue* stringOutput)
             << term->function->name << " expects type "
             << as_cstring(&get_input_type(term_function(term), inputIndex)->name);
     }
-    else if (term->function == FUNCS.static_error)
-        out << to_string(term_value(term->input(0)));
-    else
+    else if (term->function == FUNCS.static_error) {
+        Value str;
+        to_string(term_value(term->input(0)), &str);
+        out << as_cstring(&str);
+    } else
         //out << "(unrecognized error type: " << type << ")";
         out << type;
 
     set_string(stringOutput, out.str());
+}
+
+void format_static_error(Term* term, caValue* out)
+{
+    Value errors;
+    set_list(&errors, 0);
+    check_term_for_static_error(&errors, term);
+    if (errors.isEmpty())
+        return;
+    format_static_error(errors.element(0), out);
 }
 
 void format_static_errors(caValue* errorList, caValue* output)
@@ -211,41 +226,7 @@ void format_static_errors(caValue* errorList, caValue* output)
     }
 }
 
-void print_static_error(caValue* value, std::ostream& out)
-{
-    Value str;
-    format_static_error(value, &str);
-    out << as_cstring(&str);
-}
-
-bool print_static_errors_formatted(caValue* result, std::ostream& out)
-{
-    int count = list_length(result);
-
-    if (count == 0)
-        return false;
-
-    out << count << " static error";
-    if (count != 1) out << "s";
-    out << ":\n";
-
-    for (int i=0; i < count; i++) {
-        print_static_error(list_get(result, i), out);
-        out << std::endl;
-    }
-    return true;
-}
-
 bool print_static_errors_formatted(Block* block, caValue* out)
-{
-    std::stringstream strm;
-    if (!print_static_errors_formatted(block, strm))
-        return false;
-    set_string(out, strm.str());
-    return true;
-}
-
-bool print_static_errors_formatted(Block* block, std::ostream& out)
 {
     update_static_error_list(block);
     if (!is_list(&block->staticErrors))
@@ -253,20 +234,36 @@ bool print_static_errors_formatted(Block* block, std::ostream& out)
     return print_static_errors_formatted(&block->staticErrors, out);
 }
 
+bool print_static_errors_formatted(caValue* result, caValue* out)
+{
+    int count = list_length(result);
+
+    if (count == 0)
+        return false;
+
+    string_append(out, count);
+    string_append(out, " static error");
+    if (count != 1)
+        string_append(out, "s");
+
+    string_append(out, ":\n");
+
+    for (int i=0; i < count; i++) {
+        format_static_error(list_get(result, i), out);
+        string_append(out, "\n");
+    }
+    return true;
+}
+
 bool print_static_errors_formatted(Block* block)
 {
-    return print_static_errors_formatted(block, std::cout);
+    Value out;
+    bool result = print_static_errors_formatted(block, &out);
+    dump(&out);
+    return result;
 }
 
-void print_static_error(Term* term, std::ostream& out)
-{
-    // delete this
-    Value result;
-    check_term_for_static_error(&result, term);
-    if (!result.isEmpty())
-        print_static_error(result.element(0), out);
-}
-
+#if 0
 std::string get_static_errors_formatted(Block* block)
 {
     std::stringstream out;
@@ -277,9 +274,10 @@ std::string get_static_errors_formatted(Block* block)
 std::string get_static_error_message(Term* term)
 {
     std::stringstream out;
-    print_static_error(term, out);
+    format_static_error(term, out);
     return out.str();
 }
+#endif
 
 void mark_static_error(Term* term, const char* msg)
 {

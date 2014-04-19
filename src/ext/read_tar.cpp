@@ -3,7 +3,7 @@
 
 #include "common_headers.h"
 
-#include "blob.h"
+#include "string_type.h"
 #include "tagged_value.h"
 
 namespace circa {

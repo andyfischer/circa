@@ -33,11 +33,13 @@ void fix_forward_function_references(Block* block)
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             // See if we can now find this function
-            std::string functionName = term->stringProp(sym_Syntax_FunctionName, "");
+            caValue* functionName = term->getProp(sym_Syntax_FunctionName);
 
-            Term* func = find_name(block, functionName.c_str(), sym_LookupFunction);
-            if (func != NULL)
-                change_function(term, func);
+            if (functionName != NULL) {
+                Term* func = find_name(block, functionName, sym_LookupFunction);
+                if (func != NULL)
+                    change_function(term, func);
+            }
         }
     }
 }

@@ -13,8 +13,9 @@ namespace circa {
 
 void ListData::dump()
 {
-    std::string s = list_to_string(this);
-    printf("%s\n", s.c_str());
+    Value str;
+    list_to_string(this, &str);
+    printf("%s\n", as_cstring(&str));
 }
 
 #if DEBUG
@@ -322,19 +323,20 @@ void list_copy(caValue* source, caValue* dest)
     dest->value_data.ptr = sourceData;
 }
 
-std::string list_to_string(ListData* value)
+void list_to_string(ListData* value, caValue* out)
 {
-    if (value == NULL)
-        return "[]";
-
-    std::stringstream out;
-    out << "[";
-    for (int i=0; i < value->count; i++) {
-        if (i > 0) out << ", ";
-        out << to_string(&value->items[i]);
+    if (value == NULL) {
+        string_append(out, "[]");
+        return;
     }
-    out << "]";
-    return out.str();
+
+    string_append(out, "[");
+    for (int i=0; i < value->count; i++) {
+        if (i > 0)
+            string_append(out, ", ");
+        to_string(&value->items[i], out);
+    }
+    string_append(out, "]");
 }
 
 int list_length(caValue* value)
@@ -680,23 +682,24 @@ bool is_struct_type(Type* type)
     return list_get_parameter_type(&type->parameter) == sym_StructType;
 }
 
-std::string compound_type_to_string(caValue* value)
+void compound_type_to_string(caValue* value, caValue* out)
 {
-    Type* type = value->value_type;
+    if (!is_string(out))
+        set_string(out, "");
 
-    std::stringstream out;
-    out << "{";
+    Type* type = value->value_type;
+    
+    string_append(out, "{");
     for (int i=0; i < compound_type_get_field_count(type); i++) {
         if (i != 0)
-            out << ", ";
+            string_append(out, ", ");
 
         const char* name = compound_type_get_field_name(type, i);
-        out << name;
-        out << ": ";
-        out << to_string(list_get(value, i));
+        string_append(out, name);
+        string_append(out, ": ");
+        string_append_quoted(out, list_get(value, i));
     }
-    out << "}";
-    return out.str();
+    string_append(out, "}");
 }
 
 void list_type_initialize_from_decl(Type* type, Block* decl)
@@ -874,12 +877,12 @@ namespace list_t {
         copy(element, list_get(value, index));
     }
 
-    std::string tv_to_string(caValue* value)
+    void tv_to_string(caValue* value, caValue* out)
     {
         if (is_struct_type(value->value_type))
-            return compound_type_to_string(value);
+            return compound_type_to_string(value, out);
 
-        return list_to_string((ListData*) get_pointer(value));
+        return list_to_string((ListData*) get_pointer(value), out);
     }
 
 

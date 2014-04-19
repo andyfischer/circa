@@ -7,7 +7,6 @@
 #include <fstream>
 #include <sys/stat.h>
 
-#include "blob.h"
 #include "list.h"
 #include "string_type.h"
 #include "tagged_value.h"

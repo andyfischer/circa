@@ -42,14 +42,16 @@ namespace type_check_function {
         Term* func = get_parent_term(caller, 3);
 
         std::stringstream out;
-        out << "In overloaded function ";
+        Value msg;
+        string_append(&msg, "In overloaded function ");
+
         if (func == NULL)
-            out << "<name not found>";
+            string_append(&msg, "<name not found>");
         else
-            out << func->name;
-        out << ", no func could handle inputs: ";
-        out << to_string(inputs);
-        circa_output_error(stack, out.str().c_str());
+            string_append(&msg, func->name);
+        string_append(&msg, ", no func could handle inputs: ");
+        string_append(&msg, inputs);
+        circa_output_error(stack, as_cstring(&msg));
     }
 
     void setup(Block* kernel)

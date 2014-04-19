@@ -2,7 +2,6 @@
 
 #include "common_headers.h"
 
-#include "blob.h"
 #include "block.h"
 #include "building.h"
 #include "bytecode.h"
@@ -431,13 +430,13 @@ std::string block_namespace_to_string(Block* block)
     return out.str();
 }
 
-void print_indent(RawOutputPrefs* prefs, std::ostream& out)
+void print_indent(RawOutputPrefs* prefs, caValue* out)
 {
     for (int i=0; i < prefs->indentLevel; i++)
-        out << " ";
+        string_append(out, " ");
 }
 
-void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* stack)
+void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack)
 {
     int prevIndent = prefs->indentLevel;
     int bytecodePc = 0;
@@ -449,12 +448,15 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* 
 
     print_indent(prefs, out);
 
-    out << "[Block#" << block->id << "]" << std::endl;
+    string_append(out, "[Block#");
+    string_append(out, block->id);
+    string_append(out, "]\n");
+
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
 
         print_term(term, prefs, out);
-        out << std::endl;
+        string_append(out, "\n");
 
         prefs->indentLevel += 2;
         if (term->nestedContents != NULL) {
@@ -467,15 +469,12 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* 
                 if (currentTermIndex != -1 && currentTermIndex != i)
                     break;
 
-                Value str;
-                set_string(&str, "");
-                string_append(&str, "[");
-                string_append(&str, bytecodePc);
-                string_append(&str, "] ");
-                bytecode_op_to_string(bytecodeData, &bytecodePc, &str);
                 print_indent(prefs, out);
-                out << as_cstring(&str);
-                out << std::endl;
+                string_append(out, "[");
+                string_append(out, bytecodePc);
+                string_append(out, "] ");
+                bytecode_op_to_string(bytecodeData, &bytecodePc, out);
+                string_append(out, "\n");
             }
         }
 
@@ -485,12 +484,10 @@ void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* 
     prefs->indentLevel = prevIndent;
 }
 
-std::string get_block_raw(Block* block)
+void get_block_raw(Block* block, caValue* out)
 {
     RawOutputPrefs prefs;
-    std::stringstream out;
     print_block(block, &prefs, out);
-    return out.str();
 }
 
 void get_short_location(Term* term, caValue* str)
@@ -646,103 +643,111 @@ void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &
     }
 }
 
-void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out)
+void print_term(Term* term, RawOutputPrefs* prefs, caValue* out)
 {
     for (int i=0; i < prefs->indentLevel; i++)
-        out << " ";
+        string_append(out, " ");
 
     if (term == NULL) {
-        out << "<NULL>";
+        string_append(out, "<NULL>");
         return;
     }
 
-    out << global_id(term);
+    string_append(out, global_id(term).c_str());
+    string_append(out, " ");
+    string_append(out, unique_name(term));
 
-    out << " " << to_string(unique_name(term));
-
-    if (term->name != "")
-        out << " '" << term->name << "'";
+    if (term->name != "") {
+        string_append(out, " '");
+        string_append(out, term->name.c_str());
+        string_append(out, "'");
+    }
 
     if (term->function == NULL) {
-        out << " <NULL function>";
+        string_append(out, " <NULL function>");
     } else {
-        out << " " << term->function->name;
-        out << global_id(term->function);
+        string_append(out, " ");
+        string_append(out, term->function->name.c_str());
+        string_append(out, global_id(term->function).c_str());
     }
 
     // Arguments
-    out << "(";
+    string_append(out, "(");
     for (int i=0; i < term->numInputs(); i++) {
-        if (i != 0) out << " ";
-        out << global_id(term->input(i));
+        if (i != 0)
+            string_append(out, " ");
+        string_append(out, global_id(term->input(i)).c_str());
 
         if (prefs->showProperties) {
-            out << " ";
-            out << to_string(&term->inputInfo(i)->properties);
+            string_append(out, " ");
+            to_string(&term->inputInfo(i)->properties, out);
         }
     }
-    out << ") ";
+    string_append(out, ") ");
 
     // Print out certain properties
     if (term->boolProp(sym_Multiple, false))
-        out << ":multiple ";
+        string_append(out, ":multiple ");
     if (term->boolProp(sym_Output, false))
-        out << ":output ";
+        string_append(out, ":output ");
     if (term->boolProp(sym_State, false))
-        out << ":state ";
-    if (term->hasProperty(sym_Field))
-        out << ":field(" << term->stringProp(sym_Field, "") << ")";
+        string_append(out, ":state ");
+    if (term->hasProperty(sym_Field)) {
+        string_append(out, ":field(");
+        string_append(out, term->getProp(sym_Field));
+        string_append(out, ")");
+    }
 
-    out << "t:";
+    string_append(out, "t:");
     
     if (term->type == NULL)
-        out << "<NULL type>";
+        string_append(out, "<NULL type>");
     else if (!is_string(&term->type->name))
-        out << "<Anon type>";
+        string_append(out, "<Anon type>");
     else
-        out << as_cstring(&term->type->name);
+        string_append(out, &term->type->name);
 
-    if (is_value(term))
-        out << " val:" << to_string(term_value(term));
+    if (is_value(term)) {
+        string_append(out, " val:");
+        to_string(term_value(term), out);
+    }
 
-    if (prefs->showProperties)
-        out << " " << to_string(&term->properties);
+    if (prefs->showProperties) {
+        string_append(out, " ");
+        to_string(&term->properties, out);
+    }
 }
 
-void print_term(Term* term, std::ostream& out)
+void print_term(Term* term, caValue* out)
 {
     RawOutputPrefs prefs;
     print_term(term, &prefs, out);
 }
 
-void print_block(Block* block, std::ostream& out)
+void print_block(Block* block, caValue* out)
 {
     RawOutputPrefs prefs;
     print_block(block, &prefs, out);
 }
 
-void print_block_with_properties(Block* block, std::ostream& out)
+void print_block_with_properties(Block* block, caValue* out)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
     print_block(block, &prefs, out);
 }
 
-std::string get_term_to_string_extended(Term* term)
+void get_term_to_string_extended(Term* term, caValue* out)
 {
     RawOutputPrefs prefs;
-    std::stringstream out;
     print_term(term, &prefs, out);
-    return out.str();
 }
 
-std::string get_term_to_string_extended_with_props(Term* term)
+void get_term_to_string_extended_with_props(Term* term, caValue* out)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
-    std::stringstream out;
     print_term(term, &prefs, out);
-    return out.str();
 }
 
 void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context)

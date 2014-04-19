@@ -132,10 +132,10 @@ Term::contents(const char* name)
     return nested_contents(this)->get(name);
 }
 
-std::string
-Term::toString()
+void
+Term::toString(caValue* out)
 {
-    return to_string(term_value(this));
+    to_string(term_value(this), out);
 }
 
 bool Term::hasProperty(Symbol key)

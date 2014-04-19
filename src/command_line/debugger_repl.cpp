@@ -17,8 +17,11 @@ static void load(Block* block, std::string const& filename)
     }
 
     load_script(block, filename.c_str());
-    if (has_static_errors(block))
-        print_static_errors_formatted(block, std::cout);
+    if (has_static_errors(block)) {
+        Value str;
+        print_static_errors_formatted(block, &str);
+        dump(&str);
+    }
 }
 
 int run_debugger_repl(std::string const& filename)
@@ -40,7 +43,9 @@ int run_debugger_repl(std::string const& filename)
             continue;
 
         if (input == "p") {
-            print_block(&block, std::cout);
+            Value out;
+            print_block(&block, &out);
+            printf("%s\n", as_cstring(&out));
             continue;
         }
 
@@ -51,7 +56,9 @@ int run_debugger_repl(std::string const& filename)
         }
 
         if (input == "c") {
-            print_static_errors_formatted(&block, std::cout);
+            Value str;
+            print_static_errors_formatted(&block, &str);
+            dump(&str);
             continue;
         }
 

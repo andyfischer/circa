@@ -16,9 +16,13 @@ namespace cast_function {
 
         if (!cast_possible(source, type)) {
             std::stringstream message;
-            message << "Can't cast value " << to_string(source)
-                << " to type " << as_cstring(&type->name);
-            return circa_output_error(stack, message.str().c_str());
+            Value msg;
+            string_append(&msg, "Can't cast value ");
+            string_append_quoted(&msg, source);
+            string_append(&msg, " to type ");
+            string_append(&msg, &type->name);
+
+            return circa_output_error(stack, as_cstring(&msg));
         }
 
         caValue* output = circa_output(stack, 0);

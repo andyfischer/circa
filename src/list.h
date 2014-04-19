@@ -99,7 +99,7 @@ void list_remove_nulls(caValue* list);
 // (if it wasn't already).
 void list_copy(caValue* source, caValue* dest);
 
-std::string list_to_string(ListData* value);
+void list_to_string(ListData* value, caValue* out);
 void list_slice(caValue* original, int start, int end, caValue* result);
 
 // Reverse the list.

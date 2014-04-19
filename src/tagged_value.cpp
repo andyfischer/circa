@@ -2,7 +2,6 @@
 
 #include "common_headers.h"
 
-#include "blob.h"
 #include "debug.h"
 #include "function.h"
 #include "hashtable.h"
@@ -101,7 +100,12 @@ bool Value::isEmpty()
     return list_empty(this);
 }
 
-void Value::dump() { std::cout << to_string(this) << std::endl; }
+void Value::dump()
+{
+    Value str;
+    to_string(this, &str);
+    printf("%s\n", as_cstring(&str));
+}
 
 void initialize_null(caValue* value)
 {
@@ -285,42 +289,48 @@ bool touch_is_necessary(caValue* value)
     return false;
 }
 
-std::string to_string(caValue* value)
+void to_string(caValue* value, caValue* out)
 {
-    if (value->value_type == NULL)
-        return "<type is NULL>";
-
-    Type::ToString toString = value->value_type->toString;
-    if (toString != NULL)
-        return toString(value);
-
-    std::stringstream out;
-    out << "<" << as_cstring(&value->value_type->name)
-        << " " << value->value_data.ptr << ">";
-    return out.str();
-}
-
-std::string to_string_annotated(caValue* value)
-{
-    if (value->value_type == NULL)
-        return "<type is NULL>";
-
-    std::stringstream out;
-
-    out << as_cstring(&value->value_type->name) << "#";
-
-    if (is_list(value)) {
-        out << "[";
-        for (int i=0; i < num_elements(value); i++) {
-            if (i > 0) out << ", ";
-            out << to_string_annotated(get_index(value,i));
-        }
-        out << "]";
-    } else {
-        out << to_string(value);
+    if (value->value_type == NULL) {
+        set_string(out, "<type is NULL>");
+        return;
     }
 
-    return out.str();
+    if (!is_string(out))
+        set_string(out, "");
+    Type::ToString toString = value->value_type->toString;
+    if (toString != NULL)
+        return toString(value, out);
+
+    // Generic fallback
+    string_append(out, "<");
+    string_append(out, &value->value_type->name);
+    string_append(out, " ");
+    string_append_ptr(out, value->value_data.ptr);
+    string_append(out, ">");
+}
+
+void to_string_annotated(caValue* value, caValue* out)
+{
+    if (value->value_type == NULL) {
+        set_string(out, "<type is NULL>");
+        return;
+    }
+
+    string_append(out, &value->value_type->name);
+    string_append(out, "#");
+
+    if (is_list(value)) {
+        string_append(out, "[");
+        for (int i=0; i < num_elements(value); i++) {
+            if (i > 0)
+                string_append(out, ", ");
+            to_string_annotated(get_index(value,i), out);
+        }
+        string_append(out, "]");
+    } else {
+        string_append(out, value);
+    }
 }
 
 caValue* get_index(caValue* value, int index)
@@ -799,7 +809,6 @@ using namespace circa;
 extern "C" {
 
 bool circa_is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
-bool circa_is_blob(caValue* value) { return value->value_type == TYPES.blob; }
 bool circa_is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool circa_is_error(caValue* value) { return value->value_type == TYPES.error; }
 bool circa_is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
@@ -817,7 +826,6 @@ bool circa_bool(caValue* value) {
     return value->value_data.asbool;
 }
 char* circa_blob(caValue* value) {
-    ca_assert(circa_is_blob(value));
     return as_blob(value);
 }
 caBlock* circa_block(caValue* value) {

@@ -23,11 +23,9 @@ namespace int_t {
     {
         return as_int(a);
     }
-    std::string to_string(caValue* value)
+    void to_string(caValue* value, caValue* asStr)
     {
-        std::stringstream strm;
-        strm << as_int(value);
-        return strm.str();
+        string_append(asStr, as_int(value));
     }
     void format_source(caValue* source, Term* term)
     {

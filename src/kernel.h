@@ -105,7 +105,6 @@ struct BuiltinFuncs {
 struct BuiltinTypes {
     Type* any;
     Type* block;
-    Type* blob;
     Type* bool_type;
     Type* color;
     Type* error;

@@ -5,9 +5,9 @@
 namespace circa {
 namespace any_t {
 
-    std::string to_string(caValue*)
+    void to_string(caValue*, caValue* out)
     {
-        return "<any>";
+        string_append(out, "<any>");
     }
     void initialize(Type*, caValue* value)
     {

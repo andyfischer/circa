@@ -6,6 +6,7 @@
 #include "list.h"
 #include "names_builtin.h"
 #include "source_repro.h"
+#include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
@@ -82,17 +83,17 @@ void symbol_as_string(caValue* symbol, caValue* str)
     set_string(str, "");
 }
 
-static std::string symbol_to_source_string(caValue* value)
+static void symbol_to_source_string(caValue* value, caValue* out)
 {
-    Value str;
-    symbol_as_string(value, &str);
-    return std::string(":") + as_cstring(&str);
+    string_append(out, ":");
+    string_append(out, symbol_as_string(value));
 }
 
 static void format_source(caValue* source, Term* term)
 {
-    std::string s = symbol_to_source_string(term_value(term));
-    append_phrase(source, s.c_str(), term, tok_ColonString);
+    Value msg;
+    symbol_to_source_string(term_value(term), &msg);
+    append_phrase(source, as_cstring(&msg), term, tok_ColonString);
 }
 
 static int hash_func(caValue* value)

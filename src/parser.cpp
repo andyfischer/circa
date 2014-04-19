@@ -62,7 +62,8 @@ Term* compile(Block* block, ParsingStep step, std::string const& input)
 
     block_finish_changes(block);
 
-    ca_assert(block_check_invariants_print_result(block, std::cout));
+    Value invariantsCheck;
+    ca_assert(block_check_invariants_print_result(block, &invariantsCheck));
 
     log_start(0, "parser::compile finished");
     log_arg("block.length", block->length());

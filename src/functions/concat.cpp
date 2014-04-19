@@ -8,15 +8,13 @@ namespace concat_function {
     void concat(caStack* stack)
     {
         caValue* args = circa_input(stack, 0);
-        std::stringstream out;
+        caValue* out = circa_output(stack, 0);
+        set_string(out, "");
+
         for (int index=0; index < list_length(args); index++) {
             caValue* v = circa_index(args, index);
-            if (is_string(v))
-                out << as_string(v);
-            else
-                out << to_string(v);
+            string_append(out, v);
         }
-        set_string(circa_output(stack, 0), out.str());
     }
 
     void setup(Block* kernel)

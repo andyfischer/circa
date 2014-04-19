@@ -115,16 +115,16 @@ struct RawOutputPrefs
 };
 
 
-void print_block(Block* block, RawOutputPrefs* prefs, std::ostream& out, Stack* stack=NULL);
-void print_term(Term* term, RawOutputPrefs* prefs, std::ostream& out);
-void print_term(Term* term, std::ostream& out);
+void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack=NULL);
+void print_term(Term* term, RawOutputPrefs* prefs, caValue* out);
+void print_term(Term* term, caValue* out);
 
 // Convenient overloads for raw format printing
-void print_block(Block* block, std::ostream& out);
-void print_block_with_properties(Block* block, std::ostream& out);
-std::string get_block_raw(Block* block);
-std::string get_term_to_string_extended(Term*);
-std::string get_term_to_string_extended_with_props(Term*);
+void print_block(Block* block, caValue* out);
+void print_block_with_properties(Block* block, caValue* out);
+void get_block_raw(Block* block, caValue* out);
+void get_term_to_string_extended(Term*, caValue* out);
+void get_term_to_string_extended_with_props(Term*, caValue* out);
 
 // Print a short source-code location for this term.
 void get_short_location(Term* term, caValue* str);

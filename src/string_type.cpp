@@ -4,7 +4,6 @@
 
 #include <cstring>
 
-#include "blob.h"
 #include "importing.h"
 #include "interpreter.h"
 #include "kernel.h"
@@ -193,11 +192,11 @@ bool string_equals(caValue* left, caValue* right)
     return true;
 }
 
-std::string string_to_string(caValue* value)
+void string_to_string(caValue* value, caValue* asStr)
 {
-    std::stringstream result;
-    result << "'" << as_cstring(value) << "'";
-    return result.str();
+    string_append(asStr, "'");
+    string_append(asStr, value);
+    string_append(asStr, "'");
 }
 
 void string_format_source(caValue* source, Term* term)
@@ -246,6 +245,11 @@ void string_append(caValue* left, const char* right)
     string_append_len(left, right, strlen(right));
 }
 
+void string_append(caValue* left, const std::string& right)
+{
+    string_append_len(left, right.c_str(), right.size());
+}
+
 void string_append_len(caValue* left, const char* right, int len)
 {
     if (is_null(left))
@@ -271,18 +275,22 @@ void string_append(caValue* left, caValue* right)
 
     ca_assert(is_string(left));
 
+    if (right == NULL)
+        return;
+
     if (is_string(right))
         string_append(left, as_cstring(right));
     else {
-        std::string s = to_string(right);
-        string_append(left, s.c_str());
+        to_string(right, left);
     }
 }
 
-void string_append_quoted(caValue* left, caValue* right)
+void string_append_quoted(caValue* out, caValue* s)
 {
-    std::string s = to_string(right);
-    string_append(left, s.c_str());
+    if (is_string(s))
+        string_to_string(s, out);
+    else
+        string_append(out, s);
 }
 void string_append(caValue* left, int value)
 {
@@ -296,8 +304,32 @@ void string_append_f(caValue* left, float value)
 {
     ca_assert(is_string(left));
 
-    char buf[64];
+    const int BUF_SIZE = 64;
+    char buf[BUF_SIZE];
     sprintf(buf, "%f", value);
+
+    // Chop off extra zeros.
+    int dotPosition = -1;
+
+    for (int i=0; i < BUF_SIZE; i++) {
+        if (buf[i] == 0)
+            break;
+
+        if (buf[i] == '.') {
+            dotPosition = i;
+            break;
+        }
+    }
+
+    int len = strlen(buf);
+
+    for (int i = strlen(buf) - 1; i > dotPosition + 1; i--) {
+        if (buf[i] == '0')
+            buf[i] = 0;
+        else
+            break;
+    }
+
     string_append(left, buf);
 }
 void string_append_char(caValue* left, char c)
@@ -305,6 +337,12 @@ void string_append_char(caValue* left, char c)
     char buf[2];
     buf[0] = c;
     buf[1] = 0;
+    string_append(left, buf);
+}
+void string_append_ptr(caValue* left, void* ptr)
+{
+    char buf[64];
+    sprintf(buf, "%p", ptr);
     string_append(left, buf);
 }
 
@@ -580,12 +618,134 @@ void set_string(caValue* value, const char* s, int length)
     value->value_data.ptr = data;
 }
 
+char* set_blob(caValue* value, int length)
+{
+    make(TYPES.string, value);
+    StringData* data = string_create(length);
+    memset(data->str, 0, length);
+    value->value_data.ptr = data;
+    return data->str;
+}
+
 char* circa_strdup(const char* s)
 {
     size_t length = strlen(s);
     char* out = (char*) malloc(length + 1);
     memcpy(out, s, length + 1);
     return out;
+}
+
+char* as_blob(caValue* value)
+{
+    return (char*) as_cstring(value);
+}
+
+int blob_size(caValue* val)
+{
+    return string_length(val);
+}
+
+void blob_append_char(caValue* blob, char c)
+{
+    int size = blob_size(blob);
+    string_resize(blob, size + 1);
+    as_blob(blob)[size] = c;
+}
+
+void blob_append_u16(caValue* blob, u16 val)
+{
+    int size = blob_size(blob);
+    string_resize(blob, size + 2);
+    u16* position = (u16*) &as_blob(blob)[size];
+    *position = val;
+}
+
+void blob_append_u32(caValue* blob, u32 val)
+{
+    int size = blob_size(blob);
+    string_resize(blob, size + 4);
+    u32* position = (u32*) &as_blob(blob)[size];
+    *position = val;
+}
+void blob_append_float(caValue* blob, float f)
+{
+    int size = blob_size(blob);
+    string_resize(blob, size + 4);
+    float* position = (float*) &as_blob(blob)[size];
+    *position = f;
+}
+
+void blob_append_space(caValue* blob, size_t additionalSize)
+{
+    size_t size = blob_size(blob);
+    string_resize(blob, int(size + additionalSize));
+    memset(as_blob(blob) + size, 0, additionalSize);
+}
+
+char blob_read_char(const char* data, int* pos)
+{
+    char c = data[*pos];
+    *pos += 1;
+    return c;
+}
+
+u16 blob_read_u16(const char* data, int* pos)
+{
+    u16 value = *((u16*) &data[*pos]);
+    *pos += 2;
+    return value;
+}
+
+u32 blob_read_u32(const char* data, int* pos)
+{
+    u32 value = *((u32*) &data[*pos]);
+    *pos += 4;
+    return value;
+}
+
+float blob_read_float(const char* data, int* pos)
+{
+    float value = *((float*) &data[*pos]);
+    *pos += 4;
+    return value;
+}
+
+void* blob_read_pointer(const char* data, int* pos)
+{
+    void* value = *((void**) &data[*pos]);
+    *pos += sizeof(void*);
+    return value;
+}
+
+void blob_write_u32(char* data, int* pos, u32 value)
+{
+    *((u32*) &data[*pos]) = value;
+    *pos += 4;
+}
+
+void blob_write_pointer(char* data, int* pos, void* value)
+{
+    *((void**) &data[*pos]) = value;
+    *pos += sizeof(void*);
+}
+
+static char to_hex_digit(int i)
+{
+    if (i >= 0 && i < 10)
+        return '0' + i;
+    return 'a' + (i - 10);
+}
+
+void blob_to_hex_string(caValue* blob, caValue* str)
+{
+    set_string(str, "");
+
+    for (int i=0; i < blob_size(blob); i++) {
+        char c = as_blob(blob)[i];
+
+        string_append_char(str, to_hex_digit(c / 16));
+        string_append_char(str, to_hex_digit(c % 16));
+    }
 }
 
 CIRCA_EXPORT int circa_string_length(caValue* string)

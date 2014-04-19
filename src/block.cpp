@@ -4,7 +4,6 @@
 
 #include "circa/file.h"
 
-#include "blob.h"
 #include "block.h"
 #include "building.h"
 #include "kernel.h"
@@ -60,16 +59,14 @@ Block* alloc_block()
     return block;
 }
 
-std::string block_to_string(caValue* val)
+void block_to_string(caValue* value, caValue* asStr)
 {
-    Block* block = as_block(val);
+    Block* block = as_block(value);
     if (block == NULL) {
-        return "Block#null";
+        set_string(asStr, "Block#null");
     } else {
-        std::stringstream s;
-        s << "Block#";
-        s << block->id;
-        return s.str();
+        set_string(asStr, "Block#");
+        string_append(asStr, block->id);
     }
 }
 
@@ -321,21 +318,6 @@ void Block::remapPointers(TermMap const& map)
         if (term != NULL)
             remap_pointers(term, map);
     }
-}
-
-std::string Block::toString()
-{
-    std::stringstream out;
-    out << "[";
-    for (int i=0; i < length(); i++) {
-        Term* term = get(i);
-        if (i > 0) out << ", ";
-        if (!has_empty_name(term))
-            out << term->nameStr() << ": ";
-        out << term->toString();
-    }
-    out << "]";
-    return out.str();
 }
 
 Term*
@@ -827,7 +809,7 @@ void block_check_invariants(caValue* result, Block* block)
     }
 } 
 
-bool block_check_invariants_print_result(Block* block, std::ostream& out)
+bool block_check_invariants_print_result(Block* block, caValue* out)
 {
     circa::Value result;
     block_check_invariants(&result, block);
@@ -835,17 +817,21 @@ bool block_check_invariants_print_result(Block* block, std::ostream& out)
     if (list_length(&result) == 0)
         return true;
 
-    out << list_length(&result) << " errors found in block " << &block
-        << std::endl;
+    string_append(out, list_length(&result));
+    string_append(out, " errors found in block ");
+    string_append_ptr(out, block);
+    string_append(out, "\n");
 
     for (int i=0; i < list_length(&result); i++) {
         caValue* error = list_get(&result,i);
-        out << "[" << as_int(list_get(error, 1)) << "] ";
-        out << as_cstring(list_get(error, 2));
-        out << std::endl;
+        string_append(out, "[");
+        string_append(out, as_int(list_get(error, 1)));
+        string_append(out, "]");
+        string_append(out, as_cstring(list_get(error, 2)));
+        string_append(out, "\n");
     }
 
-    out << "contents:" << std::endl;
+    string_append(out, "contents:\n");
     print_block(block, out);
 
     return false;

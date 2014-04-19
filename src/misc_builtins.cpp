@@ -264,7 +264,6 @@ void Map__remove(caStack* stack)
 {
     caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
-
     hashtable_remove(out, circa_input(stack, 1));
 }
 
@@ -274,8 +273,10 @@ void Map__get(caStack* stack)
     caValue* key = circa_input(stack, 1);
     caValue* value = hashtable_get(table, key);
     if (value == NULL) {
-        std::string msg = "Key not found: " + to_string(key);
-        return circa_output_error(stack, msg.c_str());
+        Value msg;
+        set_string(&msg, "Key not found: ");
+        string_append_quoted(&msg, key);
+        return circa_output_error(stack, as_cstring(&msg));
     }
     copy(value, circa_output(stack, 0));
 }
@@ -567,17 +568,14 @@ void error(caStack* stack)
 {
     caValue* args = circa_input(stack, 0);
 
-    std::stringstream out;
+    Value out;
 
     for (int i = 0; i < circa_count(args); i++) {
         caValue* val = circa_index(args, i);
-        if (is_string(val))
-            out << as_string(val);
-        else
-            out << to_string(val);
+        string_append(&out, val);
     }
 
-    circa_output_error(stack, out.str().c_str());
+    circa_output_error(stack, as_cstring(&out));
 }
 
 void get_with_symbol(caStack* stack)
@@ -603,17 +601,14 @@ void print(caStack* stack)
 {
     caValue* args = circa_input(stack, 0);
 
-    std::stringstream out;
+    Value out;
 
     for (int i = 0; i < circa_count(args); i++) {
         caValue* val = circa_index(args, i);
-        if (is_string(val))
-            out << as_string(val);
-        else
-            out << to_string(val);
+        string_append(&out, val);
     }
 
-    write_log(out.str().c_str());
+    write_log(as_cstring(&out));
 
     set_null(circa_output(stack, 0));
 }
@@ -625,7 +620,7 @@ void to_string(caStack* stack)
     if (is_string(in))
         copy(in, out);
     else
-        set_string(out, to_string(in));
+        to_string(in, out);
 }
 
 void compute_patch_hosted(caStack* stack)

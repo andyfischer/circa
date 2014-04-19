@@ -14,16 +14,18 @@ namespace bool_t {
     {
         return as_bool(a) ? 1 : 0;
     }
-    std::string to_string(caValue* value)
+    void to_string(caValue* value, caValue* out)
     {
         if (as_bool(value))
-            return "true";
+            string_append(out, "true");
         else
-            return "false";
+            string_append(out, "false");
     }
     void format_source(caValue* source, Term* term)
     {
-        append_phrase(source, bool_t::to_string(term_value(term)), term, tok_Bool);
+        Value str;
+        bool_t::to_string(term_value(term), &str);
+        append_phrase(source, as_cstring(&str), term, tok_Bool);
     }
     void setup_type(Type* type)
     {

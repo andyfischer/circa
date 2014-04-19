@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "block.h"
-#include "blob.h"
 #include "bytecode.h"
 #include "change_events.h"
 #include "debug.h"
@@ -69,7 +68,9 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
         return;
     }
     if (string_equals(line, "/dump")) {
-        print_block(block, std::cout);
+        Value out;
+        print_block(block, &out);
+        dump(&out);
         return;
     }
     if (string_equals(line, "/dumpbc")) {
@@ -129,13 +130,14 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     Term* result = block->get(block->length() - 1);
     if (result->type != TYPES.void_type) {
         Frame* frame = top_frame(stack);
-        std::string s = to_string(stack_find_nonlocal(frame, result));
-        set_string(list_append(output), s.c_str());
+        to_string(stack_find_nonlocal(frame, result), list_append(output));
     }
 
     if (as_bool(displayRaw)) {
         for (int i=previousBlockLength; i < block->length(); i++) {
-            std::cout << get_term_to_string_extended(block->get(i)) << std::endl;
+            Value line;
+            get_term_to_string_extended(block->get(i), &line);
+            dump(&line);
         }
     }
 }

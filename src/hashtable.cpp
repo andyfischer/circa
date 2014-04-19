@@ -366,37 +366,43 @@ void clear(Hashtable* table)
     table->count = 0;
 }
 
-static std::string hashtable_to_string(caValue* table)
+static void hashtable_to_string(caValue* table, caValue* out)
 {
-    if (table == NULL || hashtable_count(table) == 0)
-        return "{}";
+    if (table == NULL || hashtable_count(table) == 0) {
+        string_append(out, "{}");
+        return;
+    }
 
     Value keys;
     hashtable_get_keys(table, &keys);
     list_sort(&keys, NULL, NULL);
 
-    Value out;
-    set_string(&out, "{");
+    string_append(out, "{");
 
     for (int i=0; i < list_length(&keys); i++) {
         if (i > 0)
-            string_append(&out, ", ");
+            string_append(out, ", ");
 
         caValue* key = list_get(&keys, i);
 
         caValue* value = hashtable_get(table, key);
 
-        if (is_string(key))
-            string_append(&out, as_string(key).c_str());
-        else
-            string_append(&out, to_string(key).c_str());
+        if (is_string(key)) {
+            string_append(out, as_string(key).c_str());
+        } else {
+            Value keyAsString;
+            to_string(key, &keyAsString);
+            string_append(out, &keyAsString);
+        }
 
-        string_append(&out, ": ");
-        string_append(&out, to_string(value).c_str());
+        Value valueAsString;
+        to_string(value, &valueAsString);
+
+        string_append(out, ": ");
+        string_append(out, &valueAsString);
     }
 
-    string_append(&out, "}");
-    return as_string(&out);
+    string_append(out, "}");
 }
 
 namespace tagged_value_wrappers {

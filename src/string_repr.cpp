@@ -105,7 +105,7 @@ void write_string_repr(caValue* value, caValue* out)
 {
     // For certain types, just use to_string
     if (is_int(value) || is_float(value) || is_bool(value)) {
-        set_string(out, to_string(value).c_str());
+        to_string(value, out);
     } else if (is_list(value)) {
         set_string(out, "");
         string_append(out, "[");

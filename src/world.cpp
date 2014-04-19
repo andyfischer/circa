@@ -12,7 +12,6 @@
 #include "file_watch.h"
 #include "kernel.h"
 #include "inspection.h"
-#include "ext/libuv.h"
 #include "list.h"
 #include "modules.h"
 #include "native_patch.h"
@@ -22,6 +21,10 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "world.h"
+
+#if CIRCA_ENABLE_LIBUV
+  #include "ext/libuv.h"
+#endif
 
 namespace circa {
 
@@ -58,7 +61,10 @@ void world_initialize(World* world)
 
     world->nativePatchWorld = alloc_native_patch_world();
     world->fileWatchWorld = alloc_file_watch_world();
-    world->libuvWorld = alloc_libuv_world();
+
+    #if CIRCA_ENABLE_LIBUV
+        world->libuvWorld = alloc_libuv_world();
+    #endif
 
     world->builtinPatch = alloc_native_patch(world);
 }
@@ -91,7 +97,9 @@ caValue* world_append_file_source(World* world)
 void world_tick(caWorld* world)
 {
     file_watch_check_all(world);
-    libuv_process_events(world->libuvWorld);
+    #if CIRCA_ENABLE_LIBUV
+        libuv_process_events(world->libuvWorld);
+    #endif
 }
 
 extern "C" {
