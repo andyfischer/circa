@@ -10,3 +10,7 @@ print("c = " c)
 print("c.r = " c.r)
 c.r = 1.0
 print("c = " c)
+
+green = #00ff00
+half_blue = #0000ff88
+half_red = #f008

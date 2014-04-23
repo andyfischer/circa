@@ -5,34 +5,9 @@
 namespace circa {
 namespace for_function {
 
-    void format_heading(caValue* source, Term* term)
-    {
-        format_name_binding(source, term);
-        append_phrase(source, "for ", term, sym_Keyword);
-        std::string explicitTypeName = term->stringProp(sym_Syntax_ExplicitType, "");
-        if (explicitTypeName != "") {
-            append_phrase(source, explicitTypeName, term, sym_None);
-            append_phrase(source, " ", term, sym_Whitespace);
-        }
-        append_phrase(source, for_loop_get_iterator_name(term), term, sym_None);
-        append_phrase(source, " in ", term, sym_Keyword);
-        if (term->boolProp(sym_ModifyList, false))
-            append_phrase(source, "@", term, sym_None);
-        format_source_for_input(source, term, 0);
-    }
-
-    void formatSource(caValue* source, Term* term)
-    {
-        format_heading(source, term);
-        format_block_source(source, nested_contents(term), term);
-        append_phrase(source, term->stringProp(sym_Syntax_WhitespaceBeforeEnd, ""),
-            term, tok_Whitespace);
-    }
-
     void setup(Block* kernel)
     {
         FUNCS.for_func = import_function(kernel, NULL, "for(List list) -> List");
-        block_set_format_source_func(function_contents(FUNCS.for_func), formatSource);
 
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any _, any _) -> int");

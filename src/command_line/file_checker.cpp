@@ -12,7 +12,6 @@
 #include "block.h"
 #include "kernel.h"
 #include "list.h"
-#include "source_repro.h"
 #include "static_checking.h"
 #include "tagged_value.h"
 
@@ -50,14 +49,6 @@ void run_file_checker(const char* filename, Value* errors)
             return;
         }
         actualSource = as_cstring(&fileContents);
-    }
-
-    // Run a source-repro test
-    std::string reproducedSource = get_block_source_text(&block);
-
-    if (actualSource != reproducedSource) {
-        // TODO: Provide more details about the source repro problem.
-        set_string(errors->append(), "Source reproduction failed");
     }
 }
 

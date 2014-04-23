@@ -17,8 +17,6 @@
 #include "names.h"
 #include "native_patch.h"
 #include "parser.h"
-#include "stateful_code.h"
-#include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "names.h"
@@ -63,9 +61,9 @@ void block_to_string(caValue* value, caValue* asStr)
 {
     Block* block = as_block(value);
     if (block == NULL) {
-        set_string(asStr, "Block#null");
+        string_append(asStr, "Block#null");
     } else {
-        set_string(asStr, "Block#");
+        string_append(asStr, "Block#");
         string_append(asStr, block->id);
     }
 }
@@ -759,10 +757,6 @@ void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeF
     block->overrides.specializeType = specializeFunc;
 }
 
-void block_set_format_source_func(Block* block, FormatSourceFunc formatSource)
-{
-    block->overrides.formatSource = formatSource;
-}
 void block_set_post_compile_func(Block* block, PostCompileFunc postCompile)
 {
     block->overrides.postCompile = postCompile;

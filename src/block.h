@@ -11,13 +11,11 @@ struct BlockOverrides
 {
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
-    FormatSourceFunc formatSource;
     PostCompileFunc postCompile;
 
     BlockOverrides() :
       evaluate(NULL),
       specializeType(NULL),
-      formatSource(NULL),
       postCompile(NULL)
     {}
 };
@@ -208,7 +206,6 @@ Type* get_output_type(Block* block, int index);
 
 void block_set_evaluate_func(Block* block, EvaluateFunc eval);
 void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc);
-void block_set_format_source_func(Block* block, FormatSourceFunc formatSource);
 void block_set_post_compile_func(Block* block, PostCompileFunc postCompile);
 void block_set_function_has_nested(Block* block, bool hasNestedContents);
 

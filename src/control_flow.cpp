@@ -13,7 +13,6 @@
 #include "importing.h"
 #include "inspection.h"
 #include "kernel.h"
-#include "source_repro.h"
 #include "string_type.h"
 #include "term.h"
 
@@ -95,39 +94,6 @@ static Symbol max_exit_level(Symbol left, Symbol right)
     if (left == sym_ExitLevelLoop || right == sym_ExitLevelLoop)
         return sym_ExitLevelLoop;
     return sym_None;
-}
-
-void break_formatSource(caValue* source, Term* term)
-{
-    append_phrase(source, "break", term, sym_Keyword);
-}
-void continue_formatSource(caValue* source, Term* term)
-{
-    append_phrase(source, "continue", term, sym_Keyword);
-}
-void discard_formatSource(caValue* source, Term* term)
-{
-    append_phrase(source, "discard", term, sym_Keyword);
-}
-
-void return_formatSource(caValue* source, Term* term)
-{
-    if (term->boolProp(sym_Syntax_ReturnStatement, false)) {
-        append_phrase(source, "return", term, sym_Keyword);
-        append_phrase(source,
-                term->stringProp(sym_Syntax_PostKeywordWs, " "),
-                term, sym_Whitespace);
-
-        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
-            if (is_input_hidden(term, inputIndex) || term->input(inputIndex) == NULL)
-                continue;
-            if (inputIndex != 0)
-                append_phrase(source, ", ", term, sym_None);
-            format_source_for_input(source, term, inputIndex, "", "");
-        }
-    } else {
-        format_term_source_default_formatting(source, term);
-    }
 }
 
 void create_output_from_minor_block(Block* block, caValue* description)
@@ -252,22 +218,18 @@ void control_flow_setup_funcs(Block* kernel)
 {
     FUNCS.return_func = import_function(kernel, NULL, "return(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.return_func), true);
-    block_set_format_source_func(function_contents(FUNCS.return_func), return_formatSource);
     block_set_post_compile_func(function_contents(FUNCS.return_func), controlFlow_postCompile);
 
     FUNCS.discard = import_function(kernel, NULL, "discard(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.discard), true);
-    block_set_format_source_func(function_contents(FUNCS.discard), discard_formatSource);
     block_set_post_compile_func(function_contents(FUNCS.discard), controlFlow_postCompile);
 
     FUNCS.break_func = import_function(kernel, NULL, "break(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.break_func), true);
-    block_set_format_source_func(function_contents(FUNCS.break_func), break_formatSource);
     block_set_post_compile_func(function_contents(FUNCS.break_func), controlFlow_postCompile);
 
     FUNCS.continue_func = import_function(kernel, NULL, "continue(any outs :multiple :optional)");
     block_set_evaluation_empty(function_contents(FUNCS.continue_func), true);
-    block_set_format_source_func(function_contents(FUNCS.continue_func), continue_formatSource);
     block_set_post_compile_func(function_contents(FUNCS.continue_func), controlFlow_postCompile);
 }
 

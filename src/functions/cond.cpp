@@ -14,7 +14,9 @@ namespace cond_function {
     Type* specializeType(Term* caller)
     {
         Value choices;
-        set_type_list(&choices, caller->input(1)->type, caller->input(2)->type);
+        Type* leftType = caller->input(1) != NULL ? caller->input(1)->type : NULL;
+        Type* rightType = caller->input(2) != NULL ? caller->input(2)->type : NULL;
+        set_type_list(&choices, leftType, rightType);
         return find_common_type(&choices);
     }
 

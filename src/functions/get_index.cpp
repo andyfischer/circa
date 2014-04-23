@@ -30,25 +30,11 @@ namespace get_index_function {
         return infer_type_of_get_index(term->input(0));
     }
 
-    void format_source(caValue* source, Term* term)
-    {
-        if (term->boolProp(sym_Syntax_Brackets, false)) {
-            format_name_binding(source, term);
-            format_source_for_input(source, term, 0);
-            append_phrase(source, "[", term, tok_LSquare);
-            format_source_for_input(source, term, 1);
-            append_phrase(source, "]", term, tok_RSquare);
-        } else {
-            format_term_source_default_formatting(source, term);
-        }
-    }
-
     void setup(Block* kernel)
     {
         FUNCS.get_index = import_function(kernel, hosted_get_index,
                 "get_index(List list, int index) -> any");
         block_set_specialize_type_func(function_contents(FUNCS.get_index), specializeType);
-        block_set_format_source_func(function_contents(FUNCS.get_index), format_source);
     }
 }
 }

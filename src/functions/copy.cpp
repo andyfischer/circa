@@ -15,18 +15,10 @@ namespace copy_function {
         return get_type_of_input(caller, 0);
     }
 
-    void formatSource(caValue* source, Term* term)
-    {
-        format_name_binding(source, term);
-        append_phrase(source, get_relative_name_at(term, term->input(0)),
-                term, tok_Identifier);
-    }
-
     void setup(Block* kernel)
     {
         FUNCS.copy = import_function(kernel, evaluate, "copy(any val) -> any");
         block_set_specialize_type_func(function_contents(FUNCS.copy), specializeType);
-        block_set_format_source_func(function_contents(FUNCS.copy), formatSource);
     }
 }
 }

@@ -13,8 +13,6 @@
 #include "interpreter.h"
 #include "list.h"
 #include "loops.h"
-#include "source_repro.h"
-#include "stateful_code.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -389,21 +387,6 @@ void while_loop_finish_changes(Block* contents)
     update_looped_inputs(contents);
 }
 
-void while_formatSource(caValue* source, Term* term)
-{
-    Block* contents = nested_contents(term);
-    format_name_binding(source, term);
-    append_phrase(source, "while ", term, sym_Keyword);
-    Term* conditionCheck = loop_find_condition_check(contents);
-    format_source_for_input(source, conditionCheck, 0);
-    append_phrase(source,
-            term->stringProp(sym_Syntax_LineEnding, ""),
-            term, tok_Whitespace);
-    format_block_source(source, contents, term);
-    append_phrase(source, term->stringProp(sym_Syntax_WhitespaceBeforeEnd, ""),
-        term, tok_Whitespace);
-}
-
 void index_func_postCompile(Term* term)
 {
     Term* enclosingLoop = find_enclosing_for_loop(term);
@@ -427,7 +410,6 @@ void loop_setup_functions(Block* kernel)
     block_set_post_compile_func(function_contents(index_func), index_func_postCompile);
 
     FUNCS.while_loop = import_function(kernel, NULL, "while()");
-    block_set_format_source_func(function_contents(FUNCS.while_loop), while_formatSource);
 }
 
 } // namespace circa

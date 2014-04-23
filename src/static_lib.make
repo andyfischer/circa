@@ -102,9 +102,7 @@ OBJECTS := \
 	$(OBJDIR)/repl.o \
 	$(OBJDIR)/replication.o \
 	$(OBJDIR)/selector.o \
-	$(OBJDIR)/source_repro.o \
 	$(OBJDIR)/stack.o \
-	$(OBJDIR)/stateful_code.o \
 	$(OBJDIR)/static_checking.o \
 	$(OBJDIR)/string_repr.o \
 	$(OBJDIR)/string_type.o \
@@ -114,7 +112,6 @@ OBJECTS := \
 	$(OBJDIR)/term.o \
 	$(OBJDIR)/term_list.o \
 	$(OBJDIR)/term_namespace.o \
-	$(OBJDIR)/thread.o \
 	$(OBJDIR)/token.o \
 	$(OBJDIR)/type.o \
 	$(OBJDIR)/type_inference.o \
@@ -302,13 +299,7 @@ $(OBJDIR)/replication.o: replication.cpp
 $(OBJDIR)/selector.o: selector.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/source_repro.o: source_repro.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/stack.o: stack.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/stateful_code.o: stateful_code.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/static_checking.o: static_checking.cpp
@@ -336,9 +327,6 @@ $(OBJDIR)/term_list.o: term_list.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/term_namespace.o: term_namespace.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/thread.o: thread.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/token.o: token.cpp

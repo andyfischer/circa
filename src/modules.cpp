@@ -22,7 +22,6 @@
 #include "names.h"
 #include "native_patch.h"
 #include "reflection.h"
-#include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -258,19 +257,6 @@ void require_func_postCompile(Term* term)
     set_block(list_get(moduleRef, 0), module);
 }
 
-void require_formatSource(caValue* source, Term* term)
-{
-    if (term->boolProp(sym_Syntax_Require, false)) {
-        append_phrase(source, "require ", term, tok_Require);
-        append_phrase(source, term->name.c_str(), term, sym_TermName);
-    } else if (term->boolProp(sym_Syntax_Import, false)) {
-        append_phrase(source, "import ", term, tok_Import);
-        format_source_for_input(source, term, 0);
-    } else {
-        format_term_source_default_formatting(source, term);
-    }
-}
-
 void load_module_eval(caStack* stack)
 {
     Term* caller = circa_caller_term(stack);
@@ -352,7 +338,6 @@ void modules_install_functions(Block* kernel)
 {
     FUNCS.require = kernel->get("require");
     block_set_post_compile_func(function_contents(FUNCS.require), require_func_postCompile);
-    block_set_format_source_func(function_contents(FUNCS.require), require_formatSource);
 
     FUNCS.package = install_function(kernel, "package", NULL);
 

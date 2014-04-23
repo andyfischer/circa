@@ -48,25 +48,11 @@ namespace get_field_function {
         return head;
     }
 
-    void format_source(caValue* source, Term* term)
-    {
-        format_name_binding(source, term);
-        //append_phrase(source, get_relative_name(term, term->input(0)),
-        //        term, sym_None);
-        format_source_for_input(source, term, 0);
-        for (int i=1; i < term->numInputs(); i++) {
-            append_phrase(source, ".", term, tok_Dot);
-            append_phrase(source, as_string(term_value(term->input(i))),
-                    term, tok_Identifier);
-        }
-    }
-
     void setup(Block* kernel)
     {
         FUNCS.get_field = import_function(kernel, evaluate,
                 "get_field(any obj, String key) -> any");
         block_set_specialize_type_func(function_contents(FUNCS.get_field), specializeType);
-        block_set_format_source_func(function_contents(FUNCS.get_field), format_source);
     }
 }
 }

@@ -159,6 +159,9 @@ void set_input_implicit(Term* term, int index, bool implicit);
 bool is_input_hidden(Term* term, int inputIndex);
 void set_input_hidden(Term* term, int inputIndex, bool hidden);
 
+// Mark the given term as hidden from source reproduction.
+void hide_from_source(Term* term);
+
 caValue* term_name(Term* term);
 caValue* term_value(Term* term);
 Block* term_function(Term* term);

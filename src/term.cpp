@@ -335,6 +335,12 @@ void set_input_hidden(Term* term, int index, bool hidden)
     set_bool(term_insert_input_property(term, index, sym_Hidden), true);
 }
 
+void hide_from_source(Term* term)
+{
+    ca_assert(term != NULL);
+    term->setBoolProp(sym_Hidden, true);
+}
+
 caValue* term_name(Term* term)
 {
     return &term->nameValue;

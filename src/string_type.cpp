@@ -9,7 +9,6 @@
 #include "kernel.h"
 #include "list.h"
 #include "string_type.h"
-#include "source_repro.h"
 #include "symbols.h"
 #include "names.h"
 #include "tagged_value.h"
@@ -199,24 +198,6 @@ void string_to_string(caValue* value, caValue* asStr)
     string_append(asStr, "'");
 }
 
-void string_format_source(caValue* source, Term* term)
-{
-    if (term->hasProperty(sym_Syntax_OriginalFormat)) {
-        append_phrase(source, term->stringProp(sym_Syntax_OriginalFormat, ""),
-                term, tok_String);
-        return;
-    }
-
-    std::string quoteType = term->stringProp(sym_Syntax_QuoteType, "'");
-    std::string result;
-    if (quoteType == "<")
-        result = "<<<" + as_string(term_value(term)) + ">>>";
-    else
-        result = quoteType + as_cstring(term_value(term)) + quoteType;
-
-    append_phrase(source, result, term, tok_String);
-}
-
 void string_setup_type(Type* type)
 {
     reset_type(type);
@@ -228,7 +209,6 @@ void string_setup_type(Type* type)
     type->equals = string_equals;
     type->hashFunc = string_hash;
     type->toString = string_to_string;
-    type->formatSource = string_format_source;
 }
 
 const char* as_cstring(caValue* value)

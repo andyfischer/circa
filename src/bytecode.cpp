@@ -14,7 +14,6 @@
 #include "list.h"
 #include "loops.h"
 #include "names.h"
-#include "stateful_code.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"

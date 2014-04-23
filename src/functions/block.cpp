@@ -5,12 +5,6 @@
 namespace circa {
 namespace block_function {
 
-    void format_source(caValue* source, Term* term)
-    {
-        format_name_binding(source, term);
-        format_block_source(source, nested_contents(term), term);
-    }
-
     void setup(Block* kernel)
     {
         // TODO: delete
@@ -20,7 +14,6 @@ namespace block_function {
 
         // TODO: delete
         FUNCS.lambda = import_function(kernel, NULL, "lambda(any inputs :multiple) -> Block");
-        block_set_format_source_func(function_contents(FUNCS.lambda), format_source);
         block_set_function_has_nested(function_contents(FUNCS.lambda), true);
     }
 }

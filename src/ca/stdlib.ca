@@ -283,11 +283,6 @@ def Block.dump(self)
   -- Dump this block's raw contents to stdout.
 def Block.find_term(self, String name) -> Term
   -- Find a term inside this Block with the given name.
-def Block.to_code_lines(self) -> List
-def Block.format_source(self) -> List
-  -- Return the block's contents as formatted source.
-def Block.format_function_heading(self) -> List
-  -- Return a formatted function header for this block.
 def Block.functions(self) -> List
   -- Return a list of functions that occur inside this block.
 def Block.get_term(self, int index) -> Term
@@ -366,6 +361,28 @@ def Block.get_top_comments(self) -> List
 def Block.call(self, any inputs :multiple) -> any
   -- Invoke this Block with the given inputs.
   self.to_func.apply(inputs)
+
+def Block.get_iterator(self) -> Term
+  -- For a for-loop, return the iterator term
+  for term in self.terms
+    if term.function == block_ref(get_index)
+      return term
+  return null
+
+def Block.if_block_cases(self) -> List
+  self.terms.filter({term = input(); term.function.name == 'case'})
+
+def Block.case_find_condition(self) -> Term
+  for term in self.terms
+    if term.function == block_ref(case_condition_bool)
+      return term
+  return null
+
+def Block.find_while_condition(self) -> Term
+  for term in self.terms
+    if term.function == block_ref(loop_condition_bool)
+      return term
+  return null
 
 type Frame { Stack stack, int index }
 type RetainedFrame { Block block, any _state }
@@ -499,6 +516,8 @@ def Func.to_stack(self) -> Stack
   make_stack(self)
 
 def repeat(any val, int count) -> List
+
+def int.to_hex_string(val) -> String
 
 def List.append(self, any item) -> List
   -- Append an item to the end of this list.
@@ -783,14 +802,7 @@ def Term.name(self) -> String
     -- Return this term's local name. May be blank.
 def Term.parent(self) -> Block
 def Term.to_string(self) -> String
-def Term.to_source_string(self) -> String
 def Term.unique_name(self) -> any
-def Term.format_source(self) -> List
-    -- Return a list of formatted source phrases for this Term
-def Term.format_source_normal(self) -> List
-    -- Return a list of formatted source phrases for this Term. This formatting is 'normal',
-    -- meaning that it doesn't include the source for inputs (inputs are referred to by name
-    -- or by id), and special syntax is not used.
 def Term.function(self) -> Block
     -- Fetch this term's function.
 def Term.get_type(self) -> Type
@@ -848,7 +860,7 @@ def Term.output(self, int index) -> Term
   else
     self.extra_output(index - 1)
 def Term.extra_output(self, int index)
-  self.owner.get_term(self.index + index + 1)
+  self.parent.get_term(self.index + index + 1)
 
 def Point.add(self, Point b) -> Point
   [self.x + b.x, self.y + b.y]

@@ -6,7 +6,6 @@
 #include "interpreter.h"
 #include "inspection.h"
 #include "kernel.h"
-#include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "world.h"
@@ -47,7 +46,7 @@ void test_assert_function(Term* term, int line, const char* file)
     }
 
     if (is_bool(term_value(term)) && !as_bool(term_value(term))) {
-        std::cout << "Assertion failed: " << get_term_source_text(term) << std::endl;
+        std::cout << "Assertion failed: " << term->id << std::endl;
         std::cout << "Occurred in " << file << ", line " << line << std::endl;
         declare_current_test_failed();
     }
@@ -352,7 +351,7 @@ void test_block_as_assertions_list(Block* block, std::string const& contextStr)
 
         if (!as_bool(term_value(term))) {
             std::cout << "Assertion failed " << contextStr << std::endl;
-            std::cout << "failed: " << get_term_source_text(term) << std::endl;
+            std::cout << "failed: " << term->id << std::endl;
             declare_current_test_failed();
             return;
         }
@@ -388,7 +387,6 @@ namespace names_test { void register_tests(); }
 namespace native_patch_test { void register_tests(); }
 namespace parser_test { void register_tests(); }
 namespace path_expression_test { void register_tests(); }
-namespace source_repro_test { void register_tests(); }
 namespace stack_test { void register_tests(); }
 namespace state_test { void register_tests(); }
 namespace string_test { void register_tests(); }
@@ -423,7 +421,6 @@ int main(int argc, char** argv)
     native_patch_test::register_tests();
     parser_test::register_tests();
     path_expression_test::register_tests();
-    source_repro_test::register_tests();
     stack_test::register_tests();
     state_test::register_tests();
     symbol_test::register_tests();

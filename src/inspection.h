@@ -34,6 +34,7 @@ bool is_hidden(Term* term);
 bool has_empty_name(Term* term);
 bool is_copying_call(Term* term);
 bool is_dynamic_func_call(Term* term);
+bool is_declared_state(Term* term);
 
 bool is_an_unknown_identifier(Term* term);
 

@@ -40,7 +40,6 @@ namespace set_index_function { void setup(Block* kernel); }
 namespace static_error_function { void setup(Block* kernel); }
 namespace sub_function { void setup(Block* kernel); }
 namespace switch_function { void setup(Block* kernel); }
-namespace term_to_source_function { void setup(Block* kernel); }
 namespace trig_function { void setup(Block* kernel); }
 namespace type_check_function { void setup(Block* kernel); }
 namespace unique_id_function { void setup(Block* kernel); }
@@ -80,7 +79,6 @@ void setup_builtin_functions(Block* kernel)
     static_error_function::setup(kernel);
     sub_function::setup(kernel);
     switch_function::setup(kernel);
-    term_to_source_function::setup(kernel);
     trig_function::setup(kernel);
     type_check_function::setup(kernel);
     unique_id_function::setup(kernel);

@@ -1,0 +1,15 @@
+
+type StackDump {
+  IndentWriter out
+}
+
+def StackDump.write(self, String str) -> StackDump
+  @self.out.write(str)
+def StackDump.to_string(self) -> String
+  self.out.toString
+
+def StackDump.stack(self, Stack stack) -> StackDump
+  @self.out.write('[Stack #' stack.id ', frames = ', stack.frames_count)
+
+def stack_to_string(Stack stack) -> String
+  StackDump.make.stack(stack).to_string

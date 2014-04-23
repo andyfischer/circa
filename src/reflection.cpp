@@ -17,8 +17,6 @@
 #include "modules.h"
 #include "native_patch.h"
 #include "reflection.h"
-#include "source_repro.h"
-#include "stateful_code.h"
 #include "static_checking.h"
 #include "term.h"
 #include "tagged_value.h"
@@ -169,44 +167,6 @@ void Block__source_filename(caStack* stack)
         block = get_parent_block(block);
     }
     set_string(circa_output(stack, 0), "");
-}
-
-void Block__to_code_lines(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-
-    if (block == NULL)
-        return circa_output_error(stack, "null block");
-
-    block_to_code_lines(block, circa_output(stack, 0));
-}
-
-void Block__to_code_lines_descendant_filtered(caStack* stack)
-{
-#if 0
-    Block* block = as_block(circa_input(stack, 0));
-    Term* descendant = as_term_ref(circa_input(stack, 1));
-#endif
-}
-
-void Block__format_source(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-
-    if (block == NULL)
-        return circa_output_error(stack, "null block");
-
-    caValue* output = circa_output(stack, 0);
-    circa_set_list(output, 0);
-    format_block_source((caValue*) output, block);
-}
-
-void Block__format_function_heading(caStack* stack)
-{
-    Block* block = as_block(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
-    circa_set_list(output, 0);
-    function_format_header_source(output, block);
 }
 
 void Block__has_static_error(caStack* stack)
@@ -382,37 +342,12 @@ void Term__to_string(caStack* stack)
         return circa_output_error(stack, "NULL reference");
     circa::to_string(term_value(t), circa_output(stack, 0));
 }
-void Term__to_source_string(caStack* stack)
-{
-    Term* t = as_term_ref(circa_input(stack, 0));
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_string(circa_output(stack, 0), get_term_source_text(t));
-}
 void Term__unique_name(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_value(circa_output(stack, 0), unique_name(t));
-}
-void Term__format_source(caStack* stack)
-{
-    Term* t = as_term_ref(circa_input(stack, 0));
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    caValue* output = circa_output(stack, 0);
-    circa_set_list(output, 0);
-    format_term_source(output, t);
-}
-void Term__format_source_normal(caStack* stack)
-{
-    Term* t = as_term_ref(circa_input(stack, 0));
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    caValue* output = circa_output(stack, 0);
-    circa_set_list(output, 0);
-    format_term_source_normal(output, t);
 }
 void Term__function(caStack* stack)
 {
@@ -780,9 +715,6 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Block.find_term", Block__find_term);
     module_patch_function(patch, "Block.functions", Block__functions);
     module_patch_function(patch, "Block.statements", Block__statements);
-    module_patch_function(patch, "Block.to_code_lines", Block__to_code_lines);
-    module_patch_function(patch, "Block.format_source", Block__format_source);
-    module_patch_function(patch, "Block.format_function_heading", Block__format_function_heading);
     module_patch_function(patch, "Block.get_term", Block__get_term);
     module_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
     module_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
@@ -809,8 +741,6 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.asfloat", Term__asfloat);
     module_patch_function(patch, "Term.id", Term__id);
     module_patch_function(patch, "Term.index", Term__index);
-    module_patch_function(patch, "Term.format_source", Term__format_source);
-    module_patch_function(patch, "Term.format_source_normal", Term__format_source_normal);
     module_patch_function(patch, "Term.function", Term__function);
     module_patch_function(patch, "Term.get_type", Term__type);  // TODO: rename to just .type
     module_patch_function(patch, "Term.tweak", Term__tweak);
@@ -827,7 +757,6 @@ void reflection_install_functions(NativePatch* patch)
     module_patch_function(patch, "Term.location_string", Term__location_string);
     module_patch_function(patch, "Term.global_id", Term__global_id);
     module_patch_function(patch, "Term.to_string", Term__to_string);
-    module_patch_function(patch, "Term.to_source_string", Term__to_source_string);
     module_patch_function(patch, "Term.unique_name", Term__unique_name);
     module_patch_function(patch, "Term.properties", Term__properties);
     module_patch_function(patch, "Term.has_property", Term__has_property);

@@ -4,7 +4,7 @@ type SourceRepro {
 }
 
 type Phrase {
-  Symbol id
+  Symbol t
   any val
   Map attrs
 }
@@ -12,40 +12,414 @@ type Phrase {
 def Phrase.term(self) -> Term
   self.val
 
-def Phrase.asString(self) -> String
+def Phrase.block(self) -> Block
+  self.val
+
+def Phrase.text(self) -> String
   if type(self.val) == String
     self.val
-  elif self.id == :name_ref
-    self.val.name
-  elif self.id == :sub_expr
-    self.val | to_string
+  elif self.t == :name_ref
+    self.term.name
   else
-    error('how to turn ' self.id ' into a string?')
-
-def SourceRepro.flatten_to_string(self) -> String
-  strs = for Phrase phrase in self.phrases
-    phrase.asString
-  strs.join('')
+    self.val | to_string
 
 def new()
   SourceRepro.make
 
-def SourceRepro.phrase(self, Symbol id, any val) -> SourceRepro
-  @self.phrases.append(Phrase.make(id val))
+def Term.is_comment(term)
+  term.function == block_ref(comment)
+def Term.is_neg(term)
+  term.function == block_ref(neg)
+def Term.is_function_decl(term)
+  term.function == block_ref(function_decl)
+def Term.is_closure_decl(term)
+  term.function == block_ref(closure_block)
+def Term.is_type_decl(term)
+  term.is_value and is_type(term.value)
+def Term.is_require(term)
+  term.function.name == 'require'
+def Term.is_declared_state(term)
+  term.function == block_ref(_declared_state)
+def Term.is_get_index(term)
+  term.function == block_ref(get_index)
+def Term.is_set_with_selector(term)
+  term.function == block_ref(set_with_selector)
+def Term.is_for_loop(term)
+  term.function.name == 'for'
+def Term.is_while_loop(term)
+  term.function.name == 'while'
+def Term.is_if_block(term)
+  term.function.name == 'if'
+def Term.is_copy(term)
+  term.function == block_ref(copy)
+def Term.is_nonlocal(term)
+  term.function == block_ref(nonlocal)
+def Term.is_continue(term)
+  term.function.name == 'continue'
+def Term.is_break(term)
+  term.function.name == 'break'
+def Term.is_discard(term)
+  term.function.name == 'discard'
+def Term.is_syntax_error(term)
+  term.function == block_ref(syntax_error)
 
-def Term.value_to_source(term) -> String
-  -- Todo: improve
-  term.value | to_string
+def break_apart_newlines(String str) -> List
+  newlineFound, loc = str.index_of('\n')
+
+  if newlineFound
+    [str.substr(0, loc), str.substr(loc, 1)].concat(break_apart_newlines(str.substr(loc+1, -1)))
+  else
+    [str]
+
+def SourceRepro.ws_phrase(self, str) -> SourceRepro
+  for s in break_apart_newlines(str)
+    if s == ''
+      discard
+    @self.phrases.append(Phrase.make(:ws s))
+  self
+
+def SourceRepro.phrase(self, Symbol t, val) -> SourceRepro
+  if t == :ws
+    @self.ws_phrase(val)
+  else
+    @self.phrases.append(Phrase.make(t val))
+  self
+
+def SourceRepro.neg(self, Term term) -> SourceRepro
+  @self.phrase(:operator '-')
+  @self.term_input(term 0)
+
+def SourceRepro.literal_color(self, Term term) -> SourceRepro
+  color = term.value
+  hasAlpha = color.a != 1.0
+  digits = term.property_opt(:Syntax_ColorFormat 6)
+  digitsPerChannel = cond(digits == 6 or digits == 8, 2, 1)
+  specifyAlpha = hasAlpha or digits == 4 or digits == 8
+  specifyColorCount = cond(specifyAlpha, 4, 3)
+
+  out = ['#']
+  for c in 0..specifyColorCount
+    if digitsPerChannel == 1
+      @out.append(floor(color[c] * 15.999).to_hex_string)
+    else
+      mod255 = floor(color[c] * 255)
+      @out.append((mod255 // 0x10).to_hex_string)
+      @out.append((mod255 % 0x10).to_hex_string)
+
+  @self.phrase(:value out.join(''))
+
+def SourceRepro.literal_int(self, Term term) -> SourceRepro
+  if term.property_opt(:Syntax_IntegerFormat '') == 'hex'
+    @self.phrase(:value concat('0x' term.value.to_hex_string))
+  else
+    @self.phrase(:value term.value)
+  self
+
+def SourceRepro.term_value(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  if type(term.value) == Color
+    return self.literal_color(term)
+  if type(term.value) == int
+    return self.literal_int(term)
+  if is_string(term.value)
+    if term.has_property(:Syntax_OriginalFormat)
+      return self.phrase(:value term.property(:Syntax_OriginalFormat))
+
+    quote = term.property(:Syntax_QuoteType)
+    startQuote = quote
+    endQuote = quote
+    if quote == '<'
+      startQuote = '<<<'
+      endQuote = '>>>'
+
+    @self.phrase(:value concat(startQuote term.value endQuote))
+
+  elif is_number(term.value)
+    if term.has_property(:Syntax_OriginalFormat)
+      return self.phrase(:value term.property(:Syntax_OriginalFormat))
+
+  else
+    @self.phrase(:value to_string(term.value))
+
+  self
+
+def SourceRepro.require_statement(self, Term term) -> SourceRepro
+  if term.property_opt(:Syntax_Require false)
+    @self.phrase(:text 'require ')
+    @self.phrase(:name term.name)
+  elif term.property_opt(:Syntax_Import false)
+    @self.phrase(:text 'import ')
+    @self.term_input(term 0)
+  else
+    @self.term_default_format(term)
+  self
+
+def SourceRepro.function_decl(self, Term term) -> SourceRepro
+  @self.phrase(:text "def ")
+  @self.phrase(:name term.name)
+  @self.phrase(:ws term.property_opt(:Syntax_PostNameWs ''))
+  @self.phrase(:ws term.property_opt(:Syntax_Properties ''))
+  @self.phrase(:text "(")
+
+  inputs = term.contents.inputs.filter({ not input().property_opt(:HiddenInput false) })
+
+  first = true
+  for input in inputs
+    if input.property_opt(:State false)
+      @self.phrase(:text "state ")
+
+    if not first
+      @self.phrase(:text ", ")
+
+    if input.property_opt(:Syntax_ExplicitType true)
+      @self.phrase(:text input.get_type.name)
+      @self.phrase(:ws " ")
+
+    if input.property_opt(:Syntax_RebindSymbol false)
+      @self.phrase(:text "@")
+
+    @self.phrase(:name input.name)
+
+    if input.property_opt(:Output false) and not input.property_opt(:Syntax_RebindSymbol false)
+      @self.phrase(:text " :out")
+
+    if input.property_opt(:Meta false)
+      @self.phrase(:text " :meta")
+
+    if input.property_opt(:Rebind false)
+      @self.phrase(:text " :rebind")
+
+    if input.property_opt(:Multiple false)
+      @self.phrase(:text " :multiple")
+
+    first = false
+
+  @self.phrase(:text ')')
+
+  if term.property_opt(:Syntax_ExplicitType false)
+    @self.phrase(:ws term.property_opt(:Syntax_WhitespacePreColon ''))
+    @self.phrase(:text '->')
+    @self.phrase(:ws term.property_opt(:Syntax_WhitespacePostColon ''))
+
+    outputs = term.contents.outputs.filter({not input().property_opt(:Hidden false)})
+
+    if outputs.length > 1
+      @self.phrase(:text "(")
+
+    first = true
+    for output in outputs
+      if not first
+        @self.phrase(:text ", ")
+      first = false
+
+      @self.phrase(:name output.get_type.name)
+
+    if outputs.length > 1
+      @self.phrase(:text ")")
+
+  @self.block_pre(term)
+  @self.phrase(:contents term.contents)
+  @self.block_post(term)
+
+  self
+
+def SourceRepro.closure_decl(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  @self.block_pre(term)
+  @self.phrase(:contents term.contents)
+  @self.block_post(term)
+
+def SourceRepro.type_decl(self, Term term) -> SourceRepro
+  @self.phrase(:text "type ")
+  @self.phrase(:name term.name)
+
+  if term.has_property(:Syntax_TypeMagicSymbol)
+    @self.phrase(:text " = ")
+    @self.phrase(:text term.property(:Syntax_TypeMagicSymbol))
+
+  if term.property_opt(:Syntax_NoBrackets false)
+    return self
+
+  @self.phrase(:ws term.property_opt(:Syntax_PreLBracketWs ' '))
+  @self.phrase(:text '{')
+  @self.phrase(:ws term.property_opt(:Syntax_PostLBracketWs ' '))
+
+  for field in term.contents.terms
+    if field.is_comment
+      @self.phrase(:comment field.property(:Comment))
+      @self.phrase(:ws field.property_opt(:Syntax_LineEnding ''))
+    elif field.property_opt(:FieldAccessor false)
+      @self.phrase(:ws field.property_opt(:Syntax_PreWs ''))
+      @self.phrase(:name field.contents.output_placeholder(0).get_type.name)
+      @self.phrase(:ws field.property_opt(:Syntax_PostNameWs ' '))
+      @self.phrase(:name field.name)
+      @self.phrase(:ws field.property_opt(:Syntax_PostWs ''))
+
+  @self.phrase(:ws term.property_opt(:Syntax_PreRBracketWs ''))
+  @self.phrase(:text '}')
+
+def SourceRepro.get_index_brackets(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  @self.term_input(term 0)
+  @self.phrase(:text '[')
+  @self.term_input_inner(term 1)
+  @self.phrase(:text ']')
+
+def SourceRepro.selector(self, Term term) -> SourceRepro
+  for i in 0..(term.num_inputs)
+    input = term.input(i)
+
+    if input.is_value and is_string(input.value)
+      @self.phrase(:text '.')
+      @self.phrase(:identifier input.value)
+    else
+      @self.phrase(:text '[')
+      @self.term_input_inner(term i)
+      @self.phrase(:text ']')
+
+  self
+
+def SourceRepro.set_with_selector(self, Term term) -> SourceRepro
+  @self.term_input_inner(term 0)
+  @self.selector(term.input(1))
+  @self.phrase(:text term.property_opt(:Syntax_PreEqualsSpace ''))
+  if term.has_property(:Syntax_RebindOperator)
+    @self.phrase(:text term.property(:Syntax_RebindOperator))
+    @self.phrase(:text term.property_opt(:Syntax_PostEqualsSpace ''))
+    @self.term_input(term.input(2) 1)
+  else
+    @self.phrase(:text '=')
+    @self.phrase(:ws term.property_opt(:Syntax_PostEqualsSpace ''))
+    @self.term_input_inner(term 2)
+  self
+
+def SourceRepro.return_statement(self, Term term) -> SourceRepro
+  @self.phrase(:text 'return')
+  @self.phrase(:ws term.property_opt(:Syntax_PostKeywordWs ' '))
+  for inputIndex in 0..(term.num_inputs)
+    if inputIndex != 0
+      @self.phrase(:text ', ')
+    @self.term_input_inner(term inputIndex)
+  self
+
+def SourceRepro.declared_state(self, Term term) -> SourceRepro
+  if not term.property_opt(:Syntax_StateKeyword false)
+    return self.term_default_format(term)
+
+  @self.phrase(:text 'state ')
+  if term.has_property(:Syntax_ExplicitType)
+    @self.phrase(:name term.property(:Syntax_ExplicitType)).phrase(:text ' ')
+  @self.phrase(:name term.name)
+
+  if not term.input(1).is_null
+    @self.phrase(:text ' = ')
+    initializer = term.input(1).contents.output(0)
+    if initializer.property_opt(:Hidden false)
+      initializer = initializer.input(0)
+    @self.term(initializer)
+  self
+
+def SourceRepro.for_loop(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  @self.phrase(:text 'for ')
+  if term.has_property(:Syntax_ExplicitType)
+    @self.phrase(:name term.property(:Syntax_ExplicitType))
+    @self.phrase(:ws ' ')
+  @self.phrase(:name term.contents.get_iterator.name)
+  @self.phrase(:text ' in ')
+  if term.property_opt(:ModifyList false)
+    @self.phrase(:text '@')
+  @self.term_input(term 0)
+  @self.block_pre(term)
+  @self.phrase(:contents term.contents)
+  @self.block_post(term)
+
+def SourceRepro.while_loop(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  @self.phrase(:text 'while ')
+  @self.term_input(term.contents.find_while_condition, 0)
+  @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
+  @self.block_pre(term)
+  @self.phrase(:contents term.contents)
+  @self.block_post(term)
+  @self.phrase(:ws term.property_opt(:Syntax_WhitespaceBeforeEnd ''))
+
+def SourceRepro.if_block(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  first = true
+  cases = term.contents.if_block_cases.filter({not input().property_opt(:Hidden false)})
+  for caseTerm in cases
+    @self.phrase(:ws caseTerm.property_opt(:Syntax_PreWs ''))
+
+    if caseTerm.name != 'else'
+      if first
+        @self.phrase(:text 'if ')
+      else
+        @self.phrase(:text 'elif ')
+
+      condition = caseTerm.contents.case_find_condition
+      assert(not condition.is_null)
+      @self.term_input(condition 0)
+    else
+      @self.phrase(:text 'else')
+    @self.phrase(:ws caseTerm.property_opt(:Syntax_LineEnding ''))
+    @self.block_pre(caseTerm)
+    @self.phrase(:contents caseTerm.contents)
+    @self.block_post(caseTerm)
+
+    first = false
+  self
+
+def SourceRepro.implicit_copy(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  @self.term_input(term 0)
+
+def SourceRepro.nonlocal(self, Term term) -> SourceRepro
+  @self.phrase(:name term.input(0).name)
 
 def SourceRepro.term(self, Term term) -> SourceRepro
-  if term.has_property(:Comment)
-    return self.phrase(:comment term.property_opt(:Comment ''))
-
-  -- Todo: Function special cases
-  if term.is_value
-    @self.phrase(:value term.value_to_source)
+  if term.is_comment
+    @self.phrase(:comment term.property_opt(:Comment ''))
+  elif term.is_neg
+    @self.neg(term)
+  elif term.is_require
+    @self.require_statement(term)
+  elif term.is_function_decl
+    @self.function_decl(term)
+  elif term.is_closure_decl
+    @self.closure_decl(term)
+  elif term.is_type_decl
+    @self.type_decl(term)
+  elif term.is_get_index and term.property_opt(:Syntax_Brackets false)
+    @self.get_index_brackets(term)
+  elif term.is_set_with_selector
+    @self.set_with_selector(term)
+  elif term.property_opt(:Syntax_ReturnStatement false)
+    @self.return_statement(term)
+  elif term.is_declared_state
+    @self.declared_state(term)
+  elif term.is_for_loop
+    @self.for_loop(term)
+  elif term.is_while_loop
+    @self.while_loop(term)
+  elif term.is_if_block
+    @self.if_block(term)
+  elif term.is_copy
+    @self.implicit_copy(term)
+  elif term.is_nonlocal
+    @self.nonlocal(term)
+  elif term.is_continue
+    @self.phrase(:text 'continue')
+  elif term.is_break
+    @self.phrase(:text 'break')
+  elif term.is_discard
+    @self.phrase(:text 'discard')
+  elif term.is_syntax_error
+    @self.phrase(:text term.property_opt(:OriginalText ''))
+  elif term.is_value
+    @self.term_value(term)
   else
-    @self.term_default(term)
+    @self.term_default_format(term)
 
   @self.phrase(:ws term.property_opt(:Syntax_PostWs ''))
 
@@ -75,31 +449,53 @@ def SourceRepro.name_binding_source(self, Term term) -> SourceRepro
 
   self
 
-def SourceRepro.term_input(self, Term term, int index) -> SourceRepro
-  input = term.input(index)
 
+def SourceRepro.term_input_pre(self, Term term, int index) -> SourceRepro
   defaultPre = cond(index == 0, "", " ")
-  defaultPost = cond(index+1 == term.num_inputs, "", ",")
-
   @self.phrase(:ws term.input_property_opt(index :Syntax_PreWs defaultPre))
 
-  if input.name == ''
-    @self.phrase(:sub_expr input)
-  else
-    @self.phrase(:name_ref input)
+def Term.input_visible(term, int index) -> bool
+  if term.input(index).is_null
+    return false
+  if term.input_property_opt(index :Hidden false)
+    return false
+  true
 
+def SourceRepro.term_input_inner(self, Term term, int index) -> SourceRepro
+  if not term.input_visible(index)
+    return self
+
+  inputTerm = term.input(index)
+
+  if inputTerm.name == ''
+    @self.phrase(:sub_expr inputTerm)
+  else
+    if term.input_property_opt(index :Syntax_IdentifierRebind false)
+      @self.phrase(:text '@')
+    @self.phrase(:name_ref inputTerm)
+
+def SourceRepro.term_input_post(self, Term term, int index) -> SourceRepro
+  defaultPost = cond(index+1 == term.num_inputs, "", ",")
   @self.phrase(:ws term.input_property_opt(index :Syntax_PostWs defaultPost))
 
-def SourceRepro.term_default(self, Term term) -> SourceRepro
+def SourceRepro.term_input(self, Term term, int index) -> SourceRepro
+  if not term.input_visible(index)
+    return self
+
+  @self.term_input_pre(term index)
+  @self.term_input_inner(term index)
+  @self.term_input_post(term index)
+
+def SourceRepro.term_default_format(self, Term term) -> SourceRepro
 
   declarationStyle = term.property_opt(:Syntax_DeclarationStyle, 'function-call')
   functionName = term.property_opt(:Syntax_FunctionName, term.function.name)
 
   -- Check for an infix operator with implicit rebinding (like +=)
   if declarationStyle == 'infix' and term.property_opt(:Syntax_RebindingInfix false)
-    @self.phrase(:name_binding term)
+    @self.phrase(:name_binding term.name)
     @self.phrase(:ws ' ')
-    @self.phrase(:operator term.property(:InfixOperator))
+    @self.phrase(:operator functionName)
     @self.term_input(term 1)
     return self
 
@@ -127,20 +523,61 @@ def SourceRepro.term_default(self, Term term) -> SourceRepro
       @self.phrase(:text ')')
 
   elif declarationStyle == 'method-call'
-    @self.term_input(term 0)
+    @self.term_input_pre(term 0)
+    @self.term_input_inner(term 0)
+
+    @self.phrase(:ws term.property_opt(:Syntax_PreDotWs ''))
+    @self.phrase(:text '.')
+    @self.phrase(:function_name functionName)
+    if not term.property_opt(:Syntax_NoParens false)
+      @self.phrase(:text '(')
+
+    for inputIndex in 1..term.num_inputs
+      @self.term_input(term inputIndex)
+
+    if not term.property_opt(:Syntax_NoParens false)
+      @self.phrase(:text ')')
+
   elif declarationStyle == 'dot-access'
+    @self.term_input(term 0)
+    @self.phrase(:text '.')
+    @self.term_input(term 1)
+  elif declarationStyle == 'dot-concat'
+    @self.term_input(term 0)
+    @self.phrase(:text '.')
+    @self.phrase(:functionName functionName)
   elif declarationStyle == 'infix'
     @self.term_input(term 0)
-    @self.phrase(:function_name functionName)
+    @self.phrase(:functionName functionName)
     @self.term_input(term 1)
   elif declarationStyle == 'prefix'
+    @self.phrase(:functionName functionName)
+    @self.phrase(:ws term.property_opt(:Syntax_PostFunctionWs ''))
+    @self.term_input(term 0)
   elif declarationStyle == 'arrow-concat'
+    @self.term_input(term 0)
+    @self.phrase(:text '->')
+    @self.phrase(:ws term.property_opt(:Syntax_PostOperatorWs ''))
+    @self.phrase(:functionName functionName)
   elif declarationStyle == 'bar-apply'
+    @self.term_input(term 0)
+    @self.phrase(:text '|')
+    @self.phrase(:ws term.property_opt(:Syntax_PostOperatorWs ''))
+    @self.phrase(:functionName functionName)
   elif declarationStyle == 'method-right-arrow'
-  elif declarationStyle == 'left-arrow'
+    @self.term_input(term 1)
+    @self.phrase(:text '->')
+    @self.phrase(:ws term.property_opt(:Syntax_PostOperatorWs ''))
+    @self.term_input_pre(term 0)
+    @self.term_input_inner(term 0)
+    @self.phrase(:text '.')
+    @self.phrase(:functionName functionName)
   elif declarationStyle == 'bracket-list'
+    @self.phrase(:text '[')
+    for index in 0..(term.num_inputs)
+      @self.term_input(term index)
+    @self.phrase(:text ']')
 
-    -- TODO
   else
     error('unrecognized declaration style: ' declarationStyle)
 
@@ -152,6 +589,17 @@ def SourceRepro.term_default(self, Term term) -> SourceRepro
 
 def Term.should_print_source_line(term) -> bool
   term.is_statement
+
+def SourceRepro.block_pre(self, Term term) -> SourceRepro
+  @self.phrase(:ws term.property_opt(:Syntax_PostHeadingWs ''))
+  if term.property_opt(:Syntax_BlockStyle '') == 'braces'
+    @self.phrase(:text '{')
+  self
+
+def SourceRepro.block_post(self, Term term) -> SourceRepro
+  if term.property_opt(:Syntax_BlockStyle '') == 'braces'
+    @self.phrase(:text '}')
+  self
 
 def SourceRepro.block(self, Block block) -> SourceRepro
   newlineNeeded = false
@@ -166,7 +614,7 @@ def SourceRepro.block(self, Block block) -> SourceRepro
 
     @self.phrase(:ws term.property_opt(:Syntax_PreWs ''))
 
-    @self.term(term)
+    @self.phrase(:sub_expr term)
 
     if term.has_property(:Syntax_LineEnding)
       @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
@@ -177,9 +625,28 @@ def SourceRepro.block(self, Block block) -> SourceRepro
 
   self
 
-def Block.to_source_string(block) -> String
-  SourceRepro.make.block(block).flatten_to_string
+def phrases_to_string(List phrases) -> String
+  strs = for phrase in phrases
+    if phrase.t == :sub_expr
+      phrase.term | term_phrases | phrases_to_string
+    elif phrase.t == :contents
+      phrase.block | block_phrases | phrases_to_string
+    else
+      phrase.text
+  strs.join('')
 
 def term_phrases(Term term) -> List
   SourceRepro.make.term(term).phrases
 
+def block_phrases(Block block) -> List
+  SourceRepro.make.block(block).phrases
+
+def expand_block_contents(List phrases) -> List
+  for phrase in @phrases
+    if phrase.t == :contents
+      phrase = block_phrases(phrase.block)
+
+  phrases.flatten
+
+def block_to_string(Block block)
+  block | block_phrases | phrases_to_string

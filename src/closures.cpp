@@ -12,7 +12,6 @@
 #include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
-#include "source_repro.h"
 #include "tagged_value.h"
 
 namespace circa {
@@ -77,12 +76,6 @@ void insert_nonlocal_terms(Block* block)
             }
         }
     }
-}
-
-void closure_block_formatSource(caValue* source, Term* term)
-{
-    format_name_binding(source, term);
-    format_block_source(source, nested_contents(term), term);
 }
 
 void closure_block_evaluate(caStack* stack)
@@ -194,8 +187,6 @@ void closure_save_all_bindings(caValue* closure, Stack* stack)
 void closures_install_functions(Block* kernel)
 {
     install_function(kernel, "closure_block", closure_block_evaluate);
-    block_set_format_source_func(function_contents(FUNCS.closure_block), closure_block_formatSource);
-
     install_function(kernel, "function_decl", closure_block_evaluate);
 
     FUNCS.func_apply = kernel->get("Func.apply");

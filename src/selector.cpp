@@ -9,7 +9,6 @@
 #include "interpreter.h"
 #include "list.h"
 #include "selector.h"
-#include "source_repro.h"
 #include "string_type.h"
 #include "type.h"
 
@@ -303,25 +302,6 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
     return NULL;
 }
 
-void selector_format_source(caValue* source, Term* term)
-{
-    // Append subscripts for each selector element
-    for (int i=0; i < term->numInputs(); i++) {
-        Term* input = term->input(i);
-
-        if (is_value(input) && is_string(term_value(input))) {
-            append_phrase(source, ".", input, tok_Dot);
-            append_phrase(source, as_string(term_value(input)),
-                    input, tok_Identifier);
-
-        } else {
-            append_phrase(source, "[", term, tok_LSquare);
-            format_source_for_input(source, term, i, "", "");
-            append_phrase(source, "]", term, tok_RSquare);
-        }
-    }
-}
-
 void get_with_selector_evaluate(caStack* stack)
 {
     caValue* root = circa_input(stack, 0);
@@ -338,20 +318,6 @@ void get_with_selector_evaluate(caStack* stack)
     }
 
     copy(result, circa_output(stack, 0));
-}
-
-void get_with_selector__formatSource(caValue* source, Term* term)
-{
-    Term* selector = term->input(1);
-    if (selector->function != FUNCS.selector) {
-        // Unusual case; bail out with default formatting.
-        format_term_source_default_formatting(source, term);
-        return;
-    }
-
-    format_name_binding(source, term);
-    format_source_for_input(source, term, 0, "", "");
-    selector_format_source(source, selector);
 }
 
 void set_with_selector_evaluate(caStack* stack)
@@ -371,33 +337,6 @@ void set_with_selector_evaluate(caStack* stack)
     }
 }
 
-void set_with_selector__formatSource(caValue* source, Term* term)
-{
-    Term* selector = term->input(1);
-    if (selector->function != FUNCS.selector) {
-        format_term_source_default_formatting(source, term);
-        return;
-    }
-
-    // Don't call format_name_binding here
-
-    format_source_for_input(source, term, 0, "", "");
-
-    selector_format_source(source, selector);
-
-    append_phrase(source, term->stringProp(sym_Syntax_PreEqualsSpace,""), term, tok_Whitespace);
-
-    if (term->hasProperty(sym_Syntax_RebindOperator)) {
-        append_phrase(source, term->stringProp(sym_Syntax_RebindOperator,""), term, tok_Equals);
-        append_phrase(source, term->stringProp(sym_Syntax_PostEqualsSpace,""), term, tok_Whitespace);
-        format_source_for_input(source, term->input(2), 1, "", "");
-    } else {
-        append_phrase(source, "=", term, tok_Equals);
-        append_phrase(source, term->stringProp(sym_Syntax_PostEqualsSpace,""), term, tok_Whitespace);
-        format_source_for_input(source, term, 2, "", "");
-    }
-}
-
 void selector_setup_funcs(Block* kernel)
 {
     FUNCS.selector = 
@@ -406,14 +345,10 @@ void selector_setup_funcs(Block* kernel)
     FUNCS.get_with_selector = 
         import_function(kernel, get_with_selector_evaluate,
             "get_with_selector(any object, Selector selector) -> any");
-    block_set_format_source_func(function_contents(FUNCS.get_with_selector),
-        get_with_selector__formatSource);
 
     FUNCS.set_with_selector =
         import_function(kernel, set_with_selector_evaluate,
             "set_with_selector(any object, Selector selector, any newValue) -> any");
-    block_set_format_source_func(function_contents(FUNCS.set_with_selector),
-        set_with_selector__formatSource);
 }
 
 } // namespace circa

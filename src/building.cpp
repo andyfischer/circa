@@ -17,8 +17,6 @@
 #include "names.h"
 #include "parser.h"
 #include "selector.h"
-#include "source_repro.h"
-#include "stateful_code.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "term.h"

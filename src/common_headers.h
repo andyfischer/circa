@@ -67,7 +67,6 @@ typedef int Symbol;
 
 typedef void (*EvaluateFunc)(caStack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
-typedef void (*FormatSourceFunc)(caValue* source, Term* term);
 typedef void (*ReleaseFunc)(caValue* value);
 typedef void (*PostCompileFunc)(Term*);
 
@@ -114,11 +113,6 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 // fopen()
 #ifndef CIRCA_ENABLE_FILESYSTEM
 #define CIRCA_ENABLE_FILESYSTEM 1
-#endif
-
-// ENABLE_THREADING - Enables functions that wrap around system threading utils
-#ifndef CIRCA_ENABLE_THREADING
-#define CIRCA_ENABLE_THREADING 1
 #endif
 
 // ENABLE_LOGGING - Enables internal logging (disabled by default)

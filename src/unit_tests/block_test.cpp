@@ -3,7 +3,6 @@
 #include "unit_test_common.h"
 
 #include "block.h"
-#include "stateful_code.h"
 #include "type.h"
 
 namespace block_test {

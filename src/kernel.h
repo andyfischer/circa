@@ -162,10 +162,6 @@ namespace for_function {
     std::string get_heading_source(Term* term);
 }
 
-namespace neg_function {
-    void formatSource(caValue* source, Term* term);
-}
-
 namespace return_function {
     void setup(Block* kernel);
 }

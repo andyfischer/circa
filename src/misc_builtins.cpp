@@ -107,6 +107,13 @@ void repeat(caStack* stack)
         copy(source, circa_index(out, i));
 }
 
+void int__to_hex_string(caStack* stack)
+{
+    std::stringstream strm;
+    strm << std::hex << as_int(circa_input(stack, 0));
+    set_string(circa_output(stack, 0), strm.str().c_str());
+}
+
 void List__append(caStack* stack)
 {
     caValue* out = circa_output(stack, 0);
@@ -602,6 +609,7 @@ void print(caStack* stack)
     caValue* args = circa_input(stack, 0);
 
     Value out;
+    set_string(&out, "");
 
     for (int i = 0; i < circa_count(args); i++) {
         caValue* val = circa_index(args, i);
@@ -617,10 +625,7 @@ void to_string(caStack* stack)
 {
     caValue* in = circa_input(stack, 0);
     caValue* out = circa_output(stack, 0);
-    if (is_string(in))
-        copy(in, out);
-    else
-        to_string(in, out);
+    to_string(in, out);
 }
 
 void compute_patch_hosted(caStack* stack)
@@ -660,6 +665,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "is_function", hosted_is_function);
     module_patch_function(patch, "is_type", hosted_is_type);
     module_patch_function(patch, "length", length);
+    module_patch_function(patch, "int.to_hex_string", int__to_hex_string);
     module_patch_function(patch, "List.append", List__append);
     module_patch_function(patch, "List.concat", List__concat);
     module_patch_function(patch, "List.resize", List__resize);

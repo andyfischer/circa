@@ -10,7 +10,6 @@
 #include "importing.h"
 #include "inspection.h"
 #include "parser.h"
-#include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "names.h"
@@ -48,54 +47,6 @@ namespace type_t {
         dest->value_data.ptr = type;
     }
 
-    void formatSource(caValue* source, Term* term)
-    {
-        append_phrase(source, "type ", term, sym_Keyword);
-        append_phrase(source, term->name, term, sym_TypeName);
-
-        if (term->hasProperty(sym_Syntax_TypeMagicSymbol)) {
-            append_phrase(source, " = ", term, sym_None);
-            append_phrase(source, term->stringProp(sym_Syntax_TypeMagicSymbol, ""),
-                term, sym_None);
-        }
-
-        if (term->boolProp(sym_Syntax_NoBrackets, false))
-            return;
-
-        append_phrase(source, term->stringProp(sym_Syntax_PreLBracketWs, " "),
-                term, tok_Whitespace);
-        append_phrase(source, "{", term, tok_LBrace);
-        append_phrase(source, term->stringProp(sym_Syntax_PostLBracketWs, " "),
-                term, tok_Whitespace);
-
-        Block* contents = nested_contents(term);
-
-        for (int i=0; i < contents->length(); i++) {
-            Term* field = contents->get(i);
-
-            if (is_comment(field)) {
-                append_phrase(source, field->stringProp(sym_Comment,""), field, tok_Comment);
-                append_phrase(source, field->stringProp(sym_Syntax_LineEnding,""), field, tok_Whitespace);
-                continue;
-            } else if (field->boolProp(sym_FieldAccessor, false)) {
-                ca_assert(field != NULL);
-                append_phrase(source, field->stringProp(sym_Syntax_PreWs,""),
-                        term, tok_Whitespace);
-
-                Type* fieldType = get_output_type(function_contents(field), 0);
-                append_phrase(source, as_cstring(&fieldType->name), term, sym_TypeName);
-                append_phrase(source, field->stringProp(sym_Syntax_PostNameWs," "),
-                        term, tok_Whitespace);
-                append_phrase(source, field->name, term, tok_Identifier);
-                append_phrase(source, field->stringProp(sym_Syntax_PostWs,""),
-                        term, tok_Whitespace);
-            }
-        }
-        append_phrase(source, term->stringProp(sym_Syntax_PreRBracketWs,""),
-            term, tok_Whitespace);
-        append_phrase(source, "}", term, tok_RBrace);
-    }
-
     void toString(caValue* value, caValue* out)
     {
         string_append(out, "<Type ");
@@ -109,7 +60,6 @@ namespace type_t {
         type->initialize = type_t::initialize;
         type->release = type_t::release;
         type->copy = type_t::copy;
-        type->formatSource = formatSource;
         type->toString = toString;
     }
 
@@ -367,7 +317,6 @@ void reset_type(Type* type)
     type->cast = NULL;
     type->staticTypeQuery = NULL;
     type->toString = NULL;
-    type->formatSource = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;
     type->numElements = NULL;

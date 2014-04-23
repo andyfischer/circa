@@ -27,15 +27,6 @@ namespace int_t {
     {
         string_append(asStr, as_int(value));
     }
-    void format_source(caValue* source, Term* term)
-    {
-        std::stringstream strm;
-        if (term->stringProp(sym_Syntax_IntegerFormat, "dec") == "hex")
-            strm << "0x" << std::hex;
-
-        strm << as_int(term_value(term));
-        append_phrase(source, strm.str(), term, tok_Integer);
-    }
     void setup_type(Type* type)
     {
         if (string_equals(&type->name, ""))
@@ -45,7 +36,6 @@ namespace int_t {
         type->equals = equals;
         type->hashFunc = hashFunc;
         type->toString = to_string;
-        type->formatSource = format_source;
     }
 }
 }

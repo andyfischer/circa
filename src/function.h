@@ -17,12 +17,6 @@ void finish_building_function(Block* func);
 
 Type* derive_specialized_output_type(Term* function, Term* call);
 
-// Returns whether this term rebinds the input at 'index'
-bool function_call_rebinds_input(Term* term, int index);
-
-void function_format_header_source(caValue* source, Block* func);
-void function_format_source(caValue* source, Term* term);
-
 bool is_subroutine(Term* term);
 bool is_subroutine(Block* block);
 

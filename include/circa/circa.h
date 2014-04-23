@@ -105,18 +105,23 @@ struct Value
     Value* element(int i);
     int length();
 
-    // Chainable setters.
-    Value* set_element_int(int index, int i);
-    Value* set_element_null(int index);
-    Value* set_element_str(int index, const char* s);
-    Value* set_element_sym(int index, caSymbol s);
-    Value* set_element(int index, Value* val);
+    // Assignment
+    Value* set_value(caValue* v);
+    Value* set_bool(bool b);
+    Value* set_string(const char* s);
+    Value* set_int(int i);
+    Value* set_symbol(caSymbol s);
 
     // List
     Value* set_list(int size);
     Value* append();
     Value* resize(int size);
     bool isEmpty();
+    Value* set_element_int(int index, int i);
+    Value* set_element_null(int index);
+    Value* set_element_str(int index, const char* s);
+    Value* set_element_sym(int index, caSymbol s);
+    Value* set_element(int index, Value* val);
 
     // For debugging:
     void dump();

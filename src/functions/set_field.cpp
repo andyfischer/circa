@@ -31,24 +31,11 @@ namespace set_field_function {
         return caller->input(0)->type;
     }
 
-    void formatSource(caValue* source, Term* term)
-    {
-        format_source_for_input(source, term, 0);
-        for (int i=2; i < term->numInputs(); i++) {
-            append_phrase(source, ".", term, sym_None);
-            caValue* fieldName = term_value(term->input(i));
-            append_phrase(source, as_cstring(fieldName), term, sym_None);
-        }
-        append_phrase(source, " =", term, sym_None);
-        format_source_for_input(source, term, 1);
-    }
-
     void setup(Block* kernel)
     {
         FUNCS.set_field = import_function(kernel, set_field,
                 "set_field(any obj, String key, any val) -> any");
         block_set_specialize_type_func(function_contents(FUNCS.set_field), specializeType);
-        block_set_format_source_func(function_contents(FUNCS.set_field), formatSource);
     }
 }
 }

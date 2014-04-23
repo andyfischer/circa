@@ -28,7 +28,6 @@
 #include "../functions/static_error.cpp"
 #include "../functions/sub.cpp"
 #include "../functions/switch.cpp"
-#include "../functions/term_to_source.cpp"
 #include "../functions/trig.cpp"
 #include "../functions/type_check.cpp"
 #include "../functions/unique_id.cpp"

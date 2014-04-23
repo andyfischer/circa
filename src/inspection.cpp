@@ -110,6 +110,11 @@ bool is_dynamic_func_call(Term* term)
     return !is_function(term->function);
 }
 
+bool is_declared_state(Term* term)
+{
+    return term->function == FUNCS.declared_state;
+}
+
 bool is_an_unknown_identifier(Term* term)
 {
     return term->function == FUNCS.unknown_identifier;

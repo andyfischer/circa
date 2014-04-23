@@ -5,7 +5,6 @@
 #include "hashtable.h"
 #include "list.h"
 #include "names_builtin.h"
-#include "source_repro.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -89,13 +88,6 @@ static void symbol_to_source_string(caValue* value, caValue* out)
     string_append(out, symbol_as_string(value));
 }
 
-static void format_source(caValue* source, Term* term)
-{
-    Value msg;
-    symbol_to_source_string(term_value(term), &msg);
-    append_phrase(source, as_cstring(&msg), term, tok_ColonString);
-}
-
 static int hash_func(caValue* value)
 {
     return as_symbol(value);
@@ -130,7 +122,6 @@ void symbol_setup_type(Type* type)
     set_string(&type->name, "Symbol");
     type->storageType = sym_StorageTypeInt;
     type->toString = symbol_to_source_string;
-    type->formatSource = format_source;
     type->hashFunc = hash_func;
 }
 

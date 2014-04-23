@@ -25,9 +25,7 @@
 #include "parser.h"
 #include "reflection.h"
 #include "selector.h"
-#include "source_repro.h"
 #include "stack.h"
-#include "stateful_code.h"
 #include "static_checking.h"
 #include "string_repr.h"
 #include "string_type.h"
@@ -82,11 +80,6 @@ void syntax_error(caStack* stack)
     set_string(&msg, "");
     string_append(&msg, circa_caller_term(stack)->stringProp(sym_Message,"Syntax error").c_str());
     circa_output_error(stack, as_cstring(&msg));
-}
-
-void syntax_error_formatSource(caValue* source, Term* term)
-{
-    append_phrase(source, term->stringProp(sym_OriginalText,""), term, sym_None);
 }
 
 void from_string(caStack* stack)
@@ -251,7 +244,7 @@ void term_toString(caValue* val, caValue* out)
 {
     Term* t = as_term_ref(val);
     if (t == NULL)
-        set_string(out, "Term#null");
+        string_append(out, "Term#null");
     else {
         string_append(out, "Term#");
         string_append(out, t->id);
@@ -320,19 +313,6 @@ void test_spy(caStack* stack)
         set_list(g_spyValues);
     }
     copy(circa_input(stack, 0), list_append(g_spyValues));
-}
-
-void section_block_formatSource(caValue* source, Term* term)
-{
-    format_name_binding(source, term);
-    append_phrase(source, "section", term, sym_None);
-    append_phrase(source, " ", term, sym_Whitespace);
-    format_block_source(source, nested_contents(term), term);
-}
-
-void nonlocal_formatSource(caValue* source, Term* term)
-{
-    append_phrase(source, as_cstring(term_name(term->input(0))), term, sym_None);
 }
 
 void for_each_root_type(void (*callback)(Type* type))
@@ -426,7 +406,6 @@ void bootstrap_kernel()
     FUNCS.function_decl = functionDeclFunction;
     FUNCS.function_decl->function = FUNCS.function_decl;
     make_nested_contents(FUNCS.function_decl);
-    function_contents(FUNCS.function_decl)->overrides.formatSource = function_format_source;
     block_set_function_has_nested(function_contents(FUNCS.function_decl), true);
 
     // Create value function
@@ -513,13 +492,11 @@ void bootstrap_kernel()
     loop_setup_functions(builtins);
 
     FUNCS.syntax_error = import_function(builtins, syntax_error, "syntax_error(i :multiple)");
-    block_set_format_source_func(function_contents(FUNCS.syntax_error), syntax_error_formatSource);
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(builtins);
 
     FUNCS.section_block = import_function(builtins, NULL, "def section() -> any");
-    block_set_format_source_func(function_contents(FUNCS.section_block), section_block_formatSource);
 
     FUNCS.case_condition_bool = import_function(builtins, NULL, "def case_condition_bool(bool condition)");
     FUNCS.loop_condition_bool = import_function(builtins, NULL, "def loop_condition_bool(bool condition)");
@@ -579,7 +556,6 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
     append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
     finish_building_overloaded_function(FUNCS.neg);
-    block_set_format_source_func(function_contents(FUNCS.neg), neg_function::formatSource);
 
     // Install native functions.
     module_patch_function(world->builtinPatch, "from_string", from_string);
@@ -606,16 +582,12 @@ void bootstrap_kernel()
 
     native_patch_apply_patch(world->builtinPatch, builtins);
 
-    block_set_format_source_func(function_contents(FUNCS.nonlocal), nonlocal_formatSource);
-
     // Fix 'builtins' module now that the module() function is created.
     change_function(builtinsTerm, FUNCS.module);
     block_set_bool_prop(builtins, sym_Builtins, true);
 
     // Fetch refereneces to certain stdlib funcs.
     ca_assert(FUNCS.declared_state != NULL);
-    block_set_format_source_func(function_contents(FUNCS.declared_state),
-        declared_state_format_source);
 
     FUNCS.has_effects = builtins->get("has_effects");
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
@@ -661,7 +633,6 @@ void bootstrap_kernel()
     TYPES.mutable_type->toString = Mutable_toString;
 
     stack_setup_type(TYPES.stack);
-    color_t::setup_type(TYPES.color);
 
     function_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 }

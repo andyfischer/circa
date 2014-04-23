@@ -50,27 +50,57 @@ float Value::asFloat()  { return as_float(this); }
 Value* Value::element(int i) { return list_get(this, i); }
 int Value::length() { return list_length(this); }
 
+Value* Value::set_value(caValue* v)
+{
+    ::set_value(this, v);
+    return this;
+}
+
+Value* Value::set_bool(bool b)
+{
+    ::set_bool(this, b);
+    return this;
+}
+
+Value* Value::set_string(const char* str)
+{
+    ::set_string(this, str);
+    return this;
+}
+
+Value* Value::set_int(int i)
+{
+    ::set_int(this, i);
+    return this;
+}
+
+Value* Value::set_symbol(caSymbol s)
+{
+    ::set_symbol(this, s);
+    return this;
+}
+
 Value* Value::set_element_str(int index, const char* s)
 {
-    set_string(list_get(this, index), s);
+    ::set_string(list_get(this, index), s);
     return this;
 }
 
 Value* Value::set_element_sym(int index, Symbol s)
 {
-    set_symbol(list_get(this, index), s);
+    ::set_symbol(list_get(this, index), s);
     return this;
 }
 
 Value* Value::set_element_int(int index, int i)
 {
-    set_int(list_get(this, index), i);
+    ::set_int(list_get(this, index), i);
     return this;
 }
 
 Value* Value::set_element(int index, Value* val)
 {
-    set_value(list_get(this, index), val);
+    ::set_value(list_get(this, index), val);
     return this;
 }
 Value* Value::set_element_null(int index)

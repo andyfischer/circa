@@ -18,7 +18,6 @@
 #include "names.h"
 #include "parser.h"
 #include "repl.h"
-#include "source_repro.h"
 #include "static_checking.h"
 #include "string_repr.h"
 #include "string_type.h"
@@ -131,7 +130,6 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
 {
     RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
-    bool printSource = false;
     bool printState = false;
     bool dontRunScript = false;
 
@@ -164,11 +162,6 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
             continue;
         }
 
-        if (string_equals(args->element(argIndex), "-s")) {
-            printSource = true;
-            argIndex++;
-            continue;
-        }
         if (string_equals(args->element(argIndex), "-print-state")) {
             printState = true;
             argIndex++;
@@ -184,9 +177,6 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
 
     Block block;
     load_script(&block, as_cstring(args->element(argIndex)));
-
-    if (printSource)
-        std::cout << get_block_source_text(&block);
 
     if (dontRunScript)
         return;
@@ -313,11 +303,36 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         do_update_file(&filename, &contents, reply);
 
     } else if (equals_string(&command, "source_repro")) {
+
+        Value args;
+        parse_string_as_argument_list(input, &args);
+
+        Block block;
+        load_script(&block, as_cstring(args.element(1)));
+
+        Value sourceReproStr;
+        set_string(&sourceReproStr, "source_repro");
+        Block* sourceRepro = load_module_by_name(world, NULL, &sourceReproStr);
+        Block* to_source_string = find_function_local(sourceRepro, "block_to_string");
+
+        Stack stack;
+        stack_init(&stack, to_source_string);
+        set_block(circa_input(&stack, 0), &block);
+
+        stack_run(&stack);
+
+        if (stack_errored(&stack))
+            dump(&stack);
+        else
+            std::cout << as_string(circa_output(&stack, 0));
+        
+#if 0
         Value args;
         parse_string_as_argument_list(input, &args);
         Block block;
         load_script(&block, as_cstring(args.element(1)));
         std::cout << get_block_source_text(&block);
+#endif
     } else if (equals_string(&command, "dump_stats")) {
 
         perf_stats_dump();
@@ -585,7 +600,7 @@ int run_command_line(caWorld* world, caValue* args)
         Value sourceReproStr;
         set_string(&sourceReproStr, "source_repro");
         Block* sourceRepro = load_module_by_name(world, NULL, &sourceReproStr);
-        Block* to_source_string = find_function_local(sourceRepro, "Block.to_source_string");
+        Block* to_source_string = find_function_local(sourceRepro, "block_to_string");
 
         Stack stack;
         stack_init(&stack, to_source_string);
@@ -597,14 +612,6 @@ int run_command_line(caWorld* world, caValue* args)
             dump(&stack);
         else
             std::cout << as_string(circa_output(&stack, 0));
-        return 0;
-    }
-
-    // Rewrite source, this is useful for upgrading old source
-    if (string_equals(list_get(args, 0), "-rewrite-source")) {
-        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(list_get(args, 1)));
-        std::string contents = get_block_source_text(block);
-        write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
 

@@ -23,7 +23,6 @@
 #include "parser.h"
 #include "reflection.h"
 #include "stack.h"
-#include "stateful_code.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "names.h"
@@ -313,7 +312,7 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
 static void indent(caValue* out, int count)
 {
     for (int x = 0; x < count; x++)
-        string_append(out, count);
+        string_append(out, " ");
 }
 
 void stack_to_string(Stack* stack, caValue* out, bool withBytecode)

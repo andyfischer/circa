@@ -14,7 +14,6 @@
 #include "list.h"
 #include "modules.h"
 #include "parser.h"
-#include "source_repro.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -63,10 +62,12 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
         set_string(list_append(output), "Cleared working area.");
         return;
     }
+#if 0
     if (string_equals(line, "/show")) {
         std::cout << get_block_source_text(block);
         return;
     }
+#endif
     if (string_equals(line, "/dump")) {
         Value out;
         print_block(block, &out);
@@ -94,7 +95,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
         set_string(list_append(output), "");
         set_string(list_append(output), "Special REPL commands:");
         set_string(list_append(output), " /raw   - Toggle the display of raw format");
-        set_string(list_append(output), " /show  - Print all code in working area");
+        //set_string(list_append(output), " /show  - Print all code in working area");
         set_string(list_append(output), " /dump  - Print all code in working area, raw format");
         set_string(list_append(output), " /stack - Display the current stack, raw format");
         set_string(list_append(output), " /help  - Print this text");

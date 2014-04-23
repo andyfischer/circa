@@ -21,12 +21,6 @@ namespace bool_t {
         else
             string_append(out, "false");
     }
-    void format_source(caValue* source, Term* term)
-    {
-        Value str;
-        bool_t::to_string(term_value(term), &str);
-        append_phrase(source, as_cstring(&str), term, tok_Bool);
-    }
     void setup_type(Type* type)
     {
         set_string(&type->name, "bool");
@@ -34,7 +28,6 @@ namespace bool_t {
         type->reset = reset;
         type->hashFunc = hashFunc;
         type->toString = to_string;
-        type->formatSource = format_source;
     }
 } // namespace bool_t
 } // namespace circa

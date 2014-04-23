@@ -12,7 +12,6 @@
 #include "list.h"
 #include "modules.h"
 #include "names_builtin.h"
-#include "source_repro.h"
 #include "string_type.h"
 #include "term.h"
 #include "world.h"

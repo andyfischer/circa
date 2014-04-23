@@ -17,8 +17,6 @@
 #include "modules.h"
 #include "parser.h"
 #include "selector.h"
-#include "source_repro.h"
-#include "stateful_code.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "switch_block.h"
@@ -121,7 +119,7 @@ struct ListSyntaxHints {
     {
         for (int i=0; i < inputs.length(); i++) {
             for (HashtableIterator it(inputs.element(i)); it; ++it) {
-                set_input_syntax_hint(term, i, as_symbol(it.currentKey()), it.current());
+                term_insert_input_property(term, i, as_symbol(it.currentKey()))->set_value(it.current());
             }
         }
     }
@@ -316,9 +314,7 @@ void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* con
 void apply_hints_from_parsed_input(Term* term, int index, ParseResult const& parseResult)
 {
     if (parseResult.identifierRebind) {
-        Value value;
-        set_bool(&value, true);
-        set_input_syntax_hint(term, index, sym_Syntax_IdentifierRebind, &value);
+        term_insert_input_property(term, index, sym_Syntax_IdentifierRebind)->set_bool(true);
     }
 }
 
@@ -1185,7 +1181,7 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     Term* forTerm = apply(block, FUNCS.for_func, TermList(listExpr));
     Block* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
-    set_input_syntax_hint(forTerm, 0, sym_Syntax_PostWs, "");
+    term_insert_input_property(forTerm, 0, sym_Syntax_PostWs)->set_string("");
     if (explicitTypeStr != "")
         forTerm->setStringProp(sym_Syntax_ExplicitType, explicitTypeStr.c_str());
 
@@ -1672,8 +1668,8 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 set_input(term, 1, left.term);
                 term->setStringProp(sym_Syntax_DeclarationStyle, "method-right-arrow");
 
-                set_input_syntax_hint(term, 1, sym_Syntax_PreWs, "");
-                set_input_syntax_hint(term, 1, sym_Syntax_PostWs, preOperatorWhitespace);
+                term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string("");
+                term_insert_input_property(term, 1, sym_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
 
             } else {
 
@@ -1686,7 +1682,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                     term->setStringProp(sym_Syntax_DeclarationStyle, "arrow-concat");
                 else
                     term->setStringProp(sym_Syntax_DeclarationStyle, "bar-apply");
-                set_input_syntax_hint(term, 0, sym_Syntax_PostWs, preOperatorWhitespace);
+                term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
 
             }
 
@@ -1706,8 +1702,8 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             if (opInfo.isRebinding)
                 term->setBoolProp(sym_Syntax_RebindingInfix, true);
 
-            set_input_syntax_hint(term, 0, sym_Syntax_PostWs, preOperatorWhitespace);
-            set_input_syntax_hint(term, 1, sym_Syntax_PreWs, postOperatorWhitespace);
+            term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
+            term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string(postOperatorWhitespace.c_str());
 
             if (opInfo.isRebinding) {
                 // Just bind the name if left side is an identifier.
@@ -2016,8 +2012,8 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
     Term* term = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
 
     term->setStringProp(sym_Syntax_DeclarationStyle, "dot-access");
-    set_input_syntax_hint(term, 0, sym_Syntax_PostWs, "");
-    set_input_syntax_hint(term, 1, sym_Syntax_PreWs, "");
+    term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string("");
+    term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string("");
 
     set_source_location(term, startPosition, tokens);
 
@@ -2055,8 +2051,8 @@ ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* c
             tokens.consume(tok_RSquare);
 
             Term* term = apply(block, FUNCS.get_index, TermList(head, subscript));
-            set_input_syntax_hint(term, 0, sym_Syntax_PostWs, "");
-            set_input_syntax_hint(term, 1, sym_Syntax_PreWs, postLbracketWs);
+            term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string("");
+            term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string(postLbracketWs.c_str());
             term->setBoolProp(sym_Syntax_Brackets, true);
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
