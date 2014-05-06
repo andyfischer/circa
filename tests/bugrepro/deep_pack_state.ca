@@ -15,7 +15,7 @@ def click_resolver(any message)
             listener = message[2]
             @clickAreas.append(ClickArea.make(rect listener))
         elif message[0] == :resolve
-            mousePos = message[1] -> Point.cast
+            mousePos = message[1] -> Vec2.cast
             event = message[2]
 
             listener = null
@@ -34,8 +34,8 @@ def click_resolver(any message)
         clickAreas = []
 
 int = make_stack(click_resolver)
-int.call([:resolve, [0 0] -> Point.cast, {}])
-int.call([:resolve, [0 0] -> Point.cast, {}])
-int.call([:resolve, [0 0] -> Point.cast, {}])
+int.call([:resolve, [0 0] -> Vec2.cast, {}])
+int.call([:resolve, [0 0] -> Vec2.cast, {}])
+int.call([:resolve, [0 0] -> Vec2.cast, {}])
 
 

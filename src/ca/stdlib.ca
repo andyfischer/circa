@@ -271,8 +271,9 @@ type FileSignature { String filename, int time_modified }
 type Callable;
 type Color { number r, number g, number b, number a }
 type Stack;
-type Point { number x, number y }
-type Point_i { int x, int y }
+type Vec2 { number x, number y }
+type Vec2i { int x, int y }
+type Vec3 { number x, number y, number z }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1, int y1, int x2, int y2 }
 
@@ -862,55 +863,64 @@ def Term.output(self, int index) -> Term
 def Term.extra_output(self, int index)
   self.parent.get_term(self.index + index + 1)
 
-def Point.add(self, Point b) -> Point
+def Vec2.add(self, Vec2 b) -> Vec2
   [self.x + b.x, self.y + b.y]
-def Point.sub(self, Point b) -> Point
+def Vec2.sub(self, Vec2 b) -> Vec2
   [self.x - b.x, self.y - b.y]
-def Point.mult(self, number scalar) -> Point
+def Vec2.mult(self, number scalar) -> Vec2
   [self.x * scalar, self.y * scalar]
-def Point.div(self, number scalar) -> Point
+def Vec2.div(self, number scalar) -> Vec2
   [self.x / scalar, self.y / scalar]
     
-def Point.distance(self, Point b) -> number
+def Vec2.distance(self, Vec2 b) -> number
   -- Returns the distance between self and b.
   sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
 
-def Point.magnitude(self) -> number
+def Vec2.magnitude(self) -> number
   -- Return the magnitude of this point, aka the distance to the origin.
   sqrt(sqr(self.x) + sqr(self.y))
 
-def Point.norm(self) -> Point
+def Vec2.norm(self) -> Vec2
   -- Returns the point normalized to be along the unit circle.
   m = self.magnitude
   [self.x / m, self.y / m]
 
-def Point.perpendicular(self) -> Point
-  -- Returns a vector that is perpendicular to its old value, rotated clockwise.
+def Vec2.perpendicular(self) -> Vec2
+  -- Returns a perpendicular vector, rotated clockwise.
   [self.y -self.x]
 
-def Point.translate(self, Point b) -> Point
+def Vec2.translate(self, Vec2 b) -> Vec2
   [self.x + b.x, self.y + b.y]
 
-def Point.to_rect_center(self, Point size) -> Rect
+def Vec2.to_rect_center(self, Vec2 size) -> Rect
   -- Returns a Rect with this point as the center, and the given size.
-  size_half = (size * 0.5) -> Point.cast
+  size_half = (size * 0.5) -> Vec2.cast
   [self.x - size_half.x,
       self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
 
-def Point.to_rect_topleft(self, Point size) -> Rect
+def Vec2.to_rect_topleft(self, Vec2 size) -> Rect
   -- Returns a Rect with this point as the top-left, and the given size.
   [self.x, self.y, self.x + size.x, self.y + size.y]
 
-def Point.delta(self) -> Point
+def Vec2.delta(self) -> Vec2
   -- Stateful function, returns the point difference since the last step.
-  state Point prev = self
+  state Vec2 prev = self
   result = [self.x - prev.x, self.y - prev.y]
   prev = self
   result
 
-def Point.rotate(self, number rotation) -> Point
+def Vec2.rotate(self, number rotation) -> Vec2
   -- Return the point rotated around [0 0] by the given angle.
   [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
+
+def Vec3.add(self, Vec3 b) -> Vec3
+  [self.x + b.x, self.y + b.y, self.z + b.z]
+def Vec3.sub(self, Vec3 b) -> Vec3
+  [self.x - b.x, self.y - b.y, self.z - b.z]
+def Vec3.mult(self, number s) -> Vec3
+  [self.x * s, self.y * s, self.z * s]
+def Vec3.div(self, number s) -> Vec3
+  [self.x / s, self.y / s, self.z / s]
 
 def Rect.add(self, Rect b) -> Rect
   [self.x1 + b.x1, self.y1 + b.y1, self.x2 + b.x2, self.y2 + b.y2]
@@ -925,7 +935,7 @@ def Rect.width(self) -> number
   self.x2 - self.x1
 def Rect.height(self) -> number
   self.y2 - self.y1
-def Rect.size(self) -> Point
+def Rect.size(self) -> Vec2
   [self.width self.height]
 def Rect.left(self) -> number
   self.x1
@@ -935,20 +945,20 @@ def Rect.right(self) -> number
   self.x2
 def Rect.bottom(self) -> number
   self.y2
-def Rect.top_left(self) -> Point
-  -- Returns the top-left coordinates as a Point.
+def Rect.top_left(self) -> Vec2
+  -- Returns the top-left coordinates as a Vec2.
   [self.x1 self.y1]
-def Rect.top_right(self) -> Point
-  -- Returns the top-rigth coordinates as a Point.
+def Rect.top_right(self) -> Vec2
+  -- Returns the top-rigth coordinates as a Vec2.
   [self.x2 self.y1]
-def Rect.bottom_left(self) -> Point
-  -- Returns the bottom-left coordinates as a Point.
+def Rect.bottom_left(self) -> Vec2
+  -- Returns the bottom-left coordinates as a Vec2.
   [self.x1 self.y2]
-def Rect.bottom_right(self) -> Point
-  -- Returns the bottom-right coordinates as a Point.
+def Rect.bottom_right(self) -> Vec2
+  -- Returns the bottom-right coordinates as a Vec2.
   [self.x2 self.y2]
-def Rect.center(self) -> Point
-  -- Returns the rectangle's center as a Point
+def Rect.center(self) -> Vec2
+  -- Returns the rectangle's center as a Vec2
   [(self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2]
 
 def Rect.intersects(self, Rect b) -> bool
@@ -957,13 +967,13 @@ def Rect.intersects(self, Rect b) -> bool
   intersects_on_y = (self.y2 > b.y1) and (b.y2 > self.y1)
   intersects_on_x and intersects_on_y
 
-def Rect.translate(self, Point p) -> Rect
+def Rect.translate(self, Vec2 p) -> Rect
   [self.x1 + p.x, self.y1 + p.y, self.x2 + p.x, self.y2 + p.y]
 
-def Rect.contains(self, Point p) -> bool
+def Rect.contains(self, Vec2 p) -> bool
   p.x >= self.x1 and p.y >= self.y1 and p.x < self.x2 and p.y < self.y2
 
-def Rect.grow(self, Point size) -> Rect
+def Rect.grow(self, Vec2 size) -> Rect
   [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
 
 def Rect.grow_s(self, number size) -> Rect
@@ -1083,11 +1093,11 @@ def seed() -> number
   s
 
 -- Math utility functions
-def polar(number angle) -> Point
+def polar(number angle) -> Vec2
   -- Return a point on the unit circle with the given angle.
   [cos(angle) sin(angle)]
 
-def random_norm_vector() -> Point
+def random_norm_vector() -> Vec2
   -- Return a random normalized vector.
   angle = rand() * 360
   [cos(angle) sin(angle)]
@@ -1095,19 +1105,19 @@ def random_norm_vector() -> Point
 def rect(number x1, number y1, number x2, number y2) -> Rect
   [x1 y1 x2 y2]
 
-def bezier3(number t, List points) -> Point
+def bezier3(number t, List points) -> Vec2
   -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
-  p0 = points[0] -> Point.cast
-  p1 = points[1] -> Point.cast
-  p2 = points[2] -> Point.cast
+  p0 = points[0] -> Vec2.cast
+  p1 = points[1] -> Vec2.cast
+  p2 = points[2] -> Vec2.cast
   (p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t))
 
-def bezier4(number t, List points) -> Point
+def bezier4(number t, List points) -> Vec2
   -- Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
-  p0 = points[0] -> Point.cast
-  p1 = points[1] -> Point.cast
-  p2 = points[2] -> Point.cast
-  p3 = points[3] -> Point.cast
+  p0 = points[0] -> Vec2.cast
+  p1 = points[1] -> Vec2.cast
+  p2 = points[2] -> Vec2.cast
+  p3 = points[3] -> Vec2.cast
   (p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t))
 
 def smooth_in_out(number t, number smooth_in, number smooth_out) -> number

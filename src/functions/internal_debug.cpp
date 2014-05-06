@@ -12,7 +12,7 @@ namespace internal_debug_function {
             if (i != 0) std::cout << ", ";
             Value str;
             print_term(term->input(0), &str);
-            std::cout << as_cstring(&str) << std::cout;
+            std::cout << as_cstring(&str) << std::endl;
         }
         std::cout << std::endl;
     }

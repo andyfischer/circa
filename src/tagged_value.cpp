@@ -994,13 +994,7 @@ void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)
 }
 void circa_set_vec2(caValue* container, float x, float y)
 {
-    if (!circa_is_list(container))
-        circa_set_list(container, 2);
-    else if (circa_count(container) != 2)
-        circa_resize(container, 2);
-    else
-        circa_touch(container);
-
+    make(TYPES.vec2, container);
     circa_set_float(circa_index(container, 0), x);
     circa_set_float(circa_index(container, 1), y);
 }

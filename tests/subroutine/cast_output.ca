@@ -1,7 +1,7 @@
 
-def f() -> Point
+def f() -> Vec2
     return [3 4]
 
 p = f()
 print(p)
-assert(type(p) == Point)
+assert(type(p) == Vec2)

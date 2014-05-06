@@ -121,7 +121,7 @@ struct BuiltinTypes {
     Type* native_ptr;
     Type* null;
     Type* opaque_pointer;
-    Type* point;
+    Type* vec2;
     Type* retained_frame;
     Type* selector;
     Type* stack;

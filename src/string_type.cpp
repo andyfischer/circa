@@ -301,8 +301,6 @@ void string_append_f(caValue* left, float value)
         }
     }
 
-    int len = strlen(buf);
-
     for (int i = strlen(buf) - 1; i > dotPosition + 1; i--) {
         if (buf[i] == '0')
             buf[i] = 0;
@@ -426,6 +424,19 @@ void string_prepend(caValue* result, const char* prefix)
     set_string(&output, prefix);
     string_append(&output, result);
     move(&output, result);
+}
+
+void string_substr(caValue* s, int start, int len, caValue* out)
+{
+    if (s == out)
+        internal_error("Usage error in string_substr, 's' cannot be 'out'");
+
+    if (len == -1)
+        len = string_length(s) - start;
+    else if ((start + len) > string_length(s))
+        len = string_length(s) - start;
+
+    set_string(out, as_cstring(s) + start, len);
 }
 
 void string_slice(caValue* s, int start, int end, caValue* out)

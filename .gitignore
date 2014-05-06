@@ -4,6 +4,7 @@
 
 # build results:
 /build
+/src/build
 
 # miscellaneous artifacts:
 /tags
@@ -14,6 +15,7 @@
 # miscellaneous
 /*.ca
 /*.xcodeproj
+/src/*.xcodeproj
 
 *.swp
 *.pyc

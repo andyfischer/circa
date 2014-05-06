@@ -17,8 +17,8 @@ namespace neg_function  {
 
     void setup(Block* kernel)
     {
-        Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int i) -> int");
-        Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number n) -> number");
+        import_function(kernel, evaluate_i, "neg_i(int i) -> int");
+        import_function(kernel, evaluate_f, "neg_f(number n) -> number");
     }
 }
 }

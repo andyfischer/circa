@@ -3,8 +3,8 @@
 
 type Bullet {
     number lifespan,
-    Point loc,
-    Point direction
+    Vec2 loc,
+    Vec2 direction
 }
 
 bullet_width = 10.0

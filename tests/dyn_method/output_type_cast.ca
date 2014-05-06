@@ -4,11 +4,11 @@ type T {
 
 t = T.make
 
-def T.f(self) -> Point
+def T.f(self) -> Vec2
     [1, 2]
 
-assert(type(t.f) == Point)
+assert(type(t.f) == Vec2)
 
 any.cast(@t)
 
-assert(type(t.f) == Point)
+assert(type(t.f) == Vec2)

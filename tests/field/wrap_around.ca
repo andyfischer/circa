@@ -1,6 +1,6 @@
-window_size = Point.make(200 200)
+window_size = Vec2.make(200 200)
 
-def wrap_around_screen(Point p) -> Point
+def wrap_around_screen(Vec2 p) -> Vec2
     size = window_size
     if p.x < 0 { p.x += size.x }
     if p.y < 0 { p.y += size.y }

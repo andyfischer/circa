@@ -116,7 +116,7 @@ struct Block
     void remapPointers(TermMap const& map);
 
     // Compile the given statement, return the result term.
-    Term* compile(std::string const& statement);
+    Term* compile(const char* statement);
 
     void dump();
     Term* owner();

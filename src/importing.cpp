@@ -16,7 +16,7 @@
 
 namespace circa {
 
-Term* import_function(Block* block, EvaluateFunc evaluate, std::string const& header)
+Term* import_function(Block* block, EvaluateFunc evaluate, const char* header)
 {
     Term* result = parser::compile(block, parser::function_decl, header);
 

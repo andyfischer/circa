@@ -9,7 +9,7 @@ for j in [1]
   for i in [1]
     if j == 1
       var = true
-      x = Point.cast([0 0])
+      x = Vec2.cast([0 0])
       discard
 
   assert(var == true)

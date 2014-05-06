@@ -14,7 +14,7 @@ namespace circa {
 // a header in Circa-syntax.
 //
 // Example function header: "function do-something(int, string) -> int"
-Term* import_function(Block* block, EvaluateFunc func, std::string const& header);
+Term* import_function(Block* block, EvaluateFunc func, const char* header);
 
 // Install an evaluate function into an existing function object.
 void install_function(Term* function, EvaluateFunc evaluate);

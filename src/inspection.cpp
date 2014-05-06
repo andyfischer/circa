@@ -781,7 +781,9 @@ void parse_path_expression(const char* expr, caValue* valueOut)
 {
     set_list(valueOut, 0);
 
-    TokenStream tokens(expr);
+    Value exprStr;
+    set_string(&exprStr, expr);
+    TokenStream tokens(&exprStr);
 
     while (!tokens.finished()) {
 
@@ -823,7 +825,9 @@ void parse_path_expression(const char* expr, caValue* valueOut)
         else {
             caValue* err = list_append(valueOut);
             set_string(err, "Unrecognized syntax: ");
-            string_append(err, tokens.nextStr().c_str());
+            Value next;
+            tokens.getNextStr(&next);
+            string_append(err, &next);
             return;
         }
 

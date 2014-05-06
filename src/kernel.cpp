@@ -617,7 +617,7 @@ void bootstrap_kernel()
     TYPES.frame = as_type(builtins->get("Frame"));
     TYPES.module_frame = as_type(builtins->get("ModuleFrame"));
     TYPES.retained_frame = as_type(builtins->get("RetainedFrame"));
-    TYPES.point = as_type(builtins->get("Point"));
+    TYPES.vec2 = as_type(builtins->get("Vec2"));
 
     // Fix function_decl now that Func type is available.
     {

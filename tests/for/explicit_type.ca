@@ -1,3 +1,3 @@
 
-for Point p in [[0 0]]
-    assert(type(p) == Point)
+for Vec2 p in [[0 0]]
+    assert(type(p) == Vec2)

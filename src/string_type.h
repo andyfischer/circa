@@ -42,6 +42,7 @@ int string_length(caValue* s);
 bool string_less_than(caValue* left, caValue* right);
 void string_prepend(caValue* result, caValue* prefix);
 void string_prepend(caValue* result, const char* prefix);
+void string_substr(caValue* s, int start, int len, caValue* out);
 void string_slice(caValue* s, int start, int end, caValue* out);
 void string_slice(caValue* str, int start, int end);
 int string_find_char(caValue* s, int start, char c);

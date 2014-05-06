@@ -17,8 +17,8 @@ def hi(int i) {   }
 def hi(int i) { 1 }
 def hi(number n, String s, bool b)  {}
 
-type Point { number x, number y }
-def hi() -> Point { return [0 0] }
+type Vec2 { number x, number y }
+def hi() -> Vec2 { return [0 0] }
 
 def hi() { if true { return 1 } else { return 2 } }
 def my_func(int _ :multiple) -> int {}

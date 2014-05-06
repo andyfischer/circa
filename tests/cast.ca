@@ -1,5 +1,5 @@
 
-v, b = cast([1 1], Point)
+v, b = cast([1 1], Vec2)
 
 assert(v == [1 1])
 assert(v.x == 1)

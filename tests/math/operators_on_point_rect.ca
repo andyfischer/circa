@@ -1,18 +1,18 @@
 
-a = Point.make(1 2)
-b = Point.make(3 4)
+a = Vec2.make(1 2)
+b = Vec2.make(3 4)
 
 assert(a + b == [4 6])
-assert(type(a + b) == Point)
+assert(type(a + b) == Vec2)
 
 assert(a - b == [-2 -2])
-assert(type(a - b) == Point)
+assert(type(a - b) == Vec2)
 
 assert(a * 3 == [3 6])
-assert(type(a * 3) == Point)
+assert(type(a * 3) == Vec2)
 
-assert(Point.make(2 4) / 2 == [1.0, 2.0])
-assert(type(a / 3) == Point)
+assert(Vec2.make(2 4) / 2 == [1.0, 2.0])
+assert(type(a / 3) == Vec2)
 
 r1 = Rect.make(1 2 3 4)
 r2 = Rect.make(0 3 6 9)

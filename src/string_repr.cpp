@@ -35,10 +35,14 @@ static void parse_value(TokenStream* tokens, caValue* out)
         set_string(out, "unexpected end of string");
 
     } else if (tokens->nextIs(tok_Integer)) {
-        set_int(out, atoi(tokens->nextStr().c_str()));
+        Value next;
+        tokens->getNextStr(&next);
+        set_int(out, atoi(as_cstring(&next)));
         tokens->consume(tok_Integer);
     } else if (tokens->nextIs(tok_Float)) {
-        set_float(out, (float) atof(tokens->nextStr().c_str()));
+        Value next;
+        tokens->getNextStr(&next);
+        set_float(out, (float) atof(as_cstring(&next)));
         tokens->consume(tok_Float);
     } else if (tokens->nextIs(tok_String)) {
         tokens->consumeStr(out, tok_String);
@@ -81,7 +85,9 @@ static void parse_value(TokenStream* tokens, caValue* out)
 
     } else {
         set_string(out, "unrecognized token: ");
-        string_append(out, tokens->nextStr().c_str());
+        Value next;
+        tokens->getNextStr(&next);
+        string_append(out, &next);
         tokens->consume();
     }
 
@@ -91,13 +97,15 @@ static void parse_value(TokenStream* tokens, caValue* out)
 
 void parse_string_repr(const char* str, int len, caValue* out)
 {
-    TokenStream tokens(str, len);
+    Value strVal;
+    set_string(&strVal, str, len);
+    TokenStream tokens(&strVal);
     parse_value(&tokens, out);
 }
 
 void parse_string_repr(caValue* str, caValue* out)
 {
-    TokenStream tokens(as_cstring(str), string_length(str));
+    TokenStream tokens(str);
     parse_value(&tokens, out);
 }
 

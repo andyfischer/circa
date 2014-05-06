@@ -1,6 +1,6 @@
-def draggable(self, Rect rect) -> Point
+def draggable(self, Rect rect) -> Vec2
     state is_dragging = false
-    state Point drag_start_loc
+    state Vec2 drag_start_loc
     if context(:userInput).leftMouseDown and rect.contains(mousePos())
         is_dragging = true
         drag_start_loc = self.mousePos

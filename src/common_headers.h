@@ -144,18 +144,12 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
  #endif
 #endif
 
+#ifndef CIRCA_ENABLE_LIBUV
+ #define CIRCA_ENABLE_LIBUV 0
+#endif
+
 // ENABLE_SNEAKY_EQUALS - When enabled, equals() is allowed to combine the
 // internal representation of values (when it's correct to do so).
 #define CIRCA_ENABLE_SNEAKY_EQUALS 1
 
 #define CIRCA_ENABLE_INLINE_DYNAMIC_METHOD_CACHE 1
-
-#if CIRCA_EMSCRIPTEN
-
-#define CIRCA_ENABLE_LIBUV 0
-
-#else
-
-#define CIRCA_ENABLE_LIBUV 1
-
-#endif

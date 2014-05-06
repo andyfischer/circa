@@ -44,7 +44,7 @@ a = 1.0; -a
 'string'.length()
 make(Map).set(1,2)
 make(Map).set(1, 2)
-make(Point).x = 1.0
+make(Vec2).x = 1.0
 
 -- Rebinding
 a = 1
@@ -53,24 +53,24 @@ a *= 5*3+1
   a -= 5*3+1
 a /= 5*3+1  
 
-a = Point.make(0 0)
+a = Vec2.make(0 0)
 a.x += 1
 a.x   += 1
 a.x +=   1
 
-p = make(Point); p.x += 1.0
-p = make(Point); p.x   += 1.0
-p = make(Point); p.x +=   1.0
-p = make(Point); p.x = 1.0
-p = make(Point); p.x   = 1.0
-p = make(Point); p.x =   1.0
+p = make(Vec2); p.x += 1.0
+p = make(Vec2); p.x   += 1.0
+p = make(Vec2); p.x +=   1.0
+p = make(Vec2); p.x = 1.0
+p = make(Vec2); p.x   = 1.0
+p = make(Vec2); p.x =   1.0
 
 -- More methods
 l = []; l.append(1)
 
-t = make(Point); t.x
-t = make(Point); t.x = 1.0
-t = make(Point); a = t.x
+t = make(Vec2); t.x
+t = make(Vec2); t.x = 1.0
+t = make(Vec2); a = t.x
 type A{int z} type B{A y} x = make(B); x.y.z
 
 -- Index access

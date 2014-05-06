@@ -94,8 +94,7 @@ void parse_string_as_argument_list(caValue* str, Value* output)
     if (!is_list(output))
         set_list(output, 0);
 
-    TokenStream tokens;
-    tokens.reset(as_cstring(str));
+    TokenStream tokens(str);
     
     Value itemInProgress;
     set_string(&itemInProgress, "");
@@ -109,7 +108,9 @@ void parse_string_as_argument_list(caValue* str, Value* output)
             }
 
         } else {
-            string_append(&itemInProgress, tokens.nextStr().c_str());
+            Value next;
+            tokens.getNextStr(&next);
+            string_append(&itemInProgress, &next);
         }
 
         tokens.consume();

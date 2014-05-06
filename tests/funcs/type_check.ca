@@ -1,7 +1,7 @@
 
 assert(is_list([]))
 assert(not is_list(1))
-assert(not is_list(Point.make))
+assert(not is_list(Vec2.make))
 
 assert(is_number(1.0))
 assert(not is_number(1))

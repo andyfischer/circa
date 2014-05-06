@@ -1,6 +1,6 @@
 
 def main()
-  Point([0 0])
+  Vec2([0 0])
 
 stack = make_stack(main)
 stack.run

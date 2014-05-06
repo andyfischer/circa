@@ -319,7 +319,7 @@ void Block::remapPointers(TermMap const& map)
 }
 
 Term*
-Block::compile(std::string const& code)
+Block::compile(const char* code)
 {
     return parser::compile(this, parser::statement_list, code);
 }
@@ -610,7 +610,7 @@ void load_script(Block* block, const char* filename)
         return;
     }
 
-    parser::compile(block, parser::statement_list, as_blob(&contents));
+    parser::compile(block, parser::statement_list, &contents);
 
     // Make sure the block has a primary output.
     if (get_output_placeholder(block, 0) == NULL)

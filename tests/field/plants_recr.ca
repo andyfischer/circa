@@ -20,7 +20,7 @@ type Segment {
   number distance_from_base
   number base_radius
   number end_radius
-  Point base_loc
+  Vec2 base_loc
   number base_angle
 }
 

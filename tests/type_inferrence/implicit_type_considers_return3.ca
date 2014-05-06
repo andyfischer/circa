@@ -3,7 +3,7 @@ def f(bool b)
  if b
    return [1 0]
 
- Point.make
+ Vec2.make
 
 result = f(true)
 

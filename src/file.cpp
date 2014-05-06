@@ -203,11 +203,12 @@ void read_text_file(const char* filename, caValue* contentsOut)
 
     // Read raw data.
     touch(contentsOut);
-    set_blob(contentsOut, int(file_size) + 1);
+    set_blob(contentsOut, int(file_size));
 
     size_t bytesRead = fread(as_blob(contentsOut), 1, file_size, fp);
-
-    as_blob(contentsOut)[bytesRead] = 0;
+    
+    if (bytesRead < file_size)
+        string_resize(contentsOut, bytesRead);
 
     fclose(fp);
 }

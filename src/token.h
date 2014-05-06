@@ -22,8 +22,7 @@ struct Token
     Token() : match(0), start(0), end(0), lineStart(0), lineEnd(0),
         colStart(0), colEnd(0), precedingIndent(0) {}
 
-    std::string toString() const;
-    int length() const;
+    int length();
 };
 
 typedef std::vector<Token> TokenList;
@@ -34,31 +33,12 @@ void tokenize(std::string const &input, TokenList* results);
 
 struct TokenStream
 {
-    std::string _sourceText;
+    Value _sourceText;
     TokenList tokens;
     unsigned int _position;
 
-    TokenStream()
-      : _position(0)
-    {
-    }
-
-    TokenStream(TokenList const& _tokens)
-      : tokens(_tokens), _position(0)
-    {
-    }
-
-    TokenStream(std::string const& input)
-      : _sourceText(input), _position(0)
-    {
-        tokenize(input, &tokens);
-    }
-
-    TokenStream(const char* input, int len)
-      : _sourceText(input, len), _position(0)
-    {
-        tokenize(input, len, &tokens);
-    }
+    TokenStream(caValue* sourceText);
+    TokenStream(const char* sourceText);
 
     Token operator[](int index) {
         return tokens[index];
@@ -68,31 +48,24 @@ struct TokenStream
     }
 
     void reset(caValue* inputString);
+    void reset(const char* inputString);
 
-    void reset(std::string const& input)
-    {
-        _sourceText = input;
-        tokens.clear();
-        tokenize(input, &tokens);
-        _position = 0;
-    }
+    int length() { return (int) tokens.size(); }
+    int remaining() { return (int) tokens.size() - _position; }
+    int position() { return _position; }
+    bool finished() { return (_position >= tokens.size()); }
 
-    int length() const { return (int) tokens.size(); }
-    int remaining() const { return (int) tokens.size() - _position; }
-    int position() const { return _position; }
-
-    Token const& next(int lookahead=0) const;
-    std::string nextStr(int lookahead=0) const;
-    void getNextStr(caValue* value, int lookahead=0) const;
+    Token& next(int lookahead=0);
+    void getNextStr(caValue* value, int lookahead=0);
 
     // Return true if the given lookahead is past the end of the list.
-    bool nextIsEof(int lookahead) const;
+    bool nextIsEof(int lookahead);
 
-    bool nextIs(int match, int lookahead=0) const;
-    bool nextEqualsString(const char* str, int lookahead=0) const;
+    bool nextIs(int match, int lookahead=0);
+    bool nextEqualsString(const char* str, int lookahead=0);
 
-    Symbol nextMatch(int lookahead=0) const;
-    int nextIndent(int lookahead=0) const;
+    Symbol nextMatch(int lookahead=0);
+    int nextIndent(int lookahead=0);
 
     // Consume the next token. If a token match is provided, and the next token doesn't
     // have this match, then we trigger a fatal error. This matching should be treated
@@ -107,17 +80,11 @@ struct TokenStream
 
     void dropRemainder();
 
-    bool finished() const
-    {
-        return (_position >= tokens.size());
-    }
-
-    int getPosition() const;
+    int getPosition();
     void setPosition(int loc); 
-    std::string toString() const;
     void dump();
 };
 
-void print_remaining_tokens(std::ostream& stream, TokenStream& tokens);
+void dump_remaining_tokens(TokenStream& tokens);
 
 } // namespace circa

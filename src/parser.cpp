@@ -44,11 +44,11 @@ static void token_position_to_short_source_location(int position, TokenStream& t
 
 static ParseResult right_apply_to_function(Block* block, Term* lhs, caValue* functionName);
 
-Term* compile(Block* block, ParsingStep step, std::string const& input)
+Term* compile(Block* block, ParsingStep step, caValue* input)
 {
     log_start(0, "parser::compile");
     log_arg("block.id", block->id);
-    log_arg("input", input.c_str());
+    log_arg("input", input);
     log_finish();
 
     block_start_changes(block);
@@ -68,6 +68,13 @@ Term* compile(Block* block, ParsingStep step, std::string const& input)
     log_finish();
 
     return result;
+}
+
+Term* compile(Block* block, ParsingStep step, const char* input)
+{
+    Value inputVal;
+    set_string(&inputVal, input);
+    return compile(block, step, &inputVal);
 }
 
 // -------------------------- Utility functions -------------------------------
@@ -417,7 +424,7 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // Avoid an infinite loop
     if (initialPosition == tokens.getPosition())
-        internal_error("parser::statement is stuck, next token is: " + tokens.nextStr());
+        internal_error("parser::statement is stuck");
 
     return result;
 }
@@ -1541,8 +1548,6 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
     return parseResult;
 }
 
-const int HIGHEST_INFIX_PRECEDENCE = 8;
-
 struct InfixOperatorInfo
 {
     Term* function;
@@ -2504,13 +2509,14 @@ ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    std::string s = tokens.nextStr();
+    Value str;
+    tokens.getNextStr(&str);
     tokens.consume(tok_ColonString);
 
     Term* term = create_value(block, TYPES.symbol);
 
     // Skip the leading ':' in the name string
-    set_symbol_from_string(term_value(term), s.c_str() + 1);
+    set_symbol_from_string(term_value(term), as_cstring(&str) + 1);
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);

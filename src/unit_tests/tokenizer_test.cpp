@@ -6,32 +6,39 @@
 
 namespace tokenizer_test {
 
+std::string nextStr(TokenStream& tokens)
+{
+    Value str;
+    tokens.getNextStr(&str);
+    return as_cstring(&str);
+}
+
 void test_identifiers()
 {
     TokenStream tokens("word has_underscore has_hyphen,hasnumbers183,has:colon");
 
     test_assert(tokens.nextIs(tok_Identifier));
-    test_assert(tokens.nextStr() == "word");
+    test_assert(nextStr(tokens) == "word");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Identifier));
-    test_assert(tokens.nextStr() == "has_underscore");
+    test_assert(nextStr(tokens) == "has_underscore");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Identifier));
-    test_assert(tokens.nextStr() == "has_hyphen");
+    test_assert(nextStr(tokens) == "has_hyphen");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Comma));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Identifier));
-    test_assert(tokens.nextStr() == "hasnumbers183");
+    test_assert(nextStr(tokens) == "hasnumbers183");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Comma));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Identifier));
-    test_assert(tokens.nextStr() == "has:colon");
+    test_assert(nextStr(tokens) == "has:colon");
     tokens.consume();
     test_assert(tokens.finished());
 }
@@ -41,22 +48,22 @@ void test_integers()
     TokenStream tokens("1 0 1234567890 0x123");
 
     test_assert(tokens.nextIs(tok_Integer));
-    test_assert(tokens.nextStr() == "1");
+    test_assert(nextStr(tokens) == "1");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Integer));
-    test_assert(tokens.nextStr() == "0");
+    test_assert(nextStr(tokens) == "0");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Integer));
-    test_assert(tokens.nextStr() == "1234567890");
+    test_assert(nextStr(tokens) == "1234567890");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_HexInteger));
-    test_assert(tokens.nextStr() == "0x123");
+    test_assert(nextStr(tokens) == "0x123");
     tokens.consume();
     test_assert(tokens.finished());
 }
@@ -66,22 +73,22 @@ void test_floats()
     TokenStream tokens("1.0 16. .483 .123.");
 
     test_assert(tokens.nextIs(tok_Float));
-    test_assert(tokens.nextStr() == "1.0");
+    test_assert(nextStr(tokens) == "1.0");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Float));
-    test_assert(tokens.nextStr() == "16.");
+    test_assert(nextStr(tokens) == "16.");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Float));
-    test_assert(tokens.nextStr() == ".483");
+    test_assert(nextStr(tokens) == ".483");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Float));
-    test_assert(tokens.nextStr() == ".123");
+    test_assert(nextStr(tokens) == ".123");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Dot));
     tokens.consume();
@@ -90,7 +97,7 @@ void test_floats()
     tokens.reset("5.200");
 
     test_assert(tokens.nextIs(tok_Float));
-    test_assert(tokens.nextStr() == "5.200");
+    test_equals(nextStr(tokens), "5.200");
     tokens.consume();
     test_assert(tokens.finished());
 
@@ -98,12 +105,12 @@ void test_floats()
     // 0..1 would get parsed as 0. and then .1
     tokens.reset("0..1");
     test_assert(tokens.nextIs(tok_Integer));
-    test_assert(tokens.nextStr() == "0");
+    test_assert(nextStr(tokens) == "0");
     tokens.consume();
     test_assert(tokens.nextIs(tok_TwoDots));
     tokens.consume();
     test_assert(tokens.nextIs(tok_Integer));
-    test_assert(tokens.nextStr() == "1");
+    test_assert(nextStr(tokens) == "1");
     tokens.consume();
     test_assert(tokens.finished());
 }
@@ -221,16 +228,16 @@ void test_identifiers_that_look_like_keywords()
 {
     TokenStream tokens("endup,iffy,else_,stateful");
 
-    test_equals(tokens.nextStr(), "endup");
+    test_equals(nextStr(tokens), "endup");
     tokens.consume(tok_Identifier);
     tokens.consume(tok_Comma);
-    test_equals(tokens.nextStr(), "iffy");
+    test_equals(nextStr(tokens), "iffy");
     tokens.consume(tok_Identifier);
     tokens.consume(tok_Comma);
-    test_equals(tokens.nextStr(), "else_");
+    test_equals(nextStr(tokens), "else_");
     tokens.consume(tok_Identifier);
     tokens.consume(tok_Comma);
-    test_equals(tokens.nextStr(), "stateful");
+    test_equals(nextStr(tokens), "stateful");
     tokens.consume(tok_Identifier);
     test_assert(tokens.finished());
 }
@@ -239,9 +246,9 @@ void test_string_literal()
 {
     TokenStream tokens("\"string literal\"'string2'");
 
-    test_equals(tokens.nextStr(), "\"string literal\"");
+    test_equals(nextStr(tokens), "\"string literal\"");
     tokens.consume(tok_String);
-    test_equals(tokens.nextStr(), "'string2'");
+    test_equals(nextStr(tokens), "'string2'");
     tokens.consume(tok_String);
     test_assert(tokens.finished());
 
@@ -328,7 +335,7 @@ void test_preceding_indent()
                  "      d1 + d2\n");
 
     while (!tokens.finished()) {
-        std::string const& txt = tokens.nextStr();
+        std::string const& txt = nextStr(tokens);
         if (txt[0] == 'a') {
             test_assert(tokens.next().precedingIndent == 0);
         } else if (txt[0] == 'b') {

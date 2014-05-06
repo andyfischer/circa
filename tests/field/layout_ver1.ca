@@ -10,12 +10,12 @@ type Node {
 
 type Layout {
     List nodes
-    Point size
+    Vec2 size
     int cursor
 }
 
 
-def start(Point size) -> Layout
+def start(Vec2 size) -> Layout
     layout = make(Layout)
     layout.size = size
 

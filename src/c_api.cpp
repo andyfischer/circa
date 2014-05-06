@@ -126,13 +126,6 @@ void circa_resize(caValue* list, int count)
 {
     list_resize(list, count);
 }
-void circa_set_point(caValue* point, float x, float y)
-{
-    make(TYPES.point, point);
-    list_resize(point, 2);
-    set_float(get_index(point, 0), x);
-    set_float(get_index(point, 1), y);
-}
 
 void* circa_raw_pointer(caValue* value)
 {

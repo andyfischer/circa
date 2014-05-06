@@ -14,7 +14,7 @@ assert(g(false, 'test') == 5)
 
 -- Field access
 def h() -> any
-    Point.cast([1 2])
+    Vec2.cast([1 2])
 
 p = h()
 assert(p.x == 1.0)

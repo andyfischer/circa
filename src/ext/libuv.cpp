@@ -85,7 +85,7 @@ void ServerRelease(void* ptr)
 
 void ConnectionRelease(void* ptr)
 {
-    Connection* connection = (Connection*) ptr;
+    // Connection* connection = (Connection*) ptr;
     //uv_close((uv_handle_t*) &connection->uv_connect.handle, NULL);
     // delete connection;
 }

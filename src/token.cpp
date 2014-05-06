@@ -99,13 +99,7 @@ const char* get_token_text(int match)
     }
 }
 
-std::string Token::toString() const
-{
-    std::stringstream out;
-    out << get_token_text(match);
-    return out.str();
-}
-int Token::length() const
+int Token::length()
 {
     ca_assert(end >= start);
     return end - start;
@@ -131,7 +125,7 @@ struct TokenizeContext
           results(_results)
     { }
 
-    char next(int lookahead=0) const
+    char next(int lookahead=0)
     {
         unsigned int index = nextIndex + lookahead;
         if (index >= inputSize)
@@ -156,11 +150,11 @@ struct TokenizeContext
         return c;
     }
 
-    bool finished() const {
+    bool finished() {
         return nextIndex >= (int) inputSize;
     }
 
-    bool withinRange(int lookahead) const {
+    bool withinRange(int lookahead) {
         return nextIndex + lookahead < (int) inputSize;
     }
 
@@ -752,13 +746,33 @@ void consume_name(TokenizeContext &context)
     context.consume(tok_ColonString, lookahead);
 }
 
-void TokenStream::reset(caValue* inputString)
+TokenStream::TokenStream(caValue* sourceText)
 {
-    reset(as_string(inputString));
+    reset(sourceText);
 }
 
-Token const&
-TokenStream::next(int lookahead) const
+TokenStream::TokenStream(const char* sourceText)
+{
+    reset(sourceText);
+}
+
+void TokenStream::reset(caValue* inputString)
+{
+    _position = 0;
+    tokens.clear();
+    set_value(&_sourceText, inputString);
+    tokenize(as_cstring(&_sourceText), string_length(&_sourceText), &tokens);
+}
+
+void TokenStream::reset(const char* inputString)
+{
+    Value str;
+    set_string(&str, inputString);
+    reset(&str);
+}
+
+Token&
+TokenStream::next(int lookahead)
 {
     int i = this->_position + lookahead;
 
@@ -771,29 +785,20 @@ TokenStream::next(int lookahead) const
     return tokens[i];
 }
 
-std::string TokenStream::nextStr(int lookahead) const
+void TokenStream::getNextStr(caValue* value, int lookahead)
 {
     int startPos = next(lookahead).start;
     int length = next(lookahead).length();
-
-    ca_assert(length > 0);
-    return std::string(_sourceText.c_str() + startPos, length);
+    string_substr(&_sourceText, startPos, length, value);
 }
 
-void TokenStream::getNextStr(caValue* value, int lookahead) const
-{
-    int startPos = next(lookahead).start;
-    int length = next(lookahead).length();
-    circa_set_string_size(value, _sourceText.c_str() + startPos, length);
-}
-
-bool TokenStream::nextIsEof(int lookahead) const
+bool TokenStream::nextIsEof(int lookahead)
 {
     int i = this->_position + lookahead;
     return i >= (int) tokens.size();
 }
 
-bool TokenStream::nextIs(int match, int lookahead) const
+bool TokenStream::nextIs(int match, int lookahead)
 {
     if ((this->_position + lookahead) >= tokens.size())
         return false;
@@ -802,21 +807,23 @@ bool TokenStream::nextIs(int match, int lookahead) const
         
     return next(lookahead).match == match;
 }
-bool TokenStream::nextEqualsString(const char* str, int lookahead) const
+bool TokenStream::nextEqualsString(const char* str, int lookahead)
 {
     if ((this->_position + lookahead) >= tokens.size())
         return false;
 
-    return nextStr(lookahead) == str;
+    Value next;
+    getNextStr(&next, lookahead);
+    return string_equals(&next, str);
 }
 
-Symbol TokenStream::nextMatch(int lookahead) const
+Symbol TokenStream::nextMatch(int lookahead)
 {
     if ((this->_position + lookahead) >= tokens.size())
         return tok_Eof;
     return next(lookahead).match;
 }
-int TokenStream::nextIndent(int lookahead) const
+int TokenStream::nextIndent(int lookahead)
 {
     if ((this->_position + lookahead) >= tokens.size())
         return 0;
@@ -832,9 +839,11 @@ TokenStream::consume(int match)
 
     if ((match != -1) && next().match != match) {
         std::stringstream msg;
+        Value nextStr;
+        getNextStr(&nextStr);
         msg << "Unexpected token (expected " << get_token_text(match)
             << ", found " << get_token_text(next().match)
-            << " '" << nextStr() << "')";
+            << " '" << as_cstring(&nextStr) << "')";
         internal_error(msg.str());
     }
 
@@ -844,7 +853,9 @@ TokenStream::consume(int match)
 std::string
 TokenStream::consumeStr(int match)
 {
-    std::string out = nextStr();
+    Value next;
+    getNextStr(&next);
+    std::string out = as_cstring(&next);
     consume(match);
     return out;
 }
@@ -855,8 +866,9 @@ TokenStream::consumeStr(caValue* output, int match)
     if (!is_string(output))
         set_string(output, "");
 
-    std::string next = nextStr();
-    string_append(output, next.c_str());
+    Value next;
+    getNextStr(&next);
+    string_append(output, &next);
     consume(-1);
 }
 
@@ -867,7 +879,7 @@ TokenStream::dropRemainder()
 }
 
 int
-TokenStream::getPosition() const
+TokenStream::getPosition()
 {
     return _position;
 }
@@ -879,25 +891,6 @@ TokenStream::setPosition(int loc)
     _position = loc;
 }
 
-std::string
-TokenStream::toString() const
-{
-    std::stringstream out;
-
-    out << "{index: " << _position << ", ";
-    out << "tokens: [";
-
-    bool first = true;
-
-    for (unsigned int i=0; i < tokens.size(); i++) {
-        if (!first) out << ", ";
-        out << tokens[i].toString();
-        first = false;
-    }
-    out << "]}";
-    return out.str();
-}
-
 void TokenStream::dump()
 {
     int lookbehind = 5;
@@ -907,18 +900,22 @@ void TokenStream::dump()
         if (index < 0) continue;
         if (index >= length()) continue;
 
-        std::cout << "[" << i << "] " << get_token_text(next(i).match)
-            << " '" << nextStr(i) << "'" << std::endl;
+        Value nextStr;
+        getNextStr(&nextStr, i);
+        printf("[%d] %s '%s'\n", i, get_token_text(next(i).match), as_cstring(&nextStr));
     }
 }
 
-void print_remaining_tokens(std::ostream& out, TokenStream& tokens)
+void dump_remaining_tokens(TokenStream& tokens)
 {
     for (int i=0; i < tokens.remaining(); i++) {
-        if (i != 0) out << " ";
-        out << get_token_text(tokens.next(i).match);
-        out << "(" << tokens.nextStr(i) << ")";
+        if (i != 0)
+            printf(" ");
+        Value nextStr;
+        tokens.getNextStr(&nextStr, i);
+        printf("%s(%s)", get_token_text(tokens.next(i).match), as_cstring(&nextStr));
     }
+    printf("\n");
 }
 
 } // namespace circa

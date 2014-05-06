@@ -7,7 +7,7 @@ type UIElement {
     bool pressed
 }
 
-def UIElement.getSize(self) -> Point
+def UIElement.getSize(self) -> Vec2
     return [50 50]
 
 def UIElement.layoutInRect(@self, Rect rect)

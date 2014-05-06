@@ -23,7 +23,7 @@ type Sprite;
 type Texture;
 type TouchRegion;
 
-def viewport_size() -> Point
+def viewport_size() -> Vec2
   [100 100]
 
 def Label.width(label) -> number
@@ -32,10 +32,10 @@ def Label.ascent(label) -> number
   return 10.0
 def Label.descent(label) -> number
   return 10.0
-def Label.setPosition(label, Point p)
+def Label.setPosition(label, Vec2 p)
 def Label.setColor(label, Color c)
 def Label.setText(label, Font font, String text)
-def Label.position(label) -> Point
+def Label.position(label) -> Vec2
   [100 100]
 def Label.right(label) -> number
   return label.position().x + label.width()
@@ -54,7 +54,7 @@ def font(String name, int size) -> Font
 
 def create_label() -> Label
   return make(Label);
-def label(Font font, String text, Point pos) -> Label
+def label(Font font, String text, Vec2 pos) -> Label
   state l = create_label()
   if changed([font text])
     l.setText(font,text)
@@ -64,7 +64,7 @@ def label(Font font, String text, Point pos) -> Label
 
 def create_line() -> Line
   return make(Line)
-def Line.set(_, Point a, Point b)
+def Line.set(_, Vec2 a, Vec2 b)
 def Line.setColor(_, Color c)
 
 def create_sprite(Symbol pass) -> Sprite
@@ -74,10 +74,10 @@ def Sprite.loadFromFile(_, String filename)
 def Sprite.setTexture(_, Texture texture)
 def Sprite.setTexture2(_, Texture texture)
 def Sprite.setBlend(_, number blend)
-def Sprite.setPosition(_, Point p)
-def Sprite.position(_) -> Point
+def Sprite.setPosition(_, Vec2 p)
+def Sprite.position(_) -> Vec2
   [100 100]
-def Sprite.size(_) -> Point
+def Sprite.size(_) -> Vec2
   [100 100]
 
 def Sprite.bounds(_) -> Vec4

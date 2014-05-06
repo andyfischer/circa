@@ -403,9 +403,6 @@ void circa_set_vec2(caValue* container, float x, float y);
 void circa_set_vec3(caValue* container, float x, float y, float z);
 void circa_set_vec4(caValue* container, float x, float y, float z, float w);
 
-// Set a value to a Point with the given (x,y).
-void circa_set_point(caValue* point, float x, float y);
-
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated.
 void circa_set_string_size(caValue* container, const char* str, int size);
 
