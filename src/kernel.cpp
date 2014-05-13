@@ -196,26 +196,6 @@ Type* List__append_specializeType(Term* term)
     }
 }
 
-void Mutable_initialize(Type* type, caValue* value)
-{
-    object_initialize(type, value);
-    caValue* val = (caValue*) object_get_body(value);
-    initialize_null(val);
-}
-
-void Mutable_toString(caValue* value, caValue* out)
-{
-    string_append(out, "Mutable[");
-    string_append_ptr(out, object_get_body(value));
-    string_append(out, "]");
-}
-
-void Mutable_release(void* object)
-{
-    caValue* val = (caValue*) object;
-    set_null(val);
-}
-
 Type* Type_cast_specializeType(Term* caller)
 {
     if (is_value(caller->input(0)) && is_type(caller->input(0)))
@@ -626,11 +606,6 @@ void bootstrap_kernel()
         set_declared_type(FUNCS.function_decl, TYPES.func);
         finish_building_function(function_contents(FUNCS.function_decl));
     }
-
-    TYPES.mutable_type = as_type(builtins->get("Mutable"));
-    circa_setup_object_type(TYPES.mutable_type, sizeof(Value), Mutable_release);
-    TYPES.mutable_type->initialize = Mutable_initialize;
-    TYPES.mutable_type->toString = Mutable_toString;
 
     stack_setup_type(TYPES.stack);
 

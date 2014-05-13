@@ -88,6 +88,7 @@ OBJECTS := \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/loops.o \
+	$(OBJDIR)/matrix.o \
 	$(OBJDIR)/migration.o \
 	$(OBJDIR)/misc_builtins.o \
 	$(OBJDIR)/modules.o \
@@ -95,7 +96,6 @@ OBJECTS := \
 	$(OBJDIR)/names_builtin.o \
 	$(OBJDIR)/native_patch.o \
 	$(OBJDIR)/native_ptr.o \
-	$(OBJDIR)/object.o \
 	$(OBJDIR)/parser.o \
 	$(OBJDIR)/rand.o \
 	$(OBJDIR)/reflection.o \
@@ -106,7 +106,6 @@ OBJECTS := \
 	$(OBJDIR)/static_checking.o \
 	$(OBJDIR)/string_repr.o \
 	$(OBJDIR)/string_type.o \
-	$(OBJDIR)/switch_block.o \
 	$(OBJDIR)/symbols.o \
 	$(OBJDIR)/tagged_value.o \
 	$(OBJDIR)/term.o \
@@ -257,6 +256,9 @@ $(OBJDIR)/list.o: list.cpp
 $(OBJDIR)/loops.o: loops.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/matrix.o: matrix.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/migration.o: migration.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -276,9 +278,6 @@ $(OBJDIR)/native_patch.o: native_patch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/native_ptr.o: native_ptr.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/object.o: object.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/parser.o: parser.cpp
@@ -309,9 +308,6 @@ $(OBJDIR)/string_repr.o: string_repr.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_type.o: string_type.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/switch_block.o: switch_block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/symbols.o: symbols.cpp

@@ -536,7 +536,7 @@ void Term__source_location(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    caValue* out = circa_create_default_output(stack, 0);
+    caValue* out = circa_set_default_output(stack, 0);
     touch(out);
     set_int(list_get(out, 0), t->sourceLoc.col);
     set_int(list_get(out, 1), t->sourceLoc.line);

@@ -920,7 +920,7 @@ void block_finish_changes(Block* block)
         Term* output = get_output_placeholder(block, 0);
 
         // Don't mess with the primary if-block output.
-        if (output != NULL && output->input(0) == NULL && !is_if_block(output->owningBlock)) {
+        if (output != NULL && output->input(0) == NULL && !is_switch_block(output->owningBlock)) {
             set_input(output, 0, find_expression_for_implicit_output(block));
             respecialize_type(output);
         }

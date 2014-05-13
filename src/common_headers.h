@@ -29,7 +29,6 @@
 #define EXPORT extern "C"
 
 #include "circa/circa.h"
-#include "circa/objects.h"
 #include "names_builtin.h"
 
 namespace circa {

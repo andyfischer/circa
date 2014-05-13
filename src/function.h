@@ -5,7 +5,6 @@
 #include "common_headers.h"
 
 #include "block.h"
-#include "object.h"
 #include "term.h"
 
 namespace circa {

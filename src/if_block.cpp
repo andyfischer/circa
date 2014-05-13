@@ -76,14 +76,14 @@ int if_block_count_cases(Block* block)
 
 int case_block_get_index(Block* caseBlock)
 {
-    Block* if_block = get_block_for_case_block(caseBlock);
+    Block* parentBlock = get_block_for_case_block(caseBlock);
 
     int index = 0;
-    for (int i=0; i < if_block->length(); i++) {
-        if (if_block->get(i)->nestedContents == caseBlock)
+    for (int i=0; i < parentBlock->length(); i++) {
+        if (parentBlock->get(i)->nestedContents == caseBlock)
             return index;
 
-        if (if_block->get(i)->function == FUNCS.case_func)
+        if (parentBlock->get(i)->function == FUNCS.case_func)
             index++;
     }
 
@@ -152,7 +152,7 @@ Term* if_block_append_output(Block* block, caValue* description)
     return blockPlaceholder;
 }
 
-Block* if_block_get_case(Block* block, int index)
+Block* get_case_block(Block* block, int index)
 {
     for (int i=0; i < block->length(); i++) {
         if (block->get(i) == NULL || block->get(i)->function != FUNCS.case_func)
@@ -223,10 +223,14 @@ bool is_case_block(Block* block)
 {
     return block->owningTerm != NULL && block->owningTerm->function == FUNCS.case_func;
 }
-bool is_if_block(Block* block)
+bool is_switch_block(Block* block)
 {
-    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.if_block;
+    if (block->owningTerm == NULL)
+        return false;
+
+    return block->owningTerm->function == FUNCS.if_block || block->owningTerm->function == FUNCS.switch_func;
 }
+
 Block* get_block_for_case_block(Block* block)
 {
     return get_parent_block(block);
@@ -423,6 +427,30 @@ void finish_if_block(Term* ifBlock)
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);
     update_extra_outputs(ifBlock);
+}
+
+bool switch_has_default_case(Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term != NULL && term->function == FUNCS.case_condition_bool && term->numInputs() == 0)
+            return true;
+    }
+    return false;
+}
+
+void switch_block_post_compile(Term* term)
+{
+    Block* block = nested_contents(term);
+
+    // Add a default case (if needed)
+    if (!switch_has_default_case(block)) {
+        Term* defaultCase = apply(block, FUNCS.case_func, TermList());
+        rename(defaultCase, "else");
+        hide_from_source(defaultCase);
+    }
+
+    finish_if_block(term);
 }
 
 } // namespace circa

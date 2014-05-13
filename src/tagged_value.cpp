@@ -870,10 +870,6 @@ int circa_int(caValue* value) {
     ca_assert(circa_is_int(value));
     return value->value_data.asint;
 }
-void* circa_object(caValue* value)
-{
-    return object_get_body(value);
-}
 caStack* circa_stack(caValue* value)
 {
     return as_stack(value);

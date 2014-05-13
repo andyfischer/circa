@@ -187,7 +187,7 @@ void make_server(caStack* stack)
         return;
     }
 
-    caValue* out = circa_create_default_output(stack, 0);
+    caValue* out = circa_set_default_output(stack, 0);
     circa_set_native_ptr(circa_index(out, 0), server, ServerRelease);
 }
 
@@ -450,7 +450,7 @@ void make_client(caStack* stack)
         printf("uv_tcp_connect error\n");
     }
 
-    caValue* out = circa_create_default_output(stack, 0);
+    caValue* out = circa_set_default_output(stack, 0);
     circa_set_native_ptr(circa_index(out, 0), connection, ConnectionRelease);
     printf("make_client fin\n");
 }

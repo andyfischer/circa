@@ -50,6 +50,8 @@ def Term.is_while_loop(term)
   term.function.name == 'while'
 def Term.is_if_block(term)
   term.function.name == 'if'
+def Term.is_switch_block(term)
+  term.function.name == 'switch'
 def Term.is_copy(term)
   term.function == block_ref(copy)
 def Term.is_nonlocal(term)
@@ -370,6 +372,35 @@ def SourceRepro.if_block(self, Term term) -> SourceRepro
     first = false
   self
 
+def SourceRepro.switch_block(self, Term term) -> SourceRepro
+  @self.name_binding_source(term)
+  @self.phrase(:text 'switch')
+
+  if term.num_inputs > 0
+    @self.phrase(:text ' ')
+    @self.term_input(term 0)
+
+  @self.block_pre(term)
+
+  cases = term.contents.if_block_cases.filter({not input().property_opt(:Hidden false)})
+  for caseTerm in cases
+    @self.phrase(:ws caseTerm.property_opt(:Syntax_PreWs ''))
+    @self.phrase(:text 'case ')
+    condition = caseTerm.contents.case_find_condition
+
+    @self.term_input_pre(condition 0)
+    if condition.input(0).property_opt(:Hidden false)
+      @self.term_expr(condition.input(0).input(0))
+    else
+      @self.term_expr(condition.input(0))
+    @self.term_input_post(condition 0)
+
+    @self.phrase(:ws caseTerm.property_opt(:Syntax_LineEnding ''))
+    @self.block_pre(caseTerm)
+    @self.phrase(:contents caseTerm.contents)
+    @self.block_post(caseTerm)
+  self
+
 def SourceRepro.implicit_copy(self, Term term) -> SourceRepro
   @self.name_binding_source(term)
   @self.term_input(term 0)
@@ -404,6 +435,8 @@ def SourceRepro.term(self, Term term) -> SourceRepro
     @self.while_loop(term)
   elif term.is_if_block
     @self.if_block(term)
+  elif term.is_switch_block
+    @self.switch_block(term)
   elif term.is_copy
     @self.implicit_copy(term)
   elif term.is_nonlocal
@@ -461,6 +494,13 @@ def Term.input_visible(term, int index) -> bool
     return false
   true
 
+def SourceRepro.term_expr(self, Term term) -> SourceRepro
+  if term.name == ''
+    @self.phrase(:sub_expr term)
+  else
+    @self.phrase(:name_ref term)
+  self
+
 def SourceRepro.term_input_inner(self, Term term, int index) -> SourceRepro
   if not term.input_visible(index)
     return self
@@ -473,6 +513,7 @@ def SourceRepro.term_input_inner(self, Term term, int index) -> SourceRepro
     if term.input_property_opt(index :Syntax_IdentifierRebind false)
       @self.phrase(:text '@')
     @self.phrase(:name_ref inputTerm)
+  self
 
 def SourceRepro.term_input_post(self, Term term, int index) -> SourceRepro
   defaultPost = cond(index+1 == term.num_inputs, "", ",")

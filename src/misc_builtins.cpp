@@ -304,19 +304,6 @@ void Map__empty(caStack* stack)
     set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
 }
 
-void Mutable__get(caStack* stack)
-{
-    caValue* val = (caValue*) circa_object_input(stack, 0);
-    copy(val, circa_output(stack, 0));
-}
-
-void Mutable__set(caStack* stack)
-{
-    caValue* val = (caValue*) circa_object_input(stack, 0);
-    copy(circa_input(stack, 1), val);
-}
-
-
 void String__char_at(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
@@ -683,8 +670,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "Map.get", Map__get);
     module_patch_function(patch, "Map.set", Map__set);
     module_patch_function(patch, "Map.empty", Map__empty);
-    module_patch_function(patch, "Mutable.get", Mutable__get);
-    module_patch_function(patch, "Mutable.set", Mutable__set);
     module_patch_function(patch, "String.char_at", String__char_at);
     module_patch_function(patch, "String.ends_with", String__ends_with);
     module_patch_function(patch, "String.length", String__length);

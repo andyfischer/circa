@@ -1,0 +1,8 @@
+
+y = switch
+  case true
+    'pass'
+  case false
+    'fail'
+
+assert(y == 'pass')

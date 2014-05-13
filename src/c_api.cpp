@@ -42,7 +42,7 @@ caBlock* caTerm::parent()
     return circa_parent_block(this);
 }
 
-caValue* circa_create_default_input(caStack* stack, int index)
+caValue* circa_set_default_input(caStack* stack, int index)
 {
     caValue* val = circa_input(stack, index);
     caBlock* top = circa_stack_top_block(stack);
@@ -51,7 +51,7 @@ caValue* circa_create_default_input(caStack* stack, int index)
     return val;
 }
 
-caValue* circa_create_default_output(caStack* stack, int index)
+caValue* circa_set_default_output(caStack* stack, int index)
 {
     caValue* val = circa_output(stack, index);
     caBlock* top = circa_stack_top_block(stack);

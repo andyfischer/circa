@@ -24,7 +24,6 @@ struct BuiltinFuncs {
     Term* copy;
     Term* declare_field;
     Term* declared_state;
-    Term* default_case;
     Term* discard;
     Term* div;
     Term* div_f;
@@ -117,7 +116,6 @@ struct BuiltinTypes {
     Type* map;
     Type* module_ref;
     Type* module_frame;
-    Type* mutable_type;
     Type* native_ptr;
     Type* null;
     Type* opaque_pointer;

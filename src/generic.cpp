@@ -191,7 +191,7 @@ void list_overload_contents(Block* block, caValue* output)
 
     // iterate across cases
     for (int caseIndex=0;; caseIndex++) {
-        Block* caseContents = if_block_get_case(ifContents, caseIndex);
+        Block* caseContents = get_case_block(ifContents, caseIndex);
         if (caseContents == NULL)
             break;
 

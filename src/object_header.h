@@ -5,7 +5,7 @@
 namespace circa {
 
 // Header used for any objects that participate in GC
-struct CircaObject
+struct ObjectHeader
 {
     char magicalHeader[6];
 
@@ -25,7 +25,7 @@ struct CircaObject
     // The object's body will be contiguous in memory.
     char body[0];
 
-    CircaObject()
+    ObjectHeader()
       : type(NULL),
         referenced(false),
         root(false),
@@ -33,12 +33,5 @@ struct CircaObject
         gcColor(0)
     {}
 };
-
-bool is_object(caValue* value);
-CircaObject* as_object(caValue* value);
-void* object_get_body(caValue* value);
-
-void object_initialize(Type* type, caValue* value);
-void setup_object_type(Type* type, int objectSize, caObjectReleaseFunc releaseFunc);
 
 } // namespace circa

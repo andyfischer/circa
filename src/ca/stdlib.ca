@@ -202,12 +202,6 @@ def rand_i(int range) -> int
 def swap(a, b) -> (any, any)
   return b, a
 
-type Mutable;
-  -- Container for a mutable value. Future status is undecided, this might
-  -- be removed.
-def Mutable.set(self, any val)
-def Mutable.get(self) -> any
-
 -- Modules
 
 type ModuleRef {

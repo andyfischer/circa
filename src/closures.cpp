@@ -81,7 +81,7 @@ void insert_nonlocal_terms(Block* block)
 void closure_block_evaluate(caStack* stack)
 {
     Term* term = circa_caller_term(stack);
-    caValue* closureOutput = circa_create_default_output(stack, 0);
+    caValue* closureOutput = circa_set_default_output(stack, 0);
     Block* block = nested_contents(term);
     set_block(list_get(closureOutput, 0), block);
     closure_save_all_bindings(closureOutput, stack);

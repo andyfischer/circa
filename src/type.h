@@ -8,7 +8,7 @@
 
 #include "block.h"
 #include "heap_debugging.h"
-#include "object.h"
+#include "object_header.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -53,8 +53,7 @@ struct Type
 
     typedef int (*ChecksumFunc)(caValue* value);
 
-    // CircaObject header, must be the first field.
-    CircaObject header;
+    ObjectHeader header;
 
     int id;
 

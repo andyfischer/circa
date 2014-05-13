@@ -1,0 +1,6 @@
+
+switch
+  case true
+    print("pass")
+  case false
+    print("fail")

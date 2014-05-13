@@ -32,8 +32,6 @@ struct FunctionAttrs
 
 struct Block
 {
-    // CircaObject header;
-
     // Globally unique ID. Used for debugging.
     int id;
 

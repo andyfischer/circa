@@ -67,7 +67,6 @@ OBJECTS := \
 	$(OBJDIR)/actor_test.o \
 	$(OBJDIR)/block_test.o \
 	$(OBJDIR)/building_test.o \
-	$(OBJDIR)/c_objects_test.o \
 	$(OBJDIR)/cascading_test.o \
 	$(OBJDIR)/code_iterator_test.o \
 	$(OBJDIR)/compound_type_test.o \
@@ -163,9 +162,6 @@ $(OBJDIR)/block_test.o: unit_tests/block_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/building_test.o: unit_tests/building_test.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/c_objects_test.o: unit_tests/c_objects_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/cascading_test.o: unit_tests/cascading_test.cpp

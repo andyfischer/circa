@@ -19,7 +19,6 @@
 #include "selector.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "switch_block.h"
 #include "symbols.h"
 #include "names.h"
 #include "term.h"
@@ -1040,9 +1039,16 @@ ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context)
     tokens.consume(tok_Switch);
     possible_whitespace(tokens);
 
-    Term* input = infix_expression(block, tokens, context, 0).term;
+    TermList switchInputs;
 
-    Term* result = apply(block, FUNCS.switch_func, TermList(input));
+    // Optional input expression.
+    int nextNonWhitespace = lookahead_next_non_whitespace(tokens, true);
+    if (nextNonWhitespace != tok_Case) {
+        switchInputs.append(infix_expression(block, tokens, context, 0).term);
+        possible_whitespace(tokens);
+    }
+
+    Term* result = apply(block, FUNCS.switch_func, switchInputs);
 
     set_starting_source_location(result, startPosition, tokens);
     consume_block(nested_contents(result), tokens, context);
@@ -1065,22 +1071,26 @@ ParseResult case_statement(Block* block, TokenStream& tokens, ParserCxt* context
     possible_whitespace(tokens);
 
     // Find the parent 'switch' block.
-    Term* parent = block->owningTerm;
-    if (parent == NULL || parent->function != FUNCS.switch_func) {
+    Term* switchTerm = block->owningTerm;
+    if (switchTerm == NULL || switchTerm->function != FUNCS.switch_func) {
         return syntax_error(block, tokens, startPosition,
             "'case' keyword must occur inside 'switch' block");
     }
 
-    Block* parentBlock = parent->owningBlock;
-
-    // Parse the 'case' input, using the block that the 'switch' is in.
-    Term* input = infix_expression(parentBlock, tokens, context, 0).term;
-
-    Term* result = apply(block, FUNCS.case_func, TermList(input));
-
+    Term* result = apply(block, FUNCS.case_func, TermList());
     set_starting_source_location(result, startPosition, tokens);
-    consume_block(nested_contents(result), tokens, context);
+    Block* contents = nested_contents(result);
 
+    Term* caseInput = infix_expression(contents, tokens, context, 0).term;
+
+    if (switchTerm->numInputs() > 0) {
+        caseInput = apply(contents, FUNCS.equals, TermList(caseInput, switchTerm->input(0)));
+        hide_from_source(caseInput);
+    }
+    
+    case_add_condition_check(contents, caseInput);
+
+    consume_block(contents, tokens, context);
     set_source_location(result, startPosition, tokens);
     set_is_statement(result, true);
     return ParseResult(result);

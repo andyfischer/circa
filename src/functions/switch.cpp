@@ -10,10 +10,7 @@ namespace switch_function {
 
     void setup(Block* kernel)
     {
-        FUNCS.switch_func = import_function(kernel, evaluate_switch, "switch(any input) -> any");
-        //FUNCS.case_func = import_function(kernel, evaluate_case, "case(any input)");
-
-        FUNCS.default_case = import_function(kernel, evaluate_default_case, "default_case()");
+        FUNCS.switch_func = import_function(kernel, NULL, "switch(any input :optional) -> any");
     }
 
 } // namespace switch_function

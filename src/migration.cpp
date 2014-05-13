@@ -271,9 +271,6 @@ void migrate_value(caValue* value, Migration* migration)
         set_block(value, migrate_block_pointer(as_block(value), migration));
     } else if (is_stack(value)) {
         migrate_stack(as_stack(value), migration);
-    } else if (value->value_type == TYPES.mutable_type) {
-        caValue* boxedValue = (caValue*) object_get_body(value);
-        migrate_value(boxedValue, migration);
     } else if (is_retained_frame(value)) {
         migrate_retained_frame(value, migration);
     } else if (is_list_based(value)) {

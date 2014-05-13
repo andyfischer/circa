@@ -565,7 +565,7 @@ Block* case_condition_get_next_case_block(Block* currentCase)
 {
     Block* ifBlock = get_parent_block(currentCase);
     int caseIndex = case_block_get_index(currentCase) + 1;
-    return if_block_get_case(ifBlock, caseIndex);
+    return get_case_block(ifBlock, caseIndex);
 }
 
 Block* find_enclosing_loop(Block* block)
@@ -643,6 +643,11 @@ void write_term_call(Writer* writer, Term* term)
         bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
 
         Block* nextCase = case_condition_get_next_case_block(term->owningBlock);
+
+        // At the end of every if/switch block, there must be an 'else' case block which
+        // contains no case_condition. So here, there must be a non-null nextCase.
+        ca_assert(nextCase != NULL);
+
         int nextBlockBcIndex = stack_bytecode_create_entry(writer->stack, nextCase);
         blob_append_u32(writer->bytecode, nextBlockBcIndex);
         write_post_term_call(writer, term);
@@ -752,11 +757,11 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_u32(writer->bytecode, term->index);
     }
 
-    else if (term->function == FUNCS.if_block) {
+    else if (term->function == FUNCS.if_block || term->function == FUNCS.switch_func) {
         staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushCase);
         blob_append_u32(writer->bytecode, term->index);
-        Block* firstCaseBlock = if_block_get_case(term->nestedContents, 0);
+        Block* firstCaseBlock = get_case_block(term->nestedContents, 0);
         u32 blockIndex = stack_bytecode_create_entry(writer->stack, firstCaseBlock);
         blob_append_u32(writer->bytecode, blockIndex);
     }
@@ -812,7 +817,6 @@ void write_term_call(Writer* writer, Term* term)
     }
 
     bytecode_write_input_instructions(writer, term);
-
     blob_append_char(writer->bytecode, bc_EnterFrame);
     bytecode_write_output_instructions(writer, term, staticallyKnownBlock);
     blob_append_char(writer->bytecode, bc_PopFrame);
@@ -907,6 +911,11 @@ static void bytecode_write_input_instructions(Writer* writer, Term* caller)
     if (is_dynamic_func_call(caller))
         bytecode_write_input_instruction_block_ref(writer, caller->function);
 
+    if (caller->function == FUNCS.switch_func) {
+        // switch's input is used by nested cases.
+        return;
+    }
+
     if (caller->function == FUNCS.while_loop) {
         Block* block = caller->nestedContents;
         for (int i=0; i < block->length(); i++) {
@@ -970,7 +979,7 @@ static int get_expected_stack_distance(Block* from, Block* to)
         // The one case where the block distance doesn't match the stack frame distance
         // is with an if-block. The if-block has a 'parent' block (that contains each
         // condition) which itself does not get a stack frame.
-        if (!is_if_block(from))
+        if (!is_switch_block(from))
             distance++;
 
         from = get_parent_block(from);

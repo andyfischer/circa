@@ -24,7 +24,7 @@ syn match circaSymbol   ":\([A-Z0-9a-z_]\)*"
 syn region circaMultilineComment start="{-" end="-}" contains=circaMultilineComment
 
 " Keywords
-syn keyword circaKeyword def type if elif else for state return in true false discard break continue while not and or require import package section case
+syn keyword circaKeyword def type if elif else for state return in true false discard break continue while not and or require import package section switch case
 
 " Comments
 syn region circaLineComment start="--" skip="\\$" end="$"

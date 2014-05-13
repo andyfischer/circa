@@ -2319,7 +2319,7 @@ void make_stack(caStack* stack)
 
     stack_init_with_closure(newStack, closure);
 
-    set_pointer(circa_create_default_output(stack, 0), newStack);
+    set_pointer(circa_set_default_output(stack, 0), newStack);
 }
 
 void stack_silently_finish_call(caStack* stack)
@@ -2364,7 +2364,7 @@ void capture_stack(caStack* stack)
 {
     Stack* newStack = stack_duplicate(stack);
     stack_silently_finish_call(newStack);
-    set_pointer(circa_create_default_output(stack, 0), newStack);
+    set_pointer(circa_set_default_output(stack, 0), newStack);
 }
 
 void hosted_extract_path(caStack* stack)
