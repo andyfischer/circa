@@ -52,6 +52,7 @@ struct LibuvWorld;
 struct NativePatchWorld;
 struct NativePatch;
 struct NativePatchFunction;
+struct Program;
 struct RawOutputPrefs;
 struct StaticTypeQuery;
 struct Term;

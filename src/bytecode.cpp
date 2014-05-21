@@ -9,11 +9,11 @@
 #include "hashtable.h"
 #include "if_block.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "loops.h"
 #include "names.h"
+#include "program.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -23,8 +23,7 @@
 namespace circa {
 
 struct Writer {
-    Stack* stack;
-    BytecodeCache* cache;
+    Program* program;
     caValue* bytecode;
     bool skipEffects;
     bool noSaveState;
@@ -648,7 +647,7 @@ void write_term_call(Writer* writer, Term* term)
         // contains no case_condition. So here, there must be a non-null nextCase.
         ca_assert(nextCase != NULL);
 
-        int nextBlockBcIndex = stack_bytecode_create_entry(writer->stack, nextCase);
+        int nextBlockBcIndex = program_create_entry(writer->program, nextCase);
         blob_append_u32(writer->bytecode, nextBlockBcIndex);
         write_post_term_call(writer, term);
         return;
@@ -762,7 +761,7 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PushCase);
         blob_append_u32(writer->bytecode, term->index);
         Block* firstCaseBlock = get_case_block(term->nestedContents, 0);
-        u32 blockIndex = stack_bytecode_create_entry(writer->stack, firstCaseBlock);
+        u32 blockIndex = program_create_entry(writer->program, firstCaseBlock);
         blob_append_u32(writer->bytecode, blockIndex);
     }
 
@@ -775,8 +774,8 @@ void write_term_call(Writer* writer, Term* term)
         staticallyKnownBlock = term->nestedContents;
         blob_append_char(writer->bytecode, bc_PushLoop);
         blob_append_u32(writer->bytecode, term->index);
-        blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack, term->nestedContents));
-        blob_append_u32(writer->bytecode, stack_bytecode_create_entry(writer->stack,
+        blob_append_u32(writer->bytecode, program_create_entry(writer->program, term->nestedContents));
+        blob_append_u32(writer->bytecode, program_create_entry(writer->program,
             for_loop_get_zero_block(term->nestedContents)));
         blob_append_char(writer->bytecode, loop_produces_output_value(term) ? 0x1 : 0x0);
     }
@@ -786,7 +785,7 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PushWhile);
         blob_append_u32(writer->bytecode, term->index);
         blob_append_u32(writer->bytecode,
-            stack_bytecode_create_entry(writer->stack, term->nestedContents));
+            program_create_entry(writer->program, term->nestedContents));
     }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
@@ -830,14 +829,17 @@ static void write_post_term_call(Writer* writer, Term* term)
 
 static void possibly_write_watch_check(Writer* writer, Term* term)
 {
-    StackBlock* stackBlock = stack_bytecode_find_entry(writer->stack, term->owningBlock);
-    if (stackBlock == NULL || !stackBlock->hasWatch)
+    int entryIndex = program_find_block_index(writer->program, term->owningBlock);
+    if (entryIndex == -1)
+        return;
+
+    if (!program_block_info(writer->program, entryIndex)->hasWatch)
         return;
 
     // This block has one or more watches, find them.
-    for (HashtableIterator it(&writer->stack->bytecode.watchByKey); it; ++it) {
+    for (HashtableIterator it(&writer->program->watchByKey); it; ++it) {
         int valueIndex = it.current()->asInt();
-        caValue* watch = writer->stack->bytecode.cachedValues.element(valueIndex);
+        caValue* watch = writer->program->cachedValues.element(valueIndex);
         caValue* targetPath = watch->element(1);
         Term* targetTerm = as_term_ref(list_last(targetPath));
         if (targetTerm != term)
@@ -852,7 +854,7 @@ void bytecode_write_input_instruction_block_ref(Writer* writer, Term* input)
 {
     blob_append_char(writer->bytecode, bc_InputFromBlockRef);
     blob_append_u32(writer->bytecode,
-        stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
+        program_create_empty_entry(writer->program, input->owningBlock));
     blob_append_u32(writer->bytecode, input->index);
 }
 
@@ -861,7 +863,7 @@ static caValue* find_set_value_hack(Writer* writer, Term* term)
     Value termVal;
     set_term_ref(&termVal, term);
 
-    caValue* termSpecificHacks = hashtable_get(&writer->cache->hacksByTerm, &termVal);
+    caValue* termSpecificHacks = hashtable_get(&writer->program->hacksByTerm, &termVal);
     if (termSpecificHacks == NULL)
         return NULL;
 
@@ -876,7 +878,7 @@ static caValue* term_effective_value(Writer* writer, Term* term)
 {
     caValue* setValueHackIndex = find_set_value_hack(writer, term);
     if (setValueHackIndex != NULL)
-        return writer->stack->bytecode.cachedValues.element(as_int(setValueHackIndex));
+        return writer->program->cachedValues.element(as_int(setValueHackIndex));
 
     return term_value(term);
 }
@@ -899,7 +901,7 @@ static void bytecode_write_input_instruction(Writer* writer, Term* input)
     if (is_value(input) || input->owningBlock == global_builtins_block()) {
         blob_append_char(writer->bytecode, bc_InputFromValue);
         blob_append_u32(writer->bytecode,
-            stack_bytecode_create_empty_entry(writer->stack, input->owningBlock));
+            program_create_empty_entry(writer->program, input->owningBlock));
         blob_append_u32(writer->bytecode, input->index);
     } else {
         bytecode_write_input_instruction_block_ref(writer, input);
@@ -1106,28 +1108,27 @@ void write_block(Writer* writer, Block* block)
     blob_append_char(writer->bytecode, bc_End);
 }
 
-void writer_setup_from_stack(Writer* writer, Stack* stack)
+void writer_setup(Writer* writer, Program* program)
 {
-    writer->stack = stack;
-    writer->cache = &stack->bytecode;
-    writer->skipEffects = stack->bytecode.skipEffects;
-    writer->noSaveState = stack->bytecode.noSaveState;
+    writer->program = program;
+    writer->skipEffects = program->skipEffects;
+    writer->noSaveState = program->noSaveState;
 }
 
-void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term)
+void bytecode_write_term_call(Program* program, caValue* bytecode, Term* term)
 {
     Writer writer;
     writer.bytecode = bytecode;
-    writer_setup_from_stack(&writer, stack);
+    writer_setup(&writer, program);
     set_blob(bytecode, 0);
     write_term_call(&writer, term);
 }
 
-void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block)
+void bytecode_write_block(Program* program, caValue* bytecode, Block* block)
 {
     Writer writer;
     writer.bytecode = bytecode;
-    writer_setup_from_stack(&writer, stack);
+    writer_setup(&writer, program);
     set_blob(bytecode, 0);
     write_block(&writer, block);
 }

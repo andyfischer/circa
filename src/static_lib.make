@@ -97,6 +97,7 @@ OBJECTS := \
 	$(OBJDIR)/native_patch.o \
 	$(OBJDIR)/native_ptr.o \
 	$(OBJDIR)/parser.o \
+	$(OBJDIR)/program.o \
 	$(OBJDIR)/rand.o \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/repl.o \
@@ -281,6 +282,9 @@ $(OBJDIR)/native_ptr.o: native_ptr.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/parser.o: parser.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/program.o: program.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/rand.o: rand.cpp

@@ -257,7 +257,11 @@ void List__remove(caStack* stack)
 
 void Map__contains(caStack* stack)
 {
-    caValue* value = hashtable_get(circa_input(stack, 0), circa_input(stack, 1));
+    caValue* key = circa_input(stack, 1);
+    if (!value_hashable(key))
+        return circa_output_error(stack, "Key is not hashable");
+
+    caValue* value = hashtable_get(circa_input(stack, 0), key);
     set_bool(circa_output(stack, 0), value != NULL);
 }
 
@@ -269,15 +273,22 @@ void Map__keys(caStack* stack)
 
 void Map__remove(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-    hashtable_remove(out, circa_input(stack, 1));
+    caValue* key = circa_input(stack, 1);
+    if (!value_hashable(key))
+        return circa_output_error(stack, "Key is not hashable");
+
+    caValue* self = circa_output(stack, 0);
+    move(circa_input(stack, 0), self);
+    hashtable_remove(self, key);
 }
 
 void Map__get(caStack* stack)
 {
     caValue* table = circa_input(stack, 0);
     caValue* key = circa_input(stack, 1);
+    if (!value_hashable(key))
+        return circa_output_error(stack, "Key is not hashable");
+
     caValue* value = hashtable_get(table, key);
     if (value == NULL) {
         Value msg;
@@ -290,13 +301,16 @@ void Map__get(caStack* stack)
 
 void Map__set(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
     caValue* key = circa_input(stack, 1);
+    if (!value_hashable(key))
+        return circa_output_error(stack, "Key is not hashable");
+
+    caValue* self = circa_output(stack, 0);
+    move(circa_input(stack, 0), self);
+
     caValue* value = circa_input(stack, 2);
 
-    copy(value, hashtable_insert(out, key, false));
+    copy(value, hashtable_insert(self, key, false));
 }
 
 void Map__empty(caStack* stack)

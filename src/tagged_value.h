@@ -90,6 +90,7 @@ caValue* get_field(caValue* value, const char* field, caValue* error=NULL);
 
 int num_elements(caValue* value);
 
+bool value_hashable(caValue* value);
 int get_hash_value(caValue* value);
 
 void set_pointer(caValue* value, void* ptr);

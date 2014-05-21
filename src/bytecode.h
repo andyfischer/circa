@@ -110,7 +110,7 @@ void bytecode_dump_next_op(const char* bc, int* pc);
 void bytecode_dump_val(caValue* bytecode);
 void bytecode_dump(char* data);
 
-void bytecode_write_term_call(Stack* stack, caValue* bytecode, Term* term);
-void bytecode_write_block(Stack* stack, caValue* bytecode, Block* block);
+void bytecode_write_term_call(Program* program, caValue* bytecode, Term* term);
+void bytecode_write_block(Program* program, caValue* bytecode, Block* block);
 
 } // namespace circa

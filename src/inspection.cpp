@@ -13,6 +13,7 @@
 #include "interpreter.h"
 #include "list.h"
 #include "names.h"
+#include "program.h"
 #include "string_type.h"
 #include "term.h"
 #include "term_list.h"
@@ -447,8 +448,8 @@ void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack
     int bytecodePc = 0;
     char* bytecodeData = NULL;
     if (stack != NULL) {
-        int blockIndex = stack_bytecode_create_entry(stack, block);
-        bytecodeData = stack_bytecode_get_data(stack, blockIndex);
+        int blockIndex = program_create_entry(stack->program, block);
+        bytecodeData = program_block_bytecode(stack->program, blockIndex);
     }
 
     print_indent(prefs, out);

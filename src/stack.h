@@ -7,39 +7,7 @@
 
 namespace circa {
 
-struct StackBlock {
-    // Per-block data stored in BytecodeCache.
-    
-    Block* block;
-    Value bytecode;
-    bool hasWatch;
-};
-
-struct BytecodeCache
-{
-    // Cached information related to running a stack. All of this data is per-stack, and
-    // is erased when the hackset changes.
-    
-    StackBlock* blocks;
-    int blockCount;
-
-    Value indexMap; // Map of Block* to block index.
-
-    // Hackset that was used in the generation of this bytecode.
-    Value hackset;
-
-    // Additional information.
-    bool skipEffects;
-    bool noSaveState;
-
-    Value hacksByTerm;
-
-    // Map of watch key to cachedValue index (containing the watch).
-    Value watchByKey;
-
-    // List of values that can be referenced by InputFromCachedValue.
-    Value cachedValues;
-};
+struct Program;
 
 struct Stack
 {
@@ -57,7 +25,8 @@ struct Stack
 
     Frame* top;
 
-    BytecodeCache bytecode;
+    Value derivedHackset;
+    Program* program;
 
     // Stored values that were computed on-demand. Keyed by Term reference.
     Value demandValues;
@@ -205,21 +174,10 @@ Term* frame_current_term(Frame* frame);
 caValue* frame_state(Frame* frame);
 Block* frame_block(Frame* frame);
 
-
-// Stack block cache
-char* stack_bytecode_get_data(Stack* stack, int index);
-Block* stack_bytecode_get_block(Stack* stack, int index);
-StackBlock* stack_bytecode_get_entry(Stack* stack, int index);
-int stack_bytecode_get_index(Stack* stack, Block* block);
-StackBlock* stack_bytecode_find_entry(Stack* stack, Block* block);
-int stack_bytecode_create_empty_entry(Stack* stack, Block* block);
-int stack_bytecode_create_entry(Stack* stack, Block* block);
-caValue* stack_bytecode_get_watch_observation(Stack* stack, caValue* key);
-
 // Prepare stack's bytecode for a VM run.
 void stack_bytecode_start_run(Stack* stack);
 
-void stack_bytecode_erase(Stack* stack);
+void stack_on_program_change(Stack* stack);
 
 void stack_derive_hackset(Stack* stack, Value* hackset);
 

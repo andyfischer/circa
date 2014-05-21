@@ -21,6 +21,7 @@
 #include "modules.h"
 #include "native_patch.h"
 #include "parser.h"
+#include "program.h"
 #include "reflection.h"
 #include "stack.h"
 #include "string_type.h"
@@ -68,7 +69,7 @@ void stack_init(Stack* stack, Block* block)
     while (top_frame(stack) != NULL)
         stack_pop(stack);
 
-    stack_bytecode_erase(stack);
+    stack_on_program_change(stack);
 
     vm_push_frame(stack, 0, block);
 }
@@ -576,8 +577,8 @@ static void start_interpreter_session(Stack* stack)
     // Make sure any existing frames have bytecode.
     for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
         if (frame->bc == NULL) {
-            frame->blockIndex = stack_bytecode_create_entry(stack, frame->block);
-            frame->bc = stack_bytecode_get_data(stack, frame->blockIndex);
+            frame->blockIndex = program_create_entry(stack->program, frame->block);
+            frame->bc = program_block_bytecode(stack->program, frame->blockIndex);
             ca_assert(frame->bc != NULL);
         }
     }
@@ -805,7 +806,7 @@ void vm_run(Stack* stack)
             u32 bcIndex = vm_read_u32(stack);
 
             if (bcIndex == 0xffffffff) {
-                bcIndex = stack_bytecode_create_entry(stack, block);
+                bcIndex = program_create_entry(stack->program, block);
 
                 // Save index back in bytecode.
                 int pos = stack->pc - 4;
@@ -813,7 +814,7 @@ void vm_run(Stack* stack)
             }
 
             top = vm_push_frame(stack, termIndex, block);
-            top->bc = stack_bytecode_get_data(stack, bcIndex);
+            top->bc = program_block_bytecode(stack->program, bcIndex);
             top->blockIndex = bcIndex;
             ca_assert(top->bc != NULL);
             
@@ -841,8 +842,8 @@ void vm_run(Stack* stack)
             Block* block = nested_contents(FUNCS.eval_on_demand);
 
             top = vm_push_frame(stack, termIndex, block);
-            int bcIndex = stack_bytecode_create_entry(stack, block);
-            top->bc = stack_bytecode_get_data(stack, bcIndex);
+            int bcIndex = program_create_entry(stack->program, block);
+            top->bc = program_block_bytecode(stack->program, bcIndex);
             top->blockIndex = bcIndex;
             ca_assert(top->bc != NULL);
             
@@ -863,8 +864,8 @@ void vm_run(Stack* stack)
             Block* block = term_function(targetTerm);
 
             top = vm_push_frame(stack, termIndex, block);
-            top->blockIndex = stack_bytecode_create_entry(stack, block);
-            top->bc = stack_bytecode_get_data(stack, top->blockIndex);
+            top->blockIndex = program_create_entry(stack->program, block);
+            top->bc = program_block_bytecode(stack->program, top->blockIndex);
 
             expand_frame(stack_top_parent(stack), top);
             vm_run_input_instructions_apply(stack, inputsVal);
@@ -1077,11 +1078,11 @@ void vm_run(Stack* stack)
             top->pc = stack->pc;
 
             // Start the first case.
-            Block* block = stack_bytecode_get_block(stack, blockIndex);
+            Block* block = program_block(stack->program, blockIndex);
 
             top = vm_push_frame(stack, termIndex, block);
             top->blockIndex = blockIndex;
-            top->bc = stack_bytecode_get_data(stack, blockIndex);
+            top->bc = program_block_bytecode(stack->program, blockIndex);
             expand_frame_indexed(stack_top_parent(stack), top, 0);
             vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
@@ -1107,12 +1108,12 @@ void vm_run(Stack* stack)
                 // Move to the next condition block.
                 stack_pop(stack);
 
-                Block* nextCase = stack_bytecode_get_block(stack, nextBcIndex);
+                Block* nextCase = program_block(stack->program, nextBcIndex);
                 int caseIndex = case_block_get_index(nextCase);
 
                 Frame* top = vm_push_frame(stack, parentIndex, nextCase);
                 top->blockIndex = nextBcIndex;
-                top->bc = stack_bytecode_get_data(stack, nextBcIndex);
+                top->bc = program_block_bytecode(stack->program, nextBcIndex);
                 stack->bc = top->bc;
                 ca_assert(stack->bc != NULL);
                 stack->pc = 0;
@@ -1148,11 +1149,11 @@ void vm_run(Stack* stack)
                 blockIndex = mainBlockIndex;
             }
 
-            block = stack_bytecode_get_block(stack, blockIndex);
+            block = program_block(stack->program, blockIndex);
 
             top = vm_push_frame(stack, termIndex, block);
             top->blockIndex = blockIndex;
-            top->bc = stack_bytecode_get_data(stack, blockIndex);
+            top->bc = program_block_bytecode(stack->program, blockIndex);
             vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
                 return;
@@ -1200,10 +1201,10 @@ void vm_run(Stack* stack)
             Frame* top = top_frame(stack);
             top->termIndex = index;
 
-            Block* block = stack_bytecode_get_block(stack, blockIndex);
+            Block* block = program_block(stack->program, blockIndex);
             top = vm_push_frame(stack, index, block);
             top->blockIndex = blockIndex;
-            top->bc = stack_bytecode_get_data(stack, blockIndex);
+            top->bc = program_block_bytecode(stack->program, blockIndex);
             vm_run_input_bytecodes(stack);
 
             if (stack->step != sym_StackRunning)
@@ -1507,7 +1508,7 @@ void vm_run(Stack* stack)
             u32 valueIndex = vm_read_u32(stack);
 
             Frame* top = top_frame(stack);
-            caValue* watch = stack->bytecode.cachedValues.element(valueIndex);
+            caValue* watch = stack->program->cachedValues.element(valueIndex);
             caValue* watchPath = watch->element(1);
 
             if (vm_matches_watch_path(stack, watchPath)) {
@@ -1538,7 +1539,7 @@ static caValue* vm_run_single_input(Frame* frame)
     case bc_InputFromValue: {
         int blockIndex = vm_read_u32(stack);
         int termIndex = vm_read_u32(stack);
-        Block* block = stack_bytecode_get_block(stack, blockIndex);
+        Block* block = program_block(stack->program, blockIndex);
         Term* input = block->get(termIndex);
 
         // Special case for function values: lazily create closures for these.
@@ -1555,7 +1556,7 @@ static caValue* vm_run_single_input(Frame* frame)
     }
     case bc_InputFromCachedValue: {
         int index = vm_read_u32(stack);
-        return list_get(&stack->bytecode.cachedValues, index);
+        return list_get(&stack->program->cachedValues, index);
     }
     default:
         stack->pc--; // Rewind.
@@ -1605,7 +1606,7 @@ static void vm_run_input_bytecodes(Stack* stack)
             case bc_InputFromValue: {
                 int blockIndex = vm_read_u32(stack);
                 int termIndex = vm_read_u32(stack);
-                Block* block = stack_bytecode_get_block(stack, blockIndex);
+                Block* block = program_block(stack->program, blockIndex);
                 Term* input = block->get(termIndex);
                 caValue* value = term_value(input);
                 copy(value, dest);
@@ -1620,7 +1621,7 @@ static void vm_run_input_bytecodes(Stack* stack)
             }
             case bc_InputFromCachedValue: {
                 int index = vm_read_u32(stack);
-                caValue* value = list_get(&stack->bytecode.cachedValues, index);
+                caValue* value = list_get(&stack->program->cachedValues, index);
                 copy(value, dest);
                 break;
             }
@@ -1785,8 +1786,8 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
 
     if (is_function(term)) {
         Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);
-        top->blockIndex = stack_bytecode_create_entry(stack, term->nestedContents);
-        top->bc = stack_bytecode_get_data(stack, top->blockIndex);
+        top->blockIndex = program_create_entry(stack->program, term->nestedContents);
+        top->bc = program_block_bytecode(stack->program, top->blockIndex);
         expand_frame(stack_top_parent(stack), top);
         vm_run_input_bytecodes(stack);
         return true;
@@ -1831,8 +1832,8 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
 
     top = vm_push_frame(stack, callerIndex, block);
 
-    top->blockIndex = stack_bytecode_create_entry(stack, block);
-    top->bc = stack_bytecode_get_data(stack, top->blockIndex);
+    top->blockIndex = program_create_entry(stack->program, block);
+    top->bc = program_block_bytecode(stack->program, top->blockIndex);
 
     expand_frame(stack_top_parent(stack), top);
 
@@ -1883,8 +1884,8 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
     copy(closure, &closureLocal);
 
     top = vm_push_frame(stack, callerIndex, block);
-    top->blockIndex = stack_bytecode_create_entry(stack, block);
-    top->bc = stack_bytecode_get_data(stack, top->blockIndex);
+    top->blockIndex = program_create_entry(stack->program, block);
+    top->bc = program_block_bytecode(stack->program, top->blockIndex);
 
     expand_frame(stack_top_parent(stack), top);
 
@@ -1985,7 +1986,7 @@ static void vm_finish_run(Stack* stack)
     Frame* top = top_frame(stack);
 
     if (!stack->errorOccurred) {
-        if (!stack->bytecode.noSaveState) {
+        if (!stack->program->noSaveState) {
             // Commit state.
             move(&top->outgoingState, &top->state);
         }
@@ -2072,7 +2073,7 @@ static void vm_push_dynamic_method(Stack* stack)
         // Method found, save in cache.
         Block* block = method->nestedContents;
 
-        u32 blockIndex = stack_bytecode_create_entry(stack, block);
+        u32 blockIndex = program_create_entry(stack->program, block);
 
         // Save method in cache.
         memmove(methodCache + sizeof(MethodCallSiteCacheLine), methodCache,
@@ -2084,7 +2085,7 @@ static void vm_push_dynamic_method(Stack* stack)
         cache->blockIndex = blockIndex;
     }
 
-    Block* block = stack_bytecode_get_block(stack, cache->blockIndex);
+    Block* block = program_block(stack->program, cache->blockIndex);
 
     // Special cases: check for methods that are normally handled with different bytecode.
 
@@ -2103,7 +2104,7 @@ static void vm_push_dynamic_method(Stack* stack)
     stack->pc = pcBeforeTargetObject;
     top = vm_push_frame(stack, termIndex, block);
     top->blockIndex = cache->blockIndex;
-    top->bc = stack_bytecode_get_data(stack, cache->blockIndex);
+    top->bc = program_block_bytecode(stack->program, cache->blockIndex);
     expand_frame(stack_top_parent(stack), top);
     vm_run_input_bytecodes(stack);
 }
@@ -2504,7 +2505,7 @@ void Stack__get_watch_result(caStack* stack)
     Stack* self = as_stack(circa_input(stack, 0));
     caValue* key = circa_input(stack, 1);
 
-    caValue* observation = stack_bytecode_get_watch_observation(self, key);
+    caValue* observation = program_get_watch_observation(self->program, key);
 
     if (observation == NULL)
         set_null(circa_output(stack, 0));

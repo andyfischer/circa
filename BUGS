@@ -1,8 +1,6 @@
 
 Miscellanous (most-recent first)
 
-  No hash function for type number
-
   Defining a method on non-existant type: weird parser errors
 
   Can't use a type before it's defined. Should be able to post-define it like functions.

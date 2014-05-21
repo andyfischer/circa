@@ -1,0 +1,4 @@
+Error occurred:
+[tests/map/unhashable_key.ca 3,0] Map.set()
+Key is not hashable
+

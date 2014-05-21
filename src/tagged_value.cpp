@@ -432,6 +432,34 @@ int num_elements(caValue* value)
     return numElements(value);
 }
 
+bool value_hashable(caValue* value)
+{
+    if (is_list_based(value)) {
+        for (int i=0; i < list_length(value); i++)
+            if (!value_hashable(list_get(value, i)))
+                return false;
+        return true;
+    }
+
+    if (is_hashtable(value)) {
+        for (int i=0; i < hashtable_slot_count(value); i++) {
+            if (hashtable_key_by_index(value, i) == NULL)
+                continue;
+            if (!value_hashable(hashtable_key_by_index(value, i)))
+                return false;
+            if (!value_hashable(hashtable_value_by_index(value, i)))
+                return false;
+        }
+        return true;
+    }
+
+    Type::HashFunc f = value->value_type->hashFunc;
+    if (f == NULL)
+        return false;
+
+    return true;
+}
+
 int get_hash_value(caValue* value)
 {
     Type::HashFunc f = value->value_type->hashFunc;
