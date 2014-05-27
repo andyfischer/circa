@@ -891,8 +891,8 @@ caBlock* circa_block(caValue* value) {
     return (caBlock*) value->value_data.ptr;
 }
 float circa_float(caValue* value) {
-    ca_assert(circa_is_float(value));
-    return value->value_data.asfloat;
+    // TODO: Rename circa_to_float to circa_float
+    return circa_to_float(value);
 }
 int circa_int(caValue* value) {
     ca_assert(circa_is_int(value));
@@ -918,10 +918,10 @@ caType* circa_type(caValue* value) {
 
 float circa_to_float(caValue* value)
 {
-    if (circa_is_int(value))
-        return (float) circa_int(value);
-    else if (circa_is_float(value))
-        return circa_float(value);
+    if (is_int(value))
+        return (float) as_int(value);
+    else if (is_float(value))
+        return as_float(value);
     else {
         internal_error("In to_float, type is not an int or float");
         return 0.0;
@@ -933,6 +933,10 @@ caValue* circa_index(caValue* container, int index)
     return get_index(container, index);
 }
 int circa_count(caValue* container)
+{
+    return list_length(container);
+}
+int circa_length(caValue* container)
 {
     return list_length(container);
 }
@@ -1060,6 +1064,12 @@ void circa_set_symbol(caValue* container, const char* str)
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
     set_string(container, str, size);
+}
+
+void circa_set_empty_string(caValue* container, int size)
+{
+    set_string(container, "");
+    string_resize(container, size);
 }
 
 void circa_copy(caValue* source, caValue* dest)

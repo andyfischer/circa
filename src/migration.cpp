@@ -197,6 +197,7 @@ void migrate_stack(Stack* stack, Migration* migration)
 
         for (int i=0; i < frame_register_count(frame); i++)
             migrate_value(frame_register(frame, i), migration);
+
         migrate_value(&frame->bindings, migration);
         migrate_value(&frame->dynamicScope, migration);
         migrate_state_list(&frame->state, oldBlock, frame->block, migration);

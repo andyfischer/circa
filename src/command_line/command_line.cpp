@@ -320,7 +320,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         stack_init(&stack, to_source_string);
         set_block(circa_input(&stack, 0), &block);
 
-        stack_run(&stack);
+        vm_run(&stack);
 
         if (stack_errored(&stack))
             dump(&stack);
@@ -550,7 +550,7 @@ int run_command_line(caWorld* world, caValue* args)
         stack_init(stack, block);
         while (true) {
 
-            stack_run(stack);
+            circa_run(stack);
 
             world_tick(world);
 
@@ -607,7 +607,7 @@ int run_command_line(caWorld* world, caValue* args)
         stack_init(&stack, to_source_string);
         set_block(circa_input(&stack, 0), block);
 
-        stack_run(&stack);
+        circa_run(&stack);
 
         if (stack_errored(&stack))
             dump(&stack);
@@ -634,7 +634,7 @@ int run_command_line(caWorld* world, caValue* args)
     if (dontRunScript)
         return 0;
 
-    stack_run(stack);
+    circa_run(stack);
 
     if (printState) {
         caValue* state = stack_get_state(stack);

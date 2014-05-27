@@ -54,7 +54,7 @@ void builtin_symbol_used_in_code()
 
     Stack stack;
     stack_init(&stack, f);
-    stack_run(&stack);
+    circa_run(&stack);
 
     test_equals(circa_output(&stack, 0), ":Unknown");
     test_equals(as_symbol(circa_output(&stack, 0)), sym_Unknown);

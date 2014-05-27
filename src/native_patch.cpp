@@ -130,11 +130,6 @@ static void function_key(const char* name, caValue* out)
     set_list(out, 2)->set_element_sym(0, sym_Function)->set_element_str(1, name);
 }
 
-static void type_release_key(const char* typeName, caValue* out)
-{
-    set_list(out, 2)->set_element_sym(0, sym_TypeRelease)->set_element_str(1, typeName);
-}
-
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func)
 {
     Value key;

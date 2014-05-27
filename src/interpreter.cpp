@@ -604,15 +604,10 @@ void evaluate_block(Stack* stack, Block* block)
 
     stack_init(stack, block);
 
-    stack_run(stack);
+    vm_run(stack);
 
     if (!stack_errored(stack))
         stack_pop(stack);
-}
-
-void stack_run(Stack* stack)
-{
-    vm_run(stack);
 }
 
 void raise_error_input_type_mismatch(Stack* stack, int inputIndex)
@@ -2412,7 +2407,7 @@ void Stack__eval_on_demand(caStack* stack)
     stack_bytecode_start_run(self);
 
     vm_evaluate_module_on_demand(self, term, true);
-    stack_run(self);
+    vm_run(self);
     caValue* result = stack_active_value_for_term(top_frame(self), term);
     copy(result, circa_output(stack, 0));
 #endif
@@ -2527,7 +2522,7 @@ void Stack__call(caStack* stack)
     for (int i=0; i < list_length(inputs); i++)
         copy(list_get(inputs, i), circa_input(self, i));
 
-    stack_run(self);
+    vm_run(self);
 
     caValue* output = circa_output(self, 0);
     if (output != NULL)
@@ -2647,7 +2642,7 @@ void Stack__run(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
-    stack_run(self);
+    vm_run(self);
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 

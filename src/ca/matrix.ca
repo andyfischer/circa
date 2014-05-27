@@ -1,0 +1,47 @@
+
+type Mat2 {
+  List col0
+  List col1
+}
+type Mat3 {
+  List col0
+  List col1
+  List col2
+}
+type Mat4 {
+  List col0
+  List col1
+  List col2
+  List col3
+}
+
+def make_mat3() -> Mat3
+  Mat3.make([1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0])
+
+def make_scale3(Vec2 vec) -> Mat3
+  Mat3.make([vec.x 0.0 0.0] [0.0 vec.y 0.0] [0.0 0.0 1.0])
+
+def make_translate3(Vec2 vec) -> Mat3
+  Mat3.make([1.0 0.0 0.0] [0.0 1.0 0.0] [vec.x vec.y 1.0])
+
+def col3_mult(List left, List right) -> number
+  left[0] * right[0] + left[1] * right[1] + left[2] * right[2]
+
+def Mat3.mult(self, Mat3 rhs) -> Mat3
+  lrow0 = [self.col0[0] self.col1[0] self.col2[0]]
+  lrow1 = [self.col0[1] self.col1[1] self.col2[1]]
+  lrow2 = [self.col0[2] self.col1[2] self.col2[2]]
+
+  rcol0 = rhs.col0
+  rcol1 = rhs.col1
+  rcol2 = rhs.col2
+
+  Mat3.make([col3_mult(lrow0 rcol0) col3_mult(lrow1 rcol0) col3_mult(lrow2 rcol0)]
+    [col3_mult(lrow0 rcol1) col3_mult(lrow1 rcol1) col3_mult(lrow2 rcol1)]
+    [col3_mult(lrow0 rcol2) col3_mult(lrow1 rcol2) col3_mult(lrow2 rcol2)])
+
+def Mat3.scale(self, Vec2 vec) -> Mat3
+  self.mult(make_scale3(vec))
+
+def Mat3.translate(self, Vec2 vec) -> Mat3
+  self.mult(make_translate3(vec))

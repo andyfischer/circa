@@ -37,7 +37,6 @@ void stack_extract_state(Stack* stack, caValue* output);
 
 void frame_extract_state(Frame* frame, caValue* output);
 
-void stack_run(Stack* stack);
 void vm_run(Stack* stack);
 
 // Deprecated

@@ -351,7 +351,7 @@ caValue* circa_frame_output(caStack* stack, int index)
 
 void circa_run(caStack* stack)
 {
-    stack_run(stack);
+    vm_run(stack);
 }
 
 void circa_pop(caStack* stack)

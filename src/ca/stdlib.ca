@@ -1011,13 +1011,14 @@ def zip(List left, List right) -> List
 def cached(Func refresh) -> any
   -- Cache a function's result, the function will only be (re)evaluated as needed.
 
-  state Func _refresh
-  state version = global_script_version()
-  state _out
-  if _refresh != refresh or version != global_script_version()
-    _refresh = refresh
-    _out = refresh.call()
-  _out
+  state Func prev_refresh
+  state prev_version = global_script_version()
+  state out
+  if prev_refresh != refresh or prev_version != global_script_version()
+    prev_refresh = refresh
+    prev_version = global_script_version()
+    out = refresh.call()
+  out
 
 def changed(any val) -> bool
   -- Stateful function; returns true if the value has changed since the

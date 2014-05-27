@@ -125,4 +125,14 @@ void symbol_setup_type(Type* type)
     type->hashFunc = hash_func;
 }
 
+CIRCA_EXPORT const char* circa_symbol_text(caValue* symbol)
+{
+    return symbol_as_string(symbol);
+}
+
+CIRCA_EXPORT bool circa_symbol_equals(caValue* symbol, const char* text)
+{
+    return strcmp(symbol_as_string(symbol), text) == 0;
+}
+
 }

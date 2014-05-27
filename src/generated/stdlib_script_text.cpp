@@ -1018,13 +1018,14 @@ const char* BUILTIN_MODULE_stdlib =
     "def cached(Func refresh) -> any\n"
     "  -- Cache a function's result, the function will only be (re)evaluated as needed.\n"
     "\n"
-    "  state Func _refresh\n"
-    "  state version = global_script_version()\n"
-    "  state _out\n"
-    "  if _refresh != refresh or version != global_script_version()\n"
-    "    _refresh = refresh\n"
-    "    _out = refresh.call()\n"
-    "  _out\n"
+    "  state Func prev_refresh\n"
+    "  state prev_version = global_script_version()\n"
+    "  state out\n"
+    "  if prev_refresh != refresh or prev_version != global_script_version()\n"
+    "    prev_refresh = refresh\n"
+    "    prev_version = global_script_version()\n"
+    "    out = refresh.call()\n"
+    "  out\n"
     "\n"
     "def changed(any val) -> bool\n"
     "  -- Stateful function; returns true if the value has changed since the\n"
@@ -1430,6 +1431,55 @@ const char* BUILTIN_MODULE_error_trace =
     "  @writer.write('Error: ' stack.top.register(stack.top.pc))\n"
     "\n"
     "  writer.toString\n";
+
+const char* BUILTIN_MODULE_matrix = 
+    "\n"
+    "type Mat2 {\n"
+    "  List col0\n"
+    "  List col1\n"
+    "}\n"
+    "type Mat3 {\n"
+    "  List col0\n"
+    "  List col1\n"
+    "  List col2\n"
+    "}\n"
+    "type Mat4 {\n"
+    "  List col0\n"
+    "  List col1\n"
+    "  List col2\n"
+    "  List col3\n"
+    "}\n"
+    "\n"
+    "def make_mat3() -> Mat3\n"
+    "  Mat3.make([1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0])\n"
+    "\n"
+    "def make_scale3(Vec2 vec) -> Mat3\n"
+    "  Mat3.make([vec.x 0.0 0.0] [0.0 vec.y 0.0] [0.0 0.0 1.0])\n"
+    "\n"
+    "def make_translate3(Vec2 vec) -> Mat3\n"
+    "  Mat3.make([1.0 0.0 0.0] [0.0 1.0 0.0] [vec.x vec.y 1.0])\n"
+    "\n"
+    "def col3_mult(List left, List right) -> number\n"
+    "  left[0] * right[0] + left[1] * right[1] + left[2] * right[2]\n"
+    "\n"
+    "def Mat3.mult(self, Mat3 rhs) -> Mat3\n"
+    "  lrow0 = [self.col0[0] self.col1[0] self.col2[0]]\n"
+    "  lrow1 = [self.col0[1] self.col1[1] self.col2[1]]\n"
+    "  lrow2 = [self.col0[2] self.col1[2] self.col2[2]]\n"
+    "\n"
+    "  rcol0 = rhs.col0\n"
+    "  rcol1 = rhs.col1\n"
+    "  rcol2 = rhs.col2\n"
+    "\n"
+    "  Mat3.make([col3_mult(lrow0 rcol0) col3_mult(lrow1 rcol0) col3_mult(lrow2 rcol0)]\n"
+    "    [col3_mult(lrow0 rcol1) col3_mult(lrow1 rcol1) col3_mult(lrow2 rcol1)]\n"
+    "    [col3_mult(lrow0 rcol2) col3_mult(lrow1 rcol2) col3_mult(lrow2 rcol2)])\n"
+    "\n"
+    "def Mat3.scale(self, Vec2 vec) -> Mat3\n"
+    "  self.mult(make_scale3(vec))\n"
+    "\n"
+    "def Mat3.translate(self, Vec2 vec) -> Mat3\n"
+    "  self.mult(make_translate3(vec))\n";
 
 const char* BUILTIN_MODULE_source_repro = 
     "\n"
@@ -2229,6 +2279,8 @@ const char* find_builtin_module(const char* name) {
         return BUILTIN_MODULE_json;
     if (strcmp(name, "error_trace") == 0)
         return BUILTIN_MODULE_error_trace;
+    if (strcmp(name, "matrix") == 0)
+        return BUILTIN_MODULE_matrix;
     if (strcmp(name, "source_repro") == 0)
         return BUILTIN_MODULE_source_repro;
     if (strcmp(name, "stack_dump") == 0)

@@ -367,20 +367,18 @@ void*       circa_get_pointer(caValue* value);
 float circa_to_float(caValue* value);
 
 // Returns the number of elements in a list value.
-//   Effect on safety: none.
-int circa_count(caValue* container);
+int circa_count(caValue* container); // TODO: delete
+int circa_length(caValue* container);
 
 // Allocate a new list value, with the given initial size.
 caValue* circa_alloc_list(int size);
 
 // Access a list's element by index. The result is a deep pointer. See the above section titled
 // "Safely using container values".
-//   Effect on safety: none.
 caValue* circa_index(caValue* container, int index);
 
 // Access a map's element by key. Returns NULL if the key is not found. The result is a deep
 // pointer. See the above section titled "Safely using container values". 
-//   Effect on safety: none.
 caValue* circa_map_get(caValue* map, caValue* key);
 
 // -- Writing to a caValue --
@@ -405,9 +403,13 @@ void circa_set_vec4(caValue* container, float x, float y, float z, float w);
 
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated.
 void circa_set_string_size(caValue* container, const char* str, int size);
+void circa_set_empty_string(caValue* container, int size);
 
 int circa_string_length(caValue* string);
 int circa_blob_length(caValue* string);
+
+const char* circa_symbol_text(caValue* symbol);
+bool circa_symbol_equals(caValue* symbol, const char* text);
 
 // Append to a string
 void circa_string_append(caValue* str, const char* suffix);
@@ -440,6 +442,8 @@ caValue* circa_map_insert(caValue* map, caValue* key);
 
 // Like circa_map_insert, but the 'key' value is moved instead of copied. (see circa_move)
 caValue* circa_map_insert_move(caValue* map, caValue* key);
+
+void circa_map_set_int(caValue* map, caValue* key, int val);
 
 void* circa_raw_pointer(caValue* value);
 void circa_set_raw_pointer(caValue* value, void* ptr);

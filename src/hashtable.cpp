@@ -650,15 +650,26 @@ void HashtableIterator::_advanceWhileInvalid()
 {
 }
 
-// Publich functions
 CIRCA_EXPORT caValue* circa_map_insert(caValue* map, caValue* key)
 {
     return hashtable_insert(map, key, false);
 }
 
+CIRCA_EXPORT caValue* circa_map_get(caValue* map, caValue* key)
+{
+    return hashtable_get(map, key);
+}
+
 CIRCA_EXPORT caValue* circa_map_insert_move(caValue* map, caValue* key)
 {
     return hashtable_insert(map, key, true);
+}
+
+CIRCA_EXPORT void circa_map_set_int(caValue* map, caValue* key, int val)
+{
+    Value wrapped;
+    set_int(&wrapped, val);
+    move(&wrapped, circa_map_insert(map, key));
 }
 
 CIRCA_EXPORT void circa_set_map(caValue* value)

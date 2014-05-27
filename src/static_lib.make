@@ -88,7 +88,6 @@ OBJECTS := \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/loops.o \
-	$(OBJDIR)/matrix.o \
 	$(OBJDIR)/migration.o \
 	$(OBJDIR)/misc_builtins.o \
 	$(OBJDIR)/modules.o \
@@ -255,9 +254,6 @@ $(OBJDIR)/list.o: list.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/loops.o: loops.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/matrix.o: matrix.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/migration.o: migration.cpp

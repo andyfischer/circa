@@ -119,7 +119,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
 
     // Run the stack to the new end of the block.
     stack_restart(stack);
-    stack_run(stack);
+    vm_run(stack);
 
     if (stack_errored(stack)) {
         set_string(list_append(output), "error: ");
