@@ -1,6 +1,18 @@
 
 Miscellanous (most-recent first)
 
+  switch-else not implemented?
+
+  "else if" (instead of the correct elif) causes bad parsing. Example:
+      if t < 1/6
+        p + (q - p) * 6 * t
+      else if t < 1/2
+        q
+      else if t < 2/3
+        p + (q - p) * (2/3 - t) * 6
+      else
+        p
+
   Defining a method on non-existant type: weird parser errors
 
   Can't use a type before it's defined. Should be able to post-define it like functions.

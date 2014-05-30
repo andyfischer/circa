@@ -172,11 +172,10 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     frame->blockIndex = -1;
     frame->pc = 0;
     frame->exitType = sym_None;
-    frame->callType = sym_NormalCall;
     frame->block = NULL;
     frame->registerCount = registerCount;
     initialize_null(&frame->bindings);
-    initialize_null(&frame->dynamicScope);
+    initialize_null(&frame->env);
     initialize_null(&frame->state);
     initialize_null(&frame->outgoingState);
 
@@ -196,7 +195,7 @@ void stack_pop_no_retain(Stack* stack)
         set_null(&frame->registers[i]);
 
     set_null(&frame->bindings);
-    set_null(&frame->dynamicScope);
+    set_null(&frame->env);
     set_null(&frame->state);
     set_null(&frame->outgoingState);
 
@@ -332,12 +331,11 @@ Stack* stack_duplicate(Stack* stack)
         dupeFrame->parentIndex = sourceFrame->parentIndex;
         dupeFrame->block = sourceFrame->block;
         dupeFrame->termIndex = sourceFrame->termIndex;
-        dupeFrame->callType = sourceFrame->callType;
         dupeFrame->exitType = sourceFrame->exitType;
         set_value(&dupeFrame->state, &sourceFrame->state);
         set_value(&dupeFrame->outgoingState, &sourceFrame->outgoingState);
         set_value(&dupeFrame->bindings, &sourceFrame->bindings);
-        set_value(&dupeFrame->dynamicScope, &sourceFrame->dynamicScope);
+        set_value(&dupeFrame->env, &sourceFrame->env);
 
         sourceFrame = next_frame(sourceFrame);
     }
@@ -624,17 +622,13 @@ void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retaine
 void frame_copy(Frame* left, Frame* right)
 {
     right->parentIndex = left->parentIndex;
-    //FIXME
-    //copy(&left->registers, &right->registers);
-    //touch(&right->registers);
     copy(&left->state, &right->state);
     copy(&left->bindings, &right->bindings);
-    copy(&left->dynamicScope, &right->dynamicScope);
+    copy(&left->env, &right->env);
     right->block = left->block;
     right->termIndex = left->termIndex;
     right->bc = NULL;
     right->pc = left->pc;
-    right->callType = left->callType;
     right->exitType = left->exitType;
 }
 

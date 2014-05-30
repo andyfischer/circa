@@ -877,6 +877,7 @@ bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
 bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
 bool circa_is_stack(caValue* value) { return is_stack(value); }
 bool circa_is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
+bool circa_is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
 bool circa_is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
 bool circa_bool(caValue* value) {

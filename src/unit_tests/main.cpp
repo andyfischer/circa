@@ -364,7 +364,6 @@ void test_block_as_assertions_list(Block* block, std::string const& contextStr)
     }
 }
 
-namespace actor_test { void register_tests(); }
 namespace block_test { void register_tests(); }
 namespace building_test { void register_tests(); }
 namespace code_iterator_test { void register_tests(); }
@@ -398,7 +397,6 @@ int main(int argc, char** argv)
 {
     hashtable_test::register_tests();
 
-    actor_test::register_tests();
     block_test::register_tests();
     building_test::register_tests();
     code_iterator_test::register_tests();

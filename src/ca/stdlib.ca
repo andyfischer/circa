@@ -258,6 +258,10 @@ def sys_module_search_paths() -> List
 def sys_perf_stats_reset()
 def sys_perf_stats_dump() -> List
 
+-- Channels
+def channel_send(Symbol name, any val)
+def channel_read(Symbol name) -> List
+
 def global_script_version() -> int
 
 -- Builtin types
@@ -503,10 +507,6 @@ def make_stack(Func func) -> Stack
 def make_vm(Func func) -> Stack
   -- Create a new Stack
 
-def make_actor(Func func) -> Stack
-  -- 'Actor' support is broken right now
-  make_stack(func)
-
 def Func.to_stack(self) -> Stack
   make_stack(self)
 
@@ -561,6 +561,17 @@ def List.join(self, String joiner) -> String
   -- 
   -- Outputs: '1, 2, 3'
 
+def List.split(self, boundaryValue) -> List
+  out = [[]]
+  for item in self
+    if item == boundaryValue
+      @out.append([])
+    else
+      @out.modify(out.length - 1, {
+        input().append(item)
+      })
+  out
+
 def List.slice(self, int start, int fin) -> List
   -- Return a list constructed from the elements starting from index 'start', and
   -- ending immediately before index 'fin'.
@@ -590,6 +601,9 @@ def List.set(self, int index, any val) -> List
 
 def List.remove(self, int index) -> List
   -- Remove an element at the given index, shrinking the list by 1.
+
+def List.modify(self, int index, Func func)
+  @self.set(index, func.call(self.get(index)))
 
 def List.add(self, any value) -> List
   if is_compound(value)
@@ -1169,6 +1183,32 @@ def hsv_to_rgb(List hsv) -> Color
     [v p q 1]
   else
     [0 0 0 0]
+
+def hsl_color(number h, number s, number l) -> Color
+  if s == 0
+    [1 1 1 1]
+  else
+    def hue_to_rgb(number p, number q, number t)
+      mod(@t 1)
+      if t < 1/6
+        p + (q - p) * 6 * t
+      elif t < 1/2
+        q
+      elif t < 2/3
+        p + (q - p) * (2/3 - t) * 6
+      else
+        p
+
+    q = if l < 0.5
+      l * (1 + s)
+    else
+      l + s - l * s
+
+    p = 2 * l - q
+    r = hue_to_rgb(p, q, h + 1/3)
+    g = hue_to_rgb(p, q, h)
+    b = hue_to_rgb(p, q, h - 1/3)
+    [r g b 1]
 
 def Color.add(self, any value) -> Color
   for i in self { i + value }

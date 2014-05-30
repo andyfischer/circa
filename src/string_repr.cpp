@@ -144,7 +144,7 @@ CIRCA_EXPORT void circa_to_string(caValue* value, caValue* out)
 
 CIRCA_EXPORT void circa_parse_string(const char* str, caValue* valueOut)
 {
-    parse_string_repr(str, strlen(str), valueOut);
+    parse_string_repr(str, (int) strlen(str), valueOut);
 }
 
 CIRCA_EXPORT void circa_parse_string_len(const char* str, int len, caValue* valueOut)

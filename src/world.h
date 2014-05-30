@@ -15,7 +15,6 @@ struct World {
     LibuvWorld* libuvWorld;
 
     // Global IDs.
-    int nextActorID;
     int nextTermID;
     int nextBlockID;
     int nextStackID;

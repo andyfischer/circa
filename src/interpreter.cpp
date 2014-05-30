@@ -351,10 +351,10 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         if (block == NULL)
             continue;
 
-        if (!is_null(&frame->dynamicScope)) {
+        if (!is_null(&frame->env)) {
             indent(out, frameIndex+2);
             string_append(out, "env: ");
-            to_string(&frame->dynamicScope, out);
+            to_string(&frame->env, out);
             string_append(out, "\n");
         }
         if (!is_null(&frame->state)) {
@@ -1836,8 +1836,6 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
     if (!hashtable_is_empty(bindings))
         copy(bindings, &top->bindings);
 
-    top->callType = sym_FuncCall;
-
     vm_run_input_bytecodes(stack);
 }
 
@@ -1887,8 +1885,6 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
     caValue* bindings = list_get(&closureLocal, 1);
     if (!hashtable_is_empty(bindings))
         copy(bindings, &top->bindings);
-
-    top->callType = sym_FuncApply;
 
     vm_run_input_instructions_apply(stack, inputList);
 }

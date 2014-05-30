@@ -94,8 +94,8 @@ struct Frame
     // Map of Term to value, for scope-specific bindings. Used in closure call.
     Value bindings;
 
-    // Map of term->value. Used for a closure call.
-    Value dynamicScope;
+    // Frame env values.
+    Value env;
 
     // Block index (as stored in BytecodeCache).
     int blockIndex;
@@ -108,9 +108,6 @@ struct Frame
 
     // PC stored as a termIndex.
     int termIndex;
-
-    // Whether this frame was pushed from a normal call, or Func.apply/Func.call.
-    Symbol callType;
 
     // When a block is exited early, this stores the exit type.
     Symbol exitType;

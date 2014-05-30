@@ -485,16 +485,12 @@ void String__split(caStack* stack)
 
 caValue* find_env_value(caStack* stack, caValue* key)
 {
-    Frame* frame = top_frame(stack);
-
-    while (frame != NULL) {
-        if (!is_null(&frame->dynamicScope)) {
-            caValue* value = hashtable_get(&frame->dynamicScope, key);
+    for (Frame* frame = top_frame(stack); frame != NULL; frame = prev_frame(frame)) {
+        if (!is_null(&frame->env)) {
+            caValue* value = hashtable_get(&frame->env, key);
             if (value != NULL)
                 return value;
         }
-
-        frame = prev_frame(frame);
     }
 
     if (!is_null(&stack->env)) {
@@ -546,6 +542,30 @@ void file__version(caStack* stack)
 void file__read_text(caStack* stack)
 {
     circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
+}
+
+void channel_send(caStack* stack)
+{
+    caValue* name = circa_input(stack, 0);
+    caValue* channel = find_env_value(stack, name);
+    if (channel == NULL) {
+        channel = stack_env_insert(stack, name);
+        set_list(channel, 0);
+    }
+
+    move(circa_input(stack, 1), list_append(channel));
+}
+
+void channel_read(caStack* stack)
+{
+    caValue* name = circa_input(stack, 0);
+    caValue* channel = find_env_value(stack, name);
+    if (channel == NULL)
+        set_list(circa_output(stack, 0), 0);
+    else {
+        move(channel, circa_output(stack, 0));
+        set_list(channel, 0);
+    }
 }
 
 void typeof_func(caStack* stack)
@@ -705,6 +725,8 @@ void misc_builtins_setup_functions(NativePatch* patch)
     module_patch_function(patch, "file_version", file__version);
     module_patch_function(patch, "file_exists", file__exists);
     module_patch_function(patch, "file_read_text", file__read_text);
+    module_patch_function(patch, "channel_send", channel_send);
+    module_patch_function(patch, "channel_read", channel_read);
 
     module_patch_function(patch, "not_equals", not_equals);
     module_patch_function(patch, "print", print);

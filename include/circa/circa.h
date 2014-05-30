@@ -343,6 +343,7 @@ bool circa_is_null(caValue* value);
 bool circa_is_number(caValue* value);
 bool circa_is_stack(caValue* value);
 bool circa_is_string(caValue* value);
+bool circa_is_symbol(caValue* value);
 bool circa_is_type(caValue* value);
 
 // Read the value from a caValue.

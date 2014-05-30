@@ -64,7 +64,6 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/actor_test.o \
 	$(OBJDIR)/block_test.o \
 	$(OBJDIR)/building_test.o \
 	$(OBJDIR)/cascading_test.o \
@@ -155,9 +154,6 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/actor_test.o: unit_tests/actor_test.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/block_test.o: unit_tests/block_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
