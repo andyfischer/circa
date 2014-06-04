@@ -1,5 +1,5 @@
 
-type A = :interface
+struct A = :interface
 
 def A.f(self) -> String
   'A.f called'

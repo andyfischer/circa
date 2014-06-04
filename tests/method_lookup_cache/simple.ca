@@ -1,10 +1,10 @@
 
-type A {}
+struct A {}
 
 def A.f(self)
   print('called A.f')
 
-type B {}
+struct B {}
 
 def B.f(self)
   print('called B.f')

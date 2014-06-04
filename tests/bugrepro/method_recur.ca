@@ -1,5 +1,5 @@
 
-type UIElement {
+struct UIElement {
     Symbol tag
     List args
     Rect rect

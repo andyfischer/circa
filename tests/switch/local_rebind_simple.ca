@@ -1,0 +1,8 @@
+
+a = 'outer'
+
+switch 1
+  case 1
+    a = 'inner'
+
+print(a)

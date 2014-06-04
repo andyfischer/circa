@@ -51,7 +51,7 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult blank_line(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context);
-ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult case_statement(Block* block, TokenStream& tokens, ParserCxt* context);

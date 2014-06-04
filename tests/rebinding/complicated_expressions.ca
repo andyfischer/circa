@@ -1,5 +1,5 @@
 
-type T {
+struct T {
     String s
 }
 
@@ -20,7 +20,7 @@ assert(t == ['hello'])
 @t.setStr('goodbye')
 assert(t == ['goodbye'])
 
-type T2 {
+struct T2 {
     List list
 }
 

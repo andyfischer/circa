@@ -273,11 +273,11 @@ caValue* term_get_input_property(Term* term, int inputIndex, Symbol key)
     Term::Input* info = term->inputInfo(inputIndex);
     if (info == NULL)
         return NULL;
-    return hashtable_get_int_key(&info->properties, key);
+    return hashtable_get_symbol_key(&info->properties, key);
 }
 caValue* term_insert_input_property(Term* term, int inputIndex, Symbol key)
 {
-    return hashtable_insert_int_key(&term->inputInfo(inputIndex)->properties, key);
+    return hashtable_insert_symbol_key(&term->inputInfo(inputIndex)->properties, key);
 }
 
 bool term_get_bool_input_prop(Term* term, int inputIndex, Symbol key, bool defaultValue)

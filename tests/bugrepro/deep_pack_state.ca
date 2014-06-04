@@ -1,5 +1,5 @@
 
-type ClickArea {
+struct ClickArea {
     Rect rect
     Func listener
 }

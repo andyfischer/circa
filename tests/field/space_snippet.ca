@@ -1,7 +1,7 @@
 
 -- This code once caused a parser error from the trailing comma.
 
-type Bullet {
+struct Bullet {
     number lifespan,
     Vec2 loc,
     Vec2 direction

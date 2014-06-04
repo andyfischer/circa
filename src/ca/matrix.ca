@@ -1,14 +1,14 @@
 
-type Mat2 {
+struct Mat2 {
   List col0
   List col1
 }
-type Mat3 {
+struct Mat3 {
   List col0
   List col1
   List col2
 }
-type Mat4 {
+struct Mat4 {
   List col0
   List col1
   List col2

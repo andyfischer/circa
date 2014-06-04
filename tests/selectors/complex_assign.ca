@@ -1,5 +1,5 @@
 
-type Button {
+struct Button {
     String label
     any action
     Rect rect
@@ -9,7 +9,7 @@ type Button {
     bool toggled
 }
 
-type ButtonBar {
+struct ButtonBar {
     List buttons
 }
 

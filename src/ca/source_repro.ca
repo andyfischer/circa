@@ -1,9 +1,9 @@
 
-type SourceRepro {
+struct SourceRepro {
   List phrases
 }
 
-type Phrase {
+struct Phrase {
   Symbol t
   any val
   Map attrs
@@ -34,7 +34,7 @@ def Term.is_function_decl(term)
   term.function == block_ref(function_decl)
 def Term.is_closure_decl(term)
   term.function == block_ref(closure_block)
-def Term.is_type_decl(term)
+def Term.is_struct_decl(term)
   term.is_value and is_type(term.value)
 def Term.is_require(term)
   term.function.name == 'require'
@@ -231,8 +231,8 @@ def SourceRepro.closure_decl(self, Term term) -> SourceRepro
   @self.phrase(:contents term.contents)
   @self.block_post(term)
 
-def SourceRepro.type_decl(self, Term term) -> SourceRepro
-  @self.phrase(:text "type ")
+def SourceRepro.struct_decl(self, Term term) -> SourceRepro
+  @self.phrase(:text "struct ")
   @self.phrase(:name term.name)
 
   if term.has_property(:Syntax_TypeMagicSymbol)
@@ -419,8 +419,8 @@ def SourceRepro.term(self, Term term) -> SourceRepro
     @self.function_decl(term)
   elif term.is_closure_decl
     @self.closure_decl(term)
-  elif term.is_type_decl
-    @self.type_decl(term)
+  elif term.is_struct_decl
+    @self.struct_decl(term)
   elif term.is_get_index and term.property_opt(:Syntax_Brackets false)
     @self.get_index_brackets(term)
   elif term.is_set_with_selector

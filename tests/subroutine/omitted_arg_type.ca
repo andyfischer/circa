@@ -20,7 +20,7 @@ assert(my_cond(true, 1, 'hi') == 1)
 assert(my_cond(false, 1, 'hi') == 'hi')
 
 -- Methods
-type T {}
+struct T {}
 
 def T.func(self, b)
     print('T.func self static_type: ' static_type(self))

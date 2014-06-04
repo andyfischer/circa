@@ -1,7 +1,7 @@
 
 print('evaluating lib1.ca')
 
-type Lib1_T {
+struct Lib1_T {
     String s
 }
 

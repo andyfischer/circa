@@ -1,5 +1,5 @@
 
-type T {}
+struct T {}
 
 def f(bool b)
  if b

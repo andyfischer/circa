@@ -6,7 +6,7 @@
 def f()
     state a = 1
 
-    type T {
+    struct T {
     }
 
     state b = 2

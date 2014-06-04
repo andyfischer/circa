@@ -1,9 +1,0 @@
-
-
-actor = make_actor( { i = input(int); state s = 0; s += i; s } )
-
-assert(actor.call(1) == 1)
-assert(actor.call(1) == 2)
-assert(actor.call(1) == 3)
-assert(actor.call(3) == 6)
-assert(actor.call(-6) == 0)

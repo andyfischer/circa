@@ -1,5 +1,5 @@
 
-type T {}
+struct T {}
 
 def T.f(self, int i) -> int
   if i <= 0

@@ -15,7 +15,7 @@ distance_between_blocks_min = 30.0 -- 20 - 100
 distance_between_blocks_var = 20.0 -- 20 - 100
 block_split_angle = .1
 
-type Segment {
+struct Segment {
   int generation
   number distance_from_base
   number base_radius

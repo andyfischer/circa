@@ -359,8 +359,8 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     // Type decl
-    else if (tokens.nextIs(tok_Type)) {
-        result = type_decl(block, tokens, context);
+    else if (tokens.nextIs(tok_Struct)) {
+        result = struct_decl(block, tokens, context);
     }
 
     // Stateful value decl
@@ -488,7 +488,7 @@ bool token_is_allowed_as_function_name(int token)
         case tok_For:
         case tok_If:
         case tok_Include:
-        case tok_Type:
+        case tok_Struct:
         case tok_Not:
         case tok_Require:
         case tok_Package:
@@ -783,11 +783,11 @@ consume_next_output: {
     return ParseResult(result);
 }
 
-ParseResult type_decl(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    if (tokens.nextIs(tok_Type))
+    if (tokens.nextIs(tok_Struct))
         tokens.consume();
 
     possible_whitespace(tokens);
@@ -1335,7 +1335,23 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
     ParseResult result = name_binding_expression(block, tokens, context);
     Term* term = result.term;
 
-    // resolve_rebind_operators_in_inputs(block, term);
+    // Check for trailing equals, used for <complicated selector> = <expression> syntax.
+    if (lookahead_match_equals(tokens)) {
+        std::string preEqualsSpace = possible_whitespace(tokens);
+        tokens.consume(tok_Equals);
+        std::string postEqualsSpace = possible_whitespace(tokens);
+
+        Term* left = term;
+        Term* right = expression(block, tokens, context).term;
+
+        Term* output = find_or_create_next_unnamed_term_output(left);
+        Term* set = rebind_possible_accessor(block, output, right);
+
+        set->setStringProp(sym_Syntax_PreEqualsSpace, preEqualsSpace);
+        set->setStringProp(sym_Syntax_PostEqualsSpace, postEqualsSpace);
+
+        term = set;
+    }
 
     set_source_location(term, startPosition, tokens);
     set_is_statement(term, true);
@@ -1497,20 +1513,6 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
     if (setWithSelectorTerm != NULL)
         set_source_location(setWithSelectorTerm, startPosition, tokens);
 
-#if 0
-    // If there were any "implicit" outputs (as in, from rebind operators), then
-    // the indexes in the nameBindingSyntax will need to be corrected.
-    int implicitOutputCount = count_outputs(term) - outputCountPreRebindOperators;
-    if (implicitOutputCount > 0) {
-        touch(&nameBindingSyntax);
-        for (int i=0; i < list_length(&nameBindingSyntax); i++) {
-            caValue* element = list_get(&nameBindingSyntax, i);
-            if (is_int(element))
-                set_int(element, implicitOutputCount + as_int(element));
-        }
-    }
-#endif
-
     if (hasSimpleNameBinding) {
         result->setProp(sym_Syntax_NameBinding, &nameBindingSyntax);
 
@@ -1518,23 +1520,6 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
             rename(find_or_create_next_unnamed_term_output(result), list_get(&names, i));
     }
     
-    // Check for <complicated selector> = <expression> syntax.
-    else if (lookahead_match_equals(tokens)) {
-        std::string preEqualsSpace = possible_whitespace(tokens);
-        tokens.consume(tok_Equals);
-        std::string postEqualsSpace = possible_whitespace(tokens);
-
-        Term* right = expression(block, tokens, context).term;
-
-        Term* output = find_or_create_next_unnamed_term_output(result);
-        Term* set = rebind_possible_accessor(block, output, right);
-
-        set->setStringProp(sym_Syntax_PreEqualsSpace, preEqualsSpace);
-        set->setStringProp(sym_Syntax_PostEqualsSpace, postEqualsSpace);
-
-        result = set;
-    }
-
     set_source_location(result, startPosition, tokens);
 
     return ParseResult(result);

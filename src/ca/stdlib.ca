@@ -1,6 +1,6 @@
 
 -- Func --
-type Func {
+struct Func {
   Block block
   Map bindings
 }
@@ -204,7 +204,7 @@ def swap(a, b) -> (any, any)
 
 -- Modules
 
-type ModuleRef {
+struct ModuleRef {
   Block block
 }
 
@@ -225,7 +225,7 @@ def package(String moduleName)
   -- (Note: Currently this function does nothing)
 
 -- Packages
-type Package {
+struct Package {
   String name
   Map files
 }
@@ -265,15 +265,15 @@ def channel_read(Symbol name) -> List
 def global_script_version() -> int
 
 -- Builtin types
-type FileSignature { String filename, int time_modified }
-type Callable;
-type Color { number r, number g, number b, number a }
-type Stack;
-type Vec2 { number x, number y }
-type Vec2i { int x, int y }
-type Vec3 { number x, number y, number z }
-type Rect { number x1, number y1, number x2, number y2 }
-type Rect_i { int x1, int y1, int x2, int y2 }
+struct FileSignature { String filename, int time_modified }
+struct Callable;
+struct Color { number r, number g, number b, number a }
+struct Stack;
+struct Vec2 { number x, number y }
+struct Vec2i { int x, int y }
+struct Vec3 { number x, number y, number z }
+struct Rect { number x1, number y1, number x2, number y2 }
+struct Rect_i { int x1, int y1, int x2, int y2 }
 
 -- Metaprogramming on Block
 def block_ref(any block :ignore_error) -> Block
@@ -383,9 +383,9 @@ def Block.find_while_condition(self) -> Term
       return term
   return null
 
-type Frame { Stack stack, int index }
-type RetainedFrame { Block block, any _state }
-type ModuleFrame { Block block, List registers }
+struct Frame { Stack stack, int index }
+struct RetainedFrame { Block block, any _state }
+struct ModuleFrame { Block block, List registers }
 
 def Frame.active_value(self, Term) -> any
 def Frame.set_active_value(self, Term, any)
@@ -708,7 +708,7 @@ def Map.list_append(self, any key, any value) -> Map
 
 def Map.keys(self) -> List
 
-type Set {
+struct Set {
   Map m
 }
 

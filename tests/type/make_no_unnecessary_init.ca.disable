@@ -1,9 +1,9 @@
 
-type T = :handle
+struct T = :handle
 def T.release()
     print('Called T.release')
 
-type U {
+struct U {
     T t
 }
 

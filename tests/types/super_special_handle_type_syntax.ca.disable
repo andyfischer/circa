@@ -1,2 +1,2 @@
 
-type T = :handle
+struct T = :handle

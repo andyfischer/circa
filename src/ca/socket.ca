@@ -1,18 +1,18 @@
 
-type Server {
+struct Server {
     native_ptr native
 }
 
-type Connection {
+struct Connection {
     native_ptr native
 }
 
-type ServerRequest {
+struct ServerRequest {
     Connection conn
     any data
 }
 
-type WebsockServer {
+struct WebsockServer {
     native_ptr native
 }
 

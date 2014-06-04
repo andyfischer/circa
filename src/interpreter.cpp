@@ -39,7 +39,6 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index);
 static void retain_stack_top(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 
-static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block);
 static caValue* vm_run_single_input(Frame* frame);
 static void vm_run_input_bytecodes(Stack* stack);
 static void vm_run_input_instructions_apply(caStack* stack, caValue* inputs);
@@ -58,8 +57,6 @@ static void vm_push_dynamic_method(Stack* stack);
 static void vm_while_loop_finish_early(Stack* stack);
 
 bool run_memoize_check(Stack* stack);
-void extract_state(Block* block, caValue* state, caValue* output);
-static void retained_frame_extract_state(caValue* frame, caValue* output);
 
 void stack_init(Stack* stack, Block* block)
 {
@@ -71,7 +68,8 @@ void stack_init(Stack* stack, Block* block)
 
     stack_on_program_change(stack);
 
-    vm_push_frame(stack, 0, block);
+    int blockIndex = program_create_entry(stack->program, block);
+    vm_push_frame2(stack, 0, blockIndex);
 }
 
 void stack_init_with_closure(Stack* stack, caValue* closure)
@@ -84,12 +82,22 @@ void stack_init_with_closure(Stack* stack, caValue* closure)
         copy(bindings, &top_frame(stack)->bindings);
 }
 
-static Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block)
+Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block)
 {
     Frame* top = stack_push_blank_frame(stack, block_locals_count(block));
     top->parentIndex = parentIndex;
-    top->block = block;
     //set_list(&top->registers, block_locals_count(block));
+    return top;
+}
+
+Frame* vm_push_frame2(Stack* stack, int parentIndex, int blockIndex)
+{
+    int localsCount = block_locals_count(program_block(stack->program, blockIndex));
+    Frame* top = stack_push_blank_frame(stack, localsCount);
+    top->parentIndex = parentIndex;
+    top->block = program_block(stack->program, blockIndex);
+    top->blockIndex = blockIndex;
+    top->bc = program_block_bytecode(stack->program, blockIndex);
     return top;
 }
 
@@ -103,8 +111,8 @@ static Frame* expand_frame(Frame* parent, Frame* top)
 
         if (is_retained_frame(retainedFrame)
                 // Don't expand state on calls from within declared_state.
-                && (parent->block->owningTerm != FUNCS.declared_state)
-                && (as_block(retained_frame_get_block(retainedFrame)) == top->block)) {
+                && (frame_block(parent)->owningTerm != FUNCS.declared_state)
+                && (as_block(retained_frame_get_block(retainedFrame)) == frame_block(top))) {
 
             // Copy 'retained', even if the retained frame has none.
             copy(retained_frame_get_state(retainedFrame), &top->state);
@@ -127,9 +135,9 @@ static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index)
 
             if (is_retained_frame(retainedFrame)
                     // Don't expand state on calls from within declared_state.
-                    && (parent->block->owningTerm != FUNCS.declared_state)) {
+                    && (frame_block(parent)->owningTerm != FUNCS.declared_state)) {
 
-                if (as_block(retained_frame_get_block(retainedFrame)) == top->block)
+                if (as_block(retained_frame_get_block(retainedFrame)) == frame_block(top))
                     copy(retained_frame_get_state(retainedFrame), &top->state);
             }
         }
@@ -162,17 +170,17 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
 
     // Expand parent state if needed.
     if (is_null(parentState))
-        set_list(parentState, parent->block->length());
+        set_list(parentState, frame_block(parent)->length());
     touch(parentState);
 
     caValue* slot = list_get(parentState, top->parentIndex);
 
-    if (top->block->owningTerm->function == FUNCS.case_func) {
+    if (frame_block(top)->owningTerm->function == FUNCS.case_func) {
 
         // If-block special case: Store a list where each element corresponds with a
         // condition block.
 
-        int caseIndex = case_block_get_index(top->block);
+        int caseIndex = case_block_get_index(frame_block(top));
 
         if (!is_list(slot))
             set_list(slot);
@@ -184,7 +192,7 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
 
         slot = list_get(slot, caseIndex);
 
-    } else if (top->block->owningTerm->function == FUNCS.for_func) {
+    } else if (frame_block(top)->owningTerm->function == FUNCS.for_func) {
 
         // For-loop special case: Store a list where each element corresponds with a
         // loop iteration.
@@ -192,12 +200,16 @@ static caValue* prepare_retained_slot_for_parent(Stack* stack)
         // Note that when a loop iteration is being saved, retain_stack_top is called by
         // IterationDone instead of by stack_pop.
         
+        int iterationIndex = as_int(frame_register(top, for_loop_find_index(frame_block(top))));
+
         if (!is_list(slot))
             set_list(slot);
         else
             list_touch(slot);
 
-        slot = list_append(slot);
+        caValue* listContainer = slot;
+        while (iterationIndex >= list_length(listContainer))
+            slot = list_append(listContainer);
     }
 
     return slot;
@@ -286,7 +298,7 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term)
                 return value;
         }
 
-        if (frame->block == term->owningBlock)
+        if (frame_block(frame) == term->owningBlock)
             return frame_register(frame, term);
 
         frame = prev_frame(frame);
@@ -321,7 +333,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
     string_append(out, "[Stack #");
     string_append(out, stack->id);
     string_append(out, ", frames = ");
-    string_append(out, stack->framesCount);
+    string_append(out, stack->frameCount);
     string_append(out, "]\n");
 
     Frame* frame = first_frame(stack);
@@ -334,8 +346,8 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         if (childFrame != NULL)
             activeTermIndex = childFrame->parentIndex;
 
-        int depth = stack->framesCount - 1 - frameIndex;
-        Block* block = frame->block;
+        int depth = stack->frameCount - 1 - frameIndex;
+        Block* block = frame_block(frame);
         string_append(out, " [Frame index ");
         string_append(out, frameIndex);
         string_append(out, ", depth = ");
@@ -373,7 +385,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         char* bytecode = frame->bc;
         int bytecodePc = 0;
         
-        for (int i=0; i < frame->block->length(); i++) {
+        for (int i=0; i < frame_block(frame)->length(); i++) {
             Term* term = block->get(i);
 
             indent(out, frameIndex+1);
@@ -444,7 +456,7 @@ void stack_trace_to_string(Stack* stack, caValue* out)
     // Print the error value
     Frame* top = top_frame(stack);
     caValue* msg = frame_register(top, top->termIndex);
-    Term* errorLocation = top->block->get(top->termIndex);
+    Term* errorLocation = frame_block(top)->get(top->termIndex);
     if (is_input_placeholder(errorLocation)) {
         string_append(out, "(input ");
         string_append(out, errorLocation->index);
@@ -455,12 +467,6 @@ void stack_trace_to_string(Stack* stack, caValue* out)
     string_append(out, "\n");
 }
 
-void stack_extract_state(Stack* stack, caValue* output)
-{
-    Frame* frame = first_frame(stack);
-    extract_state(frame->block, &frame->state, output);
-}
-
 void fetch_stack_outputs(Stack* stack, caValue* outputs)
 {
     Frame* top = top_frame(stack);
@@ -468,7 +474,7 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
     set_list(outputs, 0);
 
     for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(top->block, i);
+        Term* placeholder = get_output_placeholder(frame_block(top), i);
         if (placeholder == NULL)
             break;
 
@@ -478,7 +484,7 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
 
 int num_inputs(Stack* stack)
 {
-    return count_input_placeholders(top_frame(stack)->block);
+    return count_input_placeholders(frame_block(top_frame(stack)));
 }
 
 void consume_inputs_to_list(Stack* stack, Value* list)
@@ -503,7 +509,7 @@ void consume_input(Stack* stack, int index, caValue* dest)
 caValue* get_output(Stack* stack, int index)
 {
     Frame* frame = top_frame(stack);
-    Term* placeholder = get_output_placeholder(frame->block, index);
+    Term* placeholder = get_output_placeholder(frame_block(frame), index);
     if (placeholder == NULL)
         return NULL;
     return frame_register(frame, placeholder);
@@ -512,20 +518,20 @@ caValue* get_output(Stack* stack, int index)
 caValue* get_caller_output(Stack* stack, int index)
 {
     Frame* frame = stack_top_parent(stack);
-    Term* currentTerm = frame->block->get(frame->termIndex);
+    Term* currentTerm = frame_block(frame)->get(frame->termIndex);
     return frame_register(frame, get_output_term(currentTerm, index));
 }
 
 Term* current_term(Stack* stack)
 {
     Frame* top = top_frame(stack);
-    return top->block->get(top->termIndex);
+    return frame_block(top)->get(top->termIndex);
 }
 
 Block* current_block(Stack* stack)
 {
     Frame* top = top_frame(stack);
-    return top->block;
+    return frame_block(top);
 }
 
 caValue* frame_state(Frame* frame)
@@ -535,13 +541,15 @@ caValue* frame_state(Frame* frame)
 
 Block* frame_block(Frame* frame)
 {
-    return frame->block;
+    Block* block = program_block(frame->stack->program, frame->blockIndex);
+    ca_assert(block == frame->block);
+    return block;
 }
 
 caValue* get_top_register(Stack* stack, Term* term)
 {
     Frame* frame = top_frame(stack);
-    ca_assert(term->owningBlock == frame->block);
+    ca_assert(term->owningBlock == frame_block(frame));
     return frame_register(frame, term);
 }
 
@@ -613,7 +621,7 @@ void evaluate_block(Stack* stack, Block* block)
 void raise_error_input_type_mismatch(Stack* stack, int inputIndex)
 {
     Frame* frame = top_frame(stack);
-    Term* term = frame->block->get(inputIndex);
+    Term* term = frame_block(frame)->get(inputIndex);
     caValue* value = frame_register(frame, inputIndex);
 
     circa::Value msg;
@@ -651,7 +659,7 @@ void raise_error_stack_value_not_found(Stack* stack)
 int get_count_of_caller_inputs_for_error(Stack* stack)
 {
     Frame* parentFrame = stack_top_parent(stack);
-    Term* callerTerm = parentFrame->block->get(parentFrame->termIndex);
+    Term* callerTerm = frame_block(parentFrame)->get(parentFrame->termIndex);
     int foundCount = callerTerm->numInputs();
 
     if (callerTerm->function == FUNCS.func_call)
@@ -668,18 +676,18 @@ void raise_error_not_enough_inputs(Stack* stack)
 {
     Frame* frame = top_frame(stack);
 
-    int expectedCount = count_input_placeholders(frame->block);
+    int expectedCount = count_input_placeholders(frame_block(frame));
     int foundCount = get_count_of_caller_inputs_for_error(stack);
 
     Value msg;
     set_string(&msg, "Too few inputs: expected ");
     string_append(&msg, expectedCount);
-    if (has_variable_args(frame->block))
+    if (has_variable_args(frame_block(frame)))
         string_append(&msg, " (or more)");
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    frame->termIndex = frame->block->length() - 1;
+    frame->termIndex = frame_block(frame)->length() - 1;
     set_error_string(circa_output(stack, 0), as_cstring(&msg));
     raise_error(stack);
 }
@@ -688,7 +696,7 @@ void raise_error_too_many_inputs(Stack* stack)
 {
     Frame* frame = top_frame(stack);
 
-    int expectedCount = count_input_placeholders(frame->block);
+    int expectedCount = count_input_placeholders(frame_block(frame));
     int foundCount = get_count_of_caller_inputs_for_error(stack);
 
     Value msg;
@@ -697,7 +705,7 @@ void raise_error_too_many_inputs(Stack* stack)
     string_append(&msg, ", received ");
     string_append(&msg, foundCount);
 
-    frame->termIndex = frame->block->length() - 1;
+    frame->termIndex = frame_block(frame)->length() - 1;
     set_error_string(circa_output(stack, 0), as_cstring(&msg));
     raise_error(stack);
 }
@@ -747,7 +755,7 @@ static caValue* vm_read_local_value(Frame* referenceFrame)
 
     Frame* frame = prev_frame_n(referenceFrame, stackDistance);
 
-    Term* term = frame->block->get(index);
+    Term* term = frame_block(frame)->get(index);
     if (is_value(term))
         return term_value(term);
     return frame_register(frame, index);
@@ -808,9 +816,7 @@ void vm_run(Stack* stack)
                 blob_write_u32(stack->bc, &pos, bcIndex);
             }
 
-            top = vm_push_frame(stack, termIndex, block);
-            top->bc = program_block_bytecode(stack->program, bcIndex);
-            top->blockIndex = bcIndex;
+            top = vm_push_frame2(stack, termIndex, bcIndex);
             ca_assert(top->bc != NULL);
             
             expand_frame(stack_top_parent(stack), top);
@@ -823,7 +829,7 @@ void vm_run(Stack* stack)
         case bc_PushNonlocalInput: {
             int termIndex = vm_read_u32(stack);
             Frame* top = top_frame(stack);
-            Term* caller = top->block->get(termIndex);
+            Term* caller = frame_block(top)->get(termIndex);
             ca_assert(caller->function == FUNCS.nonlocal);
             Term* input = caller->input(0);
             caValue* value = stack_find_nonlocal(top, input);
@@ -836,10 +842,8 @@ void vm_run(Stack* stack)
             // Evaluate on-demand.
             Block* block = nested_contents(FUNCS.eval_on_demand);
 
-            top = vm_push_frame(stack, termIndex, block);
             int bcIndex = program_create_entry(stack->program, block);
-            top->bc = program_block_bytecode(stack->program, bcIndex);
-            top->blockIndex = bcIndex;
+            top = vm_push_frame2(stack, termIndex, bcIndex);
             ca_assert(top->bc != NULL);
             
             expand_frame(stack_top_parent(stack), top);
@@ -858,13 +862,10 @@ void vm_run(Stack* stack)
             Term* targetTerm = as_term_ref(termVal);
             Block* block = term_function(targetTerm);
 
-            top = vm_push_frame(stack, termIndex, block);
-            top->blockIndex = program_create_entry(stack->program, block);
-            top->bc = program_block_bytecode(stack->program, top->blockIndex);
-
+            int blockIndex = program_create_entry(stack->program, block);
+            top = vm_push_frame2(stack, termIndex, blockIndex);
             expand_frame(stack_top_parent(stack), top);
             vm_run_input_instructions_apply(stack, inputsVal);
-
             continue;
         }
         case bc_PushExplicitState: {
@@ -926,7 +927,7 @@ void vm_run(Stack* stack)
             Frame* parent = stack_top_parent(stack);
             Term* caller = frame_term(parent, top->parentIndex);
 
-            Term* placeholder = get_output_placeholder(top->block, placeholderIndex);
+            Term* placeholder = get_output_placeholder(frame_block(top), placeholderIndex);
             caValue* value = frame_register(top, placeholder->index);
 
             Term* receiver = get_output_term(caller, outputIndex);
@@ -1075,9 +1076,7 @@ void vm_run(Stack* stack)
             // Start the first case.
             Block* block = program_block(stack->program, blockIndex);
 
-            top = vm_push_frame(stack, termIndex, block);
-            top->blockIndex = blockIndex;
-            top->bc = program_block_bytecode(stack->program, blockIndex);
+            top = vm_push_frame2(stack, termIndex, blockIndex);
             expand_frame_indexed(stack_top_parent(stack), top, 0);
             vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
@@ -1091,7 +1090,7 @@ void vm_run(Stack* stack)
             if (!is_bool(condition)) {
                 Value msg;
                 set_string(&msg, "Case expected bool input, found: ");
-                top_frame(stack)->termIndex = top_frame(stack)->block->length() - 1;
+                top_frame(stack)->termIndex = frame_block(top_frame(stack))->length() - 1;
                 string_append_quoted(&msg, condition);
                 raise_error_msg(stack, as_cstring(&msg));
                 return;
@@ -1105,10 +1104,7 @@ void vm_run(Stack* stack)
 
                 Block* nextCase = program_block(stack->program, nextBcIndex);
                 int caseIndex = case_block_get_index(nextCase);
-
-                Frame* top = vm_push_frame(stack, parentIndex, nextCase);
-                top->blockIndex = nextBcIndex;
-                top->bc = program_block_bytecode(stack->program, nextBcIndex);
+                Frame* top = vm_push_frame2(stack, parentIndex, nextBcIndex);
                 stack->bc = top->bc;
                 ca_assert(stack->bc != NULL);
                 stack->pc = 0;
@@ -1146,9 +1142,7 @@ void vm_run(Stack* stack)
 
             block = program_block(stack->program, blockIndex);
 
-            top = vm_push_frame(stack, termIndex, block);
-            top->blockIndex = blockIndex;
-            top->bc = program_block_bytecode(stack->program, blockIndex);
+            top = vm_push_frame2(stack, termIndex, blockIndex);
             vm_run_input_bytecodes(stack);
             if (stack->step != sym_StackRunning)
                 return;
@@ -1196,8 +1190,7 @@ void vm_run(Stack* stack)
             Frame* top = top_frame(stack);
             top->termIndex = index;
 
-            Block* block = program_block(stack->program, blockIndex);
-            top = vm_push_frame(stack, index, block);
+            top = vm_push_frame2(stack, index, blockIndex);
             top->blockIndex = blockIndex;
             top->bc = program_block_bytecode(stack->program, blockIndex);
             vm_run_input_bytecodes(stack);
@@ -1249,7 +1242,7 @@ void vm_run(Stack* stack)
         case bc_FireNative: {
             Frame* top = top_frame(stack);
 
-            EvaluateFunc override = get_override_for_block(top->block);
+            EvaluateFunc override = get_override_for_block(frame_block(top));
             ca_assert(override != NULL);
 
             // Call override
@@ -1270,7 +1263,7 @@ void vm_run(Stack* stack)
             Frame* toFrame = top;
 
             // Find destination frame, the first parent major block.
-            while (!is_major_block(toFrame->block) && prev_frame(toFrame) != NULL)
+            while (!is_major_block(frame_block(toFrame)) && prev_frame(toFrame) != NULL)
                 toFrame = prev_frame(toFrame);
 
             // Copy outputs to destination frame.
@@ -1307,7 +1300,7 @@ void vm_run(Stack* stack)
             Frame* toFrame = top;
 
             // Find destination frame, the parent for-loop block.
-            while (!is_for_loop(toFrame->block) && prev_frame(toFrame) != NULL)
+            while (!is_for_loop(frame_block(toFrame)) && prev_frame(toFrame) != NULL)
                 toFrame = prev_frame(toFrame);
 
             // Copy outputs to destination frame.
@@ -1345,7 +1338,7 @@ void vm_run(Stack* stack)
         }
 
         case bc_Continue2: {
-            while (!is_while_loop(top_frame(stack)->block) && stack_top_parent(stack) != NULL)
+            while (!is_while_loop(frame_block(top_frame(stack))) && stack_top_parent(stack) != NULL)
                 stack_pop(stack);
             Frame* top = top_frame(stack);
             top->termIndex = 0;
@@ -1354,7 +1347,7 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_Break2: {
-            while (!is_while_loop(top_frame(stack)->block) && stack_top_parent(stack) != NULL)
+            while (!is_while_loop(frame_block(top_frame(stack))) && stack_top_parent(stack) != NULL)
                 stack_pop(stack);
 
             vm_while_loop_finish_early(stack);
@@ -1493,7 +1486,7 @@ void vm_run(Stack* stack)
 
             // Expand state if necessary.
             if (is_null(outgoingState))
-                set_list(outgoingState, declaredFrame->block->length());
+                set_list(outgoingState, frame_block(declaredFrame)->length());
             touch(outgoingState);
 
             copy(result, list_get(outgoingState, declaredIndex));
@@ -1574,7 +1567,7 @@ static void vm_run_input_bytecodes(Stack* stack)
             break;
         }
 
-        Term* placeholder = top->block->get(placeholderIndex);
+        Term* placeholder = frame_block(top)->get(placeholderIndex);
         if (!is_input_placeholder(placeholder) && placeholder->function != FUNCS.looped_input)
             return raise_error_too_many_inputs(stack);
 
@@ -1636,7 +1629,7 @@ static void vm_run_input_bytecodes(Stack* stack)
         placeholderIndex = nextPlaceholderIndex;
     }
 
-    Term* placeholder = top->block->getSafe(placeholderIndex);
+    Term* placeholder = frame_block(top)->getSafe(placeholderIndex);
 
     if (placeholder == NULL)
         return;
@@ -1662,7 +1655,7 @@ static void vm_run_input_instructions_apply(Stack* stack, caValue* inputs)
 
     for (int inputIndex = 0; inputIndex < inputCount; inputIndex++) {
 
-        Term* placeholder = top->block->get(placeholderIndex);
+        Term* placeholder = frame_block(top)->get(placeholderIndex);
         if (!is_input_placeholder(placeholder))
             return raise_error_too_many_inputs(stack);
 
@@ -1686,7 +1679,7 @@ static void vm_run_input_instructions_apply(Stack* stack, caValue* inputs)
         }
     }
 
-    Term* placeholder = top->block->get(placeholderIndex);
+    Term* placeholder = frame_block(top)->get(placeholderIndex);
     if (is_input_placeholder(placeholder)
             && !placeholder->boolProp(sym_Multiple, false))
         return raise_error_not_enough_inputs(stack);
@@ -1780,9 +1773,8 @@ static bool vm_handle_method_as_module_access(Frame* top, int callerIndex, caVal
         return false;
 
     if (is_function(term)) {
-        Frame* top = vm_push_frame(stack, callerIndex, term->nestedContents);
-        top->blockIndex = program_create_entry(stack->program, term->nestedContents);
-        top->bc = program_block_bytecode(stack->program, top->blockIndex);
+        int blockIndex = program_create_entry(stack->program, term->nestedContents);
+        Frame* top = vm_push_frame2(stack, callerIndex, blockIndex);
         expand_frame(stack_top_parent(stack), top);
         vm_run_input_bytecodes(stack);
         return true;
@@ -1825,11 +1817,8 @@ static void vm_push_func_call_closure(Stack* stack, int callerIndex, caValue* cl
     Value closureLocal;
     copy(closure, &closureLocal);
 
-    top = vm_push_frame(stack, callerIndex, block);
-
-    top->blockIndex = program_create_entry(stack->program, block);
-    top->bc = program_block_bytecode(stack->program, top->blockIndex);
-
+    int blockIndex = program_create_entry(stack->program, block);
+    top = vm_push_frame2(stack, callerIndex, blockIndex);
     expand_frame(stack_top_parent(stack), top);
 
     caValue* bindings = list_get(&closureLocal, 1);
@@ -1876,8 +1865,8 @@ static void vm_push_func_apply(Stack* stack, int callerIndex)
     Value closureLocal;
     copy(closure, &closureLocal);
 
-    top = vm_push_frame(stack, callerIndex, block);
-    top->blockIndex = program_create_entry(stack->program, block);
+    int blockIndex = program_create_entry(stack->program, block);
+    top = vm_push_frame2(stack, callerIndex, blockIndex);
     top->bc = program_block_bytecode(stack->program, top->blockIndex);
 
     expand_frame(stack_top_parent(stack), top);
@@ -1893,7 +1882,7 @@ static void vm_finish_loop_iteration(Stack* stack, bool enableOutput)
 {
     Frame* top = top_frame(stack);
 
-    Block* contents = top->block;
+    Block* contents = frame_block(top);
 
     // Possibly save state.
     if (!is_null(&top->outgoingState) && top->exitType != sym_Discard)
@@ -2037,7 +2026,7 @@ static void vm_push_dynamic_method(Stack* stack)
         Frame* top = top_frame(stack);
         caValue* elementName = caller->getProp(sym_MethodName);
 
-        Term* method = find_method(top->block, (Type*) circa_type_of(object), elementName);
+        Term* method = find_method(frame_block(top), (Type*) circa_type_of(object), elementName);
 
         if (method == NULL) {
             // Method still not found.
@@ -2093,9 +2082,7 @@ static void vm_push_dynamic_method(Stack* stack)
 
     // Call this method.
     stack->pc = pcBeforeTargetObject;
-    top = vm_push_frame(stack, termIndex, block);
-    top->blockIndex = cache->blockIndex;
-    top->bc = program_block_bytecode(stack->program, cache->blockIndex);
+    top = vm_push_frame2(stack, termIndex, cache->blockIndex);
     expand_frame(stack_top_parent(stack), top);
     vm_run_input_bytecodes(stack);
 }
@@ -2129,7 +2116,7 @@ bool run_memoize_check(Stack* stack)
     if (!is_list(state))
         return false;
 
-    Block* block = top->block;
+    Block* block = frame_block(top);
 
     // Check every input.
     for (int i=0;; i++) {
@@ -2160,145 +2147,6 @@ bool run_memoize_check(Stack* stack)
     return true;
 }
 
-void Frame__registers(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    ca_assert(frame != NULL);
-
-    caValue* out = circa_output(stack, 0);
-    int count = frame_register_count(frame);
-    set_list(out, count);
-    for (int i=0; i < count; i++)
-        copy(frame_register(frame, i), list_get(out, i));
-}
-
-void Frame__active_value(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_find_nonlocal(frame, term);
-    if (value == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        set_value(circa_output(stack, 0), value);
-}
-
-void Frame__set_active_value(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    if (frame == NULL)
-        return raise_error_msg(stack, "Bad frame reference");
-
-    Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_find_nonlocal(frame, term);
-    if (value == NULL)
-        return raise_error_msg(stack, "Value not found");
-
-    set_value(value, circa_input(stack, 2));
-}
-
-void Frame__block(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    ca_assert(frame != NULL);
-    set_block(circa_output(stack, 0), frame->block);
-}
-
-void Frame__parent(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    Frame* parent = prev_frame(frame);
-    if (parent == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        set_frame_ref(circa_output(stack, 0), parent);
-}
-
-void Frame__height(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    set_int(circa_output(stack, 0), frame_find_index(frame));
-}
-
-void Frame__has_parent(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    Frame* parent = prev_frame(frame);
-    set_bool(circa_output(stack, 0), parent != NULL);
-}
-
-void Frame__register(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    ca_assert(frame != NULL);
-    int index = circa_int_input(stack, 1);
-    copy(frame_register(frame, index), circa_output(stack, 0));
-}
-
-void Frame__pc(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    ca_assert(frame != NULL);
-    set_int(circa_output(stack, 0), frame->termIndex);
-}
-
-void Frame__parentPc(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    ca_assert(frame != NULL);
-    set_int(circa_output(stack, 0), frame->parentIndex);
-}
-
-void Frame__current_term(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    ca_assert(frame != NULL);
-    set_term_ref(circa_output(stack, 0), frame_current_term(frame));
-}
-
-void extract_state(Block* block, caValue* state, caValue* output)
-{
-    set_hashtable(output);
-    if (!is_list(state))
-        return;
-
-    for (int i=0; i < list_length(state); i++) {
-        Term* term = block->get(i);
-        caValue* element = list_get(state, i);
-        caValue* name = unique_name(term);
-
-        if (term->function == FUNCS.declared_state) {
-            copy(element, hashtable_insert(output, name));
-        } else if (is_retained_frame(element)) {
-            retained_frame_extract_state(element, hashtable_insert(output, name));
-        } else if (is_list(element)) {
-            caValue* listOutput = hashtable_insert(output, name);
-            set_list(listOutput, list_length(element));
-            for (int i=0; i < list_length(element); i++) {
-                caValue* indexedState = list_get(element, i);
-                // indexedState is either null or a Frame
-                if (is_retained_frame(indexedState)) {
-                    retained_frame_extract_state(indexedState, list_get(listOutput, i));
-                }
-            }
-        }
-    }
-}
-
-static void retained_frame_extract_state(caValue* frame, caValue* output)
-{
-    Block* block = as_block(retained_frame_get_block(frame));
-    caValue* state = retained_frame_get_state(frame);
-    extract_state(block, state, output);
-}
-
-void Frame__extract_state(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
-    extract_state(frame->block, &frame->state, output);
-}
-
 void make_stack(caStack* stack)
 {
     Stack* newStack = create_stack(stack->world);
@@ -2314,48 +2162,10 @@ void make_stack(caStack* stack)
     set_pointer(circa_set_default_output(stack, 0), newStack);
 }
 
-void stack_silently_finish_call(caStack* stack)
-{
-#if 0
-    // Discard the top frame on 'stack', and advance PC to be past any Output instructions.
-
-    stack_pop(stack);
-
-    Frame* top = top_frame(stack);
-    char* bc = top->bc;
-
-    int pc = top->pc;
-
-    while (true) {
-        switch (blob_read_char(bc, &pc)) {
-        case bc_PopOutput:
-            blob_read_u32(bc, &pc);
-            blob_read_u32(bc, &pc);
-            continue;
-        case bc_PopOutputNull:
-            blob_read_u32(bc, &pc);
-            continue;
-        case bc_PopOutputsDynamic:
-            continue;
-        case bc_PopExplicitState:
-            blob_read_u32(bc, &pc);
-            continue;
-        case bc_PopFrame:
-            goto reached_pop_frame;
-        default:
-            internal_error("Unexpected op inside stack_silently_finish_call");
-        }
-    }
-
-reached_pop_frame:
-    top->pc = pc;
-#endif
-}
-
 void capture_stack(caStack* stack)
 {
     Stack* newStack = stack_duplicate(stack);
-    stack_silently_finish_call(newStack);
+    // TODO: Fix 'newStack', right now it has the capture_stack call still in progress.
     set_pointer(circa_set_default_output(stack, 0), newStack);
 }
 
@@ -2363,357 +2173,6 @@ void hosted_extract_path(caStack* stack)
 {
     Frame* untilFrame = stack_top_parent(stack);
     stack_extract_current_path(stack, circa_output(stack, 0), untilFrame);
-}
-
-void Stack__block(caStack* stack)
-{
-    Stack* actor = as_stack(circa_input(stack, 0));
-    set_block(circa_output(stack, 0), top_frame(actor)->block);
-}
-
-void Stack__dump(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    Value str;
-    stack_to_string(self, &str, false);
-    write_log(as_cstring(&str));
-}
-
-void Stack__dump_with_bytecode(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    Value str;
-    stack_to_string(self, &str, true);
-    write_log(as_cstring(&str));
-}
-
-void Stack__extract_state(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    stack_extract_state(self, circa_output(stack, 0));
-}
-
-void Stack__eval_on_demand(caStack* stack)
-{
-#if 0
-    Stack* self = as_stack(circa_input(stack, 0));
-    Term* term = as_term_ref(circa_input(stack, 1));
-
-    // Make sure currentHacksetBytecode is initialzed
-    stack_bytecode_start_run(self);
-
-    vm_evaluate_module_on_demand(self, term, true);
-    vm_run(self);
-    caValue* result = stack_active_value_for_term(top_frame(self), term);
-    copy(result, circa_output(stack, 0));
-#endif
-}
-
-void Stack__find_active_value(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_active_value_for_term(top_frame(self), term);
-
-    if (value == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        set_value(circa_output(stack, 0), value);
-}
-
-void Stack__find_active_frame_for_term(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    Term* term = as_term_ref(circa_input(stack, 1));
-
-    if (term == NULL)
-        return raise_error_msg(stack, "Term is null");
-
-    Frame* frame = top_frame(self);
-
-    while (true) {
-        if (frame->block == term->owningBlock) {
-            set_frame_ref(circa_output(stack, 0), frame);
-            return;
-        }
-
-        frame = prev_frame(frame);
-
-        if (frame == NULL)
-            break;
-    }
-
-    set_null(circa_output(stack, 0));
-}
-
-void Stack__id(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    set_int(circa_output(stack, 0), self->id);
-}
-
-void Stack__init(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    caValue* closure = circa_input(stack, 1);
-    stack_init_with_closure(self, closure);
-}
-
-void Stack__has_incoming_state(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    Frame* top = top_frame(self);
-    if (top == NULL)
-        set_bool(circa_output(stack, 0), false);
-    else
-        set_bool(circa_output(stack, 0), !is_null(&top->state));
-}
-
-void Stack__get_env(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    copy(&self->env, circa_output(stack, 0));
-}
-
-void Stack__set_env(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    caValue* map = circa_input(stack, 1);
-    copy(map, &self->env);
-}
-
-void Stack__set_env_val(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    caValue* name = circa_input(stack, 1);
-    caValue* val = circa_input(stack, 2);
-
-    copy(val, stack_env_insert(self, name));
-}
-
-void Stack__get_watch_result(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    caValue* key = circa_input(stack, 1);
-
-    caValue* observation = program_get_watch_observation(self->program, key);
-
-    if (observation == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        set_value(circa_output(stack, 0), observation);
-}
-
-void Stack__call(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-
-    if (self == NULL)
-        return raise_error_msg(self, "Stack is null");
-
-    stack_restart(self);
-
-    // Populate inputs.
-    caValue* inputs = circa_input(stack, 1);
-    for (int i=0; i < list_length(inputs); i++)
-        copy(list_get(inputs, i), circa_input(self, i));
-
-    vm_run(self);
-
-    caValue* output = circa_output(self, 0);
-    if (output != NULL)
-        copy(output, circa_output(stack, 0));
-    else
-        set_null(circa_output(stack, 0));
-}
-
-void Stack__copy(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-
-    set_stack(circa_output(stack, 0), stack_duplicate(self));
-}
-
-void Stack__stack_push(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-
-    Block* block = as_block(circa_input(stack, 1));
-
-    if (block == NULL)
-        return circa_output_error(stack, "Null block for input 1");
-
-    ca_assert(block != NULL);
-
-    Frame* top = vm_push_frame(self, top_frame(self)->termIndex, block);
-
-    caValue* inputs = circa_input(stack, 2);
-
-    for (int i=0; i < list_length(inputs); i++) {
-        if (i >= frame_register_count(top))
-            break;
-        copy(list_get(inputs, i), frame_register(top, i));
-    }
-}
-
-void Stack__stack_pop(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    stack_pop(self);
-}
-
-void Stack__set_state_input(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    Frame* top = top_frame(self);
-
-    if (top == NULL)
-        return circa_output_error(stack, "No stack frame");
-
-    copy(circa_input(stack, 1), &top->state);
-}
-
-void Stack__get_state_output(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-
-    Frame* top = top_frame(self);
-    if (top == NULL)
-        return circa_output_error(stack, "No stack frame");
-
-    copy(&top->outgoingState, circa_output(stack, 0));
-}
-
-void Stack__migrate(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    Block* fromBlock = as_block(circa_input(stack, 1));
-    Block* toBlock = as_block(circa_input(stack, 2));
-    migrate_stack(self, fromBlock, toBlock);
-}
-
-void Stack__migrate_to(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    Block* toBlock = as_block(closure_get_block(circa_input(stack, 1)));
-    ca_assert(toBlock != NULL);
-
-    migrate_stack(self, top_frame(self)->block, toBlock);
-}
-
-void Stack__reset(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    stack_reset(self);
-}
-
-void Stack__reset_state(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    set_null(&top_frame(self)->state);
-    set_null(&top_frame(self)->outgoingState);
-}
-
-void Stack__restart(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    stack_restart(self);
-}
-
-void Stack__restart_discarding_state(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    stack_restart_discarding_state(self);
-}
-
-void Stack__run(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    vm_run(self);
-    copy(circa_input(stack, 0), circa_output(stack, 0));
-}
-
-void Stack__frame_from_base(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    int index = circa_int_input(stack, 1);
-    if (index >= self->framesCount)
-        return circa_output_error(stack, "Index out of range");
-
-    Frame* frame = next_frame_n(first_frame(self), index);
-    set_frame_ref(circa_output(stack, 0), frame);
-}
-void Stack__frame(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    int index = circa_int_input(stack, 1);
-    if (index >= self->framesCount)
-        return circa_output_error(stack, "Index out of range");
-
-    Frame* frame = prev_frame_n(top_frame(self), index);
-    set_frame_ref(circa_output(stack, 0), frame);
-}
-
-void Stack__frame_count(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    set_int(circa_output(stack, 0), stack_frame_count(self));
-}
-
-void Stack__output(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    int index = circa_int_input(stack, 1);
-
-    Frame* frame = top_frame(self);
-    Term* output = get_output_placeholder(frame->block, index);
-    if (output == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        copy(frame_register(frame, output), circa_output(stack, 0));
-}
-
-void Stack__errored(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), stack_errored(self));
-}
-
-void Stack__error_message(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-
-    Frame* frame = top_frame(self);
-
-    if (frame->termIndex >= frame_register_count(frame)) {
-        set_string(circa_output(stack, 0), "");
-        return;
-    }
-
-    caValue* errorReg = frame_register(frame, frame->termIndex);
-
-    set_string(circa_output(stack, 0), "");
-    string_append(circa_output(stack, 0), errorReg);
-}
-
-void Stack__toString(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    ca_assert(self != NULL);
-
-    stack_to_string(self, circa_output(stack, 0), false);
 }
 
 void reflect__caller(caStack* stack)
@@ -2757,57 +2216,10 @@ void store_demand_value(caStack* stack)
 
 void interpreter_install_functions(NativePatch* patch)
 {
-    module_patch_function(patch, "Frame.active_value", Frame__active_value);
-    module_patch_function(patch, "Frame.block", Frame__block);
-    module_patch_function(patch, "Frame.current_term", Frame__current_term);
-    module_patch_function(patch, "Frame.height", Frame__height);
-    module_patch_function(patch, "Frame.has_parent", Frame__has_parent);
-    module_patch_function(patch, "Frame.parent", Frame__parent);
-    module_patch_function(patch, "Frame.register", Frame__register);
-    module_patch_function(patch, "Frame.registers", Frame__registers);
-    module_patch_function(patch, "Frame.pc", Frame__pc);
-    module_patch_function(patch, "Frame.parentIndex", Frame__parentPc);
-    module_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
-    module_patch_function(patch, "Frame.extract_state", Frame__extract_state);
     module_patch_function(patch, "make_stack", make_stack);
     module_patch_function(patch, "make_vm", make_stack);
     module_patch_function(patch, "capture_stack", capture_stack);
     module_patch_function(patch, "_extract_stack_path", hosted_extract_path);
-    module_patch_function(patch, "Stack.block", Stack__block);
-    module_patch_function(patch, "Stack.dump", Stack__dump);
-    module_patch_function(patch, "Stack.dump_with_bytecode", Stack__dump_with_bytecode);
-    module_patch_function(patch, "Stack.extract_state", Stack__extract_state);
-    module_patch_function(patch, "Stack.eval_on_demand", Stack__eval_on_demand);
-    module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
-    module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
-    module_patch_function(patch, "Stack.id", Stack__id);
-    module_patch_function(patch, "Stack.init", Stack__init);
-    module_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
-    module_patch_function(patch, "Stack.get_env", Stack__get_env);
-    module_patch_function(patch, "Stack.set_env", Stack__set_env);
-    module_patch_function(patch, "Stack.set_env_val", Stack__set_env_val);
-    module_patch_function(patch, "Stack.get_watch_result", Stack__get_watch_result);
-    module_patch_function(patch, "Stack.apply", Stack__call);
-    module_patch_function(patch, "Stack.call", Stack__call);
-    module_patch_function(patch, "Stack.copy", Stack__copy);
-    module_patch_function(patch, "Stack.stack_push", Stack__stack_push);
-    module_patch_function(patch, "Stack.stack_pop", Stack__stack_pop);
-    module_patch_function(patch, "Stack.set_state_input", Stack__set_state_input);
-    module_patch_function(patch, "Stack.get_state_output", Stack__get_state_output);
-    module_patch_function(patch, "Stack.migrate", Stack__migrate);
-    module_patch_function(patch, "Stack.migrate_to", Stack__migrate_to);
-    module_patch_function(patch, "Stack.reset", Stack__reset);
-    module_patch_function(patch, "Stack.reset_state", Stack__reset_state);
-    module_patch_function(patch, "Stack.restart", Stack__restart);
-    module_patch_function(patch, "Stack.restart_discarding_state", Stack__restart_discarding_state);
-    module_patch_function(patch, "Stack.run", Stack__run);
-    module_patch_function(patch, "Stack.frame", Stack__frame);
-    module_patch_function(patch, "Stack.frame_from_base", Stack__frame_from_base);
-    module_patch_function(patch, "Stack.frame_count", Stack__frame_count);
-    module_patch_function(patch, "Stack.output", Stack__output);
-    module_patch_function(patch, "Stack.errored", Stack__errored);
-    module_patch_function(patch, "Stack.error_message", Stack__error_message);
-    module_patch_function(patch, "Stack.toString", Stack__toString);
     module_patch_function(patch, "reflect_caller", reflect__caller);
     module_patch_function(patch, "reflect_get_frame_state", reflect_get_frame_state);
     module_patch_function(patch, "_get_demand_value", get_demand_value);

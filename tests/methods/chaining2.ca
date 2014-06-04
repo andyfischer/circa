@@ -2,7 +2,7 @@
 -- Make sure that a method written in rebind-input style can be called
 -- by a function in implicit-output style, and vice versa.
 
-type T {
+struct T {
     List list
 }
 

@@ -558,6 +558,7 @@ void bootstrap_kernel()
     reflection_install_functions(world->builtinPatch);
     interpreter_install_functions(world->builtinPatch);
     misc_builtins_setup_functions(world->builtinPatch);
+    stack_install_functions(world->builtinPatch);
     type_install_functions(builtins);
 
     native_patch_apply_patch(world->builtinPatch, builtins);

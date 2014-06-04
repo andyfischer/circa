@@ -1,6 +1,6 @@
 
 -- Test a method that modifies the object contents
-type Object
+struct Object
 {
     int a
 }
@@ -14,7 +14,7 @@ assert(o.a == 3)
 assert(o.a == 5)
 
 -- Same test, but with a nested object
-type Object2
+struct Object2
 {
     List list
 }
@@ -32,10 +32,10 @@ assert(o.list == [5 5])
 assert(o.list == [5 5 5])
 
 -- Multiple levels of nesting
-type T1 { List list }
-type T2 { T1 t }
-type T3 { T2 t }
-type T4 { T3 t }
+struct T1 { List list }
+struct T2 { T1 t }
+struct T3 { T2 t }
+struct T4 { T3 t }
 
 t = make(T4)
 assert(to_string(t) == "{t: {t: {t: {list: []}}}}")

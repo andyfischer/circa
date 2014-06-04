@@ -1,5 +1,5 @@
 
-type TargetSubElement {
+struct TargetSubElement {
     List list
 }
 
@@ -15,12 +15,12 @@ def TargetSubElement.append(@self, any subElement)
 def TargetSubElement.empty(self) -> bool
     self.list.empty
 
-type Target {
+struct Target {
     Term term
     TargetSubElement subElement
 }
 
-type ConstraintSet {
+struct ConstraintSet {
     Map byTerm
 }
 def ConstraintSet.setValue(@self, Term term, any value)
@@ -33,23 +33,23 @@ def ConstraintSet.getKnowledge(@self, Term term) -> any
     else
         null
 
-type Desire {
+struct Desire {
     Symbol name
     List args
 }
 
-type Request {
+struct Request {
     Target target
     ConstraintSet constraints
     Desire desire
 }
 
-type Failure {
+struct Failure {
     Symbol name
     List args
 }
 
-type ChangeOperation {
+struct ChangeOperation {
     Symbol name
     List args
 }

@@ -1,6 +1,6 @@
 
 
-type MyType {
+struct MyType {
   int a,
   int b,
   String name,
@@ -23,7 +23,7 @@ assert(m.a == 6)
 assert(to_string(m) == "{a: 6, b: 3, name: 'Andy', distance: 0.0}")
 
 -- Cast from a plain list
-type MyType2 {
+struct MyType2 {
     String a
     String b
     int c
@@ -36,7 +36,7 @@ assert(mt2.b == 'there')
 assert(mt2.c == 3)
 
 -- Composite type
-type Composite {
+struct Composite {
   MyType myClass,
   MyType myClass2,
   String name,
@@ -44,7 +44,7 @@ type Composite {
 c = make(Composite)
 assert(to_string(c) == "{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}")
 
-type Vector { number x, number y }
+struct Vector { number x, number y }
 v = make(Vector)
 
 v.x = 5.0

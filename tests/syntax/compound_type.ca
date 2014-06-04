@@ -1,14 +1,14 @@
 
-type Vector { number x, number y }
+struct Vector { number x, number y }
 
-type MyClass {
+struct MyClass {
   int a,
   int b,
   String name,
   number distance
 }
 
-type Composite {
+struct Composite {
   MyClass myClass,
   MyClass myClass2,
   String name,

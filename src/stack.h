@@ -17,13 +17,13 @@ struct Stack
     int refCount;
     bool isRefcounted;
 
-    // Activation frame list. Has a list of Frame objects in sequential memory. Each
-    // Frame object has variable size (see frame_size()), so this list can't be indexed.
-    char* frameData;
-    int framesCount;
-    size_t framesCapacity;
+    Frame* frames;
+    int frameCount;
+    int frameCapacity;
 
-    Frame* top;
+    Value* registers;
+    int registerCount;
+    int registerCapacity;
 
     Value derivedHackset;
     Program* program;
@@ -79,17 +79,11 @@ struct Frame
     // PC (in the parent frame) that this frame was expanded from. Invalid for the first frame.
     int parentIndex;
 
-    // Size of previous frame, used when walking backwards.
-    u32 prevFrameSize;
-
     // Stack state: data saved between invocations.
     Value state;
 
     // Outgoing stack state. Will be committed to parent frame's state.
     Value outgoingState;
-
-    // Source block
-    Block* block;
 
     // Map of Term to value, for scope-specific bindings. Used in closure call.
     Value bindings;
@@ -97,7 +91,9 @@ struct Frame
     // Frame env values.
     Value env;
 
-    // Block index (as stored in BytecodeCache).
+    Block* block;
+
+    // Block index (as stored in Program).
     int blockIndex;
 
     // Bytecode data. Data is owned in Stack.bytecode.
@@ -112,8 +108,8 @@ struct Frame
     // When a block is exited early, this stores the exit type.
     Symbol exitType;
 
+    int firstRegisterIndex;
     int registerCount;
-    Value registers[0]; // Has length of 'registerCount'
 };
 
 // Allocate a new Stack object.
@@ -159,6 +155,7 @@ Frame* prev_frame(Frame* frame);
 Frame* prev_frame_n(Frame* frame, int distance);
 size_t frame_size(Frame* frame);
 
+caValue* stack_register(Stack* stack, int index);
 caValue* frame_register(Frame* frame, int index);
 caValue* frame_register(Frame* frame, Term* term);
 caValue* frame_register_from_end(Frame* frame, int index);
@@ -192,8 +189,12 @@ bool is_retained_frame(caValue* frame);
 caValue* retained_frame_get_block(caValue* frame);
 caValue* retained_frame_get_state(caValue* frame);
 
+void stack_extract_state(Stack* stack, caValue* output);
+void frame_extract_state(Frame* frame, caValue* output);
+
 void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame);
 
 void stack_setup_type(Type* stackType);
+void stack_install_functions(NativePatch* patch);
 
 } // namespace circa

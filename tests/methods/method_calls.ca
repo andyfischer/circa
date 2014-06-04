@@ -4,11 +4,11 @@ l = [4 5 6]
 print('l.length() == ' l.length())
 
 -- define a new method
-type T;
+struct T;
 def T.method(t) -> String
     return "called T.method"
 
-type U;
+struct U;
 def U.method(t) -> String
     return "called U.method"
 

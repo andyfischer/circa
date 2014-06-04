@@ -278,7 +278,7 @@ tok_TripleGThan
 tok_Pound
 
 tok_Def
-tok_Type
+tok_Struct
 tok_UnusedName1
 tok_UnusedName2
 tok_UnusedName3

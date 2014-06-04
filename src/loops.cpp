@@ -341,7 +341,7 @@ void for_loop_remake_zero_block(Block* forContents)
 void start_for_loop(caStack* stack, bool enableLoopOutput)
 {
     Frame* frame = top_frame(stack);
-    Block* contents = frame->block;
+    Block* contents = frame_block(frame);
 
     // Check if top frame actually contains a for-loop (it might be using the #zero block)
     if (!is_for_loop(contents))

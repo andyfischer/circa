@@ -17,7 +17,7 @@ def hi(int i) {   }
 def hi(int i) { 1 }
 def hi(number n, String s, bool b)  {}
 
-type Vec2 { number x, number y }
+struct Vec2 { number x, number y }
 def hi() -> Vec2 { return [0 0] }
 
 def hi() { if true { return 1 } else { return 2 } }

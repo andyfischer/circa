@@ -73,7 +73,7 @@ const char* get_token_text(int match)
         case tok_For: return "for";
         case tok_State: return "state";
         case tok_Def: return "def";
-        case tok_Type: return "type";
+        case tok_Struct: return "struct";
         case tok_Return: return "return";
         case tok_In: return "in";
         case tok_True: return "true";
@@ -321,9 +321,9 @@ void top_level_consume_token(TokenizeContext &context)
             if (try_to_consume_keyword(context, tok_Or)) return;
             if (try_to_consume_keyword(context, tok_Return)) return;
             if (try_to_consume_keyword(context, tok_State)) return;
+            if (try_to_consume_keyword(context, tok_Struct)) return;
             if (try_to_consume_keyword(context, tok_Switch)) return;
             if (try_to_consume_keyword(context, tok_True)) return;
-            if (try_to_consume_keyword(context, tok_Type)) return;
             if (try_to_consume_keyword(context, tok_Require)) return;
             if (try_to_consume_keyword(context, tok_Package)) return;
             if (try_to_consume_keyword(context, tok_Section)) return;

@@ -328,7 +328,7 @@ caValue* circa_frame_input(caStack* stack, int index)
     if (top == NULL)
         return NULL;
 
-    Term* term = top->block->get(index);
+    Term* term = frame_block(top)->get(index);
 
     if (term->function != FUNCS.input)
         return NULL;
@@ -340,9 +340,9 @@ caValue* circa_frame_output(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);
 
-    int realIndex = top->block->length() - index - 1;
+    int realIndex = frame_block(top)->length() - index - 1;
 
-    Term* term = top->block->get(realIndex);
+    Term* term = frame_block(top)->get(realIndex);
     if (term->function != FUNCS.output)
         return NULL;
 
@@ -361,7 +361,7 @@ void circa_pop(caStack* stack)
 
 caBlock* circa_stack_top_block(caStack* stack)
 {
-    return (caBlock*) top_frame(stack)->block;
+    return (caBlock*) frame_block(top_frame(stack));
 }
 
 caValue* circa_input(caStack* stack, int index)
@@ -402,7 +402,7 @@ caValue* circa_output(caStack* stack, int index)
 void circa_output_error_val(caStack* stack, caValue* val)
 {
     copy(val, circa_output(stack, 0));
-    top_frame(stack)->termIndex = top_frame(stack)->block->length() - 1;
+    top_frame(stack)->termIndex = frame_block(top_frame(stack))->length() - 1;
     raise_error(stack);
 }
 
@@ -423,7 +423,7 @@ caBlock* circa_caller_block(caStack* stack)
     Frame* frame = stack_top_parent(stack);
     if (frame == NULL)
         return NULL;
-    return frame->block;
+    return frame_block(frame);
 }
 
 caTerm* circa_caller_term(caStack* stack)

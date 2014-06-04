@@ -1,7 +1,7 @@
 
-type T {}
+struct T {}
 
-type U {}
+struct U {}
 
 def f(bool b)
  if b

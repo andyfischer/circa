@@ -1,5 +1,5 @@
 
-type T {
+struct T {
 }
 
 def T.a(self)
@@ -8,7 +8,7 @@ def T.a(self)
 def T.b(self)
   concat('T.b calling T.a: ' self.a)
 
-type Interface = :interface
+struct Interface = :interface
 
 def Interface.a(self)
   'Interface.a'

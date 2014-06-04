@@ -1,6 +1,6 @@
 
 
-type Node {
+struct Node {
     int parent
     List children
     Symbol strategy
@@ -8,7 +8,7 @@ type Node {
     any data
 }
 
-type Layout {
+struct Layout {
     List nodes
     Vec2 size
     int cursor

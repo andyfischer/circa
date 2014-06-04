@@ -3,25 +3,25 @@
 -- were being constantly reloaded. The simplest code that reproduces the bug can
 -- be found at tests/bugrepro/if_block_messing_up_pack_state.ca
 
-type Vec3 {
+struct Vec3 {
   number x
   number y
   number z
 }
 
-type Vec4 {
+struct Vec4 {
   number x
   number y
   number z
   number w
 }
 
-type Font;
-type Label;
-type Line;
-type Sprite;
-type Texture;
-type TouchRegion;
+struct Font;
+struct Label;
+struct Line;
+struct Sprite;
+struct Texture;
+struct TouchRegion;
 
 def viewport_size() -> Vec2
   [100 100]

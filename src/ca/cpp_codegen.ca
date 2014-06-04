@@ -1,5 +1,5 @@
 
-type CodeWriter
+struct CodeWriter
 {
     int curIndent
     bool needsIndent

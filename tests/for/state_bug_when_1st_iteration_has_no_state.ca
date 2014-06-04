@@ -1,0 +1,13 @@
+
+def main()
+  print("calling main:")
+  for step in [1 2]
+    if step == 1
+      print(' step 1')
+    elif step == 2
+      state s = 0
+      s += 1
+      print(' step 2, state = ' s)
+
+make_vm(main).run.run
+

@@ -248,7 +248,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_TripleGThan: return "tok_TripleGThan";
     case tok_Pound: return "tok_Pound";
     case tok_Def: return "tok_Def";
-    case tok_Type: return "tok_Type";
+    case tok_Struct: return "tok_Struct";
     case tok_UnusedName1: return "tok_UnusedName1";
     case tok_UnusedName2: return "tok_UnusedName2";
     case tok_UnusedName3: return "tok_UnusedName3";
@@ -2758,9 +2758,17 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'r':
-        if (strcmp(str + 7, "ing") == 0)
+    switch (str[7]) {
+    case 'i':
+        if (strcmp(str + 8, "ng") == 0)
             return tok_String;
         break;
+    case 'u':
+        if (strcmp(str + 8, "ct") == 0)
+            return tok_Struct;
+        break;
+    default: return -1;
+    }
     default: return -1;
     }
     case 'w':
@@ -2806,10 +2814,6 @@ int builtin_symbol_from_string(const char* str)
     case 'w':
         if (strcmp(str + 6, "oDots") == 0)
             return tok_TwoDots;
-        break;
-    case 'y':
-        if (strcmp(str + 6, "pe") == 0)
-            return tok_Type;
         break;
     default: return -1;
     }

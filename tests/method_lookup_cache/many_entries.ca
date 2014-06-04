@@ -1,35 +1,35 @@
 
-type A {}
+struct A {}
 
 def A.f(self)
   print('called A.f')
 
-type B {}
+struct B {}
 
 def B.f(self)
   print('called B.f')
 
-type C {}
+struct C {}
 
 def C.f(self)
   print('called C.f')
 
-type D {}
+struct D {}
 
 def D.f(self)
   print('called D.f')
 
-type E {}
+struct E {}
 
 def E.f(self)
   print('called E.f')
 
-type F {}
+struct F {}
 
 def F.f(self)
   print('called F.f')
 
-type G {}
+struct G {}
 
 def G.f(self)
   print('called G.f')

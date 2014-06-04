@@ -1,5 +1,5 @@
 
-type T {
+struct T {
     int a
     String b
 }

@@ -1,6 +1,6 @@
 
 def left()
-  type T {
+  struct T {
     int a
   }
 
@@ -12,7 +12,7 @@ def left()
   t
 
 def right()
-  type T {
+  struct T {
     int a
   }
 

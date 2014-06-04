@@ -252,6 +252,7 @@ Block* term_get_function_details(Term* call)
 {
     // TODO: Shouldn't need to special case these functions.
     if (call->function == FUNCS.if_block
+        || call->function == FUNCS.switch_func
         || call->function == FUNCS.for_func
         || call->function == FUNCS.include_func)
         return nested_contents(call);

@@ -130,7 +130,7 @@ void closure_save_bindings_for_frame(caValue* closure, Frame* frame)
     if (closureBlock == NULL)
         return;
 
-    Block* finishingBlock = frame->block;
+    Block* finishingBlock = frame_block(frame);
 
     for (int i=0; i < closureBlock->length(); i++) {
         Term* term = closureBlock->get(i);

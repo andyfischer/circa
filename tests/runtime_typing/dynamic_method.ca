@@ -2,7 +2,7 @@
 def call_blah(any a)
     print(a.blah)
 
-type A {
+struct A {
     int x
 }
 def A.blah(self) -> String
@@ -11,7 +11,7 @@ def A.blah(self) -> String
 def A.increment(self)
     self.x += 1
 
-type B {
+struct B {
     int x
 }
 def B.blah(self) -> String

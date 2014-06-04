@@ -71,7 +71,7 @@ l = []; l.append(1)
 t = make(Vec2); t.x
 t = make(Vec2); t.x = 1.0
 t = make(Vec2); a = t.x
-type A{int z} type B{A y} x = make(B); x.y.z
+struct A{int z} struct B{A y} x = make(B); x.y.z
 
 -- Index access
 a = [1]; a[0]

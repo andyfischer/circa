@@ -20,11 +20,11 @@ namespace interpreter_test {
 
 void test_cast_first_inputs()
 {
-    // Pass an input of [1] to a block that expects a compound type.
+    // Pass an input of [1] to a block that expects a struct.
     // The function will need to cast the [1] to T in order for it to work.
 
     Block block;
-    block.compile("type T { int i }");
+    block.compile("struct T { int i }");
     Term* f = block.compile("def f(T t) -> int { return t.i }");
 
     Stack stack;

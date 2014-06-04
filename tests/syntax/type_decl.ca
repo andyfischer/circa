@@ -1,7 +1,7 @@
 
-type Vec2 { number x, number y }
+struct Vec2 { number x, number y }
 -- a comment
 
-type Vector3 { number x, number y, number z }
+struct Vector3 { number x, number y, number z }
 
 -- another comment

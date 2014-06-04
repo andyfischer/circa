@@ -2,7 +2,7 @@
 
 main = {
 
-    type T {}
+    struct T {}
     t = make(T)
     t.hello()
 }

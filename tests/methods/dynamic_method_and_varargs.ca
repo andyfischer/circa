@@ -1,6 +1,6 @@
 
 
-type T {}
+struct T {}
 
 def T.f(self, args :multiple)
   print('T.f: ', args)

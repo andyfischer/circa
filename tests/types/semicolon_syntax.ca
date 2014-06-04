@@ -1,6 +1,6 @@
 
-type T;
+struct T;
 
-type U {}
+struct U {}
 
-type V {};
+struct V {};

@@ -1,5 +1,5 @@
 
-type StackDump {
+struct StackDump {
   IndentWriter out
 }
 
