@@ -8,7 +8,7 @@ testBlock = {
     }
 }
 
-br = block_ref(testBlock)
+br = testBlock.block
 
 a = br.find_term('a')
 b = br.find_term('b')

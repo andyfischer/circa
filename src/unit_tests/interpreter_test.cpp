@@ -78,6 +78,7 @@ void my_func_override(caStack* stack)
 
 void test_directly_call_native_override()
 {
+#if 0
     // Test an interpreter session where the top frame is a native override.
     
     Block block;
@@ -90,6 +91,7 @@ void test_directly_call_native_override()
     set_int(circa_input(&stack, 0), 5);
     circa_run(&stack);
     test_equals(circa_output(&stack, 0), "15");
+#endif
 }
 
 void bug_stale_bytecode_after_migrate()

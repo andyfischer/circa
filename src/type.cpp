@@ -19,9 +19,6 @@
 #include "type.h"
 #include "world.h"
 
-#include "types/int.h"
-#include "types/common.h"
-
 namespace circa {
 
 static void dealloc_type(Type* type);
@@ -450,6 +447,11 @@ static int type_decl_get_field_count(Block* declaration)
 
 Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fieldType)
 {
+    if (FUNCS.get_index == NULL)
+        internal_error("in type_decl_append_field: get_index is NULL");
+    if (FUNCS.set_index == NULL)
+        internal_error("in type_decl_append_field: set_index is NULL");
+
     int fieldIndex = type_decl_get_field_count(declaration);
 
     Term* accessor;
@@ -579,18 +581,6 @@ void Type__make(caStack* stack)
     type_incref(type);
 }
 
-Type* Type__make__specializeType(Term* caller)
-{
-    Term* input = caller->input(0);
-    if (input == NULL)
-        return TYPES.any;
-
-    if (is_value(input) && is_type(input))
-        return as_type(input);
-
-    return TYPES.any;
-}
-
 void Type__name(caStack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
@@ -608,14 +598,12 @@ void Type__property(caStack* stack)
         copy(prop, circa_output(stack, 0));
 }
 
-void type_install_functions(Block* block)
+void type_install_functions(NativePatch* patch)
 {
-    install_function(block, "Type.declaringTerm", Type__declaringTerm);
-    Term* Type_make = install_function(block, "Type.make", Type__make);
-    install_function(block, "Type.name", Type__name);
-    install_function(block, "Type.property", Type__property);
-
-    block_set_specialize_type_func(function_contents(Type_make), Type__make__specializeType);
+    circa_patch_function(patch, "Type.declaringTerm", Type__declaringTerm);
+    circa_patch_function(patch, "Type.make", Type__make);
+    circa_patch_function(patch, "Type.name", Type__name);
+    circa_patch_function(patch, "Type.property", Type__property);
 }
 
 } // namespace circa

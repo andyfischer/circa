@@ -1,0 +1,22 @@
+
+a = Map.make
+
+set(@a [:x :y :z] 1)
+
+print(a)
+
+delete(@a [:x :y :z])
+
+print(a)
+
+delete(@a [:x :y :z])
+
+print(a)
+
+delete(@a [:x])
+
+print(a)
+
+delete(@a [])
+
+print(a)

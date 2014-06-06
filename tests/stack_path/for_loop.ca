@@ -1,0 +1,6 @@
+
+def f()
+  for i in 0..5
+    print('iteration ' i ', path = ' _get_local_stack_path())
+
+f()

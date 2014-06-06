@@ -20,10 +20,7 @@ solution "Circa"
         location "src"
         files {
             "src/*.cpp",
-            "src/ext/*.cpp",
-            "src/generated/all_builtin_functions.cpp",
-            "src/generated/all_builtin_types.cpp",
-            "src/generated/setup_builtin_functions.cpp",
+            "src/ext/read_tar.cpp",
             "src/generated/stdlib_script_text.cpp",
             "3rdparty/tinymt/tinymt64.cc",
             "3rdparty/http-parser/http_parser.c"
@@ -45,7 +42,7 @@ solution "Circa"
             "src/command_line/file_checker.cpp",
             "3rdparty/linenoise/linenoise.c",
         }
-        links {"static_lib","dl","uv"}
+        links {"static_lib","dl"}
 
         configuration "Debug"
             targetname "circa_d"
@@ -55,7 +52,7 @@ solution "Circa"
         targetname "circa_test"
         location "src"
         files {"src/unit_tests/*.cpp"}
-        links {"static_lib","dl","uv"}
+        links {"static_lib","dl"}
 
         configuration "Release"
             targetname "circa_test_r"

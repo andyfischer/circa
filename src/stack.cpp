@@ -13,7 +13,6 @@
 #include "migration.h"
 #include "names.h"
 #include "native_patch.h"
-#include "program.h"
 #include "stack.h"
 #include "string_type.h"
 #include "symbols.h"
@@ -23,8 +22,6 @@
 
 namespace circa {
 
-void extract_state(Block* block, caValue* state, caValue* output);
-static void retained_frame_extract_state(caValue* frame, caValue* output);
 static void stack_bytecode_prepare_new_hackset(Stack* stack);
 
 Stack::Stack()
@@ -51,6 +48,7 @@ Stack::Stack()
     
     set_hashtable(&demandValues);
     set_hashtable(&env);
+    set_hashtable(&state);
     set_list(&observations);
     rand_init(&randState, 0);
 
@@ -58,7 +56,7 @@ Stack::Stack()
 
     // Currently: each Stack owns their own Program. Future: We'll
     // share Programs among stacks.
-    program = alloc_program();
+    program = alloc_program(global_world());
 }
 
 Stack::~Stack()
@@ -90,6 +88,11 @@ void
 Stack::dump()
 {
     circa::dump(this);
+}
+void
+Stack::dump_compiled()
+{
+    compiled_dump(program);
 }
 
 Stack* create_stack(World* world)
@@ -168,14 +171,13 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     // Prepare frame.
     frame->stack = stack;
     frame->termIndex = 0;
-    frame->bc = NULL;
     frame->block = NULL;
     frame->blockIndex = -1;
     frame->pc = 0;
     frame->exitType = sym_None;
     initialize_null(&frame->bindings);
     initialize_null(&frame->env);
-    initialize_null(&frame->state);
+    initialize_null(&frame->incomingState);
     initialize_null(&frame->outgoingState);
 
     frame->firstRegisterIndex = stack->registerCount;
@@ -184,6 +186,14 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     stack_reserve_register_capacity(stack, stack->registerCount);
 
     return frame;
+}
+
+void stack_resize_top_frame(Stack* stack, int registerCount)
+{
+    Frame* top = top_frame(stack);
+    top->registerCount = registerCount;
+    stack->registerCount = top->firstRegisterIndex + registerCount;
+    stack_reserve_register_capacity(stack, stack->registerCount);
 }
 
 void stack_pop_no_retain(Stack* stack)
@@ -197,7 +207,7 @@ void stack_pop_no_retain(Stack* stack)
 
     set_null(&frame->bindings);
     set_null(&frame->env);
-    set_null(&frame->state);
+    set_null(&frame->incomingState);
     set_null(&frame->outgoingState);
 
     stack->frameCount--;
@@ -247,7 +257,7 @@ int stack_frame_count(Stack* stack)
     return stack->frameCount;
 }
 
-Frame* stack_top_parent(Stack* stack)
+Frame* top_frame_parent(Stack* stack)
 {
     Frame* top = top_frame(stack);
     if (top == NULL)
@@ -261,6 +271,11 @@ Block* stack_top_block(Stack* stack)
     if (frame == NULL)
         return NULL;
     return frame_block(frame);
+}
+
+caValue* stack_state(Stack* stack)
+{
+    return &stack->state;
 }
 
 bool stack_errored(Stack* stack)
@@ -325,10 +340,10 @@ Stack* stack_duplicate(Stack* stack)
         dupeFrame->block = sourceFrame->block;
         dupeFrame->termIndex = sourceFrame->termIndex;
         dupeFrame->exitType = sourceFrame->exitType;
-        set_value(&dupeFrame->state, &sourceFrame->state);
-        set_value(&dupeFrame->outgoingState, &sourceFrame->outgoingState);
         set_value(&dupeFrame->bindings, &sourceFrame->bindings);
         set_value(&dupeFrame->env, &sourceFrame->env);
+        set_value(&dupeFrame->incomingState, &sourceFrame->incomingState);
+        set_value(&dupeFrame->outgoingState, &sourceFrame->outgoingState);
 
         sourceFrame = next_frame(sourceFrame);
     }
@@ -429,6 +444,11 @@ Frame* top_frame(Stack* stack)
     return &stack->frames[stack->frameCount - 1];
 }
 
+CompiledBlock* frame_compiled_block(Frame* frame)
+{
+    return compiled_block(frame->stack->program, frame->blockIndex);
+}
+
 caValue* stack_register(Stack* stack, int index)
 {
     ca_assert(index < stack->registerCount);
@@ -512,11 +532,10 @@ void stack_on_program_change(Stack* stack)
 {
     program_erase(stack->program);
     for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
-        frame->bc = NULL;
         frame->pc = 0;
         frame->blockIndex = -1;
     }
-    stack->bc = NULL;
+    stack->bytecode = NULL;
     stack->pc = 0;
 }
 
@@ -588,87 +607,16 @@ void set_frame_ref(caValue* value, Frame* frame)
     cast(value, TYPES.frame);
 }
 
-void set_retained_frame(caValue* frame)
-{
-    make(TYPES.retained_frame, frame);
-}
-bool is_retained_frame(caValue* frame)
-{
-    return frame->value_type == TYPES.retained_frame;
-}
-caValue* retained_frame_get_block(caValue* frame)
-{
-    ca_assert(is_retained_frame(frame));
-    return frame->element(0);
-}
-caValue* retained_frame_get_state(caValue* frame)
-{
-    ca_assert(is_retained_frame(frame));
-    return frame->element(1);
-}
-
-void stack_extract_state(Stack* stack, caValue* output)
-{
-    Frame* frame = first_frame(stack);
-    extract_state(frame_block(frame), &frame->state, output);
-}
-
-void extract_state(Block* block, caValue* state, caValue* output)
-{
-    set_hashtable(output);
-    if (!is_list(state))
-        return;
-
-    for (int i=0; i < list_length(state); i++) {
-        Term* term = block->get(i);
-        caValue* element = list_get(state, i);
-        caValue* name = unique_name(term);
-
-        if (term->function == FUNCS.declared_state) {
-            copy(element, hashtable_insert(output, name));
-        } else if (is_retained_frame(element)) {
-            retained_frame_extract_state(element, hashtable_insert(output, name));
-        } else if (is_list(element)) {
-            caValue* listOutput = hashtable_insert(output, name);
-            set_list(listOutput, list_length(element));
-            for (int i=0; i < list_length(element); i++) {
-                caValue* indexedState = list_get(element, i);
-                // indexedState is either null or a Frame
-                if (is_retained_frame(indexedState)) {
-                    retained_frame_extract_state(indexedState, list_get(listOutput, i));
-                }
-            }
-        }
-    }
-}
-
-static void retained_frame_extract_state(caValue* frame, caValue* output)
-{
-    Block* block = as_block(retained_frame_get_block(frame));
-    caValue* state = retained_frame_get_state(frame);
-    extract_state(block, state, output);
-}
-
-void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame)
-{
-    if (!is_retained_frame(retainedFrame))
-        set_retained_frame(retainedFrame);
-    touch(retainedFrame);
-
-    set_block(retained_frame_get_block(retainedFrame), frame_block(source));
-    set_value(retained_frame_get_state(retainedFrame), &source->outgoingState);
-}
-
 void frame_copy(Frame* left, Frame* right)
 {
     right->parentIndex = left->parentIndex;
-    copy(&left->state, &right->state);
     copy(&left->bindings, &right->bindings);
     copy(&left->env, &right->env);
+    copy(&left->incomingState, &right->incomingState);
+    copy(&left->outgoingState, &right->outgoingState);
     right->block = left->block;
     right->blockIndex = left->blockIndex;
     right->termIndex = left->termIndex;
-    right->bc = NULL;
     right->pc = left->pc;
     right->exitType = left->exitType;
 }
@@ -708,6 +656,14 @@ void Stack__dump(caStack* stack)
     write_log(as_cstring(&str));
 }
 
+void Stack__dump_compiled(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Value str;
+    compiled_to_string(self->program, &str);
+    write_log(as_cstring(&str));
+}
+
 void Stack__dump_with_bytecode(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -719,7 +675,7 @@ void Stack__dump_with_bytecode(caStack* stack)
 void Stack__extract_state(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    stack_extract_state(self, circa_output(stack, 0));
+    copy(&self->state, circa_output(stack, 0));
 }
 
 void Stack__eval_on_demand(caStack* stack)
@@ -788,6 +744,7 @@ void Stack__init(caStack* stack)
     stack_init_with_closure(self, closure);
 }
 
+#if 0
 void Stack__has_incoming_state(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -797,6 +754,7 @@ void Stack__has_incoming_state(caStack* stack)
     else
         set_bool(circa_output(stack, 0), !is_null(&top->state));
 }
+#endif
 
 void Stack__get_env(caStack* stack)
 {
@@ -818,6 +776,12 @@ void Stack__set_env_val(caStack* stack)
     caValue* val = circa_input(stack, 2);
 
     copy(val, stack_env_insert(self, name));
+}
+
+void Stack__get_state(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    copy(&self->state, circa_output(stack, 0));
 }
 
 void Stack__get_watch_result(caStack* stack)
@@ -875,7 +839,7 @@ void Stack__stack_push(caStack* stack)
 
     ca_assert(block != NULL);
 
-    Frame* top = vm_push_frame(self, top_frame(self)->termIndex, block);
+    Frame* top = vm_push_frame2(self, top_frame(self)->termIndex, vm_compile_block(self, block));
 
     caValue* inputs = circa_input(stack, 2);
 
@@ -891,30 +855,6 @@ void Stack__stack_pop(caStack* stack)
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     stack_pop(self);
-}
-
-void Stack__set_state_input(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    Frame* top = top_frame(self);
-
-    if (top == NULL)
-        return circa_output_error(stack, "No stack frame");
-
-    copy(circa_input(stack, 1), &top->state);
-}
-
-void Stack__get_state_output(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-
-    Frame* top = top_frame(self);
-    if (top == NULL)
-        return circa_output_error(stack, "No stack frame");
-
-    copy(&top->outgoingState, circa_output(stack, 0));
 }
 
 void Stack__migrate(caStack* stack)
@@ -945,8 +885,7 @@ void Stack__reset(caStack* stack)
 void Stack__reset_state(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    set_null(&top_frame(self)->state);
-    set_null(&top_frame(self)->outgoingState);
+    set_hashtable(&self->state);
 }
 
 void Stack__restart(caStack* stack)
@@ -1141,62 +1080,68 @@ void Frame__current_term(caStack* stack)
     set_term_ref(circa_output(stack, 0), frame_current_term(frame));
 }
 
+#if 0
 void Frame__extract_state(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
     extract_state(frame_block(frame), &frame->state, output);
 }
+#endif
 
 void stack_install_functions(NativePatch* patch)
 {
-    module_patch_function(patch, "Stack.block", Stack__block);
-    module_patch_function(patch, "Stack.dump", Stack__dump);
-    module_patch_function(patch, "Stack.dump_with_bytecode", Stack__dump_with_bytecode);
-    module_patch_function(patch, "Stack.extract_state", Stack__extract_state);
-    module_patch_function(patch, "Stack.eval_on_demand", Stack__eval_on_demand);
-    module_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
-    module_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
-    module_patch_function(patch, "Stack.id", Stack__id);
-    module_patch_function(patch, "Stack.init", Stack__init);
-    module_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
-    module_patch_function(patch, "Stack.get_env", Stack__get_env);
-    module_patch_function(patch, "Stack.set_env", Stack__set_env);
-    module_patch_function(patch, "Stack.set_env_val", Stack__set_env_val);
-    module_patch_function(patch, "Stack.get_watch_result", Stack__get_watch_result);
-    module_patch_function(patch, "Stack.apply", Stack__call);
-    module_patch_function(patch, "Stack.call", Stack__call);
-    module_patch_function(patch, "Stack.copy", Stack__copy);
-    module_patch_function(patch, "Stack.stack_push", Stack__stack_push);
-    module_patch_function(patch, "Stack.stack_pop", Stack__stack_pop);
-    module_patch_function(patch, "Stack.set_state_input", Stack__set_state_input);
-    module_patch_function(patch, "Stack.get_state_output", Stack__get_state_output);
-    module_patch_function(patch, "Stack.migrate", Stack__migrate);
-    module_patch_function(patch, "Stack.migrate_to", Stack__migrate_to);
-    module_patch_function(patch, "Stack.reset", Stack__reset);
-    module_patch_function(patch, "Stack.reset_state", Stack__reset_state);
-    module_patch_function(patch, "Stack.restart", Stack__restart);
-    module_patch_function(patch, "Stack.restart_discarding_state", Stack__restart_discarding_state);
-    module_patch_function(patch, "Stack.run", Stack__run);
-    module_patch_function(patch, "Stack.frame", Stack__frame);
-    module_patch_function(patch, "Stack.frame_from_base", Stack__frame_from_base);
-    module_patch_function(patch, "Stack.frame_count", Stack__frame_count);
-    module_patch_function(patch, "Stack.output", Stack__output);
-    module_patch_function(patch, "Stack.errored", Stack__errored);
-    module_patch_function(patch, "Stack.error_message", Stack__error_message);
-    module_patch_function(patch, "Stack.toString", Stack__toString);
-    module_patch_function(patch, "Frame.active_value", Frame__active_value);
-    module_patch_function(patch, "Frame.block", Frame__block);
-    module_patch_function(patch, "Frame.current_term", Frame__current_term);
-    module_patch_function(patch, "Frame.height", Frame__height);
-    module_patch_function(patch, "Frame.has_parent", Frame__has_parent);
-    module_patch_function(patch, "Frame.parent", Frame__parent);
-    module_patch_function(patch, "Frame.register", Frame__register);
-    module_patch_function(patch, "Frame.registers", Frame__registers);
-    module_patch_function(patch, "Frame.pc", Frame__pc);
-    module_patch_function(patch, "Frame.parentIndex", Frame__parentPc);
-    module_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
-    module_patch_function(patch, "Frame.extract_state", Frame__extract_state);
+    circa_patch_function(patch, "Stack.block", Stack__block);
+    circa_patch_function(patch, "Stack.dump", Stack__dump);
+    circa_patch_function(patch, "Stack.dump_compiled", Stack__dump_compiled);
+    circa_patch_function(patch, "Stack.dump_with_bytecode", Stack__dump_with_bytecode);
+    circa_patch_function(patch, "Stack.extract_state", Stack__extract_state);
+    circa_patch_function(patch, "Stack.eval_on_demand", Stack__eval_on_demand);
+    circa_patch_function(patch, "Stack.find_active_value", Stack__find_active_value);
+    circa_patch_function(patch, "Stack.find_active_frame_for_term", Stack__find_active_frame_for_term);
+    circa_patch_function(patch, "Stack.id", Stack__id);
+    circa_patch_function(patch, "Stack.init", Stack__init);
+#if 0
+    circa_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
+#endif
+    circa_patch_function(patch, "Stack.get_env", Stack__get_env);
+    circa_patch_function(patch, "Stack.set_env", Stack__set_env);
+    circa_patch_function(patch, "Stack.set_env_val", Stack__set_env_val);
+    circa_patch_function(patch, "Stack.get_state", Stack__get_state);
+    circa_patch_function(patch, "Stack.get_watch_result", Stack__get_watch_result);
+    circa_patch_function(patch, "Stack.apply", Stack__call);
+    circa_patch_function(patch, "Stack.call", Stack__call);
+    circa_patch_function(patch, "Stack.copy", Stack__copy);
+    circa_patch_function(patch, "Stack.stack_push", Stack__stack_push);
+    circa_patch_function(patch, "Stack.stack_pop", Stack__stack_pop);
+    circa_patch_function(patch, "Stack.migrate", Stack__migrate);
+    circa_patch_function(patch, "Stack.migrate_to", Stack__migrate_to);
+    circa_patch_function(patch, "Stack.reset", Stack__reset);
+    circa_patch_function(patch, "Stack.reset_state", Stack__reset_state);
+    circa_patch_function(patch, "Stack.restart", Stack__restart);
+    circa_patch_function(patch, "Stack.restart_discarding_state", Stack__restart_discarding_state);
+    circa_patch_function(patch, "Stack.run", Stack__run);
+    circa_patch_function(patch, "Stack.frame", Stack__frame);
+    circa_patch_function(patch, "Stack.frame_from_base", Stack__frame_from_base);
+    circa_patch_function(patch, "Stack.frame_count", Stack__frame_count);
+    circa_patch_function(patch, "Stack.output", Stack__output);
+    circa_patch_function(patch, "Stack.errored", Stack__errored);
+    circa_patch_function(patch, "Stack.error_message", Stack__error_message);
+    circa_patch_function(patch, "Stack.toString", Stack__toString);
+    circa_patch_function(patch, "Frame.active_value", Frame__active_value);
+    circa_patch_function(patch, "Frame.block", Frame__block);
+    circa_patch_function(patch, "Frame.current_term", Frame__current_term);
+    circa_patch_function(patch, "Frame.height", Frame__height);
+    circa_patch_function(patch, "Frame.has_parent", Frame__has_parent);
+    circa_patch_function(patch, "Frame.parent", Frame__parent);
+    circa_patch_function(patch, "Frame.register", Frame__register);
+    circa_patch_function(patch, "Frame.registers", Frame__registers);
+    circa_patch_function(patch, "Frame.pc", Frame__pc);
+    circa_patch_function(patch, "Frame.parentIndex", Frame__parentPc);
+    circa_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
+#if 0
+    circa_patch_function(patch, "Frame.extract_state", Frame__extract_state);
+#endif
 }
 
 } // namespace circa

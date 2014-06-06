@@ -1,31 +1,260 @@
 
--- Func --
-struct Func {
-  Block block
-  Map bindings
-}
+-- Parse errors
+def unknown_function(any ins :multiple)
+def unknown_identifier()
 
-def Func.call(self, any inputs :multiple) -> any
-  -- Call the func using the given inputs.
+-- Misc builtins
+def declare_field()
+def return(any outs :multiple :optional)
+def discard(any outs :multiple :optional)
+def dynamic_method(any inputs :multiple)
+def break(any outs :multiple :optional)
+def continue(any outs :multiple :optional)
+def extra_output(any _) -> any
+def func_call_implicit(any inputs :multiple)
+def get_field(any obj, String key) -> any
+def get_index(List list, int index) -> any
+def selector(any elements :multiple) -> Selector
+def get_with_selector(any object, Selector selector) -> any
+def set_with_selector(any object, Selector selector, any newValue) -> any
+def syntax_error(msg :multiple)
+def section()
+def case_condition_bool(bool condition)
+def loop_condition_bool(bool condition)
+def minor_return_if_empty()
+def index(int i :optional) -> int
+def module()
 
-def Func.apply(self, List inputs) -> any
-  -- Like .call, but the inputs are given as one list instead of separate args.
+-- While-block
+def while()
 
--- Misc builtin functions --
+-- For-block
+def for(List list) -> List
+def loop_iterator(any _, any _) -> int
+def loop_index(int index) -> int
+def loop_output_index() -> any
+
+-- If-block
+def if() -> any
+def case(bool b :optional)
+
+-- Switch-block
+def switch(any input :optional) -> any
+
+-- Explicit input/output (future questionable)
+def input(Type t :optional, any _) -> any
+def output(any _)
+
+-- Lists
+def list(any vals :multiple) -> List
+def blank_list(int count) -> List
+
+-- Logical
+def and(bool a, bool b) -> bool
+  -- Return whether a and b are both true
+def or(bool a, bool b) -> bool
+  -- Return whether a or b are both true
+def not(bool b) -> bool
+
+-- Math
+def add_i(int a, int b) -> int
+def add_f(number a, number b) -> number
+def max_f(number a,number b) -> number
+  -- Maximum of two numbers
+def max_i(int a,int b) -> int
+  -- Maximum of two integers
+def min_f(number a,number b) -> number
+  -- Minimum of two numbers
+def min_i(int a,int b) -> int
+  -- Minimum of two integers
+def remainder_i(int a,int b) -> int
+def remainder_f(number a,number b) -> number
+def mult_i(int a,int b) -> int
+def mult_f(number a,number b) -> number
+def mod_i(int a,int b) -> int
+def mod_f(number a,number b) -> number
+def neg_i(int i) -> int
+def neg_f(number n) -> number
+def sub_i(int a,int b) -> int
+def sub_f(number a,number b) -> number
+def round(number n) -> int
+  -- Return the integer that is closest to n
+def floor(number n) -> int
+  -- Return the closest integer that is less than n
+def ceil(number n) -> int
+  -- Return the closest integer that is greater than n
+def average(vals :multiple) -> number
+  -- Returns the average of all inputs
+def pow(int i, int x) -> int
+  -- Returns i to the power of x
+def sqr(number n) -> number
+  -- Square function
+def cube(number n) -> number
+  -- Cube function
+def sqrt(number n) -> number
+  -- Square root
+def log(number n) -> number
+  -- Natural log function
+
+-- Trig
+def sin(number degrees) -> number
+  -- Trigonometric sin() function
+def cos(number degrees) -> number
+  -- Trigonometric cos() function
+def tan(number degrees) -> number
+  -- Trigonometric tan() function
+def arcsin(number n) -> number
+  -- Trigonometric arcsin() function
+def arccos(number n) -> number
+  -- Trigonometric arccos() function
+def arctan(number n) -> number
+  -- Trigonometric arctan() function
+
+-- Secret functions used by interpreter
+def _get_local_state() -> any
+  -- Special call, read this frame's state.
+def _get_local_stack_path() -> any
+def _find_active_value(term) -> (any, bool)
+def _save_state_result(Term declaredStateTerm, any result)
+def _get_demand_value(Term t) -> (bool, any)
+def _store_demand_value(Term t, any val)
+def _extract_stack_path() -> List
+def dbg_get_incoming_state() -> any
+def dbg_get_outgoing_state() -> any
+def dbg_set_incoming_state(val)
+def dbg_set_outgoing_state(val)
+
+-- Type checking
+def is_compound(any) -> bool
+def is_list(any) -> bool
+def is_map(any) -> bool
+def is_int(any) -> bool
+def is_number(any) -> bool
+def is_bool(any) -> bool
+def is_string(any) -> bool
+def is_null(any) -> bool
+def is_function(any) -> bool
+def is_type(any) -> bool
+
+-- Overloaded math funcs
+def add(any left, any right) -> any
+  if is_int(left) and is_int(right)
+    add_i(left, right)
+  elif is_int(left) or is_number(left)
+    add_f(left, right)
+  else
+    left.add(right)
+
+def sub(any left, any right) -> any
+  if is_int(left) and is_int(right)
+    sub_i(left, right)
+  elif is_int(left) or is_number(left)
+    sub_f(left, right)
+  else
+    left.sub(right)
+
+def mult(any left, any right) -> any
+  if is_int(left) and is_int(right)
+    mult_i(left, right)
+  elif is_int(left) or is_number(left)
+    mult_f(left, right)
+  else
+    left.mult(right)
+
+def div(any left, any right) -> any
+  if is_int(left) or is_number(left)
+    div_f(left, right)
+  else
+    left.div(right)
+
+def less_than(any a, any b) -> bool
+  if is_int(a) and is_int(b)
+    less_than_i(a b)
+  else
+    less_than_f(a b)
+
+def less_than_eq(any a, any b) -> bool
+  if is_int(a) and is_int(b)
+    less_than_eq_i(a b)
+  else
+    less_than_eq_f(a b)
+
+def greater_than(any a, any b) -> bool
+  if is_int(a) and is_int(b)
+    greater_than_i(a b)
+  else
+    greater_than_f(a b)
+
+def greater_than_eq(any a, any b) -> bool
+  if is_int(a) and is_int(b)
+    greater_than_eq_i(a b)
+  else
+    greater_than_eq_f(a b)
+
+def max(any a, any b) -> any
+  if is_int(a) and is_int(b)
+    max_i(a b)
+  else
+    max_f(a b)
+
+def min(any a, any b) -> any
+  if is_int(a) and is_int(b)
+    min_i(a b)
+  else
+    min_f(a b)
+
+def remainder(any a, any b) -> any
+  if is_int(a) and is_int(b)
+    remainder_i(a b)
+  else
+    remainder_f(a b)
+
+def mod(any a, any b) -> any
+  if is_int(a) and is_int(b)
+    mod_i(a b)
+  else
+    mod_f(a b)
+
+def neg(any a) -> any
+  if is_int(a)
+    neg_i(a)
+  else
+    neg_f(a)
+
+def number.add(left, right) -> number
+  add(left, right)
+def number.sub(left, right) -> number
+  sub(left, right)
+def number.mult(left, right) -> number
+  mult(left, right)
+def number.div(left, right) -> number
+  div(left, right)
 
 def rand() -> number
 
-def closure_block() -> Func
-  -- Internally used function for declaring a closure.
+def block_unevaluated()
 
-def nonlocal(any _) -> any
-  -- Internally used function for non-local references.
+def copy(any val) -> any
+
+def cast1(any val) -> any
+def cast(any val, Type t) -> (any, bool)
+
+def cond(bool condition, any pos, any neg) -> any
+  -- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.
+
+def concat(any vals :multiple) -> String
+  -- Concatenate each input (converting to a string if necessary)
+
+def copy(any val) -> any
 
 def convert(any value, Type t) -> any
   -- Convert the value to the given type, if possible.
 
 def compute_patch(existing, new) -> any
   -- Compute a patch, which when applied to 'existing' will equal 'new'
+
+def div_f(number a,number b) -> number
+def div_i(number a,number b) -> int
 
 def apply_patch(existing, patch) -> any
   -- Apply a patch
@@ -40,13 +269,40 @@ def from_string(String s) -> any
 
 def error(any msg :multiple)
 
+-- Comparison
+def less_than_i(int a,int b) -> bool
+def less_than_f(number a,number b) -> bool
+def less_than_eq_i(int a,int b) -> bool
+def less_than_eq_f(number a,number b) -> bool
+def greater_than_i(int a,int b) -> bool
+def greater_than_f(number a,number b) -> bool
+def greater_than_eq_i(int a,int b) -> bool
+def greater_than_eq_f(number a,number b) -> bool
+
 def length(List list) -> int
   -- Return the number of items in the given list
+
+def make(Type t) -> any
+
+def range(int start, int max) -> List
+  -- Return a list of integers from start to max-1
+
+def rpath(String path) -> String
+
+def set_field(any obj, String key, any val) -> any
+def set_index(any list, int index, any val) -> List
+
+def static_error(any msg)
 
 def not_equals(any a,any b) -> bool
 
 def print(any items :multiple)
   -- Prints a line of text output to the console.
+
+def get(Map val, List path) -> any
+def set(Map val, List path, any newValue) -> any
+def delete(Map val, List path) -> Map
+
 def trace(any items :multiple)
 
 def to_string(any val) -> String
@@ -79,27 +335,60 @@ def native_patch(String filename)
 def memoize()
   -- Instruct the VM to memoize the current frame.
 
-def reflect_get_frame_state() -> any
-  -- Special call, read this frame's state.
+def write_text_file(String filename, String contents)
+  -- Write contents to the given filename, overwriting any existing file. (future questionable)
 
--- Type checking
-def is_compound(any) -> bool
-def is_list(any) -> bool
-def is_map(any) -> bool
-def is_int(any) -> bool
-def is_number(any) -> bool
-def is_bool(any) -> bool
-def is_string(any) -> bool
-def is_null(any) -> bool
-def is_function(any) -> bool
-def is_type(any) -> bool
+
+def inputs_fit_function(List inputs,Func func) -> bool
+def overload_error_no_match(List inputs)
+def unique_id() -> int
+
+
+-- Channels
+def channel_send(Symbol name, any val)
+def channel_read(Symbol name) -> List
+
+def global_script_version() -> int
+
+-- Func
+struct Func {
+  Block block
+  Map bindings
+}
+
+def Func.call(self, any inputs :multiple) -> any
+  -- Call the func using the given inputs.
+
+  -- This function is replaced by special bytecode, however in some situations
+  -- (like dynamic methods), we might find ourselves actually calling this
+  -- function. So we have another closure call here, and this one will definitely
+  -- be compiled with the correct bytecode.
+  self.apply(inputs)
+
+def Func.apply(self, List inputs) -> any
+  -- Like .call, but the inputs are given as one list instead of separate args.
+
+  -- See note in Func.call:
+  self.apply(inputs)
+
+def closure_block() -> Func
+  -- Internally used function for declaring a closure.
+
+-- Secret internally-used funcs
+
+def _nonlocal(term :ref) -> any
+  value, found = _find_active_value(term)
+  if found
+    value
+  else
+    _eval_term_on_demand(term)
 
 def _declared_state(Type t, Func initializer :optional) -> any
   -- Internally used function for fetching a stateful value. The parser
   -- adds a call to this function whereever the 'state' keyword is used.
 
-  existing = reflect_get_frame_state()
-  
+  existing = _get_local_state()
+
   if existing != null
     -- Try to cast to the desired type
     existing, cast_success = cast(existing, t)
@@ -114,10 +403,8 @@ def _declared_state(Type t, Func initializer :optional) -> any
   -- No initializer. Use the type's default value.
   return make(t)
 
-def _get_demand_value(Term t) -> (bool, any)
-def _store_demand_value(Term t, any val)
 def _dynamic_term_eval(Term t, List inputs) -> any
-def _extract_stack_path() -> List
+  t.function.to_func.apply(inputs)
 
 def _eval_term_on_demand(Term t) -> any
   -- Internal function, used when a nonlocal() term needs a value.
@@ -134,46 +421,6 @@ def _eval_term_on_demand(Term t) -> any
   result = _dynamic_term_eval(t inputs)
   _store_demand_value(t result)
   result
-
--- Primitive math funcs --
-def add(any left, any right) -> any
-  if is_int(left) and is_int(right)
-    add_i(left, right)
-  elif is_int(left) or is_number(left)
-    add_f(left, right)
-  else
-    left.add(right)
-
-def sub(any left, any right) -> any
-  if is_int(left) and is_int(right)
-    sub_i(left, right)
-  elif is_int(left) or is_number(left)
-    sub_f(left, right)
-  else
-    left.sub(right)
-
-def mult(any left, any right) -> any
-  if is_int(left) and is_int(right)
-    mult_i(left, right)
-  elif is_int(left) or is_number(left)
-    mult_f(left, right)
-  else
-    left.mult(right)
-
-def div(any left, any right) -> any
-  if is_int(left) or is_number(left)
-    div_f(left, right)
-  else
-    left.div(right)
-
-def number.add(left, right) -> number
-  add(left, right)
-def number.sub(left, right) -> number
-  sub(left, right)
-def number.mult(left, right) -> number
-  mult(left, right)
-def number.div(left, right) -> number
-  div(left, right)
 
 -- Misc builtin funcs --
 
@@ -202,11 +449,19 @@ def rand_i(int range) -> int
 def swap(a, b) -> (any, any)
   return b, a
 
+def increment(int i) -> int
+  i + 1
+
+def decrement(int i) -> int
+  i - 1
+
 -- Modules
 
 struct ModuleRef {
   Block block
 }
+
+def ModuleRef._get(self, name)
 
 def load_module(String moduleName) -> Block
   -- Look for a loaded module with the given name, and load it if necessary.
@@ -258,12 +513,6 @@ def sys_module_search_paths() -> List
 def sys_perf_stats_reset()
 def sys_perf_stats_dump() -> List
 
--- Channels
-def channel_send(Symbol name, any val)
-def channel_read(Symbol name) -> List
-
-def global_script_version() -> int
-
 -- Builtin types
 struct FileSignature { String filename, int time_modified }
 struct Callable;
@@ -275,9 +524,6 @@ struct Vec3 { number x, number y, number z }
 struct Rect { number x1, number y1, number x2, number y2 }
 struct Rect_i { int x1, int y1, int x2, int y2 }
 
--- Metaprogramming on Block
-def block_ref(any block :ignore_error) -> Block
-  -- Obtain a Block ref from an expression.
 def Block.dump(self)
   -- Dump this block's raw contents to stdout.
 def Block.find_term(self, String name) -> Term
@@ -364,7 +610,7 @@ def Block.call(self, any inputs :multiple) -> any
 def Block.get_iterator(self) -> Term
   -- For a for-loop, return the iterator term
   for term in self.terms
-    if term.function == block_ref(get_index)
+    if term.function == get_index.block
       return term
   return null
 
@@ -373,18 +619,17 @@ def Block.if_block_cases(self) -> List
 
 def Block.case_find_condition(self) -> Term
   for term in self.terms
-    if term.function == block_ref(case_condition_bool)
+    if term.function == case_condition_bool.block
       return term
   return null
 
 def Block.find_while_condition(self) -> Term
   for term in self.terms
-    if term.function == block_ref(loop_condition_bool)
+    if term.function == loop_condition_bool.block
       return term
   return null
 
 struct Frame { Stack stack, int index }
-struct RetainedFrame { Block block, any _state }
 struct ModuleFrame { Block block, List registers }
 
 def Frame.active_value(self, Term) -> any
@@ -432,6 +677,7 @@ def Stack.current_term(self) -> Term
 def Stack.dump(self)
   -- Dumps a string representation to stdout.
 def Stack.dump_with_bytecode(self)
+def Stack.dump_compiled(self)
 def Stack.eval_on_demand(self, Term term) -> any
 def Stack.find_active_value(self, Term term) -> any
 def Stack.rethrow(self)
@@ -458,7 +704,7 @@ def Stack.stack_push2(self, Func func)
 def Stack.stack_pop(self)
   -- Pop the topmost frame.
 def Stack.set_state_input(self, any)
-def Stack.get_state_output(self) -> any
+def Stack.get_state(self) -> any
 def Stack.migrate(self, Block from, Block to)
 def Stack.migrate_to(self, Func func)
   -- Use 'func' as the new root, and migrate data and state.
@@ -795,7 +1041,10 @@ def Type.name(self) -> String
 def Type.property(self, String name) -> any
 
 -- Term
-def term_ref(any term :ignore_error) -> Term
+def term_ref(term :ref) -> Term
+  if term.function == _nonlocal.block
+    term = term.input(0)
+  term
 def Term.assign(self, any val)
 def Term.asint(self) -> int
 def Term.asfloat(self) -> number
@@ -847,7 +1096,6 @@ def Term.input_property_opt(self, int index, Symbol key, any default) -> any
 def Term.has_input_property(self, int index, Symbol key) -> bool
 
 def Term.is_value(self) -> bool
-    self.function == block_ref(value)
 def Term.is_function(self) -> bool
     self.get_type == Func
 def Term.has_name(term) -> bool
@@ -859,9 +1107,9 @@ def Term.is_statement(term) -> bool
 def Term.is_type(self) -> bool
     self.is_value and is_type(self.value)
 def Term.is_input_placeholder(self) -> bool
-    self.function == block_ref(input_placeholder)
+    self.function == input_placeholder.block
 def Term.is_comment(self) -> bool
-    self.function == block_ref(comment)
+    self.function == comment.block
 def Term.trace_dependents(self, Block untilBlock) -> List
 def Term.output(self, int index) -> Term
   if index == 0

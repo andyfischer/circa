@@ -1,5 +1,5 @@
-Call 1 to s branch: {_if: [{_f: {inside_f: 1}, s: 1}]}
-Call 2 to s branch: {_if: [{_f: {inside_f: 2}, s: 2}]}
-Call 1 to t branch: {_if: [{_f: {inside_f: 3}, s: null}, {_f: {inside_f: 1}, t: 1}]}
-Call 2 to t branch: {_if: [{_f: {inside_f: 4}, s: null}, {_f: {inside_f: 2}, t: 2}]}
-Call 3 to s branch: {_if: [{_f: {inside_f: 5}, s: 1}]}
+Call 1 to s branch: {_if: {0: {_f: {inside_f: 1}, s: 1}}}
+Call 2 to s branch: {_if: {0: {_f: {inside_f: 2}, s: 2}}}
+Call 1 to t branch: {_if: {0: {_f: {inside_f: 3}}, 1: {_f: {inside_f: 1}, t: 1}}}
+Call 2 to t branch: {_if: {0: {_f: {inside_f: 4}}, 1: {_f: {inside_f: 2}, t: 2}}}
+Call 3 to s branch: {_if: {0: {_f: {inside_f: 5}, s: 1}}}

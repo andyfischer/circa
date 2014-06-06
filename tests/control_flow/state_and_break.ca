@@ -1,0 +1,12 @@
+
+def main()
+  a = 0
+  for i in [1 2 3]
+    a = i
+    if i == 2
+      state s = 1
+      break
+
+vm = make_vm(main)
+vm.run
+vm.extract_state | print

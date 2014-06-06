@@ -143,32 +143,32 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
             return;
         }
 
-        if (string_equals(args->element(argIndex), "-p")) {
+        if (string_equals(args->index(argIndex), "-p")) {
             printRaw = true;
             argIndex++;
             continue;
         }
 
-        if (string_equals(args->element(argIndex), "-pp")) {
+        if (string_equals(args->index(argIndex), "-pp")) {
             printRaw = true;
             rawOutputPrefs.showProperties = true;
             argIndex++;
             continue;
         }
         
-        if (string_equals(args->element(argIndex), "-b") || string_equals(args->element(argIndex), "-pb")) {
+        if (string_equals(args->index(argIndex), "-b") || string_equals(args->index(argIndex), "-pb")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             argIndex++;
             continue;
         }
 
-        if (string_equals(args->element(argIndex), "-print-state")) {
+        if (string_equals(args->index(argIndex), "-print-state")) {
             printState = true;
             argIndex++;
             continue;
         }
-        if (string_equals(args->element(argIndex), "-n")) {
+        if (string_equals(args->index(argIndex), "-n")) {
             dontRunScript = true;
             argIndex++;
             continue;
@@ -177,7 +177,7 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
     }
 
     Block block;
-    load_script(&block, as_cstring(args->element(argIndex)));
+    load_script(&block, as_cstring(args->index(argIndex)));
 
     if (dontRunScript)
         return;
@@ -309,7 +309,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         parse_string_as_argument_list(input, &args);
 
         Block block;
-        load_script(&block, as_cstring(args.element(1)));
+        load_script(&block, as_cstring(args.index(1)));
 
         Value sourceReproStr;
         set_string(&sourceReproStr, "source_repro");
@@ -331,7 +331,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         Value args;
         parse_string_as_argument_list(input, &args);
         Block block;
-        load_script(&block, as_cstring(args.element(1)));
+        load_script(&block, as_cstring(args.index(1)));
         std::cout << get_block_source_text(&block);
 #endif
     } else if (equals_string(&command, "dump_stats")) {

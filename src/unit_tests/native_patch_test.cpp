@@ -9,6 +9,7 @@
 #include "world.h"
 
 namespace native_patch_test {
+#if 0
 
 void my_add(caStack* stack)
 {
@@ -45,7 +46,7 @@ void patch_manually()
     // Create a patch for my_add
     NativePatch* patch = insert_native_patch(world, "patch_manually");
     module_patch_function(patch, "my_add", my_add);
-    native_patch_apply_patch(patch, &block);
+    //native_patch_apply_patch(patch, &block);
 
     stack_init(&stack, &block);
     test_spy_clear();
@@ -132,13 +133,16 @@ void patch_manually_public_api()
 
     circa_free_stack(stack);
 }
+#endif
 
 void register_tests()
 {
+#if 0
     REGISTER_TEST_CASE(native_patch_test::patch_manually);
     REGISTER_TEST_CASE(native_patch_test::trigger_change);
     REGISTER_TEST_CASE(native_patch_test::new_function_patched_by_world);
     REGISTER_TEST_CASE(native_patch_test::patch_manually_public_api);
+#endif
 }
 
 } // namespace native_patch_test

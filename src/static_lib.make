@@ -26,7 +26,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -gdwarf-2
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib
   LIBS      += 
@@ -66,6 +66,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/block.o \
 	$(OBJDIR)/building.o \
+	$(OBJDIR)/builtin_types.o \
 	$(OBJDIR)/bytecode.o \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/change_events.o \
@@ -96,7 +97,6 @@ OBJECTS := \
 	$(OBJDIR)/native_patch.o \
 	$(OBJDIR)/native_ptr.o \
 	$(OBJDIR)/parser.o \
-	$(OBJDIR)/program.o \
 	$(OBJDIR)/rand.o \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/repl.o \
@@ -116,11 +116,7 @@ OBJECTS := \
 	$(OBJDIR)/type_inference.o \
 	$(OBJDIR)/update_cascades.o \
 	$(OBJDIR)/world.o \
-	$(OBJDIR)/libuv.o \
 	$(OBJDIR)/read_tar.o \
-	$(OBJDIR)/all_builtin_functions.o \
-	$(OBJDIR)/all_builtin_types.o \
-	$(OBJDIR)/setup_builtin_functions.o \
 	$(OBJDIR)/stdlib_script_text.o \
 	$(OBJDIR)/tinymt64.o \
 	$(OBJDIR)/http_parser.o \
@@ -188,6 +184,9 @@ $(OBJDIR)/block.o: block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/building.o: building.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/builtin_types.o: builtin_types.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/bytecode.o: bytecode.cpp
@@ -280,9 +279,6 @@ $(OBJDIR)/native_ptr.o: native_ptr.cpp
 $(OBJDIR)/parser.o: parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/program.o: program.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/rand.o: rand.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -340,19 +336,7 @@ $(OBJDIR)/update_cascades.o: update_cascades.cpp
 $(OBJDIR)/world.o: world.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/libuv.o: ext/libuv.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/read_tar.o: ext/read_tar.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/all_builtin_functions.o: generated/all_builtin_functions.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/all_builtin_types.o: generated/all_builtin_types.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/setup_builtin_functions.o: generated/setup_builtin_functions.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp

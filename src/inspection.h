@@ -54,6 +54,7 @@ bool is_for_loop(Block* block);
 bool is_while_loop(Block* block);
 
 bool has_variable_args(Block* block);
+int find_index_of_vararg(Block* block);
 
 // Input & output placeholders
 Term* get_input_placeholder(Block* block, int index);
@@ -68,6 +69,7 @@ int count_output_placeholders(Block* block);
 int input_placeholder_index(Term* inputPlaceholder);
 bool is_input_placeholder(Term* term);
 bool is_output_placeholder(Term* term);
+Term* find_input_with_name(Block* block, Value* name);
 
 // Other properties on inputs.
 bool is_input_meta(Block* block, int index);

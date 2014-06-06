@@ -7,6 +7,7 @@
 
 #include "block.h"
 #include "building.h"
+#include "builtin_types.h"
 #include "closures.h"
 #include "control_flow.h"
 #include "code_iterators.h"
@@ -36,27 +37,17 @@
 #include "type.h"
 #include "world.h"
 
-#include "types/any.h"
-#include "types/bool.h"
-#include "types/color.h"
-#include "types/common.h"
-#include "types/int.h"
-#include "types/number.h"
-#include "types/set.h"
-#include "types/void.h"
-
 namespace circa {
 
 World* g_world = NULL;
-
-// setup_functions is defined in generated/setup_builtin_functions.cpp
-void setup_builtin_functions(Block*);
 
 BuiltinFuncs FUNCS;
 BuiltinTypes TYPES;
 
 caValue* g_oracleValues;
 caValue* g_spyValues;
+
+Term* find_builtin_func(Block* builtins, const char* name);
 
 Type* output_placeholder_specializeType(Term* caller)
 {
@@ -74,7 +65,7 @@ Type* output_placeholder_specializeType(Term* caller)
     return declared_type(caller->input(0));
 }
 
-void syntax_error(caStack* stack)
+void syntax_error(Stack* stack)
 {
     Value msg;
     set_string(&msg, "");
@@ -167,6 +158,102 @@ Type* specializeType_div(Term* term)
     return TYPES.any;
 }
 
+Type* cond_specializeType(Term* caller)
+{
+    Value choices;
+    Type* leftType = caller->input(1) != NULL ? caller->input(1)->type : NULL;
+    Type* rightType = caller->input(2) != NULL ? caller->input(2)->type : NULL;
+    set_type_list(&choices, leftType, rightType);
+    return find_common_type(&choices);
+}
+
+Type* cast_specializeType(Term* caller)
+{
+    Term* input = caller->input(0);
+    if (input == NULL)
+        return TYPES.any;
+
+    if (is_value(input) && is_type(input))
+        return as_type(input);
+
+    return TYPES.any;
+}
+
+Type* copy_specializeType(Term* caller)
+{
+    return get_type_of_input(caller, 0);
+}
+
+Type* get_field_specializeType(Term* caller)
+{
+    Type* head = caller->input(0)->type;
+
+    for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
+
+        // Abort if input type is not correct
+        if (!is_string(term_value(caller->input(1))))
+            return TYPES.any;
+
+        if (!is_list_based_type(head))
+            return TYPES.any;
+
+        std::string const& name = as_string(term_value(caller->input(1)));
+
+        int fieldIndex = list_find_field_index_by_name(head, name.c_str());
+
+        if (fieldIndex == -1)
+            return TYPES.any;
+
+        head = as_type(get_index(list_get_type_list_from_type(head),fieldIndex));
+    }
+
+    return head;
+}
+
+Type* get_index_specializeType(Term* term)
+{
+    return infer_type_of_get_index(term->input(0));
+}
+
+Type* make_specializeType(Term* caller)
+{
+    Term* input = caller->input(0);
+    if (input == NULL)
+        return TYPES.any;
+
+    if (is_value(input) && is_type(input))
+        return as_type(input);
+
+    return TYPES.any;
+}
+
+Type* range_specializeType(Term* term)
+{
+    Type* type = create_typed_unsized_list_type(TYPES.int_type);
+    type_start_at_zero_refs(type);
+    return type;
+}
+
+Type* set_field_specializeType(Term* caller)
+{
+    return caller->input(0)->type;
+}
+
+Type* set_index_specializeType(Term* caller)
+{
+    // TODO: Fix type inference on set_index.
+    return TYPES.list;
+    //return caller->input(0)->type;
+}
+
+Type* extra_output_specializeType(Term* term)
+{
+    ca_assert(term->input(0)->owningBlock == term->owningBlock);
+    int myOutputIndex = term->index - term->input(0)->index;
+    return get_output_type(term->input(0), myOutputIndex);
+}
+
+
 Type* List__append_specializeType(Term* term)
 {
     Term* listInput = term->input(0);
@@ -204,6 +291,65 @@ Type* Type_cast_specializeType(Term* caller)
     return NULL;
 }
 
+Type* type_make_specializeType(Term* caller)
+{
+    Term* input = caller->input(0);
+    if (input == NULL)
+        return TYPES.any;
+
+    if (is_value(input) && is_type(input))
+        return as_type(input);
+
+    return TYPES.any;
+}
+
+void input_explicit_postCompile(Term* term)
+{
+    Block* block = term->owningBlock;
+
+    Term* in = append_input_placeholder(block);
+    set_input(term, 1, in);
+    set_bool(term_insert_input_property(term, 1, sym_Hidden), true);
+
+    Term* input = term->input(0);
+
+    if (input != NULL && is_type(term_value(input))) {
+        Type* type = as_type(term_value(term->input(0)));
+        set_declared_type(in, type);
+        set_declared_type(term, type);
+    }
+}
+
+void output_explicit_postCompile(Term* term)
+{
+    Term* out = insert_output_placeholder(term->owningBlock, term->input(0), 0);
+    hide_from_source(out);
+}
+
+void require_postCompile(Term* term)
+{
+    caValue* moduleName = term_value(term->input(0));
+    Block* module = load_module_by_name(global_world(), term->owningBlock, moduleName);
+    if (module != NULL)
+        module_on_loaded_by_term(module, term);
+
+    // Save a ModuleRef value.
+    caValue* moduleRef = term_value(term);
+    make(TYPES.module_ref, moduleRef);
+    set_block(list_get(moduleRef, 0), module);
+}
+
+void index_postCompile(Term* term)
+{
+    Term* enclosingLoop = find_enclosing_for_loop(term);
+    if (enclosingLoop == NULL)
+        return;
+    Term* loop_index = for_loop_find_index(nested_contents(enclosingLoop));
+    if (loop_index == NULL)
+        return;
+    set_input(term, 0, loop_index);
+    set_input_hidden(term, 0, true);
+}
 
 World* global_world()
 {
@@ -355,21 +501,21 @@ void bootstrap_kernel()
 
     for_each_root_type(type_set_root);
 
-    any_t::setup_type(TYPES.any);
+    any_setup_type(TYPES.any);
     block_setup_type(TYPES.block);
-    bool_t::setup_type(TYPES.bool_type);
+    bool_setup_type(TYPES.bool_type);
     hashtable_setup_type(TYPES.map);
-    int_t::setup_type(TYPES.int_type);
+    int_setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
     symbol_setup_type(TYPES.symbol);
     native_ptr_setup_type(TYPES.native_ptr);
-    null_t::setup_type(TYPES.null);
-    number_t::setup_type(TYPES.float_type);
-    opaque_pointer_t::setup_type(TYPES.opaque_pointer);
+    null_setup_type(TYPES.null);
+    number_setup_type(TYPES.float_type);
+    opaque_pointer_setup_type(TYPES.opaque_pointer);
     term_setup_type(TYPES.term);
     string_setup_type(TYPES.error); // errors are just stored as strings for now
     type_t::setup_type(TYPES.type);
-    void_t::setup_type(TYPES.void_type);
+    void_setup_type(TYPES.void_type);
 
     // Create root Block.
     g_world->root = new Block();
@@ -439,7 +585,6 @@ void bootstrap_kernel()
 
     // Setup output_placeholder() function, needed to declare functions properly.
     FUNCS.output = apply(builtins, FUNCS.function_decl, TermList(), "output_placeholder");
-    function_contents(FUNCS.output)->overrides.evaluate = NULL;
     function_contents(FUNCS.output)->overrides.specializeType = output_placeholder_specializeType;
     ca_assert(get_output_type(function_contents(FUNCS.output), 0) == TYPES.any);
 
@@ -453,126 +598,56 @@ void bootstrap_kernel()
     ca_assert(get_output_type(function_contents(valueFunc), 0) == TYPES.any);
 
     // input_placeholder() is needed before we can declare a function with inputs
-    FUNCS.input = import_function(builtins, NULL, "input_placeholder() -> any");
+    FUNCS.input = apply(builtins, FUNCS.function_decl, TermList(), "input_placeholder");
     block_set_evaluation_empty(function_contents(FUNCS.input), true);
 
-    // Now that we have input_placeholder() let's declare one input on output_placeholder()
+    // Now that we have input_placeholder(), declare one input on output_placeholder()
     apply(function_contents(FUNCS.output),
         FUNCS.input, TermList())->setBoolProp(sym_Optional, true);
-
-    // Setup declare_field() function, needed to represent compound types.
-    FUNCS.declare_field = import_function(builtins, NULL, "declare_field() -> any");
 
     // Initialize a few more types
     TYPES.selector = unbox_type(create_value(builtins, TYPES.type, "Selector"));
     list_t::setup_type(TYPES.selector);
 
-    control_flow_setup_funcs(builtins);
-    selector_setup_funcs(builtins);
-    loop_setup_functions(builtins);
+    // Need the comment() function before parsing stdlib.ca
+    FUNCS.comment = apply(builtins, FUNCS.function_decl, TermList(), "comment");
 
-    FUNCS.syntax_error = import_function(builtins, syntax_error, "syntax_error(i :multiple)");
-
-    // Setup all the builtin functions defined in src/functions
-    setup_builtin_functions(builtins);
-
-    FUNCS.section_block = import_function(builtins, NULL, "def section() -> any");
-
-    FUNCS.case_condition_bool = import_function(builtins, NULL, "def case_condition_bool(bool condition)");
-    FUNCS.loop_condition_bool = import_function(builtins, NULL, "def loop_condition_bool(bool condition)");
-    FUNCS.minor_return_if_empty = import_function(builtins, NULL, "def minor_return_if_empty()");
-    FUNCS.looped_input = import_function(builtins, NULL, "def looped_input(first, next) -> any");
-    block_set_evaluation_empty(function_contents(FUNCS.looped_input), true);
-
-    // dynamic_method() is needed before stdlib.ca.
-    FUNCS.dynamic_method = import_function(builtins, NULL,
-            "def dynamic_method(any inputs :multiple) -> any");
-
-    FUNCS.func_call_implicit = import_function(builtins, NULL,
-            "def func_call_implicit(any inputs :multiple) -> any");
-
-    // Now we can build derived functions
-    FUNCS.less_than = create_overloaded_function(builtins, "less_than(any a,any b) -> bool");
-    append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_i"));
-    append_to_overloaded_function(FUNCS.less_than, builtins->get("less_than_f"));
-    finish_building_overloaded_function(FUNCS.less_than);
-
-    FUNCS.less_than_eq = create_overloaded_function(builtins, "less_than_eq(any a,any b) -> bool");
-    append_to_overloaded_function(FUNCS.less_than_eq, builtins->get("less_than_eq_i"));
-    append_to_overloaded_function(FUNCS.less_than_eq, builtins->get("less_than_eq_f"));
-    finish_building_overloaded_function(FUNCS.less_than_eq);
-
-    FUNCS.greater_than = create_overloaded_function(builtins, "greater_than(any a,any b) -> bool");
-    append_to_overloaded_function(FUNCS.greater_than, builtins->get("greater_than_i"));
-    append_to_overloaded_function(FUNCS.greater_than, builtins->get("greater_than_f"));
-    finish_building_overloaded_function(FUNCS.greater_than);
-
-    FUNCS.greater_than_eq = create_overloaded_function(builtins, "greater_than_eq(any a,any b) -> bool");
-    append_to_overloaded_function(FUNCS.greater_than_eq, builtins->get("greater_than_eq_i"));
-    append_to_overloaded_function(FUNCS.greater_than_eq, builtins->get("greater_than_eq_f"));
-    finish_building_overloaded_function(FUNCS.greater_than_eq);
-
-    Term* max_func = create_overloaded_function(builtins, "max(any a,any b) -> any");
-    append_to_overloaded_function(max_func, builtins->get("max_i"));
-    append_to_overloaded_function(max_func, builtins->get("max_f"));
-    finish_building_overloaded_function(max_func);
-
-    Term* min_func = create_overloaded_function(builtins, "min(any a,any b) -> any");
-    append_to_overloaded_function(min_func, builtins->get("min_i"));
-    append_to_overloaded_function(min_func, builtins->get("min_f"));
-    finish_building_overloaded_function(min_func);
-
-    FUNCS.remainder = create_overloaded_function(builtins, "remainder(any a,any b) -> any");
-    append_to_overloaded_function(FUNCS.remainder, builtins->get("remainder_i"));
-    append_to_overloaded_function(FUNCS.remainder, builtins->get("remainder_f"));
-    finish_building_overloaded_function(FUNCS.remainder);
-
-    Term* mod_func = create_overloaded_function(builtins, "mod(any a,any b) -> any");
-    append_to_overloaded_function(mod_func, builtins->get("mod_i"));
-    append_to_overloaded_function(mod_func, builtins->get("mod_f"));
-    finish_building_overloaded_function(mod_func);
-
-    FUNCS.neg = create_overloaded_function(builtins, "neg(any n) -> any");
-    append_to_overloaded_function(FUNCS.neg, builtins->get("neg_i"));
-    append_to_overloaded_function(FUNCS.neg, builtins->get("neg_f"));
-    finish_building_overloaded_function(FUNCS.neg);
-
-    // Install native functions.
-    module_patch_function(world->builtinPatch, "from_string", from_string);
-    module_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
-    module_patch_function(world->builtinPatch, "test_spy", test_spy);
-    module_patch_function(world->builtinPatch, "test_oracle", test_oracle);
-    module_patch_function(world->builtinPatch, "reflect_this_block", reflect__this_block);
-    module_patch_function(world->builtinPatch, "reflect_kernel", reflect__kernel);
-    module_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
-    module_patch_function(world->builtinPatch, "sys_perf_stats_reset", sys__perf_stats_reset);
-    module_patch_function(world->builtinPatch, "sys_perf_stats_dump", sys__perf_stats_dump);
-    module_patch_function(world->builtinPatch, "global_script_version", global_script_version);
-
-    // Load the standard library from stdlib.ca
+    // Parse stdlib.ca
     parser::compile(builtins, parser::statement_list, find_builtin_module("stdlib"));
     set_string(block_insert_property(builtins, sym_ModuleName), "stdlib");
 
-    closures_install_functions(builtins);
-    modules_install_functions(builtins);
+    // Install native functions.
+    circa_patch_function(world->builtinPatch, "from_string", from_string);
+    circa_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
+    circa_patch_function(world->builtinPatch, "test_spy", test_spy);
+    circa_patch_function(world->builtinPatch, "test_oracle", test_oracle);
+    circa_patch_function(world->builtinPatch, "reflect_this_block", reflect__this_block);
+    circa_patch_function(world->builtinPatch, "reflect_kernel", reflect__kernel);
+    circa_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
+    circa_patch_function(world->builtinPatch, "sys_perf_stats_reset", sys__perf_stats_reset);
+    circa_patch_function(world->builtinPatch, "sys_perf_stats_dump", sys__perf_stats_dump);
+    circa_patch_function(world->builtinPatch, "syntax_error", syntax_error);
+    circa_patch_function(world->builtinPatch, "global_script_version", global_script_version);
+
+    selector_setup_funcs(world->builtinPatch);
+    closures_install_functions(world->builtinPatch);
+    modules_install_functions(world->builtinPatch);
     reflection_install_functions(world->builtinPatch);
     interpreter_install_functions(world->builtinPatch);
     misc_builtins_setup_functions(world->builtinPatch);
     stack_install_functions(world->builtinPatch);
-    type_install_functions(builtins);
-
-    native_patch_apply_patch(world->builtinPatch, builtins);
+    type_install_functions(world->builtinPatch);
 
     // Fix 'builtins' module now that the module() function is created.
     change_function(builtinsTerm, FUNCS.module);
     block_set_bool_prop(builtins, sym_Builtins, true);
 
-    // Fetch refereneces to certain stdlib funcs.
     ca_assert(FUNCS.declared_state != NULL);
 
     FUNCS.has_effects = builtins->get("has_effects");
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
+    // TODO: can delete these lines?
     function_contents(FUNCS.add)->overrides.specializeType = specializeType_add_sub_mult;
     function_contents(FUNCS.sub)->overrides.specializeType = specializeType_add_sub_mult;
     function_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
@@ -583,6 +658,8 @@ void bootstrap_kernel()
     FUNCS.list_append = builtins->get("List.append");
     FUNCS.native_patch = builtins->get("native_patch");
     FUNCS.output_explicit = builtins->get("output");
+    FUNCS.package = builtins->get("package");
+    FUNCS.module = builtins->get("module");
 
     function_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
 
@@ -597,7 +674,6 @@ void bootstrap_kernel()
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
     TYPES.module_frame = as_type(builtins->get("ModuleFrame"));
-    TYPES.retained_frame = as_type(builtins->get("RetainedFrame"));
     TYPES.vec2 = as_type(builtins->get("Vec2"));
 
     // Fix function_decl now that Func type is available.
@@ -608,33 +684,164 @@ void bootstrap_kernel()
         finish_building_function(function_contents(FUNCS.function_decl));
     }
 
+    // Also, now that Func type is available, make sure all builtin functions have closure values.
+    for (BlockIterator it(builtins); it; ++it)
+        if (is_function(*it)) {
+            set_declared_type(*it, TYPES.func);
+            set_closure_for_declared_function(*it);
+        }
+
     stack_setup_type(TYPES.stack);
 
     function_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
+
+    #define set_evaluation_empty(name) block_set_evaluation_empty(function_contents(FUNCS.name), true)
+        set_evaluation_empty(return_func);
+        set_evaluation_empty(discard);
+        set_evaluation_empty(break_func);
+        set_evaluation_empty(continue_func);
+        set_evaluation_empty(block_unevaluated);
+        set_evaluation_empty(comment);
+        set_evaluation_empty(extra_output);
+        set_evaluation_empty(loop_index);
+        set_evaluation_empty(loop_output_index);
+        set_evaluation_empty(static_error);
+    #undef set_evaluation_empty
+}
+
+Term* find_builtin_func(Block* builtins, const char* name)
+{
+    Term* term = builtins->get(name);
+    if (term == NULL) {
+        printf("Builtin func not found: %s\n", name);
+        internal_error("");
+    }
+    return term;
 }
 
 void on_new_function_parsed(Term* func, caValue* functionName)
 {
-    // Catch certain builtin functions as soon as they are defined.
-    #define STORE_BUILTIN_FUNC(ref, name) \
-        if (ref == NULL && string_equals(functionName, name)) \
-            ref = func;
+    #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
+        find_func(add_i, "add_i"); find_func(add_f, "add_f");
+        find_func(and_func, "and");
+        find_func(block_unevaluated, "block_unevaluated");
+        find_func(break_func, "break");
+        find_func(case_func, "case");
+        find_func(case_condition_bool, "case_condition_bool");
+        find_func(cast, "cast");
+        find_func(cond, "cond");
+        find_func(continue_func, "continue");
+        find_func(copy, "copy");
+        find_func(declare_field, "declare_field");
+        find_func(discard, "discard");
+        find_func(div_f, "div_f"); find_func(div_i, "div_i");
+        find_func(dynamic_method, "dynamic_method");
+        find_func(error, "error");
+        find_func(equals, "equals");
+        find_func(extra_output, "extra_output");
+        find_func(for_func, "for");
+        find_func(func_call_implicit, "func_call_implicit");
+        find_func(function_decl, "function_decl");
+        find_func(get_field, "get_field");
+        find_func(get_index, "get_index");
+        find_func(get_with_selector, "get_with_selector");
+        find_func(greater_than, "greater_than");
+        find_func(greater_than_eq, "greater_than_eq");
+        find_func(has_effects, "has_effects");
+        find_func(if_block, "if");
+        find_func(input_explicit, "input");
+        find_func(inputs_fit_function, "inputs_fit_function");
+        find_func(length, "length");
+        find_func(less_than, "less_than");
+        find_func(less_than_eq, "less_than_eq");
+        find_func(list, "list");
+        find_func(loop_condition_bool, "loop_condition_bool");
+        find_func(loop_index, "loop_index");
+        find_func(loop_iterator, "loop_iterator");
+        find_func(loop_output_index, "loop_output_index");
+        find_func(make, "make");
+        find_func(memoize, "memoize");
+        find_func(minor_return_if_empty, "minor_return_if_empty");
+        find_func(module, "module");
+        find_func(native_patch, "native_patch");
+        find_func(neg, "neg");
+        find_func(not_equals, "not_equals");
+        find_func(not_func, "not");
+        find_func(or_func, "or");
+        find_func(output_explicit, "output");
+        find_func(overload_error_no_match, "overload_error_no_match");
+        find_func(range, "range");
+        find_func(return_func, "return");
+        find_func(remainder, "remainder");
+        find_func(section_block, "section");
+        find_func(selector, "selector");
+        find_func(set_index, "set_index");
+        find_func(set_field, "set_field");
+        find_func(set_with_selector, "set_with_selector");
+        find_func(static_error, "static_error");
+        find_func(sub_i, "sub_i"); find_func(sub_f, "sub_f");
+        find_func(switch_func, "switch");
+        find_func(syntax_error, "syntax_error");
+        find_func(type, "type");
+        find_func(unknown_function, "unknown_function");
+        find_func(unknown_identifier, "unknown_identifier");
+        find_func(while_loop, "while");
+        find_func(add, "add");
+        find_func(div, "div");
+        find_func(mult, "mult");
+        find_func(sub, "sub");
+        find_func(closure_block, "closure_block");
+        find_func(declared_state, "_declared_state");
+        find_func(dynamic_method, "dynamic_method");
+        find_func(dynamic_term_eval, "_dynamic_term_eval");
+        find_func(equals, "equals");
+        find_func(error, "error");
+        find_func(eval_on_demand, "_eval_term_on_demand");
+        find_func(func_call, "Func.call");
+        find_func(func_apply, "Func.apply");
+        find_func(get_with_selector, "get_with_selector");
+        find_func(map_get, "Map.get");
+        find_func(moduleRef_get, "ModuleRef._get");
+        find_func(not_equals, "not_equals");
+        find_func(nonlocal, "_nonlocal");
+        find_func(require, "require");
+        find_func(selector, "selector");
+        find_func(set_with_selector, "set_with_selector");
+        find_func(save_state_result, "_save_state_result");
+        find_func(type_make, "Type.make");
+    #undef find_func
 
-    STORE_BUILTIN_FUNC(FUNCS.add, "add");
-    STORE_BUILTIN_FUNC(FUNCS.closure_block, "closure_block");
-    STORE_BUILTIN_FUNC(FUNCS.declared_state, "_declared_state");
-    STORE_BUILTIN_FUNC(FUNCS.dynamic_term_eval, "_dynamic_term_eval");
-    STORE_BUILTIN_FUNC(FUNCS.equals, "equals");
-    STORE_BUILTIN_FUNC(FUNCS.error, "error");
-    STORE_BUILTIN_FUNC(FUNCS.eval_on_demand, "_eval_term_on_demand");
-    STORE_BUILTIN_FUNC(FUNCS.func_call, "Func.call");
-    STORE_BUILTIN_FUNC(FUNCS.div, "div");
-    STORE_BUILTIN_FUNC(FUNCS.sub, "sub");
-    STORE_BUILTIN_FUNC(FUNCS.mult, "mult");
-    STORE_BUILTIN_FUNC(FUNCS.not_func, "not");
-    STORE_BUILTIN_FUNC(FUNCS.not_equals, "not_equals");
-    STORE_BUILTIN_FUNC(FUNCS.nonlocal, "nonlocal");
-    STORE_BUILTIN_FUNC(FUNCS.type, "type");
+    #define has_custom_type_infer(name) \
+        if (FUNCS.name != NULL) \
+            block_set_specialize_type_func(function_contents(FUNCS.name), name##_specializeType)
+
+        has_custom_type_infer(cast);
+        has_custom_type_infer(cond);
+        has_custom_type_infer(copy);
+        has_custom_type_infer(extra_output);
+        has_custom_type_infer(get_field);
+        has_custom_type_infer(get_index);
+        has_custom_type_infer(make);
+        has_custom_type_infer(range);
+        has_custom_type_infer(set_field);
+        has_custom_type_infer(set_index);
+        has_custom_type_infer(type_make);
+
+    #undef has_custom_type_infer
+
+    #define has_post_compile(sourceName, f) if (string_equals(functionName, sourceName)) \
+        block_set_post_compile_func(function_contents(func), f);
+
+        has_post_compile("return", controlFlow_postCompile);
+        has_post_compile("discard", controlFlow_postCompile);
+        has_post_compile("break", controlFlow_postCompile);
+        has_post_compile("continue", controlFlow_postCompile);
+        has_post_compile("input", input_explicit_postCompile);
+        has_post_compile("output", output_explicit_postCompile);
+        has_post_compile("index", index_postCompile);
+        has_post_compile("require", require_postCompile);
+
+    #undef has_post_compile
 }
 
 CIRCA_EXPORT caWorld* circa_initialize()

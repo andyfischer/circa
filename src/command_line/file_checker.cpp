@@ -32,7 +32,7 @@ void run_file_checker(const char* filename, Value* errors)
         set_list(&staticErrors, 0);
         check_for_static_errors(&staticErrors, &block);
         for (int i=0; i < staticErrors.length(); i++)
-            format_static_error(staticErrors.element(i), errors->append());
+            format_static_error(staticErrors.index(i), errors->append());
     }
 
     // Fetch the file as a string
@@ -69,7 +69,7 @@ int run_file_checker(const char* filename)
     std::cout << filename << " had " << errors.length() << " error(s):\n";
 
     for (int i=0; i < errors.length(); i++)
-        std::cout << as_cstring(errors.element(i)) << std::endl;
+        std::cout << as_cstring(errors.index(i)) << std::endl;
 
     return -1;
 }

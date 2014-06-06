@@ -357,6 +357,13 @@ Term* block_get_function_term(Block* block)
     return block->owningTerm->function;
 }
 
+Value* block_name(Block* block)
+{
+    if (block->owningTerm == NULL)
+        return NULL;
+    return term_name(block->owningTerm);
+}
+
 Block* function_contents(Term* func)
 {
     return nested_contents(func);
@@ -468,7 +475,7 @@ void clear_block(Block* block)
 
     // Iterate through the block and tear down any term references, so that we
     // don't have to worry about stale pointers later.
-    for (BlockIterator it(block); it.unfinished(); ++it) {
+    for (BlockIterator it(block); it; ++it) {
         if (*it == NULL)
             continue;
 
@@ -523,11 +530,6 @@ void remove_nulls(Block* block)
 
     if (numDeleted > 0)
         block->_terms.resize(block->_terms.length() - numDeleted);
-}
-
-EvaluateFunc get_override_for_block(Block* block)
-{
-    return block->overrides.evaluate;
 }
 
 Term* find_term_by_id(Block* block, int id)
@@ -747,11 +749,6 @@ Type* get_output_type(Block* block, int index)
     return placeholder->type;
 }
 
-void block_set_evaluate_func(Block* block, EvaluateFunc eval)
-{
-    block->overrides.evaluate = eval;
-}
-
 void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc)
 {
     block->overrides.specializeType = specializeFunc;
@@ -833,7 +830,7 @@ bool block_check_invariants_print_result(Block* block, caValue* out)
 
 void block_link_missing_functions(Block* block, Block* source)
 {
-    for (BlockIterator it(block); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it; ++it) {
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             std::string funcName = term->stringProp(sym_Syntax_FunctionName, "");

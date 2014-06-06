@@ -42,11 +42,19 @@ World* alloc_world()
     world->builtinPatch = NULL;
     world->globalScriptVersion = 1;
 
+    world->nativePatch = NULL;
+    world->nativePatchCount = 0;
+    world->funcTable = NULL;
+    world->funcTableCount = 0;
+
     return world;
 }
 
 void dealloc_world(World* world)
 {
+    // TODO: free NativePatch contents
+    free(world->nativePatch);
+    free(world->funcTable);
     free(world);
 }
 
@@ -58,21 +66,17 @@ void world_initialize(World* world)
     set_list(&world->moduleSearchPaths);
     set_list(&world->fileSources);
 
-    world->nativePatchWorld = alloc_native_patch_world();
     world->fileWatchWorld = alloc_file_watch_world();
+    world->builtinPatch = insert_native_patch(world, "builtins");
 
     #if CIRCA_ENABLE_LIBUV
         world->libuvWorld = alloc_libuv_world();
     #endif
-
-    world->builtinPatch = alloc_native_patch(world);
 }
 
 void world_uninitialize(World* world)
 {
     set_null(&world->moduleSearchPaths);
-    free_native_patch(world->builtinPatch);
-    free_native_patch_world(world->nativePatchWorld);
     free_file_watch_world(world->fileWatchWorld);
 }
 

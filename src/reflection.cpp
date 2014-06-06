@@ -26,27 +26,6 @@
 
 namespace circa {
 
-void block_ref(caStack* stack)
-{
-    Term* term = (Term*) circa_caller_input_term(stack, 0);
-
-    if (term->function == FUNCS.nonlocal)
-        term = term->input(0);
-
-    Block* block = term->nestedContents;
-    set_block(circa_output(stack, 0), block);
-}
-
-void term_ref(caStack* stack)
-{
-    caTerm* term = circa_caller_input_term(stack, 0);
-
-    if (term->function == FUNCS.nonlocal)
-        term = term->input(0);
-
-    set_term_ref(circa_output(stack, 0), (Term*) term);
-}
-
 void Block__dump(caStack* stack)
 {
     dump(as_block(circa_input(stack, 0)));
@@ -235,7 +214,7 @@ void Block__walk_terms(caStack* stack)
 
     caValue* out = circa_output(stack, 0);
     set_list(out, 0);
-    for (BlockIterator it(block); it.unfinished(); it.advance())
+    for (BlockIterator it(block); it; ++it)
         set_term_ref(list_append(out), *it);
 }
 
@@ -529,6 +508,11 @@ void Term__is_null(caStack* stack)
     Term* t = as_term_ref(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), t == NULL);
 }
+void Term__is_value(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), is_value(t));
+}
 
 void Term__source_location(caStack* stack)
 {
@@ -709,67 +693,66 @@ void overload__get_contents(caStack* stack)
 
 void reflection_install_functions(NativePatch* patch)
 {
-    module_patch_function(patch, "term_ref", term_ref);
-    module_patch_function(patch, "block_ref", block_ref);
-    module_patch_function(patch, "Block.dump", Block__dump);
-    module_patch_function(patch, "Block.find_term", Block__find_term);
-    module_patch_function(patch, "Block.functions", Block__functions);
-    module_patch_function(patch, "Block.statements", Block__statements);
-    module_patch_function(patch, "Block.get_term", Block__get_term);
-    module_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
-    module_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
-    module_patch_function(patch, "Block.has_static_error", Block__has_static_error);
-    module_patch_function(patch, "Block.id", Block__id);
-    module_patch_function(patch, "Block.input", Block__input);
-    module_patch_function(patch, "Block.inputs", Block__inputs);
-    module_patch_function(patch, "Block.is_null", Block__is_null);
-    module_patch_function(patch, "Block.link", Block__link);
-    module_patch_function(patch, "Block.list_configs", Block__list_configs);
-    module_patch_function(patch, "Block.output", Block__output);
-    module_patch_function(patch, "Block.outputs", Block__outputs);
-    module_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
-    module_patch_function(patch, "Block.owner", Block__owner);
-    module_patch_function(patch, "Block.parent", Block__parent);
-    module_patch_function(patch, "Block.property", Block__property);
-    module_patch_function(patch, "Block.properties", Block__properties);
-    module_patch_function(patch, "Block.source_filename", Block__source_filename);
-    module_patch_function(patch, "Block.term_named", Block__term_named);
-    module_patch_function(patch, "Block.terms", Block__terms);
-    module_patch_function(patch, "Block.walk_terms", Block__walk_terms);
-    module_patch_function(patch, "Term.assign", Term__assign);
-    module_patch_function(patch, "Term.asint", Term__asint);
-    module_patch_function(patch, "Term.asfloat", Term__asfloat);
-    module_patch_function(patch, "Term.id", Term__id);
-    module_patch_function(patch, "Term.index", Term__index);
-    module_patch_function(patch, "Term.function", Term__function);
-    module_patch_function(patch, "Term.get_type", Term__type);  // TODO: rename to just .type
-    module_patch_function(patch, "Term.tweak", Term__tweak);
-    module_patch_function(patch, "Term.input", Term__input);
-    module_patch_function(patch, "Term.inputs", Term__inputs);
-    module_patch_function(patch, "Term.name", Term__name);
-    module_patch_function(patch, "Term.num_inputs", Term__num_inputs);
-    module_patch_function(patch, "Term.parent", Term__parent);
-    module_patch_function(patch, "Term.contents", Term__contents);
-    module_patch_function(patch, "Term.is_input", Term__is_input);
-    module_patch_function(patch, "Term.is_output", Term__is_output);
-    module_patch_function(patch, "Term.is_null", Term__is_null);
-    module_patch_function(patch, "Term.source_location", Term__source_location);
-    module_patch_function(patch, "Term.location_string", Term__location_string);
-    module_patch_function(patch, "Term.global_id", Term__global_id);
-    module_patch_function(patch, "Term.to_string", Term__to_string);
-    module_patch_function(patch, "Term.unique_name", Term__unique_name);
-    module_patch_function(patch, "Term.properties", Term__properties);
-    module_patch_function(patch, "Term.has_property", Term__has_property);
-    module_patch_function(patch, "Term.property", Term__property);
-    module_patch_function(patch, "Term.property_opt", Term__property_opt);
-    module_patch_function(patch, "Term.has_input_property", Term__has_input_property);
-    module_patch_function(patch, "Term.input_property", Term__input_property);
-    module_patch_function(patch, "Term.input_property_opt", Term__input_property_opt);
-    module_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
-    module_patch_function(patch, "Term.value", Term__value);
-    module_patch_function(patch, "Term.set_value", Term__set_value);
-    module_patch_function(patch, "is_overloaded_func", is_overloaded_func);
-    module_patch_function(patch, "overload_get_contents", overload__get_contents);
+    circa_patch_function(patch, "Block.dump", Block__dump);
+    circa_patch_function(patch, "Block.find_term", Block__find_term);
+    circa_patch_function(patch, "Block.functions", Block__functions);
+    circa_patch_function(patch, "Block.statements", Block__statements);
+    circa_patch_function(patch, "Block.get_term", Block__get_term);
+    circa_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
+    circa_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
+    circa_patch_function(patch, "Block.has_static_error", Block__has_static_error);
+    circa_patch_function(patch, "Block.id", Block__id);
+    circa_patch_function(patch, "Block.input", Block__input);
+    circa_patch_function(patch, "Block.inputs", Block__inputs);
+    circa_patch_function(patch, "Block.is_null", Block__is_null);
+    circa_patch_function(patch, "Block.link", Block__link);
+    circa_patch_function(patch, "Block.list_configs", Block__list_configs);
+    circa_patch_function(patch, "Block.output", Block__output);
+    circa_patch_function(patch, "Block.outputs", Block__outputs);
+    circa_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
+    circa_patch_function(patch, "Block.owner", Block__owner);
+    circa_patch_function(patch, "Block.parent", Block__parent);
+    circa_patch_function(patch, "Block.property", Block__property);
+    circa_patch_function(patch, "Block.properties", Block__properties);
+    circa_patch_function(patch, "Block.source_filename", Block__source_filename);
+    circa_patch_function(patch, "Block.term_named", Block__term_named);
+    circa_patch_function(patch, "Block.terms", Block__terms);
+    circa_patch_function(patch, "Block.walk_terms", Block__walk_terms);
+    circa_patch_function(patch, "Term.assign", Term__assign);
+    circa_patch_function(patch, "Term.asint", Term__asint);
+    circa_patch_function(patch, "Term.asfloat", Term__asfloat);
+    circa_patch_function(patch, "Term.id", Term__id);
+    circa_patch_function(patch, "Term.index", Term__index);
+    circa_patch_function(patch, "Term.function", Term__function);
+    circa_patch_function(patch, "Term.get_type", Term__type);  // TODO: rename to just .type
+    circa_patch_function(patch, "Term.tweak", Term__tweak);
+    circa_patch_function(patch, "Term.input", Term__input);
+    circa_patch_function(patch, "Term.inputs", Term__inputs);
+    circa_patch_function(patch, "Term.name", Term__name);
+    circa_patch_function(patch, "Term.num_inputs", Term__num_inputs);
+    circa_patch_function(patch, "Term.parent", Term__parent);
+    circa_patch_function(patch, "Term.contents", Term__contents);
+    circa_patch_function(patch, "Term.is_input", Term__is_input);
+    circa_patch_function(patch, "Term.is_output", Term__is_output);
+    circa_patch_function(patch, "Term.is_null", Term__is_null);
+    circa_patch_function(patch, "Term.is_value", Term__is_value);
+    circa_patch_function(patch, "Term.source_location", Term__source_location);
+    circa_patch_function(patch, "Term.location_string", Term__location_string);
+    circa_patch_function(patch, "Term.global_id", Term__global_id);
+    circa_patch_function(patch, "Term.to_string", Term__to_string);
+    circa_patch_function(patch, "Term.unique_name", Term__unique_name);
+    circa_patch_function(patch, "Term.properties", Term__properties);
+    circa_patch_function(patch, "Term.has_property", Term__has_property);
+    circa_patch_function(patch, "Term.property", Term__property);
+    circa_patch_function(patch, "Term.property_opt", Term__property_opt);
+    circa_patch_function(patch, "Term.has_input_property", Term__has_input_property);
+    circa_patch_function(patch, "Term.input_property", Term__input_property);
+    circa_patch_function(patch, "Term.input_property_opt", Term__input_property_opt);
+    circa_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
+    circa_patch_function(patch, "Term.value", Term__value);
+    circa_patch_function(patch, "Term.set_value", Term__set_value);
+    circa_patch_function(patch, "is_overloaded_func", is_overloaded_func);
+    circa_patch_function(patch, "overload_get_contents", overload__get_contents);
 }
 
 } // namespace circa

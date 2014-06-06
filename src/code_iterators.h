@@ -24,7 +24,6 @@ struct BlockIterator
     BlockIterator(Block* block, bool backwards=false);
     void reset(Block* block);
     bool finished();
-    bool unfinished() { return !finished(); }
     Term* current();
     void advance();
     void advanceSkippingBlock();
@@ -36,6 +35,7 @@ struct BlockIterator
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }
     void operator++() { advance(); }
+    operator bool() { return !finished(); }
 };
 
 struct MinorBlockIterator

@@ -141,19 +141,6 @@ void circa_make(caValue* value, caType* type)
     make((Type*) type, value);
 }
 
-// Code setup
-caTerm* circa_install_function(caBlock* block, const char* name, caEvaluateFunc evaluate)
-{
-    return (caTerm*) install_function((Block*) block, name, (EvaluateFunc) evaluate);
-}
-void circa_install_function_list(caBlock* block, const caFunctionBinding* list)
-{
-    while (list->name != NULL) {
-        circa_install_function(block, list->name, list->func);
-        list++;
-    }
-}
-
 caTerm* circa_find_term(caBlock* block, const char* name)
 {
     return (caTerm*) find_name((Block*) block, name);
@@ -364,11 +351,6 @@ caBlock* circa_stack_top_block(caStack* stack)
     return (caBlock*) frame_block(top_frame(stack));
 }
 
-caValue* circa_input(caStack* stack, int index)
-{
-    return get_input(stack, index);
-}
-
 int circa_num_inputs(caStack* stack)
 {
     return num_inputs(stack);
@@ -394,11 +376,6 @@ const char* circa_string_input(caStack* stack, int index)
     return circa_string(circa_input(stack, index));
 }
 
-caValue* circa_output(caStack* stack, int index)
-{
-    return get_output(stack, index);
-}
-
 void circa_output_error_val(caStack* stack, caValue* val)
 {
     copy(val, circa_output(stack, 0));
@@ -420,7 +397,7 @@ caTerm* circa_caller_input_term(caStack* stack, int index)
 
 caBlock* circa_caller_block(caStack* stack)
 {
-    Frame* frame = stack_top_parent(stack);
+    Frame* frame = top_frame_parent(stack);
     if (frame == NULL)
         return NULL;
     return frame_block(frame);

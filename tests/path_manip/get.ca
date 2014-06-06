@@ -1,0 +1,6 @@
+
+a = Map.make
+
+@a.set(:x 5)
+
+assert(get(a [:x]) == 5)

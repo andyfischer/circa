@@ -26,10 +26,10 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -gdwarf-2
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca_d -ldl -luv
+  LIBS      += -lcirca_d -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca_d.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca -ldl -luv
+  LIBS      += -lcirca -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -76,7 +76,6 @@ OBJECTS := \
 	$(OBJDIR)/function_test.o \
 	$(OBJDIR)/hashtable_test.o \
 	$(OBJDIR)/if_block.o \
-	$(OBJDIR)/importing_test.o \
 	$(OBJDIR)/interpreter_test.o \
 	$(OBJDIR)/list_test.o \
 	$(OBJDIR)/loop_test.o \
@@ -88,7 +87,6 @@ OBJECTS := \
 	$(OBJDIR)/parser_test.o \
 	$(OBJDIR)/path_expression_test.o \
 	$(OBJDIR)/stack_test.o \
-	$(OBJDIR)/state_test.o \
 	$(OBJDIR)/string_test.o \
 	$(OBJDIR)/symbol_test.o \
 	$(OBJDIR)/tagged_value_test.o \
@@ -190,9 +188,6 @@ $(OBJDIR)/hashtable_test.o: unit_tests/hashtable_test.cpp
 $(OBJDIR)/if_block.o: unit_tests/if_block.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/importing_test.o: unit_tests/importing_test.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/interpreter_test.o: unit_tests/interpreter_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -224,9 +219,6 @@ $(OBJDIR)/path_expression_test.o: unit_tests/path_expression_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/stack_test.o: unit_tests/stack_test.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/state_test.o: unit_tests/state_test.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_test.o: unit_tests/string_test.cpp

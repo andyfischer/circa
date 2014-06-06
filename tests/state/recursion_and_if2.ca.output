@@ -2,14 +2,14 @@ reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 1st iter: {_if_1: [{_recr: {_if_1: [{_recr: {_if_1: [{_recr: {called_with: 0, top: 0}, inside_if: 2}], called_with: 1, top: 3}, inside_if: 4}], called_with: 2, top: 5}, inside_if: 6}], called_with: 3, top: 7}
+after 1st iter: {_if_1: {0: {_recr: {_if_1: {0: {_recr: {_if_1: {0: {_recr: {called_with: 0, top: 0}, inside_if: 2}}, called_with: 1, top: 3}, inside_if: 4}}, called_with: 2, top: 5}, inside_if: 6}}, called_with: 3, top: 7}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 2nd iter: {_if_1: [{_recr: {_if_1: [{_recr: {_if_1: [{_recr: {called_with: 0, top: 0}, inside_if: 4}], called_with: 1, top: 7}, inside_if: 8}], called_with: 2, top: 11}, inside_if: 12}], called_with: 3, top: 15}
+after 2nd iter: {_if_1: {0: {_recr: {_if_1: {0: {_recr: {_if_1: {0: {_recr: {called_with: 0, top: 0}, inside_if: 4}}, called_with: 1, top: 7}, inside_if: 8}}, called_with: 2, top: 11}, inside_if: 12}}, called_with: 3, top: 15}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 3rd iter: {_if_1: [{_recr: {_if_1: [{_recr: {_if_1: [{_recr: {called_with: 0, top: 0}, inside_if: 8}], called_with: 1, top: 15}, inside_if: 16}], called_with: 2, top: 23}, inside_if: 24}], called_with: 3, top: 31}
+after 3rd iter: {_if_1: {0: {_recr: {_if_1: {0: {_recr: {_if_1: {0: {_recr: {called_with: 0, top: 0}, inside_if: 8}}, called_with: 1, top: 15}, inside_if: 16}}, called_with: 2, top: 23}, inside_if: 24}}, called_with: 3, top: 31}

@@ -8,10 +8,11 @@ def f()
   if once()
       print("Check (should only print once)")
 
-int = make_stack(f)
-int.call
-int.call
-int.call
-int.call
-int.call
-print('final state: ' int.extract_state)
+
+vm = make_vm(f)
+vm.call
+vm.call
+vm.call
+vm.call
+vm.call
+print('final state: ' vm.extract_state)

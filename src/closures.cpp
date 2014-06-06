@@ -31,7 +31,7 @@ void insert_nonlocal_terms(Block* block)
     int nextInsertPosition = count_input_placeholders(block);
     Block* compilationUnit = find_nearest_compilation_unit(block);
 
-    for (BlockIterator it(block); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it; ++it) {
         Term* innerTerm = *it;
 
         // Skip nonlocal() terms in this block. But, don't skip nonlocal terms that are
@@ -184,12 +184,10 @@ void closure_save_all_bindings(caValue* closure, Stack* stack)
     }
 }
 
-void closures_install_functions(Block* kernel)
+void closures_install_functions(NativePatch* patch)
 {
-    install_function(kernel, "closure_block", closure_block_evaluate);
-    install_function(kernel, "function_decl", closure_block_evaluate);
-
-    FUNCS.func_apply = kernel->get("Func.apply");
+    circa_patch_function(patch, "closure_block", closure_block_evaluate);
+    circa_patch_function(patch, "function_decl", closure_block_evaluate);
 }
 
 } // namespace circa

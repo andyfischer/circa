@@ -42,7 +42,7 @@ void migrate_block(Block* target, Migration* migration)
     // Migrate term values; needs to happen whether or not the migration targets
     // this block. Needed for ModuleRef values that are written by require().
     // Future: Might be able to change require() to make this unnecessary.
-    for (BlockIterator it(target); it.unfinished(); it.advance()) {
+    for (BlockIterator it(target); it; ++it) {
         Term* term = *it;
         migrate_value(term_value(term), migration);
     }
@@ -53,7 +53,7 @@ void migrate_block(Block* target, Migration* migration)
     // Store a cache of lookups that we've made in this call.
     TermMap cache;
 
-    for (BlockIterator it(target); it.unfinished(); it.advance()) {
+    for (BlockIterator it(target); it; ++it) {
 
         Term* term = *it;
 
@@ -180,6 +180,8 @@ void migrate_stack(Stack* stack, Migration* migration)
 
     stack_on_migration(stack);
 
+    migrate_value(&stack->state, migration);
+
     Frame* frame = top_frame(stack);
 
     while (frame != NULL) {
@@ -200,33 +202,15 @@ void migrate_stack(Stack* stack, Migration* migration)
 
         migrate_value(&frame->bindings, migration);
         migrate_value(&frame->env, migration);
-        migrate_state_list(&frame->state, oldBlock, frame->block, migration);
-        migrate_state_list(&frame->outgoingState, oldBlock, frame->block, migration);
 
         frame = prev_frame(frame);
     }
 }
 
-void migrate_retained_frame(caValue* retainedFrame, Migration* migration)
-{
-    Block* block = as_block(retained_frame_get_block(retainedFrame));
-    Block* newBlock = migrate_block_pointer(block, migration);
-    
-    if (newBlock == NULL) {
-        set_null(retainedFrame);
-        return;
-    }
-
-    touch(retainedFrame);
-    caValue* state = retained_frame_get_state(retainedFrame);
-    migrate_state_list(state, block, newBlock, migration);
-    set_block(retained_frame_get_block(retainedFrame), newBlock);
-}
-
 bool list_value_may_need_migration(caValue* value, Migration* migration)
 {
     for (int i=0; i < list_length(value); i++)
-        if (value_may_need_migration(value->element(i), migration))
+        if (value_may_need_migration(value->index(i), migration))
             return true;
 
     Type* newType = migrate_type(value->value_type, migration);
@@ -272,8 +256,6 @@ void migrate_value(caValue* value, Migration* migration)
         set_block(value, migrate_block_pointer(as_block(value), migration));
     } else if (is_stack(value)) {
         migrate_stack(as_stack(value), migration);
-    } else if (is_retained_frame(value)) {
-        migrate_retained_frame(value, migration);
     } else if (is_list_based(value)) {
         migrate_list_value(value, migration);
 

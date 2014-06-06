@@ -4,6 +4,7 @@
 
 #include "building.h"
 #include "kernel.h"
+#include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
 #include "interpreter.h"
@@ -20,15 +21,19 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
         int selectorIndex = as_int(selectorElement);
 
         if (!is_list(value)) {
-            set_error_string(error, "Value is not indexable: ");
-            string_append_quoted(error, value);
+            if (error != NULL) {
+                set_error_string(error, "Value is not indexable: ");
+                string_append_quoted(error, value);
+            }
             return NULL;
         }
 
         if (selectorIndex >= list_length(value)) {
-            set_error_string(error, "Index ");
-            string_append(error, selectorIndex);
-            string_append(error, " is out of range");
+            if (error != NULL) {
+                set_error_string(error, "Index ");
+                string_append(error, selectorIndex);
+                string_append(error, " is out of range");
+            }
             return NULL;
         }
 
@@ -37,14 +42,18 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
     } else if (is_string(selectorElement)) {
         caValue* field = get_field(value, selectorElement, NULL);
         if (field == NULL) {
-            set_error_string(error, "Field not found: ");
-            string_append(error, selectorElement);
+            if (error != NULL) {
+                set_error_string(error, "Field not found: ");
+                string_append(error, selectorElement);
+            }
             return NULL;
         }
         return field;
     } else {
-        set_error_string(error, "Unrecognized selector element: ");
-        string_append_quoted(error, selectorElement);
+        if (error != NULL) {
+            set_error_string(error, "Unrecognized selector element: ");
+            string_append_quoted(error, selectorElement);
+        }
         return NULL;
     }
 }
@@ -67,26 +76,23 @@ Type* element_type_from_selector(Type* type, caValue* selectorElement)
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
 {
     caValue* element = root;
-    ca_assert(is_null(error));
 
     for (int i=0; i < list_length(selector); i++) {
         caValue* selectorElement = list_get(selector, i);
         element = selector_advance(element, selectorElement, error);
 
-        if (!is_null(error))
+        if (element == NULL)
             return NULL;
     }
 
     return element;
 }
 
-void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caValue* error)
+bool set_with_selector(caValue* value, caValue* selector, caValue* newValue, caValue* error)
 {
-    ca_assert(is_null(error));
-
     if (list_empty(selector)) {
         copy(newValue, value);
-        return;
+        return true;
     }
 
     for (int selectorIndex=0;; selectorIndex++) {
@@ -94,22 +100,25 @@ void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
         caValue* selectorElement = list_get(selector, selectorIndex);
         caValue* element = selector_advance(value, selectorElement, error);
 
-        if (!is_null(error))
-            return;
+        if (element == NULL)
+            return false;
 
         if (selectorIndex+1 == list_length(selector)) {
             copy(newValue, element);
             Type* elementType = element_type_from_selector(value->value_type, selectorElement);
             if (!cast(element, elementType)) {
-                set_string(error, "Couldn't cast value ");
-                string_append_quoted(error, newValue);
-                string_append(error, " to type ");
-                string_append(error, &elementType->name);
-                string_append(error, " (element ");
-                string_append_quoted(error, selectorElement);
-                string_append(error, " of type ");
-                string_append(error, &value->value_type->name);
-                string_append(error, ")");
+                if (error != NULL) {
+                    set_string(error, "Couldn't cast value ");
+                    string_append_quoted(error, newValue);
+                    string_append(error, " to type ");
+                    string_append(error, &elementType->name);
+                    string_append(error, " (element ");
+                    string_append_quoted(error, selectorElement);
+                    string_append(error, " of type ");
+                    string_append(error, &value->value_type->name);
+                    string_append(error, ")");
+                }
+                return false;
             }
             
             break;
@@ -117,6 +126,64 @@ void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
 
         value = element;
         // loop
+    }
+    return true;
+}
+
+Value* path_touch_and_init_map(caValue* value, caValue* path)
+{
+    caValue* currentElement = value;
+    for (int i=0; i < list_length(path); i++) {
+        touch(currentElement);
+
+        if (!is_hashtable(currentElement))
+            set_hashtable(currentElement);
+
+        caValue* nextElement = hashtable_insert(currentElement, path->index(i));
+
+        currentElement = nextElement;
+    }
+    return currentElement;
+}
+
+Value* path_get(Value* value, Value* path)
+{
+    Value* currentElement = value;
+    for (int i=0; i < list_length(path); i++) {
+        if (!is_hashtable(currentElement))
+            return NULL;
+
+        Value* nextElement = hashtable_get(currentElement, path->index(i));
+
+        if (nextElement == NULL)
+            return NULL;
+
+        currentElement = nextElement;
+    }
+    return currentElement;
+}
+
+void path_delete(Value* value, Value* path)
+{
+    caValue* currentElement = value;
+    for (int i=0; i < list_length(path); i++) {
+
+        if (!is_hashtable(currentElement))
+            return;
+
+        touch(currentElement);
+
+        if (i+1 >= list_length(path)) {
+            hashtable_remove(currentElement, path->index(i));
+            return;
+        }
+
+        caValue* nextElement = hashtable_get(currentElement, path->index(i));
+
+        if (nextElement == NULL)
+            return;
+
+        currentElement = nextElement;
     }
 }
 
@@ -144,6 +211,10 @@ bool is_accessor_function(Term* accessor)
 
 bool term_is_accessor_traceable(Term* accessor)
 {
+    ca_assert(FUNCS.get_index != NULL);
+    ca_assert(FUNCS.get_field != NULL);
+    ca_assert(FUNCS.dynamic_method != NULL);
+
     if (!has_empty_name(accessor))
         return false;
 
@@ -151,7 +222,8 @@ bool term_is_accessor_traceable(Term* accessor)
             || accessor->function == FUNCS.get_field
             || is_copying_call(accessor)
             || accessor->function == FUNCS.dynamic_method
-            || is_subroutine(accessor->function))
+            || accessor->function->boolProp(sym_FieldAccessor, false)
+            || accessor->function->boolProp(sym_Setter, false))
         return true;
 
     return false;
@@ -337,18 +409,35 @@ void set_with_selector_evaluate(caStack* stack)
     }
 }
 
-void selector_setup_funcs(Block* kernel)
+void path_get_func(Stack* stack)
 {
-    FUNCS.selector = 
-        import_function(kernel, evaluate_selector, "selector(any elements :multiple) -> Selector");
+    Value* result = path_get(circa_input(stack, 0), circa_input(stack, 1));
+    if (result != NULL)
+        copy(result, circa_output(stack, 0));
+    else
+        set_null(circa_output(stack, 0));
+}
 
-    FUNCS.get_with_selector = 
-        import_function(kernel, get_with_selector_evaluate,
-            "get_with_selector(any object, Selector selector) -> any");
+void path_set_func(Stack* stack)
+{
+    move(circa_input(stack, 0), circa_output(stack, 0));
+    move(circa_input(stack, 2), path_touch_and_init_map(circa_output(stack, 0), circa_input(stack, 1)));
+}
 
-    FUNCS.set_with_selector =
-        import_function(kernel, set_with_selector_evaluate,
-            "set_with_selector(any object, Selector selector, any newValue) -> any");
+void path_delete_func(Stack* stack)
+{
+    move(circa_input(stack, 0), circa_output(stack, 0));
+    path_delete(circa_output(stack, 0), circa_input(stack, 1));
+}
+
+void selector_setup_funcs(NativePatch* patch)
+{
+    circa_patch_function(patch, "selector", evaluate_selector);
+    circa_patch_function(patch, "get_with_selector", get_with_selector_evaluate);
+    circa_patch_function(patch, "set_with_selector", set_with_selector_evaluate);
+    circa_patch_function(patch, "get", path_get_func);
+    circa_patch_function(patch, "set", path_set_func);
+    circa_patch_function(patch, "delete", path_delete_func);
 }
 
 } // namespace circa

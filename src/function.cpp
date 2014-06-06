@@ -43,6 +43,12 @@ Type* find_implicit_output_type(Block* block)
     return type;
 }
 
+void set_closure_for_declared_function(Term* term)
+{
+    if (TYPES.func != NULL)
+        set_closure(term_value(term), term->nestedContents, NULL);
+}
+
 void finish_building_function(Block* contents)
 {
     // Connect the primary output placeholder with the last expression.
@@ -76,7 +82,7 @@ void finish_building_function(Block* contents)
     // After the output_placeholder terms are created, we might need to update any
     // recursive calls.
 
-    for (BlockIterator it(contents); it.unfinished(); it.advance()) {
+    for (BlockIterator it(contents); it; ++it) {
         Term* term = it.current();
         if (function_contents(term->function) != contents)
             continue;
@@ -88,8 +94,8 @@ void finish_building_function(Block* contents)
     update_for_control_flow(contents);
     insert_nonlocal_terms(contents);
 
-    // Possibly apply a native patch
-    native_patch_apply_to_new_function(global_world(), contents);
+    if (contents->owningTerm != NULL)
+        set_closure_for_declared_function(contents->owningTerm);
 
     block_finish_changes(contents);
 }
@@ -119,18 +125,6 @@ void evaluate_subroutine(caStack*)
 {
     // This once did something, but now the default function calling behavior
     // is the same as evaluating a subroutine.
-}
-
-bool is_subroutine(Term* term)
-{
-    if (!is_function(term))
-        return false;
-    return function_contents(term)->overrides.evaluate == NULL;
-}
-
-bool is_subroutine(Block* block)
-{
-    return block->owningTerm != NULL && is_subroutine(block->owningTerm);
 }
 
 } // namespace circa

@@ -27,6 +27,7 @@
 *.o
 *.trace
 .gdb_history
+.vagrant
 
 # Windows build artifacts
 *.opensdf

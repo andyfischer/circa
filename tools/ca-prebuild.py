@@ -37,37 +37,6 @@ def get_cpp_files_in_dir(dir):
 def get_cpp_file_names(dir):
     return map(lambda s: s[:-4], get_cpp_files_in_dir(dir))
 
-def setup_builtin_functions():
-    dir = 'src/functions'
-
-    namespaces = list(map(lambda s: s+'_function', get_cpp_file_names(dir)))
-    function_decls = '\n'.join(
-            sorted(map(lambda n: 'namespace '+n+' { void setup(Block* kernel); }', namespaces)))
-    function_calls = '\n    '.join(
-            sorted(map(lambda n: n+'::setup(kernel);', namespaces)))
-
-    return """
-// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
-
-// This file is generated during the build process by ca-prebuild.py .
-// You should probably not edit this file manually.
-
-#include "../common_headers.h"
-
-#include "../block.h"
-
-namespace circa {
-
-%s
-
-void setup_builtin_functions(Block* kernel)
-{
-    %s
-}
-
-} // namespace circa""" % (function_decls, function_calls)
-# end of setup_builtin_functions
-    
 def register_all_tests():
     dir = 'src/tests'
     #print "cpp file names = " + str(get_cpp_file_names(dir))
@@ -153,14 +122,10 @@ if 'CIRCA_HOME' in os.environ:
 
 mkdir('src/generated')
 
-# generate setup_builtin_functions.cpp and register_all_tests.cpp
-write_text_file('src/generated/setup_builtin_functions.cpp', setup_builtin_functions())
-# write_text_file('src/generated/register_all_tests.cpp', register_all_tests())
-
 # generate stdlib_script_text.cpp
 write_text_file('src/generated/stdlib_script_text.cpp',
-        text_files_to_builtin_modules(
-            [{'name': "stdlib", 'filename':"src/ca/stdlib.ca"},
+        text_files_to_builtin_modules([
+            {'name': "stdlib", 'filename':"src/ca/stdlib.ca"},
             {'name': "json", 'filename':"src/ca/json.ca"},
             {'name': "error_trace", 'filename':"src/ca/error_trace.ca"},
             {'name': "matrix", 'filename':"src/ca/matrix.ca"},
@@ -170,15 +135,12 @@ write_text_file('src/generated/stdlib_script_text.cpp',
             {'name': "socket", 'filename':"src/ca/socket.ca"}]
         ))
 
-# generate all_tests.cpp, all_builtin_functions.cpp, and all_builtin_types.cpp
+# generate all_tests.cpp
 def source_files(dir):
     for path in os.listdir(dir):
         if not os.path.isfile(os.path.join(dir,path)): continue
         if not path.endswith('.cpp'): continue
         yield path
-def builtin_function_cpps():
-    for file in get_cpp_files_in_dir('src/functions'):
-        yield "functions/"+file
 def test_cpps():
     for file in get_cpp_files_in_dir('src/tests'):
         yield "tests/"+file
@@ -194,10 +156,6 @@ def include_list(items):
 
 #write_text_file('src/generated/all_tests.cpp',
 #    include_list(['../'+file for file in test_cpps()]))
-write_text_file('src/generated/all_builtin_functions.cpp',
-    include_list(['../'+file for file in builtin_function_cpps()]))
-write_text_file('src/generated/all_builtin_types.cpp',
-    include_list(['../types/'+file for file in source_files('src/types')]))
 
 def all_source_files():
     for file in get_cpp_files_in_dir('src'):
@@ -206,9 +164,6 @@ def all_source_files():
         yield "../" + file
     for file in get_cpp_files_in_dir('src/command_line'):
         yield "../command_line/" + file
-    yield "./all_builtin_functions.cpp"
-    yield "./all_builtin_types.cpp"
-    yield "./setup_builtin_functions.cpp"
     yield "./stdlib_script_text.cpp"
 
 write_text_file('src/generated/all_source_files.cpp',

@@ -26,7 +26,16 @@ bool is_exit_point(Term* term)
         || term->function == FUNCS.break_func
         || term->function == FUNCS.continue_func
         || term->function == FUNCS.discard
-        || term->function == FUNCS.case_condition_bool;
+        || term->function == FUNCS.case_condition_bool
+        || term->function == FUNCS.loop_condition_bool;
+}
+
+bool is_unconditional_exit_point(Term* term)
+{
+    return term->function == FUNCS.return_func
+        || term->function == FUNCS.break_func
+        || term->function == FUNCS.continue_func
+        || term->function == FUNCS.discard;
 }
 
 bool is_conditional_exit_point(Term* term)
@@ -77,7 +86,7 @@ Block* find_block_that_exit_point_will_reach(Term* term)
         return get_parent_block(term->owningBlock);
 
     // Otherwise, exit to nearest for-loop.
-    while (!is_for_loop(block)) {
+    while (!is_for_loop(block) && !is_while_loop(block)) {
         Block* parent = get_parent_block(block);
         if (parent == NULL)
             return block;
@@ -161,15 +170,15 @@ void update_derived_inputs_for_exit_point(Term* term)
     Block* block = find_block_that_exit_point_will_reach(term);
     
     for (int i=0;; i++) {
-        Term* blockOutput = get_output_placeholder(block, i);
-        if (blockOutput == NULL)
+        Term* inputResult = get_output_placeholder(block, i);
+        if (inputResult == NULL)
             break;
 
         // Don't touch input if it's explicit.
         if (i < term->numInputs() && !is_input_implicit(term, i))
             continue;
 
-        Term* intermediateValue = find_intermediate_result_for_output(term, blockOutput);
+        Term* intermediateValue = find_intermediate_result_for_output(term, inputResult);
 
         set_input(term, i, intermediateValue);
         set_input_implicit(term, i, true);
@@ -212,25 +221,6 @@ void controlFlow_postCompile(Term* term)
         if (block == NULL)
             break;
     }
-}
-
-void control_flow_setup_funcs(Block* kernel)
-{
-    FUNCS.return_func = import_function(kernel, NULL, "return(any outs :multiple :optional)");
-    block_set_evaluation_empty(function_contents(FUNCS.return_func), true);
-    block_set_post_compile_func(function_contents(FUNCS.return_func), controlFlow_postCompile);
-
-    FUNCS.discard = import_function(kernel, NULL, "discard(any outs :multiple :optional)");
-    block_set_evaluation_empty(function_contents(FUNCS.discard), true);
-    block_set_post_compile_func(function_contents(FUNCS.discard), controlFlow_postCompile);
-
-    FUNCS.break_func = import_function(kernel, NULL, "break(any outs :multiple :optional)");
-    block_set_evaluation_empty(function_contents(FUNCS.break_func), true);
-    block_set_post_compile_func(function_contents(FUNCS.break_func), controlFlow_postCompile);
-
-    FUNCS.continue_func = import_function(kernel, NULL, "continue(any outs :multiple :optional)");
-    block_set_evaluation_empty(function_contents(FUNCS.continue_func), true);
-    block_set_post_compile_func(function_contents(FUNCS.continue_func), controlFlow_postCompile);
 }
 
 } // namespace circa

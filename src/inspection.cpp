@@ -13,7 +13,6 @@
 #include "interpreter.h"
 #include "list.h"
 #include "names.h"
-#include "program.h"
 #include "string_type.h"
 #include "term.h"
 #include "term_list.h"
@@ -137,7 +136,8 @@ bool is_minor_block(Block* block)
     Term* owner = block->owningTerm;
     return owner->function == FUNCS.if_block
         || owner->function == FUNCS.case_func
-        || owner->function == FUNCS.for_func;
+        || owner->function == FUNCS.for_func
+        || owner->function == FUNCS.while_loop;
 }
 
 bool is_module(Block* block)
@@ -239,6 +239,17 @@ bool is_output_placeholder(Term* term)
 {
     return term->function == FUNCS.output;
 }
+Term* find_input_with_name(Block* block, Value* name)
+{
+    for (int i=0;; i++) {
+        Term* term = get_input_placeholder(block, i);
+        if (term == NULL)
+            break;
+        if (equals(&term->nameValue, name))
+            return term;
+    }
+    return NULL;
+}
 
 bool is_input_meta(Block* block, int index)
 {
@@ -254,6 +265,7 @@ Block* term_get_function_details(Term* call)
     if (call->function == FUNCS.if_block
         || call->function == FUNCS.switch_func
         || call->function == FUNCS.for_func
+        || call->function == FUNCS.while_loop
         || call->function == FUNCS.include_func)
         return nested_contents(call);
 
@@ -327,6 +339,17 @@ bool has_variable_args(Block* block)
             return false;
         if (placeholder->boolProp(sym_Multiple, false))
             return true;
+    }
+}
+
+int find_index_of_vararg(Block* block)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(block, i);
+        if (placeholder == NULL)
+            return -1;
+        if (placeholder->boolProp(sym_Multiple, false))
+            return i;
     }
 }
 
@@ -448,10 +471,12 @@ void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack
     int prevIndent = prefs->indentLevel;
     int bytecodePc = 0;
     char* bytecodeData = NULL;
+#if 0
     if (stack != NULL) {
         int blockIndex = program_create_entry(stack->program, block);
         bytecodeData = program_block_bytecode(stack->program, blockIndex);
     }
+#endif
 
     print_indent(prefs, out);
 
@@ -471,17 +496,28 @@ void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack
         }
 
         if (prefs->showBytecode && bytecodeData) {
+            bool opcodeIndent = false;
             while (bytecodeData[bytecodePc] != bc_End) {
+                char opcode = bytecodeData[bytecodePc];
+
                 int currentTermIndex = bytecode_op_to_term_index(bytecodeData, bytecodePc);
                 if (currentTermIndex != -1 && currentTermIndex != i)
                     break;
+
+                if (opcode == bc_EnterFrame || opcode == bc_EnterFrameNext)
+                    opcodeIndent = false;
 
                 print_indent(prefs, out);
                 string_append(out, "[");
                 string_append(out, bytecodePc);
                 string_append(out, "] ");
+                if (opcodeIndent)
+                    string_append(out, " ");
                 bytecode_op_to_string(bytecodeData, &bytecodePc, out);
                 string_append(out, "\n");
+
+                if (opcode == bc_PushFrame)
+                    opcodeIndent = true;
             }
         }
 
@@ -880,7 +916,7 @@ Term* find_term_from_path(Block* root, caValue* path, int offset)
             return match;
 
         // Check if recursive wildcard matches any nested term.
-        for (BlockIterator it(root); it.unfinished(); ++it) {
+        for (BlockIterator it(root); it; ++it) {
             Term* term = *it;
             if (term->nestedContents == NULL)
                 continue;

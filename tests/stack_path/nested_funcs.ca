@@ -1,0 +1,11 @@
+
+def h()
+  print('path inside h: ' _get_local_stack_path())
+
+def g()
+  h()
+
+def f()
+  g()
+
+f()

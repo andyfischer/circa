@@ -32,6 +32,8 @@ void on_term_created(Term* term)
 
 Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 {
+    ca_assert(function != NULL);
+
     block_start_changes(block);
 
     // Figure out the term position; it should be placed before any output() terms.
@@ -929,8 +931,6 @@ void block_finish_changes(Block* block)
     // Refresh for-loop zero block
     if (is_for_loop(block))
         for_loop_remake_zero_block(block);
-    if (is_while_loop(block))
-        while_loop_finish_changes(block);
 
     dirty_bytecode(block);
 
@@ -1254,7 +1254,7 @@ void create_inputs_for_outer_references(Term* term)
     Block* block = nested_contents(term);
     TermMap outerToInnerMap;
 
-    for (BlockIterator it(block); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it; ++it) {
         Term* innerTerm = *it;
         for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
             Term* input = innerTerm->input(inputIndex);

@@ -1,17 +1,15 @@
 calling g
-starting loop
 i: 0
   s: 0
 i: 1
   s: 0
 i: 2
   s: 0
-state: {_for: [{s: 1}, {s: 1}, {s: 1}]}
-starting loop
+state: {_for: {0: {s: 1}, 1: {s: 1}, 2: {s: 1}}}
 i: 0
   s: 1
 i: 1
   s: 1
 i: 2
   s: 1
-state: {_for: [{s: 2}, {s: 2}, {s: 2}]}
+state: {_for: {0: {s: 2}, 1: {s: 2}, 2: {s: 2}}}

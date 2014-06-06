@@ -12,7 +12,7 @@ def recr(int depth)
         recr(depth - 1)
         t = t * 2
 
-vm = make_stack(recr)
+vm = make_vm(recr)
 vm.call(3)
 print('after 1st iter: ' vm.extract_state)
 vm.call(3)

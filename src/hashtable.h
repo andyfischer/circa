@@ -12,6 +12,7 @@ caValue* hashtable_get(caValue* table, caValue* key);
 caValue* hashtable_get(caValue* table, const char* keyStr);
 caValue* hashtable_insert(caValue* table, caValue* key, bool moveKey);
 caValue* hashtable_insert(caValue* table, caValue* key);
+void hashtable_remove(caValue* table, caValue* key);
 
 caValue* hashtable_get_int_key(caValue* table, int key);
 caValue* hashtable_insert_int_key(caValue* table, int key);
@@ -24,7 +25,6 @@ void hashtable_remove_symbol_key(caValue* table, Symbol key);
 caValue* hashtable_insert_string(caValue* table, const char* str);
 caValue* hashtable_get_string(caValue* table, const char* str);
 
-void hashtable_remove(caValue* table, caValue* key);
 bool hashtable_is_empty(caValue* table);
 void hashtable_get_keys(caValue* table, caValue* keysOut);
 

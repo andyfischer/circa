@@ -315,7 +315,7 @@ void test_block_as_assertions_list(Block* block, std::string const& contextStr)
         std::cout << "Static error " << contextStr << ":" << std::endl;
         Value str;
         print_static_errors_formatted(block, &str);
-        std::cout << as_cstring(&str) << std::cout;
+        std::cout << as_cstring(&str) << std::endl;
         declare_current_test_failed();
         return;
     }
@@ -375,7 +375,6 @@ namespace file_watch_test { void register_tests(); }
 namespace function_test { void register_tests(); }
 namespace hashtable_test { void register_tests(); }
 namespace if_block_test { void register_tests(); }
-namespace importing_test { void register_tests(); }
 namespace interpreter_test { void register_tests(); }
 namespace list_test { void register_tests(); }
 namespace loop_test { void register_tests(); }
@@ -386,7 +385,6 @@ namespace native_patch_test { void register_tests(); }
 namespace parser_test { void register_tests(); }
 namespace path_expression_test { void register_tests(); }
 namespace stack_test { void register_tests(); }
-namespace state_test { void register_tests(); }
 namespace string_test { void register_tests(); }
 namespace symbol_test { void register_tests(); }
 namespace tagged_value_test { void register_tests(); }
@@ -407,7 +405,6 @@ int main(int argc, char** argv)
     file_watch_test::register_tests();
     function_test::register_tests();
     if_block_test::register_tests();
-    importing_test::register_tests();
     interpreter_test::register_tests();
     list_test::register_tests();
     loop_test::register_tests();
@@ -418,7 +415,6 @@ int main(int argc, char** argv)
     parser_test::register_tests();
     path_expression_test::register_tests();
     stack_test::register_tests();
-    state_test::register_tests();
     symbol_test::register_tests();
     tagged_value_test::register_tests();
     string_test::register_tests();

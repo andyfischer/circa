@@ -22,6 +22,7 @@ struct BuiltinFuncs {
     Term* cond;
     Term* continue_func;
     Term* copy;
+    Term* cull_state;
     Term* declare_field;
     Term* declared_state;
     Term* discard;
@@ -64,10 +65,12 @@ struct BuiltinFuncs {
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output_index;
-    Term* looped_input;
+    Term* make;
+    Term* map_get;
     Term* memoize;
     Term* minor_return_if_empty;
     Term* module;
+    Term* moduleRef_get;
     Term* mult;
     Term* native_patch;
     Term* neg;
@@ -82,6 +85,7 @@ struct BuiltinFuncs {
     Term* range;
     Term* remainder;
     Term* return_func;
+    Term* save_state_result;
     Term* section_block;
     Term* selector;
     Term* set_index;
@@ -94,6 +98,7 @@ struct BuiltinFuncs {
     Term* switch_func;
     Term* syntax_error;
     Term* type;
+    Term* type_make;
     Term* unbound_input;
     Term* unknown_function;
     Term* unknown_identifier;
@@ -120,7 +125,6 @@ struct BuiltinTypes {
     Type* null;
     Type* opaque_pointer;
     Type* vec2;
-    Type* retained_frame;
     Type* selector;
     Type* stack;
     Type* string;

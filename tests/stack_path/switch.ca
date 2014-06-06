@@ -1,0 +1,10 @@
+
+def f(int i)
+  switch i
+    case 1
+      print('case 1, path = ' _get_local_stack_path())
+    case 2
+      print('case 2, path = ' _get_local_stack_path())
+
+f(1)
+f(2)

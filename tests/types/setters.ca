@@ -1,7 +1,7 @@
 
 struct T {
-    int a
-    String b
+  int a
+  String b
 }
 
 t = T.make(1, 'x')
@@ -14,7 +14,7 @@ assert(to_string(t) == "{a: 4, b: 'x'}")
 assert(to_string(t) == "{a: 5, b: 'y'}")
 
 def error_test(t)
-    t.set_a('hi')
+  t.set_a('hi')
 
 int = make_stack(error_test)
 int.call(t)

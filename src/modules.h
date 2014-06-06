@@ -62,6 +62,6 @@ Block* module_load_from_zip_data(char* data, size_t data);
 bool is_module_ref(caValue* value);
 
 // Install builtin modules functions.
-void modules_install_functions(Block* kernel);
+void modules_install_functions(NativePatch* patch);
 
 } // namespace circa

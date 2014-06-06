@@ -106,7 +106,7 @@ void check_for_static_errors(Value* errors, Block* block)
 {
     if (!is_list(errors))
         set_list(errors, 0);
-    for (BlockIterator it(block); it.unfinished(); ++it)
+    for (BlockIterator it(block); it; ++it)
         check_term_for_static_error(errors, *it);
 }
 
@@ -212,7 +212,7 @@ void format_static_error(Term* term, caValue* out)
     check_term_for_static_error(&errors, term);
     if (errors.isEmpty())
         return;
-    format_static_error(errors.element(0), out);
+    format_static_error(errors.index(0), out);
 }
 
 void format_static_errors(caValue* errorList, caValue* output)
@@ -220,7 +220,7 @@ void format_static_errors(caValue* errorList, caValue* output)
     set_string(output, "");
     for (int i=0; i < list_length(errorList); i++) {
         Value line;
-        format_static_error(errorList->element(i), &line);
+        format_static_error(errorList->index(i), &line);
         string_append(output, &line);
         string_append(output, "\n");
     }
@@ -236,6 +236,9 @@ bool print_static_errors_formatted(Block* block, caValue* out)
 
 bool print_static_errors_formatted(caValue* result, caValue* out)
 {
+    if (!is_string(out))
+        set_string(out, "");
+
     int count = list_length(result);
 
     if (count == 0)

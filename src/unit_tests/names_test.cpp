@@ -115,7 +115,7 @@ void search_every_global_name()
     // the global name.
 
     circa::Value globalName;
-    for (BlockIterator it(global_root_block()); it.unfinished(); it.advance()) {
+    for (BlockIterator it(global_root_block()); it; ++it) {
         get_global_name(*it, &globalName);
 
         if (!is_string(&globalName))

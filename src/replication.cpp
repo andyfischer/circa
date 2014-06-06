@@ -24,15 +24,15 @@ static void compute_patch_list(caValue* base, caValue* latest, caValue* patch, c
         if (i >= list_length(base)) {
             caValue* elementPatch = patch->append()->set_list(2);
             elementPatch->set_element_sym(0, sym_Append);
-            elementPatch->set_element(1, latest->element(i));
+            elementPatch->set_element(1, latest->index(i));
         }
             
-        else if (!strict_equals(base->element(i), latest->element(i))) {
+        else if (!strict_equals(base->index(i), latest->index(i))) {
             caValue* elementPatch = patch->append()->set_list(3);
             elementPatch->set_element_sym(0, sym_Element);
             elementPatch->set_element_int(1, i);
-            compute_value_patch(base->element(i), latest->element(i),
-                elementPatch->element(2), error);
+            compute_value_patch(base->index(i), latest->index(i),
+                elementPatch->index(2), error);
             if (!is_null(error))
                 return;
         }
@@ -61,7 +61,7 @@ static void compute_patch_hashtable(caValue* base, caValue* latest, caValue* pat
             caValue* elementPatch = patch->append()->set_list(3);
             elementPatch->set_element_sym(0, sym_Key);
             elementPatch->set_element(1, key);
-            compute_value_patch(old, it.current(), elementPatch->element(2), error);
+            compute_value_patch(old, it.current(), elementPatch->index(2), error);
             if (!is_null(error))
                 return;
         }
@@ -125,29 +125,29 @@ void apply_patch(caValue* val, caValue* patch)
     touch(val);
 
     for (int i=0; i < list_length(patch); i++) {
-        Value* patchItem = patch->element(i);
+        Value* patchItem = patch->index(i);
 
         switch (first_symbol(patchItem)) {
         case sym_Replace:
-            set_value(val, patchItem->element(1));
+            set_value(val, patchItem->index(1));
             break;
         case sym_Append:
-            copy(patchItem->element(1), list_append(val));
+            copy(patchItem->index(1), list_append(val));
             break;
         case sym_Truncate:
-            list_resize(val, patchItem->element(1)->asInt());
+            list_resize(val, patchItem->index(1)->asInt());
             break;
         case sym_Insert:
-            set_value(hashtable_insert(val, patchItem->element(1)), patchItem->element(2));
+            set_value(hashtable_insert(val, patchItem->index(1)), patchItem->index(2));
             break;
         case sym_Delete:
-            hashtable_remove(val, patchItem->element(1));
+            hashtable_remove(val, patchItem->index(1));
             break;
         case sym_Element:
-            apply_patch(val->element(patchItem->element(1)->asInt()), patchItem->element(2));
+            apply_patch(val->index(patchItem->index(1)->asInt()), patchItem->index(2));
             break;
         case sym_Key:
-            apply_patch(hashtable_get(val, patchItem->element(1)), patchItem->element(2));
+            apply_patch(hashtable_get(val, patchItem->index(1)), patchItem->index(2));
             break;
         }
     }

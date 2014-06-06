@@ -102,6 +102,8 @@ void string_resize(StringData** data, int newLength)
 
 int string_length(StringData* data)
 {
+    if (data == NULL)
+        return 0;
     return data->length;
 }
 
@@ -258,9 +260,9 @@ void string_append(caValue* left, caValue* right)
     if (right == NULL)
         return;
 
-    if (is_string(right))
-        string_append(left, as_cstring(right));
-    else {
+    if (is_string(right)) {
+        string_append_len(left, as_cstring(right), string_length(right));
+    } else {
         to_string(right, left);
     }
 }
@@ -334,6 +336,12 @@ void string_append_qualified_name(caValue* left, caValue* right)
         return;
     string_append(left, ":");
     string_append(left, right);
+}
+
+void blob_append(Value* left, Value* right)
+{
+    ca_assert(is_string(left));
+    ca_assert(is_string(left));
 }
 
 void string_resize(caValue* s, int length)
@@ -484,7 +492,7 @@ int string_find_char_from_end(caValue* s, char c)
 {
     const char* cstr = as_cstring(s);
 
-    for (int i= (int) strlen(cstr) - 1; i >= 0; i--)
+    for (int i= string_length(s) - 1; i >= 0; i--)
         if (cstr[i] == c)
             return i;
     return -1;
@@ -529,7 +537,7 @@ void string_unquote_and_unescape(caValue* s)
     if (quote == '<')
         quoteSize = 3;
 
-    int end = (int) strlen(input) - quoteSize;
+    int end = string_length(s) - quoteSize;
 
     // Unescape any escaped characters
     std::stringstream result;
@@ -561,6 +569,16 @@ void string_unquote_and_unescape(caValue* s)
     }
 
     set_string(s, result.str());
+}
+
+void string_join(caValue* list, caValue* separator, caValue* out)
+{
+    set_string(out, "");
+    for (int i=0; i < list_length(list); i++) {
+        if (i != 0 && separator != NULL && !is_null(separator))
+            string_append(out, separator);
+        string_append(out, list_get(list, i));
+    }
 }
 
 void string_split(caValue* s, char sep, caValue* listOut)
@@ -643,6 +661,13 @@ void blob_append_char(caValue* blob, char c)
     as_blob(blob)[size] = c;
 }
 
+void blob_append_u8(caValue* blob, u8 val)
+{
+    int size = blob_size(blob);
+    string_resize(blob, size + 1);
+    as_blob(blob)[size] = val;
+}
+
 void blob_append_u16(caValue* blob, u16 val)
 {
     int size = blob_size(blob);
@@ -680,6 +705,13 @@ char blob_read_char(const char* data, int* pos)
     return c;
 }
 
+u8 blob_read_u8(const char* data, int* pos)
+{
+    u8 c = data[*pos];
+    *pos += 1;
+    return c;
+}
+
 u16 blob_read_u16(const char* data, int* pos)
 {
     u16 value = *((u16*) &data[*pos]);
@@ -706,6 +738,12 @@ void* blob_read_pointer(const char* data, int* pos)
     void* value = *((void**) &data[*pos]);
     *pos += sizeof(void*);
     return value;
+}
+
+void blob_write_u8(char* data, int* pos, u8 value)
+{
+    *((u8*) &data[*pos]) = value;
+    *pos += 1;
 }
 
 void blob_write_u32(char* data, int* pos, u32 value)

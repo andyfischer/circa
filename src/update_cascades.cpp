@@ -29,7 +29,7 @@ void on_block_inputs_changed(Block* block)
 
 void fix_forward_function_references(Block* block)
 {
-    for (BlockIterator it(block); it.unfinished(); it.advance()) {
+    for (BlockIterator it(block); it; ++it) {
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             // See if we can now find this function

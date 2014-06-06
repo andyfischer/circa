@@ -7,8 +7,6 @@
 
 namespace circa {
 
-struct Program;
-
 struct Stack
 {
     // Globally unique ID.
@@ -26,7 +24,7 @@ struct Stack
     int registerCapacity;
 
     Value derivedHackset;
-    Program* program;
+    Compiled* program;
 
     // Stored values that were computed on-demand. Keyed by Term reference.
     Value demandValues;
@@ -37,11 +35,14 @@ struct Stack
     // Term value observations. Keyed by stack path.
     Value observations;
 
+    // Stack state
+    Value state;
+
     // Stack-local random number generator.
     RandState randState;
 
-    // Transient data, used during vm_run.
-    char* bc;
+    // Program counter, only valid during vm_run.
+    char* bytecode;
     int pc;
 
     // Current step, either StackReady, StackRunning or StackFinished.
@@ -64,6 +65,7 @@ struct Stack
     ~Stack();
 
     void dump();
+    void dump_compiled();
 
 private:
     // Disabled C++ functions.
@@ -79,25 +81,19 @@ struct Frame
     // PC (in the parent frame) that this frame was expanded from. Invalid for the first frame.
     int parentIndex;
 
-    // Stack state: data saved between invocations.
-    Value state;
-
-    // Outgoing stack state. Will be committed to parent frame's state.
-    Value outgoingState;
-
     // Map of Term to value, for scope-specific bindings. Used in closure call.
     Value bindings;
 
     // Frame env values.
     Value env;
 
+    Value incomingState;
+    Value outgoingState;
+
     Block* block;
 
     // Block index (as stored in Program).
     int blockIndex;
-
-    // Bytecode data. Data is owned in Stack.bytecode.
-    char* bc;
 
     // Bytecode position. Saved when this frame is not the top.
     int pc;
@@ -119,6 +115,7 @@ void stack_incref(Stack* stack);
 void stack_decref(Stack* stack);
 
 Frame* stack_push_blank_frame(Stack* stack, int registerCount);
+void stack_resize_top_frame(Stack* stack, int registerCount);
 void stack_pop_no_retain(Stack* stack);
 
 // Resize the given frame to have a new register count. This will invalidate your 'frame'
@@ -127,8 +124,10 @@ Frame* stack_resize_frame(Stack* stack, Frame* frame, int newRegisterCount);
 
 int stack_frame_count(Stack* stack);
 
-Frame* stack_top_parent(Stack* stack);
+Frame* top_frame_parent(Stack* stack);
 Block* stack_top_block(Stack* stack);
+
+caValue* stack_state(Stack* stack);
 
 // Returns whether evaluation has been stopped due to an error.
 bool stack_errored(Stack* stack);
@@ -148,6 +147,8 @@ Frame* first_frame(Stack* stack);
 
 // Returns "top" frame; the one that is currently executing; the last one in memory.
 Frame* top_frame(Stack* stack);
+
+CompiledBlock* frame_compiled_block(Frame* frame);
 
 Frame* next_frame(Frame* frame);
 Frame* next_frame_n(Frame* frame, int distance);
@@ -183,16 +184,6 @@ void stack_on_migration(Stack* stack);
 Frame* as_frame_ref(caValue* value);
 bool is_frame_ref(caValue* value);
 void set_frame_ref(caValue* value, Frame* frame);
-
-void set_retained_frame(caValue* frame);
-bool is_retained_frame(caValue* frame);
-caValue* retained_frame_get_block(caValue* frame);
-caValue* retained_frame_get_state(caValue* frame);
-
-void stack_extract_state(Stack* stack, caValue* output);
-void frame_extract_state(Frame* frame, caValue* output);
-
-void copy_stack_frame_outgoing_state_to_retained(Frame* source, caValue* retainedFrame);
 
 void stack_setup_type(Type* stackType);
 void stack_install_functions(NativePatch* patch);

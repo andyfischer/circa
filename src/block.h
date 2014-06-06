@@ -9,12 +9,10 @@ namespace circa {
 
 struct BlockOverrides
 {
-    EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
     PostCompileFunc postCompile;
 
     BlockOverrides() :
-      evaluate(NULL),
       specializeType(NULL),
       postCompile(NULL)
     {}
@@ -135,6 +133,7 @@ bool has_nested_contents(Term* term);
 Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);
 Term* block_get_function_term(Block* block);
+Value* block_name(Block* block);
 
 void remove_nested_contents(Term* term);
 
@@ -177,9 +176,6 @@ Block* load_script_term(Block* block, const char* filename);
 
 void remove_nulls(Block* block);
 
-// Return the block's override func. May be NULL.
-EvaluateFunc get_override_for_block(Block* block);
-
 Term* find_term_by_id(Block* block, int id);
 
 std::string get_source_file_location(Block* block);
@@ -202,7 +198,6 @@ int block_locals_count(Block* block);
 Type* get_input_type(Block* block, int index);
 Type* get_output_type(Block* block, int index);
 
-void block_set_evaluate_func(Block* block, EvaluateFunc eval);
 void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeFunc);
 void block_set_post_compile_func(Block* block, PostCompileFunc postCompile);
 void block_set_function_has_nested(Block* block, bool hasNestedContents);

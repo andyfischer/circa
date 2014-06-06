@@ -29,49 +29,53 @@
 
 namespace circa {
 
-typedef std::map<std::string, NativePatch*> StringToNativePatchMap;
-
-struct NativePatchWorld
+struct NativeFunc
 {
-    // Map of names to NativePatches.
-    StringToNativePatchMap nativeModules;
+    Value name;
+    EvaluateFunc func;
 };
 
 struct NativePatch
 {
+    // One "NativePatch" is a collection of name and native-function pairs that all apply
+    // to a single module.
+    
     World* world;
 
-    // Hashtable, maps names to patches.
-    Value patches;
+    // Hashtable, maps names to funcTable index.
+    Value funcMap;
 
-    // Target block name.
-    Value targetName;
+    // Target module name.
+    Value name;
 
     // If this module was loaded from a DLL or shared object, that object is here.
     // May be NULL if the module was created a different way.
     void* dll;
 };
 
-NativePatchWorld* alloc_native_patch_world()
+
+static int add_native_func(World* world, Value* name, EvaluateFunc func)
 {
-    NativePatchWorld* world = new NativePatchWorld();
-    return world;
+    int index = world->funcTableCount;
+    world->funcTableCount++;
+    world->funcTable = (NativeFunc*) realloc(world->funcTable, sizeof(NativeFunc) * world->funcTableCount);
+    NativeFunc* newFunc = &world->funcTable[world->funcTableCount - 1];
+    initialize_null(&newFunc->name);
+    copy(name, &newFunc->name);
+    newFunc->func = func;
+    return index;
 }
 
-void free_native_patch_world(NativePatchWorld* world)
+static NativePatch* add_native_patch(World* world)
 {
-    std::map<std::string, NativePatch*>::const_iterator it;
-    for (it = world->nativeModules.begin(); it != world->nativeModules.end(); ++it) {
-        NativePatch* patch = it->second;
-        delete patch;
-    }
-    delete world;
-}
-
-NativePatch* alloc_native_patch(World* world)
-{
-    NativePatch* patch = new NativePatch();
-    set_hashtable(&patch->patches);
+    world->nativePatchCount++;
+    world->nativePatch = (NativePatch*) realloc(world->nativePatch,
+        sizeof(NativePatch) * world->nativePatchCount);
+    
+    NativePatch* patch = &world->nativePatch[world->nativePatchCount - 1];
+    initialize_null(&patch->funcMap);
+    initialize_null(&patch->name);
+    set_hashtable(&patch->funcMap);
     patch->world = world;
     patch->dll = NULL;
     return patch;
@@ -82,70 +86,53 @@ void free_native_patch(NativePatch* patch)
     delete patch;
 }
 
-NativePatch* get_existing_native_patch(World* world, const char* name)
+NativePatch* find_existing_native_patch(World* world, const char* name)
 {
-    NativePatchWorld* nativeWorld = world->nativePatchWorld;
-
-    // Return existing module, if it exists.
-    std::map<std::string, NativePatch*>::const_iterator it =
-        nativeWorld->nativeModules.find(name);
-
-    if (it != nativeWorld->nativeModules.end())
-        return it->second;
+    for (int i=0; i < world->nativePatchCount; i++) {
+        NativePatch* patch = &world->nativePatch[i];
+        if (string_equals(&patch->name, name))
+            return patch;
+    }
 
     return NULL;
 }
 
-NativePatch* insert_native_patch(World* world, const char* targetName)
+NativePatch* insert_native_patch(World* world, const char* name)
 {
-    NativePatchWorld* nativeWorld = world->nativePatchWorld;
+    NativePatch* patch = find_existing_native_patch(world, name);
 
-    NativePatch* module = get_existing_native_patch(world, targetName);
+    if (patch != NULL)
+        return patch;
 
-    if (module != NULL)
-        return module;
-
-    // Create new NativePatch with this name.
-    module = alloc_native_patch(world);
-    set_string(&module->targetName, targetName);
-    nativeWorld->nativeModules[targetName] = module;
-    return module;
+    patch = add_native_patch(world);
+    set_string(&patch->name, name);
+    return patch;
 }
 
 void remove_native_patch(World* world, const char* name)
 {
-    world->nativePatchWorld->nativeModules.erase(name);
+    // TODO
+}
 
-    std::map<std::string, NativePatch*>::iterator it;
-    it = world->nativePatchWorld->nativeModules.find(name);
+CIRCA_EXPORT void circa_patch_function(caNativePatch* patch, const char* nameStr,
+        caEvaluateFunc func)
+{
+    Value name;
+    set_string(&name, nameStr);
 
-    if (it != world->nativePatchWorld->nativeModules.end()) {
-        free_native_patch(it->second);
-        world->nativePatchWorld->nativeModules.erase(it);
+    Value* funcIndex = hashtable_get(&patch->funcMap, &name);
+
+    if (funcIndex == NULL) {
+        int index = add_native_func(patch->world, &name, func);
+        set_int(hashtable_insert(&patch->funcMap, &name), index);
+    } else {
+        NativeFunc* entry = &patch->world->funcTable[as_int(funcIndex)];
+        copy(&name, &entry->name);
+        entry->func = func;
     }
 }
 
-static void function_key(const char* name, caValue* out)
-{
-    set_list(out, 2)->set_element_sym(0, sym_Function)->set_element_str(1, name);
-}
-
-void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func)
-{
-    Value key;
-    function_key(name, &key);
-    set_opaque_pointer(hashtable_insert(&module->patches, &key), (void*) func);
-}
-
 #if 0
-void module_patch_type_release(NativePatch* module, const char* typeName, ReleaseFunc func)
-{
-    Value key;
-    type_release_key(typeName, &key);
-    set_opaque_pointer(hashtable_insert(&module->patches, &key), (void*) func);
-}
-#endif
-
 void native_patch_apply_patch(NativePatch* module, Block* block)
 {
     // Walk through list of patches, and apply them to block terms as appropriate.
@@ -186,9 +173,11 @@ void native_patch_apply_patch(NativePatch* module, Block* block)
         }
     }
 }
+#endif
 
 void native_patch_finish_change(NativePatch* module)
 {
+#if 0
     World* world = module->world;
 
     // Apply changes to the target module.
@@ -199,6 +188,7 @@ void native_patch_finish_change(NativePatch* module)
         return;
 
     native_patch_apply_patch(module, block);
+#endif
 }
 
 CIRCA_EXPORT void circa_finish_native_patch(caNativePatch* module)
@@ -206,7 +196,8 @@ CIRCA_EXPORT void circa_finish_native_patch(caNativePatch* module)
     native_patch_finish_change(module);
 }
 
-static NativePatch* find_native_patch_for_module(NativePatchWorld* world, Block* module)
+#if 0
+static NativePatch* find_native_patch_for_module(World* world, Block* module)
 {
     if (module == NULL)
         return NULL;
@@ -219,6 +210,7 @@ static NativePatch* find_native_patch_for_module(NativePatchWorld* world, Block*
 
     return it->second;
 }
+#endif
 
 static bool term_can_be_patched(Term* term)
 {
@@ -239,11 +231,12 @@ Block* find_enclosing_module(Block* block)
 
 void native_patch_apply_to_new_function(World* world, Block* function)
 {
+#if 0
     Term* term = function->owningTerm;
     if (!term_can_be_patched(term))
         return;
 
-    NativePatchWorld* moduleWorld = world->nativePatchWorld;
+    World* moduleWorld = world->nativePatchWorld;
 
     Block* module = find_enclosing_module(function);
     if (module == NULL)
@@ -261,9 +254,58 @@ void native_patch_apply_to_new_function(World* world, Block* function)
         
     EvaluateFunc evaluateFunc = (EvaluateFunc) as_opaque_pointer(patch);
     install_function(term, evaluateFunc);
+#endif
     #if NATIVE_PATCH_VERBOSE
         printf("Patching with native func (on creation): %s\n", as_cstring(term_name(term)));
     #endif
+}
+
+NativeFuncIndex find_native_func_index(World* world, Block* block)
+{
+    if (block->owningTerm == NULL)
+        return -1;
+
+    Value* funcName = term_name(block->owningTerm);
+    if (is_null(funcName))
+        return -1;
+
+    Block* module = find_enclosing_module(block);
+    if (module == NULL)
+        return -1;
+
+    NativePatch* nativePatch = find_existing_native_patch(world,
+        as_cstring(term_name(module->owningTerm)));
+
+    if (nativePatch == NULL)
+        return -1;
+
+    Value* patchIndex = hashtable_get(&nativePatch->funcMap, funcName);
+    if (patchIndex == NULL)
+        return -1;
+
+    return patchIndex->asInt();
+}
+
+NativeFuncIndex find_native_func_index_by_name(NativePatch* patch, Value* name)
+{
+    Value* patchIndex = hashtable_get(&patch->funcMap, name);
+    if (patchIndex == NULL)
+        return -1;
+    return as_int(patchIndex);
+}
+
+EvaluateFunc get_native_func(World* world, NativeFuncIndex index)
+{
+    ca_assert(index != -1 && index < world->funcTableCount);
+    return world->funcTable[index].func;
+}
+
+Value* get_native_func_name(World* world, NativeFuncIndex index)
+{
+    if (index < 0 || index >= world->funcTableCount)
+        return NULL;
+
+    return &world->funcTable[index].name;
 }
 
 void native_patch_apply_to_new_type(World* world, Type* type)
@@ -273,7 +315,7 @@ void native_patch_apply_to_new_type(World* world, Type* type)
     if (!term_can_be_patched(term))
         return;
 
-    NativePatchWorld* moduleWorld = world->nativePatchWorld;
+    World* moduleWorld = world->nativePatchWorld;
 
     Block* module = find_enclosing_module(term->owningBlock);
     if (module == NULL)
@@ -344,11 +386,6 @@ CIRCA_EXPORT caNativePatch* circa_create_native_patch(caWorld* world, const char
     return insert_native_patch(world, name);
 }
 
-CIRCA_EXPORT void circa_patch_function(caNativePatch* module, const char* name,
-        caEvaluateFunc func)
-{
-    module_patch_function((NativePatch*) module, name, func);
-}
 
 #if 0
 CIRCA_EXPORT void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func)

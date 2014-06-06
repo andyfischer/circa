@@ -26,10 +26,10 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG -DCIRCA_USE_LINENOISE
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -gdwarf-2
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca_d -ldl -luv
+  LIBS      += -lcirca_d -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca_d.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -51,7 +51,7 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
-  LIBS      += -lcirca -ldl -luv
+  LIBS      += -lcirca -ldl
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += ../build/libcirca.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)

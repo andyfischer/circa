@@ -244,18 +244,6 @@ Block* find_module_from_filename(const char* filename)
     return NULL;
 }
 
-void require_func_postCompile(Term* term)
-{
-    caValue* moduleName = term_value(term->input(0));
-    Block* module = load_module_by_name(global_world(), term->owningBlock, moduleName);
-    if (module != NULL)
-        module_on_loaded_by_term(module, term);
-
-    // Save a ModuleRef value.
-    caValue* moduleRef = term_value(term);
-    make(TYPES.module_ref, moduleRef);
-    set_block(list_get(moduleRef, 0), module);
-}
 
 void load_module_eval(caStack* stack)
 {
@@ -334,18 +322,11 @@ void require_eval(caStack* stack)
     set_block(list_get(moduleRef, 0), module);
 }
 
-void modules_install_functions(Block* kernel)
+void modules_install_functions(NativePatch* patch)
 {
-    FUNCS.require = kernel->get("require");
-    block_set_post_compile_func(function_contents(FUNCS.require), require_func_postCompile);
-
-    FUNCS.package = install_function(kernel, "package", NULL);
-
-    FUNCS.module = import_function(kernel, NULL, "module()");
-
-    install_function(kernel, "require", require_eval);
-    install_function(kernel, "load_module", load_module_eval);
-    install_function(kernel, "load_script", load_script_eval);
+    circa_patch_function(patch, "require", require_eval);
+    circa_patch_function(patch, "load_module", load_module_eval);
+    circa_patch_function(patch, "load_script", load_script_eval);
 }
 
 CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)

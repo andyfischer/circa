@@ -35,12 +35,18 @@ namespace circa {
 
 typedef long long int int64;
 typedef long long unsigned int uint64;
+typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
+typedef int8_t i8;
+typedef int16_t i16;
+typedef int32_t i32;
 
 struct Block;
 struct CastResult;
 struct CircaObject;
+struct Compiled;
+struct CompiledBlock;
 struct Frame;
 struct Stack;
 struct FeedbackOperation;
@@ -49,10 +55,8 @@ struct FileWatchWorld;
 struct GCReferenceList;
 struct ListData;
 struct LibuvWorld;
-struct NativePatchWorld;
+struct NativeFunc;
 struct NativePatch;
-struct NativePatchFunction;
-struct Program;
 struct RawOutputPrefs;
 struct StaticTypeQuery;
 struct Term;

@@ -46,6 +46,7 @@ Mutability
 Optional
 OriginalText
 OverloadedFunc
+Ref
 Rebind
 RebindsInput
 Setter
@@ -153,6 +154,8 @@ no_save_state
 effect
 set_value
 watch
+Copy
+Move
 
 # Stack steps
 StackReady

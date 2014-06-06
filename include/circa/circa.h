@@ -102,7 +102,7 @@ struct Value
     int asInt();
     float asFloat();
 
-    Value* element(int i);
+    Value* index(int i);
     int length();
 
     // Assignment
@@ -520,20 +520,6 @@ caBlock* circa_term_get_function(caTerm* term);
 caValue* circa_function_get_name(caBlock* func);
 
 // -- Code Building --
-
-// Install an evaluation function to the given named function. Returns the container Term.
-// Returns NULL if the name was not found.
-caTerm* circa_install_function(caBlock* block, const char* name, caEvaluateFunc func);
-
-typedef struct caFunctionBinding
-{
-    const char* name;
-    caEvaluateFunc func;
-} caFunctionBinding;
-
-// Install a series of C function bindings. This will treat 'bindingList' as an array
-// that is terminanted with a NULL caFunctionBinding.
-void circa_install_function_list(caBlock* block, const caFunctionBinding* bindingList);
 
 // Create a new value() term with the given name. Returns the term's value. The value
 // is deep-write-safe.

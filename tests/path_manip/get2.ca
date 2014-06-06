@@ -1,0 +1,12 @@
+
+a = Map.make
+
+set(@a [:x :y :z] 123)
+
+print('a = ' a)
+
+print('get [] = ' get(a []))
+print('get :x = ' get(a [:x]))
+print('get :x :y = ' get(a [:x :y]))
+print('get :x :y :z = ' get(a [:x :y :z]))
+print('get :x :y :z :w = ' get(a [:x :y :z :w]))

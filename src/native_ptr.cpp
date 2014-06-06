@@ -2,11 +2,11 @@
 
 #include "common_headers.h"
 
+#include "builtin_types.h"
 #include "kernel.h"
 #include "tagged_value.h"
 #include "type.h"
 #include "native_ptr.h"
-#include "types/common.h"
 
 namespace circa {
 
@@ -76,7 +76,7 @@ void native_ptr_setup_type(Type* type)
     type->copy = native_ptr_copy;
     type->release = native_ptr_release;
     type->storageType = sym_StorageTypeOpaquePointer;
-    type->hashFunc = common_type_callbacks::shallow_hash_func;
+    type->hashFunc = shallow_hash_func;
 }
 
 CIRCA_EXPORT void* circa_native_ptr(caValue* val)

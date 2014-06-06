@@ -9,9 +9,9 @@ def f() -> List
 
     return result
 
-int = make_stack(f)
-result = int.call
-print('step1, result = ' result ', s = ' int.extract_state)
+vm = make_vm(f)
+result = vm.call
+print('step1, result = ' result ', s = ' vm.extract_state)
 
-result = int.call
-print('step2, result = ' result ', s = ' int.extract_state)
+result = vm.call
+print('step2, result = ' result ', s = ' vm.extract_state)

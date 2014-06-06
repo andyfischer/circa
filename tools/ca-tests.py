@@ -114,6 +114,7 @@ def test_file(process, filename):
         process.kill()
 
     # Source repro test
+    """
     try:
         diff = diff_command_against_file(process, "source_repro "+filename, filename)
     except Exception as e:
@@ -128,6 +129,7 @@ def test_file(process, filename):
         desc.append(' Observed: '+diff.fromCommand)
         failures.append(TestFailure(desc, filename))
         process.kill()
+    """
 
     return failures
 

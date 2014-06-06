@@ -10,7 +10,6 @@ struct World {
     Block* builtins;
 
     // Private data.
-    NativePatchWorld* nativePatchWorld;
     FileWatchWorld* fileWatchWorld;
     LibuvWorld* libuvWorld;
 
@@ -32,7 +31,14 @@ struct World {
     // Whether the world is currently bootstrapping. Either :Bootstrapping or :Done.
     Symbol bootstrapStatus;
 
-    // NativePatch for all builtins.
+    // NativePatch data.
+    NativePatch* nativePatch;
+    int nativePatchCount;
+
+    NativeFunc* funcTable;
+    int funcTableCount;
+
+    // Special NativePatch for builtin funcs.
     NativePatch* builtinPatch;
 
     int globalScriptVersion;

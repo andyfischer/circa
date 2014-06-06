@@ -167,4 +167,21 @@ namespace list_t {
     std::string tv_to_string(caValue* value);
 }
 
+struct ListIterator
+{
+    Value* list;
+    int index;
+
+    ListIterator(Value* list_in) : list(list_in), index(0) {}
+
+    bool finished() { return index >= list_length(list); }
+    void advance() { index++; }
+
+    operator bool() { return !finished(); }
+    void operator++() { advance(); }
+
+    int key() { return index; }
+    Value* value() { return list_get(list, index); }
+};
+
 } // namespace circa

@@ -1,0 +1,26 @@
+
+a = Map.make
+
+set(@a [:x :y :z] 1)
+
+print(a)
+
+set(@a [:x :y2 :z] 2)
+
+print(a)
+
+set(@a [:w] 3)
+
+print(a)
+
+set(@a [:x :y :z] 4)
+
+print(a)
+
+set(@a [:x :y] 5)
+
+print(a)
+
+set(@a [] 6)
+
+print(a)

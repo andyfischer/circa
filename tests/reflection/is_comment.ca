@@ -1,0 +1,6 @@
+
+def f()
+  -- this is a comment
+
+term = f.block.terms[0]
+assert(term.is_comment)

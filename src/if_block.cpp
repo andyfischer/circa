@@ -363,17 +363,17 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
 
         // search through 'names' and remove any not in this block.
         for (int i=0; i < names.length(); i++) {
-            if (is_null(names.element(i)))
+            if (is_null(names.index(i)))
                 continue;
-            if (caseBlock->get(as_cstring(names.element(i))) == NULL)
-                set_null(names.element(i));
+            if (caseBlock->get(as_cstring(names.index(i))) == NULL)
+                set_null(names.index(i));
         }
     }
 
     list_remove_nulls(&names);
 
     for (int i=0; i < names.length(); i++) {
-        caValue* name = names.element(i);
+        caValue* name = names.index(i);
 
         // Skip if name is already bound
         if (find_output_placeholder_with_name(contents, name) != NULL)

@@ -16,6 +16,7 @@
 
 namespace circa {
 
+#if 0
 Term* import_function(Block* block, EvaluateFunc evaluate, const char* header)
 {
     Term* result = parser::compile(block, parser::function_decl, header);
@@ -44,6 +45,7 @@ Term* install_function(Block* block, const char* name, EvaluateFunc evaluate)
     dirty_bytecode(function_contents(term));
     return term;
 }
+#endif
 
 Term* import_type(Block* block, Type* type)
 {

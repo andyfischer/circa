@@ -5,6 +5,7 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
+#include "control_flow.h"
 #include "function.h"
 #include "hashtable.h"
 #include "kernel.h"
@@ -102,7 +103,7 @@ void add_implicit_placeholders(Term* forTerm)
         Term* result = contents->get(name);
 
         // Create input_placeholder
-        Term* input = apply(contents, FUNCS.input, TermList(), name.c_str());
+        Term* input = apply(contents, FUNCS.input, TermList(original), name.c_str());
         Type* type = find_common_type(original->type, result->type);
         set_declared_type(input, type);
         contents->move(input, inputIndex);
@@ -110,14 +111,16 @@ void add_implicit_placeholders(Term* forTerm)
         set_input(forTerm, inputIndex, original);
 
         // Repoint terms to use our new input_placeholder
-        for (BlockIterator it(contents); it.unfinished(); it.advance())
+        for (BlockIterator it(contents); it; ++it)
             remap_pointers_quick(*it, original, input);
 
         // Create output_placeholder
-        Term* term = apply(contents, FUNCS.output, TermList(result), name.c_str());
+        Term* outputPlaceholder = apply(contents, FUNCS.output, TermList(result), name.c_str());
+
+        set_input(input, 1, outputPlaceholder);
 
         // Move output into the correct output slot
-        contents->move(term, contents->length() - 1 - inputIndex);
+        contents->move(outputPlaceholder, contents->length() - 1 - inputIndex);
 
         inputIndex++;
     }
@@ -171,43 +174,31 @@ void list_names_that_must_be_looped(Block* contents, caValue* names)
     list_sort(names, NULL, NULL);
 }
 
-void update_looped_inputs(Block* contents)
+void insert_looped_placeholders(Block* contents)
 {
     Value names;
     list_names_that_must_be_looped(contents, &names);
 
-    // Terms 0 through N (where N = number of looped names) should be looped inputs.
-    for (int i=0; i < list_length(&names); i++) {
+    //set_input_placeholder_count(contents, hashtable_count(&names));
+    //set_output_placeholder_count(contents, hashtable_count(&names));
 
-        caValue* name = list_get(&names, i);
-        Term* outside = find_name_at(contents->owningTerm, name);
-        Term* inside = find_local_name(contents, name);
+    for (ListIterator it(&names); it; ++it) {
+        Term* inputPlaceholder = append_input_placeholder(contents);
+        Value* name = it.value();
+        rename(inputPlaceholder, name);
+        Term* outsideTerm = find_name_at(contents->owningTerm, name);
+        Term* innerResult = find_local_name(contents, name);
+        Term* outputPlaceholder = append_output_placeholder(contents, innerResult);
+        rename(outputPlaceholder, name);
 
-        Term* looped = contents->getSafe(i);
-        if (looped == NULL || looped->function != FUNCS.looped_input) {
-            looped = apply(contents, FUNCS.looped_input, TermList(outside, inside));
-            move_to_index(looped, i);
-        } else {
-            set_inputs(looped, TermList(outside, inside));
-        }
-        rename(looped, as_cstring(name));
+        set_inputs(inputPlaceholder, TermList(outsideTerm, outputPlaceholder));
 
-        // Now repoint inputs from the outside version to the looped input.
         for (BlockInputIterator it(contents); it; ++it) {
             Term* term = it.currentTerm();
-            Term* input = it.currentInput();
-            if (input == outside && term != looped)
-                set_input(term, it.currentInputIndex(), looped);
+            if (it.currentInput() == outsideTerm && term != inputPlaceholder)
+                set_input(term, it.currentInputIndex(), inputPlaceholder);
         }
     }
-
-    // Delete any remaining looped terms.
-    for (int i=list_length(&names); i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function == FUNCS.looped_input)
-            erase_term(term);
-    }
-    remove_nulls(contents);
 }
 
 void list_names_that_should_be_used_as_minor_block_output(Block* block, caValue* names)
@@ -237,35 +228,36 @@ void finish_while_loop(Block* block)
 {
     block_finish_changes(block);
 
-    for (int i=0; i < block->length(); i++) {
-        Term* looped_input = block->get(i);
-        if (looped_input->function != FUNCS.looped_input)
-            break;
+    // Add a a primary output
+    Term* primaryOutput = apply(block, FUNCS.output, TermList(NULL));
 
-        Term* output = find_or_create_output_term(block->owningTerm, 1 + i);
-        rename(output, term_name(looped_input));
-    }
+    // Add looped_inputs
+    insert_looped_placeholders(block);
+
+    update_extra_outputs(block->owningTerm);
+    update_for_control_flow(block);
+
+    block_finish_changes(block);
 }
 
 void finish_for_loop(Term* forTerm)
 {
-    Block* contents = nested_contents(forTerm);
+    Block* block = nested_contents(forTerm);
 
     // Need to finish here to prevent error
-    block_finish_changes(contents);
+    block_finish_changes(block);
 
     // Add a a primary output
-    Term* primaryOutput = apply(contents, FUNCS.output,
-            TermList(loop_get_primary_result(contents)));
+    Term* primaryOutput = apply(block, FUNCS.output,
+            TermList(loop_get_primary_result(block)));
     primaryOutput->setBoolProp(sym_AccumulatingOutput, true);
     respecialize_type(primaryOutput);
 
-    add_implicit_placeholders(forTerm);
-    repoint_terms_to_use_input_placeholders(contents);
+    insert_looped_placeholders(block);
 
     update_extra_outputs(forTerm);
 
-    block_finish_changes(contents);
+    block_finish_changes(block);
 }
 
 Term* find_enclosing_for_loop(Term* location)
@@ -384,32 +376,6 @@ Term* loop_find_condition(Block* block)
 
 void while_loop_finish_changes(Block* contents)
 {
-    update_looped_inputs(contents);
-}
-
-void index_func_postCompile(Term* term)
-{
-    Term* enclosingLoop = find_enclosing_for_loop(term);
-    if (enclosingLoop == NULL)
-        return;
-    Term* loop_index = for_loop_find_index(nested_contents(enclosingLoop));
-    if (loop_index == NULL)
-        return;
-    set_input(term, 0, loop_index);
-    set_input_hidden(term, 0, true);
-}
-
-void evaluate_index_func(caStack* stack)
-{
-    copy(circa_input(stack, 0), circa_output(stack, 0));
-}
-
-void loop_setup_functions(Block* kernel)
-{
-    Term* index_func = import_function(kernel, evaluate_index_func, "index(int i :optional) -> int");
-    block_set_post_compile_func(function_contents(index_func), index_func_postCompile);
-
-    FUNCS.while_loop = import_function(kernel, NULL, "while()");
 }
 
 } // namespace circa

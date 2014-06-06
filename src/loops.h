@@ -33,6 +33,4 @@ Term* loop_find_condition(Block* block);
 
 void while_loop_finish_changes(Block* contents);
 
-void loop_setup_functions(Block* kernel);
-
 } // namespace circa

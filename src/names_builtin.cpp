@@ -56,6 +56,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Optional: return "Optional";
     case sym_OriginalText: return "OriginalText";
     case sym_OverloadedFunc: return "OverloadedFunc";
+    case sym_Ref: return "Ref";
     case sym_Rebind: return "Rebind";
     case sym_RebindsInput: return "RebindsInput";
     case sym_Setter: return "Setter";
@@ -147,6 +148,8 @@ const char* builtin_symbol_to_string(int name)
     case sym_effect: return "effect";
     case sym_set_value: return "set_value";
     case sym_watch: return "watch";
+    case sym_Copy: return "Copy";
+    case sym_Move: return "Move";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -453,6 +456,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'p':
+        if (strcmp(str + 3, "y") == 0)
+            return sym_Copy;
+        break;
     default: return -1;
     }
     default: return -1;
@@ -933,6 +940,10 @@ int builtin_symbol_from_string(const char* str)
         break;
     default: return -1;
     }
+    case 'v':
+        if (strcmp(str + 3, "e") == 0)
+            return sym_Move;
+        break;
     default: return -1;
     }
     case 'u':
@@ -1071,6 +1082,8 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 3, "ursiveWildcard") == 0)
             return sym_RecursiveWildcard;
         break;
+    case 'f':
+            return sym_Ref;
     case 'p':
     switch (str[3]) {
     case 'e':

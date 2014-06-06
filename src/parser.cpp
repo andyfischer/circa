@@ -99,14 +99,14 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        set_string(hashtable_insert_int_key(inputs.element(index), key), value.c_str());
+        set_string(hashtable_insert_int_key(inputs.index(index), key), value.c_str());
     }
     void set(int index, Symbol key, caValue* value)
     {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        copy(value, hashtable_insert_int_key(inputs.element(index), key));
+        copy(value, hashtable_insert_int_key(inputs.index(index), key));
     }
 
     void append(int index, Symbol key, std::string const& value)
@@ -114,7 +114,7 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        caValue* existing = hashtable_insert_int_key(inputs.element(index), key);
+        caValue* existing = hashtable_insert_int_key(inputs.index(index), key);
         if (!is_string(existing))
             set_string(existing, "");
 
@@ -124,7 +124,7 @@ struct ListSyntaxHints {
     void apply(Term* term)
     {
         for (int i=0; i < inputs.length(); i++) {
-            for (HashtableIterator it(inputs.element(i)); it; ++it) {
+            for (HashtableIterator it(inputs.index(i)); it; ++it) {
                 term_insert_input_property(term, i, as_symbol(it.currentKey()))->set_value(it.current());
             }
         }
@@ -669,6 +669,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
                 input->setBoolProp(sym_Output, true);
             } else if (symbolText == ":multiple") {
                 input->setBoolProp(sym_Multiple, true);
+            } else if (symbolText == ":ref") {
+                input->setBoolProp(sym_Ref, true);
             } else if (symbolText == ":meta") {
                 input->setBoolProp(sym_Meta, true);
             } else {
@@ -849,8 +851,6 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         result->setBoolProp(sym_Syntax_NoBrackets, true);
         return ParseResult(result);
     }
-
-    native_patch_apply_to_new_type(global_world(), unbox_type(result));
 
     // if there's a semicolon, or we've run out of tokens, then finish here.
     if (tokens.nextIs(tok_Semicolon) || tokens.finished()) {
@@ -1694,6 +1694,14 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
             InfixOperatorInfo opInfo = get_infix_operator_info(operatorMatch);
 
+            #ifdef DEBUG
+                if (opInfo.function == NULL) {
+                    printf("in infix_expression: function not found for infix operator %s\n",
+                        builtin_symbol_to_string(operatorMatch));
+                    internal_error("");
+                }
+            #endif
+
             Term* term = apply(block, opInfo.function, TermList(left.term, rightExpr.term));
 
             term->setStringProp(sym_Syntax_DeclarationStyle, "infix");
@@ -1905,6 +1913,14 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     inputs.prepend(lhs.term);
     inputHints.insert(0);
     Type* rootType = lhs.term->type;
+
+    #ifdef DEBUG
+        if (rootType == NULL) {
+            printf("Parsing method_call, no type for term named %s (bootstrapping?)\n",
+                as_cstring(&lhs.term->nameValue));
+            internal_error("Error in parser::method_call");
+        }
+    #endif
 
     // Find the function
     Term* function = find_method(block, rootType, &functionName);

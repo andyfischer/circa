@@ -36,10 +36,9 @@ caValue* stack_find_nonlocal(Frame* frame, Term* term);
 void stack_to_string(Stack* stack, caValue* out, bool withBytecode);
 void stack_trace_to_string(Stack* stack, caValue* out);
 
-
 void vm_run(Stack* stack);
-Frame* vm_push_frame(Stack* stack, int parentIndex, Block* block);
 Frame* vm_push_frame2(Stack* stack, int parentIndex, int blockIndex);
+int vm_compile_block(Stack* stack, Block* block);
 
 // Deprecated
 void evaluate_block(Stack* stack, Block* block);
@@ -50,13 +49,8 @@ void evaluate_block(Stack* stack, Block* block);
 void fetch_stack_outputs(Stack* stack, caValue* outputs);
 
 // Functions used by eval functions.
-caValue* get_input(Stack* stack, int index);
-void consume_input(Stack* stack, Term* term, caValue* dest);
-void consume_input(Stack* stack, int index, caValue* dest);
 int num_inputs(Stack* stack);
 void consume_inputs_to_list(Stack* stack, Value* list);
-caValue* get_output(Stack* stack, int index);
-caValue* get_caller_output(Stack* stack, int index);
 
 Term* current_term(Stack* stack);
 Block* current_block(Stack* stack);

@@ -8,9 +8,11 @@
 int main(int argc, const char * args[])
 {
     caWorld* world = circa_initialize();
-
+    
+#if CIRCA_USE_LIBUV
     // Install extensions.
     libuv_native_patch(world);
+#endif
 
     circa_use_local_filesystem(world, "");
 
