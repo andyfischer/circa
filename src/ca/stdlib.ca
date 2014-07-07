@@ -342,7 +342,7 @@ def write_text_file(String filename, String contents)
 def inputs_fit_function(List inputs,Func func) -> bool
 def overload_error_no_match(List inputs)
 def unique_id() -> int
-
+def source_id() -> any
 
 -- Channels
 def channel_send(Symbol name, any val)
@@ -521,6 +521,7 @@ struct Stack;
 struct Vec2 { number x, number y }
 struct Vec2i { int x, int y }
 struct Vec3 { number x, number y, number z }
+struct Vec4 { number x, number y, number z, number w }
 struct Rect { number x1, number y1, number x2, number y2 }
 struct Rect_i { int x1, int y1, int x2, int y2 }
 
@@ -689,13 +690,31 @@ def Stack.find_active_frame_for_term(self, Term term) -> Frame
 def Stack.id(self) -> int
 def Stack.init(self, Func func)
 def Stack.has_incoming_state(self) -> bool
+
+def Stack.env(self, name) -> any
+def Stack.env_map(self) -> Map
+def Stack.set_env(self, any name, any val)
+def Stack.set_env_map(self, Map map)
+
+def Stack.init_env(self)
+  self.set_env_map(Map.make)
+
+def Stack.modify_env(self, Func func)
+  self.set_env_map(func.call(self.env_map))
+
 def Stack.append_hack(self, any hack)
   self.modify_env({ input().list_append(:_hacks hack) })
-def Stack.modify_env(self, Func func)
-  self.set_env(func.call(self.get_env))
-def Stack.get_env(self) -> Map
-def Stack.set_env(self, Map map)
-def Stack.set_env_val(self, any name, any val)
+
+def Stack.forward_env(self, names :multiple)
+  for name in names
+    self.set_env(name env(name))
+
+def Stack.init_channel(self, any name)
+  self.set_env(name, [])
+
+def Stack.read_channel(self, any name)
+  self.env_map.get(name)
+
 def Stack.get_watch_result(self, key) -> any
 def Stack.stack_push(self, Block b, List inputs)
   -- Push a new frame, using the given block and input list.
@@ -903,13 +922,10 @@ def List.filter(self, Func func) -> List
   result
 
 def List.flatten(self) -> List
-  -- Return a list where all nested lists are concatenated into one big list.
+  -- Take a list of lists, and concat them all into one list.
   out = []
   for el in self
-    if type(el) == List
-      @out.concat(el.flatten)
-    else
-      @out.append(el)
+    @out.concat(el)
   out
 
 def List.map_all(self, Func func) -> List
@@ -918,6 +934,13 @@ def List.map_all(self, Func func) -> List
 
 def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
+
+def List.flatMap(self, Func func) -> List
+  out = []
+  for el in self
+    result = func.call(el)
+    @out.concat(result)
+  out
 
 def Map.contains(self, any key) -> bool
   -- Returns true if the map contains the given key.
@@ -1119,6 +1142,8 @@ def Term.output(self, int index) -> Term
 def Term.extra_output(self, int index)
   self.parent.get_term(self.index + index + 1)
 
+def vec2(number x, number y)
+  Vec2.make(x y)
 def Vec2.add(self, Vec2 b) -> Vec2
   [self.x + b.x, self.y + b.y]
 def Vec2.sub(self, Vec2 b) -> Vec2
@@ -1132,9 +1157,15 @@ def Vec2.distance(self, Vec2 b) -> number
   -- Returns the distance between self and b.
   sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
 
+def Vec2.distance_sqr(self, Vec2 b) -> number
+  sqr(self.x - b.x) + sqr(self.y - b.y)
+
 def Vec2.magnitude(self) -> number
   -- Return the magnitude of this point, aka the distance to the origin.
   sqrt(sqr(self.x) + sqr(self.y))
+
+def Vec2.magnitude_sqr(self) -> number
+  sqr(self.x) + sqr(self.y)
 
 def Vec2.norm(self) -> Vec2
   -- Returns the point normalized to be along the unit circle.
@@ -1169,6 +1200,8 @@ def Vec2.rotate(self, number rotation) -> Vec2
   -- Return the point rotated around [0 0] by the given angle.
   [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
 
+def vec3(number x, number y, number z)
+  Vec3.make(x y z)
 def Vec3.add(self, Vec3 b) -> Vec3
   [self.x + b.x, self.y + b.y, self.z + b.z]
 def Vec3.sub(self, Vec3 b) -> Vec3
@@ -1177,6 +1210,9 @@ def Vec3.mult(self, number s) -> Vec3
   [self.x * s, self.y * s, self.z * s]
 def Vec3.div(self, number s) -> Vec3
   [self.x / s, self.y / s, self.z / s]
+
+def vec4(number x, number y, number z, number w)
+  Vec4.make(x y z w)
 
 def Rect.add(self, Rect b) -> Rect
   [self.x1 + b.x1, self.y1 + b.y1, self.x2 + b.x2, self.y2 + b.y2]

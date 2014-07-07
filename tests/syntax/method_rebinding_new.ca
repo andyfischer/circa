@@ -25,7 +25,3 @@ assert(t == [1])
 
 assert(t == [3])
 
--- Chained calls
-@t.increment.increment.increment
-
-assert(t == [6])

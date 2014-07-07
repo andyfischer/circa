@@ -27,16 +27,16 @@ void test_cast_first_inputs()
     block.compile("struct T { int i }");
     Term* f = block.compile("def f(T t) -> int { return t.i }");
 
-    Stack stack;
-    stack_init(&stack, function_contents(f));
+    Stack* stack = create_stack(test_world());
+    stack_init(stack, function_contents(f));
 
-    caValue* in = circa_input((caStack*) &stack, 0);
+    caValue* in = circa_input(stack, 0);
     circa_set_list(in, 1);
     circa_set_int(circa_index(in, 0), 5);
 
-    circa_run(&stack);
+    circa_run(stack);
 
-    test_assert(circa_int(circa_output((caStack*) &stack, 0)) == 5);
+    test_assert(circa_int(circa_output(stack, 0)) == 5);
 }
 
 void run_block_after_additions()
@@ -51,10 +51,10 @@ void run_block_after_additions()
 
     test_spy_clear();
 
-    Stack stack;
-    stack_init(&stack, &block);
+    Stack* stack = create_stack(test_world());
+    stack_init(stack, &block);
 
-    circa_run(&stack);
+    circa_run(stack);
 
     test_equals(test_spy_get_results(), "[1, 3]");
 
@@ -66,32 +66,9 @@ void run_block_after_additions()
     block.compile("test_spy(d)");
 
     test_spy_clear();
-    circa_run(&stack);
+    circa_run(stack);
 
     test_equals(test_spy_get_results(), "[4, 8]");
-}
-
-void my_func_override(caStack* stack)
-{
-    set_int(circa_output(stack, 0), circa_int_input(stack, 0) + 10);
-}
-
-void test_directly_call_native_override()
-{
-#if 0
-    // Test an interpreter session where the top frame is a native override.
-    
-    Block block;
-    Term* my_func = block.compile("def my_func(int i) -> int");
-    install_function(&block, "my_func", my_func_override);
-
-    Stack stack;
-    stack_init(&stack, function_contents(my_func));
-
-    set_int(circa_input(&stack, 0), 5);
-    circa_run(&stack);
-    test_equals(circa_output(&stack, 0), "15");
-#endif
 }
 
 void bug_stale_bytecode_after_migrate()
@@ -105,17 +82,17 @@ void bug_stale_bytecode_after_migrate()
     Block version2;
     version2.compile("test_spy(2)");
 
-    Stack stack;
-    stack_init(&stack, &version1);
+    Stack* stack = create_stack(test_world());
+    stack_init(stack, &version1);
 
     test_spy_clear();
-    circa_run(&stack);
+    circa_run(stack);
     test_equals(test_spy_get_results(), "[1]");
 
-    stack_restart(&stack);
-    migrate_stack(&stack, &version1, &version2);
+    stack_restart(stack);
+    migrate_stack(stack, &version1, &version2);
     test_spy_clear();
-    circa_run(&stack);
+    circa_run(stack);
     test_equals(test_spy_get_results(), "[2]");
 }
 
@@ -130,14 +107,14 @@ void bug_restart_dies_after_code_delete()
     Block version2;
     version1.compile("1");
 
-    Stack stack;
-    stack_init(&stack, &version1);
-    circa_run(&stack);
+    Stack* stack = create_stack(test_world());
+    stack_init(stack, &version1);
+    circa_run(stack);
 
-    migrate_stack(&stack, &version1, &version2);
+    migrate_stack(stack, &version1, &version2);
 
     // This was causing a crash, internal NULL deref.
-    stack_restart(&stack);
+    stack_restart(stack);
 }
 
 void test_set_env()
@@ -145,12 +122,12 @@ void test_set_env()
     Block block;
     block.compile("test_spy(env(:a) + 5)");
 
-    Stack stack;
-    stack_init(&stack, &block);
+    Stack* stack = create_stack(test_world());
+    stack_init(stack, &block);
 
-    set_int(circa_env_insert(&stack, "a"), 5);
+    set_int(circa_env_insert(stack, "a"), 5);
     test_spy_clear();
-    circa_run(&stack);
+    circa_run(stack);
 
     test_equals(test_spy_get_results(), "[10]");
 }
@@ -162,16 +139,16 @@ void test_that_stack_is_implicitly_restarted_in_run_interpreter()
 
     test_spy_clear();
 
-    Stack stack;
-    stack_init(&stack, &block);
+    Stack* stack = create_stack(test_world());
+    stack_init(stack, &block);
 
-    circa_run(&stack);
+    circa_run(stack);
 
     test_equals(test_spy_get_results(), "[1]");
 
-    circa_run(&stack);
-    circa_run(&stack);
-    circa_run(&stack);
+    circa_run(stack);
+    circa_run(stack);
+    circa_run(stack);
 
     test_equals(test_spy_get_results(), "[1, 1, 1, 1]");
 }
@@ -179,7 +156,6 @@ void test_that_stack_is_implicitly_restarted_in_run_interpreter()
 void register_tests()
 {
     REGISTER_TEST_CASE(interpreter_test::test_cast_first_inputs);
-    REGISTER_TEST_CASE(interpreter_test::test_directly_call_native_override);
     REGISTER_TEST_CASE(interpreter_test::bug_stale_bytecode_after_migrate);
     REGISTER_TEST_CASE(interpreter_test::bug_restart_dies_after_code_delete);
     REGISTER_TEST_CASE(interpreter_test::test_set_env);

@@ -57,7 +57,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 
     // Create the term
     Term* term = block->appendNew();
-    INCREMENT_STAT(TermsCreated);
+    increment_stat(TermCreated);
 
     on_term_created(term);
 
@@ -927,10 +927,6 @@ void block_finish_changes(Block* block)
             respecialize_type(output);
         }
     }
-
-    // Refresh for-loop zero block
-    if (is_for_loop(block))
-        for_loop_remake_zero_block(block);
 
     dirty_bytecode(block);
 

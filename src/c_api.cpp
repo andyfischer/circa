@@ -343,7 +343,7 @@ void circa_run(caStack* stack)
 
 void circa_pop(caStack* stack)
 {
-    stack_pop(stack);
+    pop_frame(stack);
 }
 
 caBlock* circa_stack_top_block(caStack* stack)
@@ -379,7 +379,7 @@ const char* circa_string_input(caStack* stack, int index)
 void circa_output_error_val(caStack* stack, caValue* val)
 {
     copy(val, circa_output(stack, 0));
-    top_frame(stack)->termIndex = frame_block(top_frame(stack))->length() - 1;
+    // top_frame(stack)->termIndex = frame_block(top_frame(stack))->length() - 1;
     raise_error(stack);
 }
 

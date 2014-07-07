@@ -18,9 +18,6 @@ void stack_init(Stack* stack, Block* main);
 
 void stack_init_with_closure(Stack* stack, caValue* closure);
 
-// Pop the topmost frame from the stack.
-void stack_pop(Stack* stack);
-
 // Reset a Stack to its default value.
 void stack_reset(Stack* stack);
 

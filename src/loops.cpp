@@ -69,87 +69,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
     set_declared_type(iterator, iteratorType);
     hide_from_source(iterator);
 
-    // Add the zero block
-    create_block_unevaluated(contents, "#zero");
-
     return iterator;
-}
-
-void add_implicit_placeholders(Term* forTerm)
-{
-    Block* contents = nested_contents(forTerm);
-    std::string listName = forTerm->input(0)->name;
-    Term* iterator = for_loop_get_iterator(contents);
-    std::string iteratorName = iterator->name;
-
-    std::vector<std::string> reboundNames;
-    list_names_that_this_block_rebinds(contents, reboundNames);
-
-    int inputIndex = 1;
-
-    for (size_t i=0; i < reboundNames.size(); i++) {
-        std::string const& name = reboundNames[i];
-        if (name == listName)
-            continue;
-        if (name == iteratorName)
-            continue;
-
-        Term* original = find_name_at(forTerm, name.c_str());
-
-        // The name might not be found, for certain parser errors.
-        if (original == NULL)
-            continue;
-
-        Term* result = contents->get(name);
-
-        // Create input_placeholder
-        Term* input = apply(contents, FUNCS.input, TermList(original), name.c_str());
-        Type* type = find_common_type(original->type, result->type);
-        set_declared_type(input, type);
-        contents->move(input, inputIndex);
-
-        set_input(forTerm, inputIndex, original);
-
-        // Repoint terms to use our new input_placeholder
-        for (BlockIterator it(contents); it; ++it)
-            remap_pointers_quick(*it, original, input);
-
-        // Create output_placeholder
-        Term* outputPlaceholder = apply(contents, FUNCS.output, TermList(result), name.c_str());
-
-        set_input(input, 1, outputPlaceholder);
-
-        // Move output into the correct output slot
-        contents->move(outputPlaceholder, contents->length() - 1 - inputIndex);
-
-        inputIndex++;
-    }
-}
-
-void repoint_terms_to_use_input_placeholders(Block* contents)
-{
-    // Visit every term
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-
-        // Visit every input
-        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
-            Term* input = term->input(inputIndex);
-            if (input == NULL)
-                continue;
-            
-            // If the input is outside this block, then see if we have a named
-            // input that could be used instead.
-            if (input->owningBlock == contents || input->name == "")
-                continue;
-
-            Term* replacement = find_input_placeholder_with_name(contents, &input->nameValue);
-            if (replacement == NULL)
-                continue;
-
-            set_input(term, inputIndex, replacement);
-        }
-    }
 }
 
 void list_names_that_must_be_looped(Block* contents, caValue* names)
@@ -166,7 +86,13 @@ void list_names_that_must_be_looped(Block* contents, caValue* names)
         if (has_empty_name(term))
             continue;
 
-        if (find_name_at(contents->owningTerm, term_name(term)) != NULL)
+        Term* outsideName = find_name_at(contents->owningTerm, term_name(term));
+
+        // Don't look at names outside the major block.
+        if (outsideName != NULL && !is_under_same_major_block(term, outsideName))
+            outsideName = NULL;
+
+        if (outsideName != NULL)
             set_bool(hashtable_insert(&namesMap, term_name(term)), true);
     }
 
@@ -229,7 +155,7 @@ void finish_while_loop(Block* block)
     block_finish_changes(block);
 
     // Add a a primary output
-    Term* primaryOutput = apply(block, FUNCS.output, TermList(NULL));
+    apply(block, FUNCS.output, TermList(NULL));
 
     // Add looped_inputs
     insert_looped_placeholders(block);
@@ -288,69 +214,6 @@ bool enclosing_loop_produces_output_value(Term* term)
     return loop_produces_output_value(enclosingForLoop);
 }
 
-Block* for_loop_get_zero_block(Block* contents)
-{
-    return contents->get("#zero")->contents();
-}
-
-void for_loop_remake_zero_block(Block* forContents)
-{
-    Block* zero = for_loop_get_zero_block(forContents);
-    clear_block(zero);
-
-    // Clone inputs
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(forContents, i);
-        if (placeholder == NULL)
-            break;
-        Term* clone = append_input_placeholder(zero);
-        rename(clone, &placeholder->nameValue);
-        if (placeholder->boolProp(sym_State, false))
-            clone->setBoolProp(sym_State, true);
-    }
-
-    Term* loopOutput = create_list(zero);
-
-    // Clone outputs
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(forContents, i);
-        if (placeholder == NULL)
-            break;
-
-        // Find the appropriate connection
-        Term* result = find_local_name(zero, placeholder->name.c_str());
-
-        if (i == 0)
-            result = loopOutput;
-
-        Term* clone = append_output_placeholder(zero, result);
-        rename(clone, &placeholder->nameValue);
-    }
-
-    block_finish_changes(zero);
-}
-
-void start_for_loop(caStack* stack, bool enableLoopOutput)
-{
-    Frame* frame = top_frame(stack);
-    Block* contents = frame_block(frame);
-
-    // Check if top frame actually contains a for-loop (it might be using the #zero block)
-    if (!is_for_loop(contents))
-        return;
-
-    // Initialize the loop index
-    set_int(frame_register(frame, for_loop_find_index(contents)), 0);
-
-    if (enableLoopOutput) {
-        // Initialize output value.
-        caValue* outputList = stack_find_nonlocal(frame, contents->owningTerm);
-        set_list(outputList, 0);
-    }
-
-    // Interpreter will run the contents of the block
-}
-
 void loop_add_condition_check(Block* caseBlock, Term* condition)
 {
     apply(caseBlock, FUNCS.loop_condition_bool, TermList(condition));
@@ -372,10 +235,6 @@ Term* loop_find_condition(Block* block)
     if (conditionCheck != NULL)
         return conditionCheck->input(0);
     return NULL;
-}
-
-void while_loop_finish_changes(Block* contents)
-{
 }
 
 } // namespace circa

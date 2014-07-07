@@ -259,8 +259,11 @@ void load_script_eval(caStack* stack)
     Value moduleName;
     set_string(&moduleName, "file:");
     string_append(&moduleName, filename);
-    Block* module = load_module_file_watched(stack->world, &moduleName,
-        as_cstring(filename));
+
+    Block* module = find_module(stack->world->root, &moduleName);
+    if (module == NULL)
+        module = load_module_file_watched(stack->world, &moduleName, as_cstring(filename));
+
     set_block(circa_output(stack, 0), module);
 }
 

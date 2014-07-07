@@ -42,7 +42,7 @@ void repl_run_line(Stack* stack, caValue* line, caValue* output)
     caValue* displayRaw = hashtable_get(&stack->attrs, &sym_displayRaw);
 
     if (string_equals(line, "exit") || string_equals(line, "/exit")) {
-        stack_pop(stack);
+        pop_frame(stack);
         return;
     }
 

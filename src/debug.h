@@ -44,11 +44,11 @@ extern uint64 PERF_STATS[c_numPerfStats];
 
 #if CIRCA_ENABLE_PERF_STATS
 
-#define INCREMENT_STAT(x) perf_stat_inc(stat_##x);
+#define increment_stat(x) perf_stat_inc(stat_##x);
 
 #else
 
-#define INCREMENT_STAT(x) ;
+#define increment_stat(x) ;
 
 #endif
 

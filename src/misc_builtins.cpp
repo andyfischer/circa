@@ -240,6 +240,12 @@ void unique_id(caStack* stack)
     set_int(circa_output(stack, 0), nextId++);
 }
 
+void source_id(Stack* stack)
+{
+    Term* caller = frame_current_term(top_frame_parent(stack));
+    get_global_name(caller, circa_output(stack, 0));
+}
+
 void unknown_function(caStack* stack)
 {
     std::string out;
@@ -555,7 +561,11 @@ void range(caStack* stack)
     int start = circa_int_input(stack, 0);
     int max = circa_int_input(stack, 1);
 
-    int count = std::abs(max - start);
+    unsigned count = std::abs(max - start);
+    
+    if (count > 1000000)
+        return circa_output_error(stack, "Range is too large");
+    
     caValue* output = circa_output(stack, 0);
     set_list(output, count);
 
@@ -575,7 +585,7 @@ void rpath(caStack* stack)
 
 void set_field(caStack* stack)
 {
-    INCREMENT_STAT(SetField);
+    increment_stat(SetField);
 
     caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
@@ -596,7 +606,7 @@ void set_field(caStack* stack)
 
 void set_index(caStack* stack)
 {
-    INCREMENT_STAT(SetIndex);
+    increment_stat(SetIndex);
 
     caValue* output = circa_output(stack, 0);
     copy(circa_input(stack, 0), output);
@@ -1394,6 +1404,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "inputs_fit_function", inputs_fit_function);
     circa_patch_function(patch, "overload_error_no_match", overload_error_no_match);
     circa_patch_function(patch, "unique_id", unique_id);
+    circa_patch_function(patch, "source_id", source_id);
     circa_patch_function(patch, "unknown_identifier", unknown_identifier);
     circa_patch_function(patch, "unknown_function", unknown_function);
     circa_patch_function(patch, "write_text_file", write_text_file_func);

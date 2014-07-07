@@ -325,18 +325,27 @@ FuncCall
 # Performance stats
 FirstStatIndex
 
-stat_TermsCreated
+stat_TermCreated
 stat_TermPropAdded
 stat_TermPropAccess
 
-stat_InternedNameLookup
-stat_InternedNameCreate
+# Bytecode
+stat_Bytecode_WriteTermCall
+stat_Bytecode_CreateEntry
+
+# Interpreter
+stat_LoadFrameState
+stat_StoreFrameState
+stat_MoveAppend
+stat_Interpreter_DynamicMethod_SlowLookup
+stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef
+stat_Interpreter_DynamicMethod_SlowLookup_Hashtable
+stat_Interpreter_DynamicFuncToClosureCall
 
 # Copying
 stat_Copy_PushedInputNewFrame
 stat_Copy_PushedInputMultiNewFrame
 stat_Copy_PushFrameWithInputs
-stat_Copy_ListDuplicate
 stat_Copy_LoopCopyRebound
 
 # Casting
@@ -348,22 +357,24 @@ stat_Cast_FinishFrame
 stat_Touch_ListCast
 
 # Values (general)
-stat_ValueCreates
-stat_ValueCopies
-stat_ValueCast
+stat_Make
+stat_Copy
+stat_Cast
 stat_ValueCastDispatched
-stat_ValueTouch
+stat_Touch
 
 # List values
 stat_ListsCreated
 stat_ListsGrown
 stat_ListSoftCopy
-stat_ListHardCopy
+stat_ListDuplicate
+stat_ListDuplicate_Copy
 
-# Dict values
-stat_DictHardCopy
+# Hashtables
+stat_HashtableDuplicate
+stat_HashtableDuplicate_Copy
 
-# String values
+# Strings
 stat_StringCreate
 stat_StringDuplicate
 stat_StringResizeInPlace
@@ -386,5 +397,8 @@ stat_FinishDynamicCall
 stat_DynamicMethodCall
 stat_SetIndex
 stat_SetField
+
+# Stack
+stat_StackPushFrame
 
 LastStatIndex

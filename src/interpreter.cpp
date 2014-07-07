@@ -34,19 +34,11 @@
 
 namespace circa {
 
-static void frame_fetch_state_from_parent(Frame* frame);
-static Frame* expand_frame_indexed(Frame* parent, Frame* top, int index);
-static void retain_stack_top(Stack* stack);
 static void start_interpreter_session(Stack* stack);
 
 static void vm_prepare_top_frame(Stack* stack, int blockIndex);
 static bool vm_matches_watch_path(Stack* stack, caValue* path);
-static void vm_finish_loop_iteration(Stack* stack, bool enableOutput);
 static void vm_finish_frame(Stack* stack);
-static void vm_finish_run(Stack* stack);
-
-static void vm_push_dynamic_method(Stack* stack);
-static void vm_while_loop_finish_early(Stack* stack);
 
 void get_stack_path(Frame* frame, caValue* out);
 
@@ -56,7 +48,7 @@ void stack_init(Stack* stack, Block* block)
 
     // Pop existing frames.
     while (top_frame(stack) != NULL)
-        stack_pop(stack);
+        pop_frame(stack);
 
     stack_on_program_change(stack);
 
@@ -84,18 +76,12 @@ Frame* vm_push_frame2(Stack* stack, int parentIndex, int blockIndex)
     return top;
 }
 
-void stack_pop(Stack* stack)
-{
-    Frame* frame = top_frame(stack);
-    stack_pop_no_retain(stack);
-}
-
 void stack_reset(Stack* stack)
 {
     stack->errorOccurred = false;
 
     while (top_frame(stack) != NULL)
-        stack_pop(stack);
+        pop_frame(stack);
 }
 
 void stack_restart(Stack* stack)
@@ -107,7 +93,7 @@ void stack_restart(Stack* stack)
         return;
 
     while (top_frame_parent(stack) != NULL)
-        stack_pop(stack);
+        pop_frame(stack);
 
     Frame* top = top_frame(stack);
     top->termIndex = 0;
@@ -127,7 +113,7 @@ void stack_restart_discarding_state(Stack* stack)
         return;
 
     while (top_frame_parent(stack) != NULL)
-        stack_pop(stack);
+        pop_frame(stack);
 
     Frame* top = top_frame(stack);
     top->termIndex = 0;
@@ -250,7 +236,7 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode)
         }
 
         //char* bytecode = stack->bytecode + frame->pc;
-        int bytecodePc = 0;
+        //int bytecodePc = 0;
         
         for (int i=0; i < frame_register_count(frame); i++) {
             Term* term = NULL;
@@ -462,7 +448,7 @@ void evaluate_block(Stack* stack, Block* block)
     vm_run(stack);
 
     if (!stack_errored(stack))
-        stack_pop(stack);
+        pop_frame(stack);
 }
 
 void raise_error_input_type_mismatch(Stack* stack, int inputIndex)
@@ -616,7 +602,7 @@ inline char* vm_get_bytecode_raw(Stack* stack)
 
 void vm_pop_frame_and_store_error(Stack* stack, Value* msg)
 {
-    stack_pop_no_retain(stack);
+    pop_frame(stack);
     Frame* top = top_frame(stack);
     set_error_string(frame_register(top, frame_current_term(top)), as_cstring(msg));
     raise_error(stack);
@@ -738,6 +724,7 @@ bool vm_resolve_closure_apply(Stack* stack)
 
 void vm_resolve_dynamic_func_to_closure_call(Stack* stack)
 {
+    increment_stat(Interpreter_DynamicFuncToClosureCall);
     Frame* top = top_frame(stack);
 
     int inputCount = frame_register_count(top);
@@ -762,12 +749,15 @@ bool vm_resolve_dynamic_method(Stack* stack)
     // Slow lookup
     Term* caller = frame_term(parent, termIndex);
     caValue* elementName = caller->getProp(sym_MethodName);
+
+    increment_stat(Interpreter_DynamicMethod_SlowLookup);
     Term* method = find_method(frame_block(parent), (Type*) circa_type_of(object), elementName);
 
     if (method == NULL) {
         if (is_module_ref(object)) {
             Block* moduleBlock = module_ref_get_block(object);
             Term* term = find_local_name(moduleBlock, elementName);
+            increment_stat(Interpreter_DynamicMethod_SlowLookup_ModuleRef);
             if (term == NULL) {
                 // FIXME: write error
                 ca_assert(false);
@@ -790,6 +780,7 @@ bool vm_resolve_dynamic_method(Stack* stack)
             }
 
         } else if (is_hashtable(object)) {
+            increment_stat(Interpreter_DynamicMethod_SlowLookup_Hashtable);
 
             stack_resize_top_frame(stack, frame_register_count(top) + 1);
             copy(elementName, frame_register(top, 1));
@@ -857,7 +848,7 @@ void vm_run(Stack* stack)
 
     while (true) {
 
-        INCREMENT_STAT(StepInterpreter);
+        increment_stat(StepInterpreter);
 
         #if DUMP_EXECUTION
         {
@@ -882,10 +873,6 @@ void vm_run(Stack* stack)
         case bc_Pause:
             top_frame(stack)->pc = stack->pc;
             return;
-        case bc_DoneTransient:
-            // Stop execution, don't save pc.
-            return;
-
         case bc_PushFrame: {
             int termIndex = vm_read_u32(stack);
             int count = vm_read_u8(stack);
@@ -895,17 +882,15 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_PopFrame: {
-            stack_pop(stack);
+            pop_frame(stack);
             continue;
         }
         case bc_PopFrameAndPause: {
-            stack_pop(stack);
+            pop_frame(stack);
             return;
         }
         case bc_PrepareBlockUncompiled: {
             int rewindPos = stack->pc - 1;
-
-            Frame* top = top_frame(stack);
 
             Term* caller = frame_current_term(top_frame_parent(stack));
             Block* block = caller->function->nestedContents;
@@ -919,7 +904,6 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_PrepareBlock: {
-            Frame* top = top_frame(stack);
             u32 blockIndex = vm_read_u32(stack);
             vm_prepare_top_frame(stack, blockIndex);
             continue;
@@ -1049,6 +1033,7 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_MoveAppend: {
+            increment_stat(MoveAppend);
             Value* from = vm_read_register(stack);
             Value* to = vm_read_register(stack);
             if (!is_list(to))
@@ -1072,14 +1057,6 @@ void vm_run(Stack* stack)
                 return;
             continue;
         }
-        case bc_FinishIteration: {
-            //bool loopEnableOutput = vm_read_char(stack);
-            vm_finish_loop_iteration(stack, false);
-            if (stack->step != sym_StackRunning)
-                return;
-            continue;
-        }
-        
         case bc_PopOutput: {
             int placeholderIndex = vm_read_u32(stack);
             int outputIndex = vm_read_u32(stack);
@@ -1207,87 +1184,6 @@ void vm_run(Stack* stack)
 
             continue;
         }
-#if 0
-        case bc_PushLoop: {
-            int termIndex = vm_read_u32(stack);
-            u32 mainBlockIndex = vm_read_u32(stack);
-            u32 zeroBlockIndex = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-
-            top->termIndex = termIndex;
-            top->pc = stack->pc;
-
-            // Peek at the first input.
-            caValue* input = frame_register(top, 0);
-
-            // If the input list is empty, use the #zero block.
-            Block* block = NULL;
-            int blockIndex = 0;
-
-            bool zeroBlock = false;
-            if (is_list(input) && list_length(input) == 0) {
-                blockIndex = zeroBlockIndex;
-                zeroBlock = true;
-            } else {
-                blockIndex = mainBlockIndex;
-            }
-
-            block = program_block(stack->program, blockIndex);
-
-            vm_prepare_top_frame(stack, blockIndex);
-
-            //if (loopEnableOutput)
-            {
-                // Initialize output value.
-                caValue* outputList = frame_register(top_frame_parent(stack), termIndex);
-                set_list(outputList, 0);
-            }
-
-            continue;
-        }
-#endif
-#if 0
-        case bc_LoopConditionBool: {
-            caValue* condition = vm_read_local_value(top_frame(stack));
-
-            if (!is_bool(condition)) {
-                Value msg;
-                set_string(&msg, "Loop expected bool input, found: ");
-                string_append_quoted(&msg, condition);
-                raise_error_msg(stack, as_cstring(&msg));
-                return;
-            }
-
-            if (!as_bool(condition)) {
-                
-                vm_while_loop_finish_early(stack);
-                if (stack->step != sym_StackRunning)
-                    return;
-            }
-            continue;
-        }
-#endif
-        case bc_PushWhile: {
-#if 0
-            FIXME
-            int index = vm_read_u32(stack);
-            u32 blockIndex = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-            top->termIndex = index;
-
-            top = vm_push_frame2(stack, index, blockIndex);
-            top->blockIndex = blockIndex;
-            //top->bc = program_block_bytecode(stack->program, blockIndex);
-            vm_run_input_bytecodes(stack);
-
-            if (stack->step != sym_StackRunning)
-                return;
-
-#endif
-            continue;
-        }
         case bc_InlineCopy: {
             Frame* top = top_frame(stack);
             int index = vm_read_u32(stack);
@@ -1306,14 +1202,7 @@ void vm_run(Stack* stack)
             copy(source, dest);
             continue;
         }
-        case bc_Copy: {
-            // FIXME
-            internal_error("Copy bytecode doesn't work");
-            continue;
-        }
         case bc_NativeCall: {
-            Frame* top = top_frame(stack);
-            
             NativeFuncIndex funcIndex = vm_read_u32(stack);
 
             EvaluateFunc func = get_native_func(stack->world, funcIndex);
@@ -1322,112 +1211,14 @@ void vm_run(Stack* stack)
             if (stack_errored(stack))
                 return;
 
-            continue;
-        }
-#if 0
-        case bc_Return: {
-            int termIndex = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-            Term* caller = frame_term(top, termIndex);
-
-            Frame* toFrame = top;
-
-            // Find destination frame, the first parent major block.
-            while (!is_major_block(frame_block(toFrame)) && prev_frame(toFrame) != NULL)
-                toFrame = prev_frame(toFrame);
-
-            // Copy outputs to destination frame.
-            for (int i=0; i < caller->numInputs(); i++) {
-                caValue* dest = frame_register_from_end(toFrame, i);
-                if (caller->input(i) == NULL)
-                    set_null(dest);
-                else
-                    copy(stack_find_nonlocal(top, caller->input(i)), dest);
-            }
-
-            // Throw away intermediate frames.
-            while (top_frame(stack) != toFrame)
-                stack_pop(stack);
-
-            top = top_frame(stack);
-
-            vm_finish_frame(stack);
-            if (stack->step != sym_StackRunning)
-                return;
-            continue;
-        }
-#endif
-        case bc_Break:
-            top_frame(stack)->exitType = sym_Break;
-            continue;
-#if 0
-        case bc_Continue:
-        case bc_Discard: {
-            bool loopEnableOutput = vm_read_char(stack);
-            int index = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-            Term* caller = frame_term(top, index);
-
-            Frame* toFrame = top;
-
-            // Find destination frame, the parent for-loop block.
-            while (!is_for_loop(frame_block(toFrame)) && prev_frame(toFrame) != NULL)
-                toFrame = prev_frame(toFrame);
-
-            // Copy outputs to destination frame.
-            for (int i=0; i < caller->numInputs(); i++) {
-                caValue* dest = frame_register_from_end(toFrame, i);
-                if (caller->input(i) == NULL)
-                    set_null(dest);
-                else
-                    copy(stack_find_nonlocal(top, caller->input(i)), dest);
-            }
-
-            // Throw away intermediate frames.
-            while (top_frame(stack) != toFrame)
-                stack_pop(stack);
-
-            // Save exit type
-            if (op == bc_Continue)
-                toFrame->exitType = sym_Continue;
-            else if (op == bc_Break)
-                toFrame->exitType = sym_Break;
-            else if (op == bc_Discard) {
-                toFrame->exitType = sym_Discard;
-            }
-
-            top = top_frame(stack);
-            stack->pc = frame_compiled_block(top)->bytecodeOffset;
-
-            vm_finish_loop_iteration(stack, loopEnableOutput);
-            if (stack->step != sym_StackRunning)
-                return;
-            continue;
-        }
-#endif
-
-        case bc_Continue2: {
-            while (!is_while_loop(frame_block(top_frame(stack))) && top_frame_parent(stack) != NULL)
-                stack_pop(stack);
-            Frame* top = top_frame(stack);
-            top->termIndex = 0;
-            stack->pc = frame_compiled_block(top)->bytecodeOffset;
-            continue;
-        }
-        case bc_Break2: {
-            while (!is_while_loop(frame_block(top_frame(stack))) && top_frame_parent(stack) != NULL)
-                stack_pop(stack);
-
-            vm_while_loop_finish_early(stack);
-            if (stack->step != sym_StackRunning)
-                return;
+            // Certain functions (like require/load_script) can invalidate stack.bytecode.
+            stack->bytecode = as_blob(&stack->program->bytecode);
             continue;
         }
 
         case bc_ErrorNotEnoughInputs:
             return raise_error_not_enough_inputs(stack);
+
         case bc_ErrorTooManyInputs:
             return raise_error_too_many_inputs(stack);
 
@@ -1449,16 +1240,6 @@ void vm_run(Stack* stack)
             set_float(slot, value);
             continue;
         }
-        case bc_SetTermValue: {
-            int index = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-            Term* term = frame_term(top, index);
-            caValue* slot = frame_register(top, index);
-            copy(term_value(term), slot);
-            continue;
-        }
-
         #define INLINE_MATH_OP_HEADER \
             int termIndex = vm_read_u32(stack); \
             Frame* top = top_frame(stack); \
@@ -1499,11 +1280,20 @@ void vm_run(Stack* stack)
         }
         case bc_Divf: {
             INLINE_MATH_OP_HEADER;
+            if (to_float(right) == 0.0) {
+                pop_frame(stack);
+                return circa_output_error(stack, "Division by 0.0");
+            }
+
             set_float(slot, to_float(left) / to_float(right));
             continue;
         }
         case bc_Divi: {
             INLINE_MATH_OP_HEADER;
+            if (as_int(right) == 0) {
+                pop_frame(stack);
+                return circa_output_error(stack, "Division by 0");
+            }
             set_int(slot, as_int(left) / as_int(right));
             continue;
         }
@@ -1570,64 +1360,6 @@ static bool vm_matches_watch_path(Stack* stack, caValue* path)
     return true;
 }
 
-static void vm_finish_loop_iteration(Stack* stack, bool enableOutput)
-{
-    Frame* top = top_frame(stack);
-
-    Block* contents = frame_block(top);
-
-    caValue* index = frame_register(top, for_loop_find_index(contents));
-    set_int(index, as_int(index) + 1);
-
-    // Preserve list output.
-    if (enableOutput && top->exitType != sym_Discard) {
-
-        caValue* resultValue = frame_register_from_end(top, 0);
-        caValue* outputList = frame_register(top_frame_parent(stack), contents->owningTerm);
-
-        copy(resultValue, list_append(outputList));
-
-        INCREMENT_STAT(LoopWriteOutput);
-    }
-
-    // Check if we are finished
-    caValue* listInput = frame_register(top, 0);
-    if (as_int(index) >= list_length(listInput)
-            || top->exitType == sym_Break
-            || top->exitType == sym_Return) {
-
-        // Silly code- move the output list (in the parent frame) to our frame's output,
-        // where it will get copied back to parent when the frame is finished.
-        if (enableOutput) {
-            caValue* outputList = frame_register(top_frame_parent(stack), contents->owningTerm);
-            move(outputList, frame_register_from_end(top, 0));
-        } else {
-            set_list(frame_register_from_end(top, 0), 0);
-        }
-
-        vm_finish_frame(stack);
-        return;
-    }
-
-    // If we're not finished yet, copy rebound outputs back to inputs.
-    for (int i=1;; i++) {
-        Term* input = get_input_placeholder(contents, i);
-        if (input == NULL)
-            break;
-        Term* output = get_output_placeholder(contents, i);
-        caValue* result = frame_register(top, output);
-
-        copy(result, frame_register(top, input));
-
-        INCREMENT_STAT(Copy_LoopCopyRebound);
-    }
-
-    // Return to start of the loop.
-    top->termIndex = 0;
-    stack->pc = compiled_block(stack->program, top->blockIndex)->bytecodeOffset;
-    top->exitType = sym_None;
-}
-
 static void vm_finish_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
@@ -1637,16 +1369,10 @@ static void vm_finish_frame(Stack* stack)
     if (prev_frame(top) == NULL) {
         top->pc = stack->pc;
         stack->step = sym_StackFinished;
-        vm_finish_run(stack);
         return;
     }
 
     stack->pc = parent->pc;
-}
-
-static void vm_finish_run(Stack* stack)
-{
-    Frame* top = top_frame(stack);
 }
 
 static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(caValue* object, char* data)
@@ -1666,25 +1392,6 @@ static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(caValue* object, 
 #endif
 
     return NULL;
-}
-
-static void vm_while_loop_finish_early(Stack* stack)
-{
-    Frame* top = top_frame(stack);
-    Frame* parent = top_frame_parent(stack);
-
-    Term* whileTerm = frame_current_term(parent);
-    ca_assert(whileTerm->function == FUNCS.while_loop);
-
-    for (int i=0;; i++) {
-        Term* output = get_extra_output(whileTerm, i);
-        if (output == NULL)
-            break;
-
-        copy(frame_register(top, i), frame_register(parent, output));
-    }
-
-    stack->pc = parent->pc;
 }
 
 void make_stack(caStack* stack)
@@ -1813,6 +1520,8 @@ void save_state_result(Stack* stack)
 
 void load_frame_state(caStack* stack)
 {
+    increment_stat(LoadFrameState);
+
     Frame* top = top_frame(stack);
     Frame* parent = top_frame_parent(stack);
 
@@ -1842,6 +1551,8 @@ void load_frame_state(caStack* stack)
 
 void store_frame_state(caStack* stack)
 {
+    increment_stat(StoreFrameState);
+
     Frame* top = top_frame(stack);
     Frame* parent = top_frame_parent(stack);
 

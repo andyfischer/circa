@@ -10,19 +10,11 @@ const char bc_Noop = 0xf;
 const char bc_Pause = 0x1;
 const char bc_InlineCopy = 0x3;
 const char bc_LocalCopy = 0x4;
-const char bc_Copy = 0x5;
 const char bc_NoOp = 0x6;
 const char bc_PopFrame = 0x7;
 const char bc_PopFrameAndPause = 0x8;
-const char bc_DoneTransient = 0x9;
 const char bc_NativeCall = 0xa;
 const char bc_FinishFrame = 0xc;
-const char bc_FinishIteration = 0xd;
-
-const char bc_PushCase = 0x16;
-//const char bc_PushLoop = 0x17;
-const char bc_PushWhile = 0x18;
-const char bc_PushRequire = 0x19;
 
 const char bc_PushFrame = 0x20;
 const char bc_PrepareBlock = 0xc2;
@@ -54,27 +46,17 @@ const char bc_ErrorTooManyInputs = 0x29;
 const char bc_PopOutput = 0x30;
 const char bc_PopOutputNull = 0x31;
 const char bc_PopOutputsDynamic = 0x32;
-const char bc_PopExplicitState = 0x33;
 const char bc_SetFrameOutput = 0x34;
 
 // Control flow
-const char bc_ExitPoint = 0x40;
-const char bc_Return = 0x41;
-const char bc_Continue = 0x42;
-const char bc_Break = 0x43;
-const char bc_Discard = 0x44;
 const char bc_Jump = 0x4c;
 const char bc_JumpIf = 0x45;
 const char bc_JumpIfIteratorDone = 0x46;
 const char bc_JumpToLoopStart = 0x4d;
-const char bc_Continue2 = 0x49;
-const char bc_Break2 = 0x4a;
-const char bc_Discard2 = 0x4b;
 
 // Raw values
 const char bc_SetInt = 0x55;
 const char bc_SetFloat = 0x56;
-const char bc_SetTermValue = 0x57;
 
 // Math
 const char bc_Addf = 0x60;

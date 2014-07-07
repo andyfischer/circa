@@ -647,7 +647,6 @@ void bootstrap_kernel()
     FUNCS.has_effects = builtins->get("has_effects");
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
-    // TODO: can delete these lines?
     function_contents(FUNCS.add)->overrides.specializeType = specializeType_add_sub_mult;
     function_contents(FUNCS.sub)->overrides.specializeType = specializeType_add_sub_mult;
     function_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
@@ -721,6 +720,9 @@ Term* find_builtin_func(Block* builtins, const char* name)
 
 void on_new_function_parsed(Term* func, caValue* functionName)
 {
+    if (global_world()->bootstrapStatus == sym_Done)
+        return;
+
     #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
         find_func(add_i, "add_i"); find_func(add_f, "add_f");
         find_func(and_func, "and");

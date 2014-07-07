@@ -208,7 +208,7 @@ void read_text_file(const char* filename, caValue* contentsOut)
     size_t bytesRead = fread(as_blob(contentsOut), 1, file_size, fp);
     
     if (bytesRead < file_size)
-        string_resize(contentsOut, bytesRead);
+        string_resize(contentsOut, (int) bytesRead);
 
     fclose(fp);
 }

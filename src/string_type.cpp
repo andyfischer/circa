@@ -39,7 +39,7 @@ void decref(StringData* data)
 // Create a new blank string with the given length. Starts off with 1 ref.
 StringData* string_create(int length)
 {
-    INCREMENT_STAT(StringCreate);
+    increment_stat(StringCreate);
 
     StringData* result = (StringData*) malloc(sizeof(StringData) + length + 1);
     result->refCount = 1;
@@ -51,7 +51,7 @@ StringData* string_create(int length)
 // Creates a hard duplicate of a string. Starts off with 1 ref.
 StringData* string_duplicate(StringData* original)
 {
-    INCREMENT_STAT(StringDuplicate);
+    increment_stat(StringDuplicate);
 
     StringData* dup = string_create(original->length);
     memcpy(dup->str, original->str, original->length + 1);
@@ -81,7 +81,7 @@ void string_resize(StringData** data, int newLength)
 
     // Perform the same check as touch()
     if ((*data)->refCount == 1) {
-        INCREMENT_STAT(StringResizeInPlace);
+        increment_stat(StringResizeInPlace);
 
         // Modify in-place
         *data = (StringData*) realloc(*data, sizeof(StringData) + newLength + 1);
@@ -90,7 +90,7 @@ void string_resize(StringData** data, int newLength)
         return;
     }
 
-    INCREMENT_STAT(StringResizeCreate);
+    increment_stat(StringResizeCreate);
 
     StringData* oldData = *data;
     StringData* newData = string_create(newLength);
@@ -129,7 +129,7 @@ void string_copy(Type* type, caValue* source, caValue* dest)
     make_no_initialize(source->value_type, dest);
     dest->value_data.ptr = data;
 
-    INCREMENT_STAT(StringSoftCopy);
+    increment_stat(StringSoftCopy);
 }
 
 void string_reset(caValue* val)
@@ -224,12 +224,12 @@ const char* as_cstring(caValue* value)
 
 void string_append(caValue* left, const char* right)
 {
-    string_append_len(left, right, strlen(right));
+    string_append_len(left, right, (int) strlen(right));
 }
 
 void string_append(caValue* left, const std::string& right)
 {
-    string_append_len(left, right.c_str(), right.size());
+    string_append_len(left, right.c_str(), (int) right.size());
 }
 
 void string_append_len(caValue* left, const char* right, int len)
@@ -597,7 +597,7 @@ void string_split(caValue* s, char sep, caValue* listOut)
 
 std::string as_string(caValue* value)
 {
-    INCREMENT_STAT(StringToStd);
+    increment_stat(StringToStd);
     return std::string(as_cstring(value));
 }
 

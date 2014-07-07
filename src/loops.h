@@ -20,17 +20,10 @@ Block* find_enclosing_for_loop_contents(Term* term);
 bool loop_produces_output_value(Term* forTerm);
 bool enclosing_loop_produces_output_value(Term* term);
 
-Block* for_loop_get_zero_block(Block* forContents);
-void for_loop_remake_zero_block(Block* forContents);
-
-void start_for_loop(Stack* stack, bool enableLoopOutput);
-
 void list_names_that_must_be_looped(Block* contents, caValue* names);
 
 void loop_add_condition_check(Block* caseBlock, Term* condition);
 Term* loop_find_condition_check(Block* block);
 Term* loop_find_condition(Block* block);
-
-void while_loop_finish_changes(Block* contents);
 
 } // namespace circa

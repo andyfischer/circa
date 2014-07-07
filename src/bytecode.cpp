@@ -190,10 +190,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
-    case bc_Copy:
-        string_append(string, "copy to ");
-        bc_append_local_reference_string(string, bc, pc);
-        break;
     case bc_NoOp:
         string_append(string, "noop");
         break;
@@ -223,26 +219,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, ")");
         break;
     }
-    case bc_PushCase:
-        string_append(string, "push_case termIndex:");
-        string_append(string, blob_read_u32(bc, pc));
-        string_append(string, " compiledBlock:");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
-#if 0
-    case bc_PushLoop:
-        string_append(string, "push_loop termIndex:");
-        string_append(string, blob_read_u32(bc, pc));
-        string_append(string, " compiledBlock:");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
-#endif
-    case bc_PushWhile:
-        string_append(string, "push_while ");
-        string_append(string, blob_read_u32(bc, pc));
-        string_append(string, " compiledBlock:");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
     case bc_PushFrame:
         string_append(string, "push_frame termIndex:");
         string_append(string, blob_read_u32(bc, pc));
@@ -303,34 +279,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, " toRegister:");
         string_append(string, blob_read_u8(bc, pc));
         break;
-    case bc_ExitPoint:
-        string_append(string, "exit_point");
-        break;
-    case bc_Return:
-        string_append(string, "return ");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
-    case bc_Continue:
-        string_append(string, "continue");
-        string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
-        string_append(string, " ");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
-    case bc_Break:
-        string_append(string, "break");
-        break;
-    case bc_Discard:
-        string_append(string, "discard");
-        string_append(string, blob_read_char(bc, pc) ? " :loop_output": "");
-        string_append(string, " ");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
-    case bc_Continue2:
-        string_append(string, "continue2");
-        break;
-    case bc_Break2:
-        string_append(string, "break2");
-        break;
     case bc_Jump:
         string_append(string, "jump offset:");
         string_append(string, (i16) blob_read_u16(bc, pc));
@@ -353,9 +301,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         break;
     case bc_JumpToLoopStart:
         string_append(string, "jump_to_loop_start");
-        break;
-    case bc_FinishIteration:
-        string_append(string, "finish_iteration");
         break;
     case bc_FinishFrame:
         string_append(string, "finish_frame");
@@ -381,10 +326,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
     case bc_PopOutputsDynamic:
         string_append(string, "pop_outputs_dynamic");
         break;
-    case bc_PopExplicitState:
-        string_append(string, "pop_explicit_state ");
-        string_append(string, blob_read_u32(bc, pc));
-        break;
     case bc_SetFrameOutput:
         string_append(string, "set_frame_output ");
         string_append(string, blob_read_u32(bc, pc));
@@ -400,10 +341,6 @@ void bytecode_op_to_string(const char* bc, int* pc, caValue* string)
         string_append(string, blob_read_u32(bc, pc));
         string_append(string, " ");
         string_append_f(string, blob_read_float(bc, pc));
-        break;
-    case bc_SetTermValue:
-        string_append(string, "set_value ");
-        string_append(string, blob_read_u32(bc, pc));
         break;
 
     #define INLINE_MATH_CASE(op, str) \
@@ -458,14 +395,6 @@ int bytecode_op_to_term_index(const char* bc, int pc)
     case bc_PushFrame:
         return blob_read_u32(bc, &pc);
     case bc_ResolveDynamicMethod:
-        return blob_read_u32(bc, &pc);
-    case bc_PushCase:
-        return blob_read_u32(bc, &pc);
-#if 0
-    case bc_PushLoop:
-        return blob_read_u32(bc, &pc);
-#endif
-    case bc_PushWhile:
         return blob_read_u32(bc, &pc);
     default:
         return -1;
@@ -668,25 +597,6 @@ bool compiled_should_ignore_term(Compiled* compiled, Term* term)
     return false;
 }
 
-void write_pre_exit_point_for_while_loop(Writer* writer, Term* exitPoint)
-{
-    Block* callingBlock = exitPoint->owningBlock;
-    Block* loopBlock = find_enclosing_loop(callingBlock);
-
-    for (int i=0;; i++) {
-        Term* input = get_input_placeholder(loopBlock, i);
-        if (input == NULL)
-            return;
-
-        Term* latestValue = find_name_at(exitPoint, term_name(input));
-        if (latestValue == input)
-            continue;
-
-        blob_append_char(writer->bytecode, bc_Copy);
-        bytecode_write_local_reference(writer, callingBlock, input);
-    }
-}
-
 void bc_loop_control_flow(Writer* writer, Term* term)
 {
     Block* enclosingLoop = find_enclosing_loop(term->owningBlock);
@@ -780,7 +690,7 @@ void bc_return(Writer* writer, Term* term)
 
 void write_term_call(Writer* writer, Term* term)
 {
-    INCREMENT_STAT(WriteTermBytecode);
+    increment_stat(Bytecode_WriteTermCall);
 
     if (compiled_should_ignore_term(writer->compiled, term))
         return;
@@ -847,34 +757,9 @@ void write_term_call(Writer* writer, Term* term)
         jump.jumpHere();
         bc_comment(writer, "loop condition is true");
         return;
-
-#if 0
-        blob_append_char(writer->bytecode, bc_LoopConditionBool);
-        bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
-        write_post_term_call(writer, term);
-        return;
-#endif
     }
 
     if (is_exit_point(term)) {
-
-#if 0
-        Block* enclosingLoop = find_enclosing_loop(term->owningBlock);
-
-        if (is_while_loop(enclosingLoop)) {
-            if (term->function == FUNCS.return_func) {
-                blob_append_char(writer->bytecode, bc_Return);
-                blob_append_u32(writer->bytecode, term->index);
-            } else if (term->function == FUNCS.break_func) {
-                write_pre_exit_point_for_while_loop(writer, term);
-                blob_append_char(writer->bytecode, bc_Break2);
-            } else if (term->function == FUNCS.continue_func) {
-                write_pre_exit_point_for_while_loop(writer, term);
-                blob_append_char(writer->bytecode, bc_Continue2);
-            }
-
-        } else {
-#endif
 
         if (term->function == FUNCS.return_func) {
             bc_return(writer, term);
@@ -906,7 +791,6 @@ void write_term_call(Writer* writer, Term* term)
     }
 
     if (term->function == FUNCS.func_call || is_dynamic_func_call(term)) {
-        // New path
         
         bytecode_start_term_call(writer, term, NULL);
 
@@ -1008,18 +892,6 @@ void write_term_call(Writer* writer, Term* term)
 
         bc_comment(writer, "more than zero iterations");
 
-
-#if 0
-        blob_append_u32(writer->bytecode, program_create_entry(writer->compiled,
-            for_loop_get_zero_block(term->nestedContents)));
-
-        blob_append_char(writer->bytecode, bc_FoldIncomingVarargs);
-        blob_append_char(writer->bytecode, bc_CheckInputs);
-
-        //blob_append_char(writer->bytecode, bc_SetZero);
-        //blob_append_u16(writer->bytecode, for_loop_find_index(knownBlock)->index);
-        #endif
-
         blob_append_char(writer->bytecode, bc_EnterFrame);
         // No output instructions here (handled inside loop)
         blob_append_char(writer->bytecode, bc_PopFrame);
@@ -1069,12 +941,6 @@ void write_term_call(Writer* writer, Term* term)
         blob_append_char(writer->bytecode, bc_PopFrame);
         write_post_term_call(writer, term);
         return;
-#if 0
-        blob_append_char(writer->bytecode, bc_PushWhile);
-        blob_append_u32(writer->bytecode, term->index);
-        blob_append_u32(writer->bytecode,
-            program_create_entry(writer->compiled, term->nestedContents));
-#endif
     }
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
@@ -1174,7 +1040,7 @@ Block* get_parent_block_stackwise(Block* block)
 {
     block = get_parent_block(block);
 
-    if (is_switch_block(block))
+    if (block != NULL && is_switch_block(block))
         block = get_parent_block(block);
 
     return block;
@@ -1190,6 +1056,10 @@ int find_register_distance(Block* topBlock, Term* input)
             return distance;
 
         searchBlock = get_parent_block_stackwise(searchBlock);
+        
+        if (searchBlock == NULL) {
+            internal_error("find_register_distance: input term is not reachable from this block");
+        }
 
         distance -= block_locals_count(searchBlock);
 
@@ -1270,7 +1140,6 @@ static void bc_loop_back_to_start(Writer* writer, Block* block)
     }
 
     // Return to start of the loop.
-    int blockIndex = program_find_block_index(writer->compiled, block);
     blob_append_char(writer->bytecode, bc_JumpToLoopStart);
 }
 
@@ -1703,6 +1572,7 @@ int program_create_empty_entry(Compiled* compiled, Block* block)
 
 int program_create_entry(Compiled* compiled, Block* block)
 {
+    increment_stat(Bytecode_CreateEntry);
     int index = program_find_block_index(compiled, block);
     if (index == -1)
         index = program_create_empty_entry(compiled, block);

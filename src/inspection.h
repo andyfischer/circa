@@ -46,6 +46,7 @@ bool is_module(Block* block);
 
 // Find the nearest (parent) block that is a major block. May return the 'block' itself.
 Block* find_nearest_major_block(Block* block);
+bool is_under_same_major_block(Term* a, Term* b);
 
 // Find the nearest (parent) block that is a compilation unit (such as a module).
 Block* find_nearest_compilation_unit(Block* block);

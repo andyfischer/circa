@@ -146,7 +146,7 @@ void initialize_null(caValue* value)
 
 void make(Type* type, caValue* value)
 {
-    INCREMENT_STAT(ValueCreates);
+    increment_stat(Make);
 
     set_null(value);
     value->value_type = type;
@@ -192,7 +192,7 @@ void set_null(caValue* value)
 
 void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
 {
-    INCREMENT_STAT(ValueCast);
+    increment_stat(Cast);
 
     result->success = true;
 
@@ -206,7 +206,7 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
         return;
 
     if (type->cast != NULL) {
-        INCREMENT_STAT(ValueCastDispatched);
+        increment_stat(ValueCastDispatched);
 
         type->cast(result, value, type, checkOnly);
         return;
@@ -232,7 +232,7 @@ bool cast_possible(caValue* source, Type* type)
 
 void copy(caValue* source, caValue* dest)
 {
-    INCREMENT_STAT(ValueCopies);
+    increment_stat(Copy);
 
     ca_assert(source);
     ca_assert(dest);
@@ -301,7 +301,7 @@ void reset(caValue* value)
 
 void touch(caValue* value)
 {
-    INCREMENT_STAT(ValueTouch);
+    increment_stat(Touch);
 
     if (is_list_based(value))
         list_touch(value);

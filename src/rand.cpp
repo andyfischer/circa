@@ -8,6 +8,7 @@ namespace circa {
 
 void rand_init(RandState* state, int seed)
 {
+    memset(&state->tinymt, 0, sizeof(state->tinymt));
     tinymt64_init(&state->tinymt, seed);
 }
 

@@ -1,0 +1,11 @@
+
+def main()
+  channel_send(:channel_key 1)
+  channel_send(:channel_key 2)
+  channel_send(:channel_key 3)
+
+vm = make_vm(main)
+
+vm.init_channel(:channel_key)
+vm.run
+assert(vm.read_channel(:channel_key) == [1 2 3])

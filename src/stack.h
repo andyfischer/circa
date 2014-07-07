@@ -101,9 +101,6 @@ struct Frame
     // PC stored as a termIndex.
     int termIndex;
 
-    // When a block is exited early, this stores the exit type.
-    Symbol exitType;
-
     int firstRegisterIndex;
     int registerCount;
 };
@@ -116,7 +113,7 @@ void stack_decref(Stack* stack);
 
 Frame* stack_push_blank_frame(Stack* stack, int registerCount);
 void stack_resize_top_frame(Stack* stack, int registerCount);
-void stack_pop_no_retain(Stack* stack);
+void pop_frame(Stack* stack);
 
 // Resize the given frame to have a new register count. This will invalidate your 'frame'
 // pointer, so the return value is a valid pointer to the same frame.

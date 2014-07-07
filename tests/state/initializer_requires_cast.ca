@@ -1,0 +1,5 @@
+
+def f()
+  state number x = 0
+
+f()

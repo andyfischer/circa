@@ -183,6 +183,11 @@ caValue* temp_string(const char* str)
     return gTempValue;
 }
 
+World* test_world()
+{
+    return global_world();
+}
+
 void test_write_fake_file(const char* filename, int version, const char* contents)
 {
     Value key;

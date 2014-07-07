@@ -22,12 +22,11 @@
 
 namespace circa {
 
-static void stack_bytecode_prepare_new_hackset(Stack* stack);
-
 Stack::Stack()
  : errorOccurred(false),
    world(NULL)
 {
+    world = global_world();
     id = global_world()->nextStackID++;
 
     refCount = 1;
@@ -61,7 +60,7 @@ Stack::Stack()
 
 Stack::~Stack()
 {
-    // Clear error, so that stack_pop doesn't complain about losing an errored frame.
+    // Clear error, so that pop_frame doesn't complain about losing an errored frame.
     this->errorOccurred = false;
 
     stack_on_program_change(this);
@@ -144,7 +143,6 @@ void stack_decref(Stack* stack)
 void stack_reserve_frame_capacity(Stack* stack, int desiredCapacity)
 {
     if (stack->frameCapacity < desiredCapacity) {
-        int prevSize = stack->frameCapacity;
         stack->frames = (Frame*) realloc(stack->frames, sizeof(Frame) * desiredCapacity);
         stack->frameCapacity = desiredCapacity;
     }
@@ -163,6 +161,7 @@ void stack_reserve_register_capacity(Stack* stack, int desiredSize)
 
 Frame* stack_push_blank_frame(Stack* stack, int registerCount)
 {
+    increment_stat(StackPushFrame);
     stack->frameCount++;
     stack_reserve_frame_capacity(stack, stack->frameCount);
 
@@ -174,7 +173,6 @@ Frame* stack_push_blank_frame(Stack* stack, int registerCount)
     frame->block = NULL;
     frame->blockIndex = -1;
     frame->pc = 0;
-    frame->exitType = sym_None;
     initialize_null(&frame->bindings);
     initialize_null(&frame->env);
     initialize_null(&frame->incomingState);
@@ -196,7 +194,7 @@ void stack_resize_top_frame(Stack* stack, int registerCount)
     stack_reserve_register_capacity(stack, stack->registerCount);
 }
 
-void stack_pop_no_retain(Stack* stack)
+void pop_frame(Stack* stack)
 {
     Frame* frame = top_frame(stack);
 
@@ -339,7 +337,6 @@ Stack* stack_duplicate(Stack* stack)
         dupeFrame->parentIndex = sourceFrame->parentIndex;
         dupeFrame->block = sourceFrame->block;
         dupeFrame->termIndex = sourceFrame->termIndex;
-        dupeFrame->exitType = sourceFrame->exitType;
         set_value(&dupeFrame->bindings, &sourceFrame->bindings);
         set_value(&dupeFrame->env, &sourceFrame->env);
         set_value(&dupeFrame->incomingState, &sourceFrame->incomingState);
@@ -618,7 +615,6 @@ void frame_copy(Frame* left, Frame* right)
     right->blockIndex = left->blockIndex;
     right->termIndex = left->termIndex;
     right->pc = left->pc;
-    right->exitType = left->exitType;
 }
 
 void stack_value_copy(Type*, caValue* source, caValue* dest)
@@ -744,19 +740,19 @@ void Stack__init(caStack* stack)
     stack_init_with_closure(self, closure);
 }
 
-#if 0
-void Stack__has_incoming_state(caStack* stack)
+void Stack__env(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    Frame* top = top_frame(self);
-    if (top == NULL)
-        set_bool(circa_output(stack, 0), false);
-    else
-        set_bool(circa_output(stack, 0), !is_null(&top->state));
-}
-#endif
+    Value* name = circa_input(stack, 1);
 
-void Stack__get_env(caStack* stack)
+    caValue* value = hashtable_get(&self->env, name);
+    if (value == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        copy(value, circa_output(stack, 0));
+}
+
+void Stack__env_map(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     copy(&self->env, circa_output(stack, 0));
@@ -765,17 +761,17 @@ void Stack__get_env(caStack* stack)
 void Stack__set_env(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    caValue* map = circa_input(stack, 1);
-    copy(map, &self->env);
-}
-
-void Stack__set_env_val(caStack* stack)
-{
-    Stack* self = as_stack(circa_input(stack, 0));
     caValue* name = circa_input(stack, 1);
     caValue* val = circa_input(stack, 2);
 
     copy(val, stack_env_insert(self, name));
+}
+
+void Stack__set_env_map(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    caValue* map = circa_input(stack, 1);
+    copy(map, &self->env);
 }
 
 void Stack__get_state(caStack* stack)
@@ -854,7 +850,7 @@ void Stack__stack_pop(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
-    stack_pop(self);
+    pop_frame(self);
 }
 
 void Stack__migrate(caStack* stack)
@@ -1104,9 +1100,10 @@ void stack_install_functions(NativePatch* patch)
 #if 0
     circa_patch_function(patch, "Stack.has_incoming_state", Stack__has_incoming_state);
 #endif
-    circa_patch_function(patch, "Stack.get_env", Stack__get_env);
+    circa_patch_function(patch, "Stack.env", Stack__env);
+    circa_patch_function(patch, "Stack.env_map", Stack__env_map);
     circa_patch_function(patch, "Stack.set_env", Stack__set_env);
-    circa_patch_function(patch, "Stack.set_env_val", Stack__set_env_val);
+    circa_patch_function(patch, "Stack.set_env_map", Stack__set_env_map);
     circa_patch_function(patch, "Stack.get_state", Stack__get_state);
     circa_patch_function(patch, "Stack.get_watch_result", Stack__get_watch_result);
     circa_patch_function(patch, "Stack.apply", Stack__call);

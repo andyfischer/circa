@@ -363,9 +363,9 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
         result = struct_decl(block, tokens, context);
     }
 
-    // Stateful value decl
+    // State decl
     else if (tokens.nextIs(tok_State)) {
-        result = stateful_value_decl(block, tokens, context);
+        result = state_decl(block, tokens, context);
     }
     // Return statement
     else if (tokens.nextIs(tok_Return)) {
@@ -1240,7 +1240,7 @@ ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(result);
 }
 
-ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
@@ -1293,7 +1293,8 @@ ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* co
 
         // Possibly add a cast()
         if (type != declared_type(initialValue) && type != TYPES.any) {
-            initialValue = apply(nested_contents(initializer), FUNCS.cast, TermList(initialValue));
+            ca_assert(type->declaringTerm != NULL);
+            initialValue = apply(nested_contents(initializer), FUNCS.cast, TermList(initialValue, type->declaringTerm));
             initialValue->setBoolProp(sym_Hidden, true);
             set_declared_type(initialValue, type);
         }
@@ -1848,29 +1849,8 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 {
     int startPosition = tokens.getPosition();
 
-    bool forceRebindLHS = false;
-    Symbol dotOperator = sym_None;
-
-    if (tokens.nextIs(tok_DotAt)) {
-        // Deprecated
-        forceRebindLHS = true;
-        dotOperator = tok_DotAt;
-        tokens.consume();
-    } else if (tokens.nextIs(tok_At)) {
-        // Deprecated
-        forceRebindLHS = true;
-        dotOperator = tok_At;
-        tokens.consume();
-    } else if (tokens.nextIs(tok_Dot)) {
-        forceRebindLHS = false;
-        dotOperator = tok_Dot;
-        tokens.consume();
-    } else {
-        internal_error("parser::method_call expected '.' or '@.'");
-    }
+    tokens.consume(tok_Dot);
     
-    bool rebindLHS = forceRebindLHS;
-
     // Check for name.symbol syntax.
     if (tokens.nextIs(tok_ColonString)) {
         Term* term = dot_symbol(block, tokens, context, lhs).term;
@@ -1934,18 +1914,8 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         term = apply(block, function, inputs);
         term->setStringProp(sym_MethodName, as_cstring(&functionName));
 
-        // Possibly introduce an extra_output
-        if (forceRebindLHS && get_extra_output(term, 0) == NULL)
-            apply(block, FUNCS.extra_output, TermList(term));
-
     } else {
         term = apply(block, function, inputs);
-    }
-
-    // Possibly rebind the left-hand-side
-    if (rebindLHS && get_extra_output(term, 0) != NULL) {
-        // LHS may be an accessor.
-        rebind_possible_accessor(block, term->input(0), get_extra_output(term, 0));
     }
 
     inputHints.apply(term);
@@ -1954,9 +1924,6 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     term->setStringProp(sym_Syntax_DeclarationStyle, "method-call");
     if (!hasParens)
         term->setBoolProp(sym_Syntax_NoParens, true);
-
-    if (forceRebindLHS)
-        term->setStringProp(sym_Syntax_Operator, get_token_text(dotOperator));
 
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);

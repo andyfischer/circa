@@ -298,8 +298,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
             continue;
 
         // Don't look at names outside the major block.
-        if (find_nearest_major_block(outer->owningBlock) !=
-                find_nearest_major_block(outerBlock))
+        if (!is_under_same_major_block(ifCall, outer))
             continue;
 
         // This term rebinds an outer name.

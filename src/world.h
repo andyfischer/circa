@@ -32,7 +32,7 @@ struct World {
     Symbol bootstrapStatus;
 
     // NativePatch data.
-    NativePatch* nativePatch;
+    NativePatch** nativePatch;
     int nativePatchCount;
 
     NativeFunc* funcTable;

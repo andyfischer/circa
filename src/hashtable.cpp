@@ -133,6 +133,8 @@ Hashtable* duplicate(Hashtable* original)
     if (original == NULL)
         return NULL;
 
+    increment_stat(HashtableDuplicate);
+
     int new_capacity = int(original->count / INITIAL_LOAD_FACTOR);
     if (new_capacity < INITIAL_SIZE)
         new_capacity = INITIAL_SIZE;
@@ -147,6 +149,7 @@ Hashtable* duplicate(Hashtable* original)
         int index = hashtable_insert(&dupe, &slot->key, false);
         Slot* dupeSlot = get_slot(dupe, index);
         copy(&slot->value, &dupeSlot->value);
+        increment_stat(HashtableDuplicate_Copy);
     }
     return dupe;
 }

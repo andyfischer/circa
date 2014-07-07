@@ -1,16 +1,16 @@
 
 vm = make_stack({})
 
-print(vm.get_env)
+print(vm.env_map)
 
 vm.append_hack(:thing1)
 
-print(vm.get_env)
+print(vm.env_map)
 
 vm.append_hack(:thing2)
 
-print(vm.get_env)
+print(vm.env_map)
 
 vm.modify_env({input().remove(:_hacks)})
 
-print(vm.get_env)
+print(vm.env_map)

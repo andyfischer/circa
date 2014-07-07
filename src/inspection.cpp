@@ -125,7 +125,9 @@ bool is_major_block(Block* block)
     if (block->owningTerm == NULL)
         return true;
 
-    return is_function(block->owningTerm) || block->owningTerm->function == FUNCS.closure_block;
+    return is_function(block->owningTerm)
+        || block->owningTerm->function == FUNCS.closure_block
+        || is_module(block);
 }
 
 bool is_minor_block(Block* block)
@@ -152,6 +154,11 @@ Block* find_nearest_major_block(Block* block)
             return block;
         block = get_parent_block(block);
     }
+}
+
+bool is_under_same_major_block(Term* a, Term* b)
+{
+    return find_nearest_major_block(a->owningBlock) == find_nearest_major_block(b->owningBlock);
 }
 
 Block* find_nearest_compilation_unit(Block* block)

@@ -59,7 +59,7 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
 ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context);
-ParseResult stateful_value_decl(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult include_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult import_statement(Block* block, TokenStream& tokens, ParserCxt* context);

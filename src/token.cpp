@@ -229,7 +229,7 @@ void tokenize(const char* input, int len, TokenList* results)
 
 void tokenize(std::string const& input, TokenList* results)
 {
-    return tokenize(input.c_str(), input.size(), results);
+    return tokenize(input.c_str(), (int) input.size(), results);
 }
 
 bool is_letter(char c)
