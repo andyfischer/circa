@@ -57,7 +57,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 
     // Create the term
     Term* term = block->appendNew();
-    increment_stat(TermCreated);
+    stat_increment(TermCreated);
 
     on_term_created(term);
 
@@ -1239,7 +1239,7 @@ bool term_is_nested_in_block(Term* term, Block* block)
         if (term->owningBlock == block)
             return true;
 
-        term = get_parent_term(term);
+        term = parent_term(term);
     }
 
     return false;
@@ -1294,7 +1294,7 @@ Term* preceding_term_recr_minor(Term* term)
         if (position < 0) {
             Block* parent = get_parent_block(block);
             if (parent != NULL && is_minor_block(block)) {
-                position = get_parent_term(block)->index - 1;
+                position = parent_term(block)->index - 1;
                 block = parent;
                 continue;
             } else {

@@ -150,6 +150,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_watch: return "watch";
     case sym_Copy: return "Copy";
     case sym_Move: return "Move";
+    case sym_Unobservable: return "Unobservable";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -301,14 +302,10 @@ const char* builtin_symbol_to_string(int name)
     case stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef: return "stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef";
     case stat_Interpreter_DynamicMethod_SlowLookup_Hashtable: return "stat_Interpreter_DynamicMethod_SlowLookup_Hashtable";
     case stat_Interpreter_DynamicFuncToClosureCall: return "stat_Interpreter_DynamicFuncToClosureCall";
-    case stat_Copy_PushedInputNewFrame: return "stat_Copy_PushedInputNewFrame";
-    case stat_Copy_PushedInputMultiNewFrame: return "stat_Copy_PushedInputMultiNewFrame";
-    case stat_Copy_PushFrameWithInputs: return "stat_Copy_PushFrameWithInputs";
-    case stat_Copy_LoopCopyRebound: return "stat_Copy_LoopCopyRebound";
-    case stat_Cast_ListCastElement: return "stat_Cast_ListCastElement";
-    case stat_Cast_PushFrameWithInputs: return "stat_Cast_PushFrameWithInputs";
-    case stat_Cast_FinishFrame: return "stat_Cast_FinishFrame";
-    case stat_Touch_ListCast: return "stat_Touch_ListCast";
+    case stat_Interpreter_CopyTermValue: return "stat_Interpreter_CopyTermValue";
+    case stat_Interpreter_CopyStackValue: return "stat_Interpreter_CopyStackValue";
+    case stat_Interpreter_MoveStackValue: return "stat_Interpreter_MoveStackValue";
+    case stat_Interpreter_CopyCachedValue: return "stat_Interpreter_CopyCachedValue";
     case stat_Make: return "stat_Make";
     case stat_Copy: return "stat_Copy";
     case stat_Cast: return "stat_Cast";
@@ -318,7 +315,9 @@ const char* builtin_symbol_to_string(int name)
     case stat_ListsGrown: return "stat_ListsGrown";
     case stat_ListSoftCopy: return "stat_ListSoftCopy";
     case stat_ListDuplicate: return "stat_ListDuplicate";
-    case stat_ListDuplicate_Copy: return "stat_ListDuplicate_Copy";
+    case stat_ListDuplicate_ElementCopy: return "stat_ListDuplicate_ElementCopy";
+    case stat_ListCast_Touch: return "stat_ListCast_Touch";
+    case stat_ListCast_CastElement: return "stat_ListCast_CastElement";
     case stat_HashtableDuplicate: return "stat_HashtableDuplicate";
     case stat_HashtableDuplicate_Copy: return "stat_HashtableDuplicate_Copy";
     case stat_StringCreate: return "stat_StringCreate";
@@ -339,6 +338,8 @@ const char* builtin_symbol_to_string(int name)
     case stat_DynamicMethodCall: return "stat_DynamicMethodCall";
     case stat_SetIndex: return "stat_SetIndex";
     case stat_SetField: return "stat_SetField";
+    case stat_SetWithSelector_Touch_List: return "stat_SetWithSelector_Touch_List";
+    case stat_SetWithSelector_Touch_Hashtable: return "stat_SetWithSelector_Touch_Hashtable";
     case stat_StackPushFrame: return "stat_StackPushFrame";
     case sym_LastStatIndex: return "LastStatIndex";
     case sym_LastBuiltinName: return "LastBuiltinName";
@@ -1729,6 +1730,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'o':
+        if (strcmp(str + 3, "bservable") == 0)
+            return sym_Unobservable;
+        break;
     case 't':
         if (strcmp(str + 3, "yped") == 0)
             return sym_Untyped;
@@ -1846,113 +1851,13 @@ int builtin_symbol_from_string(const char* str)
     case 'C':
     switch (str[6]) {
     case 'a':
-    switch (str[7]) {
-    case 's':
-    switch (str[8]) {
-    case 't':
-    switch (str[9]) {
-    case '_':
-    switch (str[10]) {
-    case 'F':
-        if (strcmp(str + 11, "inishFrame") == 0)
-            return stat_Cast_FinishFrame;
-        break;
-    case 'L':
-        if (strcmp(str + 11, "istCastElement") == 0)
-            return stat_Cast_ListCastElement;
-        break;
-    case 'P':
-        if (strcmp(str + 11, "ushFrameWithInputs") == 0)
-            return stat_Cast_PushFrameWithInputs;
-        break;
-    default: return -1;
-    }
-    case 0:
+        if (strcmp(str + 7, "st") == 0)
             return stat_Cast;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
+        break;
     case 'o':
-    switch (str[7]) {
-    case 'p':
-    switch (str[8]) {
-    case 'y':
-    switch (str[9]) {
-    case '_':
-    switch (str[10]) {
-    case 'L':
-        if (strcmp(str + 11, "oopCopyRebound") == 0)
-            return stat_Copy_LoopCopyRebound;
-        break;
-    case 'P':
-    switch (str[11]) {
-    case 'u':
-    switch (str[12]) {
-    case 's':
-    switch (str[13]) {
-    case 'h':
-    switch (str[14]) {
-    case 'F':
-        if (strcmp(str + 15, "rameWithInputs") == 0)
-            return stat_Copy_PushFrameWithInputs;
-        break;
-    case 'e':
-    switch (str[15]) {
-    case 'd':
-    switch (str[16]) {
-    case 'I':
-    switch (str[17]) {
-    case 'n':
-    switch (str[18]) {
-    case 'p':
-    switch (str[19]) {
-    case 'u':
-    switch (str[20]) {
-    case 't':
-    switch (str[21]) {
-    case 'M':
-        if (strcmp(str + 22, "ultiNewFrame") == 0)
-            return stat_Copy_PushedInputMultiNewFrame;
-        break;
-    case 'N':
-        if (strcmp(str + 22, "ewFrame") == 0)
-            return stat_Copy_PushedInputNewFrame;
-        break;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    case 0:
+        if (strcmp(str + 7, "py") == 0)
             return stat_Copy;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
+        break;
     default: return -1;
     }
     case 'D':
@@ -2101,6 +2006,34 @@ int builtin_symbol_from_string(const char* str)
         break;
     case '_':
     switch (str[17]) {
+    case 'C':
+    switch (str[18]) {
+    case 'o':
+    switch (str[19]) {
+    case 'p':
+    switch (str[20]) {
+    case 'y':
+    switch (str[21]) {
+    case 'C':
+        if (strcmp(str + 22, "achedValue") == 0)
+            return stat_Interpreter_CopyCachedValue;
+        break;
+    case 'S':
+        if (strcmp(str + 22, "tackValue") == 0)
+            return stat_Interpreter_CopyStackValue;
+        break;
+    case 'T':
+        if (strcmp(str + 22, "ermValue") == 0)
+            return stat_Interpreter_CopyTermValue;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'D':
     switch (str[18]) {
     case 'y':
@@ -2215,6 +2148,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'M':
+        if (strcmp(str + 18, "oveStackValue") == 0)
+            return stat_Interpreter_MoveStackValue;
+        break;
     default: return -1;
     }
     default: return -1;
@@ -2247,6 +2184,34 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 't':
     switch (str[9]) {
+    case 'C':
+    switch (str[10]) {
+    case 'a':
+    switch (str[11]) {
+    case 's':
+    switch (str[12]) {
+    case 't':
+    switch (str[13]) {
+    case '_':
+    switch (str[14]) {
+    case 'C':
+        if (strcmp(str + 15, "astElement") == 0)
+            return stat_ListCast_CastElement;
+        break;
+    case 'T':
+        if (strcmp(str + 15, "ouch") == 0)
+            return stat_ListCast_Touch;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'D':
     switch (str[10]) {
     case 'u':
@@ -2266,8 +2231,8 @@ int builtin_symbol_from_string(const char* str)
     case 'e':
     switch (str[18]) {
     case '_':
-        if (strcmp(str + 19, "Copy") == 0)
-            return stat_ListDuplicate_Copy;
+        if (strcmp(str + 19, "ElementCopy") == 0)
+            return stat_ListDuplicate_ElementCopy;
         break;
     case 0:
             return stat_ListDuplicate;
@@ -2367,6 +2332,90 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 9, "ndex") == 0)
             return stat_SetIndex;
         break;
+    case 'W':
+    switch (str[9]) {
+    case 'i':
+    switch (str[10]) {
+    case 't':
+    switch (str[11]) {
+    case 'h':
+    switch (str[12]) {
+    case 'S':
+    switch (str[13]) {
+    case 'e':
+    switch (str[14]) {
+    case 'l':
+    switch (str[15]) {
+    case 'e':
+    switch (str[16]) {
+    case 'c':
+    switch (str[17]) {
+    case 't':
+    switch (str[18]) {
+    case 'o':
+    switch (str[19]) {
+    case 'r':
+    switch (str[20]) {
+    case '_':
+    switch (str[21]) {
+    case 'T':
+    switch (str[22]) {
+    case 'o':
+    switch (str[23]) {
+    case 'u':
+    switch (str[24]) {
+    case 'c':
+    switch (str[25]) {
+    case 'h':
+    switch (str[26]) {
+    case '_':
+    switch (str[27]) {
+    case 'H':
+        if (strcmp(str + 28, "ashtable") == 0)
+            return stat_SetWithSelector_Touch_Hashtable;
+        break;
+    case 'L':
+        if (strcmp(str + 28, "ist") == 0)
+            return stat_SetWithSelector_Touch_List;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     default: return -1;
     }
     default: return -1;
@@ -2500,27 +2549,9 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'o':
-    switch (str[7]) {
-    case 'u':
-    switch (str[8]) {
-    case 'c':
-    switch (str[9]) {
-    case 'h':
-    switch (str[10]) {
-    case '_':
-        if (strcmp(str + 11, "ListCast") == 0)
-            return stat_Touch_ListCast;
-        break;
-    case 0:
+        if (strcmp(str + 7, "uch") == 0)
             return stat_Touch;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
+        break;
     default: return -1;
     }
     case 'V':

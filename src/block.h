@@ -36,10 +36,10 @@ struct Block
     // List of content terms. This block owns all the Term objects in this list.
     TermList _terms;
 
-    // Symbol bindings.
+    // Name bindings.
     TermNamespace names;
 
-    // Points to the Term which owns this block as a value.
+    // The term which owns this block (as term->nestedContents).
     Term* owningTerm;
 
     // Whether this block is "in progress". Certain cleanup actions are suspended
@@ -146,6 +146,12 @@ void block_graft_replacement(Block* target, Block* replacement);
 caValue* block_get_source_filename(Block* block);
 
 Block* get_outer_scope(Block* block);
+Block* get_parent_block(Block* block);
+Block* get_parent_block_stackwise(Block* block);
+Block* find_enclosing_loop(Block* block);
+Block* find_enclosing_major_block(Block* block);
+bool is_case_block(Block* block);
+bool is_switch_block(Block* block);
 
 // Delete this term and remove it from its owning block.
 void erase_term(Term* term);

@@ -146,7 +146,7 @@ void initialize_null(caValue* value)
 
 void make(Type* type, caValue* value)
 {
-    increment_stat(Make);
+    stat_increment(Make);
 
     set_null(value);
     value->value_type = type;
@@ -192,13 +192,13 @@ void set_null(caValue* value)
 
 void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
 {
-    increment_stat(Cast);
-
     result->success = true;
 
     // Finish early if value already has this exact type.
     if (value->value_type == type)
         return;
+
+    stat_increment(Cast);
 
     // Casting to a interface always succeeds. Future: check if the value actually
     // fits the interface.
@@ -206,7 +206,7 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
         return;
 
     if (type->cast != NULL) {
-        increment_stat(ValueCastDispatched);
+        stat_increment(ValueCastDispatched);
 
         type->cast(result, value, type, checkOnly);
         return;
@@ -232,7 +232,7 @@ bool cast_possible(caValue* source, Type* type)
 
 void copy(caValue* source, caValue* dest)
 {
-    increment_stat(Copy);
+    stat_increment(Copy);
 
     ca_assert(source);
     ca_assert(dest);
@@ -301,7 +301,7 @@ void reset(caValue* value)
 
 void touch(caValue* value)
 {
-    increment_stat(Touch);
+    stat_increment(Touch);
 
     if (is_list_based(value))
         list_touch(value);

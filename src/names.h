@@ -67,10 +67,6 @@ int name_find_ordinal_suffix(const char* str, int* endPos);
 // Get a named term from the global namespace.
 Term* find_global(const char* name);
 
-Block* get_parent_block(Block* block);
-Term* get_parent_term(Term* term);
-Term* get_parent_term(Block* block);
-Term* get_parent_term(Term* term, int levels);
 bool name_is_reachable_from(Term* term, Block* block);
 
 Block* find_first_common_block(Term* left, Term* right);

@@ -289,7 +289,7 @@ void get_global_name(Term* term, caValue* nameOut)
         if (searchTerm->owningBlock == global_root_block())
             break;
 
-        searchTerm = get_parent_term(searchTerm);
+        searchTerm = parent_term(searchTerm);
 
         if (searchTerm == NULL) {
             // Parent is NULL but we haven't yet reached the global root. This is
@@ -462,45 +462,6 @@ Term* find_global(const char* nameStr)
     return find_name(global_root_block(), nameStr);
 }
 
-Block* get_parent_block(Block* block)
-{
-    if (block == global_root_block())
-        return NULL;
-
-    if (block->owningTerm == NULL)
-        return NULL;
-
-    if (block->owningTerm->owningBlock == NULL)
-        return global_root_block();
-
-    return block->owningTerm->owningBlock;
-}
-
-Term* get_parent_term(Term* term)
-{
-    if (term->owningBlock == NULL)
-        return NULL;
-    if (term->owningBlock->owningTerm == NULL)
-        return NULL;
-
-    return term->owningBlock->owningTerm;
-}
-
-Term* get_parent_term(Block* block)
-{
-    return block->owningTerm;
-}
-
-Term* get_parent_term(Term* term, int levels)
-{
-    for (int i=0; i < levels; i++) {
-        term = get_parent_term(term);
-        if (term == NULL)
-            return NULL;
-    }
-    return term;
-}
-
 bool name_is_reachable_from(Term* term, Block* block)
 {
     if (term->owningBlock == block)
@@ -546,7 +507,7 @@ bool term_is_child_of_block(Term* term, Block* block)
         if (term->owningBlock == block)
             return true;
 
-        term = get_parent_term(term);
+        term = parent_term(term);
     }
 
     return false;
@@ -560,7 +521,7 @@ bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& ou
         return true;
     }
 
-    Term* parentTerm = get_parent_term(term);
+    Term* parentTerm = parent_term(term);
 
     if (parentTerm == NULL)
         return false;
@@ -627,7 +588,7 @@ void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutpu
             break;
         }
 
-        term = get_parent_term(term);
+        term = parent_term(term);
 
         // If term is null, then it wasn't really a child of relativeTo
         if (term == NULL) {

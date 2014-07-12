@@ -161,7 +161,7 @@ void stack_reserve_register_capacity(Stack* stack, int desiredSize)
 
 Frame* stack_push_blank_frame(Stack* stack, int registerCount)
 {
-    increment_stat(StackPushFrame);
+    stat_increment(StackPushFrame);
     stack->frameCount++;
     stack_reserve_frame_capacity(stack, stack->frameCount);
 

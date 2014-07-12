@@ -57,12 +57,12 @@ void cond(caStack* stack)
 
 void concat(caStack* stack)
 {
-    caValue* args = circa_input(stack, 0);
-    caValue* out = circa_output(stack, 0);
+    Value* args = circa_input(stack, 0);
+    Value* out = circa_output(stack, 0);
     set_string(out, "");
 
     for (int index=0; index < list_length(args); index++) {
-        caValue* v = circa_index(args, index);
+        Value* v = circa_index(args, index);
         string_append(out, v);
     }
 }
@@ -76,7 +76,7 @@ void cast1_evaluate(caStack* stack)
 {
     // 'cast1' is used internally. The type is passed as the term's type.
     // Deprecated in favor of the other version.
-    caValue* source = circa_input(stack, 0);
+    Value* source = circa_input(stack, 0);
 
     Type* type = circa_caller_term(stack)->type;
 
@@ -94,7 +94,7 @@ void cast1_evaluate(caStack* stack)
         return circa_output_error(stack, as_cstring(&msg));
     }
 
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     copy(source, output);
     bool success = cast(output, type);
 
@@ -105,7 +105,7 @@ void cast1_evaluate(caStack* stack)
 void cast_evaluate(caStack* stack)
 {
     // 'cast' is used by scripts. In this version, the type is passed via the 2nd param
-    caValue* result = circa_output(stack, 0);
+    Value* result = circa_output(stack, 0);
     copy(circa_input(stack, 0), result);
 
     Type* type = unbox_type(circa_input(stack, 1));
@@ -128,9 +128,9 @@ void div_i(caStack* stack)
 
 void empty_list(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     int size = circa_int_input(stack, 1);
-    caValue* initialValue = circa_input(stack, 0);
+    Value* initialValue = circa_input(stack, 0);
     set_list(out, size);
     for (int i=0; i < size; i++) {
         copy(initialValue, list_get(out, i));
@@ -187,10 +187,10 @@ void hosted_is_type(caStack* stack)
 
 void inputs_fit_function(caStack* stack)
 {
-    caValue* inputs = circa_input(stack, 0);
+    Value* inputs = circa_input(stack, 0);
     Term* function = circa_caller_input_term(stack, 1);
     Block* functionContents = function_contents(function);
-    caValue* result = circa_output(stack, 0);
+    Value* result = circa_output(stack, 0);
 
     bool varArgs = has_variable_args(functionContents);
 
@@ -203,7 +203,7 @@ void inputs_fit_function(caStack* stack)
     // Check each input
     for (int i=0; i < circa_count(inputs); i++) {
         Term* placeholder = get_effective_input_placeholder(functionContents, i);
-        caValue* value = circa_index(inputs, i);
+        Value* value = circa_index(inputs, i);
         if (value == NULL)
             continue;
         if (!cast_possible(value, declared_type(placeholder))) {
@@ -216,10 +216,10 @@ void inputs_fit_function(caStack* stack)
 }
 void overload_error_no_match(caStack* stack)
 {
-    caValue* inputs = circa_input(stack, 00);
+    Value* inputs = circa_input(stack, 00);
 
     Term* caller = (Term*) circa_caller_term(stack);
-    Term* func = get_parent_term(caller, 3);
+    Term* func = parent_term(caller, 3);
 
     std::stringstream out;
     Value msg;
@@ -270,10 +270,10 @@ void write_text_file_func(caStack* stack)
 
 void get_field(caStack* stack)
 {
-    caValue* head = circa_input(stack, 0);
+    Value* head = circa_input(stack, 0);
 
     Value error;
-    caValue* value = get_field(head, circa_input(stack, 1), &error);
+    Value* value = get_field(head, circa_input(stack, 1), &error);
 
     if (!is_null(&error)) {
         circa_output_error(stack, as_cstring(&error));
@@ -287,7 +287,7 @@ void get_field(caStack* stack)
 
 void get_index(caStack* stack)
 {
-    caValue* list = circa_input(stack, 0);
+    Value* list = circa_input(stack, 0);
     int index = circa_int_input(stack, 1);
 
     if (index < 0) {
@@ -300,7 +300,7 @@ void get_index(caStack* stack)
         return circa_output_error(stack, indexStr);
     }
 
-    caValue* result = get_index(list, index);
+    Value* result = get_index(list, index);
 
     copy(result, circa_output(stack, 0));
     cast(circa_output(stack, 0), declared_type((Term*) circa_caller_term(stack)));
@@ -320,7 +320,7 @@ void input_explicit(caStack* stack)
 void make_list(caStack* stack)
 {
     // Variadic arg handling will already have turned this into a list
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     circa_copy(circa_input(stack, 0), out);
     if (!circa_is_list(out))
         circa_set_list(out, 0);
@@ -328,7 +328,7 @@ void make_list(caStack* stack)
 
 void blank_list(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     int count = circa_int_input(stack, 0);
     circa_set_list(out, count);
 }
@@ -443,9 +443,9 @@ void ceil(caStack* stack)
 
 void average(caStack* stack)
 {
-    caValue* args = circa_input(stack, 0);
+    Value* args = circa_input(stack, 0);
     int count = circa_count(args);
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
 
     if (count == 0) {
         set_float(out, 0);
@@ -566,7 +566,7 @@ void range(caStack* stack)
     if (count > 1000000)
         return circa_output_error(stack, "Range is too large");
     
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     set_list(output, count);
 
     int val = start;
@@ -585,15 +585,15 @@ void rpath(caStack* stack)
 
 void set_field(caStack* stack)
 {
-    increment_stat(SetField);
+    stat_increment(SetField);
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
     touch(out);
 
-    caValue* name = circa_input(stack, 1);
+    Value* name = circa_input(stack, 1);
 
-    caValue* slot = get_field(out, name, NULL);
+    Value* slot = get_field(out, name, NULL);
     if (slot == NULL) {
         circa::Value msg;
         set_string(&msg, "field not found: ");
@@ -606,9 +606,9 @@ void set_field(caStack* stack)
 
 void set_index(caStack* stack)
 {
-    increment_stat(SetIndex);
+    stat_increment(SetIndex);
 
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     copy(circa_input(stack, 0), output);
     touch(output);
     int index = circa_int_input(stack, 1);
@@ -621,10 +621,10 @@ void rand(caStack* stack)
 
 void repeat(caStack* stack)
 {
-    caValue* source = circa_input(stack, 0);
+    Value* source = circa_input(stack, 0);
     int repeatCount = circa_int_input(stack, 1);
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     circa_set_list(out, repeatCount);
 
     for (int i=0; i < repeatCount; i++)
@@ -693,29 +693,30 @@ void index_func(caStack* stack)
 
 void List__append(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-    copy(circa_input(stack, 1), list_append(out));
+    Value* out = circa_output(stack, 0);
+    move(circa_input(stack, 0), out);
+    move(circa_input(stack, 1), list_append(out));
 }
 
 void List__concat(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
+    Value* out = circa_output(stack, 0);
+    move(circa_input(stack, 0), out);
 
-    caValue* additions = circa_input(stack, 1);
+    Value* additions = circa_input(stack, 1);
+    touch(additions);
 
     int oldLength = list_length(out);
     int additionsLength = list_length(additions);
 
     list_resize(out, oldLength + additionsLength);
     for (int i = 0; i < additionsLength; i++)
-        copy(list_get(additions, i), list_get(out, oldLength + i));
+        move(list_get(additions, i), list_get(out, oldLength + i));
 }
 
 void List__resize(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
     int count = circa_int_input(stack, 1);
     circa_resize(out, count);
@@ -723,10 +724,10 @@ void List__resize(caStack* stack)
 
 void List__extend(caStack* stack)
 {
-    caValue* out = circa_output(stack, 1);
+    Value* out = circa_output(stack, 1);
     copy(circa_input(stack, 0), out);
 
-    caValue* additions = circa_input(stack, 1);
+    Value* additions = circa_input(stack, 1);
 
     int oldLength = list_length(out);
     int additionsLength = list_length(additions);
@@ -747,7 +748,7 @@ void List__length(caStack* stack)
 
 void List__insert(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
 
     copy(circa_input(stack, 2), list_insert(out, circa_int_input(stack, 1)));
@@ -755,10 +756,10 @@ void List__insert(caStack* stack)
 
 void List__slice(caStack* stack)
 {
-    caValue* input = circa_input(stack, 0);
+    Value* input = circa_input(stack, 0);
     int start = circa_int_input(stack, 1);
     int end = circa_int_input(stack, 2);
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
 
     if (start < 0)
         start = 0;
@@ -784,10 +785,10 @@ void List__slice(caStack* stack)
 
 void List__join(caStack* stack)
 {
-    caValue* input = circa_input(stack, 0);
-    caValue* joiner = circa_input(stack, 1);
+    Value* input = circa_input(stack, 0);
+    Value* joiner = circa_input(stack, 1);
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     set_string(out, "");
 
     for (int i=0; i < list_length(input); i++) {
@@ -800,7 +801,7 @@ void List__join(caStack* stack)
 
 void List__get(caStack* stack)
 {
-    caValue* self = circa_input(stack, 0);
+    Value* self = circa_input(stack, 0);
     int index = circa_int_input(stack, 1);
     if (index < 0 || index >= list_length(self))
         return raise_error_msg(stack, "Index out of bounds");
@@ -810,11 +811,11 @@ void List__get(caStack* stack)
 
 void List__set(caStack* stack)
 {
-    caValue* self = circa_output(stack, 0);
+    Value* self = circa_output(stack, 0);
     copy(circa_input(stack, 0), self);
 
     int index = circa_int_input(stack, 1);
-    caValue* value = circa_input(stack, 2);
+    Value* value = circa_input(stack, 2);
 
     touch(self);
     copy(value, list_get(self, index));
@@ -822,7 +823,7 @@ void List__set(caStack* stack)
 
 void List__remove(caStack* stack)
 {
-    caValue* self = circa_output(stack, 0);
+    Value* self = circa_output(stack, 0);
     copy(circa_input(stack, 0), self);
     int index = circa_int_input(stack, 1);
 
@@ -834,39 +835,39 @@ void List__remove(caStack* stack)
 
 void Map__contains(caStack* stack)
 {
-    caValue* key = circa_input(stack, 1);
+    Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
         return circa_output_error(stack, "Key is not hashable");
 
-    caValue* value = hashtable_get(circa_input(stack, 0), key);
+    Value* value = hashtable_get(circa_input(stack, 0), key);
     set_bool(circa_output(stack, 0), value != NULL);
 }
 
 void Map__keys(caStack* stack)
 {
-    caValue* table = circa_input(stack, 0);
+    Value* table = circa_input(stack, 0);
     hashtable_get_keys(table, circa_output(stack, 0));
 }
 
 void Map__remove(caStack* stack)
 {
-    caValue* key = circa_input(stack, 1);
+    Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
         return circa_output_error(stack, "Key is not hashable");
 
-    caValue* self = circa_output(stack, 0);
+    Value* self = circa_output(stack, 0);
     move(circa_input(stack, 0), self);
     hashtable_remove(self, key);
 }
 
 void Map__get(caStack* stack)
 {
-    caValue* table = circa_input(stack, 0);
-    caValue* key = circa_input(stack, 1);
+    Value* table = circa_input(stack, 0);
+    Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
         return circa_output_error(stack, "Key is not hashable");
 
-    caValue* value = hashtable_get(table, key);
+    Value* value = hashtable_get(table, key);
     if (value == NULL) {
         Value msg;
         set_string(&msg, "Key not found: ");
@@ -878,14 +879,14 @@ void Map__get(caStack* stack)
 
 void Map__set(caStack* stack)
 {
-    caValue* key = circa_input(stack, 1);
+    Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
         return circa_output_error(stack, "Key is not hashable");
 
-    caValue* self = circa_output(stack, 0);
+    Value* self = circa_output(stack, 0);
     move(circa_input(stack, 0), self);
 
-    caValue* value = circa_input(stack, 2);
+    Value* value = circa_input(stack, 2);
 
     copy(value, hashtable_insert(self, key, false));
 }
@@ -897,7 +898,7 @@ void Map__empty(caStack* stack)
 
 void ModuleRef__get(caStack* stack)
 {
-    caValue* moduleRef = circa_input(stack, 0);
+    Value* moduleRef = circa_input(stack, 0);
     Block* moduleBlock = module_ref_get_block(moduleRef);
     Term* term = find_local_name(moduleBlock, circa_input(stack, 1));
     copy(term_value(term), circa_output(stack, 0));
@@ -940,7 +941,7 @@ void String__ord(caStack* stack)
 
 void String__substr(caStack* stack)
 {
-    caValue* self = circa_input(stack, 0);
+    Value* self = circa_input(stack, 0);
     int start = circa_int_input(stack, 1);
     int length = circa_int_input(stack, 2);
 
@@ -1068,18 +1069,18 @@ void String__split(caStack* stack)
     string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
 }
 
-caValue* find_env_value(caStack* stack, caValue* key)
+Value* find_env_value(caStack* stack, Value* key)
 {
     for (Frame* frame = top_frame(stack); frame != NULL; frame = prev_frame(frame)) {
         if (!is_null(&frame->env)) {
-            caValue* value = hashtable_get(&frame->env, key);
+            Value* value = hashtable_get(&frame->env, key);
             if (value != NULL)
                 return value;
         }
     }
 
     if (!is_null(&stack->env)) {
-        caValue* value = hashtable_get(&stack->env, key);
+        Value* value = hashtable_get(&stack->env, key);
         if (value != NULL)
             return value;
     }
@@ -1089,7 +1090,7 @@ caValue* find_env_value(caStack* stack, caValue* key)
 
 void get_env(caStack* stack)
 {
-    caValue* value = find_env_value(stack, circa_input(stack, 0));
+    Value* value = find_env_value(stack, circa_input(stack, 0));
     if (value != NULL)
         copy(value, circa_output(stack, 0));
     else
@@ -1098,7 +1099,7 @@ void get_env(caStack* stack)
 
 void get_env_opt(caStack* stack)
 {
-    caValue* value = find_env_value(stack, circa_input(stack, 0));
+    Value* value = find_env_value(stack, circa_input(stack, 0));
     if (value != NULL)
         copy(value, circa_output(stack, 0));
     else
@@ -1107,8 +1108,8 @@ void get_env_opt(caStack* stack)
 
 void set_env(caStack* stack)
 {
-    caValue* key = circa_input(stack, 0);
-    caValue* value = circa_input(stack, 1);
+    Value* key = circa_input(stack, 0);
+    Value* value = circa_input(stack, 1);
 
     copy(value, stack_env_insert(stack, key));
 }
@@ -1131,8 +1132,8 @@ void file__read_text(caStack* stack)
 
 void channel_send(caStack* stack)
 {
-    caValue* name = circa_input(stack, 0);
-    caValue* channel = find_env_value(stack, name);
+    Value* name = circa_input(stack, 0);
+    Value* channel = find_env_value(stack, name);
     if (channel == NULL) {
         channel = stack_env_insert(stack, name);
         set_list(channel, 0);
@@ -1143,8 +1144,8 @@ void channel_send(caStack* stack)
 
 void channel_read(caStack* stack)
 {
-    caValue* name = circa_input(stack, 0);
-    caValue* channel = find_env_value(stack, name);
+    Value* name = circa_input(stack, 0);
+    Value* channel = find_env_value(stack, name);
     if (channel == NULL)
         set_list(circa_output(stack, 0), 0);
     else {
@@ -1156,7 +1157,7 @@ void channel_read(caStack* stack)
 void find_active_value(caStack* stack)
 {
     Term* term = as_term_ref(circa_input(stack, 0));
-    caValue* value = stack_find_nonlocal(top_frame(stack), term);
+    Value* value = stack_find_nonlocal(top_frame(stack), term);
 
     if (value == NULL) {
         set_bool(circa_output(stack, 1), false);
@@ -1168,7 +1169,7 @@ void find_active_value(caStack* stack)
 
 void typeof_func(caStack* stack)
 {
-    caValue* in = circa_input(stack, 0);
+    Value* in = circa_input(stack, 0);
     set_type(circa_output(stack, 0), in->value_type);
 }
 
@@ -1192,21 +1193,21 @@ void not_equals(caStack* stack)
 
 void error(caStack* stack)
 {
-    caValue* args = circa_input(stack, 0);
+    Value* args = circa_input(stack, 0);
 
     Value out;
 
     for (int i = 0; i < circa_count(args); i++) {
-        caValue* val = circa_index(args, i);
+        Value* val = circa_index(args, i);
         string_append(&out, val);
     }
 
-    circa_output_error(stack, as_cstring(&out));
+    circa_output_error_val(stack, &out);
 }
 
 void get_with_symbol(caStack* stack)
 {
-    caValue* left = circa_input(stack, 0);
+    Value* left = circa_input(stack, 0);
     Value str;
     symbol_as_string(circa_input(stack, 1), &str);
 
@@ -1225,13 +1226,13 @@ void get_with_symbol(caStack* stack)
 
 void print(caStack* stack)
 {
-    caValue* args = circa_input(stack, 0);
+    Value* args = circa_input(stack, 0);
 
     Value out;
     set_string(&out, "");
 
     for (int i = 0; i < circa_count(args); i++) {
-        caValue* val = circa_index(args, i);
+        Value* val = circa_index(args, i);
         string_append(&out, val);
     }
 
@@ -1242,8 +1243,8 @@ void print(caStack* stack)
 
 void to_string(caStack* stack)
 {
-    caValue* in = circa_input(stack, 0);
-    caValue* out = circa_output(stack, 0);
+    Value* in = circa_input(stack, 0);
+    Value* out = circa_output(stack, 0);
     to_string(in, out);
 }
 

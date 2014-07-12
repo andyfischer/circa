@@ -174,6 +174,7 @@ struct BlockIterator2
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }
     void operator++() { advance(); }
+    operator bool() { return !finished(); }
 };
 
 struct NameVisibleIterator

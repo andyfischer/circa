@@ -336,7 +336,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
 #endif
     } else if (equals_string(&command, "dump_stats")) {
 
-        perf_stats_dump();
+        circa_perf_stats_dump();
         std::cout << ":done" << std::endl;
 
     } else {

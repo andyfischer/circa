@@ -76,17 +76,17 @@ struct Term
 
     const char* nameStr();
 
-    Term* input(int index) const;
+    Term* input(int index);
     Input* inputInfo(int index);
-    int numInputs() const;
+    int numInputs();
 
-    void inputsToList(TermList& out) const;
+    void inputsToList(TermList& out);
 
     // In this context, the 'dependencies' include the function term and all input
     // terms. So, this is the same as the input list, with the function inserted
     // at element 0. This is more convenient in some situations.
-    Term* dependency(int index) const;
-    int numDependencies() const;
+    Term* dependency(int index);
+    int numDependencies();
     void setDependency(int index, Term* term);
 
     // Shorthand for nested_contents()
@@ -122,6 +122,15 @@ struct Term
 // Allocate a new Term object.
 Term* alloc_term();
 void dealloc_term(Term*);
+
+int term_dependency_count(Term* term);
+Term* term_dependency(Term* term, int i);
+bool term_depends_on(Term* term, Term* termBeingUsed);
+
+Term* term_user(Term* term, int index);
+int user_count(Term* term);
+
+bool is_located_after(Term* location, Term* term);
 
 // Fetches a term property, creating it if it doesn't exist.
 caValue* term_insert_property(Term* term, Symbol key);
@@ -170,5 +179,12 @@ bool is_function(Term* term);
 Block* function_contents(Term* term);
 Type* as_type(Term* term);
 int term_line_number(Term* term);
+
+Term* parent_term(Term* term);
+Term* parent_term(Block* block);
+Term* parent_term(Term* term, int levels);
+
+bool term_is_observable(Term* term);
+bool term_is_observable_after(Term* term, Term* location);
 
 } // namespace circa

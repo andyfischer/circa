@@ -189,7 +189,7 @@ void finish_for_loop(Term* forTerm)
 Term* find_enclosing_for_loop(Term* location)
 {
     while (location != NULL && location->function != FUNCS.for_func)
-        location = get_parent_term(location);
+        location = parent_term(location);
     return location;
 }
 

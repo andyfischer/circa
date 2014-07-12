@@ -38,14 +38,14 @@ void assert_valid_list(ListData* list)
 
 ListData* allocate_empty_list(int capacity)
 {
-    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(caValue));
+    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(Value));
     debug_register_valid_object(result, LIST_OBJECT);
 
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
     result->immutable = false;
-    memset(result->items, 0, capacity * sizeof(caValue));
+    memset(result->items, 0, capacity * sizeof(Value));
     for (int i=0; i < capacity; i++)
         initialize_null(&result->items[i]);
 
@@ -91,7 +91,7 @@ void list_make_immutable(ListData* data)
 {
     data->immutable = true;
 }
-ListData* as_list_data(caValue* val)
+ListData* as_list_data(Value* val)
 {
     ca_assert(is_list(val));
     return (ListData*) val->value_data.ptr;
@@ -133,7 +133,7 @@ ListData* list_duplicate(ListData* source)
     if (source == NULL)
         return NULL;
 
-    increment_stat(ListDuplicate);
+    stat_increment(ListDuplicate);
 
     assert_valid_list(source);
 
@@ -142,7 +142,7 @@ ListData* list_duplicate(ListData* source)
     result->count = source->count;
 
     for (int i=0; i < source->count; i++) {
-        increment_stat(ListDuplicate_Copy);
+        stat_increment(ListDuplicate_ElementCopy);
         copy(&source->items[i], &result->items[i]);
     }
 
@@ -161,8 +161,8 @@ ListData* list_increase_capacity(ListData* original, int new_capacity)
 
     result->count = original->count;
     for (int i=0; i < result->count; i++) {
-        caValue* left = &original->items[i];
-        caValue* right = &result->items[i];
+        Value* left = &original->items[i];
+        Value* right = &result->items[i];
         if (createCopy)
             copy(left, right);
         else
@@ -227,7 +227,7 @@ ListData* list_resize(ListData* original, int newLength)
     return result;
 }
 
-caValue* list_append(ListData** dataPtr)
+Value* list_append(ListData** dataPtr)
 {
     if (*dataPtr == NULL) {
         *dataPtr = allocate_empty_list(1);
@@ -243,17 +243,17 @@ caValue* list_append(ListData** dataPtr)
     return &data->items[data->count - 1];
 }
 
-void list_pop(caValue* list)
+void list_pop(Value* list)
 {
     list_resize(list, list_length(list) - 1);
 }
 
-caValue* list_last(caValue* list)
+Value* list_last(Value* list)
 {
     return list_get(list, list_length(list) - 1);
 }
 
-caValue* list_insert(ListData** dataPtr, int index)
+Value* list_insert(ListData** dataPtr, int index)
 {
     list_append(dataPtr);
 
@@ -305,9 +305,9 @@ void list_remove_nulls(ListData** dataPtr)
     *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
 }
 
-void list_copy(caValue* source, caValue* dest)
+void list_copy(Value* source, Value* dest)
 {
-    increment_stat(ListSoftCopy);
+    stat_increment(ListSoftCopy);
 
     ca_assert(source->value_type->storageType == sym_StorageTypeList);
 
@@ -323,7 +323,7 @@ void list_copy(caValue* source, caValue* dest)
     dest->value_data.ptr = sourceData;
 }
 
-void list_to_string(ListData* value, caValue* out)
+void list_to_string(ListData* value, Value* out)
 {
     if (value == NULL) {
         string_append(out, "[]");
@@ -339,7 +339,7 @@ void list_to_string(ListData* value, caValue* out)
     string_append(out, "]");
 }
 
-int list_length(caValue* value)
+int list_length(Value* value)
 {
     ca_assert(is_list_based(value));
     ListData* s = (ListData*) get_pointer(value);
@@ -348,12 +348,12 @@ int list_length(caValue* value)
     return s->count;
 }
 
-bool list_empty(caValue* value)
+bool list_empty(Value* value)
 {
     return list_length(value) == 0;
 }
 
-void list_slice(caValue* original, int start, int end, caValue* result)
+void list_slice(Value* original, int start, int end, Value* result)
 {
     int originalCount = list_length(original);
 
@@ -373,7 +373,7 @@ void list_slice(caValue* original, int start, int end, caValue* result)
         copy(list_get(original, i + start), list_get(result, i));
 }
 
-void list_reverse(caValue* list)
+void list_reverse(Value* list)
 {
     int count = list_length(list);
     for (int i=0; i < count/2; i++) {
@@ -381,7 +381,7 @@ void list_reverse(caValue* list)
     }
 }
 
-bool list_contains(caValue* list, caValue* element)
+bool list_contains(Value* list, Value* element)
 {
     for (int i=0; i < list_length(list); i++)
         if (equals(list_get(list, i), element))
@@ -390,7 +390,7 @@ bool list_contains(caValue* list, caValue* element)
     return false;
 }
 
-bool list_strict_equals(caValue* left, caValue* right)
+bool list_strict_equals(Value* left, Value* right)
 {
     if (left->value_type != TYPES.list || right->value_type != TYPES.list)
         return false;
@@ -413,7 +413,7 @@ bool list_strict_equals(caValue* left, caValue* right)
     return true;
 }
 
-static void mergesort_step(caValue* list, SortCompareFunc func, void* context)
+static void mergesort_step(Value* list, SortCompareFunc func, void* context)
 {
     int length = list_length(list);
     int middle = int(length / 2);
@@ -459,9 +459,9 @@ static void mergesort_step(caValue* list, SortCompareFunc func, void* context)
             return;
         }
 
-        caValue* leftValue = list_get(&left, leftIndex);
-        caValue* rightValue = list_get(&right, rightIndex);
-        caValue* dest = list_get(list, destIndex++);
+        Value* leftValue = list_get(&left, leftIndex);
+        Value* rightValue = list_get(&right, rightIndex);
+        Value* dest = list_get(list, destIndex++);
 
         int compareResult = func(context, leftValue, rightValue);
         if (compareResult < 0) {
@@ -474,12 +474,12 @@ static void mergesort_step(caValue* list, SortCompareFunc func, void* context)
     }
 }
 
-static int default_compare_for_sort(void* context, caValue* left, caValue* right)
+static int default_compare_for_sort(void* context, Value* left, Value* right)
 {
     return compare(left, right);
 }
 
-void list_sort_mergesort(caValue* list, SortCompareFunc func, void* context)
+void list_sort_mergesort(Value* list, SortCompareFunc func, void* context)
 {
     if (func == NULL)
         func = default_compare_for_sort;
@@ -487,36 +487,36 @@ void list_sort_mergesort(caValue* list, SortCompareFunc func, void* context)
     mergesort_step(list, func, context);
 }
 
-void list_sort(caValue* list, SortCompareFunc func, void* context)
+void list_sort(Value* list, SortCompareFunc func, void* context)
 {
     list_sort_mergesort(list, func, context);
 }
 
-void list_touch(caValue* value)
+void list_touch(Value* value)
 {
     ca_assert(is_list_based(value));
     ListData* data = (ListData*) get_pointer(value);
     set_pointer(value, list_touch(data));
 }
 
-bool list_touch_is_necessary(caValue* value)
+bool list_touch_is_necessary(Value* value)
 {
     ListData* data = (ListData*) get_pointer(value);
     return !(data == NULL || data->refCount == 1);
 }
 
-caValue* list_get(caValue* value, int index)
+Value* list_get(Value* value, int index)
 {
     ca_assert(is_list_based(value));
     return list_get((ListData*) value->value_data.ptr, index);
 }
 
-caValue* list_get_from_end(caValue* value, int reverseIndex)
+Value* list_get_from_end(Value* value, int reverseIndex)
 {
     ca_assert(is_list_based(value));
     return list_get_from_end((ListData*) value->value_data.ptr, reverseIndex);
 }
-caValue* list_get_safe(caValue* value, int index)
+Value* list_get_safe(Value* value, int index)
 {
     if (!is_list_based(value) || index < 0 || index >= list_length(value))
         return NULL;
@@ -535,14 +535,14 @@ ListData* list_remove_index(ListData* original, int index)
     return result;
 }
 
-void list_remove_index(caValue* list, int index)
+void list_remove_index(Value* list, int index)
 {
     ca_assert(is_list(list));
     ListData* data = (ListData*) list->value_data.ptr;
     list->value_data.ptr = list_remove_index(data, index);
 }
 
-void list_resize(caValue* list, int size)
+void list_resize(Value* list, int size)
 {
     ca_assert(is_list_based(list));
     ListData* data = (ListData*) list->value_data.ptr;
@@ -550,31 +550,31 @@ void list_resize(caValue* list, int size)
     list->value_data.ptr = data;
 }
 
-caValue* list_append(caValue* list)
+Value* list_append(Value* list)
 {
     ca_assert(is_list(list));
     ListData* data = (ListData*) list->value_data.ptr;
-    caValue* result = list_append(&data);
+    Value* result = list_append(&data);
     list->value_data.ptr = data;
     return result;
 }
 
-void list_extend(caValue* list, caValue* rhsList)
+void list_extend(Value* list, Value* rhsList)
 {
     for (int i=0; i < list_length(rhsList); i++)
         copy(list_get(rhsList, i), list_append(list));
 }
 
-caValue* list_insert(caValue* list, int index)
+Value* list_insert(Value* list, int index)
 {
     ca_assert(list->value_type->storageType == sym_StorageTypeList);
     ListData* data = (ListData*) list->value_data.ptr;
-    caValue* result = list_insert(&data, index);
+    Value* result = list_insert(&data, index);
     list->value_data.ptr = data;
     return result;
 }
 
-bool list_equals(caValue* left, caValue* right)
+bool list_equals(Value* left, Value* right)
 {
     ca_assert(is_list_based(left));
 
@@ -600,19 +600,19 @@ bool list_equals(caValue* left, caValue* right)
     return true;
 }
 
-void list_remove_and_replace_with_last_element(caValue* value, int index)
+void list_remove_and_replace_with_last_element(Value* value, int index)
 {
     ca_assert(is_list(value));
     list_remove_and_replace_with_last_element((ListData**) &value->value_data, index);
 }
 
-void list_remove_nulls(caValue* value)
+void list_remove_nulls(Value* value)
 {
     ca_assert(is_list(value));
     list_remove_nulls((ListData**) &value->value_data);
 }
 
-Symbol list_get_parameter_type(caValue* parameter)
+Symbol list_get_parameter_type(Value* parameter)
 {
     if (is_null(parameter))
         return sym_Untyped;
@@ -628,7 +628,7 @@ Symbol list_get_parameter_type(caValue* parameter)
     return sym_Invalid;
 }
 
-bool list_type_has_specific_size(caValue* parameter)
+bool list_type_has_specific_size(Value* parameter)
 {
     return is_list(parameter);
 }
@@ -643,19 +643,19 @@ Type* create_compound_type()
 void setup_compound_type(Type* type)
 {
     list_t::setup_type(type);
-    caValue* param = &type->parameter;
+    Value* param = &type->parameter;
     set_list(param, 2);
     set_list(list_get(param, 0), 0);
     set_list(list_get(param, 1), 0);
 }
 
-void compound_type_append_field(Type* type, Type* fieldType, caValue* fieldName)
+void compound_type_append_field(Type* type, Type* fieldType, Value* fieldName)
 {
     ca_assert(list_get_parameter_type(&type->parameter) == sym_StructType);
 
     list_touch(&type->parameter);
-    caValue* types = list_get(&type->parameter, 0);
-    caValue* names = list_get(&type->parameter, 1);
+    Value* types = list_get(&type->parameter, 0);
+    Value* names = list_get(&type->parameter, 1);
 
     set_type(list_append(types), fieldType);
     set_value(list_append(names), fieldName);
@@ -663,17 +663,17 @@ void compound_type_append_field(Type* type, Type* fieldType, caValue* fieldName)
 
 int compound_type_get_field_count(Type* type)
 {
-    caValue* types = list_get(&type->parameter, 0);
+    Value* types = list_get(&type->parameter, 0);
     return list_length(types);
 }
 const char* compound_type_get_field_name(Type* type, int index)
 {
-    caValue* names = list_get(&type->parameter, 1);
+    Value* names = list_get(&type->parameter, 1);
     return as_cstring(list_get(names, index));
 }
 Type* compound_type_get_field_type(Type* type, int index)
 {
-    caValue* types = list_get(&type->parameter, 0);
+    Value* types = list_get(&type->parameter, 0);
     return as_type(list_get(types, index));
 }
 
@@ -682,7 +682,7 @@ bool is_struct_type(Type* type)
     return list_get_parameter_type(&type->parameter) == sym_StructType;
 }
 
-void compound_type_to_string(caValue* value, caValue* out)
+void compound_type_to_string(Value* value, Value* out)
 {
     if (!is_string(out))
         set_string(out, "");
@@ -719,10 +719,10 @@ void list_type_initialize_from_decl(Type* type, Block* decl)
     }
 }
 
-caValue* list_get_type_list_from_type(Type* type)
+Value* list_get_type_list_from_type(Type* type)
 {
     ca_assert(is_list_based_type(type));
-    caValue* parameter = &type->parameter;
+    Value* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
     case sym_AnonStructType:
@@ -738,10 +738,10 @@ caValue* list_get_type_list_from_type(Type* type)
     return NULL;
 }
 
-caValue* list_get_name_list_from_type(Type* type)
+Value* list_get_name_list_from_type(Type* type)
 {
     ca_assert(is_list_based_type(type));
-    caValue* parameter = &type->parameter;
+    Value* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
     case sym_StructType:
@@ -765,7 +765,7 @@ int list_find_field_index_by_name(Type* listType, const char* name)
     if (!is_list_based_type(listType))
         return -1;
 
-    caValue* names = list_get_name_list_from_type(listType);
+    Value* names = list_get_name_list_from_type(listType);
     if (names == NULL)
         return -1;
 
@@ -784,19 +784,19 @@ bool is_list_based_type(Type* type)
 
 namespace list_t {
 
-    void resize(caValue* list, int newSize)
+    void resize(Value* list, int newSize)
     {
         ca_assert(is_list(list));
         set_pointer(list, list_resize((ListData*) get_pointer(list), newSize));
     }
 
-    void tv_initialize(Type* type, caValue* value)
+    void tv_initialize(Type* type, Value* value)
     {
         ca_assert(value->value_data.ptr == NULL);
 
         // If the parameter has a fixed size list, then initialize to that.
         if (list_type_has_specific_size(&type->parameter)) {
-            caValue* typeList = list_get_type_list_from_type(type);
+            Value* typeList = list_get_type_list_from_type(type);
             int count = list_length(typeList);
 
             list_resize(value, count);
@@ -805,7 +805,7 @@ namespace list_t {
         }
     }
 
-    void tv_release(caValue* value)
+    void tv_release(Value* value)
     {
         ca_assert(is_list_based(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -814,13 +814,13 @@ namespace list_t {
         list_decref(data);
     }
 
-    void tv_copy(Type* type, caValue* source, caValue* dest)
+    void tv_copy(Type* type, Value* source, Value* dest)
     {
         list_copy(source, dest);
     }
 
 
-    void tv_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
+    void tv_cast(CastResult* result, Value* value, Type* type, bool checkOnly)
     {
         ca_assert(value->value_type != type);
 
@@ -842,7 +842,7 @@ namespace list_t {
             return;
         }
 
-        caValue* destTypes = list_get_type_list_from_type(type);
+        Value* destTypes = list_get_type_list_from_type(type);
 
         // Check for correct number of elements.
         if (sourceLength != list_length(destTypes)) {
@@ -851,7 +851,9 @@ namespace list_t {
         }
 
         if (!checkOnly) {
-            increment_stat(Touch_ListCast);
+            if (touch_is_necessary(value))
+                stat_increment(ListCast_Touch);
+
             list_touch(value);
             type_incref(type);
             type_decref(value->value_type);
@@ -859,10 +861,10 @@ namespace list_t {
         }
 
         for (int i=0; i < sourceLength; i++) {
-            caValue* sourceElement = list_get(value, i);
+            Value* sourceElement = list_get(value, i);
             Type* expectedType = as_type(list_get(destTypes,i));
 
-            increment_stat(Cast_ListCastElement);
+            stat_increment(ListCast_CastElement);
             cast(result, sourceElement, expectedType, checkOnly);
 
             if (!result->success)
@@ -870,14 +872,14 @@ namespace list_t {
         }
     }
 
-    void tv_set_index(caValue* value, int index, caValue* element)
+    void tv_set_index(Value* value, int index, Value* element)
     {
         ca_assert(is_list_based(value));
         list_touch(value);
         copy(element, list_get(value, index));
     }
 
-    void tv_to_string(caValue* value, caValue* out)
+    void tv_to_string(Value* value, Value* out)
     {
         if (is_struct_type(value->value_type))
             return compound_type_to_string(value, out);
@@ -895,7 +897,7 @@ namespace list_t {
             return (value << shift) | (value >> (32 - shift));
     }
     
-    int list_hash(caValue* value)
+    int list_hash(Value* value)
     {
         int hash = 0;
         int count = list_length(value);
@@ -919,7 +921,7 @@ namespace list_t {
                 return query->fail();
         }
 
-        caValue* expectedElementTypes = list_get_type_list_from_type(type);
+        Value* expectedElementTypes = list_get_type_list_from_type(type);
 
         // Special case when looking at a call to list(); look at inputs instead of
         // looking at the result.
@@ -940,7 +942,7 @@ namespace list_t {
         if (!list_type_has_specific_size(&subjectType->parameter))
             return query->fail();
 
-        caValue* subjectElementTypes = list_get_type_list_from_type(subjectType);
+        Value* subjectElementTypes = list_get_type_list_from_type(subjectType);
 
         bool anyUnableToDetermine = false;
 
@@ -966,7 +968,7 @@ namespace list_t {
             return query->succeed();
     }
 
-    void tv_visit_heap(Type*, caValue* value, Type::VisitHeapCallback callback, caValue* context)
+    void tv_visit_heap(Type*, Value* value, Type::VisitHeapCallback callback, Value* context)
     {
         ListData* data = (ListData*) value->value_data.ptr;
         if (data == NULL)

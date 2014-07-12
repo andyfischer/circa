@@ -16,8 +16,6 @@ namespace circa {
 // using 'usee'.
 bool is_actually_using(Term* user, Term* usee);
 
-int user_count(Term* term);
-
 // Return the static type of 'term'.
 Type* declared_type(Term* term);
 Term* declared_type_term(Term* term);

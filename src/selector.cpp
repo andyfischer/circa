@@ -88,20 +88,26 @@ caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
     return element;
 }
 
-bool set_with_selector(caValue* value, caValue* selector, caValue* newValue, caValue* error)
+void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caValue* error)
 {
     if (list_empty(selector)) {
         copy(newValue, value);
-        return true;
+        return;
     }
 
     for (int selectorIndex=0;; selectorIndex++) {
+
+        if (touch_is_necessary(value) && is_list(value))
+            stat_increment(SetWithSelector_Touch_List);
+        if (touch_is_necessary(value) && is_hashtable(value))
+            stat_increment(SetWithSelector_Touch_Hashtable);
+
         touch(value);
         caValue* selectorElement = list_get(selector, selectorIndex);
         caValue* element = selector_advance(value, selectorElement, error);
 
         if (element == NULL)
-            return false;
+            return;
 
         if (selectorIndex+1 == list_length(selector)) {
             copy(newValue, element);
@@ -118,7 +124,7 @@ bool set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
                     string_append(error, &value->value_type->name);
                     string_append(error, ")");
                 }
-                return false;
+                return;
             }
             
             break;
@@ -127,7 +133,7 @@ bool set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
         value = element;
         // loop
     }
-    return true;
+    return;
 }
 
 Value* path_touch_and_init_map(caValue* value, caValue* path)
@@ -395,7 +401,7 @@ void get_with_selector_evaluate(caStack* stack)
 void set_with_selector_evaluate(caStack* stack)
 {
     caValue* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
+    move(circa_input(stack, 0), out);
     
     caValue* selector = circa_input(stack, 1);
     caValue* newValue = circa_input(stack, 2);

@@ -557,6 +557,9 @@ void circa_repl_run_line(caStack* stack, caValue* input, caValue* output);
 void circa_dump_s(caStack* stack);
 void circa_dump_b(caBlock* block);
 
+void circa_perf_stats_dump();
+void circa_perf_stats_reset();
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

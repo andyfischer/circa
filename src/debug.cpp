@@ -110,13 +110,13 @@ void ca_debugger_break()
 #endif
 }
 
-void perf_stats_dump()
+CIRCA_EXPORT void circa_perf_stats_dump()
 {
     printf("perf_stats_dump:\n");
     for (int i=c_firstStatIndex; i < sym_LastStatIndex-1; i++)
         printf("  %s = %llu\n", builtin_symbol_to_string(i), PERF_STATS[i - c_firstStatIndex]);
 }
-void perf_stats_reset()
+CIRCA_EXPORT void circa_perf_stats_reset()
 {
     for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++)
         PERF_STATS[i - c_firstStatIndex] = 0;
@@ -139,6 +139,11 @@ void perf_stats_to_list(caValue* list)
 void perf_stat_inc(int name)
 {
     PERF_STATS[name - c_firstStatIndex]++;
+}
+
+void perf_stat_add(int name, int n)
+{
+    PERF_STATS[name - c_firstStatIndex] += n;
 }
 
 #if CIRCA_ENABLE_LOGGING

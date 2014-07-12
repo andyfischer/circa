@@ -156,6 +156,7 @@ set_value
 watch
 Copy
 Move
+Unobservable
 
 # Stack steps
 StackReady
@@ -341,20 +342,10 @@ stat_Interpreter_DynamicMethod_SlowLookup
 stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef
 stat_Interpreter_DynamicMethod_SlowLookup_Hashtable
 stat_Interpreter_DynamicFuncToClosureCall
-
-# Copying
-stat_Copy_PushedInputNewFrame
-stat_Copy_PushedInputMultiNewFrame
-stat_Copy_PushFrameWithInputs
-stat_Copy_LoopCopyRebound
-
-# Casting
-stat_Cast_ListCastElement
-stat_Cast_PushFrameWithInputs
-stat_Cast_FinishFrame
-
-# Touch
-stat_Touch_ListCast
+stat_Interpreter_CopyTermValue
+stat_Interpreter_CopyStackValue
+stat_Interpreter_MoveStackValue
+stat_Interpreter_CopyCachedValue
 
 # Values (general)
 stat_Make
@@ -368,7 +359,9 @@ stat_ListsCreated
 stat_ListsGrown
 stat_ListSoftCopy
 stat_ListDuplicate
-stat_ListDuplicate_Copy
+stat_ListDuplicate_ElementCopy
+stat_ListCast_Touch
+stat_ListCast_CastElement
 
 # Hashtables
 stat_HashtableDuplicate
@@ -397,6 +390,8 @@ stat_FinishDynamicCall
 stat_DynamicMethodCall
 stat_SetIndex
 stat_SetField
+stat_SetWithSelector_Touch_List
+stat_SetWithSelector_Touch_Hashtable
 
 # Stack
 stat_StackPushFrame

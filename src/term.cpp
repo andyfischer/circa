@@ -59,7 +59,7 @@ Term::nameStr()
 }
 
 Term*
-Term::input(int index) const
+Term::input(int index)
 {
     if (index >= numInputs())
         return NULL;
@@ -75,13 +75,13 @@ Term::inputInfo(int index)
 }
 
 int
-Term::numInputs() const
+Term::numInputs()
 {
     return (int) this->inputs.size();
 }
 
 void
-Term::inputsToList(TermList& out) const
+Term::inputsToList(TermList& out)
 {
     out.resize(numInputs());
     for (int i=0; i < numInputs(); i++)
@@ -89,20 +89,15 @@ Term::inputsToList(TermList& out) const
 }
 
 Term*
-Term::dependency(int index) const
+Term::dependency(int index)
 {
-    if (index == 0)
-        return this->function;
-    else if (index == 1)
-        return declared_type_term((Term*) this);
-    else
-        return input(index - 2);
+    return term_dependency(this, index);
 }
 
 int
-Term::numDependencies() const
+Term::numDependencies()
 {
-    return numInputs() + 2;
+    return term_dependency_count(this);
 }
 
 void
@@ -238,6 +233,37 @@ void dealloc_term(Term* term)
     delete term;
 }
 
+int term_dependency_count(Term* term)
+{
+    return term->numInputs() + 2;
+}
+Term* term_dependency(Term* term, int index)
+{
+    if (index == 0)
+        return term->function;
+    else if (index == 1)
+        return declared_type_term(term);
+    else
+        return term->input(index - 2);
+}
+bool term_depends_on(Term* term, Term* termBeingUsed)
+{
+    for (int i=0; i < term_dependency_count(term); i++)
+        if (term_dependency(term, i) == termBeingUsed)
+            return true;
+    return false;
+}
+
+Term* term_user(Term* term, int index)
+{
+    return term->users[index];
+}
+int user_count(Term* term)
+{
+    return term->users.length();
+}
+
+
 caValue* term_insert_property(Term* term, Symbol key)
 {
     return hashtable_insert_symbol_key(&term->properties, key);
@@ -350,6 +376,7 @@ caValue* term_value(Term* term)
 {
     return &term->value;
 }
+
 Block* term_function(Term* term)
 {
     return nested_contents(term->function);
@@ -359,6 +386,7 @@ bool is_type(Term* term)
 {
     return is_value(term) && is_type(&term->value);
 }
+
 bool is_function(Term* term)
 {
     if (term == NULL)
@@ -373,6 +401,65 @@ Type* as_type(Term* term)
 int term_line_number(Term* term)
 {
     return term->sourceLoc.line;
+}
+
+Term* parent_term(Term* term)
+{
+    if (term->owningBlock == NULL)
+        return NULL;
+    if (term->owningBlock->owningTerm == NULL)
+        return NULL;
+
+    return term->owningBlock->owningTerm;
+}
+
+Term* parent_term(Block* block)
+{
+    return block->owningTerm;
+}
+
+Term* parent_term(Term* term, int levels)
+{
+    for (int i=0; i < levels; i++) {
+        term = parent_term(term);
+        if (term == NULL)
+            return NULL;
+    }
+    return term;
+}
+
+bool term_is_observable(Term* term)
+{
+    if (is_output_placeholder(term))
+        return true;
+
+    if (user_count(term) == 0)
+        return false;
+
+    // Future: Some more smarts here
+
+    return true;
+}
+
+bool term_is_observable_after(Term* term, Term* location)
+{
+    // Shortcut: No need to search if 'location' is the one user.
+    if (user_count(term) == 1 && term_user(term, 0) == location)
+        return false;
+    
+    if (!term_is_observable(term))
+        return false;
+
+    for (int i=0; i < user_count(term); i++)
+        if (is_located_after(location, term_user(term, i)))
+            return true;
+ 
+    return false;
+}
+
+bool is_located_after(Term* location, Term* term)
+{
+    return false; // FIXME
 }
 
 } // namespace circa

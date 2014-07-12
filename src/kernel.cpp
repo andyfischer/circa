@@ -110,7 +110,7 @@ void sys__module_search_paths(caStack* stack)
 }
 void sys__perf_stats_reset(caStack* stack)
 {
-    perf_stats_reset();
+    circa_perf_stats_reset();
 }
 void sys__perf_stats_dump(caStack* stack)
 {

@@ -426,6 +426,74 @@ Block* get_outer_scope(Block* block)
     return block->owningTerm->owningBlock;
 }
 
+Block* get_parent_block(Block* block)
+{
+    if (block == global_root_block())
+        return NULL;
+
+    if (block->owningTerm == NULL)
+        return NULL;
+
+    if (block->owningTerm->owningBlock == NULL)
+        return global_root_block();
+
+    return block->owningTerm->owningBlock;
+}
+
+Block* get_parent_block_stackwise(Block* block)
+{
+    block = get_parent_block(block);
+
+    if (block != NULL && is_switch_block(block))
+        block = get_parent_block(block);
+
+    return block;
+}
+
+Block* find_enclosing_loop(Block* block)
+{
+    while (true) {
+        if (block == NULL)
+            return NULL;
+
+        if (is_while_loop(block) || is_for_loop(block))
+            return block;
+
+        if (is_major_block(block))
+            return NULL;
+
+        block = get_parent_block(block);
+    }
+    return NULL;
+}
+
+Block* find_enclosing_major_block(Block* block)
+{
+    while (true) {
+        if (block == NULL)
+            return NULL;
+
+        if (is_major_block(block))
+            return block;
+
+        block = get_parent_block(block);
+    }
+    return NULL;
+}
+
+bool is_case_block(Block* block)
+{
+    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.case_func;
+}
+
+bool is_switch_block(Block* block)
+{
+    if (block->owningTerm == NULL)
+        return false;
+
+    return block->owningTerm->function == FUNCS.if_block || block->owningTerm->function == FUNCS.switch_func;
+}
+
 void pre_erase_term(Term* term)
 {
     // If this term declares a Type, then clear the Type.declaringTerm pointer,

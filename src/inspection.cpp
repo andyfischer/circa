@@ -31,11 +31,6 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
-int user_count(Term* term)
-{
-    return term->users.length();
-}
-
 Type* declared_type(Term* term)
 {
     if (term == NULL)
@@ -432,7 +427,7 @@ Term* find_parent_term_in_block(Term* term, Block* block)
         if (term->owningBlock == block)
             return term;
 
-        term = get_parent_term(term);
+        term = parent_term(term);
     }
 }
 

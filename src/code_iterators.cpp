@@ -213,7 +213,7 @@ possibly_invalid:
 
         Block* previousBlock = block;
         block = get_parent_block(block);
-        Term* parentTerm = get_parent_term(previousBlock);
+        Term* parentTerm = parent_term(previousBlock);
 
         if (block == NULL || parentTerm == NULL) {
             block = NULL;
@@ -447,7 +447,6 @@ NameVisibleIterator::NameVisibleIterator(Term* term)
     // Start at the term immediately after the target.
     _iterator.startAt(following_term(_target));
 }
-
 
 void NameVisibleIterator::advance()
 {

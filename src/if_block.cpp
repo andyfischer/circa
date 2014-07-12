@@ -218,19 +218,6 @@ void case_add_condition_check(Block* caseBlock, Term* condition)
 {
     apply(caseBlock, FUNCS.case_condition_bool, TermList(condition));
 }
-
-bool is_case_block(Block* block)
-{
-    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.case_func;
-}
-bool is_switch_block(Block* block)
-{
-    if (block->owningTerm == NULL)
-        return false;
-
-    return block->owningTerm->function == FUNCS.if_block || block->owningTerm->function == FUNCS.switch_func;
-}
-
 Block* get_block_for_case_block(Block* block)
 {
     return get_parent_block(block);

@@ -39,7 +39,7 @@ void decref(StringData* data)
 // Create a new blank string with the given length. Starts off with 1 ref.
 StringData* string_create(int length)
 {
-    increment_stat(StringCreate);
+    stat_increment(StringCreate);
 
     StringData* result = (StringData*) malloc(sizeof(StringData) + length + 1);
     result->refCount = 1;
@@ -51,7 +51,7 @@ StringData* string_create(int length)
 // Creates a hard duplicate of a string. Starts off with 1 ref.
 StringData* string_duplicate(StringData* original)
 {
-    increment_stat(StringDuplicate);
+    stat_increment(StringDuplicate);
 
     StringData* dup = string_create(original->length);
     memcpy(dup->str, original->str, original->length + 1);
@@ -81,7 +81,7 @@ void string_resize(StringData** data, int newLength)
 
     // Perform the same check as touch()
     if ((*data)->refCount == 1) {
-        increment_stat(StringResizeInPlace);
+        stat_increment(StringResizeInPlace);
 
         // Modify in-place
         *data = (StringData*) realloc(*data, sizeof(StringData) + newLength + 1);
@@ -90,7 +90,7 @@ void string_resize(StringData** data, int newLength)
         return;
     }
 
-    increment_stat(StringResizeCreate);
+    stat_increment(StringResizeCreate);
 
     StringData* oldData = *data;
     StringData* newData = string_create(newLength);
@@ -108,19 +108,19 @@ int string_length(StringData* data)
 }
 
 // Tagged-value wrappers
-void string_initialize(Type* type, caValue* value)
+void string_initialize(Type* type, Value* value)
 {
     value->value_data.ptr = NULL;
 }
 
-void string_release(caValue* value)
+void string_release(Value* value)
 {
     if (value->value_data.ptr == NULL)
         return;
     decref((StringData*) value->value_data.ptr);
 }
 
-void string_copy(Type* type, caValue* source, caValue* dest)
+void string_copy(Type* type, Value* source, Value* dest)
 {
     StringData* data = (StringData*) source->value_data.ptr;
     if (data != NULL)
@@ -129,10 +129,10 @@ void string_copy(Type* type, caValue* source, caValue* dest)
     make_no_initialize(source->value_type, dest);
     dest->value_data.ptr = data;
 
-    increment_stat(StringSoftCopy);
+    stat_increment(StringSoftCopy);
 }
 
-void string_reset(caValue* val)
+void string_reset(Value* val)
 {
     StringData* data = (StringData*) val->value_data.ptr;
     if (data != NULL)
@@ -140,7 +140,7 @@ void string_reset(caValue* val)
     val->value_data.ptr = NULL;
 }
 
-int string_hash(caValue* val)
+int string_hash(Value* val)
 {
     const char* str = as_cstring(val);
 
@@ -155,7 +155,7 @@ int string_hash(caValue* val)
     return result;
 }
 
-bool string_equals(caValue* left, caValue* right)
+bool string_equals(Value* left, Value* right)
 {
     if (left->value_type != right->value_type)
         return false;
@@ -193,7 +193,7 @@ bool string_equals(caValue* left, caValue* right)
     return true;
 }
 
-void string_to_string(caValue* value, caValue* asStr)
+void string_to_string(Value* value, Value* asStr)
 {
     string_append(asStr, "'");
     string_append(asStr, value);
@@ -213,7 +213,7 @@ void string_setup_type(Type* type)
     type->toString = string_to_string;
 }
 
-const char* as_cstring(caValue* value)
+const char* as_cstring(Value* value)
 {
     ca_assert(value->value_type->storageType == sym_StorageTypeString);
     StringData* data = (StringData*) value->value_data.ptr;
@@ -222,17 +222,17 @@ const char* as_cstring(caValue* value)
     return data->str;
 }
 
-void string_append(caValue* left, const char* right)
+void string_append(Value* left, const char* right)
 {
     string_append_len(left, right, (int) strlen(right));
 }
 
-void string_append(caValue* left, const std::string& right)
+void string_append(Value* left, const std::string& right)
 {
     string_append_len(left, right.c_str(), (int) right.size());
 }
 
-void string_append_len(caValue* left, const char* right, int len)
+void string_append_len(Value* left, const char* right, int len)
 {
     if (is_null(left))
         set_string(left, "");
@@ -250,7 +250,7 @@ void string_append_len(caValue* left, const char* right, int len)
     (*data)->str[newLength] = 0;
 }
 
-void string_append(caValue* left, caValue* right)
+void string_append(Value* left, Value* right)
 {
     if (is_null(left))
         set_string(left, "");
@@ -267,14 +267,14 @@ void string_append(caValue* left, caValue* right)
     }
 }
 
-void string_append_quoted(caValue* out, caValue* s)
+void string_append_quoted(Value* out, Value* s)
 {
     if (is_string(s))
         string_to_string(s, out);
     else
         string_append(out, s);
 }
-void string_append(caValue* left, int value)
+void string_append(Value* left, int value)
 {
     ca_assert(is_string(left));
 
@@ -282,7 +282,7 @@ void string_append(caValue* left, int value)
     sprintf(buf, "%d", value);
     string_append(left, buf);
 }
-void string_append_f(caValue* left, float value)
+void string_append_f(Value* left, float value)
 {
     ca_assert(is_string(left));
 
@@ -312,21 +312,21 @@ void string_append_f(caValue* left, float value)
 
     string_append(left, buf);
 }
-void string_append_char(caValue* left, char c)
+void string_append_char(Value* left, char c)
 {
     char buf[2];
     buf[0] = c;
     buf[1] = 0;
     string_append(left, buf);
 }
-void string_append_ptr(caValue* left, void* ptr)
+void string_append_ptr(Value* left, void* ptr)
 {
     char buf[64];
     sprintf(buf, "%p", ptr);
     string_append(left, buf);
 }
 
-void string_append_qualified_name(caValue* left, caValue* right)
+void string_append_qualified_name(Value* left, Value* right)
 {
     if (string_equals(left, "")) {
         copy(right, left);
@@ -344,7 +344,7 @@ void blob_append(Value* left, Value* right)
     ca_assert(is_string(left));
 }
 
-void string_resize(caValue* s, int length)
+void string_resize(Value* s, int length)
 {
     if (length < 0)
         length = string_length(s) + length;
@@ -352,7 +352,7 @@ void string_resize(caValue* s, int length)
     StringData** data = (StringData**) &s->value_data.ptr;
     string_resize(data, length);
 }
-bool string_equals(caValue* s, const char* str)
+bool string_equals(Value* s, const char* str)
 {
     if (is_string(s))
         return strcmp(as_cstring(s), str) == 0;
@@ -367,12 +367,12 @@ bool string_equals(caValue* s, const char* str)
 
     return false;
 }
-bool string_empty(caValue* s)
+bool string_empty(Value* s)
 {
     return is_null(s) || string_equals(s, "");
 }
 
-bool string_starts_with(caValue* s, const char* beginning)
+bool string_starts_with(Value* s, const char* beginning)
 {
     const char* left = as_cstring(s);
     for (int i=0;; i++) {
@@ -383,7 +383,7 @@ bool string_starts_with(caValue* s, const char* beginning)
     }
 }
 
-bool string_ends_with(caValue* s, const char* ending)
+bool string_ends_with(Value* s, const char* ending)
 {
     int ending_len = (int) strlen(ending);
     int s_len = string_length(s);
@@ -396,7 +396,7 @@ bool string_ends_with(caValue* s, const char* ending)
     return true;
 }
 
-void string_remove_suffix(caValue* s, const char* str)
+void string_remove_suffix(Value* s, const char* str)
 {
     if (!string_ends_with(s, str))
         return;
@@ -404,29 +404,29 @@ void string_remove_suffix(caValue* s, const char* str)
     string_resize(s, string_length(s) - int(strlen(str)));
 }
 
-char string_get(caValue* s, int index)
+char string_get(Value* s, int index)
 {
     return as_cstring(s)[index];
 }
 
-int string_length(caValue* s)
+int string_length(Value* s)
 {
     return string_length((StringData*) s->value_data.ptr);
 }
 
-bool string_less_than(caValue* left, caValue* right)
+bool string_less_than(Value* left, Value* right)
 {
     return strcmp(as_cstring(left), as_cstring(right)) < 0;
 }
 
-void string_prepend(caValue* result, caValue* prefix)
+void string_prepend(Value* result, Value* prefix)
 {
     Value output;
     copy(prefix, &output);
     string_append(&output, result);
     move(&output, result);
 }
-void string_prepend(caValue* result, const char* prefix)
+void string_prepend(Value* result, const char* prefix)
 {
     Value output;
     set_string(&output, prefix);
@@ -434,7 +434,7 @@ void string_prepend(caValue* result, const char* prefix)
     move(&output, result);
 }
 
-void string_substr(caValue* s, int start, int len, caValue* out)
+void string_substr(Value* s, int start, int len, Value* out)
 {
     if (s == out)
         internal_error("Usage error in string_substr, 's' cannot be 'out'");
@@ -447,7 +447,7 @@ void string_substr(caValue* s, int start, int len, caValue* out)
     set_string(out, as_cstring(s) + start, len);
 }
 
-void string_slice(caValue* s, int start, int end, caValue* out)
+void string_slice(Value* s, int start, int end, Value* out)
 {
     // TODO: This func could be improved to work correctly when 's' is the same object
     // as 'out'.
@@ -463,7 +463,7 @@ void string_slice(caValue* s, int start, int end, caValue* out)
     set_string(out, as_cstring(s) + start, len);
 }
 
-void string_slice(caValue* str, int start, int end)
+void string_slice(Value* str, int start, int end)
 {
     touch(str);
 
@@ -478,7 +478,7 @@ void string_slice(caValue* str, int start, int end)
     string_resize(str, newSize);
 }
 
-int string_find_char(caValue* s, int start, char c)
+int string_find_char(Value* s, int start, char c)
 {
     const char* cstr = as_cstring(s);
 
@@ -488,7 +488,7 @@ int string_find_char(caValue* s, int start, char c)
     return -1;
 }
 
-int string_find_char_from_end(caValue* s, char c)
+int string_find_char_from_end(Value* s, char c)
 {
     const char* cstr = as_cstring(s);
 
@@ -498,7 +498,7 @@ int string_find_char_from_end(caValue* s, char c)
     return -1;
 }
 
-void string_quote_and_escape(caValue* s)
+void string_quote_and_escape(Value* s)
 {
     const char* input = as_cstring(s);
 
@@ -524,7 +524,7 @@ void string_quote_and_escape(caValue* s)
     set_string(s, result.str());
 }
 
-void string_unquote_and_unescape(caValue* s)
+void string_unquote_and_unescape(Value* s)
 {
     if (string_empty(s))
         return;
@@ -571,7 +571,7 @@ void string_unquote_and_unescape(caValue* s)
     set_string(s, result.str());
 }
 
-void string_join(caValue* list, caValue* separator, caValue* out)
+void string_join(Value* list, Value* separator, Value* out)
 {
     set_string(out, "");
     for (int i=0; i < list_length(list); i++) {
@@ -581,7 +581,7 @@ void string_join(caValue* list, caValue* separator, caValue* out)
     }
 }
 
-void string_split(caValue* s, char sep, caValue* listOut)
+void string_split(Value* s, char sep, Value* listOut)
 {
     set_list(listOut, 0);
 
@@ -595,13 +595,13 @@ void string_split(caValue* s, char sep, caValue* listOut)
     }
 }
 
-std::string as_string(caValue* value)
+std::string as_string(Value* value)
 {
-    increment_stat(StringToStd);
+    stat_increment(StringToStd);
     return std::string(as_cstring(value));
 }
 
-char* string_initialize(caValue* value, int length)
+char* string_initialize(Value* value, int length)
 {
     make(TYPES.string, value);
     StringData* data = string_create(length);
@@ -609,7 +609,7 @@ char* string_initialize(caValue* value, int length)
     return data->str;
 }
 
-void set_string(caValue* value, const char* s)
+void set_string(Value* value, const char* s)
 {
     make(TYPES.string, value);
     int length = (int) strlen(s);
@@ -618,7 +618,7 @@ void set_string(caValue* value, const char* s)
     value->value_data.ptr = data;
 }
 
-void set_string(caValue* value, const char* s, int length)
+void set_string(Value* value, const char* s, int length)
 {
     make(TYPES.string, value);
     StringData* data = string_create(length);
@@ -627,7 +627,7 @@ void set_string(caValue* value, const char* s, int length)
     value->value_data.ptr = data;
 }
 
-char* set_blob(caValue* value, int length)
+char* set_blob(Value* value, int length)
 {
     make(TYPES.string, value);
     StringData* data = string_create(length);
@@ -644,31 +644,31 @@ char* circa_strdup(const char* s)
     return out;
 }
 
-char* as_blob(caValue* value)
+char* as_blob(Value* value)
 {
     return (char*) as_cstring(value);
 }
 
-int blob_size(caValue* val)
+int blob_size(Value* val)
 {
     return string_length(val);
 }
 
-void blob_append_char(caValue* blob, char c)
+void blob_append_char(Value* blob, char c)
 {
     int size = blob_size(blob);
     string_resize(blob, size + 1);
     as_blob(blob)[size] = c;
 }
 
-void blob_append_u8(caValue* blob, u8 val)
+void blob_append_u8(Value* blob, u8 val)
 {
     int size = blob_size(blob);
     string_resize(blob, size + 1);
     as_blob(blob)[size] = val;
 }
 
-void blob_append_u16(caValue* blob, u16 val)
+void blob_append_u16(Value* blob, u16 val)
 {
     int size = blob_size(blob);
     string_resize(blob, size + 2);
@@ -676,14 +676,14 @@ void blob_append_u16(caValue* blob, u16 val)
     *position = val;
 }
 
-void blob_append_u32(caValue* blob, u32 val)
+void blob_append_u32(Value* blob, u32 val)
 {
     int size = blob_size(blob);
     string_resize(blob, size + 4);
     u32* position = (u32*) &as_blob(blob)[size];
     *position = val;
 }
-void blob_append_float(caValue* blob, float f)
+void blob_append_float(Value* blob, float f)
 {
     int size = blob_size(blob);
     string_resize(blob, size + 4);
@@ -691,7 +691,7 @@ void blob_append_float(caValue* blob, float f)
     *position = f;
 }
 
-void blob_append_space(caValue* blob, size_t additionalSize)
+void blob_append_space(Value* blob, size_t additionalSize)
 {
     size_t size = blob_size(blob);
     string_resize(blob, int(size + additionalSize));
@@ -765,7 +765,7 @@ static char to_hex_digit(int i)
     return 'a' + (i - 10);
 }
 
-void blob_to_hex_string(caValue* blob, caValue* str)
+void blob_to_hex_string(Value* blob, Value* str)
 {
     set_string(str, "");
 
@@ -777,12 +777,12 @@ void blob_to_hex_string(caValue* blob, caValue* str)
     }
 }
 
-CIRCA_EXPORT int circa_string_length(caValue* string)
+CIRCA_EXPORT int circa_string_length(Value* string)
 {
     return string_length(string);
 }
 
-CIRCA_EXPORT int circa_blob_length(caValue* blob)
+CIRCA_EXPORT int circa_blob_length(Value* blob)
 {
     return blob_size(blob);
 }
