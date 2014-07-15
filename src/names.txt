@@ -22,6 +22,7 @@ DirtyStateType
 Filename
 Builtins
 ModuleName
+StaticErrors
 
 # Term properties
 AccumulatingOutput
@@ -37,6 +38,7 @@ Hidden
 HiddenInput
 Implicit
 IgnoreError
+LocalStateResult
 Meta
 Message
 MethodName

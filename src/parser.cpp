@@ -746,7 +746,9 @@ consume_next_output: {
             }
 
             if (!is_type(typeTerm)) {
-                return syntax_error(block, tokens, startPosition, typeTerm->name +" is not a type");
+                std::string msg = typeTerm->name();
+                msg += " is not a type";
+                return syntax_error(block, tokens, startPosition, msg);
             }
 
             Term* output = append_output_placeholder(contents, NULL);
@@ -1759,7 +1761,7 @@ ParseResult unary_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
         // If the minus sign is on a literal number, then just negate it in place,
         // rather than introduce a neg() operation.
-        if (is_value(expr.term) && expr.term->name == "") {
+        if (is_value(expr.term) && has_empty_name(expr.term)) {
             if (is_int(term_value(expr.term))) {
                 set_int(term_value(expr.term), as_int(term_value(expr.term)) * -1);
                 return expr;
@@ -1959,7 +1961,7 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // Store the function name that they used, if it wasn't the function's
     // actual name (for example, the function might be inside a namespace).
-    if (function == NULL || result->function->name != functionName)
+    if (function == NULL || result->function->name() != functionName)
         result->setStringProp(sym_Syntax_FunctionName, functionName);
 
     inputHints.apply(result);
@@ -2182,7 +2184,7 @@ bool lookahead_match_rebind_argument(TokenStream& tokens)
 
 Term* find_lexpr_root(Term* term)
 {
-    if (term->name != "")
+    if (has_empty_name(term))
         return term;
 
     if (term->function == FUNCS.get_index)

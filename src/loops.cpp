@@ -40,7 +40,7 @@ const char* for_loop_get_iterator_name(Term* forTerm)
     if (iterator == NULL)
         return "";
 
-    return iterator->name.c_str();
+    return iterator->name();
 }
 
 Block* get_for_loop_outer_rebinds(Term* forTerm)
@@ -141,7 +141,7 @@ Term* loop_get_primary_result(Block* block)
     // For a rebound list, use the last term that has the iterator's
     // name.
     if (block->owningTerm->boolProp(sym_ModifyList, false)) {
-        Term* term = block->get(iterator->name);
+        Term* term = block->get(iterator->name());
         if (term != NULL)
             return term;
     }

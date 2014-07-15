@@ -12,7 +12,6 @@
 #include "importing.h"
 #include "inspection.h"
 #include "interpreter.h"
-#include "generic.h"
 #include "kernel.h"
 #include "modules.h"
 #include "native_patch.h"
@@ -158,10 +157,12 @@ void Block__get_static_errors(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
-    if (is_null(&block->staticErrors))
+    Value* errors = block_get_static_errors(block);
+
+    if (errors == NULL)
         set_list(circa_output(stack, 0), 0);
     else
-        copy(&block->staticErrors, circa_output(stack, 0));
+        copy(errors, circa_output(stack, 0));
 }
 
 void Block__get_static_errors_formatted(caStack* stack)
@@ -170,10 +171,12 @@ void Block__get_static_errors_formatted(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    if (is_null(&block->staticErrors))
+    Value* errors = block_get_static_errors(block);
+    if (errors == NULL) {
         set_list(circa_output(stack, 0), 0);
+        return;
+    }
 
-    caValue* errors = &block->staticErrors;
     caValue* out = circa_output(stack, 0);
     set_list(out, circa_count(errors));
     for (int i=0; i < circa_count(out); i++)
@@ -231,7 +234,7 @@ void Block__get_term(caStack* stack)
 bool is_considered_config(Term* term)
 {
     if (term == NULL) return false;
-    if (term->name == "") return false;
+    if (has_empty_name(term)) return false;
     if (!is_value(term)) return false;
     if (is_declared_state(term)) return false;
     if (is_hidden(term)) return false;
@@ -268,7 +271,7 @@ void Block__functions(caStack* stack)
     for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (is_function(term)) {
-            set_block(list_append(output), function_contents(term));
+            set_block(list_append(output), nested_contents(term));
         }
     }
 }
@@ -312,7 +315,10 @@ void Term__name(caStack* stack)
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
-    set_string(circa_output(stack, 0), t->name);
+    if (has_empty_name(t))
+        set_string(circa_output(stack, 0), "");
+    else
+        copy(term_name(t), circa_output(stack, 0));
 }
 void Term__to_string(caStack* stack)
 {
@@ -676,21 +682,6 @@ void Term__trace_dependents(caStack* stack)
     list_reverse(out);
 }
 
-void is_overloaded_func(caStack* stack)
-{
-    Block* self = (Block*) circa_block(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), is_overloaded_function(self));
-}
-
-void overload__get_contents(caStack* stack)
-{
-    Block* self = (Block*) circa_block(circa_input(stack, 0));
-    caValue* out = circa_output(stack, 0);
-    set_list(out, 0);
-
-    list_overload_contents(self, out);
-}
-
 void reflection_install_functions(NativePatch* patch)
 {
     circa_patch_function(patch, "Block.dump", Block__dump);
@@ -751,8 +742,6 @@ void reflection_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
     circa_patch_function(patch, "Term.value", Term__value);
     circa_patch_function(patch, "Term.set_value", Term__set_value);
-    circa_patch_function(patch, "is_overloaded_func", is_overloaded_func);
-    circa_patch_function(patch, "overload_get_contents", overload__get_contents);
 }
 
 } // namespace circa

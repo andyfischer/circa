@@ -8,9 +8,6 @@
 
 namespace circa {
 
-// Called when the staticErrors list on the Block should be recalculated.
-void mark_static_errors_invalid(Block* block);
-
 void finish_update_cascade(Block* block);
 void recursively_finish_update_cascade(Block* block);
 

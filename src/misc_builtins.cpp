@@ -189,7 +189,7 @@ void inputs_fit_function(caStack* stack)
 {
     Value* inputs = circa_input(stack, 0);
     Term* function = circa_caller_input_term(stack, 1);
-    Block* functionContents = function_contents(function);
+    Block* functionContents = nested_contents(function);
     Value* result = circa_output(stack, 0);
 
     bool varArgs = has_variable_args(functionContents);
@@ -228,7 +228,7 @@ void overload_error_no_match(caStack* stack)
     if (func == NULL)
         string_append(&msg, "<name not found>");
     else
-        string_append(&msg, func->name);
+        string_append(&msg, term_name(func));
     string_append(&msg, ", no func could handle inputs: ");
     string_append(&msg, inputs);
     circa_output_error(stack, as_cstring(&msg));

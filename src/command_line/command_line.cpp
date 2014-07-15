@@ -29,7 +29,6 @@
 
 #include "circa/file.h"
 #include "debugger_repl.h"
-#include "exporting_parser.h"
 #include "file_checker.h"
 
 #ifdef CIRCA_USE_LINENOISE
@@ -576,17 +575,6 @@ int run_command_line(caWorld* world, caValue* args)
     // Run file checker
     if (string_equals(list_get(args, 0), "-check"))
         return run_file_checker(as_cstring(list_get(args, 1)));
-
-    // Export parsed information
-    if (string_equals(list_get(args, 0), "-export")) {
-        const char* filename = "";
-        const char* format = "";
-        if (list_length(args) >= 2)
-            format = as_cstring(list_get(args, 1));
-        if (list_length(args) >= 3)
-            filename = as_cstring(list_get(args, 2));
-        return run_exporting_parser(format, filename);
-    }
 
     // Command reader (from stdin)
     if (string_equals(list_get(args, 0), "-run-stdin")) {

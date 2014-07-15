@@ -50,7 +50,7 @@ void new_runtime_symbol()
 void builtin_symbol_used_in_code()
 {
     Block block;
-    Block* f = function_contents(block.compile("def f() -> Symbol { :Unknown }"));
+    Block* f = nested_contents(block.compile("def f() -> Symbol { :Unknown }"));
 
     Stack stack;
     stack_init(&stack, f);

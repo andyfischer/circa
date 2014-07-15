@@ -80,11 +80,13 @@ bool is_hidden(Term* term)
     if (term->boolProp(sym_Hidden, false))
         return true;
 
-    if (term->name == "")
+    if (has_empty_name(term))
         return false;
 
+#if 0
     if (term->name[0] == '#' && term->name != "#return")
         return true;
+#endif
 
     return false;
 }
@@ -169,22 +171,6 @@ Block* find_nearest_compilation_unit(Block* block)
 
         block = parent;
     }
-}
-
-bool is_for_loop(Block* block)
-{
-    if (block == NULL || block->owningTerm == NULL || FUNCS.for_func == NULL)
-        return false;
-
-    return block->owningTerm->function == FUNCS.for_func;
-}
-
-bool is_while_loop(Block* block)
-{
-    if (block == NULL || block->owningTerm == NULL || FUNCS.while_loop == NULL)
-        return false;
-
-    return block->owningTerm->function == FUNCS.while_loop;
 }
 
 Term* get_input_placeholder(Block* block, int index)
@@ -276,7 +262,7 @@ Block* term_get_function_details(Term* call)
 
     // Check if the function is a type. (deprecated).
     if (is_type(call->function))
-        return function_contents(FUNCS.cast);
+        return nested_contents(FUNCS.cast);
 
     return term_function(call);
 }
@@ -368,8 +354,6 @@ Term* find_expression_for_implicit_output(Block* block)
                 || func == FUNCS.extra_output)
             continue;
 
-        if (block->get(i)->name == "#outer_rebinds")
-            continue;
         if (block->get(i)->function != FUNCS.comment)
             return block->get(i);
     }
@@ -394,7 +378,7 @@ Term* find_input_placeholder_with_name(Block* block, caValue* name)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return NULL;
-        if (equals(&placeholder->nameValue, name))
+        if (equals(term_name(placeholder), name))
             return placeholder;
     }
 }
@@ -418,19 +402,6 @@ Term* find_user_with_function(Term* target, Term* func)
     return NULL;
 }
 
-Term* find_parent_term_in_block(Term* term, Block* block)
-{
-    while (true) {
-        if (term == NULL)
-            return NULL;
-
-        if (term->owningBlock == block)
-            return term;
-
-        term = parent_term(term);
-    }
-}
-
 std::string global_id(Term* term)
 {
     if (term == NULL)
@@ -445,8 +416,8 @@ std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
         return "NULL";
-    if (term->name != "")
-        return term->name;
+    if (has_empty_name(term))
+        return term->name();
 
     return global_id(term);
 }
@@ -702,9 +673,9 @@ void print_term(Term* term, RawOutputPrefs* prefs, caValue* out)
     string_append(out, " ");
     string_append(out, unique_name(term));
 
-    if (term->name != "") {
+    if (!has_empty_name(term)) {
         string_append(out, " '");
-        string_append(out, term->name.c_str());
+        string_append(out, term_name(term));
         string_append(out, "'");
     }
 
@@ -712,7 +683,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, caValue* out)
         string_append(out, " <NULL function>");
     } else {
         string_append(out, " ");
-        string_append(out, term->function->name.c_str());
+        string_append(out, term_name(term->function));
         string_append(out, global_id(term->function).c_str());
     }
 
@@ -806,8 +777,8 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caVal
     for (int index=location->index - 1; index >= 0; index--) {
         Term* t = block->get(index);
         if (t == NULL) continue;
-        if (t->name == "") continue;
-        bool stop = visitor(t, t->name.c_str(), context);
+        if (has_empty_name(t)) continue;
+        bool stop = visitor(t, t->name(), context);
         if (stop) return;
 
         // TODO: Iterate inside namespaces, providing the correct name

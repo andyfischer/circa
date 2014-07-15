@@ -945,7 +945,7 @@ void write_term_call(Writer* writer, Term* term)
     
     else if (term->function == FUNCS.closure_block || term->function == FUNCS.function_decl) {
         // Call the function, not nested contents.
-        Block* target = function_contents(term->function);
+        Block* target = nested_contents(term->function);
         if (should_skip_block(writer, target))
             return;
         bytecode_start_term_call(writer, term, target);
@@ -964,7 +964,7 @@ void write_term_call(Writer* writer, Term* term)
     }
 
     // Normal function call.
-    Block* target = function_contents(term->function);
+    Block* target = nested_contents(term->function);
 
     if (should_skip_block(writer, target))
         return;
@@ -1246,9 +1246,8 @@ static void bytecode_write_input_instruction(Writer* writer, Term* term, int inp
 
     } else {
         Symbol moveOrCopy = sym_Copy;
-        //FIXME
-        //if (!term_is_observable_after(input, term))
-        //    moveOrCopy = sym_Move;
+        if (!term_is_observable_after(input, term) && !term_uses_input_multiple_times(term, input))
+            moveOrCopy = sym_Move;
 
         bc_move_or_copy(writer,
             find_register_distance_to_new_frame(term->owningBlock, input),
@@ -1356,9 +1355,9 @@ static void write_pre_exit_pack_state(Writer* writer, Block* block, Term* exitPo
         if (term->function == FUNCS.declared_state) {
             Term* stateResult = NULL;
             if (exitPoint != NULL)
-                stateResult = find_name_at(exitPoint, &term->nameValue);
+                stateResult = find_name_at(exitPoint, term_name(term));
             else
-                stateResult = find_name(block, &term->nameValue);
+                stateResult = find_name(block, term_name(term));
 
             bc_push_frame(writer, -1, 2);
             bc_set_term_ref(writer, term, 0);

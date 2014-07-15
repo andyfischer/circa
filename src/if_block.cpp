@@ -11,6 +11,7 @@
 #include "interpreter.h"
 #include "inspection.h"
 #include "list.h"
+#include "string_type.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -203,7 +204,7 @@ Term* if_block_append_case(Block* block)
             insertPos = term->index + 1;
 
         // Insert position is right after the last case.
-        if (term->function == FUNCS.case_func && term->name != "else")
+        if (term->function == FUNCS.case_func && !string_equals(term_name(term), "else"))
             insertPos = term->index + 1;
     }
 
@@ -228,7 +229,7 @@ Term* if_block_get_output_by_name(Block* block, const char* name)
         Term* term = get_output_placeholder(block, i);
         if (term == NULL)
             break;
-        if (term->name == name)
+        if (string_equals(term_name(term), name))
             return term;
     }
     return NULL;
@@ -275,10 +276,10 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
 
     for (int i=0; i < caseBlock->length(); i++) {
         Term* term = caseBlock->get(i);
-        if (term->name == "")
+        if (has_empty_name(term))
             continue;
 
-        caValue* name = term_name(term);
+        Value* name = term_name(term);
 
         Term* outer = find_name(outerBlock, name);
         if (outer == NULL)
@@ -324,8 +325,8 @@ void write_all_names_to_list(Block* block, Value* names)
 {
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        if (term->name != "")
-            set_string(names->append(), term->name);
+        if (!has_empty_name(term))
+            copy(&term->nameValue, names->append());
     }
 }
 

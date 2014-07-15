@@ -999,13 +999,6 @@ def List.to_set(self) -> Set
     @set.add(item)
   set
 
--- Overloaded functions
-def is_overloaded_func(Block block) -> bool
-    -- Return true if this block is an overloaded function
-
-def overload_get_contents(Block block) -> List
-    -- Get a list of all the functions that this overloaded function uses.
-
 def String.append(self, String right) -> String
   -- Append a string to the right side.
   concat(self, right)

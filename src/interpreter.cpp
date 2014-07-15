@@ -9,7 +9,6 @@
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "function.h"
-#include "generic.h"
 #include "hashtable.h"
 #include "if_block.h"
 #include "importing.h"
@@ -302,11 +301,11 @@ void stack_trace_to_string(Stack* stack, Value* out)
         get_short_location(term, out);
 
         string_append(out, " ");
-        if (term->name != "") {
-            string_append(out, term->name);
+        if (!has_empty_name(term)) {
+            string_append(out, term_name(term));
             string_append(out, " = ");
         }
-        string_append(out, term->function->name);
+        string_append(out, term_name(term->function));
         string_append(out, "()\n");
     }
 
@@ -514,13 +513,11 @@ void raise_error_not_enough_inputs(Stack* stack)
     ca_assert(block != NULL);
 
     int expectedCount = count_input_placeholders(block);
-
-    int foundCount = get_count_of_caller_inputs_for_error(stack);
+    int foundCount = top_frame(stack)->registerCount;
 
     Value msg;
     set_string(&msg, "Too few inputs: expected ");
     string_append(&msg, expectedCount);
-
 
     if (has_variable_args(block))
         string_append(&msg, " (or more)");
@@ -1005,17 +1002,26 @@ void vm_run(Stack* stack)
             stat_increment(Interpreter_CopyStackValue);
             Value* source = vm_read_register(stack);
             Value* dest = vm_read_register(stack);
+
+            ca_assert(!symbol_eq(source, sym_Unobservable));
+
             copy(source, dest);
+
             continue;
         }
         case bc_MoveStackValue: {
             stat_increment(Interpreter_MoveStackValue);
             Value* source = vm_read_register(stack);
             Value* dest = vm_read_register(stack);
+
+            ca_assert(!symbol_eq(source, sym_Unobservable));
+
             move(source, dest);
+
             #if DEBUG
                 set_symbol(source, sym_Unobservable);
             #endif
+
             continue;
         }
         case bc_CopyCachedValue: {
@@ -1047,6 +1053,9 @@ void vm_run(Stack* stack)
             if (!is_list(to))
                 set_list(to, 0);
             move(from, list_append(to));
+            #if DEBUG
+                set_symbol(from, sym_Unobservable);
+            #endif
             continue;
         }
         case bc_SetTermRef: {

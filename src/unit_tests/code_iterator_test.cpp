@@ -16,12 +16,13 @@ void block_iterator_2()
     block.compile("a = 1; b = 2; c = section { d = 3; e = 4; } f = 5");
 
     BlockIterator2 it(&block);
-    test_assert(it.current()->name == "a"); ++it; test_assert(!it.finished());
-    test_assert(it.current()->name == "b"); ++it; test_assert(!it.finished());
-    test_assert(it.current()->name == "c"); ++it; test_assert(!it.finished());
-    test_assert(it.current()->name == "d"); ++it; test_assert(!it.finished());
-    test_assert(it.current()->name == "e"); ++it; test_assert(!it.finished());
-    test_assert(it.current()->name == "f"); ++it; test_assert(it.finished());
+    test_equals(term_name(it.current()), "a"); ++it; test_assert(!it.finished());
+    test_equals(term_name(it.current()), "b"); ++it; test_assert(!it.finished());
+    test_equals(term_name(it.current()), "c"); ++it; test_assert(!it.finished());
+    test_equals(term_name(it.current()), "d"); ++it; test_assert(!it.finished());
+    test_equals(term_name(it.current()), "e"); ++it; test_assert(!it.finished());
+    test_equals(term_name(it.current()), "f"); ++it;
+    test_assert(it.finished());
 }
 
 void block_iterator_2_2()
@@ -30,11 +31,11 @@ void block_iterator_2_2()
     block.compile("a = section { b = section { c = section { d = 3; e = 4; }}}");
 
     BlockIterator2 it(&block);
-    test_assert(it.current()->name == "a"); test_assert(!it.finished()); ++it;
-    test_assert(it.current()->name == "b"); test_assert(!it.finished()); ++it;
-    test_assert(it.current()->name == "c"); test_assert(!it.finished()); ++it;
-    test_assert(it.current()->name == "d"); test_assert(!it.finished()); ++it;
-    test_assert(it.current()->name == "e"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()), "a"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()), "b"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()), "c"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()), "d"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()), "e"); test_assert(!it.finished()); ++it;
     test_assert(it.finished());
 }
 
@@ -47,9 +48,9 @@ void name_visible_iterator_1()
     block.compile("b = 2; f = 1; g = 1");
 
     NameVisibleIterator it(b);
-    test_equals(it.current()->name,"c"); test_assert(!it.finished()); ++it;
-    test_equals(it.current()->name,"d"); test_assert(!it.finished()); ++it;
-    test_equals(it.current()->name,"e"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()),"c"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()),"d"); test_assert(!it.finished()); ++it;
+    test_equals(term_name(it.current()),"e"); test_assert(!it.finished()); ++it;
     test_assert(it.finished());
 }
 

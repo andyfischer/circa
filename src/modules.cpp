@@ -144,7 +144,7 @@ Block* load_module_file(World* world, caValue* moduleName, const char* filename)
     if (existing == NULL) {
         newBlock = create_module(world, as_cstring(moduleName));
     } else {
-        newBlock = alloc_block();
+        newBlock = alloc_block(world);
         block_graft_replacement(existing, newBlock);
     }
 
@@ -313,7 +313,7 @@ void require_eval(caStack* stack)
         string_append(&msg, "' has static errors: \n");
 
         Value errors;
-        format_static_errors(&module->staticErrors, &errors);
+        format_static_errors(block_get_static_errors(module), &errors);
         string_append(&msg, &errors);
         circa_output_error(stack, as_cstring(&msg));
         return;

@@ -12,7 +12,6 @@
 #include "control_flow.h"
 #include "code_iterators.h"
 #include "function.h"
-#include "generic.h"
 #include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
@@ -532,7 +531,7 @@ void bootstrap_kernel()
     FUNCS.function_decl = functionDeclFunction;
     FUNCS.function_decl->function = FUNCS.function_decl;
     make_nested_contents(FUNCS.function_decl);
-    block_set_function_has_nested(function_contents(FUNCS.function_decl), true);
+    block_set_function_has_nested(nested_contents(FUNCS.function_decl), true);
 
     // Create value function
     Term* valueFunc = builtins->appendNew();
@@ -561,7 +560,7 @@ void bootstrap_kernel()
     valueFunc->type = TYPES.any;
     valueFunc->function = FUNCS.function_decl;
     make_nested_contents(valueFunc);
-    block_set_evaluation_empty(function_contents(valueFunc), true);
+    block_set_evaluation_empty(nested_contents(valueFunc), true);
 
     // Initialize primitive types (this requires value() function)
     create_type_value(builtins, TYPES.bool_type, "bool");
@@ -585,24 +584,24 @@ void bootstrap_kernel()
 
     // Setup output_placeholder() function, needed to declare functions properly.
     FUNCS.output = apply(builtins, FUNCS.function_decl, TermList(), "output_placeholder");
-    function_contents(FUNCS.output)->overrides.specializeType = output_placeholder_specializeType;
-    ca_assert(get_output_type(function_contents(FUNCS.output), 0) == TYPES.any);
+    nested_contents(FUNCS.output)->overrides.specializeType = output_placeholder_specializeType;
+    ca_assert(get_output_type(nested_contents(FUNCS.output), 0) == TYPES.any);
 
     // Now that output_placeholder is created, fix the value() function.
     {
-        Term* output = append_output_placeholder(function_contents(valueFunc), NULL);
+        Term* output = append_output_placeholder(nested_contents(valueFunc), NULL);
         set_declared_type(output, TYPES.any);
-        finish_building_function(function_contents(valueFunc));
+        finish_building_function(nested_contents(valueFunc));
     }
 
-    ca_assert(get_output_type(function_contents(valueFunc), 0) == TYPES.any);
+    ca_assert(get_output_type(nested_contents(valueFunc), 0) == TYPES.any);
 
     // input_placeholder() is needed before we can declare a function with inputs
     FUNCS.input = apply(builtins, FUNCS.function_decl, TermList(), "input_placeholder");
-    block_set_evaluation_empty(function_contents(FUNCS.input), true);
+    block_set_evaluation_empty(nested_contents(FUNCS.input), true);
 
     // Now that we have input_placeholder(), declare one input on output_placeholder()
-    apply(function_contents(FUNCS.output),
+    apply(nested_contents(FUNCS.output),
         FUNCS.input, TermList())->setBoolProp(sym_Optional, true);
 
     // Initialize a few more types
@@ -647,10 +646,10 @@ void bootstrap_kernel()
     FUNCS.has_effects = builtins->get("has_effects");
     block_set_has_effects(nested_contents(FUNCS.has_effects), true);
 
-    function_contents(FUNCS.add)->overrides.specializeType = specializeType_add_sub_mult;
-    function_contents(FUNCS.sub)->overrides.specializeType = specializeType_add_sub_mult;
-    function_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
-    function_contents(FUNCS.div)->overrides.specializeType = specializeType_div;
+    nested_contents(FUNCS.add)->overrides.specializeType = specializeType_add_sub_mult;
+    nested_contents(FUNCS.sub)->overrides.specializeType = specializeType_add_sub_mult;
+    nested_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
+    nested_contents(FUNCS.div)->overrides.specializeType = specializeType_div;
 
     FUNCS.get_with_symbol = builtins->get("get_with_symbol");
     FUNCS.length = builtins->get("length");
@@ -660,10 +659,10 @@ void bootstrap_kernel()
     FUNCS.package = builtins->get("package");
     FUNCS.module = builtins->get("module");
 
-    function_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
+    nested_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
 
     FUNCS.memoize = builtins->get("memoize");
-    block_set_evaluation_empty(function_contents(FUNCS.memoize), true);
+    block_set_evaluation_empty(nested_contents(FUNCS.memoize), true);
 
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));
@@ -677,10 +676,10 @@ void bootstrap_kernel()
 
     // Fix function_decl now that Func type is available.
     {
-        set_declared_type(append_output_placeholder(function_contents(FUNCS.function_decl), NULL),
+        set_declared_type(append_output_placeholder(nested_contents(FUNCS.function_decl), NULL),
             TYPES.func);
         set_declared_type(FUNCS.function_decl, TYPES.func);
-        finish_building_function(function_contents(FUNCS.function_decl));
+        finish_building_function(nested_contents(FUNCS.function_decl));
     }
 
     // Also, now that Func type is available, make sure all builtin functions have closure values.
@@ -692,9 +691,9 @@ void bootstrap_kernel()
 
     stack_setup_type(TYPES.stack);
 
-    function_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
+    nested_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 
-    #define set_evaluation_empty(name) block_set_evaluation_empty(function_contents(FUNCS.name), true)
+    #define set_evaluation_empty(name) block_set_evaluation_empty(nested_contents(FUNCS.name), true)
         set_evaluation_empty(return_func);
         set_evaluation_empty(discard);
         set_evaluation_empty(break_func);
@@ -815,7 +814,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
 
     #define has_custom_type_infer(name) \
         if (FUNCS.name != NULL) \
-            block_set_specialize_type_func(function_contents(FUNCS.name), name##_specializeType)
+            block_set_specialize_type_func(nested_contents(FUNCS.name), name##_specializeType)
 
         has_custom_type_infer(cast);
         has_custom_type_infer(cond);
@@ -832,7 +831,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
     #undef has_custom_type_infer
 
     #define has_post_compile(sourceName, f) if (string_equals(functionName, sourceName)) \
-        block_set_post_compile_func(function_contents(func), f);
+        block_set_post_compile_func(nested_contents(func), f);
 
         has_post_compile("return", controlFlow_postCompile);
         has_post_compile("discard", controlFlow_postCompile);

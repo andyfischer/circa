@@ -80,7 +80,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
 
     // Possibly run the function's postCompile handler
     if (is_function(function)) {
-        PostCompileFunc func = function_contents(function)->overrides.postCompile;
+        PostCompileFunc func = nested_contents(function)->overrides.postCompile;
 
         if (func != NULL)
             func(term);
@@ -281,7 +281,7 @@ void change_function(Term* term, Term* function)
 
     if (function != NULL
             && is_function(function) 
-            && function_contents(function)->functionAttrs.hasNestedContents)
+            && nested_contents(function)->functionAttrs.hasNestedContents)
         make_nested_contents(term);
 #if 0
     else
@@ -336,15 +336,12 @@ void rename(Term* termToRename, caValue* name)
     // Update binding in the owning block.
     if (block != NULL) {
         if (!has_empty_name(termToRename)) {
-            termToRename->owningBlock->names.remove(termToRename->name);
-            termToRename->name = "";
+            termToRename->owningBlock->names.remove(termToRename->name());
             set_null(&termToRename->nameValue);
         }
         termToRename->owningBlock->bindName(termToRename, name);
     }
 
-    // Update name symbol.
-    termToRename->name = as_cstring(name);
     copy(name, &termToRename->nameValue);
     update_unique_name(termToRename);
 
@@ -801,8 +798,8 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
         return result;
 
     // Nearest with same name
-    if (output->name != "")
-        return find_name_at(location, output->name.c_str());
+    if (!has_empty_name(output))
+        return find_name_at(location, output->name());
 
     return NULL;
 }
@@ -914,6 +911,8 @@ void block_finish_changes(Block* block)
 
     fix_forward_function_references(block);
 
+    annotate_stateful_values(block);
+
     // After we are finished creating outputs, update any nested control flow operators.
     update_for_control_flow(block);
 
@@ -933,11 +932,34 @@ void block_finish_changes(Block* block)
     block->inProgress = false;
 }
 
+void annotate_stateful_values(Block* block)
+{
+    for (BlockIteratorFlat it(block); it; ++it) {
+        Term* term = *it;
+        if (term->function != FUNCS.declared_state)
+            continue;
+
+        Term* result = find_name(block, term_name(term)); 
+        term_set_bool_prop(result, sym_LocalStateResult, true);
+
+        BlockIterator2 exitPointSearch;
+        exitPointSearch.startAt(term);
+
+        for (; exitPointSearch; ++exitPointSearch) {
+            if (!is_exit_point(*exitPointSearch))
+                continue;
+
+            Term* localResult = find_name_at(*exitPointSearch, term_name(term)); 
+            term_set_bool_prop(localResult, sym_LocalStateResult, true);
+        }
+    }
+}
+
 Term* find_user_with_function(Term* term, const char* funcName)
 {
     for (int i=0; i < term->users.length(); i++) {
         Term* user = term->users[i];
-        if (user->function->name == funcName)
+        if (string_equals(&user->function->nameValue, funcName))
             return user;
     }
     return NULL;
@@ -1111,7 +1133,7 @@ void check_to_add_primary_output_placeholder(Block* block)
 
 void update_declared_type(Term* term)
 {
-    Block* function = function_contents(term->function);
+    Block* function = nested_contents(term->function);
 
     Type* outputType = get_output_type(function, 0);
 

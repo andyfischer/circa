@@ -44,7 +44,6 @@ ListData* allocate_empty_list(int capacity)
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
-    result->immutable = false;
     memset(result->items, 0, capacity * sizeof(Value));
     for (int i=0; i < capacity; i++)
         initialize_null(&result->items[i]);
@@ -87,10 +86,6 @@ void free_list(ListData* data)
     debug_unregister_valid_object(data, LIST_OBJECT);
 }
 
-void list_make_immutable(ListData* data)
-{
-    data->immutable = true;
-}
 ListData* as_list_data(Value* val)
 {
     ca_assert(is_list(val));
@@ -116,9 +111,6 @@ ListData* list_touch(ListData* original)
 {
     if (original == NULL)
         return NULL;
-
-    if (!original->immutable)
-        return original;
 
     if (original->refCount == 1)
         return original;
@@ -317,7 +309,6 @@ void list_copy(Value* source, Value* dest)
     if (sourceData == NULL)
         return;
 
-    list_make_immutable(sourceData);
     list_incref(sourceData);
 
     dest->value_data.ptr = sourceData;
@@ -713,7 +704,7 @@ void list_type_initialize_from_decl(Type* type, Block* decl)
         if (!is_function(term) || !term->boolProp(sym_FieldAccessor, false))
             continue;
 
-        Type* fieldType = get_output_type(function_contents(term), 0);
+        Type* fieldType = get_output_type(nested_contents(term), 0);
 
         compound_type_append_field(type, fieldType, &term->nameValue);
     }

@@ -132,7 +132,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             // Reload this code block.
             caValue* moduleName = list_get(action, 1);
 
-            Block* block = alloc_block();
+            Block* block = alloc_block(world);
             load_script(block, as_cstring(&watch->filename));
 
             if (has_static_errors(block)) {

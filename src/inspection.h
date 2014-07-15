@@ -49,9 +49,6 @@ bool is_under_same_major_block(Term* a, Term* b);
 // Find the nearest (parent) block that is a compilation unit (such as a module).
 Block* find_nearest_compilation_unit(Block* block);
 
-bool is_for_loop(Block* block);
-bool is_while_loop(Block* block);
-
 bool has_variable_args(Block* block);
 int find_index_of_vararg(Block* block);
 
@@ -91,10 +88,6 @@ Term* find_expression_for_implicit_output(Block* block);
 Term* find_term_with_function(Block* block, Term* func);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);
-
-// Search upwards starting at 'term', and returns the parent (or the term itself) found
-// in 'block'. Returns NULL if not found.
-Term* find_parent_term_in_block(Term* term, Block* block);
 
 bool has_an_error_listener(Term* term);
 

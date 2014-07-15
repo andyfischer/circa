@@ -13,7 +13,7 @@ struct Term
 {
     Value value;
 
-    int id; // Globally unique ID. This is mainly used for debugging.
+    int id; // Globally unique ID.
 
     // A Type that statically describes our type.
     Type* type;
@@ -34,11 +34,7 @@ struct Term
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
-    // An ordinal value that is locally unique among terms with the same name.
-    int uniqueOrdinal;
-
-    // (Deprecated) Symbol binding as string.
-    std::string name;
+    const char* name() { return as_cstring(&nameValue); }
 
     Value nameValue;
 
@@ -52,6 +48,9 @@ struct Term
     };
 
     UniqueName uniqueName;
+
+    // An ordinal value that is locally unique among terms with the same name.
+    int uniqueOrdinal;
 
     // The block that owns this term. May be NULL.
     Block* owningBlock;
@@ -71,7 +70,7 @@ struct Term
     // Location in textual source code.
     TermSourceLocation sourceLoc;
 
-    Term();
+    Term(Block* block);
     ~Term();
 
     const char* nameStr();
@@ -120,7 +119,7 @@ struct Term
 };
 
 // Allocate a new Term object.
-Term* alloc_term();
+Term* alloc_term(Block* parent);
 void dealloc_term(Term*);
 
 int term_dependency_count(Term* term);
@@ -176,7 +175,6 @@ caValue* term_value(Term* term);
 Block* term_function(Term* term);
 bool is_type(Term* term);
 bool is_function(Term* term);
-Block* function_contents(Term* term);
 Type* as_type(Term* term);
 int term_line_number(Term* term);
 
@@ -186,5 +184,7 @@ Term* parent_term(Term* term, int levels);
 
 bool term_is_observable(Term* term);
 bool term_is_observable_after(Term* term, Term* location);
+bool is_located_after(Term* location, Term* term);
+bool term_uses_input_multiple_times(Term* term, Term* input);
 
 } // namespace circa

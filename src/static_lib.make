@@ -26,7 +26,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -gdwarf-2
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib
   LIBS      += 
@@ -78,7 +78,6 @@ OBJECTS := \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/filepack.o \
 	$(OBJDIR)/function.o \
-	$(OBJDIR)/generic.o \
 	$(OBJDIR)/hashtable.o \
 	$(OBJDIR)/heap_debugging.o \
 	$(OBJDIR)/if_block.o \
@@ -220,9 +219,6 @@ $(OBJDIR)/filepack.o: filepack.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/function.o: function.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/generic.o: generic.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/hashtable.o: hashtable.cpp

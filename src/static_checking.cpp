@@ -114,10 +114,7 @@ void update_static_error_list(Block* block)
 {
     Value errors;
     check_for_static_errors(&errors, block);
-    if (errors.isEmpty())
-        set_null(&block->staticErrors);
-    else
-        swap(&errors, &block->staticErrors);
+    move(&errors, block_insert_property(block, sym_StaticErrors));
 }
 
 bool has_static_error(Term* term)
@@ -136,15 +133,13 @@ bool has_static_errors(Block* block)
 
 bool has_static_errors_cached(Block* block)
 {
-    return !is_null(&block->staticErrors);
+    return block_has_property(block, sym_StaticErrors) && !block_get_static_errors(block)->isEmpty();
 }
 
 int count_static_errors(Block* block)
 {
     update_static_error_list(block);
-    if (is_null(&block->staticErrors))
-        return 0;
-    return list_length(&block->staticErrors);
+    return block_get_static_errors(block)->length();
 }
 
 void format_static_error(caValue* error, caValue* stringOutput)
@@ -161,11 +156,11 @@ void format_static_error(caValue* error, caValue* stringOutput)
     
     // Convert 'type' to a readable string
     if (strcmp(type, "not_a_function") == 0)
-        out << "Not a function: " << term->function->name;
+        out << "Not a function: " << term->function->name();
     else if (strcmp(type, "unknown_type") == 0)
-        out << "Unknown type: " << term->name;
+        out << "Unknown type: " << term->name();
     else if (strcmp(type, "unknown_identifier") == 0)
-        out << "Unknown identifier: " << term->name;
+        out << "Unknown identifier: " << term->name();
     else if (strcmp(type, "syntax_error") == 0)
         out << "Syntax error: " << term->stringProp(sym_Message, "");
     else if (strcmp(type, "wrong_input_count") == 0) {
@@ -173,10 +168,10 @@ void format_static_error(caValue* error, caValue* stringOutput)
         int actualCount = term->numInputs();
         if (actualCount > funcNumInputs)
             out << "Too many inputs (" << actualCount << "), function "
-                << term->function->name << " expects only " << funcNumInputs;
+                << term->function->name() << " expects only " << funcNumInputs;
         else
             out << "Too few inputs (" << actualCount << "), function "
-                << term->function->name << " expects " << funcNumInputs;
+                << term->function->name() << " expects " << funcNumInputs;
     } else if (strcmp(type, "null_function") == 0)
         out << "NULL function reference";
     else if (strcmp(type, "unknown_function") == 0)
@@ -186,12 +181,12 @@ void format_static_error(caValue* error, caValue* stringOutput)
     else if (strcmp(type, "type_mismatch") == 0) {
         out << "Type mismatch for input " << inputIndex << ": ";
         Term* input = term->input(inputIndex);
-        if (input->name != "")
-            out << "'" << input->name << "'";
+        if (!has_empty_name(input))
+            out << "'" << input->name() << "'";
         else
             out << "The input expression";
         out << " has type " << as_cstring(&input->type->name) << ", but function "
-            << term->function->name << " expects type "
+            << term->function->name() << " expects type "
             << as_cstring(&get_input_type(term_function(term), inputIndex)->name);
     }
     else if (term->function == FUNCS.static_error) {
@@ -229,9 +224,9 @@ void format_static_errors(caValue* errorList, caValue* output)
 bool print_static_errors_formatted(Block* block, caValue* out)
 {
     update_static_error_list(block);
-    if (!is_list(&block->staticErrors))
+    if (block_get_static_errors(block)->isEmpty())
         return false;
-    return print_static_errors_formatted(&block->staticErrors, out);
+    return print_static_errors_formatted(block_get_static_errors(block), out);
 }
 
 bool print_static_errors_formatted(caValue* result, caValue* out)

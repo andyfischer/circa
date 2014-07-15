@@ -26,7 +26,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG -DCIRCA_USE_LINENOISE
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -gdwarf-2
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L/usr/local/lib -L../build
   LIBS      += -lcirca_d -ldl
@@ -67,7 +67,6 @@ OBJECTS := \
 	$(OBJDIR)/command_line.o \
 	$(OBJDIR)/command_line_main.o \
 	$(OBJDIR)/debugger_repl.o \
-	$(OBJDIR)/exporting_parser.o \
 	$(OBJDIR)/file_checker.o \
 	$(OBJDIR)/linenoise.o \
 
@@ -137,9 +136,6 @@ $(OBJDIR)/command_line_main.o: command_line/command_line_main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/debugger_repl.o: command_line/debugger_repl.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/exporting_parser.o: command_line/exporting_parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_checker.o: command_line/file_checker.cpp

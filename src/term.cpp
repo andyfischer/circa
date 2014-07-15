@@ -19,15 +19,15 @@
 
 namespace circa {
 
-Term::Term()
+Term::Term(Block* _parent)
   : type(NULL),
     function(NULL),
     uniqueOrdinal(0),
-    owningBlock(NULL),
+    owningBlock(_parent),
     index(0),
     nestedContents(NULL)
 {
-    id = global_world()->nextTermID++;
+    id = _parent->world->nextTermID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
 
@@ -213,11 +213,9 @@ void Term::setStringProp(Symbol key, std::string const& s)
     set_string(t, s);
 }
 
-Term* alloc_term()
+Term* alloc_term(Block* parent)
 {
-    // This function is not very useful now, but we may switch to using a memory
-    // pool in the future.
-    Term* term = new Term();
+    Term* term = new Term(parent);
     return term;
 }
 
@@ -338,6 +336,14 @@ void term_set_string_prop(Term* term, Symbol prop, const char* value)
 {
     term->setStringProp(prop, value);
 }
+bool term_get_bool_prop(Term* term, Symbol prop, bool defaultValue)
+{
+    return term->boolProp(prop, defaultValue);
+}
+void term_set_bool_prop(Term* term, Symbol prop, bool value)
+{
+    term->setBoolProp(prop, value);
+}
 bool is_input_implicit(Term* term, int index)
 {
     caValue* val = term_get_input_property(term, index, sym_Implicit);
@@ -428,9 +434,19 @@ Term* parent_term(Term* term, int levels)
     return term;
 }
 
+bool term_is_observable_for_special_reasons(Term* term)
+{
+    return (is_output_placeholder(term)
+        || (term->function == FUNCS.loop_index)
+        || (term->function == FUNCS.function_decl)
+        || (is_loop(term->owningBlock) && is_input_placeholder(term))
+        || (is_loop(term->owningBlock) && is_output_placeholder(term))
+        || (term_get_bool_prop(term, sym_LocalStateResult, false)));
+}
+
 bool term_is_observable(Term* term)
 {
-    if (is_output_placeholder(term))
+    if (term_is_observable_for_special_reasons(term))
         return true;
 
     if (user_count(term) == 0)
@@ -441,25 +457,61 @@ bool term_is_observable(Term* term)
     return true;
 }
 
-bool term_is_observable_after(Term* term, Term* location)
+bool term_accesses_input_from_inside_loop(Term* term, Term* input)
 {
-    // Shortcut: No need to search if 'location' is the one user.
-    if (user_count(term) == 1 && term_user(term, 0) == location)
-        return false;
+    // Returns true if 1) "term" is inside a loop and 2) "input" is not inside that loop.
+    // In other words, "term" will access "input"'s value multiple times.
+    // (once per iteration)
     
-    if (!term_is_observable(term))
+    Block* enclosingLoop = find_enclosing_loop(term->owningBlock);
+    if (enclosingLoop == NULL)
         return false;
 
-    for (int i=0; i < user_count(term); i++)
-        if (is_located_after(location, term_user(term, i)))
+    return !term_is_child_of_block(input, enclosingLoop);
+}
+
+bool term_is_observable_after(Term* term, Term* location)
+{
+    // Check if "term" can be observed after the "location".
+    //
+    // Typically, "location" uses "term" as an input, and we're trying to decide
+    // whether the call at "location" can move/consume the value.
+
+    if (term_is_observable_for_special_reasons(term))
+        return true;
+
+    for (int i=0; i < user_count(term); i++) {
+        Term* user = term_user(term, i);
+        if (term_accesses_input_from_inside_loop(user, term))
             return true;
+        if (is_located_after(user, location))
+            return true;
+    }
  
     return false;
 }
 
-bool is_located_after(Term* location, Term* term)
+bool is_located_after(Term* term, Term* location)
 {
-    return false; // FIXME
+    if (location == term)
+        return false;
+
+    Block* commonParent = find_common_parent(location->owningBlock, term->owningBlock);
+    ca_assert(commonParent != NULL);
+
+    Term* locationParent = find_parent_term_in_block(location, commonParent);
+    Term* termParent = find_parent_term_in_block(term, commonParent);
+
+    return termParent->index > locationParent->index;
+}
+
+bool term_uses_input_multiple_times(Term* term, Term* input)
+{
+    int useCount = 0;
+    for (int i=0; i < term_dependency_count(term); i++)
+        if (term_dependency(term, i) == input)
+            useCount++;
+    return useCount > 1;
 }
 
 } // namespace circa

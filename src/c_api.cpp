@@ -178,7 +178,7 @@ caType* circa_term_declared_type(caTerm* term)
 
 caBlock* circa_term_get_function(caTerm* term)
 {
-    return function_contents(term->function);
+    return nested_contents(term->function);
 }
 
 caValue* circa_function_get_name(caBlock* func)

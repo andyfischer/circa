@@ -17,11 +17,6 @@
 
 namespace circa {
 
-void mark_static_errors_invalid(Block* block)
-{
-    set_null(&block->staticErrors);
-}
-
 void on_block_inputs_changed(Block* block)
 {
     // This once did something.

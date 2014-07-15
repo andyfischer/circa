@@ -28,7 +28,7 @@ void test_cast_first_inputs()
     Term* f = block.compile("def f(T t) -> int { return t.i }");
 
     Stack* stack = create_stack(test_world());
-    stack_init(stack, function_contents(f));
+    stack_init(stack, nested_contents(f));
 
     caValue* in = circa_input(stack, 0);
     circa_set_list(in, 1);

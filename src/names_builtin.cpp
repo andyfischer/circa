@@ -34,6 +34,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Filename: return "Filename";
     case sym_Builtins: return "Builtins";
     case sym_ModuleName: return "ModuleName";
+    case sym_StaticErrors: return "StaticErrors";
     case sym_AccumulatingOutput: return "AccumulatingOutput";
     case sym_Comment: return "Comment";
     case sym_Constructor: return "Constructor";
@@ -47,6 +48,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_HiddenInput: return "HiddenInput";
     case sym_Implicit: return "Implicit";
     case sym_IgnoreError: return "IgnoreError";
+    case sym_LocalStateResult: return "LocalStateResult";
     case sym_Meta: return "Meta";
     case sym_Message: return "Message";
     case sym_MethodName: return "MethodName";
@@ -876,6 +878,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'o':
     switch (str[2]) {
+    case 'c':
+        if (strcmp(str + 3, "alStateResult") == 0)
+            return sym_LocalStateResult;
+        break;
     case 'o':
     switch (str[3]) {
     case 'k':
@@ -1160,6 +1166,10 @@ int builtin_symbol_from_string(const char* str)
             return sym_State;
     default: return -1;
     }
+    case 'i':
+        if (strcmp(str + 5, "cErrors") == 0)
+            return sym_StaticErrors;
+        break;
     default: return -1;
     }
     default: return -1;

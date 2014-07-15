@@ -38,11 +38,15 @@ void assert_valid_block(Block const* obj)
     // this once did something
 }
 
-Block::Block()
+Block::Block(World* _world)
   : owningTerm(NULL),
-    inProgress(false)
+    inProgress(false),
+    world(_world)
 {
-    id = global_world()->nextBlockID++;
+    if (_world == NULL)
+        world = global_world();
+
+    id = world->nextBlockID++;
     on_block_created(this);
 }
 
@@ -51,13 +55,13 @@ Block::~Block()
     clear_block(this);
 }
 
-Block* alloc_block()
+Block* alloc_block(World* world)
 {
-    Block* block = new Block();
+    Block* block = new Block(world);
     return block;
 }
 
-void block_to_string(caValue* value, caValue* asStr)
+void block_to_string(Value* value, Value* asStr)
 {
     Block* block = as_block(value);
     if (block == NULL) {
@@ -68,7 +72,7 @@ void block_to_string(caValue* value, caValue* asStr)
     }
 }
 
-int block_hashFunc(caValue* val)
+int block_hashFunc(Value* val)
 {
     Block* block = as_block(val);
     if (block == NULL)
@@ -156,10 +160,9 @@ void Block::append(Term* term)
 Term* Block::appendNew()
 {
     assert_valid_block(this);
-    Term* term = alloc_term();
+    Term* term = alloc_term(this);
     ca_assert(term != NULL);
     _terms.append(term);
-    term->owningBlock = this;
     term->index = _terms.length()-1;
     return term;
 }
@@ -264,8 +267,8 @@ void Block::removeNulls()
 
 void Block::removeNameBinding(Term* term)
 {
-    if (!has_empty_name(term) && names[term->name] == term)
-        names.remove(term->name);
+    if (!has_empty_name(term) && names[term->name()] == term)
+        names.remove(term->name());
 }
 
 void Block::shorten(int newLength)
@@ -282,7 +285,7 @@ Block::clear()
     clear_block(this);
 }
 
-Term* Block::findFirstBinding(caValue* name)
+Term* Block::findFirstBinding(Value* name)
 {
     for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
@@ -294,7 +297,7 @@ Term* Block::findFirstBinding(caValue* name)
     return NULL;
 }
 
-void Block::bindName(Term* term, caValue* name)
+void Block::bindName(Term* term, Value* name)
 {
     assert_valid_term(term);
     if (!has_empty_name(term) && !equals(&term->nameValue, name)) {
@@ -303,7 +306,6 @@ void Block::bindName(Term* term, caValue* name)
 
     names.bind(term, as_cstring(name));
     copy(name, &term->nameValue);
-    term->name = as_cstring(name);
     update_unique_name(term);
 }
 
@@ -364,23 +366,12 @@ Value* block_name(Block* block)
     return term_name(block->owningTerm);
 }
 
-Block* function_contents(Term* func)
-{
-    return nested_contents(func);
-}
-
 void remove_nested_contents(Term* term)
 {
     if (term->nestedContents == NULL)
         return;
 
     clear_block(term->nestedContents);
-
-#if 0
-    // Delete this Block immediately, if it's not referenced.
-    if (!block->header.referenced)
-        delete term->nestedContents;
-#endif
 
     term->nestedContents = NULL;
 }
@@ -394,11 +385,6 @@ void block_graft_replacement(Block* target, Block* replacement)
     target->owningTerm = NULL;
 }
 
-caValue* block_get_source_filename(Block* block)
-{
-    return block_get_property(block, sym_Filename);
-}
-
 std::string get_source_file_location(Block* block)
 {
     // Search upwards until we find a block that has source-file defined.
@@ -408,7 +394,7 @@ std::string get_source_file_location(Block* block)
     if (block == NULL)
         return "";
 
-    caValue* sourceFilename = block_get_source_filename(block);
+    Value* sourceFilename = block_get_source_filename(block);
 
     if (sourceFilename == NULL)
         return "";
@@ -481,6 +467,42 @@ Block* find_enclosing_major_block(Block* block)
     return NULL;
 }
 
+Block* find_common_parent(Block* a, Block* b)
+{
+    ca_assert(a != NULL);
+    ca_assert(b != NULL);
+
+    Block* parent = a;
+    Block* searchBlock = b;
+
+    while (parent != NULL) {
+
+        searchBlock = b;
+        while (searchBlock != NULL) {
+            if (parent == searchBlock)
+                return parent;
+
+            searchBlock = get_parent_block(searchBlock);
+        }
+
+        parent = get_parent_block(parent);
+    }
+    return NULL;
+}
+
+Term* find_parent_term_in_block(Term* term, Block* block)
+{
+    while (true) {
+        if (term == NULL)
+            return NULL;
+
+        if (term->owningBlock == block)
+            return term;
+
+        term = parent_term(term);
+    }
+}
+
 bool is_case_block(Block* block)
 {
     return block->owningTerm != NULL && block->owningTerm->function == FUNCS.case_func;
@@ -492,6 +514,27 @@ bool is_switch_block(Block* block)
         return false;
 
     return block->owningTerm->function == FUNCS.if_block || block->owningTerm->function == FUNCS.switch_func;
+}
+
+bool is_for_loop(Block* block)
+{
+    if (block == NULL || block->owningTerm == NULL || FUNCS.for_func == NULL)
+        return false;
+
+    return block->owningTerm->function == FUNCS.for_func;
+}
+
+bool is_while_loop(Block* block)
+{
+    if (block == NULL || block->owningTerm == NULL || FUNCS.while_loop == NULL)
+        return false;
+
+    return block->owningTerm->function == FUNCS.while_loop;
+}
+
+bool is_loop(Block* block)
+{
+    return is_for_loop(block) || is_while_loop(block);
 }
 
 void pre_erase_term(Term* term)
@@ -536,7 +579,6 @@ void erase_term(Term* term)
 void clear_block(Block* block)
 {
     assert_valid_block(block);
-    set_null(&block->staticErrors);
 
     block->names.clear();
     block->inProgress = false;
@@ -671,7 +713,7 @@ void load_script(Block* block, const char* filename)
 
     // Read the text file
     circa::Value contents;
-    circa_read_file(global_world(), filename, &contents);
+    circa_read_file(block->world, filename, &contents);
 
     if (is_null(&contents)) {
         Term* msg = create_string(block, "File not found: ");
@@ -707,7 +749,11 @@ Block* load_script_term(Block* block, const char* filename)
     return nested_contents(includeFunc);
 }
 
-caValue* block_get_property(Block* block, Symbol key)
+bool block_has_property(Block* block, Symbol key)
+{
+    return block_get_property(block, key) != NULL;
+}
+Value* block_get_property(Block* block, Symbol key)
 {
     if (is_null(&block->properties))
         return NULL;
@@ -717,7 +763,7 @@ caValue* block_get_property(Block* block, Symbol key)
     return hashtable_get(&block->properties, &keyVal);
 }
 
-caValue* block_insert_property(Block* block, Symbol key)
+Value* block_insert_property(Block* block, Symbol key)
 {
     if (is_null(&block->properties))
         set_hashtable(&block->properties);
@@ -737,9 +783,19 @@ void block_remove_property(Block* block, Symbol key)
     hashtable_remove(&block->properties, &keyVal);
 }
 
+Value* block_get_source_filename(Block* block)
+{
+    return block_get_property(block, sym_Filename);
+}
+
+Value* block_get_static_errors(Block* block)
+{
+    return block_get_property(block, sym_StaticErrors);
+}
+
 bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue)
 {
-    caValue* propVal = block_get_property(block, name);
+    Value* propVal = block_get_property(block, name);
     if (propVal == NULL)
         return defaultValue;
 
@@ -753,7 +809,7 @@ void block_set_bool_prop(Block* block, Symbol name, bool value)
 
 bool block_is_evaluation_empty(Block* block)
 {
-    caValue* prop = block_get_property(block, sym_EvaluationEmpty);
+    Value* prop = block_get_property(block, sym_EvaluationEmpty);
 
     if (prop == NULL)
         return false;
@@ -770,7 +826,7 @@ void block_set_evaluation_empty(Block* block, bool empty)
 }
 bool block_has_effects(Block* block)
 {
-    caValue* prop = block_get_property(block, sym_HasEffects);
+    Value* prop = block_get_property(block, sym_HasEffects);
 
     if (prop == NULL)
         return false;
@@ -832,18 +888,18 @@ void block_set_function_has_nested(Block* block, bool hasNestedContents)
     block->functionAttrs.hasNestedContents = hasNestedContents;
 }
 
-void append_internal_error(caValue* result, int index, std::string const& message)
+void append_internal_error(Value* result, int index, std::string const& message)
 {
     const int INTERNAL_ERROR_TYPE = 1;
 
-    caValue* error = list_append(result);
+    Value* error = list_append(result);
     set_list(error, 3);
     set_int(list_get(error, 0), INTERNAL_ERROR_TYPE);
     set_int(list_get(error, 1), index);
     set_string(list_get(error, 2), message);
 }
 
-void block_check_invariants(caValue* result, Block* block)
+void block_check_invariants(Value* result, Block* block)
 {
     set_list(result, 0);
 
@@ -868,7 +924,7 @@ void block_check_invariants(caValue* result, Block* block)
     }
 } 
 
-bool block_check_invariants_print_result(Block* block, caValue* out)
+bool block_check_invariants_print_result(Block* block, Value* out)
 {
     circa::Value result;
     block_check_invariants(&result, block);
@@ -882,7 +938,7 @@ bool block_check_invariants_print_result(Block* block, caValue* out)
     string_append(out, "\n");
 
     for (int i=0; i < list_length(&result); i++) {
-        caValue* error = list_get(&result,i);
+        Value* error = list_get(&result,i);
         string_append(out, "[");
         string_append(out, as_int(list_get(error, 1)));
         string_append(out, "]");

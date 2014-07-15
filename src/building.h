@@ -107,6 +107,8 @@ void block_start_changes(Block* block);
 // Set the block as no longer 'in progress', perform any final cleanup actions.
 void block_finish_changes(Block* block);
 
+void annotate_stateful_values(Block* block);
+
 // Code modification
 Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);

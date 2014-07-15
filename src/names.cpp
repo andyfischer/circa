@@ -517,7 +517,7 @@ bool term_is_child_of_block(Term* term, Block* block)
 bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& output)
 {
     if (name_is_reachable_from(term, block)) {
-        output << term->name;
+        output << term->name();
         return true;
     }
 
@@ -528,14 +528,14 @@ bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& ou
 
     // Don't include the names of hidden or builtin blocks.
     if (is_hidden(parentTerm)) {
-        output << term->name;
+        output << term->name();
         return true;
     }
     
     if (parentTerm->nestedContents != NULL &&
         block_get_bool_prop(parentTerm->nestedContents, sym_Builtins, false))
     {
-        output << term->name;
+        output << term->name();
         return true;
     }
 
@@ -544,7 +544,7 @@ bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& ou
     if (!success)
         return false;
 
-    output << ":" << term->name;
+    output << ":" << term->name();
     return true;
 }
 
@@ -553,7 +553,7 @@ std::string get_relative_name(Block* block, Term* term)
     ca_assert(term != NULL);
 
     if (name_is_reachable_from(term, block))
-        return term->name;
+        return term->name();
 
     // Build a dot-separated name
     std::stringstream result;
@@ -569,7 +569,7 @@ std::string get_relative_name_at(Term* location, Term* term)
         return get_relative_name(global_root_block(), term);
 
     if (location->owningBlock == NULL)
-        return term->name;
+        return term->name();
     else
         return get_relative_name(location->owningBlock, term);
 }
@@ -601,7 +601,7 @@ void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutpu
     list_reverse(nameOutput);
 }
 
-Term* find_from_relative_name_list(caValue* name, Block* relativeTo)
+Term* find_from_relative_name_list(Value* name, Block* relativeTo)
 {
     if (is_null(name))
         return NULL;
@@ -718,14 +718,14 @@ Block* find_function(World* world, const char* name)
     caTerm* term = find_name(world->root, name, sym_LookupFunction);
     if (term == NULL)
         return NULL;
-    return function_contents(term);
+    return nested_contents(term);
 }
 Block* find_function_local(Block* block, const char* name)
 {
     caTerm* term = find_name(block, name, sym_LookupFunction);
     if (term == NULL)
         return NULL;
-    return function_contents(term);
+    return nested_contents(term);
 }
 
 void qualified_name_get_first_section(caValue* name, caValue* prefixResult)

@@ -122,7 +122,7 @@ Term* statically_infer_length_func(Block* block, Term* term)
 
     // Give up
     std::cout << "statically_infer_length_func didn't understand: "
-        << input->function->name << std::endl;
+        << input->function->name() << std::endl;
     return create_symbol_value(block, sym_Unknown);
 }
 

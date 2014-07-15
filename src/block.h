@@ -30,7 +30,7 @@ struct FunctionAttrs
 
 struct Block
 {
-    // Globally unique ID. Used for debugging.
+    // Globally unique ID.
     int id;
 
     // List of content terms. This block owns all the Term objects in this list.
@@ -46,21 +46,15 @@ struct Block
     // while in this state.
     bool inProgress;
 
-    // If this block has any static errors, then they are listed here. If there
-    // are no errors then this value is null.
-    // If this has a list, each element has structure:
-    //  [0] int index
-    //  [1] string type
-    //  [2] int inputIndex (only used for errors related to inputs)
-    Value staticErrors;
-
     // Dictionary with additional metadata.
     Value properties;
 
     BlockOverrides overrides;
     FunctionAttrs functionAttrs;
 
-    Block();
+    World* world;
+
+    Block(World* world = NULL);
     ~Block();
 
     int length();
@@ -86,7 +80,7 @@ struct Block
     Term* last();
 
     // Find the first term with the given name binding.
-    Term* findFirstBinding(caValue* name);
+    Term* findFirstBinding(Value* name);
 
     void insert(int index, Term* term);
     void append(Term* term);
@@ -106,7 +100,7 @@ struct Block
     void clear();
 
     // Bind a name to a term
-    void bindName(Term* term, caValue* name);
+    void bindName(Term* term, Value* name);
 
     // Remap pointers
     void remapPointers(TermMap const& map);
@@ -127,7 +121,7 @@ private:
 void block_setup_type(Type* type);
 void assert_valid_block(Block const* obj);
 
-Block* alloc_block();
+Block* alloc_block(World* world);
 
 bool has_nested_contents(Term* term);
 Block* make_nested_contents(Term* term);
@@ -137,21 +131,28 @@ Value* block_name(Block* block);
 
 void remove_nested_contents(Term* term);
 
-// Exactly the same as 'nested_contents' but conventionally used for functions:
-Block* function_contents(Term* func);
-
 // Insert this existing block as the nested contents for this term.
 void block_graft_replacement(Block* target, Block* replacement);
-
-caValue* block_get_source_filename(Block* block);
 
 Block* get_outer_scope(Block* block);
 Block* get_parent_block(Block* block);
 Block* get_parent_block_stackwise(Block* block);
 Block* find_enclosing_loop(Block* block);
 Block* find_enclosing_major_block(Block* block);
+
+Block* find_common_parent(Block* a, Block* b);
+Block* find_common_parent(Term* a, Term* b);
+
+// Search upwards starting at 'term', and returns the parent (or the term itself) found
+// in 'block'. Returns NULL if not found.
+Term* find_parent_term_in_block(Term* term, Block* block);
+
 bool is_case_block(Block* block);
 bool is_switch_block(Block* block);
+
+bool is_for_loop(Block* block);
+bool is_while_loop(Block* block);
+bool is_loop(Block* block);
 
 // Delete this term and remove it from its owning block.
 void erase_term(Term* term);
@@ -187,9 +188,13 @@ Term* find_term_by_id(Block* block, int id);
 std::string get_source_file_location(Block* block);
 
 // Block properties
-caValue* block_get_property(Block* block, Symbol name);
-caValue* block_insert_property(Block* block, Symbol name);
+bool block_has_property(Block* block, Symbol name);
+Value* block_get_property(Block* block, Symbol name);
+Value* block_insert_property(Block* block, Symbol name);
 void block_remove_property(Block* block, Symbol name);
+
+Value* block_get_source_filename(Block* block);
+Value* block_get_static_errors(Block* block);
 
 bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue);
 void block_set_bool_prop(Block* block, Symbol name, bool value);
@@ -208,8 +213,8 @@ void block_set_specialize_type_func(Block* block, SpecializeTypeFunc specializeF
 void block_set_post_compile_func(Block* block, PostCompileFunc postCompile);
 void block_set_function_has_nested(Block* block, bool hasNestedContents);
 
-void block_check_invariants(caValue* result, Block* block);
-bool block_check_invariants_print_result(Block* block, caValue* out);
+void block_check_invariants(Value* result, Block* block);
+bool block_check_invariants_print_result(Block* block, Value* out);
 
 void block_link_missing_functions(Block* block, Block* source);
 

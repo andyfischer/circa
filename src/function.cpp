@@ -5,7 +5,6 @@
 #include "control_flow.h"
 #include "closures.h"
 #include "function.h"
-#include "generic.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "interpreter.h"
@@ -70,10 +69,10 @@ void finish_building_function(Block* contents)
 
         if (input->boolProp(sym_Output, false)) {
 
-            Term* result = find_name(contents, input->name.c_str());
+            Term* result = find_name(contents, term_name(input));
             
             Term* output = append_output_placeholder(contents, result);
-            rename(output, &input->nameValue);
+            rename(output, term_name(input));
             set_declared_type(output, input->type);
             output->setIntProp(sym_RebindsInput, i);
         }
@@ -84,7 +83,7 @@ void finish_building_function(Block* contents)
 
     for (BlockIterator it(contents); it; ++it) {
         Term* term = it.current();
-        if (function_contents(term->function) != contents)
+        if (nested_contents(term->function) != contents)
             continue;
 
         // Update extra outputs
@@ -105,7 +104,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (!is_function(function))
         return TYPES.any;
 
-    Block* contents = function_contents(function);
+    Block* contents = nested_contents(function);
     Type* outputType = get_output_type(contents, 0);
 
     if (contents->overrides.specializeType != NULL)
@@ -113,18 +112,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (outputType == NULL)
         outputType = TYPES.any;
 
-    if (function->boolProp(sym_PreferSpecialize, false)) {
-        Term* specialized = statically_specialize_overload_for_call(call);
-        if (specialized != NULL)
-            return get_output_type(function_contents(specialized), 0);
-    }
     return outputType;
-}
-
-void evaluate_subroutine(caStack*)
-{
-    // This once did something, but now the default function calling behavior
-    // is the same as evaluating a subroutine.
 }
 
 } // namespace circa
