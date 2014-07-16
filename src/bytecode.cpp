@@ -62,6 +62,8 @@ static void bc_pop_frame(Writer* writer);
 static void bc_comment(Writer* writer, const char* msg);
 static void bc_push_frame(Writer* writer, int termIndex, int inputCount);
 static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest, Symbol moveOrCopy);
+static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest);
+static bool term_can_consume_input(Term* term, Term* input);
 static void bc_set_null(Writer* writer, int registerDistance);
 static void bc_finish_loop_iteration(Writer* writer, Block* block, Symbol exitType);
 static void bc_native_call_to_builtin(Writer* writer, const char* name);
@@ -234,6 +236,16 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
     case bc_ResolveDynamicMethod:
         string_append(string, "resolve_dyn_method ");
         string_append(string, blob_read_u32(bc, pc));
+        for (int i=0; i < c_methodCacheCount; i++) {
+            MethodCacheLine* line = ((MethodCacheLine*) &bc[*pc]) + i;
+            string_append(string, "\n typeId:");
+            string_append(string, line->typeId);
+            string_append(string, " blockIndex:");
+            string_append(string, line->blockIndex);
+            string_append(string, " type:");
+            string_append(string, line->methodCacheType);
+        }
+        *pc += c_methodCacheSize;
         break;
     case bc_ResolveDynamicFuncToClosureCall:
         string_append(string, "resolve_dyn_func_to_closure_call");
@@ -596,7 +608,7 @@ void bc_start_for_loop(Writer* writer, Term* term)
 
     bc_push_frame(writer, term->index, block_locals_count(loopBlock));
 
-    bc_copy(writer, loopBlock, term->input(0), get_input_placeholder(loopBlock, 0), sym_Copy);
+    bc_copy(writer, loopBlock, term->input(0), get_input_placeholder(loopBlock, 0));
 
     // Pass in looped initial values
     for (int i=1;; i++) {
@@ -773,14 +785,16 @@ void write_term_call(Writer* writer, Term* term)
 
     if (term->function == FUNCS.output) {
 
-        if (term->input(0) == NULL) {
+        if (is_for_loop(term->owningBlock)
+                && output_placeholder_index(term) == 0
+                && !term_is_observable(parent_term(term))) {
+            // Ignore
+        } else if (term->input(0) == NULL) {
             blob_append_char(writer->bytecode, bc_SetNull);
             blob_append_u16(writer->bytecode, term->index);
             return;
         } else {
-            blob_append_char(writer->bytecode, bc_InlineCopy);
-            blob_append_u32(writer->bytecode, term->index);
-            bytecode_write_local_reference(writer, term->owningBlock, term->input(0));
+            bc_copy(writer, term->owningBlock, term->input(0), term);
             return;
         }
     }
@@ -905,6 +919,8 @@ void write_term_call(Writer* writer, Term* term)
 
         blob_append_char(writer->bytecode, bc_ResolveDynamicMethod);
         blob_append_u32(writer->bytecode, term->index);
+
+        blob_append_space(writer->bytecode, c_methodCacheSize);
 
         blob_append_char(writer->bytecode, bc_FoldIncomingVarargs);
         blob_append_char(writer->bytecode, bc_CheckInputs);
@@ -1127,6 +1143,19 @@ static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest, Symbol
         bc_move_or_copy(writer, find_register_distance(top, source), destReg, moveOrCopy);
 }
 
+static bool term_can_consume_input(Term* term, Term* input)
+{
+    return !term_is_observable_after(input, term) && !term_uses_input_multiple_times(term, input);
+}
+
+static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest)
+{
+    Symbol moveOrCopy = sym_Copy;
+    if (term_can_consume_input(dest, source))
+        moveOrCopy = sym_Move;
+    bc_copy(writer, top, source, dest, moveOrCopy);
+}
+
 static void bc_set_null(Writer* writer, int registerDistance)
 {
     blob_append_char(writer->bytecode, bc_SetNull);
@@ -1248,6 +1277,8 @@ static void bytecode_write_input_instruction(Writer* writer, Term* term, int inp
         Symbol moveOrCopy = sym_Copy;
         if (!term_is_observable_after(input, term) && !term_uses_input_multiple_times(term, input))
             moveOrCopy = sym_Move;
+        else
+            moveOrCopy = sym_Copy;
 
         bc_move_or_copy(writer,
             find_register_distance_to_new_frame(term->owningBlock, input),

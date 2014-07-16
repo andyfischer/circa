@@ -61,6 +61,8 @@ Block* find_builtins_block(Block* block)
 
 Term* run_name_search(NameSearch* params)
 {
+    stat_increment(NameSearch);
+
     if (is_null(&params->name) || string_equals(&params->name, ""))
         return NULL;
 
@@ -81,6 +83,9 @@ Term* run_name_search(NameSearch* params)
 
     // Look for an exact match.
     for (int i = position - 1; i >= 0; i--) {
+
+        stat_increment(NameSearchStep);
+
         Term* term = block->get(i);
         if (term == NULL)
             continue;

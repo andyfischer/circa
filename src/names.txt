@@ -328,9 +328,13 @@ FuncCall
 # Performance stats
 FirstStatIndex
 
+# Building / AST
 stat_TermCreated
 stat_TermPropAdded
 stat_TermPropAccess
+stat_NameSearch
+stat_NameSearchStep
+stat_FindModule
 
 # Bytecode
 stat_Bytecode_WriteTermCall
@@ -340,9 +344,11 @@ stat_Bytecode_CreateEntry
 stat_LoadFrameState
 stat_StoreFrameState
 stat_MoveAppend
+stat_Interpreter_DynamicMethod_CacheHit
 stat_Interpreter_DynamicMethod_SlowLookup
 stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef
 stat_Interpreter_DynamicMethod_SlowLookup_Hashtable
+stat_Interpreter_DynamicMethod_ModuleLookup
 stat_Interpreter_DynamicFuncToClosureCall
 stat_Interpreter_CopyTermValue
 stat_Interpreter_CopyStackValue
@@ -361,6 +367,7 @@ stat_ListsCreated
 stat_ListsGrown
 stat_ListSoftCopy
 stat_ListDuplicate
+stat_ListDuplicate_100Count
 stat_ListDuplicate_ElementCopy
 stat_ListCast_Touch
 stat_ListCast_CastElement

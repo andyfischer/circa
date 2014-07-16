@@ -510,8 +510,7 @@ def reflect_kernel() -> Block
 -- Sys module
 def sys_arg(int index) -> String
 def sys_module_search_paths() -> List
-def sys_perf_stats_reset()
-def sys_perf_stats_dump() -> List
+def _perf_stats_dump() -> Map
 
 -- Builtin types
 struct FileSignature { String filename, int time_modified }

@@ -1,0 +1,15 @@
+def List.after_each(self, suffix) -> List
+  out = []
+  for el in self
+    @out.append(el)
+    @out.append(suffix)
+  out
+
+list = repeat(0 100)
+
+_perf_stats_dump()
+
+@list.after_each(1)
+
+dupeCount = _perf_stats_dump().get(:stat_ListDuplicate_100Count)
+assert(dupeCount == 0)

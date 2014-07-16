@@ -261,6 +261,17 @@ int user_count(Term* term)
     return term->users.length();
 }
 
+int real_user_count(Term* term)
+{
+    int count = 0;
+    for (int i=0; i < user_count(term); i++) {
+        Term* user = term_user(term, i);
+        if (user->function == FUNCS.extra_output)
+            continue;
+        count++;
+    }
+    return count;
+}
 
 caValue* term_insert_property(Term* term, Symbol key)
 {
@@ -439,7 +450,7 @@ bool term_is_observable_for_special_reasons(Term* term)
     return (is_output_placeholder(term)
         || (term->function == FUNCS.loop_index)
         || (term->function == FUNCS.function_decl)
-        || (is_loop(term->owningBlock) && is_input_placeholder(term))
+        || (is_for_loop(term->owningBlock) && is_input_placeholder(term) && term->index == 0)
         || (is_loop(term->owningBlock) && is_output_placeholder(term))
         || (term_get_bool_prop(term, sym_LocalStateResult, false)));
 }
@@ -449,7 +460,7 @@ bool term_is_observable(Term* term)
     if (term_is_observable_for_special_reasons(term))
         return true;
 
-    if (user_count(term) == 0)
+    if (real_user_count(term) == 0)
         return false;
 
     // Future: Some more smarts here
@@ -482,8 +493,17 @@ bool term_is_observable_after(Term* term, Term* location)
 
     for (int i=0; i < user_count(term); i++) {
         Term* user = term_user(term, i);
-        if (term_accesses_input_from_inside_loop(user, term))
-            return true;
+
+        if (term_accesses_input_from_inside_loop(user, term)) {
+
+            bool userOnlyAccessesOnFirstIteration = is_input_placeholder(user)
+                && user->numInputs() == 2
+                && user->input(1) != term;
+
+            if (!userOnlyAccessesOnFirstIteration)
+                return true;
+        }
+
         if (is_located_after(user, location))
             return true;
     }

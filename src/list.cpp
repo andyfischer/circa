@@ -132,6 +132,9 @@ ListData* list_duplicate(ListData* source)
     ListData* result = allocate_empty_list(source->capacity);
 
     result->count = source->count;
+    
+    if (source->count >= 100)
+        stat_increment(ListDuplicate_100Count);
 
     for (int i=0; i < source->count; i++) {
         stat_increment(ListDuplicate_ElementCopy);

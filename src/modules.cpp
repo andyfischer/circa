@@ -269,6 +269,8 @@ void load_script_eval(caStack* stack)
 
 Block* find_module(Block* root, caValue* name)
 {
+    stat_increment(FindModule);
+
     Block* moduleLevel = global_world()->root;
 
     for (int i=0; i < moduleLevel->length(); i++) {

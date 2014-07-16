@@ -219,6 +219,10 @@ int input_placeholder_index(Term* inputPlaceholder)
 {
     return inputPlaceholder->index;
 }
+int output_placeholder_index(Term* outputPlaceholder)
+{
+    return outputPlaceholder->owningBlock->length() - 1 - outputPlaceholder->index;
+}
 bool is_input_placeholder(Term* term)
 {
     return term->function == FUNCS.input;

@@ -78,13 +78,19 @@ const char bc_NoteBlockStart = 0x76;
 const char bc_Comment = 0x77;
 
 // Method lookup cache
-struct MethodCallSiteCacheLine {
+const u8 MethodCache_NormalMethod = 1;
+const u8 MethodCache_ModuleAccess = 2;
+const u8 MethodCache_HashtableGet = 3;
+const u8 MethodCache_NotFound = 4;
+
+struct MethodCacheLine {
     u32 typeId;
     u32 blockIndex;
+    u8 methodCacheType;
 };
 
-const int c_methodCacheCount = 5;
-const size_t c_methodCacheSize = c_methodCacheCount * sizeof(MethodCallSiteCacheLine);
+const int c_methodCacheCount = 4;
+const size_t c_methodCacheSize = c_methodCacheCount * sizeof(MethodCacheLine);
 
 struct CompiledBlock {
     Block* block;

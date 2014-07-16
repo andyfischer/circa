@@ -63,6 +63,7 @@ Term* get_output_placeholder(Block* block, int index);
 int count_input_placeholders(Block* block);
 int count_output_placeholders(Block* block);
 int input_placeholder_index(Term* inputPlaceholder);
+int output_placeholder_index(Term* outputPlaceholder);
 bool is_input_placeholder(Term* term);
 bool is_output_placeholder(Term* term);
 Term* find_input_with_name(Block* block, Value* name);

@@ -107,13 +107,11 @@ void sys__module_search_paths(caStack* stack)
 {
     copy(module_search_paths(stack->world), circa_output(stack, 0));
 }
-void sys__perf_stats_reset(caStack* stack)
+
+void perf_stats_dump(caStack* stack)
 {
+    perf_stats_to_map(circa_output(stack, 0));
     circa_perf_stats_reset();
-}
-void sys__perf_stats_dump(caStack* stack)
-{
-    perf_stats_to_list(circa_output(stack, 0));
 }
 void global_script_version(caStack* stack)
 {
@@ -623,8 +621,7 @@ void bootstrap_kernel()
     circa_patch_function(world->builtinPatch, "reflect_this_block", reflect__this_block);
     circa_patch_function(world->builtinPatch, "reflect_kernel", reflect__kernel);
     circa_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
-    circa_patch_function(world->builtinPatch, "sys_perf_stats_reset", sys__perf_stats_reset);
-    circa_patch_function(world->builtinPatch, "sys_perf_stats_dump", sys__perf_stats_dump);
+    circa_patch_function(world->builtinPatch, "_perf_stats_dump", perf_stats_dump);
     circa_patch_function(world->builtinPatch, "syntax_error", syntax_error);
     circa_patch_function(world->builtinPatch, "global_script_version", global_script_version);
 

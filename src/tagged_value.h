@@ -19,6 +19,7 @@ void make_no_initialize(Type* type, caValue* value);
 void make_no_initialize_ptr(Type* type, caValue* value, void* ptr);
 
 Type* get_value_type(caValue* v);
+int value_type_id(Value* v);
 
 // Set this value to null. This will call the type's destructor if necessary.
 void set_null(caValue* value);

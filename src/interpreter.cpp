@@ -614,6 +614,11 @@ int vm_compile_block(Stack* stack, Block* block)
     return blockIndex;
 }
 
+int vm_compile_block_empty(Stack* stack, Block* block)
+{
+    return program_create_empty_entry(stack->program, block);
+}
+
 bool vm_resolve_closure_call(Stack* stack)
 {
     Frame* top = top_frame(stack);
@@ -735,74 +740,142 @@ void vm_resolve_dynamic_func_to_closure_call(Stack* stack)
     copy(func, frame_register(top, 0));
 }
 
-bool vm_resolve_dynamic_method(Stack* stack)
+void vm_method_cache_make_empty_slot(MethodCacheLine* firstCacheLine)
 {
-    int termIndex = vm_read_u32(stack);
+    for (int i=c_methodCacheCount-2; i >= 0; i--)
+        firstCacheLine[i+1] = firstCacheLine[i];
+}
 
+void vm_resolve_dynamic_method_to_module_access(Stack* stack, Value* object)
+{
+    Block* moduleBlock = module_ref_get_block(object);
     Frame* top = top_frame(stack);
     Frame* parent = top_frame_parent(stack);
-
-    Value* object = frame_register(top, 0);
-
-    // Slow lookup
-    Term* caller = frame_term(parent, termIndex);
+    Term* caller = frame_current_term(parent);
     Value* elementName = caller->getProp(sym_MethodName);
 
-    stat_increment(Interpreter_DynamicMethod_SlowLookup);
-    Term* method = find_method(frame_block(parent), (Type*) circa_type_of(object), elementName);
+    stat_increment(Interpreter_DynamicMethod_ModuleLookup);
+    Term* term = find_local_name(moduleBlock, elementName);
 
-    if (method == NULL) {
-        if (is_module_ref(object)) {
-            Block* moduleBlock = module_ref_get_block(object);
-            Term* term = find_local_name(moduleBlock, elementName);
-            stat_increment(Interpreter_DynamicMethod_SlowLookup_ModuleRef);
-            if (term == NULL) {
-                // FIXME: write error
-                ca_assert(false);
-                return false;
-            }
-
-            if (is_function(term)) {
-                // Shift inputs (drop the module reference in index 0)
-                for (int i=0; i < frame_register_count(top) - 1; i++)
-                    move(frame_register(top, i + 1), frame_register(top, i));
-                stack_resize_top_frame(stack, frame_register_count(top) - 1);
-
-                method = term;
-            } else {
-                stack_resize_top_frame(stack, frame_register_count(top) + 1);
-                copy(elementName, frame_register(top, 1));
-                int blockIndex = vm_compile_block(stack, FUNCS.moduleRef_get->nestedContents);
-                vm_prepare_top_frame(stack, blockIndex);
-                return true;
-            }
-
-        } else if (is_hashtable(object)) {
-            stat_increment(Interpreter_DynamicMethod_SlowLookup_Hashtable);
-
-            stack_resize_top_frame(stack, frame_register_count(top) + 1);
-            copy(elementName, frame_register(top, 1));
-            int blockIndex = vm_compile_block(stack, FUNCS.map_get->nestedContents);
-            vm_prepare_top_frame(stack, blockIndex);
-            return true;
-        }
+    if (term == NULL) {
+        // FIXME: write error
+        ca_assert(false);
     }
 
-    if (method == NULL) {
+    if (is_function(term)) {
+        // Shift inputs (drop the module reference in index 0)
+        for (int i=0; i < frame_register_count(top) - 1; i++)
+            move(frame_register(top, i + 1), frame_register(top, i));
+        stack_resize_top_frame(stack, frame_register_count(top) - 1);
+        int blockIndex = vm_compile_block(stack, term->nestedContents);
+        vm_prepare_top_frame(stack, blockIndex);
+
+    } else {
+        stack_resize_top_frame(stack, frame_register_count(top) + 1);
+        copy(elementName, frame_register(top, 1));
+        int blockIndex = vm_compile_block(stack, FUNCS.moduleRef_get->nestedContents);
+        vm_prepare_top_frame(stack, blockIndex);
+    }
+}
+
+void vm_resolve_dynamic_method_to_hashtable_get(Stack* stack)
+{
+    Frame* top = top_frame(stack);
+    Frame* parent = top_frame_parent(stack);
+    stack_resize_top_frame(stack, frame_register_count(top) + 1);
+    Term* caller = frame_current_term(parent);
+    Value* elementName = caller->getProp(sym_MethodName);
+    copy(elementName, frame_register(top, 1));
+    int blockIndex = vm_compile_block(stack, FUNCS.map_get->nestedContents);
+    vm_prepare_top_frame(stack, blockIndex);
+}
+
+void vm_dynamic_method_dispatch_from_cache(Stack* stack, MethodCacheLine* cacheLine, Value* object)
+{
+    switch (cacheLine->methodCacheType) {
+    case MethodCache_NormalMethod:
+        vm_prepare_top_frame(stack, cacheLine->blockIndex);
+        return;
+    case MethodCache_ModuleAccess:
+        vm_resolve_dynamic_method_to_module_access(stack, object);
+        return;
+    case MethodCache_HashtableGet:
+        vm_resolve_dynamic_method_to_hashtable_get(stack);
+        return;
+    case MethodCache_NotFound: {
+        Frame* parent = top_frame_parent(stack);
+        Term* caller = frame_current_term(parent);
+        Value* elementName = caller->getProp(sym_MethodName);
         Value msg;
         set_string(&msg, "Method '");
         string_append(&msg, elementName);
         string_append(&msg, "' not found on type ");
         string_append(&msg, &circa_type_of(object)->name);
         vm_pop_frame_and_store_error(stack, &msg);
-        return false;
+        return;
+    }
     }
 
-    ca_assert(method != NULL);
-    Block* block = method->nestedContents;
-    int blockIndex = vm_compile_block(stack, block);
-    vm_prepare_top_frame(stack, blockIndex);
-    return true;
+    internal_error("unreachable");
+}
+
+void vm_resolve_dynamic_method(Stack* stack)
+{
+    int startingPc = stack->pc;
+    int termIndex = vm_read_u32(stack);
+
+    // For most of this function, stack->pc remains at the start of the cache lines.
+    MethodCacheLine* firstCacheLine = (MethodCacheLine*) vm_get_bytecode_raw(stack);
+
+    Frame* top = top_frame(stack);
+    Value* object = frame_register(top, 0);
+    int typeId = value_type_id(object);
+
+    Frame* parent = top_frame_parent(stack);
+    parent->termIndex = termIndex;
+
+    MethodCacheLine* cacheLine = firstCacheLine;
+    for (int i=0; i < c_methodCacheCount; i++, cacheLine++) {
+        if (cacheLine->typeId == typeId) {
+            stat_increment(Interpreter_DynamicMethod_CacheHit);
+            stack->pc += c_methodCacheSize;
+            return vm_dynamic_method_dispatch_from_cache(stack, cacheLine, object);
+        }
+    }
+
+    // Slow lookup
+    stat_increment(Interpreter_DynamicMethod_SlowLookup);
+    Term* caller = frame_term(parent, termIndex);
+    Value* elementName = caller->getProp(sym_MethodName);
+
+    vm_method_cache_make_empty_slot(firstCacheLine);
+    firstCacheLine->typeId = typeId;
+    firstCacheLine->blockIndex = 7;
+
+    Term* method = find_method(frame_block(parent), (Type*) circa_type_of(object), elementName);
+
+    if (method != NULL) {
+        Block* block = method->nestedContents;
+        int blockIndex = vm_compile_block(stack, block);
+
+        // 'firstCacheLine' is invalidated by vm_compile_block.
+        firstCacheLine = (MethodCacheLine*) vm_get_bytecode_raw(stack);
+
+        firstCacheLine->blockIndex = blockIndex;
+        firstCacheLine->methodCacheType = MethodCache_NormalMethod;
+    } else if (is_module_ref(object)) {
+        firstCacheLine->blockIndex = 0;
+        firstCacheLine->methodCacheType = MethodCache_ModuleAccess;
+    } else if (is_hashtable(object)) {
+        firstCacheLine->blockIndex = 0;
+        firstCacheLine->methodCacheType = MethodCache_HashtableGet;
+    } else {
+        firstCacheLine->blockIndex = 0;
+        firstCacheLine->methodCacheType = MethodCache_NotFound;
+    }
+
+    vm_dynamic_method_dispatch_from_cache(stack, firstCacheLine, object);
+    stack->pc += c_methodCacheSize;
 }
 
 static Value* vm_read_local_value(Frame* referenceFrame)
@@ -917,7 +990,8 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_ResolveDynamicMethod: {
-            if (!vm_resolve_dynamic_method(stack))
+            vm_resolve_dynamic_method(stack);
+            if (stack->step != sym_StackRunning)
                 return;
             continue;
         }
@@ -1089,6 +1163,10 @@ void vm_run(Stack* stack)
             Term* receiver = get_output_term(caller, outputIndex);
             Value* receiverSlot = frame_register(parent, receiver);
             move(value, receiverSlot);
+            
+            #if DEBUG
+                set_symbol(value, sym_Unobservable);
+            #endif
 
             // Type check
             if (typeCheck) {
@@ -1132,7 +1210,11 @@ void vm_run(Stack* stack)
                     set_null(receiverSlot);
                 } else {
                     Value* placeholderRegister = frame_register(top, placeholder->index);
-                    copy(placeholderRegister, receiverSlot);
+                    move(placeholderRegister, receiverSlot);
+                    
+                    #if DEBUG
+                        set_symbol(placeholderRegister, sym_Unobservable);
+                    #endif
 
                     // Type check
                     bool castSuccess = cast(receiverSlot, declared_type(placeholder));
@@ -1390,25 +1472,6 @@ static void vm_finish_frame(Stack* stack)
     }
 
     stack->pc = parent->pc;
-}
-
-static MethodCallSiteCacheLine* vm_dynamic_method_search_cache(Value* object, char* data)
-{
-#if CIRCA_ENABLE_INLINE_DYNAMIC_METHOD_CACHE
-    int pos = 0;
-
-    // Check method lookup cache here.
-    for (int i=0; i < c_methodCacheCount; i++) {
-        MethodCallSiteCacheLine* line = (MethodCallSiteCacheLine*) &data[pos];
-
-        if (line->typeId == object->value_type->id)
-            return line;
-
-        pos += sizeof(*line);
-    }
-#endif
-
-    return NULL;
 }
 
 void make_stack(caStack* stack)

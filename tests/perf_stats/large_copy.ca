@@ -1,0 +1,10 @@
+
+long_list = repeat(0 100)
+
+_perf_stats_dump()
+
+long_list[0] = [1 long_list]
+
+dupeCount = _perf_stats_dump().get(:stat_ListDuplicate_100Count)
+
+assert(dupeCount == 1)

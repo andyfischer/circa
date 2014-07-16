@@ -19,19 +19,15 @@ extern "C" {
 
 #ifdef __cplusplus
 namespace circa {
-    struct Actor;
-    struct ActorSpace;
     struct Block;
+    struct ListData;
+    struct NativePatch;
     struct Stack;
     struct Term;
     struct Type;
     struct World;
-    struct NativePatch;
     struct Value;
 }
-
-typedef circa::Actor caActor;
-typedef circa::ActorSpace caActorSpace;
 
 typedef circa::Block caBlock;
 
@@ -101,6 +97,7 @@ struct Value
     caSymbol asSymbol();
     int asInt();
     float asFloat();
+    ListData* listData();
 
     Value* index(int i);
     int length();

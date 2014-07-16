@@ -46,7 +46,8 @@ Term* Value::asTerm() { return as_term_ref(this); }
 bool Value::asBool() { return as_bool(this); }
 Symbol Value::asSymbol() { return as_symbol(this); }
 int Value::asInt() { return as_int(this); }
-float Value::asFloat()  { return as_float(this); }
+float Value::asFloat() { return as_float(this); }
+ListData* Value::listData() { return (ListData*) this->value_data.ptr; }
 Value* Value::index(int i) { return list_get(this, i); }
 int Value::length() { return list_length(this); }
 
@@ -175,6 +176,11 @@ void make_no_initialize_ptr(Type* type, caValue* value, void* ptr)
 Type* get_value_type(caValue* v)
 {
     return v->value_type;
+}
+
+int value_type_id(Value* v)
+{
+    return v->value_type->id;
 }
 
 void set_null(caValue* value)

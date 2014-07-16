@@ -295,14 +295,19 @@ const char* builtin_symbol_to_string(int name)
     case stat_TermCreated: return "stat_TermCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";
     case stat_TermPropAccess: return "stat_TermPropAccess";
+    case stat_NameSearch: return "stat_NameSearch";
+    case stat_NameSearchStep: return "stat_NameSearchStep";
+    case stat_FindModule: return "stat_FindModule";
     case stat_Bytecode_WriteTermCall: return "stat_Bytecode_WriteTermCall";
     case stat_Bytecode_CreateEntry: return "stat_Bytecode_CreateEntry";
     case stat_LoadFrameState: return "stat_LoadFrameState";
     case stat_StoreFrameState: return "stat_StoreFrameState";
     case stat_MoveAppend: return "stat_MoveAppend";
+    case stat_Interpreter_DynamicMethod_CacheHit: return "stat_Interpreter_DynamicMethod_CacheHit";
     case stat_Interpreter_DynamicMethod_SlowLookup: return "stat_Interpreter_DynamicMethod_SlowLookup";
     case stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef: return "stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef";
     case stat_Interpreter_DynamicMethod_SlowLookup_Hashtable: return "stat_Interpreter_DynamicMethod_SlowLookup_Hashtable";
+    case stat_Interpreter_DynamicMethod_ModuleLookup: return "stat_Interpreter_DynamicMethod_ModuleLookup";
     case stat_Interpreter_DynamicFuncToClosureCall: return "stat_Interpreter_DynamicFuncToClosureCall";
     case stat_Interpreter_CopyTermValue: return "stat_Interpreter_CopyTermValue";
     case stat_Interpreter_CopyStackValue: return "stat_Interpreter_CopyStackValue";
@@ -317,6 +322,7 @@ const char* builtin_symbol_to_string(int name)
     case stat_ListsGrown: return "stat_ListsGrown";
     case stat_ListSoftCopy: return "stat_ListSoftCopy";
     case stat_ListDuplicate: return "stat_ListDuplicate";
+    case stat_ListDuplicate_100Count: return "stat_ListDuplicate_100Count";
     case stat_ListDuplicate_ElementCopy: return "stat_ListDuplicate_ElementCopy";
     case stat_ListCast_Touch: return "stat_ListCast_Touch";
     case stat_ListCast_CastElement: return "stat_ListCast_CastElement";
@@ -1907,9 +1913,25 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'F':
-        if (strcmp(str + 6, "inishDynamicCall") == 0)
+    switch (str[6]) {
+    case 'i':
+    switch (str[7]) {
+    case 'n':
+    switch (str[8]) {
+    case 'd':
+        if (strcmp(str + 9, "Module") == 0)
+            return stat_FindModule;
+        break;
+    case 'i':
+        if (strcmp(str + 9, "shDynamicCall") == 0)
             return stat_FinishDynamicCall;
         break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'H':
     switch (str[6]) {
     case 'a':
@@ -2076,6 +2098,14 @@ int builtin_symbol_from_string(const char* str)
     switch (str[30]) {
     case '_':
     switch (str[31]) {
+    case 'C':
+        if (strcmp(str + 32, "acheHit") == 0)
+            return stat_Interpreter_DynamicMethod_CacheHit;
+        break;
+    case 'M':
+        if (strcmp(str + 32, "oduleLookup") == 0)
+            return stat_Interpreter_DynamicMethod_ModuleLookup;
+        break;
     case 'S':
     switch (str[32]) {
     case 'l':
@@ -2241,9 +2271,17 @@ int builtin_symbol_from_string(const char* str)
     case 'e':
     switch (str[18]) {
     case '_':
-        if (strcmp(str + 19, "ElementCopy") == 0)
+    switch (str[19]) {
+    case '1':
+        if (strcmp(str + 20, "00Count") == 0)
+            return stat_ListDuplicate_100Count;
+        break;
+    case 'E':
+        if (strcmp(str + 20, "lementCopy") == 0)
             return stat_ListDuplicate_ElementCopy;
         break;
+    default: return -1;
+    }
     case 0:
             return stat_ListDuplicate;
     default: return -1;
@@ -2322,6 +2360,52 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 7, "veAppend") == 0)
             return stat_MoveAppend;
         break;
+    default: return -1;
+    }
+    case 'N':
+    switch (str[6]) {
+    case 'a':
+    switch (str[7]) {
+    case 'm':
+    switch (str[8]) {
+    case 'e':
+    switch (str[9]) {
+    case 'S':
+    switch (str[10]) {
+    case 'e':
+    switch (str[11]) {
+    case 'a':
+    switch (str[12]) {
+    case 'r':
+    switch (str[13]) {
+    case 'c':
+    switch (str[14]) {
+    case 'h':
+    switch (str[15]) {
+    case 'S':
+        if (strcmp(str + 16, "tep") == 0)
+            return stat_NameSearchStep;
+        break;
+    case 0:
+            return stat_NameSearch;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     default: return -1;
     }
     case 'P':

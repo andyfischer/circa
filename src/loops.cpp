@@ -57,7 +57,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
     Term* listInput = apply(contents, FUNCS.input, TermList());
 
     // Add loop_index()
-    Term* index = apply(contents, FUNCS.loop_index, TermList(listInput));
+    Term* index = apply(contents, FUNCS.loop_index, TermList());
     hide_from_source(index);
 
     // Add get_index to fetch the list's current element.
