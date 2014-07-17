@@ -437,6 +437,8 @@ static void start_interpreter_session(Stack* stack)
     Value* seed = hashtable_get_int_key(&stack->env, sym_Entropy);
     if (seed != NULL)
         rand_init(&stack->randState, get_hash_value(seed));
+
+    compiled_reset_trace_data(stack->program);
 }
 
 void evaluate_block(Stack* stack, Block* block)
@@ -637,7 +639,7 @@ bool vm_resolve_closure_call(Stack* stack)
 
     if (!is_closure(&closure)) {
         Value msg;
-        if (is_dynamic_func_call(frame_current_term(top_frame_parent(stack)))) {
+        if (calls_function_by_value(frame_current_term(top_frame_parent(stack)))) {
             set_string(&msg, "Left side is not a function");
         } else {
             set_string(&msg, "Closure call expected a closure value in input 0, found value of type ");
@@ -939,7 +941,7 @@ void vm_run(Stack* stack)
         // Dispatch op
         char op = vm_read_char(stack);
         switch (op) {
-        case bc_NoOp:
+        case bc_Noop:
             continue;
         case bc_Pause:
             top_frame(stack)->pc = stack->pc;
@@ -1120,8 +1122,8 @@ void vm_run(Stack* stack)
             set_int(val, as_int(val) + 1);
             continue;
         }
-        case bc_MoveAppend: {
-            stat_increment(MoveAppend);
+        case bc_AppendMove: {
+            stat_increment(AppendMove);
             Value* from = vm_read_register(stack);
             Value* to = vm_read_register(stack);
             if (!is_list(to))
@@ -1130,6 +1132,34 @@ void vm_run(Stack* stack)
             #if DEBUG
                 set_symbol(from, sym_Unobservable);
             #endif
+            continue;
+        }
+        case bc_GetIndexCopy: {
+            stat_increment(GetIndexCopy);
+            Value* list = vm_read_register(stack);
+            Value* index = vm_read_register(stack);
+            Value* to = vm_read_register(stack);
+
+            Value* element = get_index(list, as_int(index));
+            copy(element, to);
+            continue;
+        }
+        case bc_GetIndexMove: {
+            stat_increment(GetIndexMove);
+            Value* list = vm_read_register(stack);
+            Value* index = vm_read_register(stack);
+            Value* to = vm_read_register(stack);
+
+            Value* element = get_index(list, as_int(index));
+            move(element, to);
+            #if DEBUG
+                set_symbol(element, sym_Unobservable);
+            #endif
+            continue;
+        }
+        case bc_Touch: {
+            Value* value = vm_read_register(stack);
+            touch(value);
             continue;
         }
         case bc_SetTermRef: {
@@ -1283,24 +1313,6 @@ void vm_run(Stack* stack)
 
             continue;
         }
-        case bc_InlineCopy: {
-            Frame* top = top_frame(stack);
-            int index = vm_read_u32(stack);
-            Value* source = vm_read_local_value(top);
-            Value* dest = frame_register(top, index);
-            copy(source, dest);
-            continue;
-        }
-        case bc_LocalCopy: {
-            int sourceIndex = vm_read_u32(stack);
-            int destIndex = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-            Value* source = frame_register(top, sourceIndex);
-            Value* dest = frame_register(top, destIndex);
-            copy(source, dest);
-            continue;
-        }
         case bc_NativeCall: {
             NativeFuncIndex funcIndex = vm_read_u32(stack);
 
@@ -1314,12 +1326,6 @@ void vm_run(Stack* stack)
             stack->bytecode = as_blob(&stack->program->bytecode);
             continue;
         }
-
-        case bc_ErrorNotEnoughInputs:
-            return raise_error_not_enough_inputs(stack);
-
-        case bc_ErrorTooManyInputs:
-            return raise_error_too_many_inputs(stack);
 
         case bc_SetInt: {
             int index = vm_read_u32(stack);
@@ -1434,6 +1440,18 @@ void vm_run(Stack* stack)
         case bc_Comment: {
             int len = vm_read_u16(stack);
             stack->pc += len;
+            continue;
+        }
+        case bc_IncrementTermCounter: {
+            Frame* top = top_frame(stack);
+            u16 termIndex = vm_read_u16(stack);
+            CompiledBlock* cblock = compiled_block(stack->program, top->blockIndex);
+            if (cblock->termCounter == NULL) {
+                size_t size = sizeof(int) * frame_block(top)->length();
+                cblock->termCounter = (int*) malloc(size);
+                memset(cblock->termCounter, 0, size);
+            }
+            cblock->termCounter[termIndex]++;
             continue;
         }
 
@@ -1698,6 +1716,8 @@ void interpreter_install_functions(NativePatch* patch)
     circa_patch_function(patch, "#save_state_result", save_state_result);
     circa_patch_function(patch, "#load_frame_state", load_frame_state);
     circa_patch_function(patch, "#store_frame_state", store_frame_state);
+    circa_patch_function(patch, "#raise_error_too_many_inputs", raise_error_too_many_inputs);
+    circa_patch_function(patch, "#raise_error_not_enough_inputs", raise_error_not_enough_inputs);
 }
 
 } // namespace circa

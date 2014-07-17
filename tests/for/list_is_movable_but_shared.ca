@@ -1,0 +1,12 @@
+
+struct Object {
+  List list
+}
+
+obj = Object.make([1 2 3])
+print('obj = ' obj)
+
+for i in obj.list
+  print('i = ' i)
+
+print('obj = ' obj)

@@ -17,6 +17,7 @@ struct BuiltinFuncs {
     Term* case_func;
     Term* case_condition_bool;
     Term* cast;
+    Term* cast_declared_type;
     Term* closure_block;
     Term* comment;
     Term* cond;
@@ -63,7 +64,7 @@ struct BuiltinFuncs {
     Term* loop_condition_bool;
     Term* load_script;
     Term* loop_index;
-    Term* loop_iterator;
+    Term* loop_get_element;
     Term* loop_output_index;
     Term* make;
     Term* map_get;

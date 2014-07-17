@@ -30,7 +30,11 @@ struct Writer {
     Value* bytecode;
     bool skipEffects;
     bool noSaveState;
+    bool enableTermCounter;
 
+    CompiledBlock* cblock() {
+        return compiled_block(compiled, blockIndex);
+    }
     Block* block() {
         return compiled_block(compiled, blockIndex)->block;
     }
@@ -50,8 +54,6 @@ struct Jump {
         *delta = writer->position() - position;
     }
 };
-
-static Symbol move_or_copy_input(Term* user, Term* input);
 
 // Bytecode writing helpers
 static void bc_append_local_reference_string(Value* string, const char* bc, int* pc);
@@ -81,14 +83,6 @@ static Value* term_effective_value(Writer* writer, Term* term);
 Block* get_parent_block_stackwise(Block* block);
 int find_register_distance(Block* callingBlock, Term* input);
 
-static Symbol move_or_copy_input(Writer* writer, Term* user, Term* input)
-{
-    if (term_is_observable_after(input, user))
-        return sym_Copy;
-    else
-        return sym_Move;
-}
-
 bool compiled_should_ignore_term(Compiled* compiled, Term* term)
 {
     if (term == NULL
@@ -109,7 +103,6 @@ static void bc_append_local_reference_string(Value* string, const char* bc, int*
     string_append(string, " reg:");
     string_append(string, blob_read_u16(bc, pc));
 }
-
 
 static Jump bc_jump(Writer* writer)
 {
@@ -176,6 +169,18 @@ static void bc_set_empty_list(Writer* writer, Block* top, Term* term)
     blob_append_u16(writer->bytecode, find_register_distance(top, term));
 }
 
+static void bc_load_frame_state(Writer* writer, Block* block)
+{
+    if (block_has_state(block) != sym_No)
+        bc_native_call_to_builtin(writer, "#load_frame_state");
+}
+
+static void bc_store_frame_state(Writer* writer, Block* block)
+{
+    if (!writer->noSaveState && block_has_state(block) != sym_No)
+        bc_native_call_to_builtin(writer, "#store_frame_state");
+}
+
 void bytecode_op_to_string(const char* bc, int* pc, Value* string)
 {
     if (!is_string(string))
@@ -206,25 +211,33 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
         string_append(string, "increment ");
         string_append(string, (i16) blob_read_u16(bc, pc));
         break;
-    case bc_MoveAppend:
-        string_append(string, "move_append ");
+    case bc_AppendMove:
+        string_append(string, "append_move ");
         string_append(string, (i16) blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append(string, (i16) blob_read_u16(bc, pc));
         break;
-    case bc_InlineCopy:
-        string_append(string, "inline_copy ");
-        string_append(string, blob_read_u32(bc, pc));
+    case bc_GetIndexCopy:
+        string_append(string, "get_index_copy ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
         string_append(string, " ");
-        bc_append_local_reference_string(string, bc, pc);
-        break;
-    case bc_LocalCopy:
-        string_append(string, "local_copy ");
-        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, (i16) blob_read_u16(bc, pc));
         string_append(string, " ");
-        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, (i16) blob_read_u16(bc, pc));
         break;
-    case bc_NoOp:
+    case bc_GetIndexMove:
+        string_append(string, "get_index_move ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        break;
+    case bc_Touch:
+        string_append(string, "touch ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        break;
+    case bc_Noop:
         string_append(string, "noop");
         break;
     case bc_PopFrame:
@@ -349,12 +362,6 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
     case bc_FinishFrame:
         string_append(string, "finish_frame");
         break;
-    case bc_ErrorNotEnoughInputs:
-        string_append(string, "error_not_enough_inputs");
-        break;
-    case bc_ErrorTooManyInputs:
-        string_append(string, "error_too_many_inputs");
-        break;
     case bc_PopOutput:
         string_append(string, "pop_output ");
         string_append(string, blob_read_u32(bc, pc));
@@ -425,6 +432,10 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
         string_append(string, &str);
         break;
     }
+    case bc_IncrementTermCounter:
+        string_append(string, "increment_term_counter ");
+        string_append(string, blob_read_u16(bc, pc));
+        break;
     default:
         string_append(string, "*unrecognized op: ");
         string_append(string, int(op));
@@ -610,6 +621,13 @@ void bc_start_for_loop(Writer* writer, Term* term)
 
     bc_copy(writer, loopBlock, term->input(0), get_input_placeholder(loopBlock, 0));
 
+    if (term_can_consume_input(term, term->input(0))) {
+        // Touch this value because get_element will do a move/extract.
+        blob_append_char(writer->bytecode, bc_Touch);
+        blob_append_u16(writer->bytecode,
+            find_register_distance(loopBlock, get_input_placeholder(loopBlock, 0)));
+    }
+
     // Pass in looped initial values
     for (int i=1;; i++) {
         Term* input = get_input_placeholder(loopBlock, i);
@@ -733,14 +751,14 @@ void bc_loop_control_flow(Writer* writer, Term* term)
 
     while (popBlock != enclosingLoop) {
         if (exitType != sym_Discard)
-            bc_native_call_to_builtin(writer, "#store_frame_state");
+            bc_store_frame_state(writer, popBlock);
 
         blob_append_char(writer->bytecode, bc_PopFrame);
         popBlock = get_parent_block_stackwise(popBlock);
     }
 
     if (exitType != sym_Discard)
-        bc_native_call_to_builtin(writer, "#store_frame_state");
+        bc_store_frame_state(writer, enclosingLoop);
 
     bc_finish_loop_iteration(writer, enclosingLoop, exitType);
 }
@@ -766,22 +784,51 @@ void bc_return(Writer* writer, Term* term)
     Block* popBlock = term->owningBlock;
 
     while (popBlock != majorBlock) {
-        bc_native_call_to_builtin(writer, "#store_frame_state");
+        bc_store_frame_state(writer, popBlock);
 
         blob_append_char(writer->bytecode, bc_PopFrame);
         popBlock = get_parent_block_stackwise(popBlock);
     }
 
-    bc_native_call_to_builtin(writer, "#store_frame_state");
+    bc_store_frame_state(writer, majorBlock);
     blob_append_char(writer->bytecode, bc_FinishFrame);
 }
 
-void write_term_call(Writer* writer, Term* term)
+void bc_loop_get_element(Writer* writer, Term* term)
 {
-    stat_increment(Bytecode_WriteTermCall);
+    bc_comment(writer, "get element");
+
+    Block* loopBlock = find_enclosing_for_loop_contents(term);
+    ca_assert(loopBlock == term->owningBlock);
+
+    int listReg = find_register_distance(loopBlock, term->input(0));
+    int indexReg = find_register_distance(loopBlock, term->input(1));
+    int destReg = find_register_distance(loopBlock, term);
+
+    Term* forTerm = loopBlock->owningTerm;
+    bool move = term_can_consume_input(forTerm, forTerm->input(0));
+
+    // If the for-loop can consume the input, then this optimization will move-extract
+    // elements out of the list to be used inside the loop. This requires that the
+    // list be writable (see inside bc_start_for_loop which will insert a bc_Touch).
+
+    blob_append_char(writer->bytecode, move ? bc_GetIndexMove : bc_GetIndexCopy);
+    blob_append_u16(writer->bytecode, listReg);
+    blob_append_u16(writer->bytecode, indexReg);
+    blob_append_u16(writer->bytecode, destReg);
+}
+
+void write_term(Writer* writer, Term* term)
+{
+    stat_increment(Bytecode_WriteTerm);
 
     if (compiled_should_ignore_term(writer->compiled, term))
         return;
+
+    if (writer->enableTermCounter) {
+        blob_append_char(writer->bytecode, bc_IncrementTermCounter);
+        blob_append_u16(writer->bytecode, term->index);
+    }
 
     if (term->function == FUNCS.output) {
 
@@ -879,11 +926,12 @@ void write_term_call(Writer* writer, Term* term)
         return;
     }
 
-    if (term->function == FUNCS.func_call || is_dynamic_func_call(term)) {
+    if (term->function == FUNCS.func_call || calls_function_by_value(term)) {
+        ca_assert(uses_dynamic_dispatch(term));
         
         bytecode_start_term_call(writer, term, NULL);
 
-        if (is_dynamic_func_call(term))
+        if (calls_function_by_value(term))
             blob_append_char(writer->bytecode, bc_ResolveDynamicFuncToClosureCall);
 
         blob_append_char(writer->bytecode, bc_ResolveClosureCall);
@@ -899,6 +947,7 @@ void write_term_call(Writer* writer, Term* term)
     }
 
     else if (term->function == FUNCS.func_apply) {
+        ca_assert(uses_dynamic_dispatch(term));
 
         bytecode_start_term_call(writer, term, NULL);
 
@@ -914,6 +963,7 @@ void write_term_call(Writer* writer, Term* term)
     }
     
     else if (term->function == FUNCS.dynamic_method) {
+        ca_assert(uses_dynamic_dispatch(term));
 
         bytecode_start_term_call(writer, term, NULL);
 
@@ -979,7 +1029,14 @@ void write_term_call(Writer* writer, Term* term)
         return;
     }
 
+    else if (term->function == FUNCS.loop_get_element) {
+        bc_loop_get_element(writer, term);
+        return;
+    }
+
     // Normal function call.
+    ca_assert(!uses_dynamic_dispatch(term));
+
     Block* target = nested_contents(term->function);
 
     if (should_skip_block(writer, target))
@@ -990,7 +1047,19 @@ void write_term_call(Writer* writer, Term* term)
     blob_append_char(writer->bytecode, bc_PrepareBlockUncompiled);
     blob_append_u32(writer->bytecode, 0);
 
-    blob_append_char(writer->bytecode, bc_FoldIncomingVarargs);
+    bool varargs = has_variable_args(target);
+    int minArgCount = count_input_placeholders(target);
+
+    if (varargs) {
+        blob_append_char(writer->bytecode, bc_FoldIncomingVarargs);
+        minArgCount -= 1;
+    }
+
+    if (term->numInputs() < minArgCount)
+        bc_native_call_to_builtin(writer, "#raise_error_not_enough_inputs");
+    else if (!varargs && (term->numInputs() > count_input_placeholders(target)))
+        bc_native_call_to_builtin(writer, "#raise_error_too_many_inputs");
+
     blob_append_char(writer->bytecode, bc_CheckInputs);
     blob_append_char(writer->bytecode, bc_EnterFrame);
 
@@ -1214,7 +1283,7 @@ static void bc_finish_loop_iteration(Writer* writer, Block* block, Symbol exitTy
 
     // Preserve list output
     if (exitType != sym_Discard && is_for_loop(block) && term_is_observable(loopTerm)) {
-        blob_append_char(writer->bytecode, bc_MoveAppend);
+        blob_append_char(writer->bytecode, bc_AppendMove);
         blob_append_u16(writer->bytecode, get_output_placeholder(block, 0)->index);
         blob_append_u16(writer->bytecode, find_register_distance(block, block->owningTerm));
     }
@@ -1241,9 +1310,9 @@ static void bc_finish_loop_iteration(Writer* writer, Block* block, Symbol exitTy
     }
 }
 
-static void bytecode_write_input_instruction(Writer* writer, Term* term, int inputIndex, Block* knownBlock)
+static void bytecode_write_input_instruction(Writer* writer, Term* caller, int inputIndex, Block* knownBlock)
 {
-    Term* input = term->input(inputIndex);
+    Term* input = caller->input(inputIndex);
     Term* placeholder = NULL;
 
     if (knownBlock != NULL)
@@ -1275,13 +1344,13 @@ static void bytecode_write_input_instruction(Writer* writer, Term* term, int inp
 
     } else {
         Symbol moveOrCopy = sym_Copy;
-        if (!term_is_observable_after(input, term) && !term_uses_input_multiple_times(term, input))
+        if (!term_is_observable_after(input, caller) && !term_uses_input_multiple_times(caller, input))
             moveOrCopy = sym_Move;
         else
             moveOrCopy = sym_Copy;
 
         bc_move_or_copy(writer,
-            find_register_distance_to_new_frame(term->owningBlock, input),
+            find_register_distance_to_new_frame(caller->owningBlock, input),
             inputIndex,
             moveOrCopy);
     }
@@ -1425,9 +1494,7 @@ static void write_block_pre_exit(Writer* writer, Block* block, Term* exitPoint)
 
     write_pre_exit_pack_state(writer, block, exitPoint);
 
-    // Future: Be more smart about when store_frame_state is actually needed.
-    if (!writer->noSaveState)
-        bc_native_call_to_builtin(writer, "#store_frame_state");
+    bc_store_frame_state(writer, block);
 }
 
 void writer_setup(Writer* writer, Compiled* compiled)
@@ -1438,15 +1505,7 @@ void writer_setup(Writer* writer, Compiled* compiled)
     writer->world = compiled->world;
     writer->skipEffects = compiled->skipEffects;
     writer->noSaveState = compiled->noSaveState;
-}
-
-void bytecode_write_term_call(Compiled* compiled, Value* bytecode, Term* term)
-{
-    Writer writer;
-    writer.bytecode = bytecode;
-    writer_setup(&writer, compiled);
-    set_blob(bytecode, 0);
-    write_term_call(&writer, term);
+    writer->enableTermCounter = compiled->enableTermCounter;
 }
 
 Compiled* alloc_program(World* world)
@@ -1494,14 +1553,6 @@ int program_find_block_index(Compiled* compiled, Block* block)
     return as_int(indexVal);
 }
 
-bool has_dynamic_target(Compiled* compiled, Term* term)
-{
-    return term->function == FUNCS.dynamic_method
-        || term->function == FUNCS.func_call
-        || term->function == FUNCS.func_apply
-        || is_dynamic_func_call(term);
-}
-
 void compile_block(Writer* writer)
 {
     Block* block = writer->block();
@@ -1526,14 +1577,14 @@ void compile_block(Writer* writer)
         return;
     }
 
-    bc_native_call_to_builtin(writer, "#load_frame_state");
+    bc_load_frame_state(writer, block);
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
         if (term == NULL)
             continue;
 
-        write_term_call(writer, term);
+        write_term(writer, term);
 
         if (is_unconditional_exit_point(term)) {
             blob_append_char(writer->bytecode, bc_End);
@@ -1545,8 +1596,6 @@ void compile_block(Writer* writer)
 
     if (is_for_loop(block) || is_while_loop(block)) {
         bc_finish_loop_iteration(writer, block, sym_Continue);
-        //blob_append_char(writer->bytecode,
-        //    loop_produces_output_value(block->owningTerm) ? 0x1 : 0x0);
     } else {
         blob_append_char(writer->bytecode, bc_FinishFrame);
     }
@@ -1594,13 +1643,13 @@ int program_create_empty_entry(Compiled* compiled, Block* block)
     compiled->blocks = (CompiledBlock*) realloc(compiled->blocks,
         sizeof(*compiled->blocks) * compiled->blockCount);
 
-    CompiledBlock* entry = &compiled->blocks[newIndex];
+    CompiledBlock* cblock = &compiled->blocks[newIndex];
 
-    entry->compileInProgress = false;
-    entry->block = block;
-    entry->hasWatch = false;
-    entry->hasState = sym_Unknown;
-    entry->bytecodeOffset = -1;
+    cblock->compileInProgress = false;
+    cblock->block = block;
+    cblock->hasWatch = false;
+    cblock->bytecodeOffset = -1;
+    cblock->termCounter = NULL;
 
     Value key;
     set_block(&key, block);
@@ -1688,6 +1737,21 @@ void program_set_hackset(Compiled* compiled, Value* hackset)
             Value* watchKey = hacksetElement->index(1);
             Value* watchPath = hacksetElement->index(2);
             program_add_watch(compiled, watchKey, watchPath);
+        } else if (first_symbol(hacksetElement) == sym_TermCounter) {
+            compiled->enableTermCounter = true;
+        }
+    }
+}
+
+void compiled_reset_trace_data(Compiled* compiled)
+{
+    if (compiled->enableTermCounter) {
+        for (int blockIndex=0; blockIndex < compiled->blockCount; blockIndex++) {
+            CompiledBlock* cblock = &compiled->blocks[blockIndex];
+            if (cblock->termCounter != NULL) {
+                for (int i=0; i < cblock->block->length(); i++)
+                    cblock->termCounter[i] = 0;
+            }
         }
     }
 }
@@ -1725,6 +1789,33 @@ void compiled_to_string(Compiled* compiled, Value* out)
         string_append(out, ", blockName: ");
         string_append(out, block_name(cblock->block));
         string_append(out, "]\n");
+
+        Block* block = cblock->block;
+        for (int i=0; i < block->length(); i++) {
+            Term* term = block->get(i);
+
+            string_append(out, "  ");
+
+            if (compiled->enableTermCounter && cblock->termCounter != NULL) {
+                string_append(out, "[count ");
+                string_append(out, cblock->termCounter[term->index]);
+                string_append(out, "] ");
+            }
+
+            format_global_id(term, out);
+            string_append(out, " ");
+            string_append(out, unique_name(term));
+            string_append(out, " ");
+            string_append(out, term_name(term->function));
+            string_append(out, "(");
+
+            for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+                if (inputIndex > 0)
+                    string_append(out, " ");
+                format_global_id(term->input(inputIndex), out);
+            }
+            string_append(out, ")\n");
+        }
 
         if (cblock->bytecodeOffset == -1) {
             string_append(out, "    (no bytecode)\n");

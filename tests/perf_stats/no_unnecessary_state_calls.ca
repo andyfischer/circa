@@ -1,0 +1,15 @@
+
+_perf_stats_dump()
+
+def func()
+  out = []
+  if true
+    for i in 0..10
+      @out.append(i)
+  return out
+
+func()
+
+stats = _perf_stats_dump()
+assert(stats.get(:stat_LoadFrameState) == 0)
+assert(stats.get(:stat_StoreFrameState) == 0)

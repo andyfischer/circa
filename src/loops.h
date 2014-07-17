@@ -11,7 +11,7 @@ Term* for_loop_find_index(Block* contents);
 
 // Initialize the contents of a for-loop for a new term. 'iteratorType' is the type to use
 // for the iterator. If it's NULL then we'll infer a type from the term's input.
-Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType);
+void start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType);
 void finish_for_loop(Term* forTerm);
 void finish_while_loop(Block* block);
 

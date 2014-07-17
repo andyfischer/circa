@@ -30,6 +30,8 @@ const char* builtin_symbol_to_string(int name)
     case sym_EvaluationEmpty: return "EvaluationEmpty";
     case sym_HasEffects: return "HasEffects";
     case sym_HasControlFlow: return "HasControlFlow";
+    case sym_HasState: return "HasState";
+    case sym_HasDynamicDispatch: return "HasDynamicDispatch";
     case sym_DirtyStateType: return "DirtyStateType";
     case sym_Filename: return "Filename";
     case sym_Builtins: return "Builtins";
@@ -153,6 +155,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Copy: return "Copy";
     case sym_Move: return "Move";
     case sym_Unobservable: return "Unobservable";
+    case sym_TermCounter: return "TermCounter";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -298,11 +301,13 @@ const char* builtin_symbol_to_string(int name)
     case stat_NameSearch: return "stat_NameSearch";
     case stat_NameSearchStep: return "stat_NameSearchStep";
     case stat_FindModule: return "stat_FindModule";
-    case stat_Bytecode_WriteTermCall: return "stat_Bytecode_WriteTermCall";
+    case stat_Bytecode_WriteTerm: return "stat_Bytecode_WriteTerm";
     case stat_Bytecode_CreateEntry: return "stat_Bytecode_CreateEntry";
     case stat_LoadFrameState: return "stat_LoadFrameState";
     case stat_StoreFrameState: return "stat_StoreFrameState";
-    case stat_MoveAppend: return "stat_MoveAppend";
+    case stat_AppendMove: return "stat_AppendMove";
+    case stat_GetIndexCopy: return "stat_GetIndexCopy";
+    case stat_GetIndexMove: return "stat_GetIndexMove";
     case stat_Interpreter_DynamicMethod_CacheHit: return "stat_Interpreter_DynamicMethod_CacheHit";
     case stat_Interpreter_DynamicMethod_SlowLookup: return "stat_Interpreter_DynamicMethod_SlowLookup";
     case stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef: return "stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef";
@@ -340,7 +345,6 @@ const char* builtin_symbol_to_string(int name)
     case stat_PushFrame: return "stat_PushFrame";
     case stat_LoopFinishIteration: return "stat_LoopFinishIteration";
     case stat_LoopWriteOutput: return "stat_LoopWriteOutput";
-    case stat_WriteTermBytecode: return "stat_WriteTermBytecode";
     case stat_DynamicCall: return "stat_DynamicCall";
     case stat_FinishDynamicCall: return "stat_FinishDynamicCall";
     case stat_DynamicMethodCall: return "stat_DynamicMethodCall";
@@ -756,9 +760,17 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 4, "ontrolFlow") == 0)
             return sym_HasControlFlow;
         break;
+    case 'D':
+        if (strcmp(str + 4, "ynamicDispatch") == 0)
+            return sym_HasDynamicDispatch;
+        break;
     case 'E':
         if (strcmp(str + 4, "ffects") == 0)
             return sym_HasEffects;
+        break;
+    case 'S':
+        if (strcmp(str + 4, "tate") == 0)
+            return sym_HasState;
         break;
     default: return -1;
     }
@@ -1671,9 +1683,25 @@ int builtin_symbol_from_string(const char* str)
             return sym_Tarball;
         break;
     case 'e':
-        if (strcmp(str + 2, "rmName") == 0)
+    switch (str[2]) {
+    case 'r':
+    switch (str[3]) {
+    case 'm':
+    switch (str[4]) {
+    case 'C':
+        if (strcmp(str + 5, "ounter") == 0)
+            return sym_TermCounter;
+        break;
+    case 'N':
+        if (strcmp(str + 5, "ame") == 0)
             return sym_TermName;
         break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'o':
         if (strcmp(str + 2, "oManyInputs") == 0)
             return sym_TooManyInputs;
@@ -1816,6 +1844,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case '_':
     switch (str[5]) {
+    case 'A':
+        if (strcmp(str + 6, "ppendMove") == 0)
+            return stat_AppendMove;
+        break;
     case 'B':
     switch (str[6]) {
     case 'l':
@@ -1843,8 +1875,8 @@ int builtin_symbol_from_string(const char* str)
             return stat_Bytecode_CreateEntry;
         break;
     case 'W':
-        if (strcmp(str + 15, "riteTermCall") == 0)
-            return stat_Bytecode_WriteTermCall;
+        if (strcmp(str + 15, "riteTerm") == 0)
+            return stat_Bytecode_WriteTerm;
         break;
     default: return -1;
     }
@@ -1926,6 +1958,46 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 9, "shDynamicCall") == 0)
             return stat_FinishDynamicCall;
         break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'G':
+    switch (str[6]) {
+    case 'e':
+    switch (str[7]) {
+    case 't':
+    switch (str[8]) {
+    case 'I':
+    switch (str[9]) {
+    case 'n':
+    switch (str[10]) {
+    case 'd':
+    switch (str[11]) {
+    case 'e':
+    switch (str[12]) {
+    case 'x':
+    switch (str[13]) {
+    case 'C':
+        if (strcmp(str + 14, "opy") == 0)
+            return stat_GetIndexCopy;
+        break;
+    case 'M':
+        if (strcmp(str + 14, "ove") == 0)
+            return stat_GetIndexMove;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     default: return -1;
     }
     default: return -1;
@@ -2351,17 +2423,9 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'M':
-    switch (str[6]) {
-    case 'a':
-        if (strcmp(str + 7, "ke") == 0)
+        if (strcmp(str + 6, "ake") == 0)
             return stat_Make;
         break;
-    case 'o':
-        if (strcmp(str + 7, "veAppend") == 0)
-            return stat_MoveAppend;
-        break;
-    default: return -1;
-    }
     case 'N':
     switch (str[6]) {
     case 'a':
@@ -2651,10 +2715,6 @@ int builtin_symbol_from_string(const char* str)
     case 'V':
         if (strcmp(str + 6, "alueCastDispatched") == 0)
             return stat_ValueCastDispatched;
-        break;
-    case 'W':
-        if (strcmp(str + 6, "riteTermBytecode") == 0)
-            return stat_WriteTermBytecode;
         break;
     default: return -1;
     }

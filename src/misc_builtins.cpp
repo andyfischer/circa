@@ -72,16 +72,14 @@ void copy_eval(caStack* stack)
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void cast1_evaluate(caStack* stack)
+void cast_declared_type(caStack* stack)
 {
-    // 'cast1' is used internally. The type is passed as the term's type.
-    // Deprecated in favor of the other version.
     Value* source = circa_input(stack, 0);
 
     Type* type = circa_caller_term(stack)->type;
 
     if (type == TYPES.any)
-        return copy(source, circa_output(stack, 0));
+        return move(source, circa_output(stack, 0));
 
     if (!cast_possible(source, type)) {
         std::stringstream message;
@@ -95,7 +93,8 @@ void cast1_evaluate(caStack* stack)
     }
 
     Value* output = circa_output(stack, 0);
-    copy(source, output);
+    move(source, output);
+    touch(output);
     bool success = cast(output, type);
 
     if (!success)
@@ -1272,7 +1271,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "add_f", add_f_evaluate);
     circa_patch_function(patch, "abs", abs);
     circa_patch_function(patch, "assert", assert_func);
-    circa_patch_function(patch, "cast1", cast1_evaluate);
+    circa_patch_function(patch, "cast_declared_type", cast_declared_type);
     circa_patch_function(patch, "cast", cast_evaluate);
     circa_patch_function(patch, "concat", concat);
     circa_patch_function(patch, "cond", cond);

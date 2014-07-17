@@ -798,13 +798,25 @@ bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue)
     Value* propVal = block_get_property(block, name);
     if (propVal == NULL)
         return defaultValue;
-
     return as_bool(propVal);
 }
 
 void block_set_bool_prop(Block* block, Symbol name, bool value)
 {
     set_bool(block_insert_property(block, name), value);
+}
+
+Symbol block_get_symbol_prop(Block* block, Symbol name, Symbol defaultValue)
+{
+    Value* propVal = block_get_property(block, name);
+    if (propVal == NULL)
+        return defaultValue;
+    return as_symbol(propVal);
+}
+
+void block_set_symbol_prop(Block* block, Symbol name, Symbol value)
+{
+    set_symbol(block_insert_property(block, name), value);
 }
 
 bool block_is_evaluation_empty(Block* block)

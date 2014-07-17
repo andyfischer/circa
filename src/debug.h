@@ -20,6 +20,7 @@ extern int DEBUG_BREAK_ON_TERM;
 // Spit out this block's raw contents to std::cout
 void dump(Block& block);
 void dump(Block* block);
+void dump_with_props(Block* block);
 void dump_with_props(Block& block);
 void dump(Term* term);
 void dump(caValue& value);

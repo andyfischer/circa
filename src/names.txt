@@ -18,6 +18,8 @@ Last
 EvaluationEmpty
 HasEffects
 HasControlFlow
+HasState
+HasDynamicDispatch
 DirtyStateType
 Filename
 Builtins
@@ -159,6 +161,7 @@ watch
 Copy
 Move
 Unobservable
+TermCounter
 
 # Stack steps
 StackReady
@@ -337,13 +340,15 @@ stat_NameSearchStep
 stat_FindModule
 
 # Bytecode
-stat_Bytecode_WriteTermCall
+stat_Bytecode_WriteTerm
 stat_Bytecode_CreateEntry
 
 # Interpreter
 stat_LoadFrameState
 stat_StoreFrameState
-stat_MoveAppend
+stat_AppendMove
+stat_GetIndexCopy
+stat_GetIndexMove
 stat_Interpreter_DynamicMethod_CacheHit
 stat_Interpreter_DynamicMethod_SlowLookup
 stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef
@@ -391,7 +396,6 @@ stat_BlockNameLookups
 stat_PushFrame
 stat_LoopFinishIteration
 stat_LoopWriteOutput
-stat_WriteTermBytecode
 
 # Function calls
 stat_DynamicCall

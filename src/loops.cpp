@@ -24,7 +24,7 @@ namespace circa {
 Term* for_loop_get_iterator(Block* contents)
 {
     for (int i=0; i < contents->length(); i++)
-        if (contents->get(i)->function == FUNCS.get_index)
+        if (contents->get(i)->function == FUNCS.loop_get_element)
             return contents->get(i);
     return NULL;
 }
@@ -49,27 +49,27 @@ Block* get_for_loop_outer_rebinds(Term* forTerm)
     return contents->getFromEnd(0)->contents();
 }
 
-Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType)
+void start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType)
 {
     Block* contents = nested_contents(forTerm);
 
     // Add input placeholder for the list input
     Term* listInput = apply(contents, FUNCS.input, TermList());
 
-    // Add loop_index()
+    // loop_index()
     Term* index = apply(contents, FUNCS.loop_index, TermList());
     hide_from_source(index);
 
-    // Add get_index to fetch the list's current element.
-    Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index), iteratorName);
-
-    if (iteratorType == NULL)
-        iteratorType = infer_type_of_get_index(forTerm->input(0));
-    
-    set_declared_type(iterator, iteratorType);
+    // loop_get_element()
+    Term* iterator = apply(contents, FUNCS.loop_get_element, TermList(listInput, index), iteratorName);
     hide_from_source(iterator);
 
-    return iterator;
+    if (iteratorType != NULL) {
+        Term* castedIterator = apply(contents, FUNCS.cast_declared_type, TermList(iterator), iteratorName);
+        set_declared_type(castedIterator, iteratorType);
+    } else {
+        iteratorType = infer_type_of_get_index(forTerm->input(0));
+    }
 }
 
 void list_names_that_must_be_looped(Block* contents, caValue* names)

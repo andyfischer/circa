@@ -24,7 +24,12 @@ extern "C" {
 
 void caBlock::dump()
 {
-    circa_dump_b(this);
+    ::dump(this);
+}
+
+void caBlock::dump_with_props()
+{
+    ::dump_with_props(this);
 }
 
 caTerm* caBlock::owner()

@@ -30,8 +30,8 @@ def while()
 
 -- For-block
 def for(List list) -> List
-def loop_iterator(any _, any _) -> int
-def loop_index(int index) -> int
+def loop_index() -> int
+def loop_get_element(list, int index)
 def loop_output_index() -> any
 
 -- If-block
@@ -236,7 +236,7 @@ def block_unevaluated()
 
 def copy(any val) -> any
 
-def cast1(any val) -> any
+def cast_declared_type(any val) -> any
 def cast(any val, Type t) -> (any, bool)
 
 def cond(bool condition, any pos, any neg) -> any
@@ -1244,6 +1244,10 @@ def Rect.bottom_right(self) -> Vec2
 def Rect.center(self) -> Vec2
   -- Returns the rectangle's center as a Vec2
   [(self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2]
+def Rect.points_cw(self) -> List
+  [self.top_left self.top_right self.bottom_right self.bottom_left]
+def Rect.points_ccw(self) -> List
+  [self.top_left self.bottom_left self.bottom_right self.top_right]
 
 def Rect.intersects(self, Rect b) -> bool
   -- Return whether the two rectangles intersect.

@@ -101,6 +101,8 @@ void update_extra_outputs(Term* term);
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
+Symbol block_has_state(Block* block);
+
 // Set a block as being 'in progress', meaning that we are actively making changes to it.
 void block_start_changes(Block* block);
 

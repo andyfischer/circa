@@ -420,6 +420,19 @@ int term_line_number(Term* term)
     return term->sourceLoc.line;
 }
 
+void format_global_id(Term* term, Value* out)
+{
+    if (!is_string(out))
+        set_string(out, "");
+
+    if (term == NULL)
+        string_append(out, "null");
+    else {
+        string_append(out, "#");
+        string_append(out, term->id);
+    }
+}
+
 Term* parent_term(Term* term)
 {
     if (term->owningBlock == NULL)
@@ -443,6 +456,36 @@ Term* parent_term(Term* term, int levels)
             return NULL;
     }
     return term;
+}
+
+bool is_declared_state(Term* term)
+{
+    return term->function == FUNCS.declared_state;
+}
+
+bool uses_dynamic_dispatch(Term* term)
+{
+    return term->function == FUNCS.dynamic_method
+        || term->function == FUNCS.func_apply
+        || term->function == FUNCS.func_call
+        || calls_function_by_value(term);
+}
+
+bool calls_function_by_value(Term* term)
+{
+    return !is_function(term->function);
+}
+
+Block* static_dispatch_block(Term* term)
+{
+    if (term->nestedContents != NULL && is_minor_block(term->nestedContents))
+        return term->nestedContents;
+
+    if (term->function == NULL || !is_function(term->function))
+        return NULL;
+
+    ca_assert(term->function->nestedContents != NULL);
+    return term->function->nestedContents;
 }
 
 bool term_is_observable_for_special_reasons(Term* term)
@@ -493,6 +536,9 @@ bool term_is_observable_after(Term* term, Term* location)
 
     for (int i=0; i < user_count(term); i++) {
         Term* user = term_user(term, i);
+
+        if (user->function == FUNCS.nonlocal)
+            return true;
 
         if (term_accesses_input_from_inside_loop(user, term)) {
 

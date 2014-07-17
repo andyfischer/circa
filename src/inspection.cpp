@@ -102,16 +102,6 @@ bool is_copying_call(Term* term)
         || term->function == FUNCS.copy;
 }
 
-bool is_dynamic_func_call(Term* term)
-{
-    return !is_function(term->function);
-}
-
-bool is_declared_state(Term* term)
-{
-    return term->function == FUNCS.declared_state;
-}
-
 bool is_an_unknown_identifier(Term* term)
 {
     return term->function == FUNCS.unknown_identifier;
@@ -448,18 +438,19 @@ void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack
     int prevIndent = prefs->indentLevel;
     int bytecodePc = 0;
     char* bytecodeData = NULL;
-#if 0
-    if (stack != NULL) {
-        int blockIndex = program_create_entry(stack->program, block);
-        bytecodeData = program_block_bytecode(stack->program, blockIndex);
-    }
-#endif
 
     print_indent(prefs, out);
 
     string_append(out, "[Block#");
     string_append(out, block->id);
-    string_append(out, "]\n");
+    string_append(out, "]");
+
+    if (prefs->showProperties) {
+        string_append(out, " ");
+        to_string(&block->properties, out);
+    }
+
+    string_append(out, "\n");
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);

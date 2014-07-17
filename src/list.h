@@ -30,9 +30,6 @@ struct ListData {
 
 // Functions for dealing directly with a ListData object
 
-void assert_valid_list(ListData* list);
-ListData* allocate_empty_list(int capacity);
-ListData* allocate_list(int num_elements);
 void list_decref(ListData* data);
 void free_list(ListData* data);
 ListData* as_list_data(Value* val);

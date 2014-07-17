@@ -6,76 +6,75 @@ namespace circa {
 
 // Instructions
 const char bc_End = 0x0;
-const char bc_Noop = 0xf;
-const char bc_Pause = 0x1;
-const char bc_InlineCopy = 0x3;
-const char bc_LocalCopy = 0x4;
-const char bc_NoOp = 0x6;
-const char bc_PopFrame = 0x7;
-const char bc_PopFrameAndPause = 0x8;
-const char bc_NativeCall = 0xa;
-const char bc_FinishFrame = 0xc;
+const char bc_Noop = 0x1;
+const char bc_Pause = 0x2;
+const char bc_PopFrame = 0x3;
+const char bc_PopFrameAndPause = 0x4;
+const char bc_NativeCall = 0x5;
 
-const char bc_PushFrame = 0x20;
-const char bc_PrepareBlock = 0xc2;
-const char bc_PrepareBlockUncompiled = 0xc8;
-const char bc_EnterFrame = 0xc1;
-const char bc_EnterFrameNext = 0xc3;
-const char bc_ResolveClosureCall = 0xc4;
-const char bc_ResolveClosureApply = 0xc6;
-const char bc_ResolveDynamicMethod = 0x12;
-const char bc_ResolveDynamicFuncToClosureCall = 0xcf;
+const char bc_PushFrame = 0x8;
+const char bc_FinishFrame = 0x9;
+const char bc_PrepareBlock = 0xa;
+const char bc_PrepareBlockUncompiled = 0xb;
+const char bc_EnterFrame = 0xc;
+const char bc_EnterFrameNext = 0xd;
+const char bc_ResolveClosureCall = 0xe;
+const char bc_ResolveClosureApply = 0xf;
+const char bc_ResolveDynamicMethod = 0x10;
+const char bc_ResolveDynamicFuncToClosureCall = 0x11;
 
 // Inputs
-const char bc_FoldIncomingVarargs = 0x38;
-const char bc_CheckInputs = 0x39;
-const char bc_CopyTermValue = 0x21;
-const char bc_CopyStackValue = 0xc5;
-const char bc_MoveStackValue = 0x3a;
-const char bc_CopyCachedValue = 0x2d;
-const char bc_SetNull = 0x2b;
-const char bc_SetZero = 0x2c;
-const char bc_SetEmptyList = 0x3b;
-const char bc_Increment = 0x2f;
-const char bc_MoveAppend = 0xd0;
-const char bc_SetTermRef = 0x2e;
-const char bc_ErrorNotEnoughInputs = 0x28;
-const char bc_ErrorTooManyInputs = 0x29;
+const char bc_FoldIncomingVarargs = 0x16;
+const char bc_CheckInputs = 0x17;
+const char bc_CopyTermValue = 0x18;
+const char bc_CopyStackValue = 0x19;
+const char bc_MoveStackValue = 0x1a;
+const char bc_CopyCachedValue = 0x1b;
+const char bc_SetNull = 0x1c;
+const char bc_SetZero = 0x1d;
+const char bc_SetEmptyList = 0x1e;
+const char bc_Increment = 0x1f;
+const char bc_AppendMove = 0x20;
+const char bc_GetIndexCopy = 0x21;
+const char bc_GetIndexMove = 0x22;
+const char bc_Touch = 0x26;
+const char bc_SetTermRef = 0x23;
 
 // Popping outputs from a finished frame
 const char bc_PopOutput = 0x30;
 const char bc_PopOutputNull = 0x31;
 const char bc_PopOutputsDynamic = 0x32;
-const char bc_SetFrameOutput = 0x34;
+const char bc_SetFrameOutput = 0x33;
 
 // Control flow
-const char bc_Jump = 0x4c;
-const char bc_JumpIf = 0x45;
-const char bc_JumpIfIteratorDone = 0x46;
-const char bc_JumpToLoopStart = 0x4d;
+const char bc_Jump = 0x34;
+const char bc_JumpIf = 0x35;
+const char bc_JumpIfIteratorDone = 0x36;
+const char bc_JumpToLoopStart = 0x37;
 
 // Raw values
-const char bc_SetInt = 0x55;
-const char bc_SetFloat = 0x56;
+const char bc_SetInt = 0x3a;
+const char bc_SetFloat = 0x3b;
 
 // Math
-const char bc_Addf = 0x60;
-const char bc_Addi = 0x61;
-const char bc_Subf = 0x62;
-const char bc_Subi = 0x63;
-const char bc_Multf = 0x64;
-const char bc_Multi = 0x65;
-const char bc_Divf = 0x66;
-const char bc_Divi = 0x67;
-const char bc_Eqf = 0x68;
-const char bc_Neqf = 0x69;
-const char bc_EqShallow = 0x6a;
-const char bc_NeqShallow = 0x6b;
+const char bc_Addf = 0x40;
+const char bc_Addi = 0x41;
+const char bc_Subf = 0x42;
+const char bc_Subi = 0x43;
+const char bc_Multf = 0x44;
+const char bc_Multi = 0x45;
+const char bc_Divf = 0x46;
+const char bc_Divi = 0x47;
+const char bc_Eqf = 0x48;
+const char bc_Neqf = 0x49;
+const char bc_EqShallow = 0x4a;
+const char bc_NeqShallow = 0x4b;
 
 // Other
-const char bc_WatchCheck = 0x75;
-const char bc_NoteBlockStart = 0x76;
-const char bc_Comment = 0x77;
+const char bc_WatchCheck = 0x50;
+const char bc_NoteBlockStart = 0x51;
+const char bc_Comment = 0x52;
+const char bc_IncrementTermCounter = 0x53;
 
 // Method lookup cache
 const u8 MethodCache_NormalMethod = 1;
@@ -97,14 +96,16 @@ struct CompiledBlock {
     int bytecodeOffset;
     bool compileInProgress;
     bool hasWatch;
-    Symbol hasState; // [:No :Yes :Unknown :Maybe]
+
+    // Accumulated knowledge
+    int* termCounter;
 };
 
 struct Compiled
 {
     World* world;
 
-    Value bytecode; // blob
+    Value bytecode;
     
     CompiledBlock* blocks;
     int blockCount;
@@ -116,6 +117,7 @@ struct Compiled
     // Additional information.
     bool skipEffects;
     bool noSaveState;
+    bool enableTermCounter;
 
     Value hacksByTerm;
 
@@ -134,8 +136,6 @@ void bytecode_dump_next_op(const char* bc, int* pc);
 void bytecode_dump_val(caValue* bytecode);
 void bytecode_dump(char* data);
 
-void bytecode_write_term_call(Compiled* compiled, caValue* bytecode, Term* term);
-
 Compiled* alloc_program(World* world);
 void free_program(Compiled* compiled);
 
@@ -150,6 +150,7 @@ caValue* program_get_cached_value(Compiled* compiled, int index);
 void program_add_watch(Compiled* compiled, caValue* key, caValue* path);
 caValue* program_get_watch_observation(Compiled* compiled, caValue* key);
 void program_set_hackset(Compiled* compiled, caValue* hackset);
+void compiled_reset_trace_data(Compiled* compiled);
 void program_erase(Compiled* compiled);
 
 void compiled_to_string(Compiled* compiled, Value* out);

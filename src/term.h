@@ -177,10 +177,16 @@ bool is_type(Term* term);
 bool is_function(Term* term);
 Type* as_type(Term* term);
 int term_line_number(Term* term);
+void format_global_id(Term* term, Value* out);
 
 Term* parent_term(Term* term);
 Term* parent_term(Block* block);
 Term* parent_term(Term* term, int levels);
+
+bool is_declared_state(Term* term);
+bool uses_dynamic_dispatch(Term* term);
+bool calls_function_by_value(Term* term);
+Block* static_dispatch_block(Term* term);
 
 bool term_is_observable(Term* term);
 bool term_is_observable_after(Term* term, Term* location);

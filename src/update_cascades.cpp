@@ -39,9 +39,4 @@ void fix_forward_function_references(Block* block)
     }
 }
 
-void dirty_bytecode(Block* block)
-{
-    // This once did something.
-}
-
 } // namespace circa

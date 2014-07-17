@@ -727,6 +727,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         find_func(case_func, "case");
         find_func(case_condition_bool, "case_condition_bool");
         find_func(cast, "cast");
+        find_func(cast_declared_type, "cast_declared_type");
         find_func(cond, "cond");
         find_func(continue_func, "continue");
         find_func(copy, "copy");
@@ -755,7 +756,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         find_func(list, "list");
         find_func(loop_condition_bool, "loop_condition_bool");
         find_func(loop_index, "loop_index");
-        find_func(loop_iterator, "loop_iterator");
+        find_func(loop_get_element, "loop_get_element");
         find_func(loop_output_index, "loop_output_index");
         find_func(make, "make");
         find_func(memoize, "memoize");

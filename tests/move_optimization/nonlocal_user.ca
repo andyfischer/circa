@@ -1,0 +1,9 @@
+
+a = 1+1
+
+def f()
+  return a
+
+b = a
+
+assert(f() == 2)

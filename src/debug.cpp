@@ -36,6 +36,12 @@ void dump(Block* block)
     print_block(block, &str);
     std::cout << as_cstring(&str);
 }
+void dump_with_props(Block* block)
+{
+    Value str;
+    print_block_with_properties(block, &str);
+    std::cout << as_cstring(&str);
+}
 void dump_bytecode(Block* block)
 {
     Value str;

@@ -109,6 +109,7 @@ struct Block
     Term* compile(const char* statement);
 
     void dump();
+    void dump_with_props();
     Term* owner();
     Block* parent();
 
@@ -198,6 +199,8 @@ Value* block_get_static_errors(Block* block);
 
 bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue);
 void block_set_bool_prop(Block* block, Symbol name, bool value);
+Symbol block_get_symbol_prop(Block* block, Symbol name, Symbol defaultValue);
+void block_set_symbol_prop(Block* block, Symbol name, Symbol value);
 
 // Convenience functions for accessing block properties.
 bool block_is_evaluation_empty(Block* block);

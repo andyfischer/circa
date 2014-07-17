@@ -144,9 +144,6 @@ void set_input(Term* term, int index, Term* input)
 
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
-
-    if (term->owningBlock != NULL)
-        dirty_bytecode(term->owningBlock);
 }
 
 void set_inputs(Term* term, TermList const& inputs)
@@ -195,14 +192,6 @@ void append_user(Term* user, Term* usee)
 
     if (usee != NULL && user != NULL)
         usee->users.appendUnique(user);
-
-    // Check if we added the first user.
-    if (originalUserCount == 0 && user_count(usee) > 0) {
-
-        // for-loop bytecode depends on the user count.
-        if (usee->function == FUNCS.for_func)
-            dirty_bytecode(usee->nestedContents);
-    }
 }
 
 static void remove_user(Term* usee, Term* user)
@@ -210,14 +199,6 @@ static void remove_user(Term* usee, Term* user)
     int originalUserCount = user_count(usee);
 
     usee->users.remove(user);
-
-    // Check if we removed the last user.
-    if (originalUserCount > 0 && user_count(usee) == 0) {
-
-        // for-loop bytecode depends on the user count.
-        if (usee->function == FUNCS.for_func)
-            dirty_bytecode(usee->nestedContents);
-    }
 }
 
 void possibly_prune_user_list(Term* user, Term* usee)
@@ -283,12 +264,6 @@ void change_function(Term* term, Term* function)
             && is_function(function) 
             && nested_contents(function)->functionAttrs.hasNestedContents)
         make_nested_contents(term);
-#if 0
-    else
-        remove_nested_contents(term);
-#endif
-
-    dirty_bytecode(term->owningBlock);
 }
 
 void set_declared_type(Term *term, Type *newType)
@@ -877,6 +852,44 @@ float get_step(Term* term)
     return term->floatProp(sym_Step, 1.0);
 }
 
+Symbol block_has_state(Block* block)
+{
+    if (block_has_property(block, sym_HasState))
+        return block_get_symbol_prop(block, sym_HasState, sym_No);
+
+    // Temporarily set to :Maybe in case of recursion.
+    block_set_symbol_prop(block, sym_HasState, sym_Maybe);
+
+    Symbol result = sym_No;
+
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (is_declared_state(term)) {
+            result = sym_Yes;
+            break;
+        }
+
+        if (uses_dynamic_dispatch(term) && result == sym_No)
+            result = sym_Maybe;
+
+        Block* contents = static_dispatch_block(term);
+        if (contents == NULL)
+            continue;
+
+        Symbol hasState = block_has_state(contents);
+        if (hasState == sym_Yes) {
+            result = sym_Yes;
+            break;
+        }
+
+        if (hasState == sym_Maybe)
+            result = sym_Maybe;
+    }
+
+    block_set_symbol_prop(block, sym_HasState, result);
+    return result;
+}
+
 void block_start_changes(Block* block)
 {
     if (block->inProgress)
@@ -909,6 +922,7 @@ void block_finish_changes(Block* block)
             block_finish_changes(term->nestedContents);
     }
 
+
     fix_forward_function_references(block);
 
     annotate_stateful_values(block);
@@ -927,7 +941,12 @@ void block_finish_changes(Block* block)
         }
     }
 
-    dirty_bytecode(block);
+    // Update :HasDynamicDispatch
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (uses_dynamic_dispatch(term))
+            block_set_bool_prop(block, sym_HasDynamicDispatch, true);
+    }
 
     block->inProgress = false;
 }

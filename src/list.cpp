@@ -18,60 +18,38 @@ void ListData::dump()
     printf("%s\n", as_cstring(&str));
 }
 
-#if DEBUG
-void assert_valid_list(ListData* list)
+size_t list_size(int capacity)
 {
-    if (list == NULL) return;
-    debug_assert_valid_object(list, LIST_OBJECT);
-    if (list->refCount == 0) {
-        std::stringstream err;
-        err << "list has zero refs: " << list;
-        internal_error(err.str().c_str());
-    }
-    ca_assert(list->refCount > 0);
+    return sizeof(ListData) + capacity * sizeof(Value);
 }
-#else
 
-#define assert_valid_list(x) ;
-
-#endif
-
-ListData* allocate_empty_list(int capacity)
+ListData* allocate_list(int count, int capacity)
 {
-    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(Value));
-    debug_register_valid_object(result, LIST_OBJECT);
+    ca_assert(count <= capacity);
+
+    ListData* result = (ListData*) malloc(list_size(capacity));
 
     result->refCount = 1;
-    result->count = 0;
+    result->count = count;
     result->capacity = capacity;
-    memset(result->items, 0, capacity * sizeof(Value));
     for (int i=0; i < capacity; i++)
         initialize_null(&result->items[i]);
 
     return result;
 }
 
-ListData* allocate_list(int size)
+void list_incref(ListData* data)
 {
-    ListData* result = allocate_empty_list(size);
-    result->count = size;
-    return result;
+    data->refCount++;
 }
 
 void list_decref(ListData* data)
 {
-    assert_valid_list(data);
     ca_assert(data->refCount > 0);
     data->refCount--;
 
     if (data->refCount == 0)
         free_list(data);
-}
-
-void list_incref(ListData* data)
-{
-    assert_valid_list(data);
-    data->refCount++;
 }
 
 void free_list(ListData* data)
@@ -83,7 +61,6 @@ void free_list(ListData* data)
     for (int i=0; i < data->count; i++)
         set_null(&data->items[i]);
     free(data);
-    debug_unregister_valid_object(data, LIST_OBJECT);
 }
 
 ListData* as_list_data(Value* val)
@@ -127,11 +104,7 @@ ListData* list_duplicate(ListData* source)
 
     stat_increment(ListDuplicate);
 
-    assert_valid_list(source);
-
-    ListData* result = allocate_empty_list(source->capacity);
-
-    result->count = source->count;
+    ListData* result = allocate_list(source->count, source->capacity);
     
     if (source->count >= 100)
         stat_increment(ListDuplicate_100Count);
@@ -144,37 +117,37 @@ ListData* list_duplicate(ListData* source)
     return result;
 }
 
-ListData* list_increase_capacity(ListData* original, int new_capacity)
+ListData* list_increase_capacity(ListData* original, int newCapacity)
 {
     if (original == NULL)
-        return allocate_empty_list(new_capacity);
-
-    assert_valid_list(original);
-    ListData* result = allocate_empty_list(new_capacity);
+        return allocate_list(0, newCapacity);
 
     bool createCopy = original->refCount > 1;
 
-    result->count = original->count;
-    for (int i=0; i < result->count; i++) {
-        Value* left = &original->items[i];
-        Value* right = &result->items[i];
-        if (createCopy)
-            copy(left, right);
-        else
-            swap(left, right);
-    }
+    if (createCopy) {
 
-    list_decref(original);
-    return result;
+        ListData* result = allocate_list(original->count, newCapacity);
+        for (int i=0; i < original->count; i++)
+            copy(list_get(original, i), list_get(result, i));
+
+        return result;
+
+    } else {
+        ListData* result = (ListData*) realloc(original, list_size(newCapacity));
+        ca_assert(result != NULL);
+        for (int i=result->capacity; i < newCapacity; i++)
+            initialize_null(&result->items[i]);
+        result->capacity = newCapacity;
+        return result;
+    }
 }
 
 ListData* list_double_capacity(ListData* original)
 {
     if (original == NULL)
-        return allocate_empty_list(1);
+        return allocate_list(0, 1);
 
-    ListData* result = list_increase_capacity(original, original->capacity * 2);
-    return result;
+    return list_increase_capacity(original, original->capacity * 2);
 }
 
 ListData* list_resize(ListData* original, int newLength)
@@ -187,12 +160,10 @@ ListData* list_resize(ListData* original, int newLength)
             return NULL;
 
         // Create a new empty list.
-        ListData* result = allocate_empty_list(newLength);
-        result->count = newLength;
-        return result;
+        return allocate_list(newLength, newLength);
     }
 
-    // Special case: if newLength is 0 then return an empty list.
+    // If newLength is 0 then return an empty list.
     if (newLength == 0) {
         list_decref(original);
         return NULL;
@@ -202,20 +173,26 @@ ListData* list_resize(ListData* original, int newLength)
     if (original->count == newLength)
         return original;
 
-    // Increase capacity if necessary.
+    ListData* result = NULL;
+
     if (newLength > original->capacity) {
-        ListData* result = list_increase_capacity(original, newLength);
-        result->count = newLength;
-        return result;
+        // Grow list
+        int newCapacity = std::max(newLength, original->capacity*2);
+        result = list_increase_capacity(original, newCapacity);
+
+        // Initialize data for new elements
+        for (int i=result->count; i < newLength; i++)
+            initialize_null(&result->items[i]);
+
+    } else {
+
+        // Shrink list
+        result = list_touch(original);
+
+        // Nullify discarded elements
+        for (int i=newLength; i < result->count; i++)
+            set_null(&result->items[i]);
     }
-
-    // At this point the capacity is good, we need to modify list->count, and
-    // discard some rightmost elements.
-    ListData* result = list_touch(original);
-
-    // Set rightmost elements to null, if we are shrinking.
-    for (int i=newLength; i < result->count; i++)
-        set_null(&result->items[i]);
 
     result->count = newLength;
 
@@ -225,7 +202,7 @@ ListData* list_resize(ListData* original, int newLength)
 Value* list_append(ListData** dataPtr)
 {
     if (*dataPtr == NULL) {
-        *dataPtr = allocate_empty_list(1);
+        *dataPtr = allocate_list(0, 1);
     } else {
         *dataPtr = list_touch(*dataPtr);
         
