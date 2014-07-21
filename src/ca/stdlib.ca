@@ -85,7 +85,7 @@ def ceil(number n) -> int
   -- Return the closest integer that is greater than n
 def average(vals :multiple) -> number
   -- Returns the average of all inputs
-def pow(int i, int x) -> int
+def pow(number i, number x) -> number
   -- Returns i to the power of x
 def sqr(number n) -> number
   -- Square function
@@ -1144,6 +1144,11 @@ def Vec2.mult(self, number scalar) -> Vec2
   [self.x * scalar, self.y * scalar]
 def Vec2.div(self, number scalar) -> Vec2
   [self.x / scalar, self.y / scalar]
+
+def Vec2.add_v(self, Vec2 right) -> Vec2
+  [self.x + right.x, self.y + right.y]
+def Vec2.mult_v(self, Vec2 right) -> Vec2
+  [self.x * right.x, self.y * right.y]
     
 def Vec2.distance(self, Vec2 b) -> number
   -- Returns the distance between self and b.
@@ -1526,6 +1531,27 @@ def Color.darken(self, number factor) -> Color
     max(self.g - factor, 0.0)
     max(self.b - factor, 0.0)
     self.a]
+
+def weighted_rand(List choices :multiple) -> any
+  total = 0
+  for choice in choices
+    weight = choice[0]
+    total += weight
+
+  r = rand() * total
+  for choice in choices
+    r -= choice[0]
+    if r < 0
+      return choice[1]
+
+  return null
+
+def rand_gaussian()
+  -- Box-Muller transform
+
+  rand1 = -2 * log(rand())
+  rand2 = (rand()) * 360
+  sqrt(rand1) * cos(rand2)
 
 -- Codechange objects
 def codechange_set_value(Term target, any newValue) -> List

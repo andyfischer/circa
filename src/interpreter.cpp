@@ -760,8 +760,13 @@ void vm_resolve_dynamic_method_to_module_access(Stack* stack, Value* object)
     Term* term = find_local_name(moduleBlock, elementName);
 
     if (term == NULL) {
-        // FIXME: write error
-        ca_assert(false);
+        Value msg;
+        set_string(&msg, "Method '");
+        string_append(&msg, elementName);
+        string_append(&msg, "' not found in module.");
+        // Future: print name of module
+        vm_pop_frame_and_store_error(stack, &msg);
+        return;
     }
 
     if (is_function(term)) {

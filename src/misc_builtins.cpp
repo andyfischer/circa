@@ -460,8 +460,8 @@ void average(caStack* stack)
 
 void pow(caStack* stack)
 {
-    set_int(circa_output(stack, 0),
-            (int) std::pow((float) circa_int_input(stack, 0), circa_int_input(stack, 1)));
+    set_float(circa_output(stack, 0),
+            std::pow((float) to_float(circa_input(stack, 0)), to_float(circa_input(stack, 1))));
 }
 
 void sqr(caStack* stack)
