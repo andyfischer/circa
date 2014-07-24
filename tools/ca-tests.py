@@ -114,22 +114,23 @@ def test_file(process, filename):
         process.kill()
 
     # Source repro test
-    """
-    try:
-        diff = diff_command_against_file(process, "source_repro "+filename, filename)
-    except Exception as e:
-        traceback.print_exc()
-        process.kill()
-        failures.append(TestFailure(["Exception running source repro"], filename))
-        return failures
+    testSourceRepro = False
 
-    if diff:
-        desc = ['Source repro failed on line '+str(diff.lineNumber)]
-        desc.append(' Expected: '+diff.fromFile)
-        desc.append(' Observed: '+diff.fromCommand)
-        failures.append(TestFailure(desc, filename))
-        process.kill()
-    """
+    if testSourceRepro:
+        try:
+            diff = diff_command_against_file(process, "source_repro "+filename, filename)
+        except Exception as e:
+            traceback.print_exc()
+            process.kill()
+            failures.append(TestFailure(["Exception running source repro"], filename))
+            return failures
+
+        if diff:
+            desc = ['Source repro failed on line '+str(diff.lineNumber)]
+            desc.append(' Expected: '+diff.fromFile)
+            desc.append(' Observed: '+diff.fromCommand)
+            failures.append(TestFailure(desc, filename))
+            process.kill()
 
     return failures
 

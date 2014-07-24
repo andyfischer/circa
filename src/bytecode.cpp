@@ -96,14 +96,6 @@ bool compiled_should_ignore_term(Compiled* compiled, Term* term)
     return false;
 }
 
-static void bc_append_local_reference_string(Value* string, const char* bc, int* pc)
-{
-    string_append(string, "frame:");
-    string_append(string, blob_read_u16(bc, pc));
-    string_append(string, " reg:");
-    string_append(string, blob_read_u16(bc, pc));
-}
-
 static Jump bc_jump(Writer* writer)
 {
     Jump jump;

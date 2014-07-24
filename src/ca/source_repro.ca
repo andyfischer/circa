@@ -26,24 +26,22 @@ def Phrase.text(self) -> String
 def new()
   SourceRepro.make
 
-def Term.is_comment(term)
-  term.function == block_ref(comment)
 def Term.is_neg(term)
-  term.function == block_ref(neg)
+  term.function == neg.block
 def Term.is_function_decl(term)
-  term.function == block_ref(function_decl)
+  term.function == function_decl.block
 def Term.is_closure_decl(term)
-  term.function == block_ref(closure_block)
+  term.function == closure_block.block
 def Term.is_struct_decl(term)
   term.is_value and is_type(term.value)
 def Term.is_require(term)
   term.function.name == 'require'
 def Term.is_declared_state(term)
-  term.function == block_ref(_declared_state)
+  term.function == _declared_state.block
 def Term.is_get_index(term)
-  term.function == block_ref(get_index)
+  term.function == get_index.block
 def Term.is_set_with_selector(term)
-  term.function == block_ref(set_with_selector)
+  term.function == set_with_selector.block
 def Term.is_for_loop(term)
   term.function.name == 'for'
 def Term.is_while_loop(term)
@@ -53,9 +51,9 @@ def Term.is_if_block(term)
 def Term.is_switch_block(term)
   term.function.name == 'switch'
 def Term.is_copy(term)
-  term.function == block_ref(copy)
+  term.function == copy.block
 def Term.is_nonlocal(term)
-  term.function == block_ref(nonlocal)
+  term.function == _nonlocal.block
 def Term.is_continue(term)
   term.function.name == 'continue'
 def Term.is_break(term)
@@ -63,7 +61,7 @@ def Term.is_break(term)
 def Term.is_discard(term)
   term.function.name == 'discard'
 def Term.is_syntax_error(term)
-  term.function == block_ref(syntax_error)
+  term.function == syntax_error.block
 
 def break_apart_newlines(String str) -> List
   newlineFound, loc = str.index_of('\n')
@@ -310,7 +308,8 @@ def SourceRepro.declared_state(self, Term term) -> SourceRepro
 
   @self.phrase(:text 'state ')
   if term.has_property(:Syntax_ExplicitType)
-    @self.phrase(:name term.property(:Syntax_ExplicitType)).phrase(:text ' ')
+    @self.phrase(:name term.property(:Syntax_ExplicitType))
+    @self.phrase(:text ' ')
   @self.phrase(:name term.name)
 
   if not term.input(1).is_null
@@ -322,7 +321,6 @@ def SourceRepro.declared_state(self, Term term) -> SourceRepro
   self
 
 def SourceRepro.for_loop(self, Term term) -> SourceRepro
-  @self.name_binding_source(term)
   @self.phrase(:text 'for ')
   if term.has_property(:Syntax_ExplicitType)
     @self.phrase(:name term.property(:Syntax_ExplicitType))
@@ -429,8 +427,6 @@ def SourceRepro.term(self, Term term) -> SourceRepro
     @self.return_statement(term)
   elif term.is_declared_state
     @self.declared_state(term)
-  elif term.is_for_loop
-    @self.for_loop(term)
   elif term.is_while_loop
     @self.while_loop(term)
   elif term.is_if_block
@@ -546,7 +542,9 @@ def SourceRepro.term_default_format(self, Term term) -> SourceRepro
   for i in 0..term.property_opt(:Syntax_Parens 0)
     @self.phrase(:text '(')
 
-  if declarationStyle == 'function-call'
+  if term.is_for_loop
+    @self.for_loop(term)
+  elif declarationStyle == 'function-call'
     if functionName == ''
       @self.term(term.function)
     else

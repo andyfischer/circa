@@ -116,6 +116,7 @@ OBJECTS := \
 	$(OBJDIR)/update_cascades.o \
 	$(OBJDIR)/world.o \
 	$(OBJDIR)/read_tar.o \
+	$(OBJDIR)/perlin.o \
 	$(OBJDIR)/stdlib_script_text.o \
 	$(OBJDIR)/tinymt64.o \
 	$(OBJDIR)/http_parser.o \
@@ -333,6 +334,9 @@ $(OBJDIR)/world.o: world.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/read_tar.o: ext/read_tar.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/perlin.o: ext/perlin.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp

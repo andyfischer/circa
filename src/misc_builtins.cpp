@@ -24,6 +24,8 @@
 #include "type.h"
 #include "type_inference.h"
 
+#include "ext/perlin.h"
+
 namespace circa {
 
 void abs(caStack* stack)
@@ -903,6 +905,7 @@ void ModuleRef__get(caStack* stack)
     copy(term_value(term), circa_output(stack, 0));
 }
 
+
 void String__char_at(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
@@ -1184,6 +1187,13 @@ void length(caStack* stack)
     set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
 }
 
+void noise(Stack* stack)
+{
+    const int octaves = 4;
+    float out = perlin_fbm(octaves, circa_float_input(stack, 0));
+    set_float(circa_output(stack, 0), out);
+}
+
 void not_equals(caStack* stack)
 {
     set_bool(circa_output(stack, 0),
@@ -1391,6 +1401,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "channel_read", channel_read);
     circa_patch_function(patch, "_find_active_value", find_active_value);
 
+    circa_patch_function(patch, "noise", noise);
     circa_patch_function(patch, "not_equals", not_equals);
     circa_patch_function(patch, "print", print);
     circa_patch_function(patch, "rand", rand);

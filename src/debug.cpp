@@ -145,7 +145,7 @@ void perf_stats_to_list(caValue* list)
 
 void perf_stats_to_map(caValue* map)
 {
-    uint64 frozenStats[c_numPerfStats];
+    u64 frozenStats[c_numPerfStats];
 
     for (int name = c_firstStatIndex; name < sym_LastStatIndex-1; name++) {
         int i = name - c_firstStatIndex;
@@ -156,7 +156,7 @@ void perf_stats_to_map(caValue* map)
 
     for (int name = c_firstStatIndex; name < sym_LastStatIndex-1; name++) {
         int i = name - c_firstStatIndex;
-        int64 value = frozenStats[i];
+        u64 value = frozenStats[i];
         set_int(hashtable_insert_symbol_key(map, name), value);
     }
 }

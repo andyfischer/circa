@@ -828,7 +828,6 @@ void vm_dynamic_method_dispatch_from_cache(Stack* stack, MethodCacheLine* cacheL
 
 void vm_resolve_dynamic_method(Stack* stack)
 {
-    int startingPc = stack->pc;
     int termIndex = vm_read_u32(stack);
 
     // For most of this function, stack->pc remains at the start of the cache lines.

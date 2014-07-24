@@ -26,6 +26,8 @@
   #include "ext/libuv.h"
 #endif
 
+#include "ext/perlin.h"
+
 namespace circa {
 
 World* alloc_world()
@@ -72,6 +74,8 @@ void world_initialize(World* world)
     #if CIRCA_ENABLE_LIBUV
         world->libuvWorld = alloc_libuv_world();
     #endif
+
+    perlin_init();
 }
 
 void world_uninitialize(World* world)

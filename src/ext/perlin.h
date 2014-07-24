@@ -50,56 +50,19 @@
 
 #pragma once
 
-#include "cinder/Cinder.h"
-#include "cinder/Vector.h"
+namespace circa {
 
-namespace cinder {
+void perlin_init();
 
-class Perlin
-{
- public:
-	Perlin( uint8_t aOctaves = 4 );
-	Perlin( uint8_t aOctaves, int32_t aSeed );
+float perlin_fbm(int octaves, float x);
+float perlin_fbm(int octaves, float x, float y);
+float perlin_fbm(int octaves, float x, float y, float z);
+void perlin_dfbm(int octaves, float x, float y, float* xout, float* yout);
+void perlin_dfbm(int octaves, float x, float y, float z, float* xout, float* yout, float* zout);
+float perlin_noise(float x);
+float perlin_noise(float x, float y);
+float perlin_noise(float x, float y, float z);
+void perlin_dnoise(float x, float y, float* xout, float* yout) ;
+void perlin_dnoise(float x, float y, float z, float* xout, float* yout, float* zout);
 
-	void	setSeed( int32_t aSeed );
-	uint8_t	getOctaves() const { return mOctaves; }
-	void	setOctaves( uint8_t aOctaves ) { mOctaves = aOctaves; }
-
-	/// Class Perlin look: fractal Brownian motion by summing 'mOctaves' worth of noise
-	float	fBm( float v ) const;
-	float	fBm( const Vec2f &v ) const;
-	float	fBm( float x, float y ) const { return fBm( Vec2f( x, y ) ); }
-	float	fBm( const Vec3f &v ) const;
-	float	fBm( float x, float y, float z ) const { return fBm( Vec3f( x, y, z ) ); }
-
-	/// Derivative of fractal Brownian motion, corresponding with the values returned by fBm()
-//	float	dfBm( float v ) const;
-	Vec2f	dfBm( const Vec2f &v ) const;
-	Vec2f	dfBm( float x, float y ) const { return dfBm( Vec2f( x, y ) ); }
-	Vec3f	dfBm( const Vec3f &v ) const;
-	Vec3f	dfBm( float x, float y, float z ) const { return dfBm( Vec3f( x, y, z ) ); }
-
-	/// Calculates a single octave of noise
-	float	noise( float x ) const;
-	float	noise( float x, float y ) const;
-	float	noise( float x, float y, float z ) const;
-
-	/// Calculates the derivative of a single octave of noise
-//	float	dnoise( float x ) const;
-	Vec2f	dnoise( float x, float y ) const;
-	Vec3f	dnoise( float x, float y, float z ) const;
-
- private:
-	void	initPermutationTable();
-
-	float grad( int32_t hash, float x ) const;
-	float grad( int32_t hash, float x, float y ) const;
-	float grad( int32_t hash, float x, float y, float z ) const;
-
-	uint8_t		mOctaves;
-	int32_t		mSeed;
-
-	uint8_t		mPerms[512];
-};
-
-} // namespace cinder
+} // namespace circa

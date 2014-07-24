@@ -21,6 +21,7 @@ solution "Circa"
         files {
             "src/*.cpp",
             "src/ext/read_tar.cpp",
+            "src/ext/perlin.cpp",
             "src/generated/stdlib_script_text.cpp",
             "3rdparty/tinymt/tinymt64.cc",
             "3rdparty/http-parser/http_parser.c"

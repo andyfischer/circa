@@ -610,9 +610,9 @@ def Block.call(self, any inputs :multiple) -> any
 def Block.get_iterator(self) -> Term
   -- For a for-loop, return the iterator term
   for term in self.terms
-    if term.function == get_index.block
+    if term.function == loop_get_element.block
       return term
-  return null
+  error("Iterator not found in Block.get_iterator")
 
 def Block.if_block_cases(self) -> List
   self.terms.filter({term = input(); term.function.name == 'case'})
@@ -1552,6 +1552,13 @@ def rand_gaussian()
   rand1 = -2 * log(rand())
   rand2 = (rand()) * 360
   sqrt(rand1) * cos(rand2)
+
+def linear_map(number x, Vec2 fromRange, Vec2 toRange)
+  ratio = (x - fromRange[0]) / (fromRange[1] - fromRange[0])
+  (toRange[0] + ratio * (toRange[1] - toRange[0]))
+
+def noise(number x)
+  -- Perlin noise
 
 -- Codechange objects
 def codechange_set_value(Term target, any newValue) -> List
