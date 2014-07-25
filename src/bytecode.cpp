@@ -56,7 +56,6 @@ struct Jump {
 };
 
 // Bytecode writing helpers
-static void bc_append_local_reference_string(Value* string, const char* bc, int* pc);
 static Jump bc_jump(Writer* writer);
 static Jump bc_jump_if(Writer* writer, Block* top, Term* condition);
 static Jump bc_jump_if_iterator_done(Writer* writer, Block* top, Term* index, Term* list);

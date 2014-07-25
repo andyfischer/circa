@@ -143,6 +143,7 @@ Block* find_enclosing_major_block(Block* block);
 
 Block* find_common_parent(Block* a, Block* b);
 Block* find_common_parent(Term* a, Term* b);
+Block* find_common_parent_major(Block* a, Block* b);
 
 // Search upwards starting at 'term', and returns the parent (or the term itself) found
 // in 'block'. Returns NULL if not found.

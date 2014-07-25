@@ -869,7 +869,7 @@ def List.remove(self, int index) -> List
   -- Remove an element at the given index, shrinking the list by 1.
 
 def List.modify(self, int index, Func func)
-  @self.set(index, func.call(self.get(index)))
+  self.set(index, func.call(self.get(index)))
 
 def List.add(self, any value) -> List
   if is_compound(value)

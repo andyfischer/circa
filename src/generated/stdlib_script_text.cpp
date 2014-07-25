@@ -876,7 +876,7 @@ const char* BUILTIN_MODULE_stdlib =
     "  -- Remove an element at the given index, shrinking the list by 1.\n"
     "\n"
     "def List.modify(self, int index, Func func)\n"
-    "  @self.set(index, func.call(self.get(index)))\n"
+    "  self.set(index, func.call(self.get(index)))\n"
     "\n"
     "def List.add(self, any value) -> List\n"
     "  if is_compound(value)\n"

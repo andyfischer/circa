@@ -106,7 +106,7 @@ Term* Block::get(int index)
 }
 Term* Block::getSafe(int index)
 {
-    if (index >= length())
+    if (index < 0 || index >= length())
         return NULL;
     return _terms[index];
 }
@@ -426,6 +426,17 @@ Block* get_parent_block(Block* block)
     return block->owningTerm->owningBlock;
 }
 
+Block* get_parent_block_major(Block* block)
+{
+    if (block->owningTerm == NULL)
+        return NULL;
+
+    if (is_major_block(block))
+        return NULL;
+
+    return block->owningTerm->owningBlock;
+}
+
 Block* get_parent_block_stackwise(Block* block)
 {
     block = get_parent_block(block);
@@ -469,9 +480,6 @@ Block* find_enclosing_major_block(Block* block)
 
 Block* find_common_parent(Block* a, Block* b)
 {
-    ca_assert(a != NULL);
-    ca_assert(b != NULL);
-
     Block* parent = a;
     Block* searchBlock = b;
 
@@ -486,6 +494,26 @@ Block* find_common_parent(Block* a, Block* b)
         }
 
         parent = get_parent_block(parent);
+    }
+    return NULL;
+}
+
+Block* find_common_parent_major(Block* a, Block* b)
+{
+    Block* parent = a;
+    Block* searchBlock = b;
+
+    while (parent != NULL) {
+
+        searchBlock = b;
+        while (searchBlock != NULL) {
+            if (parent == searchBlock)
+                return parent;
+
+            searchBlock = get_parent_block_major(searchBlock);
+        }
+
+        parent = get_parent_block_major(parent);
     }
     return NULL;
 }

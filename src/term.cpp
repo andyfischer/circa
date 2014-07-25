@@ -8,6 +8,7 @@
 #include "hashtable.h"
 #include "heap_debugging.h"
 #include "kernel.h"
+#include "if_block.h"
 #include "inspection.h"
 #include "names.h"
 #include "string_type.h"
@@ -511,6 +512,35 @@ bool term_is_observable(Term* term)
     return true;
 }
 
+bool term_occurs_before_case_condition(Term* term)
+{
+    Term* condition = case_find_condition_check(term->owningBlock);
+    if (condition == NULL)
+        return false;
+
+    return is_located_after(condition, term);
+}
+
+bool terms_are_in_different_switch_conditions(Term* left, Term* right)
+{
+    Block* commonBlock = find_common_parent_major(left->owningBlock, right->owningBlock);
+    if (commonBlock == NULL)
+        return false;
+
+    if (!is_switch_block(commonBlock))
+        return false;
+
+    if (term_occurs_before_case_condition(left))
+        return false;
+    if (term_occurs_before_case_condition(right))
+        return false;
+        
+    left = find_parent_term_in_block(left, commonBlock);
+    right = find_parent_term_in_block(right, commonBlock);
+
+    return left != right;
+}
+
 bool term_accesses_input_from_inside_loop(Term* term, Term* input)
 {
     // Returns true if 1) "term" is inside a loop and 2) "input" is not inside that loop.
@@ -539,6 +569,9 @@ bool term_is_observable_after(Term* term, Term* location)
 
         if (user->function == FUNCS.nonlocal)
             return true;
+
+        if (terms_are_in_different_switch_conditions(location, user))
+            continue;
 
         if (term_accesses_input_from_inside_loop(user, term)) {
 

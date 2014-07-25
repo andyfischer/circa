@@ -813,19 +813,19 @@ void List__get(caStack* stack)
 void List__set(caStack* stack)
 {
     Value* self = circa_output(stack, 0);
-    copy(circa_input(stack, 0), self);
+    move(circa_input(stack, 0), self);
+    touch(self);
 
     int index = circa_int_input(stack, 1);
     Value* value = circa_input(stack, 2);
 
-    touch(self);
-    copy(value, list_get(self, index));
+    move(value, list_get(self, index));
 }
 
 void List__remove(caStack* stack)
 {
     Value* self = circa_output(stack, 0);
-    copy(circa_input(stack, 0), self);
+    move(circa_input(stack, 0), self);
     int index = circa_int_input(stack, 1);
 
     if (index < 0 || index >= list_length(self))
@@ -888,8 +888,7 @@ void Map__set(caStack* stack)
     move(circa_input(stack, 0), self);
 
     Value* value = circa_input(stack, 2);
-
-    copy(value, hashtable_insert(self, key, false));
+    move(value, hashtable_insert(self, key, false));
 }
 
 void Map__empty(caStack* stack)
