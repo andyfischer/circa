@@ -65,7 +65,7 @@ struct TokenStream
     bool nextEqualsString(const char* str, int lookahead=0);
 
     Symbol nextMatch(int lookahead=0);
-    int nextIndent(int lookahead=0);
+    int indentOfLine(int lookahead=0);
 
     // Consume the next token. If a token match is provided, and the next token doesn't
     // have this match, then we trigger a fatal error. This matching should be treated

@@ -5,7 +5,7 @@ def add_logged(a, b)
 
 def main(v, cacheKey)
   print('calling main with: ' v ', cacheKey: ' cacheKey)
-  result = cached({ cacheKey; add_logged(v, 2) })
+  result = cached(-> cacheKey; add_logged(v, 2) )
   print('  result = ' result)
 
 int = main.to_stack

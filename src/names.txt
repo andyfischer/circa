@@ -62,6 +62,7 @@ PreferSpecialize
 
 Error_UnknownType
 
+Syntax_AnonFunction
 Syntax_BlockStyle
 Syntax_Brackets
 Syntax_ColorFormat

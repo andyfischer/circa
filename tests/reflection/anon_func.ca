@@ -1,12 +1,10 @@
 
-testBlock = {
+testBlock = ->
     a = 1
     b = 2
-    c = {
+    c = ->
         d = 4
         e = 5
-    }
-}
 
 br = testBlock.block
 

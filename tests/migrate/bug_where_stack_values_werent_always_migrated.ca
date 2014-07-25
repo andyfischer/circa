@@ -21,8 +21,8 @@ def main(_val)
 stack = make_stack(main)
 stack.call(func1)
 
-assert(func_to_name(stack.call({})) == 'func1')
+assert(func_to_name(stack.call(->)) == 'func1')
 
 stack.migrate(func1.block, func2.block)
 
-assert(func_to_name(stack.call({})) == 'func2')
+assert(func_to_name(stack.call(->)) == 'func2')

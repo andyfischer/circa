@@ -23,4 +23,4 @@ set_env(:a 3)
 print('env(a) = 3')
 f()
 
-with_env_5({ f() })
+with_env_5(-> f())

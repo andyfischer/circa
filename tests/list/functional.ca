@@ -1,2 +1,2 @@
 
-assert([1 2 3].map_all({input() + 3}) == [4 5 6])
+assert([1 2 3].map_all((i) -> i + 3) == [4 5 6])

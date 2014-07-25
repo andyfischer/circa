@@ -309,6 +309,8 @@ void get_index(caStack* stack)
 
 void input_explicit(caStack* stack)
 {
+    internal_error("dont use input_explicit");
+
     copy(circa_input(stack, 1), circa_output(stack, 0));
 
     Term* in = circa_caller_term(stack)->input(0);
@@ -322,7 +324,7 @@ void make_list(caStack* stack)
 {
     // Variadic arg handling will already have turned this into a list
     Value* out = circa_output(stack, 0);
-    circa_copy(circa_input(stack, 0), out);
+    move(circa_input(stack, 0), out);
     if (!circa_is_list(out))
         circa_set_list(out, 0);
 }

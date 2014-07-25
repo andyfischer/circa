@@ -1,7 +1,6 @@
 
-f = {
-    add(a b c)
-}
+f = ->
+  add(a b c)
 
 int = make_stack(f)
 int.run

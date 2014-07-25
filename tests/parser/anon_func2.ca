@@ -1,0 +1,23 @@
+
+def f(Func func)
+  print('f, result = ' func.call)
+
+def g(x, Func func)
+  print('g(' x '), result = ' func.call(x))
+
+f(->
+  print('inside a.. ')
+  print(' multiline anon function')
+  return 3)
+
+f(->
+  print('another.. ')
+  print(' multiline anon function')
+  return 3
+)
+
+g(10, (x) ->
+  print('multiline func with.. ')
+  print(' x = ' x)
+  return x + 3
+)

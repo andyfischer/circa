@@ -1,5 +1,5 @@
 
-plus_1 = { input() + 1 }
+plus_1 = (x) -> x + 1
 
 
 a = 4

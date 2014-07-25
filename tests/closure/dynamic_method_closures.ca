@@ -1,8 +1,6 @@
 
-cl = {
-    i = input()
-    print('Called cl: ' i)
-}
+cl = (i) ->
+  print('Called cl: ' i)
 
 cl.call('call normal')
 cl.apply(['apply normal'])

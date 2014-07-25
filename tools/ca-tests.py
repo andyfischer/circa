@@ -14,6 +14,7 @@ TestRoot = 'tests'
 Quiet = False
 OnlyPrintCommands = False
 DumpStats = False
+TestSourceRepro = False
 
 class CircaProcess:
     def __init__(self):
@@ -113,10 +114,7 @@ def test_file(process, filename):
         failures.append(TestFailure(desc, filename))
         process.kill()
 
-    # Source repro test
-    testSourceRepro = False
-
-    if testSourceRepro:
+    if TestSourceRepro:
         try:
             diff = diff_command_against_file(process, "source_repro "+filename, filename)
         except Exception as e:
@@ -227,12 +225,14 @@ if __name__ == '__main__':
     parser.add_option('--accept', dest="accept")
     parser.add_option('-b', '--binary', dest="binaryPath")
     parser.add_option('--stats', action="store_true", dest="dumpStats")
+    parser.add_option('--source-repro', action="store_true", dest="testSourceRepro")
     parser.add_option('--only-print-commands', action="store_true",
         dest="only_print_commands")
 
     (options,args) = parser.parse_args()
 
     OnlyPrintCommands = options.only_print_commands
+    TestSourceRepro = options.testSourceRepro
 
     if options.binaryPath:
         ExecutablePath = options.binaryPath

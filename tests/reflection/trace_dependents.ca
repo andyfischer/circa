@@ -1,13 +1,12 @@
 
 
-code = {
+def code()
     a = 1
     b = 2
     c = 3
     d = a + c
     e = 4
     f = d
-}
 
 f_term = code.block.find_term('f')
 dependents = f_term.trace_dependents(code.block)

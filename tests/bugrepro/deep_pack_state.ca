@@ -34,8 +34,8 @@ def click_resolver(any message)
         clickAreas = []
 
 int = make_stack(click_resolver)
-int.call([:resolve, [0 0] -> Vec2.cast, {}])
-int.call([:resolve, [0 0] -> Vec2.cast, {}])
-int.call([:resolve, [0 0] -> Vec2.cast, {}])
+int.call([:resolve, [0 0], ->])
+int.call([:resolve, [0 0], ->])
+int.call([:resolve, [0 0], ->])
 
 

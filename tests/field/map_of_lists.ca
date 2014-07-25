@@ -5,7 +5,7 @@ struct MapOfLists {
 
 def MapOfLists.add(@self, any key, any val)
     if self.map.contains(key)
-        @self.map.apply(key, { input().append(val) })
+        @self.map.apply(key, (list) -> list.append(val) )
     else
         @self.map.set(key, [val])
 

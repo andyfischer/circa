@@ -11,6 +11,6 @@ assert(f_output.input(0) == f.block.input(0))
 assert(f_output.input(1) == f.block.input(1))
 
 assert(term_ref(f).is_function)
-assert(term_ref({}).is_function)
+assert(term_ref(->).is_function)
 assert(not term_ref(1).is_function)
 assert(not term_ref([]).is_function)

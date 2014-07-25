@@ -1,2 +1,2 @@
 
-assert([1 2 3 4 5].filter({input() % 2 == 1}) == [1 3 5])
+assert([1 2 3 4 5].filter((i) -> i % 2 == 1) == [1 3 5])

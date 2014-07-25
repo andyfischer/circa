@@ -70,6 +70,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Output: return "Output";
     case sym_PreferSpecialize: return "PreferSpecialize";
     case sym_Error_UnknownType: return "Error_UnknownType";
+    case sym_Syntax_AnonFunction: return "Syntax_AnonFunction";
     case sym_Syntax_BlockStyle: return "Syntax_BlockStyle";
     case sym_Syntax_Brackets: return "Syntax_Brackets";
     case sym_Syntax_ColorFormat: return "Syntax_ColorFormat";
@@ -1338,6 +1339,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[6]) {
     case '_':
     switch (str[7]) {
+    case 'A':
+        if (strcmp(str + 8, "nonFunction") == 0)
+            return sym_Syntax_AnonFunction;
+        break;
     case 'B':
     switch (str[8]) {
     case 'l':

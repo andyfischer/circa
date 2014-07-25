@@ -302,6 +302,7 @@ Type* type_make_specializeType(Term* caller)
 
 void input_explicit_postCompile(Term* term)
 {
+    internal_error("don't use input_explicit");
     Block* block = term->owningBlock;
 
     Term* in = append_input_placeholder(block);

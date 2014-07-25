@@ -51,6 +51,7 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult blank_line(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult anon_function_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context);
@@ -102,6 +103,7 @@ void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* con
 bool lookahead_match_whitespace_statement(TokenStream& tokens);
 bool lookahead_match_comment_statement(TokenStream& tokens);
 bool lookahead_match_rebind_argument(TokenStream& tokens);
+bool lookahead_match_anon_function(TokenStream& tokens);
 Term* find_lexpr_root(Term* term);
 
 void prepend_whitespace(Term* term, std::string const& whitespace);

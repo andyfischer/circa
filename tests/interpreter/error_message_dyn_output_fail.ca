@@ -1,11 +1,9 @@
 
 
-main = {
-
-    struct T {}
-    t = make(T)
-    t.hello()
-}
+def main()
+  struct T {}
+  t = make(T)
+  t.hello()
 
 int = make_stack(main)
 int.run

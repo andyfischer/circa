@@ -1,20 +1,6 @@
 
-f = {
-    x = input() + input()
-    x
-}
+f = (a,b) ->
+  a + b
 
 assert(f.call(1 1) == 2)
 assert(f.call(1 3) == 4)
-
-f = {
-    output(1)
-    output(2)
-    output(3)
-
-    :last
-}
-
-a, b, c, d = f.call()
-assert(a == :last)
-assert([b c d] == [3 2 1])

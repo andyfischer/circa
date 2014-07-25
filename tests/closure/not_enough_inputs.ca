@@ -1,12 +1,11 @@
 
-int = make_stack({
+int = make_stack(->
 
-    cl = {
-        output([input() input() input()])
-    }
+    cl = (a,b,c) ->
+        [a b c]
 
     cl.call(1 2)
-})
+)
 
 int.run
 assert(int.errored)

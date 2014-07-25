@@ -1,5 +1,5 @@
 
-vm = make_stack({})
+vm = make_stack(->)
 
 print(vm.env_map)
 
@@ -11,6 +11,6 @@ vm.append_hack(:thing2)
 
 print(vm.env_map)
 
-vm.modify_env({input().remove(:_hacks)})
+vm.modify_env((env) -> env.remove(:_hacks))
 
 print(vm.env_map)

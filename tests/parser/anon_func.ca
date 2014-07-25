@@ -1,0 +1,31 @@
+
+check23 = ->
+  print('check 2')
+  print('check 3')
+
+print('check 1')
+check23()
+
+(-> print('check 4')).call()
+
+def f(Func func)
+  print('f, result = ' func.call)
+
+f(->)
+f(-> 'check 5')
+
+f = (a) ->
+  a + 1
+
+print('should equal 2: ' f.call(1))
+
+f = (a,b) ->
+  a + b
+
+print('should equal 5: ' f.call(2,3))
+
+list = [1 2 3 4]
+
+print('should equal [1, 3]: ' list.filter((el) -> el % 2 == 1))
+
+print('should equal [1, 2, 3]: ' (-> ((list) -> list.append(2)).call([1]).append(3)).call)

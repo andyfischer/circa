@@ -1,10 +1,9 @@
 
 
-testBlock = {
-    def 1
-}
+def main()
+  def 1
 
-int = make_stack(testBlock)
+int = make_stack(main)
 int.run
 
 assert(int.error_message == "Expected identifier after def, found: 1")

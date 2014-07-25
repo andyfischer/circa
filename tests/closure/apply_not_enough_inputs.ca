@@ -1,7 +1,5 @@
 
-cl = {
-    print(input() ', ' input() ', ' input())
-}
-
+cl = (a,b,c) ->
+  print([a b c])
 
 cl.apply([1 2])

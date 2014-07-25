@@ -2,9 +2,8 @@
 def main()
     a = 2
 
-    cl = {
+    cl = ->
         return a() 
-    }
 
     print(cl.call)
 

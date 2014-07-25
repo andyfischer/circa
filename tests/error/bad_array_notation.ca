@@ -1,8 +1,7 @@
 
-f = {
-    -- This caused an interpreter crash at one point
-    1[1] = 1
-}
+f = ->
+  -- This caused an interpreter crash at one point
+  1[1] = 1
 
 int = make_stack(f)
 int.run

@@ -1,39 +1,39 @@
 
 -- super simple
-a = { print('check 1') }
+a = -> print('check 1')
 a.call
 
 -- with input
-a = { print('check 2: ' input()) }
+a = (i) -> print('check 2: ' i)
 a.call('ok')
 
 -- with a closed variable
 b = 'ok'
-a = { print('check 3: ' b) }
+a = -> print('check 3: ' b)
 a.call
 
 -- with a closed variable and an input
 b = 'ok'
-a = { print('check 4: ' b ', ' input()) }
+a = (i) -> print('check 4: ' b ', ' i)
 a.call('yes')
 
 -- several closed variables
 x = 'yes'
 y = 'good'
 z = 'right'
-a = { print('check 5: ' x ' ' y ' 'z) }
+a = -> print('check 5: ' x ' ' y ' 'z)
 a.call
 
 -- several closed variables and several inputs
 x = 'yes'
 y = 'good'
 z = 'right'
-a = { print('check 6: ' x ' ' y ' ' z ' ' input() ' ' input() ' ' input()) }
+a = (a,b,c) -> print('check 6: ' x ' ' y ' ' z ' ' a ' ' b ' ' c)
 a.call('ok1' 'ok2' 'ok3')
 
 -- output value
-a = { 'ok' }
+a = -> 'ok'
 print('check 7: ' a.call)
 
-a = { concat('o' 'k') }
+a = -> concat('o' 'k')
 print('check 8: ' a.call)

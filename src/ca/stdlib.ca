@@ -479,12 +479,6 @@ def package(String moduleName)
   -- Declare that the current module is a reusable library with the given name.
   -- (Note: Currently this function does nothing)
 
--- Packages
-struct Package {
-  String name
-  Map files
-}
-
 -- Test helpers
 def test_oracle() -> any
   -- For internal testing. This function will output values that are manually
@@ -615,7 +609,7 @@ def Block.get_iterator(self) -> Term
   error("Iterator not found in Block.get_iterator")
 
 def Block.if_block_cases(self) -> List
-  self.terms.filter({term = input(); term.function.name == 'case'})
+  self.terms.filter((term) -> term.function.name == 'case')
 
 def Block.case_find_condition(self) -> Term
   for term in self.terms
@@ -702,7 +696,7 @@ def Stack.modify_env(self, Func func)
   self.set_env_map(func.call(self.env_map))
 
 def Stack.append_hack(self, any hack)
-  self.modify_env({ input().list_append(:_hacks hack) })
+  self.modify_env((env) -> env.list_append(:_hacks hack))
 
 def Stack.forward_env(self, names :multiple)
   for name in names
@@ -833,9 +827,7 @@ def List.split(self, boundaryValue) -> List
     if item == boundaryValue
       @out.append([])
     else
-      @out.modify(out.length - 1, {
-        input().append(item)
-      })
+      @out.modify(out.length - 1, (el) -> el.append(item))
   out
 
 def List.slice(self, int start, int fin) -> List
@@ -972,7 +964,7 @@ def Map.modify(self, any key, Func func)
 
 def Map.list_append(self, any key, any value) -> Map
   if self.contains(key)
-    @self.modify(key, { i = input(); i.append(value) })
+    @self.modify(key, (l) -> l.append(value))
   else
     @self.set(key, [value])
 

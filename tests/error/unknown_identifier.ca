@@ -1,8 +1,6 @@
 
-testBlock = {
-
-    print(a)
-}
+testBlock = ->
+  print(a)
 
 int = make_stack(testBlock)
 int.run

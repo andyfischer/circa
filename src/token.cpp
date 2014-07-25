@@ -823,7 +823,7 @@ Symbol TokenStream::nextMatch(int lookahead)
         return tok_Eof;
     return next(lookahead).match;
 }
-int TokenStream::nextIndent(int lookahead)
+int TokenStream::indentOfLine(int lookahead)
 {
     if ((this->_position + lookahead) >= tokens.size())
         return 0;

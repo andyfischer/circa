@@ -1,13 +1,13 @@
 
 def func1(int a) -> Func
     b = a + 1
-    return { a + b + input() + 1 }
+    return (x) -> a + b + x + 1
 
 c = func1(1)
 assert(c.call(3) == 7)
 
 def appender(String suffix) -> Func
-    return { concat(input() suffix) }
+    return (str) -> concat(str suffix)
 
 append_in_bed = appender(' in bed')
 
@@ -17,7 +17,7 @@ assert(append_in_bed.call("politics") == "politics in bed")
 
 -- function combinator
 def concat_functions(Func a, Func b) -> Func
-    return { b.call(a.call(input())) }
+    return (i) -> b.call(a.call(i))
 
-concatted = concat_functions(append_in_bed, { i = input(String); i.split(' ') })
+concatted = concat_functions(append_in_bed, (i) -> i.split(' ') )
 assert(concatted.call('spiders') == ['spiders', 'in', 'bed'])

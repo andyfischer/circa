@@ -1,0 +1,9 @@
+inside a.. 
+ multiline anon function
+f, result = 3
+another.. 
+ multiline anon function
+f, result = 3
+multiline func with.. 
+ x = 10
+g(10), result = 13

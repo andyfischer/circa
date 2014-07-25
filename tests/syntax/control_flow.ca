@@ -43,11 +43,3 @@ for x in [1] { g(1)  }
 for x in [1] { g(1) } 
 l = [1]; for x in @l { x += 1 }
 a = for x in [1] { x + 1 }
-
--- Blocks
-{}
-{  }
-{1}
-blah = {1}
-blah = { g(1) g(2) }
-

@@ -1,8 +1,9 @@
 
 
-int = make_stack({
+int = make_stack(->
     l = []
-    l[0]})
+    l[0]
+)
 
 int.run
 

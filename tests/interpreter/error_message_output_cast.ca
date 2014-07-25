@@ -1,11 +1,9 @@
 
-main = {
-
+def main()
     def f() -> int
         return "hi"
 
     f()
-}
 
 int = make_stack(main)
 int.run

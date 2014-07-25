@@ -36,6 +36,7 @@ bool is_closing_bracket(int token);
 
 static int lookahead_next_non_whitespace_pos(TokenStream& tokens, bool skipNewlinesToo);
 static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo);
+static void lookahead_skip_whitespace_and_newlines(TokenStream& tokens, int* lookahead);
 static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
@@ -170,7 +171,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
 
     parentTerm->setStringProp(sym_Syntax_BlockStyle, "sigIndent");
 
-    int parentTermIndent = tokens.next(-1).precedingIndent;
+    int parentTermIndent = tokens.indentOfLine(-1);
 
     // Consume the whitespace immediately after the heading (and possibly a newline).
     std::string postHeadingWs = possible_statement_ending(tokens);
@@ -186,9 +187,11 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
     if (!foundNewline) {
         while (!tokens.finished()) {
 
-            // Special case for if-blocks. If we hit an if-block seperator then finish,
-            // but don't consume it.
-            if (tokens.nextIs(tok_Else) || tokens.nextIs(tok_Elif))
+            // Certain tokens are considered the end of block
+            if (tokens.nextIs(tok_Else)
+                    || tokens.nextIs(tok_Elif)
+                    || tokens.nextIs(tok_RParen)
+                    || tokens.nextIs(tok_RSquare))
                 return;
 
             Term* statement = parser::statement(block, tokens, context).term;
@@ -785,6 +788,95 @@ consume_next_output: {
     on_new_function_parsed(result, &functionName);
 
     return ParseResult(result);
+}
+
+ParseResult anon_function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+    Term* result = create_function(block, "");
+    Block* contents = make_nested_contents(result);
+    set_starting_source_location(result, startPosition, tokens);
+
+    // Input arguments
+    if (tokens.nextIs(tok_LParen)) {
+        tokens.consume();
+
+        while (!tokens.nextIs(tok_RParen) && !tokens.finished()) {
+            possible_whitespace_or_newline(tokens);
+
+            Value name;
+            tokens.consumeStr(&name, tok_Identifier);
+
+            Term* input = apply(contents, FUNCS.input, TermList(), as_cstring(&name));
+            hide_from_source(input);
+
+            possible_whitespace_or_newline(tokens);
+            if (tokens.nextIs(tok_Comma))
+                tokens.consume();
+            possible_whitespace_or_newline(tokens);
+        }
+
+        tokens.consume(tok_RParen);
+    }
+
+    possible_whitespace_or_newline(tokens);
+    tokens.consume(tok_RightArrow);
+
+    consume_block(contents, tokens, context);
+
+    if (get_output_placeholder(contents, 0) == NULL)
+        append_output_placeholder(contents, NULL);
+
+    finish_building_function(contents);
+    set_source_location(result, startPosition, tokens);
+    term_set_bool_prop(result, sym_Syntax_AnonFunction, true);
+    return ParseResult(result);
+}
+
+bool lookahead_match_anon_function(TokenStream& tokens)
+{
+    int lookahead = 0;
+
+    lookahead_skip_whitespace_and_newlines(tokens, &lookahead);
+
+    if (tokens.nextIs(tok_LParen, lookahead)) {
+        lookahead++;
+        bool expectComma = false;
+
+        // Input arguments
+        while (true) {
+            lookahead_skip_whitespace_and_newlines(tokens, &lookahead);
+
+            if (tokens.nextIs(tok_RParen, lookahead))
+                break;
+
+            if (expectComma) {
+                if (!tokens.nextIs(tok_Comma, lookahead))
+                    return false;
+                lookahead++;
+                lookahead_skip_whitespace_and_newlines(tokens, &lookahead);
+            }
+
+            if (!tokens.nextIs(tok_Identifier, lookahead))
+                return false;
+
+            lookahead++;
+
+            expectComma = true;
+        }
+
+        lookahead_skip_whitespace_and_newlines(tokens, &lookahead);
+        if (!tokens.nextIs(tok_RParen, lookahead))
+            return false;
+        lookahead++;
+    }
+
+    lookahead_skip_whitespace_and_newlines(tokens, &lookahead);
+
+    if (!tokens.nextIs(tok_RightArrow, lookahead))
+        return false;
+
+    return true;
 }
 
 ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -2007,7 +2099,7 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
 
 ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* context)
 {
-    int originalIndent = tokens.nextIndent(0);
+    int originalIndent = tokens.indentOfLine(0);
 
     ParseResult result = atom(block, tokens, context);
 
@@ -2082,6 +2174,14 @@ static int lookahead_next_non_whitespace_pos(TokenStream& tokens, bool skipNewli
     }
 
     return lookahead;
+}
+
+static void lookahead_skip_whitespace_and_newlines(TokenStream& tokens, int* lookahead)
+{
+    while (tokens.nextIs(tok_Whitespace, *lookahead)
+            || (tokens.nextIs(tok_Newline, *lookahead))) {
+        (*lookahead)++;
+    }
 }
 
 static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo)
@@ -2202,8 +2302,12 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     int startPosition = tokens.getPosition();
     ParseResult result;
 
+    // anonymous function?
+    if (lookahead_match_anon_function(tokens))
+        result = anon_function_decl(block, tokens, context);
+
     // function call?
-    if (tokens.nextIs(tok_Identifier) && tokens.nextIs(tok_LParen, 1))
+    else if (tokens.nextIs(tok_Identifier) && tokens.nextIs(tok_LParen, 1))
         result = function_call(block, tokens, context);
 
     // identifier with rebind?
@@ -2250,9 +2354,6 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_ColonString))
         result = literal_symbol(block, tokens, context);
 
-    // closure block?
-    else if (tokens.nextIs(tok_LBrace))
-        result = closure_block(block, tokens, context);
 
     // section block?
     else if (tokens.nextIs(tok_Section))

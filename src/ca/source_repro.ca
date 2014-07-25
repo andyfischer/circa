@@ -28,10 +28,10 @@ def new()
 
 def Term.is_neg(term)
   term.function == neg.block
-def Term.is_function_decl(term)
-  term.function == function_decl.block
-def Term.is_closure_decl(term)
-  term.function == closure_block.block
+def Term.is_unanon_function_decl(term)
+  term.function == function_decl.block and not term.property_opt(:Syntax_AnonFunction false)
+def Term.is_anon_function_decl(term)
+  term.function == function_decl.block and term.property_opt(:Syntax_AnonFunction false)
 def Term.is_struct_decl(term)
   term.is_value and is_type(term.value)
 def Term.is_require(term)
@@ -154,6 +154,29 @@ def SourceRepro.require_statement(self, Term term) -> SourceRepro
     @self.term_default_format(term)
   self
 
+def SourceRepro.anon_function_decl(self, Term term) -> SourceRepro
+  inputs = term.contents.inputs
+
+  if inputs != []
+    @self.phrase(:text '(')
+
+    first = true
+    for input in inputs
+      if not first
+        @self.phrase(:text ',')
+
+      @self.phrase(:name input.name)
+
+      first = false
+
+    @self.phrase(:text ') ')
+
+  @self.phrase(:text '->')
+  
+  @self.block_pre(term)
+  @self.phrase(:contents term.contents)
+  @self.block_post(term)
+
 def SourceRepro.function_decl(self, Term term) -> SourceRepro
   @self.phrase(:text "def ")
   @self.phrase(:name term.name)
@@ -161,7 +184,7 @@ def SourceRepro.function_decl(self, Term term) -> SourceRepro
   @self.phrase(:ws term.property_opt(:Syntax_Properties ''))
   @self.phrase(:text "(")
 
-  inputs = term.contents.inputs.filter({ not input().property_opt(:HiddenInput false) })
+  inputs = term.contents.inputs.filter((term) -> not term.property_opt(:HiddenInput false) )
 
   first = true
   for input in inputs
@@ -201,7 +224,7 @@ def SourceRepro.function_decl(self, Term term) -> SourceRepro
     @self.phrase(:text '->')
     @self.phrase(:ws term.property_opt(:Syntax_WhitespacePostColon ''))
 
-    outputs = term.contents.outputs.filter({not input().property_opt(:Hidden false)})
+    outputs = term.contents.outputs.filter((term) -> not term.property_opt(:Hidden false))
 
     if outputs.length > 1
       @self.phrase(:text "(")
@@ -222,12 +245,6 @@ def SourceRepro.function_decl(self, Term term) -> SourceRepro
   @self.block_post(term)
 
   self
-
-def SourceRepro.closure_decl(self, Term term) -> SourceRepro
-  @self.name_binding_source(term)
-  @self.block_pre(term)
-  @self.phrase(:contents term.contents)
-  @self.block_post(term)
 
 def SourceRepro.struct_decl(self, Term term) -> SourceRepro
   @self.phrase(:text "struct ")
@@ -347,7 +364,7 @@ def SourceRepro.while_loop(self, Term term) -> SourceRepro
 def SourceRepro.if_block(self, Term term) -> SourceRepro
   @self.name_binding_source(term)
   first = true
-  cases = term.contents.if_block_cases.filter({not input().property_opt(:Hidden false)})
+  cases = term.contents.if_block_cases.filter((term) -> not term.property_opt(:Hidden false))
   for caseTerm in cases
     @self.phrase(:ws caseTerm.property_opt(:Syntax_PreWs ''))
 
@@ -380,7 +397,7 @@ def SourceRepro.switch_block(self, Term term) -> SourceRepro
 
   @self.block_pre(term)
 
-  cases = term.contents.if_block_cases.filter({not input().property_opt(:Hidden false)})
+  cases = term.contents.if_block_cases.filter((term) -> not term.property_opt(:Hidden false))
   for caseTerm in cases
     @self.phrase(:ws caseTerm.property_opt(:Syntax_PreWs ''))
     @self.phrase(:text 'case ')
@@ -413,10 +430,8 @@ def SourceRepro.term(self, Term term) -> SourceRepro
     @self.neg(term)
   elif term.is_require
     @self.require_statement(term)
-  elif term.is_function_decl
+  elif term.is_unanon_function_decl
     @self.function_decl(term)
-  elif term.is_closure_decl
-    @self.closure_decl(term)
   elif term.is_struct_decl
     @self.struct_decl(term)
   elif term.is_get_index and term.property_opt(:Syntax_Brackets false)
@@ -451,6 +466,7 @@ def SourceRepro.term(self, Term term) -> SourceRepro
     @self.term_default_format(term)
 
   @self.phrase(:ws term.property_opt(:Syntax_PostWs ''))
+  @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
 
 def Term.has_implicit_name_binding(term) -> bool
   if term.name == ""
@@ -544,6 +560,8 @@ def SourceRepro.term_default_format(self, Term term) -> SourceRepro
 
   if term.is_for_loop
     @self.for_loop(term)
+  elif term.is_anon_function_decl
+    @self.anon_function_decl(term)
   elif declarationStyle == 'function-call'
     if functionName == ''
       @self.term(term.function)
@@ -655,9 +673,7 @@ def SourceRepro.block(self, Block block) -> SourceRepro
 
     @self.phrase(:sub_expr term)
 
-    if term.has_property(:Syntax_LineEnding)
-      @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
-    elif term.has_property(:Syntax_PostHeadingWs)
+    if term.has_property(:Syntax_LineEnding) or term.has_property(:Syntax_PostHeadingWs)
       -- no newline needed
     else
       newlineNeeded = true

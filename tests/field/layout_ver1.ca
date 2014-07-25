@@ -49,10 +49,10 @@ def Layout.modifyCurrentNode(self, Func f) -> Layout
     self
 
 def Layout.setProp(self, name, value) -> Layout
-    @self.modifyCurrentNode({ 
-        node = Node.cast(input())
+    @self.modifyCurrentNode((node) -> 
+        node = Node.cast(node)
         @node.props.set(name,value)
-    })
+    )
     self
 
 def Layout.solveDim(self, String dim) -> List

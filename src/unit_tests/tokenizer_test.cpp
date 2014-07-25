@@ -369,7 +369,6 @@ void test_number_followed_by_dot_call()
     test_assert(tokens.finished());
 }
 
-
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_test::test_identifiers);

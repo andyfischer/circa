@@ -1,6 +1,6 @@
 
 def main()
-    s = _declared_state(any, { 0 })
+    s = _declared_state(any, -> 0)
     s += 1
 
 int = make_stack(main)

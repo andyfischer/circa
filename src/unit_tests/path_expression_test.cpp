@@ -26,8 +26,8 @@ void simple_name_match()
 void nested_name_match()
 {
     Block block;
-    Term* a = block.compile("a = { b = { c = 4 }}");
-    block.compile("a2 = { b2 = 5 }");
+    Term* a = block.compile("a = section { b = section { c = 4 }}");
+    block.compile("a2 = section { b2 = 5 }");
 
     test_assert(a == find_term_from_path(&block, "a"));
     Term* c = find_term_from_path(&block, "a/b/c");
@@ -42,8 +42,8 @@ void nested_name_match()
 void wildcard_nested_match()
 {
     Block block;
-    block.compile("a = { b = { c = 5 } }");
-    block.compile("a = { b2 = { d = 6 } }");
+    block.compile("a = section { b = section { c = 5 } }");
+    block.compile("a = section { b2 = section { d = 6 } }");
 
     Term* d = find_term_from_path(&block, "a/*/d");
     test_assert(d != NULL);
@@ -54,8 +54,8 @@ void recursive_wildcard_match()
 {
     Block block;
     block.compile("a = 1");
-    block.compile("b = { c = 2 }");
-    block.compile("d = { e = { f = 3 } }");
+    block.compile("b = section { c = 2 }");
+    block.compile("d = section { e = section { f = 3 } }");
 
     Term* a = find_term_from_path(&block, "**/a");
     Term* c = find_term_from_path(&block, "**/c");
