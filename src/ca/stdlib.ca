@@ -712,7 +712,9 @@ def Stack.init_channel(self, any name)
   self.set_env(name, [])
 
 def Stack.read_channel(self, any name)
-  self.env_map.get(name)
+  out = self.env_map.get(name)
+  self.set_env(name, [])
+  return out
 
 def Stack.get_watch_result(self, key) -> any
 def Stack.stack_push(self, Block b, List inputs)
