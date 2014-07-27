@@ -61,22 +61,22 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         if t == String
             writer.write('const char* ')
             writer.write(name)
-            writer.write(concat(' = circa_string(circa_input(stack, ' index '))'))
+            writer.write(str(' = circa_string(circa_input(stack, ' index '))'))
             writer.writeln(';')
         elif t == int
             writer.write('int ')
             writer.write(name)
-            writer.write(concat(' = circa_int(circa_input(stack, ' index '))'))
+            writer.write(str(' = circa_int(circa_input(stack, ' index '))'))
             writer.writeln(';')
         elif t == number
             writer.write('float ')
             writer.write(name)
-            writer.write(concat(' = circa_float(circa_input(stack, ' index '))'))
+            writer.write(str(' = circa_float(circa_input(stack, ' index '))'))
             writer.writeln(';')
         else
             writer.write('caValue* ')
             writer.write(name)
-            writer.write(concat(' = circa_input(stack, ' index ')'))
+            writer.write(str(' = circa_input(stack, ' index ')'))
             writer.writeln(';')
 
         index += 1
@@ -94,11 +94,11 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         if index == 0
             name = 'output'
         else
-            name = concat('output_' index)
+            name = str('output_' index)
 
         writer.write('caValue* ')
         writer.write(name)
-        writer.write(concat(' = circa_output(stack, ' index ')'))
+        writer.write(str(' = circa_output(stack, ' index ')'))
         writer.writeln(';')
 
         index += 1
@@ -129,8 +129,8 @@ def write_bindings(Block block) -> String
         func = binding[0] -> Function
         cname = binding[1] -> String
 
-        writer.writeln(concat('{"' func.name '", ' cname '},'))
-    writer.writeln(concat('{0, 0}'))
+        writer.writeln(str('{"' func.name '", ' cname '},'))
+    writer.writeln(str('{0, 0}'))
     writer.unindent()
     writer.writeln('};')
 

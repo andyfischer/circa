@@ -10,11 +10,11 @@ def IndentWriter.write(self, args :multiple)
         self.needsIndent = false
         for i in 0..self.curIndent
             @self.output.append(' ')
-    @self.output.append(concat.apply(args))
+    @self.output.append(str.apply(args))
     self
 
 def IndentWriter.writeln(self, args :multiple)
-    @self.write(concat.apply(args))
+    @self.write(str.apply(args))
     @self.output.append("\n")
     self.needsIndent = true
     self

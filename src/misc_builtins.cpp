@@ -57,7 +57,7 @@ void cond(caStack* stack)
     copy(circa_input(stack, index), circa_output(stack, 0));
 }
 
-void concat(caStack* stack)
+void str(caStack* stack)
 {
     Value* args = circa_input(stack, 0);
     Value* out = circa_output(stack, 0);
@@ -1074,6 +1074,8 @@ void String__split(caStack* stack)
 
 Value* find_env_value(caStack* stack, Value* key)
 {
+    stat_increment(FindEnvValue);
+
     for (Frame* frame = top_frame(stack); frame != NULL; frame = prev_frame(frame)) {
         if (!is_null(&frame->env)) {
             Value* value = hashtable_get(&frame->env, key);
@@ -1087,6 +1089,10 @@ Value* find_env_value(caStack* stack, Value* key)
         if (value != NULL)
             return value;
     }
+
+    if (stack->caller != NULL)
+        // Keep searching up to the calling stack
+        return find_env_value(stack->caller, key);
 
     return NULL;
 }
@@ -1284,7 +1290,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "assert", assert_func);
     circa_patch_function(patch, "cast_declared_type", cast_declared_type);
     circa_patch_function(patch, "cast", cast_evaluate);
-    circa_patch_function(patch, "concat", concat);
+    circa_patch_function(patch, "str", str);
     circa_patch_function(patch, "cond", cond);
     circa_patch_function(patch, "copy", copy_eval);
     circa_patch_function(patch, "div_f", div_f);

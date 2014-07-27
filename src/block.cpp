@@ -33,11 +33,6 @@ void on_block_created(Block* block)
     // No-op, used for debugging.
 }
 
-void assert_valid_block(Block const* obj)
-{
-    // this once did something
-}
-
 Block::Block(World* _world)
   : owningTerm(NULL),
     inProgress(false),
@@ -89,7 +84,6 @@ void block_setup_type(Type* type)
 
 int Block::length()
 {
-    assert_valid_block(this);
     return _terms.length();
 }
 
@@ -100,7 +94,6 @@ bool Block::contains(std::string const& name)
 
 Term* Block::get(int index)
 {
-    assert_valid_block(this);
     ca_test_assert(index < length());
     return _terms[index];
 }
@@ -140,17 +133,14 @@ int Block::getIndex(Term* term)
 {
     ca_assert(term != NULL);
     ca_assert(term->owningBlock == this);
-    assert_valid_term(term);
 
     return term->index;
 }
 
 void Block::append(Term* term)
 {
-    assert_valid_block(this);
     _terms.append(term);
     if (term != NULL) {
-        assert_valid_term(term);
         ca_assert(term->owningBlock == NULL);
         term->owningBlock = this;
         term->index = _terms.length()-1;
@@ -159,7 +149,6 @@ void Block::append(Term* term)
 
 Term* Block::appendNew()
 {
-    assert_valid_block(this);
     Term* term = alloc_term(this);
     ca_assert(term != NULL);
     _terms.append(term);
@@ -169,7 +158,6 @@ Term* Block::appendNew()
 
 void Block::set(int index, Term* term)
 {
-    assert_valid_block(this);
     ca_assert(index <= length());
 
     // No-op if this is the same term.
@@ -179,7 +167,6 @@ void Block::set(int index, Term* term)
     setNull(index);
     _terms.setAt(index, term);
     if (term != NULL) {
-        assert_valid_term(term);
         ca_assert(term->owningBlock == NULL || term->owningBlock == this);
         term->owningBlock = this;
         term->index = index;
@@ -188,7 +175,6 @@ void Block::set(int index, Term* term)
 
 void Block::setNull(int index)
 {
-    assert_valid_block(this);
     ca_assert(index <= length());
     Term* term = _terms[index];
     if (term != NULL)
@@ -197,8 +183,6 @@ void Block::setNull(int index)
 
 void Block::insert(int index, Term* term)
 {
-    assert_valid_term(term);
-    assert_valid_block(this);
     ca_assert(index >= 0);
     ca_assert(index <= _terms.length());
 
@@ -236,7 +220,6 @@ void Block::move(Term* term, int index)
 
 void Block::moveToEnd(Term* term)
 {
-    assert_valid_term(term);
     ca_assert(term != NULL);
     ca_assert(term->owningBlock == this);
     ca_assert(term->index >= 0);
@@ -299,7 +282,6 @@ Term* Block::findFirstBinding(Value* name)
 
 void Block::bindName(Term* term, Value* name)
 {
-    assert_valid_term(term);
     if (!has_empty_name(term) && !equals(&term->nameValue, name)) {
         internal_error(std::string("term already has a name: ") + term->nameStr());
     }
@@ -575,8 +557,6 @@ void pre_erase_term(Term* term)
 
 void erase_term(Term* term)
 {
-    assert_valid_term(term);
-
     pre_erase_term(term);
 
     set_null(term_value(term));
@@ -606,8 +586,6 @@ void erase_term(Term* term)
 
 void clear_block(Block* block)
 {
-    assert_valid_block(block);
-
     block->names.clear();
     block->inProgress = false;
 
@@ -702,9 +680,6 @@ void duplicate_block_nested(TermMap& newTermMap, Block* source, Block* dest)
 
 void duplicate_block(Block* source, Block* dest)
 {
-    assert_valid_block(source);
-    assert_valid_block(dest);
-
     TermMap newTermMap;
 
     duplicate_block_nested(newTermMap, source, dest);

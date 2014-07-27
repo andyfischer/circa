@@ -1,8 +1,8 @@
 -- Normal call
-concat('a', 'b')
-   concat('a', 'b')
-b = concat('a', 'b')
-  b = concat('a', 'b')
+str('a', 'b')
+   str('a', 'b')
+b = str('a', 'b')
+  b = str('a', 'b')
 assert(true)
 list(1.0, 2.0)
 list(1, 2)

@@ -1,7 +1,7 @@
 
 def get_closure(i)
   def f(j)
-    concat('f(' i ', ' j ')')
+    str('f(' i ', ' j ')')
 
 closure = get_closure(1)
 

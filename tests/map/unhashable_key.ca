@@ -1,3 +1,0 @@
-
-m = Map.make
-m.set(1.0 true)

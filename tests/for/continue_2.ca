@@ -8,5 +8,5 @@ for i in [1 2 3 4 5]
     if i % 2 == 1
         continue
 
-    x = concat('inner_' i)
+    x = str('inner_' i)
     print('end of loop ' i ', x = ' x)

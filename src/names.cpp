@@ -6,7 +6,6 @@
 #include "debug.h"
 #include "function.h"
 #include "kernel.h"
-#include "heap_debugging.h"
 #include "if_block.h"
 #include "inspection.h"
 #include "list.h"

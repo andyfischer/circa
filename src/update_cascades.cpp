@@ -8,7 +8,6 @@
 #include "inspection.h"
 #include "interpreter.h"
 #include "function.h"
-#include "heap_debugging.h"
 #include "kernel.h"
 #include "tagged_value.h"
 #include "term.h"

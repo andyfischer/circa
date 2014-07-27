@@ -35,5 +35,5 @@ a.call('ok1' 'ok2' 'ok3')
 a = -> 'ok'
 print('check 7: ' a.call)
 
-a = -> concat('o' 'k')
+a = -> str('o' 'k')
 print('check 8: ' a.call)

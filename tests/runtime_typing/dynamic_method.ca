@@ -25,10 +25,10 @@ call_blah(make(B))
 
 -- Test using an input
 
-def A.blah2(self, String str) -> String
-    return concat("A.blah2: " str)
-def B.blah2(self, String str) -> String
-    return concat("B.blah2: " str)
+def A.blah2(self, String s) -> String
+    return str("A.blah2: " s)
+def B.blah2(self, String s) -> String
+    return str("B.blah2: " s)
 
 def call_blah2(any a, String s)
     print(a.blah2(s))
@@ -40,10 +40,10 @@ call_blah2(make(B), 'str2')
 
 def A.blah3(self, int val) -> String
     self.x = val
-    return concat('A.blah3: ', self)
+    return str('A.blah3: ', self)
 def B.blah3(self, int val) -> String
     self.x = val
-    return concat('B.blah3: ', self)
+    return str('B.blah3: ', self)
 
 def call_blah3(any a :out, int i)
     print('calling blah3: ' i)

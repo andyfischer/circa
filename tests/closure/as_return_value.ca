@@ -7,7 +7,7 @@ c = func1(1)
 assert(c.call(3) == 7)
 
 def appender(String suffix) -> Func
-    return (str) -> concat(str suffix)
+    return (s) -> str(s suffix)
 
 append_in_bed = appender(' in bed')
 

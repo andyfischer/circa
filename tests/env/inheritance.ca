@@ -1,0 +1,17 @@
+
+def print_a(context)
+  print('[' context '] ' env(:a))
+  
+set_env(:a 1)
+
+print_a('top level')
+
+vm = make_vm(print_a)
+vm.call('one layer')
+
+def second_layer()
+  vm = make_vm(print_a)
+  vm.call('second layer')
+
+vm = make_vm(second_layer)
+vm.call

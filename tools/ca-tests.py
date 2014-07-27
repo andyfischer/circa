@@ -207,8 +207,19 @@ def accept_output_for_test(file):
     outfile = file + '.output'
     command = "file " + file
 
-    print('Running: '+command)
-    print('Saving results to: '+outfile)
+    print('[Accepting output for: '+command+']')
+
+    try:
+        existingFile = open(outfile, 'r')
+
+        print('[Previous output was..]')
+        for line in existingFile:
+            print(line.strip())
+        print()
+    except:
+        pass
+
+    print('[Saving results..]')
 
     out = open(outfile, 'w')
 

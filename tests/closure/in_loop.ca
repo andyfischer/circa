@@ -1,6 +1,6 @@
 
-msg = (el) -> print(concat('first element: ' el))
+msg = (el) -> print(str('first element: ' el))
 
 for i in [0 2 4 6 8]
     msg.call(i)
-    msg = (el) -> print(concat('element is: ' el ', previous was: ' i))
+    msg = (el) -> print(str('element is: ' el ', previous was: ' i))

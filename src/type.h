@@ -7,7 +7,6 @@
 #include "circa/circa.h"
 
 #include "block.h"
-#include "heap_debugging.h"
 #include "object_header.h"
 #include "term_map.h"
 #include "term.h"

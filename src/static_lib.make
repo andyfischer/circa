@@ -79,7 +79,6 @@ OBJECTS := \
 	$(OBJDIR)/filepack.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/hashtable.o \
-	$(OBJDIR)/heap_debugging.o \
 	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing.o \
 	$(OBJDIR)/inspection.o \
@@ -223,9 +222,6 @@ $(OBJDIR)/function.o: function.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/hashtable.o: hashtable.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/heap_debugging.o: heap_debugging.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/if_block.o: if_block.cpp

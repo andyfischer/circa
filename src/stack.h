@@ -55,6 +55,9 @@ struct Stack
     Stack* prevStack;
     Stack* nextStack;
 
+    // When this stack is running, 'caller' is the Stack that triggered the call.
+    Stack* caller;
+
     // Owning world
     caWorld* world;
 

@@ -8,7 +8,6 @@
 #include "building.h"
 #include "interpreter.h"
 #include "function.h"
-#include "heap_debugging.h"
 #include "if_block.h"
 #include "kernel.h"
 #include "inspection.h"
@@ -127,9 +126,6 @@ void set_input(Term* term, int index, Term* input)
 {
     block_start_changes(term->owningBlock);
 
-    assert_valid_term(term);
-    assert_valid_term(input);
-
     Term* previousInput = NULL;
     if (index < term->numInputs())
         previousInput = term->input(index);
@@ -148,19 +144,11 @@ void set_input(Term* term, int index, Term* input)
 
 void set_inputs(Term* term, TermList const& inputs)
 {
-    assert_valid_term(term);
-
-    for (int i=0; i < term->numInputs(); i++) {
-        assert_valid_term(term->input(i));
-    }
-
     Term::InputList previousInputs = term->inputs;
 
     term->inputs.resize(inputs.length());
-    for (int i=0; i < inputs.length(); i++) {
-        assert_valid_term(inputs[i]);
+    for (int i=0; i < inputs.length(); i++)
         term->inputs[i] = Term::Input(inputs[i]);
-    }
 
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
@@ -214,7 +202,6 @@ void remove_from_any_user_lists(Term* term)
 {
     for (int i=0; i < term->numDependencies(); i++) {
         Term* usee = term->dependency(i);
-        assert_valid_term(usee);
         if (usee == NULL)
             continue;
 
@@ -1192,8 +1179,6 @@ void rewrite_as_value(Block* block, int index, Type* type)
 
 void remove_term(Term* term)
 {
-    assert_valid_term(term);
-
     int index = term->index;
     Block* block = term->owningBlock;
 
@@ -1222,8 +1207,6 @@ void remap_pointers_quick(Block* block, Term* old, Term* newTerm)
 
 void remap_pointers(Term* term, TermMap const& map)
 {
-    assert_valid_term(term);
-
     // make sure this map doesn't try to remap NULL, because such a thing
     // would almost definitely lead to errors.
     ca_assert(!map.contains(NULL));
@@ -1254,8 +1237,6 @@ void remap_pointers(Term* term, TermMap const& map)
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
-    assert_valid_term(term);
-    assert_valid_term(original);
     ca_assert(original != NULL);
 
     TermMap map;

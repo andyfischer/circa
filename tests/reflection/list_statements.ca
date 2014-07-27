@@ -17,4 +17,4 @@ def main()
 
 print('statements:')
 for term in main.block.list_statements
-  print(' ' cond(term.has_name, concat(term.name ' = '), '') term.function.name '(...)')
+  print(' ' cond(term.has_name, str(term.name ' = '), '') term.function.name '(...)')

@@ -925,7 +925,7 @@ void vm_run(Stack* stack)
 
     while (true) {
 
-        stat_increment(StepInterpreter);
+        stat_increment(Interpreter_Step);
 
         #if DUMP_EXECUTION
         {
@@ -1548,11 +1548,42 @@ void get_partial_stack_path(Frame* frame, Value* out)
     // Add an index if this is a 'case' or loop iteration.
     Block* block = frame_block(frame);
     if (is_for_loop(block)) {
+        // If there's an output list, then its length gives us a more accurate index
+        // for this state value. (this is important if the list has a 'discard')
+        
         Value* index = frame_register(frame, for_loop_find_index(block));
         set_value(list_append(out), index);
+
     } else if (is_case_block(block)) {
         set_int(list_append(out), case_frame_get_index(frame));
     }
+}
+
+Value* get_incoming_state_slot(Frame* top, Value* parentState)
+{
+    if (!is_hashtable(parentState))
+        return NULL;
+
+    Value* slot = hashtable_get(parentState, unique_name(frame_caller(top)));
+
+    if (slot == NULL)
+        return NULL;
+
+    Block* block = frame_block(top);
+    if (is_for_loop(block)) {
+        if (!is_list(slot))
+            return NULL;
+
+        int index = as_int(frame_register(top, for_loop_find_index(block)));
+        slot = list_get_safe(slot, index);
+    } else if (is_case_block(block)) {
+        if (!is_hashtable(slot))
+            return NULL;
+
+        slot = hashtable_get_int_key(slot, case_frame_get_index(top));
+    }
+
+    return slot;
 }
 
 void get_stack_path(Frame* frame, Value* out)
@@ -1640,15 +1671,12 @@ void load_frame_state(caStack* stack)
     if (frame_caller(top) == NULL)
         return;
 
-    Value path;
-    get_partial_stack_path(top, &path);
+    Value* slot = get_incoming_state_slot(top, incoming);
 
-    Value* value = path_get(incoming, &path);
-
-    if (value == NULL)
+    if (slot == NULL)
         return;
 
-    copy(value, &top->incomingState);
+    copy(slot, &top->incomingState);
 }
 
 void store_frame_state(caStack* stack)
@@ -1668,17 +1696,39 @@ void store_frame_state(caStack* stack)
         return;
     }
 
-    if (!is_hashtable(&parent->outgoingState))
-        set_hashtable(&parent->outgoingState);
-
     if (frame_caller(top) == NULL)
         return;
 
-    Value path;
-    get_partial_stack_path(top, &path);
+    Value* parentState = &parent->outgoingState;
 
-    if (!is_null(outgoing) && !hashtable_is_empty(outgoing))
-        move(outgoing, path_touch_and_init_map(&parent->outgoingState, &path));
+    Block* block = frame_block(top);
+
+    // For-loop: Always save an entry in the outgoing list.
+    bool forceNullEntry = is_for_loop(block);
+
+    if (!forceNullEntry && (is_null(outgoing) || hashtable_is_empty(outgoing)))
+        return;
+
+    if (!is_hashtable(parentState))
+        set_hashtable(parentState);
+
+    Value* slot = hashtable_insert(parentState, unique_name(frame_caller(top)));
+
+    // Add an index if this is a 'case' or loop iteration.
+    if (is_for_loop(block)) {
+        if (!is_list(slot))
+            set_list(slot);
+
+        slot = list_append(slot);
+
+    } else if (is_case_block(block)) {
+        if (!is_hashtable(slot))
+            set_hashtable(slot);
+
+        slot = hashtable_insert_int_key(slot, case_frame_get_index(top));
+    }
+
+    move(outgoing, slot);
 }
 
 void dbg_get_incoming_state(Stack* stack)

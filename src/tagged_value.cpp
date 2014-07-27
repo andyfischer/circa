@@ -529,7 +529,7 @@ bool strict_equals(caValue* left, caValue* right)
     if (left->value_type == TYPES.string)
         return string_equals(left, right);
 
-    if (left->value_type == TYPES.list)
+    if (is_list_based(left) && is_list_based(right))
         return list_strict_equals(left, right);
 
     // TODO: hashtable strict equals

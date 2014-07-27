@@ -309,6 +309,7 @@ const char* builtin_symbol_to_string(int name)
     case stat_AppendMove: return "stat_AppendMove";
     case stat_GetIndexCopy: return "stat_GetIndexCopy";
     case stat_GetIndexMove: return "stat_GetIndexMove";
+    case stat_Interpreter_Step: return "stat_Interpreter_Step";
     case stat_Interpreter_DynamicMethod_CacheHit: return "stat_Interpreter_DynamicMethod_CacheHit";
     case stat_Interpreter_DynamicMethod_SlowLookup: return "stat_Interpreter_DynamicMethod_SlowLookup";
     case stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef: return "stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef";
@@ -319,6 +320,7 @@ const char* builtin_symbol_to_string(int name)
     case stat_Interpreter_CopyStackValue: return "stat_Interpreter_CopyStackValue";
     case stat_Interpreter_MoveStackValue: return "stat_Interpreter_MoveStackValue";
     case stat_Interpreter_CopyCachedValue: return "stat_Interpreter_CopyCachedValue";
+    case stat_FindEnvValue: return "stat_FindEnvValue";
     case stat_Make: return "stat_Make";
     case stat_Copy: return "stat_Copy";
     case stat_Cast: return "stat_Cast";
@@ -340,12 +342,6 @@ const char* builtin_symbol_to_string(int name)
     case stat_StringResizeCreate: return "stat_StringResizeCreate";
     case stat_StringSoftCopy: return "stat_StringSoftCopy";
     case stat_StringToStd: return "stat_StringToStd";
-    case stat_StepInterpreter: return "stat_StepInterpreter";
-    case stat_InterpreterCastOutputFromFinishedFrame: return "stat_InterpreterCastOutputFromFinishedFrame";
-    case stat_BlockNameLookups: return "stat_BlockNameLookups";
-    case stat_PushFrame: return "stat_PushFrame";
-    case stat_LoopFinishIteration: return "stat_LoopFinishIteration";
-    case stat_LoopWriteOutput: return "stat_LoopWriteOutput";
     case stat_DynamicCall: return "stat_DynamicCall";
     case stat_FinishDynamicCall: return "stat_FinishDynamicCall";
     case stat_DynamicMethodCall: return "stat_DynamicMethodCall";
@@ -1855,10 +1851,6 @@ int builtin_symbol_from_string(const char* str)
         break;
     case 'B':
     switch (str[6]) {
-    case 'l':
-        if (strcmp(str + 7, "ockNameLookups") == 0)
-            return stat_BlockNameLookups;
-        break;
     case 'y':
     switch (str[7]) {
     case 't':
@@ -1956,9 +1948,17 @@ int builtin_symbol_from_string(const char* str)
     case 'n':
     switch (str[8]) {
     case 'd':
-        if (strcmp(str + 9, "Module") == 0)
+    switch (str[9]) {
+    case 'E':
+        if (strcmp(str + 10, "nvValue") == 0)
+            return stat_FindEnvValue;
+        break;
+    case 'M':
+        if (strcmp(str + 10, "odule") == 0)
             return stat_FindModule;
         break;
+    default: return -1;
+    }
     case 'i':
         if (strcmp(str + 9, "shDynamicCall") == 0)
             return stat_FinishDynamicCall;
@@ -2109,10 +2109,6 @@ int builtin_symbol_from_string(const char* str)
     switch (str[15]) {
     case 'r':
     switch (str[16]) {
-    case 'C':
-        if (strcmp(str + 17, "astOutputFromFinishedFrame") == 0)
-            return stat_InterpreterCastOutputFromFinishedFrame;
-        break;
     case '_':
     switch (str[17]) {
     case 'C':
@@ -2269,6 +2265,10 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 18, "oveStackValue") == 0)
             return stat_Interpreter_MoveStackValue;
         break;
+    case 'S':
+        if (strcmp(str + 18, "tep") == 0)
+            return stat_Interpreter_Step;
+        break;
     default: return -1;
     }
     default: return -1;
@@ -2402,29 +2402,9 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'o':
-    switch (str[7]) {
-    case 'a':
-        if (strcmp(str + 8, "dFrameState") == 0)
+        if (strcmp(str + 7, "adFrameState") == 0)
             return stat_LoadFrameState;
         break;
-    case 'o':
-    switch (str[8]) {
-    case 'p':
-    switch (str[9]) {
-    case 'F':
-        if (strcmp(str + 10, "inishIteration") == 0)
-            return stat_LoopFinishIteration;
-        break;
-    case 'W':
-        if (strcmp(str + 10, "riteOutput") == 0)
-            return stat_LoopWriteOutput;
-        break;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
     default: return -1;
     }
     case 'M':
@@ -2477,10 +2457,6 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
-    case 'P':
-        if (strcmp(str + 6, "ushFrame") == 0)
-            return stat_PushFrame;
-        break;
     case 'S':
     switch (str[6]) {
     case 'e':
@@ -2588,10 +2564,6 @@ int builtin_symbol_from_string(const char* str)
     case 'a':
         if (strcmp(str + 8, "ckPushFrame") == 0)
             return stat_StackPushFrame;
-        break;
-    case 'e':
-        if (strcmp(str + 8, "pInterpreter") == 0)
-            return stat_StepInterpreter;
         break;
     case 'o':
         if (strcmp(str + 8, "reFrameState") == 0)

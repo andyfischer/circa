@@ -71,7 +71,6 @@ struct Term
     TermSourceLocation sourceLoc;
 
     Term(Block* block);
-    ~Term();
 
     const char* nameStr();
 

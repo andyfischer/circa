@@ -1,7 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "common_headers.h"
-#include "heap_debugging.h"
 
 #include "term_list.h"
 
@@ -97,7 +96,6 @@ TermList::appendUnique(Term* term)
         if (_terms[i] == term)
             return;
     }
-    debug_assert_valid_object(term, TERM_OBJECT);
     _terms.push_back(term);
 }
 

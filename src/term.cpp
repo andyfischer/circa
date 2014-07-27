@@ -6,7 +6,6 @@
 #include "building.h"
 #include "debug.h"
 #include "hashtable.h"
-#include "heap_debugging.h"
 #include "kernel.h"
 #include "if_block.h"
 #include "inspection.h"
@@ -30,17 +29,10 @@ Term::Term(Block* _parent)
 {
     id = _parent->world->nextTermID++;
 
-    debug_register_valid_object(this, TERM_OBJECT);
-
     set_hashtable(&properties);
 
     if (id == DEBUG_BREAK_ON_TERM)
         ca_debugger_break();
-}
-
-Term::~Term()
-{
-    debug_unregister_valid_object(this, TERM_OBJECT);
 }
 
 Term::Input::Input() : term(NULL)

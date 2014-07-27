@@ -1,7 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "function.h"
-#include "heap_debugging.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -363,7 +362,7 @@ bool list_contains(Value* list, Value* element)
 
 bool list_strict_equals(Value* left, Value* right)
 {
-    if (left->value_type != TYPES.list || right->value_type != TYPES.list)
+    if (left->value_type != right->value_type)
         return false;
 
     if (left->value_data.ptr == right->value_data.ptr)

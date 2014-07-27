@@ -19,6 +19,6 @@ def with_args(String a, String b)
 with_args('with ', 'args')
 
 def with_args2(String a, String b) -> String
-    return concat(b, a)
+    return str(b, a)
 
 print(with_args2('args2', 'with '))

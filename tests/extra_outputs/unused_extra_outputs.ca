@@ -5,4 +5,4 @@ def f() -> int
 
 a,b,c = f()
 
-assert(equals(concat([a b c]), "[1, null, null]"))
+assert(equals(str([a b c]), "[1, null, null]"))

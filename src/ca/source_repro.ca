@@ -110,7 +110,7 @@ def SourceRepro.literal_color(self, Term term) -> SourceRepro
 
 def SourceRepro.literal_int(self, Term term) -> SourceRepro
   if term.property_opt(:Syntax_IntegerFormat '') == 'hex'
-    @self.phrase(:value concat('0x' term.value.to_hex_string))
+    @self.phrase(:value str('0x' term.value.to_hex_string))
   else
     @self.phrase(:value term.value)
   self
@@ -132,7 +132,7 @@ def SourceRepro.term_value(self, Term term) -> SourceRepro
       startQuote = '<<<'
       endQuote = '>>>'
 
-    @self.phrase(:value concat(startQuote term.value endQuote))
+    @self.phrase(:value str(startQuote term.value endQuote))
 
   elif is_number(term.value)
     if term.has_property(:Syntax_OriginalFormat)

@@ -39,7 +39,7 @@ def write_literal_function(CodeWriter w :out, Term term)
 
     inputs = for input in func.inputs
         @input -> Term
-        concat(input.get_type.name ' ' input.name)
+        str(input.get_type.name ' ' input.name)
     w.write(inputs.join(', '))
     w.writeln(')')
     w.writeln('{')
@@ -76,7 +76,7 @@ def write_block(CodeWriter w :out, Block block)
             if commentStr == ""
                 w.writeln('')
             else
-                w.writeln(concat('// ' commentStr))
+                w.writeln(str('// ' commentStr))
         elif term.function == value
             write_value_term(&w, term)
 
@@ -84,7 +84,7 @@ def write_block(CodeWriter w :out, Block block)
             -- Normal function call
             termName = term.name
             if termName != ""
-                w.write(concat(termName ' = '))
+                w.write(str(termName ' = '))
             w.write(term.function.name)
             w.write('(')
             first = true

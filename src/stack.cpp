@@ -44,6 +44,8 @@ Stack::Stack()
 
     nextStack = NULL;
     prevStack = NULL;
+
+    caller = NULL;
     
     set_hashtable(&demandValues);
     set_hashtable(&env);
@@ -800,6 +802,11 @@ void Stack__call(caStack* stack)
     if (self == NULL)
         return raise_error_msg(self, "Stack is null");
 
+    if (self->caller != NULL)
+        return raise_error_msg(self, "Stack already has a call in progress");
+
+    self->caller = stack;
+
     stack_restart(self);
 
     // Populate inputs.
@@ -808,6 +815,8 @@ void Stack__call(caStack* stack)
         copy(list_get(inputs, i), circa_input(self, i));
 
     vm_run(self);
+
+    self->caller = NULL;
 
     caValue* output = circa_output(self, 0);
     if (output != NULL)
@@ -902,8 +911,16 @@ void Stack__run(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
+
+    if (self->caller != NULL)
+        return raise_error_msg(self, "Stack already has a call in progress");
+    self->caller = stack;
+
     vm_run(self);
-    copy(circa_input(stack, 0), circa_output(stack, 0));
+
+    self->caller = NULL;
+
+    move(circa_input(stack, 0), circa_output(stack, 0));
 }
 
 void Stack__frame_from_base(caStack* stack)

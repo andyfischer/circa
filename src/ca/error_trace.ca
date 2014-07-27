@@ -3,7 +3,7 @@ require indent_writer
 
 def Term.short_location_str(self) -> String
   loc = self.source_location
-  concat(self.parent.source_filename ':' loc.y1)
+  str(self.parent.source_filename ':' loc.y1)
 
 def Stack.frames_from_top(self) -> List
   for i in 0..self.frame_count

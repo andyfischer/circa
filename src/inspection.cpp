@@ -8,7 +8,6 @@
 #include "code_iterators.h"
 #include "kernel.h"
 #include "function.h"
-#include "heap_debugging.h"
 #include "inspection.h"
 #include "interpreter.h"
 #include "list.h"

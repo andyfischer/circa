@@ -6,7 +6,7 @@ def T.a(self)
   'T.a'
 
 def T.b(self)
-  concat('T.b calling T.a: ' self.a)
+  str('T.b calling T.a: ' self.a)
 
 struct Interface = :interface
 

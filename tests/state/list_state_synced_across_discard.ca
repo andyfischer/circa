@@ -1,0 +1,14 @@
+
+def main()
+  state list = [0 1 2 3 4] 
+  for i in @list
+    state s = i
+
+    print('i = ' i ', state = ' s)
+
+    if i == 1
+      discard
+
+vm = make_vm(main)
+vm.run
+vm.run

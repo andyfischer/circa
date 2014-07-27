@@ -147,6 +147,20 @@ void number_staticTypeQuery(Type* type, StaticTypeQuery* query)
         query->fail();
 }
 
+int number_hashFunc(Value* a)
+{
+    float f = as_float(a);
+
+    if (f == 0) {
+        return 0;
+    } else {
+        int exponent;
+        float mantissa = std::frexp(f, &exponent);
+        int hash = (exponent << 23) + int((mantissa - 0.5) * 2 * (1 << 23));
+        return hash;
+    }
+}
+
 void number_setup_type(Type* type)
 {
     reset_type(type);
@@ -156,6 +170,7 @@ void number_setup_type(Type* type)
     type->cast = number_cast;
     type->equals = number_equals;
     type->staticTypeQuery = number_staticTypeQuery;
+    type->hashFunc = number_hashFunc;
     type->toString = number_to_string;
 }
 

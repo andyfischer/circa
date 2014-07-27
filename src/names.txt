@@ -350,6 +350,7 @@ stat_StoreFrameState
 stat_AppendMove
 stat_GetIndexCopy
 stat_GetIndexMove
+stat_Interpreter_Step
 stat_Interpreter_DynamicMethod_CacheHit
 stat_Interpreter_DynamicMethod_SlowLookup
 stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef
@@ -360,6 +361,9 @@ stat_Interpreter_CopyTermValue
 stat_Interpreter_CopyStackValue
 stat_Interpreter_MoveStackValue
 stat_Interpreter_CopyCachedValue
+
+# Misc runtime
+stat_FindEnvValue
 
 # Values (general)
 stat_Make
@@ -389,14 +393,6 @@ stat_StringResizeInPlace
 stat_StringResizeCreate
 stat_StringSoftCopy
 stat_StringToStd
-
-# Interpreter
-stat_StepInterpreter
-stat_InterpreterCastOutputFromFinishedFrame
-stat_BlockNameLookups
-stat_PushFrame
-stat_LoopFinishIteration
-stat_LoopWriteOutput
 
 # Function calls
 stat_DynamicCall

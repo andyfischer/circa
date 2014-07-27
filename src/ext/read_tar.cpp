@@ -3,10 +3,14 @@
 
 #include "common_headers.h"
 
+#include "debug.h"
 #include "string_type.h"
 #include "tagged_value.h"
+#include "read_tar.h"
 
 namespace circa {
+
+#pragma pack(push,1)
 
 struct TarHeader
 {
@@ -31,10 +35,14 @@ struct TarHeader
 	char *gnu_longlink;
 };
 
+#pragma pack(pop)
+
 static int parse_octal_string(char* str, int len)
 {
     int output = 0;
     for (int i=0; i < len; i++) {
+        if (str[i] == 0 || str[i] == ' ')
+            break;
         output = output * 8 + (str[i] - '0');
     }
     return output;
@@ -77,6 +85,7 @@ static bool eof(char* data)
 
 void tar_read_file(caValue* tarBlob, const char* filename, caValue* fileOut)
 {
+    ca_assert(is_string(tarBlob));
     char* data = as_blob(tarBlob);
 
     while (!eof(data)) {
