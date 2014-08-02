@@ -163,6 +163,7 @@ Copy
 Move
 Unobservable
 TermCounter
+Watch
 
 # Stack steps
 StackReady
@@ -360,7 +361,7 @@ stat_Interpreter_DynamicFuncToClosureCall
 stat_Interpreter_CopyTermValue
 stat_Interpreter_CopyStackValue
 stat_Interpreter_MoveStackValue
-stat_Interpreter_CopyCachedValue
+stat_Interpreter_CopyConst
 
 # Misc runtime
 stat_FindEnvValue

@@ -50,7 +50,7 @@ Stack::Stack()
     set_hashtable(&demandValues);
     set_hashtable(&env);
     set_hashtable(&state);
-    set_list(&observations);
+    set_hashtable(&observations);
     rand_init(&randState, 0);
 
     set_hashtable(&attrs);
@@ -454,6 +454,13 @@ caValue* stack_register(Stack* stack, int index)
     return &stack->registers[index];
 }
 
+caValue* stack_register_rel(Stack* stack, int relativeIndex)
+{
+    int index = top_frame(stack)->firstRegisterIndex + relativeIndex;
+    ca_assert(index < stack->registerCount);
+    return &stack->registers[index];
+}
+
 caValue* frame_register(Frame* frame, int index)
 {
     ca_assert(index >= 0 && index < frame->registerCount);
@@ -529,7 +536,7 @@ void stack_bytecode_start_run(Stack* stack)
 
 void stack_on_program_change(Stack* stack)
 {
-    program_erase(stack->program);
+    compiled_erase(stack->program);
     for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
         frame->pc = 0;
         frame->blockIndex = -1;
@@ -563,6 +570,22 @@ caValue* stack_demand_value_get(Stack* stack, Term* term)
     Value key;
     set_term_ref(&key, term);
     return hashtable_get(&stack->demandValues, &key);
+}
+
+void stack_save_watch_observation(Stack* stack, Value* path, Value* value)
+{
+    Value* watches = hashtable_insert_symbol_key(&stack->observations, sym_Watch);
+    if (!is_hashtable(watches))
+        set_hashtable(watches);
+    copy(value, hashtable_insert(watches, path));
+}
+
+Value* stack_get_watch_observation(Stack* stack, Value* path)
+{
+    Value* watches = hashtable_get_symbol_key(&stack->observations, sym_Watch);
+    if (watches == NULL)
+        return NULL;
+    return hashtable_get(watches, path);
 }
 
 void stack_on_migration(Stack* stack)
@@ -785,9 +808,9 @@ void Stack__get_state(caStack* stack)
 void Stack__get_watch_result(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    caValue* key = circa_input(stack, 1);
+    Value* path = circa_input(stack, 1);
 
-    caValue* observation = program_get_watch_observation(self->program, key);
+    Value* observation = stack_get_watch_observation(self, path);
 
     if (observation == NULL)
         set_null(circa_output(stack, 0));

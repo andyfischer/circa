@@ -29,10 +29,7 @@ const char bc_CheckInputs = 0x17;
 const char bc_CopyTermValue = 0x18;
 const char bc_CopyStackValue = 0x19;
 const char bc_MoveStackValue = 0x1a;
-const char bc_CopyCachedValue = 0x1b;
-const char bc_SetNull = 0x1c;
-const char bc_SetZero = 0x1d;
-const char bc_SetEmptyList = 0x1e;
+const char bc_CopyConst = 0x1b;
 const char bc_Increment = 0x1f;
 const char bc_AppendMove = 0x20;
 const char bc_GetIndexCopy = 0x21;
@@ -55,6 +52,10 @@ const char bc_JumpToLoopStart = 0x37;
 // Raw values
 const char bc_SetInt = 0x3a;
 const char bc_SetFloat = 0x3b;
+const char bc_SetBool = 0x3c;
+const char bc_SetNull = 0x1c;
+const char bc_SetZero = 0x1d;
+const char bc_SetEmptyList = 0x1e;
 
 // Math
 const char bc_Addf = 0x40;
@@ -121,11 +122,10 @@ struct Compiled
 
     Value hacksByTerm;
 
-    // Map of watch key to cachedValue index (containing the watch).
-    Value watchByKey;
+    // List of watched paths.
+    Value watchedPaths;
 
-    // List of values that can be referenced by InputFromCachedValue.
-    Value cachedValues;
+    Value constList;
 };
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
@@ -145,13 +145,16 @@ int program_find_block_index(Compiled* compiled, Block* block);
 void program_generate_bytecode(Compiled* compiled, int blockIndex);
 int program_create_empty_entry(Compiled* compiled, Block* block);
 int program_create_entry(Compiled* compiled, Block* block);
-caValue* program_add_cached_value(Compiled* compiled, int* index);
-caValue* program_get_cached_value(Compiled* compiled, int index);
+
+caValue* compiled_add_const(Compiled* compiled, int* index);
+caValue* compiled_const(Compiled* compiled, int index);
+
+Value* compiled_get_watch_path(Compiled* compiled, int watchIndex);
+
 void program_add_watch(Compiled* compiled, caValue* key, caValue* path);
-caValue* program_get_watch_observation(Compiled* compiled, caValue* key);
 void program_set_hackset(Compiled* compiled, caValue* hackset);
 void compiled_reset_trace_data(Compiled* compiled);
-void program_erase(Compiled* compiled);
+void compiled_erase(Compiled* compiled);
 
 void compiled_to_string(Compiled* compiled, Value* out);
 void compiled_dump(Compiled* compiled);

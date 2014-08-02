@@ -32,7 +32,6 @@ struct Stack
     // Top-level env.
     Value env;
 
-    // Term value observations. Keyed by stack path.
     Value observations;
 
     // Stack state
@@ -157,6 +156,7 @@ Frame* prev_frame_n(Frame* frame, int distance);
 size_t frame_size(Frame* frame);
 
 caValue* stack_register(Stack* stack, int index);
+caValue* stack_register_rel(Stack* stack, int relativeIndex);
 caValue* frame_register(Frame* frame, int index);
 caValue* frame_register(Frame* frame, Term* term);
 caValue* frame_register_from_end(Frame* frame, int index);
@@ -178,6 +178,8 @@ void stack_derive_hackset(Stack* stack, Value* hackset);
 
 caValue* stack_demand_value_insert(Stack* stack, Term* key);
 caValue* stack_demand_value_get(Stack* stack, Term* key);
+void stack_save_watch_observation(Stack* stack, Value* path, Value* value);
+Value* stack_get_watch_observation(Stack* stack, Value* path);
 
 void stack_on_migration(Stack* stack);
 

@@ -41,6 +41,22 @@ static void vm_finish_frame(Stack* stack);
 
 void get_stack_path(Frame* frame, Value* out);
 
+#define unpack_push_frame(termIndex, count) \
+  u32 termIndex = *((u32*) (stack->bytecode + stack->pc)); \
+  u8 count = *((u8*) (stack->bytecode + stack->pc + 4)); \
+  stack->pc += 5;
+
+#define unpack_copy_const(index, registerIndex) \
+  u32 index = *((u32*) (stack->bytecode + stack->pc)); \
+  u8 registerIndex = *((u8*) (stack->bytecode + stack->pc + 4)); \
+  stack->pc += 5;
+
+#define unpack_set_term_ref(blockIndex, termIndex, registerIndex) \
+  u16 blockIndex = *((u16*) (stack->bytecode + stack->pc)); \
+  u16 termIndex = *((u16*) (stack->bytecode + stack->pc + 2)); \
+  u8 registerIndex = *((u8*) (stack->bytecode + stack->pc + 4)); \
+  stack->pc += 5;
+
 void stack_init(Stack* stack, Block* block)
 {
     ca_assert(block != NULL);
@@ -587,7 +603,7 @@ inline void* vm_read_pointer(Stack* stack)
 inline Value* vm_read_register(Stack* stack)
 {
     i16 distance = (i16) vm_read_u16(stack);
-    return stack_register(stack, top_frame(stack)->firstRegisterIndex + distance);
+    return stack_register_rel(stack, distance);
 }
 
 inline void vm_skip_bytecode(Stack* stack, size_t size)
@@ -951,8 +967,8 @@ void vm_run(Stack* stack)
             top_frame(stack)->pc = stack->pc;
             return;
         case bc_PushFrame: {
-            int termIndex = vm_read_u32(stack);
-            int count = vm_read_u8(stack);
+            unpack_push_frame(termIndex, count);
+
             top_frame(stack)->termIndex = termIndex;
             stack_push_blank_frame(stack, count);
             top_frame(stack)->parentIndex = termIndex;
@@ -1070,9 +1086,11 @@ void vm_run(Stack* stack)
         }
         case bc_CopyTermValue: {
             stat_increment(Interpreter_CopyTermValue);
+
             int blockIndex = vm_read_u16(stack);
             int termIndex = vm_read_u16(stack);
             Value* dest = vm_read_register(stack);
+
             Block* block = program_block(stack->program, blockIndex);
             Term* term = block->get(termIndex);
             copy(term_value(term), dest);
@@ -1080,6 +1098,7 @@ void vm_run(Stack* stack)
         }
         case bc_CopyStackValue: {
             stat_increment(Interpreter_CopyStackValue);
+
             Value* source = vm_read_register(stack);
             Value* dest = vm_read_register(stack);
 
@@ -1091,6 +1110,7 @@ void vm_run(Stack* stack)
         }
         case bc_MoveStackValue: {
             stat_increment(Interpreter_MoveStackValue);
+
             Value* source = vm_read_register(stack);
             Value* dest = vm_read_register(stack);
 
@@ -1104,11 +1124,12 @@ void vm_run(Stack* stack)
 
             continue;
         }
-        case bc_CopyCachedValue: {
-            stat_increment(Interpreter_CopyCachedValue);
-            u32 index = vm_read_u32(stack);
-            u8 registerIndex = vm_read_u8(stack);
-            Value* cachedValue = program_get_cached_value(stack->program, index);
+        case bc_CopyConst: {
+            stat_increment(Interpreter_CopyConst);
+
+            unpack_copy_const(index, registerIndex);
+
+            Value* cachedValue = compiled_const(stack->program, index);
             copy(cachedValue, frame_register(top_frame(stack), registerIndex));
             continue;
         }
@@ -1140,6 +1161,7 @@ void vm_run(Stack* stack)
         }
         case bc_GetIndexCopy: {
             stat_increment(GetIndexCopy);
+
             Value* list = vm_read_register(stack);
             Value* index = vm_read_register(stack);
             Value* to = vm_read_register(stack);
@@ -1167,9 +1189,8 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_SetTermRef: {
-            int blockIndex = vm_read_u16(stack);
-            int termIndex = vm_read_u16(stack);
-            int registerIndex = vm_read_u8(stack);
+            unpack_set_term_ref(blockIndex, termIndex, registerIndex);
+
             Block* block = program_block(stack->program, blockIndex);
             Value* dest = frame_register(top_frame(stack), registerIndex);
             Term* term = block->get(termIndex);
@@ -1332,21 +1353,21 @@ void vm_run(Stack* stack)
         }
 
         case bc_SetInt: {
-            int index = vm_read_u32(stack);
+            Value* dest = vm_read_register(stack);
             int value = vm_read_u32(stack);
-
-            Frame* top = top_frame(stack);
-            Value* slot = frame_register(top, index);
-            set_int(slot, value);
+            set_int(dest, value);
             continue;
         }
         case bc_SetFloat: {
-            int index = vm_read_u32(stack);
+            Value* dest = vm_read_register(stack);
             float value = vm_read_float(stack);
-
-            Frame* top = top_frame(stack);
-            Value* slot = frame_register(top, index);
-            set_float(slot, value);
+            set_float(dest, value);
+            continue;
+        }
+        case bc_SetBool: {
+            Value* dest = vm_read_register(stack);
+            char value = vm_read_char(stack);
+            set_bool(dest, value);
             continue;
         }
         #define INLINE_MATH_OP_HEADER \
@@ -1427,16 +1448,14 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_WatchCheck: {
-            u32 valueIndex = vm_read_u32(stack);
-
+            u32 index = vm_read_u32(stack);
             Frame* top = top_frame(stack);
-            Value* watch = stack->program->cachedValues.index(valueIndex);
-            Value* watchPath = watch->index(1);
+            Value* watchPath = compiled_get_watch_path(stack->program, index);
 
             if (vm_matches_watch_path(stack, watchPath)) {
                 Term* term = list_last(watchPath)->asTerm();
                 Value* value = frame_register(top, term);
-                watch->set_element(2, value);
+                stack_save_watch_observation(stack, watchPath, value);
             }
 
             continue;

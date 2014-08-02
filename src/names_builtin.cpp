@@ -157,6 +157,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Move: return "Move";
     case sym_Unobservable: return "Unobservable";
     case sym_TermCounter: return "TermCounter";
+    case sym_Watch: return "Watch";
     case sym_StackReady: return "StackReady";
     case sym_StackRunning: return "StackRunning";
     case sym_StackFinished: return "StackFinished";
@@ -319,7 +320,7 @@ const char* builtin_symbol_to_string(int name)
     case stat_Interpreter_CopyTermValue: return "stat_Interpreter_CopyTermValue";
     case stat_Interpreter_CopyStackValue: return "stat_Interpreter_CopyStackValue";
     case stat_Interpreter_MoveStackValue: return "stat_Interpreter_MoveStackValue";
-    case stat_Interpreter_CopyCachedValue: return "stat_Interpreter_CopyCachedValue";
+    case stat_Interpreter_CopyConst: return "stat_Interpreter_CopyConst";
     case stat_FindEnvValue: return "stat_FindEnvValue";
     case stat_Make: return "stat_Make";
     case stat_Copy: return "stat_Copy";
@@ -1789,6 +1790,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'W':
     switch (str[1]) {
+    case 'a':
+        if (strcmp(str + 2, "tch") == 0)
+            return sym_Watch;
+        break;
     case 'h':
         if (strcmp(str + 2, "itespace") == 0)
             return sym_Whitespace;
@@ -2120,8 +2125,8 @@ int builtin_symbol_from_string(const char* str)
     case 'y':
     switch (str[21]) {
     case 'C':
-        if (strcmp(str + 22, "achedValue") == 0)
-            return stat_Interpreter_CopyCachedValue;
+        if (strcmp(str + 22, "onst") == 0)
+            return stat_Interpreter_CopyConst;
         break;
     case 'S':
         if (strcmp(str + 22, "tackValue") == 0)

@@ -4,7 +4,8 @@ def main()
 
 vm = make_vm(main)
 
-vm.append_hack([:watch :key [main.block.find_term('a')]])
+watch_path = [main.block.find_term('a')]
+vm.append_hack([:watch watch_path])
 vm.run
-result = vm.get_watch_result(:key)
+result = vm.get_watch_result(watch_path)
 assert(result == 3)

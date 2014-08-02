@@ -81,6 +81,9 @@ static void possibly_write_watch_check(Writer* writer, Term* term);
 static Value* term_effective_value(Writer* writer, Term* term);
 Block* get_parent_block_stackwise(Block* block);
 int find_register_distance(Block* callingBlock, Term* input);
+static bool can_write_fixed_value(Value* value);
+static void write_fixed_value(Writer* writer, Value* value, int destReg);
+static void bc_copy_term_value(Writer* writer, Term* source, int destReg);
 
 bool compiled_should_ignore_term(Compiled* compiled, Term* term)
 {
@@ -185,18 +188,6 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
         break;
     case bc_Pause:
         string_append(string, "pause");
-        break;
-    case bc_SetNull:
-        string_append(string, "set_null ");
-        string_append(string, (i16) blob_read_u16(bc, pc));
-        break;
-    case bc_SetZero:
-        string_append(string, "set_zero ");
-        string_append(string, (i16) blob_read_u16(bc, pc));
-        break;
-    case bc_SetEmptyList:
-        string_append(string, "set_empty_list ");
-        string_append(string, (i16) blob_read_u16(bc, pc));
         break;
     case bc_Increment:
         string_append(string, "increment ");
@@ -319,6 +310,12 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
         string_append(string, " ");
         string_append(string, (i16) blob_read_u16(bc, pc));
         break;
+    case bc_CopyConst:
+        string_append(string, "copy_const ");
+        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, " ");
+        string_append(string, blob_read_u8(bc, pc));
+        break;
     case bc_SetTermRef:
         string_append(string, "set_term_ref compiledBlock:");
         string_append(string, blob_read_u16(bc, pc));
@@ -374,15 +371,33 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
         break;
     case bc_SetInt:
         string_append(string, "set_int ");
-        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append(string, blob_read_u32(bc, pc));
         break;
     case bc_SetFloat:
         string_append(string, "set_float ");
-        string_append(string, blob_read_u32(bc, pc));
+        string_append(string, blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append_f(string, blob_read_float(bc, pc));
+        break;
+    case bc_SetBool:
+        string_append(string, "set_bool ");
+        string_append(string, blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append_f(string, blob_read_char(bc, pc));
+        break;
+    case bc_SetNull:
+        string_append(string, "set_null ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        break;
+    case bc_SetZero:
+        string_append(string, "set_zero ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        break;
+    case bc_SetEmptyList:
+        string_append(string, "set_empty_list ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
         break;
 
     #define INLINE_MATH_CASE(op, str) \
@@ -1074,16 +1089,15 @@ static void possibly_write_watch_check(Writer* writer, Term* term)
         return;
 
     // This block has one or more watches, find them.
-    for (HashtableIterator it(&writer->compiled->watchByKey); it; ++it) {
-        int valueIndex = it.current()->asInt();
-        Value* watch = writer->compiled->cachedValues.index(valueIndex);
-        Value* targetPath = watch->index(1);
-        Term* targetTerm = as_term_ref(list_last(targetPath));
+    Value* watchedPaths = &writer->compiled->watchedPaths;
+    for (int i=0; i < watchedPaths->length(); i++) {
+        Value* path = watchedPaths->index(i);
+        Term* targetTerm = as_term_ref(list_last(path));
         if (targetTerm != term)
             continue;
 
         blob_append_char(writer->bytecode, bc_WatchCheck);
-        blob_append_u32(writer->bytecode, valueIndex);
+        blob_append_u32(writer->bytecode, i);
     }
 }
 
@@ -1105,10 +1119,12 @@ static Value* find_set_value_hack(Writer* writer, Term* term)
 
 static Value* term_effective_value(Writer* writer, Term* term)
 {
+#if 0
     Value* setValueHackIndex = find_set_value_hack(writer, term);
     if (setValueHackIndex != NULL)
         return writer->compiled->cachedValues.index(as_int(setValueHackIndex));
 
+#endif
     return term_value(term);
 }
 
@@ -1165,13 +1181,40 @@ static void bc_native_call_to_builtin(Writer* writer, const char* name)
     blob_append_u32(writer->bytecode, index);
 }
 
-static bool should_use_fixed_value(Writer* writer, Term* term)
+static bool can_write_fixed_value(Value* value)
+{
+    return is_int(value) || is_float(value) || is_bool(value);
+}
+
+static void write_fixed_value(Writer* writer, Value* value, int destReg)
+{
+    if (is_int(value)) {
+        blob_append_char(writer->bytecode, bc_SetInt);
+        blob_append_u16(writer->bytecode, destReg);
+        blob_append_u32(writer->bytecode, as_int(value));
+    } else if (is_float(value)) {
+        blob_append_char(writer->bytecode, bc_SetFloat);
+        blob_append_u16(writer->bytecode, destReg);
+        blob_append_float(writer->bytecode, as_float(value));
+    } else if (is_bool(value)) {
+        blob_append_char(writer->bytecode, bc_SetBool);
+        blob_append_u16(writer->bytecode, destReg);
+        blob_append_char(writer->bytecode, as_bool(value) ? 1 : 0);
+    }
+}
+
+static bool should_use_term_value(Writer* writer, Term* term)
 {
     return is_value(term) || term->owningBlock == global_builtins_block();
 }
 
-static void bc_copy_from_fixed_value(Writer* writer, Term* source, int destReg)
+static void bc_copy_term_value(Writer* writer, Term* source, int destReg)
 {
+    Value* value = term_effective_value(writer, source);
+
+    if (can_write_fixed_value(value))
+        return write_fixed_value(writer, value, destReg);
+
     int blockIndex = program_create_empty_entry(writer->compiled, source->owningBlock);
     blob_append_char(writer->bytecode, bc_CopyTermValue);
     blob_append_u16(writer->bytecode, blockIndex);
@@ -1197,8 +1240,8 @@ static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest, Symbol
     int destReg = find_register_distance(top, dest);
     if (source == NULL)
         bc_set_null(writer, destReg);
-    else if (should_use_fixed_value(writer, source))
-        bc_copy_from_fixed_value(writer, source, destReg);
+    else if (should_use_term_value(writer, source))
+        bc_copy_term_value(writer, source, destReg);
     else
         bc_move_or_copy(writer, find_register_distance(top, source), destReg, moveOrCopy);
 }
@@ -1324,14 +1367,14 @@ static void bytecode_write_input_instruction(Writer* writer, Term* caller, int i
     // Hack check, look for a :set_value on this input.
     Value* setValueIndex = find_set_value_hack(writer, input);
     if (setValueIndex != NULL) {
-        blob_append_char(writer->bytecode, bc_CopyCachedValue);
+        blob_append_char(writer->bytecode, bc_CopyConst);
         blob_append_u32(writer->bytecode, as_int(setValueIndex));
         blob_append_u8(writer->bytecode, inputIndex);
         return;
     }
 
-    if (should_use_fixed_value(writer, input)) {
-        bc_copy_from_fixed_value(writer, input, inputIndex);
+    if (should_use_term_value(writer, input)) {
+        bc_copy_term_value(writer, input, inputIndex);
 
     } else {
         Symbol moveOrCopy = sym_Copy;
@@ -1509,9 +1552,11 @@ Compiled* alloc_program(World* world)
     compiled->blocks = NULL;
     compiled->blockCount = 0;
     set_hashtable(&compiled->blockMap);
+    compiled->noSaveState = false;
+    compiled->skipEffects = false;
     set_hashtable(&compiled->hacksByTerm);
-    set_hashtable(&compiled->watchByKey);
-    set_list(&compiled->cachedValues);
+    set_list(&compiled->watchedPaths);
+    set_list(&compiled->constList);
     return compiled;
 }
 
@@ -1662,47 +1707,30 @@ int program_create_entry(Compiled* compiled, Block* block)
     return index;
 }
 
-Value* program_add_cached_value(Compiled* compiled, int* index)
+Value* compiled_add_const(Compiled* compiled, int* index)
 {
-    *index = list_length(&compiled->cachedValues);
-    return list_append(&compiled->cachedValues);
+    *index = list_length(&compiled->constList);
+    return list_append(&compiled->constList);
 }
 
-Value* program_get_cached_value(Compiled* compiled, int index)
+Value* compiled_const(Compiled* compiled, int index)
 {
-    return list_get(&compiled->cachedValues, index);
+    return compiled->constList.index(index);
 }
 
-void program_add_watch(Compiled* compiled, Value* key, Value* path)
+Value* compiled_get_watch_path(Compiled* compiled, int watchIndex)
 {
-    int cachedIndex = 0;
-    Value* watch = program_add_cached_value(compiled, &cachedIndex);
+    return compiled->watchedPaths.index(watchIndex);
+}
 
-    // Watch value is: [key, path, observation]
-    set_list(watch, 3);
-    watch->set_element(0, key);
-    watch->set_element(1, path);
-    watch->set_element_null(2);
-
-    // Update watchByKey
-    set_int(hashtable_insert(&compiled->watchByKey, key), cachedIndex);
-
-    Term* targetTerm = as_term_ref(list_last(path));
+void program_add_watch(Compiled* compiled, Value* path)
+{
+    copy(path, compiled->watchedPaths.append());
 
     // Update CompiledBlock
+    Term* targetTerm = as_term_ref(list_last(path));
     int blockIndex = program_create_empty_entry(compiled, targetTerm->owningBlock);
     compiled_block(compiled, blockIndex)->hasWatch = true;
-}
-
-Value* program_get_watch_observation(Compiled* compiled, Value* key)
-{
-    Value* index = hashtable_get(&compiled->watchByKey, key);
-    if (index == NULL)
-        return NULL;
-
-    Value* watch = list_get(&compiled->cachedValues, as_int(index));
-
-    return watch->index(2);
 }
 
 void program_set_hackset(Compiled* compiled, Value* hackset)
@@ -1722,12 +1750,11 @@ void program_set_hackset(Compiled* compiled, Value* hackset)
                 set_hashtable(termHacks);
 
             int cachedValueIndex = 0;
-            set_value(program_add_cached_value(compiled, &cachedValueIndex), setValueNewValue);
+            set_value(compiled_add_const(compiled, &cachedValueIndex), setValueNewValue);
             set_int(hashtable_insert_symbol_key(termHacks, sym_set_value), cachedValueIndex);
         } else if (first_symbol(hacksetElement) == sym_watch) {
-            Value* watchKey = hacksetElement->index(1);
-            Value* watchPath = hacksetElement->index(2);
-            program_add_watch(compiled, watchKey, watchPath);
+            Value* watchPath = hacksetElement->index(1);
+            program_add_watch(compiled, watchPath);
         } else if (first_symbol(hacksetElement) == sym_TermCounter) {
             compiled->enableTermCounter = true;
         }
@@ -1747,7 +1774,7 @@ void compiled_reset_trace_data(Compiled* compiled)
     }
 }
 
-void program_erase(Compiled* compiled)
+void compiled_erase(Compiled* compiled)
 {
     set_blob(&compiled->bytecode, 0);
     free(compiled->blocks);
@@ -1757,8 +1784,8 @@ void program_erase(Compiled* compiled)
     compiled->noSaveState = false;
     compiled->skipEffects = false;
     set_hashtable(&compiled->hacksByTerm);
-    set_hashtable(&compiled->watchByKey);
-    set_list(&compiled->cachedValues);
+    set_list(&compiled->watchedPaths);
+    set_list(&compiled->constList);
 }
 
 void compiled_to_string(Compiled* compiled, Value* out)
