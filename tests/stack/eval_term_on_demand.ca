@@ -11,6 +11,6 @@ def func_that_is_never_called()
 
 x_ref = func_that_is_never_called.block.find_term('x')
 
-print('about to call_eval_term_on_demand..')
-result = _eval_term_on_demand(x_ref)
+print('about to call _eval_on_demand..')
+result = _eval_on_demand(x_ref)
 print('result = ' result)

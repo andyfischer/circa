@@ -34,7 +34,8 @@ void stack_to_string(Stack* stack, caValue* out, bool withBytecode);
 void stack_trace_to_string(Stack* stack, caValue* out);
 
 void vm_run(Stack* stack);
-Frame* vm_push_frame2(Stack* stack, int parentIndex, int blockIndex);
+Frame* vm_push_frame(Stack* stack, int parentIndex, int blockIndex);
+void vm_prepare_top_frame(Stack* stack, int blockIndex);
 int vm_compile_block(Stack* stack, Block* block);
 
 // Deprecated

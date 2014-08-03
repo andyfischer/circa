@@ -10,3 +10,19 @@ def Lib1_T.f(self, i)
 
 def f(i)
     print('Called lib1.f with ' i)
+
+def get_x()
+    print('Called lib1.get_x')
+    1
+
+x = get_x()
+
+def get_x2()
+  2 * x
+
+x3 = call(->
+  3 * x
+)
+  
+def print_x3()
+  print(x3)

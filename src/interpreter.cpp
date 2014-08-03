@@ -35,7 +35,6 @@ namespace circa {
 
 static void start_interpreter_session(Stack* stack);
 
-static void vm_prepare_top_frame(Stack* stack, int blockIndex);
 static bool vm_matches_watch_path(Stack* stack, Value* path);
 static void vm_finish_frame(Stack* stack);
 
@@ -68,7 +67,7 @@ void stack_init(Stack* stack, Block* block)
     stack_on_program_change(stack);
 
     int blockIndex = vm_compile_block(stack, block);
-    vm_push_frame2(stack, 0, blockIndex);
+    vm_push_frame(stack, 0, blockIndex);
 }
 
 void stack_init_with_closure(Stack* stack, Value* closure)
@@ -82,7 +81,7 @@ void stack_init_with_closure(Stack* stack, Value* closure)
     }
 }
 
-Frame* vm_push_frame2(Stack* stack, int parentIndex, int blockIndex)
+Frame* vm_push_frame(Stack* stack, int parentIndex, int blockIndex)
 {
     int localsCount = block_locals_count(program_block(stack->program, blockIndex));
     Frame* top = stack_push_blank_frame(stack, localsCount);
@@ -517,7 +516,10 @@ int get_count_of_caller_inputs_for_error(Stack* stack)
         foundCount--;
     else if (callerTerm->function == FUNCS.func_apply) {
         Value* inputs = stack_find_nonlocal(parentFrame, callerTerm->input(1));
-        foundCount = list_length(inputs);
+        if (is_list(inputs))
+            foundCount = list_length(inputs);
+        else
+            foundCount = 1;
     }
 
     return foundCount;
@@ -793,10 +795,14 @@ void vm_resolve_dynamic_method_to_module_access(Stack* stack, Value* object)
         int blockIndex = vm_compile_block(stack, term->nestedContents);
         vm_prepare_top_frame(stack, blockIndex);
 
-    } else {
-        stack_resize_top_frame(stack, frame_register_count(top) + 1);
+    } else if (is_type(term)) {
+        stack_resize_top_frame(stack, 2);
         copy(elementName, frame_register(top, 1));
         int blockIndex = vm_compile_block(stack, FUNCS.moduleRef_get->nestedContents);
+        vm_prepare_top_frame(stack, blockIndex);
+    } else {
+        set_term_ref(frame_register(top, 0), term);
+        int blockIndex = vm_compile_block(stack, FUNCS.eval_on_demand->nestedContents);
         vm_prepare_top_frame(stack, blockIndex);
     }
 }
@@ -913,7 +919,7 @@ static Value* vm_read_local_value(Frame* referenceFrame)
     return frame_register(frame, index);
 }
 
-static void vm_prepare_top_frame(Stack* stack, int blockIndex)
+void vm_prepare_top_frame(Stack* stack, int blockIndex)
 {
     Frame* top = top_frame(stack);
     top->block = program_block(stack->program, blockIndex);

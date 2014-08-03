@@ -796,7 +796,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         find_func(dynamic_term_eval, "_dynamic_term_eval");
         find_func(equals, "equals");
         find_func(error, "error");
-        find_func(eval_on_demand, "_eval_term_on_demand");
+        find_func(eval_on_demand, "_eval_on_demand");
         find_func(func_call, "Func.call");
         find_func(func_apply, "Func.apply");
         find_func(get_with_selector, "get_with_selector");

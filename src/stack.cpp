@@ -457,6 +457,7 @@ caValue* stack_register(Stack* stack, int index)
 caValue* stack_register_rel(Stack* stack, int relativeIndex)
 {
     int index = top_frame(stack)->firstRegisterIndex + relativeIndex;
+    ca_assert(index >= 0);
     ca_assert(index < stack->registerCount);
     return &stack->registers[index];
 }
@@ -699,22 +700,6 @@ void Stack__extract_state(caStack* stack)
     copy(&self->state, circa_output(stack, 0));
 }
 
-void Stack__eval_on_demand(caStack* stack)
-{
-#if 0
-    Stack* self = as_stack(circa_input(stack, 0));
-    Term* term = as_term_ref(circa_input(stack, 1));
-
-    // Make sure currentHacksetBytecode is initialzed
-    stack_bytecode_start_run(self);
-
-    vm_evaluate_module_on_demand(self, term, true);
-    vm_run(self);
-    caValue* result = stack_active_value_for_term(top_frame(self), term);
-    copy(result, circa_output(stack, 0));
-#endif
-}
-
 void Stack__find_active_value(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
@@ -858,18 +843,17 @@ void Stack__copy(caStack* stack)
 void Stack__stack_push(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    ca_assert(self != NULL);
-
     Block* block = as_block(circa_input(stack, 1));
+    caValue* inputs = circa_input(stack, 2);
+
+    ca_assert(self != NULL);
 
     if (block == NULL)
         return circa_output_error(stack, "Null block for input 1");
 
     ca_assert(block != NULL);
 
-    Frame* top = vm_push_frame2(self, top_frame(self)->termIndex, vm_compile_block(self, block));
-
-    caValue* inputs = circa_input(stack, 2);
+    Frame* top = vm_push_frame(self, top_frame(self)->termIndex, vm_compile_block(self, block));
 
     for (int i=0; i < list_length(inputs); i++) {
         if (i >= frame_register_count(top))
@@ -944,6 +928,35 @@ void Stack__run(caStack* stack)
     self->caller = NULL;
 
     move(circa_input(stack, 0), circa_output(stack, 0));
+}
+
+void Stack__eval_on_demand(caStack* stack)
+{
+    Stack* self = as_stack(circa_input(stack, 0));
+    Value* termRef = circa_input(stack, 1);
+    ca_assert(self != NULL);
+
+    if (self->caller != NULL)
+        return raise_error_msg(self, "Stack already has a call in progress");
+    self->caller = stack;
+
+    stack_init(self, FUNCS.eval_on_demand->nestedContents);
+    move(termRef, circa_input(self, 0));
+    vm_run(self);
+
+#if 0
+    Term* term = as_term_ref(circa_input(stack, 1));
+
+    // Make sure currentHacksetBytecode is initialzed
+    stack_bytecode_start_run(self);
+
+    vm_evaluate_module_on_demand(self, term, true);
+    vm_run(self);
+    caValue* result = stack_active_value_for_term(top_frame(self), term);
+#endif
+
+    self->caller = NULL;
+    move(circa_output(self, 0), circa_output(stack, 0));
 }
 
 void Stack__frame_from_base(caStack* stack)

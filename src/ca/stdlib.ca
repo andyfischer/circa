@@ -371,6 +371,9 @@ def Func.apply(self, List inputs) -> any
   -- See note in Func.call:
   self.apply(inputs)
 
+def call(Func func, inputs :multiple) -> any
+  func.apply(inputs)
+
 def closure_block() -> Func
   -- Internally used function for declaring a closure.
 
@@ -381,7 +384,7 @@ def _nonlocal(term :ref) -> any
   if found
     value
   else
-    _eval_term_on_demand(term)
+    _eval_on_demand(term)
 
 def _declared_state(Type t, Func initializer :optional) -> any
   -- Internally used function for fetching a stateful value. The parser
@@ -406,9 +409,9 @@ def _declared_state(Type t, Func initializer :optional) -> any
 def _dynamic_term_eval(Term t, List inputs) -> any
   t.function.to_func.apply(inputs)
 
-def _eval_term_on_demand(Term t) -> any
+def _eval_on_demand(Term t) -> any
   -- Internal function, used when a nonlocal() term needs a value.
-  if t.is_value
+  if t.is_value or t.is_func_decl
     return t.value
 
   found, val = _get_demand_value(t)
@@ -416,7 +419,7 @@ def _eval_term_on_demand(Term t) -> any
     return val
 
   inputs = for Term input in t.inputs
-    _eval_term_on_demand(input)
+    _eval_on_demand(input)
 
   result = _dynamic_term_eval(t inputs)
   _store_demand_value(t result)
@@ -1112,6 +1115,8 @@ def Term.has_input_property(self, int index, Symbol key) -> bool
 def Term.is_value(self) -> bool
 def Term.is_function(self) -> bool
     self.get_type == Func
+def Term.is_func_decl(self) -> bool
+    self.function == function_decl.block
 def Term.has_name(term) -> bool
   term.name != ''
 def Term.is_hidden(term) -> bool

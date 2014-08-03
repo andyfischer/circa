@@ -10,7 +10,7 @@ def main()
   a = get_a()
   b = get_b()
 
-stack = make_stack({})
+stack = make_stack(->)
 
 print('Evaluating a on demand..')
 t = main.block.find_term('a')

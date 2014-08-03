@@ -1986,18 +1986,15 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     inputs.prepend(lhs.term);
     inputHints.insert(0);
+
+    // rootType may be NULL.
     Type* rootType = lhs.term->type;
 
-    #ifdef DEBUG
-        if (rootType == NULL) {
-            printf("Parsing method_call, no type for term named %s (bootstrapping?)\n",
-                as_cstring(&lhs.term->nameValue));
-            internal_error("Error in parser::method_call");
-        }
-    #endif
-
     // Find the function
-    Term* function = find_method(block, rootType, &functionName);
+    Term* function = NULL;
+    
+    if (rootType != NULL)
+        function = find_method(block, rootType, &functionName);
 
     Term* term = NULL;
 

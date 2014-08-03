@@ -1,0 +1,3 @@
+
+require lib1
+lib1.print_x3()

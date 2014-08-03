@@ -1,0 +1,5 @@
+pre require
+pre access
+Called lib1.get_x
+post access, x = 1
+post 2nd access, x = 1

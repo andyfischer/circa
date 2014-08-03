@@ -1,3 +1,3 @@
-about to call_eval_term_on_demand..
+about to call _eval_on_demand..
 calling demand_func
 result = 5

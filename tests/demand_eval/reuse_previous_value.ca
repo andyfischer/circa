@@ -6,17 +6,17 @@ def main()
 
   def get_b(i) -> String
     print('called get_b')
-    concat(i ' b')
+    str(i ' b')
 
   def get_c(i) -> String
     print('called get_c')
-    concat(i ' c')
+    str(i ' c')
 
   a = get_a()
   b = get_b(a)
   c = get_c(a)
 
-stack = make_stack({})
+stack = make_stack(->)
 
 print('Evaluating b:')
 

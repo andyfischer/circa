@@ -1,0 +1,8 @@
+
+def module()
+
+  a = (x,y) -> x + y
+  b = call(a 1 2)
+
+print('Start:')
+print('b = ' _eval_on_demand(module.block.term_named('b')))
