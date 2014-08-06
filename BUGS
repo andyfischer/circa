@@ -1,6 +1,13 @@
 
 Miscellanous (most-recent first)
   
+  Really confusing the way @ symbol is not added to field assignment
+
+    Ex:
+      struct.a.b = x
+
+    Seems like @ should be in the mix somewhere.
+  
   switch can't be used as expression. Example:
       
       x += switch 1
@@ -22,9 +29,6 @@ Miscellanous (most-recent first)
   Defining a method on non-existant type: weird parser errors
 
   Can't use a type before it's defined. Should be able to post-define it like functions.
-
-  Method lookup cache:
-    Currently does not cache method-on-module-ref, or hashtable value as method.
 
   load_module should return Func for consistency
 

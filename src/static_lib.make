@@ -75,8 +75,8 @@ OBJECTS := \
 	$(OBJDIR)/control_flow.o \
 	$(OBJDIR)/debug.o \
 	$(OBJDIR)/file.o \
+	$(OBJDIR)/file_source.o \
 	$(OBJDIR)/file_watch.o \
-	$(OBJDIR)/filepack.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/hashtable.o \
 	$(OBJDIR)/if_block.o \
@@ -212,10 +212,10 @@ $(OBJDIR)/debug.o: debug.cpp
 $(OBJDIR)/file.o: file.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_watch.o: file_watch.cpp
+$(OBJDIR)/file_source.o: file_source.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/filepack.o: filepack.cpp
+$(OBJDIR)/file_watch.o: file_watch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/function.o: function.cpp

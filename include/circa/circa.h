@@ -4,9 +4,9 @@
 #define CIRCA_H_INCLUDED
 
 #ifdef _MSC_VER
-    // No stdbool on Windows
 #else
-    #include <stdbool.h>
+    #include <cstdbool>
+    #include <cstdint>
 #endif
 
 // Public API
@@ -32,7 +32,7 @@ namespace circa {
 typedef circa::Block caBlock;
 
 // a Stack holds the interpreter's current state, including a list of frames (activation
-// records). Each Stack corresponds to one lightweight thread (not OS thread).
+// records).
 typedef circa::Stack caStack;
 
 typedef circa::Term caTerm;
@@ -41,8 +41,8 @@ typedef circa::Term caTerm;
 // initialization and destruction, and various other handlers and metadata.
 typedef circa::Type caType;
 
-// a World holds miscellaneous shared runtime information. A process should create one
-// World that is used across the program.
+// a World holds miscellaneous shared runtime information. Typically, a process should
+// create a single World at startup.
 typedef circa::World caWorld;
 
 typedef circa::NativePatch caNativePatch;
@@ -260,24 +260,24 @@ caBlock* circa_stack_top_block(caStack* stack);
 //   done through the use of *deep pointers*. An accessor function, such as circa_index,
 //   will return a deep pointer into the list.
 //
-//     Since Circa uses persistent data structures (two caValues may share the same 
+//     Since Circa uses persistent data structures (two Values may share the same 
 //   underlying data), there are rules on safely using deep pointers. The rules are:
 //
 //   If you are only reading from the deep pointer:
 //     - Many operations on the container value will invalidate all deep pointers. It's advised that
 //       you don't touch the container at all while accessing the deep pointer.
-//     - When in doubt, use circa_copy to copy a deep pointer to a new caValue. The caValue
-//       copy is now safe to use, even if its container is touched.
+//     - When in doubt, use circa_copy to copy a deep pointer to a new Value. The newly copied Value
+//       is now safe to read from, even if its container is touched.
 //
 //   If you are also *writing* to a deep pointer:
 //     - The above warnings on reading are applicable.
 //     - Additionally, you can only write to a deep pointer if its container is deep-write-safe.
 //       Check the documentation, each relevant call will describe whether its result is
 //       deep-write-safe.
-//     - When in doubt, use circa_touch to ensure that a container is deep-write-safe.
+//     - When in doubt, use circa_touch to ensure that a Value is deep-write-safe.
 //
 //   Terminology
-//     - deep-write-safe - A description applied to a container caValue, indicating that the
+//     - deep-write-safe - A description applied to a container Value, indicating that the
 //       value's contents can be safely modified. A newly created value is deep-write-safe,
 //       and circa_touch will ensure that a value is deep-write-safe. Sharing a value's data
 //       with other values will make that value not deep-write-safe.
@@ -535,6 +535,9 @@ bool circa_file_exists(caWorld* world, const char* filename);
 int circa_file_get_version(caWorld* world, const char* filename);
 void circa_use_local_filesystem(caWorld* world, const char* rootDir);
 void circa_use_tarball_filesystem(caWorld* world, caValue* tarball);
+void circa_use_in_memory_filesystem(caWorld* world);
+void circa_load_file_in_memory(caWorld* world, caValue* filename, caValue* contents);
+void circa_load_tar_in_memory(caWorld* world, char* data, uint32_t numBytes);
 
 // -- Path tools --
 void circa_get_directory_for_filename(caValue* filename, caValue* result);

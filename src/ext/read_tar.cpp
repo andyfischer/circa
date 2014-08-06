@@ -111,6 +111,22 @@ bool tar_file_exists(caValue* tarBlob, const char* filename)
     return false;
 }
 
+CIRCA_EXPORT void circa_load_tar_in_memory(World* world, char* data, uint32_t numBytes)
+{
+    char* dataStart = data;
+
+    while (!eof(data) && (data - dataStart) < numBytes) {
+        Value filename;
+        set_string(&filename, file_name(data));
+
+        Value contents;
+        file_copy_contents(data, &contents);
+
+        circa_load_file_in_memory(world, &filename, &contents);
+        advance_to_next_file(&data);
+    }
+}
+
 void tar_debug_dump_listing(caValue* tarBlob)
 {
     char* data = as_blob(tarBlob);

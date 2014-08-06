@@ -7,9 +7,10 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
-#include "filepack.h"
+#include "file_source.h"
 #include "interpreter.h"
 #include "file_watch.h"
+#include "hashtable.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
@@ -114,13 +115,35 @@ extern "C" {
 void circa_use_local_filesystem(caWorld* world, const char* rootDir)
 {
     world_clear_file_sources(world);
-    filepack_create_using_filesystem(world_append_file_source(world), rootDir);
+    file_source_create_using_filesystem(world_append_file_source(world), rootDir);
 }
 
 void circa_use_tarball_filesystem(caWorld* world, caValue* tarball)
 {
     world_clear_file_sources(world);
-    filepack_create_from_tarball(world_append_file_source(world), tarball);
+    file_source_create_from_tarball(world_append_file_source(world), tarball);
+}
+
+void circa_use_in_memory_filesystem(caWorld* world)
+{
+    world_clear_file_sources(world);
+    set_hashtable(world_append_file_source(world));
+}
+
+void circa_load_file_in_memory(caWorld* world, Value* filename, Value* contents)
+{
+    touch(&world->fileSources);
+    for (int i=0; i < world->fileSources.length(); i++) {
+        Value* fileSource = world->fileSources.index(i);
+        if (is_hashtable(fileSource)) {
+            Value entry;
+            set_list(&entry, 2);
+            entry.set_element_int(0, 0);
+            copy(contents, entry.index(1));
+            move(&entry, hashtable_insert(fileSource, filename));
+            break;
+        }
+    }
 }
 
 void circa_set_log_handler(caWorld* world, void* context, caLogFunc func)

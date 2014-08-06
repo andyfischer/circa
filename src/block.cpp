@@ -719,9 +719,11 @@ void load_script(Block* block, const char* filename)
     circa_read_file(block->world, filename, &contents);
 
     if (is_null(&contents)) {
-        Term* msg = create_string(block, "File not found: ");
-        string_append(term_value(msg), filename);
-        apply(block, FUNCS.error, TermList(msg));
+        Value msg;
+        set_string(&msg, "File not found: ");
+        string_append(&msg, filename);
+        Term* term = create_string(block, as_cstring(&msg));
+        apply(block, FUNCS.error, TermList(term));
         return;
     }
 

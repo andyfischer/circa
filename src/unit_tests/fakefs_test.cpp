@@ -4,7 +4,7 @@
 
 #include "circa/file.h"
 
-#include "filepack.h"
+#include "file_source.h"
 #include "kernel.h"
 
 namespace fakefs_test {
