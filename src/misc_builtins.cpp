@@ -107,7 +107,7 @@ void cast_evaluate(caStack* stack)
 {
     // 'cast' is used by scripts. In this version, the type is passed via the 2nd param
     Value* result = circa_output(stack, 0);
-    copy(circa_input(stack, 0), result);
+    move(circa_input(stack, 0), result);
 
     Type* type = unbox_type(circa_input(stack, 1));
 

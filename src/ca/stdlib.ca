@@ -125,16 +125,19 @@ def dbg_set_incoming_state(val)
 def dbg_set_outgoing_state(val)
 
 -- Type checking
-def is_compound(any) -> bool
-def is_list(any) -> bool
-def is_map(any) -> bool
-def is_int(any) -> bool
-def is_number(any) -> bool
-def is_bool(any) -> bool
-def is_string(any) -> bool
-def is_null(any) -> bool
-def is_function(any) -> bool
-def is_type(any) -> bool
+def is_compound(n) -> bool
+def is_list(n) -> bool
+def is_map(n) -> bool
+def is_int(n) -> bool
+def is_number(n) -> bool
+def is_bool(n) -> bool
+def is_string(n) -> bool
+def is_null(n) -> bool
+def is_function(n) -> bool
+def is_type(n) -> bool
+
+def is_scalar(n) -> bool
+  is_int(n) or is_number(n)
 
 -- Overloaded math funcs
 def add(any left, any right) -> any
@@ -1140,19 +1143,34 @@ def Term.extra_output(self, int index)
 
 def vec2(number x, number y)
   Vec2.make(x y)
-def Vec2.add(self, Vec2 b) -> Vec2
-  [self.x + b.x, self.y + b.y]
-def Vec2.sub(self, Vec2 b) -> Vec2
-  [self.x - b.x, self.y - b.y]
-def Vec2.mult(self, number scalar) -> Vec2
-  [self.x * scalar, self.y * scalar]
-def Vec2.div(self, number scalar) -> Vec2
-  [self.x / scalar, self.y / scalar]
 
-def Vec2.add_v(self, Vec2 right) -> Vec2
-  [self.x + right.x, self.y + right.y]
-def Vec2.mult_v(self, Vec2 right) -> Vec2
-  [self.x * right.x, self.y * right.y]
+def Vec2.add(self, rhs) -> Vec2
+  rhs, isVec = cast(rhs, Vec2)
+  if isVec
+    [self.x + rhs.x, self.y + rhs.y]
+  else
+    [self.x + rhs, self.y + rhs]
+
+def Vec2.sub(self, rhs) -> Vec2
+  rhs, isVec = cast(rhs, Vec2)
+  if isVec
+    [self.x - rhs.x, self.y - rhs.y]
+  else
+    [self.x - rhs, self.y - rhs]
+
+def Vec2.mult(self, rhs) -> Vec2
+  rhs, isVec = cast(rhs, Vec2)
+  if isVec
+    [self.x * rhs.x, self.y * rhs.y]
+  else
+    [self.x * rhs, self.y * rhs]
+
+def Vec2.div(self, rhs) -> Vec2
+  rhs, isVec = cast(rhs, Vec2)
+  if isVec
+    [self.x / rhs.x, self.y / rhs.y]
+  else
+    [self.x / rhs, self.y / rhs]
     
 def Vec2.distance(self, Vec2 b) -> number
   -- Returns the distance between self and b.
