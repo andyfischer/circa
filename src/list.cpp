@@ -784,11 +784,10 @@ namespace list_t {
         list_decref(data);
     }
 
-    void tv_copy(Type* type, Value* source, Value* dest)
+    void tv_copy(Value* source, Value* dest)
     {
         list_copy(source, dest);
     }
-
 
     void tv_cast(CastResult* result, Value* value, Type* type, bool checkOnly)
     {

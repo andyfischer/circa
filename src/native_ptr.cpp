@@ -48,7 +48,7 @@ void native_ptr_initialize(Type*, caValue* value)
     value->value_data.ptr = data;
 }
 
-void native_ptr_copy(Type*, caValue* source, caValue* dest)
+void native_ptr_copy(Value* source, Value* dest)
 {
     make_no_initialize(source->value_type, dest);
 

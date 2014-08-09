@@ -100,6 +100,7 @@ void* get_pointer(caValue* value);
 void* get_pointer(caValue* value, Type* expectedType);
 
 // Type checking against builtin types.
+bool is_blob(caValue* value);
 bool is_bool(caValue* value);
 bool is_block(caValue* value);
 bool is_error(caValue* value);

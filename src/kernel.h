@@ -109,6 +109,7 @@ struct BuiltinFuncs {
 
 struct BuiltinTypes {
     Type* any;
+    Type* blob;
     Type* block;
     Type* bool_type;
     Type* color;
@@ -154,15 +155,6 @@ namespace assign_function {
 
 namespace copy_function {
     void evaluate(caStack* stack);
-}
-
-namespace file_changed_function {
-    bool check(Stack*, Term* caller, caValue* fileSignature,
-            std::string const& filename);
-}
-
-namespace for_function {
-    std::string get_heading_source(Term* term);
 }
 
 namespace return_function {

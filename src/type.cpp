@@ -35,7 +35,7 @@ namespace type_t {
         Type* type = as_type(value);
         type_decref(type);
     }
-    void copy(Type*, caValue* source, caValue* dest)
+    void copy(caValue* source, caValue* dest)
     {
         ca_assert(is_type(source));
         make_no_initialize(source->value_type, dest);

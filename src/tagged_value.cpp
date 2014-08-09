@@ -256,7 +256,7 @@ void copy(caValue* source, caValue* dest)
     Type::Copy copyFunc = source->value_type->copy;
 
     if (copyFunc != NULL) {
-        copyFunc(source->value_type, source, dest);
+        copyFunc(source, dest);
         ca_assert(dest->value_type == source->value_type);
     } else {
         // Default behavior, shallow assign.
@@ -796,6 +796,7 @@ void* get_pointer(caValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
+bool is_blob(caValue* value) { return value->value_type == TYPES.blob; }
 bool is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
 bool is_block(caValue* value) { return value->value_type == TYPES.block; }
 bool is_error(caValue* value) { return value->value_type == TYPES.error; }

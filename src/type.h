@@ -26,7 +26,7 @@ struct CastResult
 struct Type
 {
     typedef void (*Initialize)(Type* type, caValue* value);
-    typedef void (*Copy)(Type* type, caValue* source, caValue* dest);
+    typedef void (*Copy)(caValue* source, caValue* dest);
     typedef void (*Reset)(Type* type, caValue* value);
     typedef bool (*Equals)(caValue* lhs, caValue* rhs);
 

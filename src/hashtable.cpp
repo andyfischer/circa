@@ -154,7 +154,7 @@ Hashtable* duplicate(Hashtable* original)
     return dupe;
 }
 
-void hashtable_copy(Type*, caValue* sourceVal, caValue* destVal)
+void hashtable_copy(Value* sourceVal, Value* destVal)
 {
     Hashtable* source = (Hashtable*) sourceVal->value_data.ptr;
 

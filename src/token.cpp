@@ -207,7 +207,7 @@ struct TokenizeContext
 
 void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
-void consume_name(TokenizeContext &context);
+void consume_symbol(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_comment(TokenizeContext& context);
 void consume_multiline_comment(TokenizeContext& context);
@@ -449,8 +449,8 @@ void top_level_consume_token(TokenizeContext &context)
             else if (context.next(1) == ':') {
                 context.consume(tok_DoubleColon, 2);
                 return;
-            } else if (is_identifier_first_letter(context.next(1))) {
-                return consume_name(context);
+            } else if (is_acceptable_inside_identifier(context.next(1))) {
+                return consume_symbol(context);
             }
 
             context.consume(tok_Colon, 1);
@@ -733,7 +733,7 @@ void consume_color_literal(TokenizeContext &context)
         context.consume(tok_Unrecognized, lookahead);
 }
 
-void consume_name(TokenizeContext &context)
+void consume_symbol(TokenizeContext &context)
 {
     int lookahead = 0;
 

@@ -134,7 +134,7 @@ void stack_incref(Stack* stack)
 
 void stack_decref(Stack* stack)
 {
-    if (stack->isRefcounted) {
+    if (stack != NULL && stack->isRefcounted) {
         ca_assert(stack->refCount > 0);
         stack->refCount--;
         if (stack->refCount == 0)
@@ -643,10 +643,11 @@ void frame_copy(Frame* left, Frame* right)
     right->pc = left->pc;
 }
 
-void stack_value_copy(Type*, caValue* source, caValue* dest)
+void stack_value_copy(caValue* source, caValue* dest)
 {
     Stack* stack = (Stack*) source->value_data.ptr;
-    stack_incref(stack);
+    if (stack != NULL)
+        stack_incref(stack);
     make_no_initialize(source->value_type, dest);
     dest->value_data.ptr = stack;
 }

@@ -357,8 +357,15 @@ void        circa_vec2(caValue* vec2, float* xOut, float* yOut);
 void        circa_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
 void        circa_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
 
+void circa_blob_data(caValue* blob, char** dataOut, uint32_t* sizeOut);
+
+// Create a new blob based on a backing value. Caller must guarantee that 'data' is owned
+// or contained inside the backingValue.
+void circa_set_blob_from_backing_value(caValue* blob, caValue* backingValue, char* data, uint32_t numBytes);
+
 // Read the pointer value from a caValue. This call will do dereferencing: if the caValue
 // is actually a Handle then we'll dereference the handle.
+// (Deprecated)
 void*       circa_get_pointer(caValue* value);
 
 // Fetch a caValue as a float (converting it from an int if necessary)

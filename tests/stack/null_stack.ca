@@ -1,0 +1,7 @@
+
+struct T {
+  Stack stack
+}
+
+t = T.make
+t = null

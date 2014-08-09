@@ -120,7 +120,7 @@ void string_release(Value* value)
     decref((StringData*) value->value_data.ptr);
 }
 
-void string_copy(Type* type, Value* source, Value* dest)
+void string_copy(Value* source, Value* dest)
 {
     StringData* data = (StringData*) source->value_data.ptr;
     if (data != NULL)
@@ -185,9 +185,9 @@ bool string_equals(Value* left, Value* right)
         // Strings are equal. Sneakily have both values reference the same data.
         // Prefer to preserve the one that has more references.
         if (leftData->refCount >= rightData->refCount)
-            string_copy(NULL, left, right);
+            string_copy(left, right);
         else
-            string_copy(NULL, right, left);
+            string_copy(right, left);
     #endif
 
     return true;
