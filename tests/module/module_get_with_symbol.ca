@@ -6,9 +6,6 @@ funcs = [lib1.:f, lib2.:f]
 
 print('Calling closure list..')
 
-for func in funcs
-    i = index()
-
-    print('Looping across closures, index = ' i)
-
-    func.call(i)
+for i, func in funcs
+  print('Looping across closures, index = ' i)
+  func.call(i)

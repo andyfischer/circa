@@ -339,6 +339,12 @@ def SourceRepro.declared_state(self, Term term) -> SourceRepro
 
 def SourceRepro.for_loop(self, Term term) -> SourceRepro
   @self.phrase(:text 'for ')
+  index = term.contents.get_loop_index
+
+  if index.has_name
+    @self.phrase(:name index.name)
+    @self.phrase(:text ', ')
+
   if term.has_property(:Syntax_ExplicitType)
     @self.phrase(:name term.property(:Syntax_ExplicitType))
     @self.phrase(:ws ' ')

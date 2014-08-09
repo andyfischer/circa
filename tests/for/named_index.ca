@@ -1,0 +1,5 @@
+
+list = ['apple' 'banana' 'cucumber']
+
+for i, str in list
+  print(i ' -> ' str)

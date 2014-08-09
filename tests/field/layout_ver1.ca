@@ -95,10 +95,10 @@ def Layout.getRects(self) -> List
     x_ranges = self.solveDim('width')
     y_ranges = self.solveDim('height')
 
-    for node in self.nodes
-        x_range = x_ranges[index()]
-        y_range = y_ranges[index()]
-        positions[index()] = [x_range[0] y_range[0] x_range[1] y_range[1]]
+    for i, node in self.nodes
+        x_range = x_ranges[i]
+        y_range = y_ranges[i]
+        positions[i] = [x_range[0] y_range[0] x_range[1] y_range[1]]
 
     positions
 

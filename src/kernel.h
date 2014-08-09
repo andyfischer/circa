@@ -53,7 +53,6 @@ struct BuiltinFuncs {
     Term* require;
     Term* include_func;
     Term* input;
-    Term* input_explicit;
     Term* inputs_fit_function;
     Term* lambda;
     Term* length;

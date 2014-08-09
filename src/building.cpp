@@ -63,7 +63,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
     // Position the term before any output_placeholder terms.
     block->move(term, position);
 
-    if (name != NULL && !string_equals(name, ""))
+    if (name != NULL && !is_null(name) && !string_equals(name, ""))
         rename(term, name);
 
     for (int i=0; i < inputs.length(); i++)

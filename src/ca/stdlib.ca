@@ -22,7 +22,6 @@ def section()
 def case_condition_bool(bool condition)
 def loop_condition_bool(bool condition)
 def minor_return_if_empty()
-def index(int i :optional) -> int
 def module()
 
 -- While-block
@@ -42,7 +41,6 @@ def case(bool b :optional)
 def switch(any input :optional) -> any
 
 -- Explicit input/output (future questionable)
-def input(Type t :optional, any _) -> any
 def output(any _)
 
 -- Lists
@@ -607,6 +605,13 @@ def Block.call(self, any inputs :multiple) -> any
   -- Invoke this Block with the given inputs.
   self.to_func.apply(inputs)
 
+def Block.get_loop_index(self) -> Term
+  -- For a for-loop, return the index term
+  for term in self.terms
+    if term.function == loop_index.block
+      return term
+  error("Iterator not found in Block.get_iterator")
+
 def Block.get_iterator(self) -> Term
   -- For a for-loop, return the iterator term
   for term in self.terms
@@ -871,27 +876,27 @@ def List.modify(self, int index, Func func)
 
 def List.add(self, any value) -> List
   if is_compound(value)
-    for i in self { i + value[index()] }
+    for i,el in self { el + value[i] }
   else
-    for i in self { i + value }
+    for el in self { el + value }
 
 def List.sub(self, any value) -> List
   if is_compound(value)
-    for i in self { i - value[index()] }
+    for i,el in self { el - value[i] }
   else
-    for i in self { i - value }
+    for el in self { el - value }
 
 def List.mult(self, any value) -> List
   if is_compound(value)
-    for i in self { i * value[index()] }
+    for i,el in self { el * value[i] }
   else
-    for i in self { i * value }
+    for el in self { el * value }
 
 def List.div(self, any value) -> List
   if is_compound(value)
-    for i in self { i / value[index()] }
+    for i,el in self { el / value[i] }
   else
-    for i in self { i / value }
+    for el in self { el / value }
 
 def List.cycle(self, int index) -> any
   -- Get an element by index. If the index is out of bounds, then modulo the
@@ -1265,6 +1270,8 @@ def Rect.top_right(self) -> Vec2
 def Rect.bottom_left(self) -> Vec2
   -- Returns the bottom-left coordinates as a Vec2.
   [self.x1 self.y2]
+def Rect.bottom_center(self) -> Vec2
+  [(self.x1+self.x2)/2, self.y2]
 def Rect.bottom_right(self) -> Vec2
   -- Returns the bottom-right coordinates as a Vec2.
   [self.x2 self.y2]
@@ -1324,8 +1331,8 @@ def sum(List numbers) -> number
   result
     
 def zip(List left, List right) -> List
-  for l in left
-    [l, right.get_opt(index(), null)]
+  for i,l in left
+    [l, right.get_opt(i, null)]
 
 -- Stateful functions
 

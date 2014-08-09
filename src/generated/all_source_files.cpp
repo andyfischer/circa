@@ -1,3 +1,4 @@
+#include "../blob.cpp"
 #include "../block.cpp"
 #include "../building.cpp"
 #include "../builtin_types.cpp"

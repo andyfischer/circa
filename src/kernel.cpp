@@ -301,24 +301,6 @@ Type* type_make_specializeType(Term* caller)
     return TYPES.any;
 }
 
-void input_explicit_postCompile(Term* term)
-{
-    internal_error("don't use input_explicit");
-    Block* block = term->owningBlock;
-
-    Term* in = append_input_placeholder(block);
-    set_input(term, 1, in);
-    set_bool(term_insert_input_property(term, 1, sym_Hidden), true);
-
-    Term* input = term->input(0);
-
-    if (input != NULL && is_type(term_value(input))) {
-        Type* type = as_type(term_value(term->input(0)));
-        set_declared_type(in, type);
-        set_declared_type(term, type);
-    }
-}
-
 void output_explicit_postCompile(Term* term)
 {
     Term* out = insert_output_placeholder(term->owningBlock, term->input(0), 0);
@@ -336,18 +318,6 @@ void require_postCompile(Term* term)
     caValue* moduleRef = term_value(term);
     make(TYPES.module_ref, moduleRef);
     set_block(list_get(moduleRef, 0), module);
-}
-
-void index_postCompile(Term* term)
-{
-    Term* enclosingLoop = find_enclosing_for_loop(term);
-    if (enclosingLoop == NULL)
-        return;
-    Term* loop_index = for_loop_find_index(nested_contents(enclosingLoop));
-    if (loop_index == NULL)
-        return;
-    set_input(term, 0, loop_index);
-    set_input_hidden(term, 0, true);
 }
 
 World* global_world()
@@ -754,7 +724,6 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         find_func(greater_than_eq, "greater_than_eq");
         find_func(has_effects, "has_effects");
         find_func(if_block, "if");
-        find_func(input_explicit, "input");
         find_func(inputs_fit_function, "inputs_fit_function");
         find_func(length, "length");
         find_func(less_than, "less_than");
@@ -841,9 +810,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         has_post_compile("discard", controlFlow_postCompile);
         has_post_compile("break", controlFlow_postCompile);
         has_post_compile("continue", controlFlow_postCompile);
-        has_post_compile("input", input_explicit_postCompile);
         has_post_compile("output", output_explicit_postCompile);
-        has_post_compile("index", index_postCompile);
         has_post_compile("require", require_postCompile);
 
     #undef has_post_compile

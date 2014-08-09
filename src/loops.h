@@ -9,9 +9,10 @@ namespace circa {
 const char* for_loop_get_iterator_name(Term* forTerm);
 Term* for_loop_find_index(Block* contents);
 
-// Initialize the contents of a for-loop for a new term. 'iteratorType' is the type to use
-// for the iterator. If it's NULL then we'll infer a type from the term's input.
-void start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType);
+// Initialize the contents of a for-loop for a new term.
+//   'iteratorType' is the type to use  for the iterator. If it's NULL then we'll infer a
+//   type from the term's input.
+void start_building_for_loop(Term* forTerm, Value* indexName, Value* iteratorName, Type* iteratorType);
 void finish_for_loop(Term* forTerm);
 void finish_while_loop(Block* block);
 

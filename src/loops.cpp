@@ -49,7 +49,7 @@ Block* get_for_loop_outer_rebinds(Term* forTerm)
     return contents->getFromEnd(0)->contents();
 }
 
-void start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType)
+void start_building_for_loop(Term* forTerm, Value* indexName, Value* iteratorName, Type* iteratorType)
 {
     Block* contents = nested_contents(forTerm);
 
@@ -57,7 +57,7 @@ void start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iter
     Term* listInput = apply(contents, FUNCS.input, TermList());
 
     // loop_index()
-    Term* index = apply(contents, FUNCS.loop_index, TermList());
+    Term* index = apply(contents, FUNCS.loop_index, TermList(), indexName);
     hide_from_source(index);
 
     // loop_get_element()

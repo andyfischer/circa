@@ -1256,21 +1256,37 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     if (!tokens.nextIs(tok_Identifier))
         return syntax_error(block, tokens, startPosition);
 
-    std::string iterator_name = tokens.consumeStr(tok_Identifier);
-    possible_whitespace(tokens);
+    Value indexName;
+    Value indexTypeName;
 
-    Type* explicitIteratorType = NULL;
-    std::string explicitTypeStr;
+    Value iteratorName;
+    Value iteratorTypeName;
+
+    tokens.consumeStr(&iteratorName, tok_Identifier);
+    possible_whitespace(tokens);
 
     // If there are two identifiers, then the first one is an explicit type and
     // the second one is the type name.
     if (tokens.nextIs(tok_Identifier)) {
-        explicitTypeStr = iterator_name;
-        Term* typeTerm = find_name(block, explicitTypeStr.c_str());
-        if (typeTerm != NULL && is_type(typeTerm))
-            explicitIteratorType = as_type(typeTerm);
-        iterator_name = tokens.consumeStr(tok_Identifier);
+        move(&iteratorName, &iteratorTypeName);
+        tokens.consumeStr(&iteratorName, tok_Identifier);
         possible_whitespace(tokens);
+    }
+
+    if (tokens.nextIs(tok_Comma)) {
+        tokens.consume();
+
+        // Comma means that we have an index name plus an iterator name.
+        move(&iteratorName, &indexName);
+        move(&iteratorTypeName, &indexTypeName);
+
+        tokens.consumeStr(&iteratorName, tok_Identifier);
+        possible_whitespace(tokens);
+        if (tokens.nextIs(tok_Identifier)) {
+            move(&iteratorName, &iteratorTypeName);
+            tokens.consumeStr(&iteratorName, tok_Identifier);
+            possible_whitespace(tokens);
+        }
     }
 
     if (!tokens.nextIs(tok_In))
@@ -1287,18 +1303,23 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
         possible_whitespace(tokens);
     }
 
+    Type* explicitIteratorType = NULL;
+    Term* typeTerm = find_name(block, &iteratorTypeName);
+    if (typeTerm != NULL && is_type(typeTerm))
+        explicitIteratorType = as_type(typeTerm);
+
     Term* listExpr = infix_expression(block, tokens, context, 0).term;
 
     Term* forTerm = apply(block, FUNCS.for_func, TermList(listExpr));
     Block* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
     term_insert_input_property(forTerm, 0, sym_Syntax_PostWs)->set_string("");
-    if (explicitTypeStr != "")
-        forTerm->setStringProp(sym_Syntax_ExplicitType, explicitTypeStr.c_str());
+    if (!is_null(&iteratorTypeName))
+        forTerm->setStringProp(sym_Syntax_ExplicitType, as_cstring(&iteratorTypeName));
 
     forTerm->setBoolProp(sym_ModifyList, rebindListName);
 
-    start_building_for_loop(forTerm, iterator_name.c_str(), explicitIteratorType);
+    start_building_for_loop(forTerm, &indexName, &iteratorName, explicitIteratorType);
 
     consume_block(contents, tokens, context);
 

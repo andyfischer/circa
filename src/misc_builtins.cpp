@@ -307,19 +307,6 @@ void get_index(caStack* stack)
     cast(circa_output(stack, 0), declared_type((Term*) circa_caller_term(stack)));
 }
 
-void input_explicit(caStack* stack)
-{
-    internal_error("dont use input_explicit");
-
-    copy(circa_input(stack, 1), circa_output(stack, 0));
-
-    Term* in = circa_caller_term(stack)->input(0);
-    if (in != NULL) {
-        Type* type = as_type(circa_input(stack, 0));
-        cast(circa_output(stack, 0), type);
-    }
-}
-
 void make_list(caStack* stack)
 {
     // Variadic arg handling will already have turned this into a list
@@ -687,11 +674,6 @@ void greater_than_eq_f(caStack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_float_input(stack, 0) >= circa_float_input(stack, 1));
-}
-
-void index_func(caStack* stack)
-{
-    copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
 void List__append(caStack* stack)
@@ -1301,8 +1283,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "get_field", get_field);
     circa_patch_function(patch, "get_index", get_index);
     circa_patch_function(patch, "get_with_symbol", get_with_symbol);
-    circa_patch_function(patch, "index", index_func);
-    circa_patch_function(patch, "input", input_explicit);
     circa_patch_function(patch, "is_compound", hosted_is_compound);
     circa_patch_function(patch, "is_list", hosted_is_list);
     circa_patch_function(patch, "is_int", hosted_is_int);
