@@ -40,7 +40,7 @@ struct Writer {
     }
 
     int position() {
-        return blob_size(bytecode);
+        return string_length(bytecode);
     }
 };
 

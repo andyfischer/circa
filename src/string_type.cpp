@@ -649,28 +649,23 @@ char* as_blob(Value* value)
     return (char*) as_cstring(value);
 }
 
-int blob_size(Value* val)
-{
-    return string_length(val);
-}
-
 void blob_append_char(Value* blob, char c)
 {
-    int size = blob_size(blob);
+    int size = string_length(blob);
     string_resize(blob, size + 1);
     as_blob(blob)[size] = c;
 }
 
 void blob_append_u8(Value* blob, u8 val)
 {
-    int size = blob_size(blob);
+    int size = string_length(blob);
     string_resize(blob, size + 1);
     as_blob(blob)[size] = val;
 }
 
 void blob_append_u16(Value* blob, u16 val)
 {
-    int size = blob_size(blob);
+    int size = string_length(blob);
     string_resize(blob, size + 2);
     u16* position = (u16*) &as_blob(blob)[size];
     *position = val;
@@ -678,14 +673,14 @@ void blob_append_u16(Value* blob, u16 val)
 
 void blob_append_u32(Value* blob, u32 val)
 {
-    int size = blob_size(blob);
+    int size = string_length(blob);
     string_resize(blob, size + 4);
     u32* position = (u32*) &as_blob(blob)[size];
     *position = val;
 }
 void blob_append_float(Value* blob, float f)
 {
-    int size = blob_size(blob);
+    int size = string_length(blob);
     string_resize(blob, size + 4);
     float* position = (float*) &as_blob(blob)[size];
     *position = f;
@@ -693,7 +688,7 @@ void blob_append_float(Value* blob, float f)
 
 void blob_append_space(Value* blob, size_t additionalSize)
 {
-    size_t size = blob_size(blob);
+    size_t size = string_length(blob);
     string_resize(blob, int(size + additionalSize));
     memset(as_blob(blob) + size, 0, additionalSize);
 }
@@ -769,7 +764,7 @@ void blob_to_hex_string(Value* blob, Value* str)
 {
     set_string(str, "");
 
-    for (int i=0; i < blob_size(blob); i++) {
+    for (int i=0; i < string_length(blob); i++) {
         char c = as_blob(blob)[i];
 
         string_append_char(str, to_hex_digit(c / 16));
@@ -780,11 +775,6 @@ void blob_to_hex_string(Value* blob, Value* str)
 CIRCA_EXPORT int circa_string_length(Value* string)
 {
     return string_length(string);
-}
-
-CIRCA_EXPORT int circa_blob_length(Value* blob)
-{
-    return blob_size(blob);
 }
 
 } // namespace circa

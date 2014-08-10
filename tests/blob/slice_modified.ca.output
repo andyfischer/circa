@@ -1,0 +1,20 @@
+slice.size = 4
+slice byte 0 = 4
+slice byte 1 = 5
+slice byte 2 = 6
+slice byte 3 = 7
+(assigned slice byte 1 to 11)
+original byte 0 = 0
+original byte 1 = 1
+original byte 2 = 2
+original byte 3 = 3
+original byte 4 = 4
+original byte 5 = 5
+original byte 6 = 6
+original byte 7 = 7
+original byte 8 = 8
+original byte 9 = 9
+slice byte 0 = 4
+slice byte 1 = 11
+slice byte 2 = 6
+slice byte 3 = 7

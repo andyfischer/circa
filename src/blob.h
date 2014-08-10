@@ -6,5 +6,6 @@ namespace circa {
 #define set_blob_from_backing_value circa_set_blob_from_backing_value
 
 void blob_setup_type(Type* type);
+void blob_install_functions(NativePatch* patch);
 
 } // namespace circa

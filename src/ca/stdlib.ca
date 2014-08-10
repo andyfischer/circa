@@ -522,6 +522,22 @@ struct Vec4 { number x, number y, number z, number w }
 struct Rect { number x1, number y1, number x2, number y2 }
 struct Rect_i { int x1, int y1, int x2, int y2 }
 
+def make_blob(int size) -> Blob
+def Blob.size(self) -> int
+def Blob.slice(self, int offset, int size) -> Blob
+def Blob.set_u8(self, int offset, int value)
+def Blob.set_u16(self, int offset, int value)
+def Blob.set_u32(self, int offset, int value)
+def Blob.set_i8(self, int offset, int value)
+def Blob.set_i16(self, int offset, int value)
+def Blob.set_i32(self, int offset, int value)
+def Blob.u8(self, int offset) -> int
+def Blob.u16(self, int offset) -> int
+def Blob.u32(self, int offset) -> int
+def Blob.i8(self, int offset) -> int
+def Blob.i16(self, int offset) -> int
+def Blob.i32(self, int offset) -> int
+
 def Block.dump(self)
   -- Dump this block's raw contents to stdout.
 def Block.find_term(self, String name) -> Term

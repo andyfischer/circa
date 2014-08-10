@@ -1,0 +1,12 @@
+
+b = make_blob(10)
+
+for i in 0..10
+  @b.set_u8(i, i)
+
+slice = b.slice(4, 4)
+
+print('slice.size = ' slice.size)
+
+for i in 0..4
+  print('slice byte ' i ' = ' slice.u8(i))

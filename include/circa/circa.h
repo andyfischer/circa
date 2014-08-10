@@ -411,7 +411,6 @@ void circa_set_string_size(caValue* container, const char* str, int size);
 void circa_set_empty_string(caValue* container, int size);
 
 int circa_string_length(caValue* string);
-int circa_blob_length(caValue* string);
 
 const char* circa_symbol_text(caValue* symbol);
 bool circa_symbol_equals(caValue* symbol, const char* text);

@@ -68,7 +68,6 @@ void set_string(caValue* value, const char* s, int length);
 // Manipulate a string as a blob
 char* set_blob(caValue* value, int len);
 char* as_blob(caValue* val);
-int blob_size(caValue* val);
 void blob_append_char(caValue* blob, char c);
 void blob_append_u8(caValue* blob, u8 val);
 void blob_append_u16(caValue* blob, u16 val);

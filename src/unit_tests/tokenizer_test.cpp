@@ -257,8 +257,7 @@ void test_string_literal()
     test_equals(tokens.consumeStr(tok_Whitespace), " ");
     test_equals(tokens.consumeStr(tok_ColonString), ":a");
     test_equals(tokens.consumeStr(tok_Whitespace), " ");
-    test_equals(tokens.consumeStr(tok_Colon), ":");
-    test_equals(tokens.consumeStr(tok_Integer), "1");
+    test_equals(tokens.consumeStr(tok_ColonString), ":1");
     test_assert(tokens.finished());
 }
 

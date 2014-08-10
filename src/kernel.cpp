@@ -601,6 +601,7 @@ void bootstrap_kernel()
     circa_patch_function(world->builtinPatch, "syntax_error", syntax_error);
     circa_patch_function(world->builtinPatch, "global_script_version", global_script_version);
 
+    blob_install_functions(world->builtinPatch);
     selector_setup_funcs(world->builtinPatch);
     closures_install_functions(world->builtinPatch);
     modules_install_functions(world->builtinPatch);
