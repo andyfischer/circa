@@ -524,7 +524,7 @@ struct Rect_i { int x1, int y1, int x2, int y2 }
 
 def make_blob(int size) -> Blob
 def Blob.size(self) -> int
-def Blob.slice(self, int offset, int size) -> Blob
+def Blob.slice(self, int offset, int len) -> Blob
 def Blob.set_u8(self, int offset, int value)
 def Blob.set_u16(self, int offset, int value)
 def Blob.set_u32(self, int offset, int value)
@@ -537,6 +537,20 @@ def Blob.u32(self, int offset) -> int
 def Blob.i8(self, int offset) -> int
 def Blob.i16(self, int offset) -> int
 def Blob.i32(self, int offset) -> int
+
+def Blob.to_hex_string(self, int offset, int len) -> String
+  def to_hex_digit(int i)
+    if i >= 0 and i < 10
+      String.make.from_char_code('0'.char_code + i)
+    else
+      String.make.from_char_code('a'.char_code + i - 10)
+
+  result = ""
+  for i in offset..(offset+len)
+    byte = self.u8(i)
+    @result.append(to_hex_digit(byte // 16))
+    @result.append(to_hex_digit(byte % 16))
+  result
 
 def Block.dump(self)
   -- Dump this block's raw contents to stdout.
@@ -1040,7 +1054,8 @@ def String.index_of(self, String substr) -> (bool, int)
 def String.ends_with(self, String suffix) -> bool
   -- Return true if this string ends with the given substring.
 
-def String.ord(self) -> int
+def String.char_code(self) -> int
+def String.from_char_code(self, int code) -> String
 
 def String.length(self) -> int
   -- Returns the string length.

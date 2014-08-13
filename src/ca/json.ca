@@ -2,7 +2,7 @@
 def is_digit(String s)
   if s.length < 1
     return false
-  (s.ord >= '0'.ord) and (s.ord <= '9'.ord)
+  (s.char_code >= '0'.char_code) and (s.char_code <= '9'.char_code)
 
 struct Reader {
   String str

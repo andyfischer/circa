@@ -915,13 +915,21 @@ void String__length(caStack* stack)
     set_int(circa_output(stack, 0), (int) strlen(str));
 }
 
-void String__ord(caStack* stack)
+void String__char_code(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
     if (strlen(str) != 1)
         return circa_output_error(stack, "Expected a string of length 1");
     
     set_int(circa_output(stack, 0), (int) str[0]);
+}
+
+void String__from_char_code(Stack* stack)
+{
+    char str[2];
+    str[0] = circa_int_input(stack, 1);
+    str[1] = 0;
+    set_string(circa_output(stack, 0), str);
 }
 
 void String__substr(caStack* stack)
@@ -1363,10 +1371,12 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "Map.set", Map__set);
     circa_patch_function(patch, "Map.empty", Map__empty);
     circa_patch_function(patch, "ModuleRef._get", ModuleRef__get);
+
     circa_patch_function(patch, "String.char_at", String__char_at);
     circa_patch_function(patch, "String.ends_with", String__ends_with);
     circa_patch_function(patch, "String.length", String__length);
-    circa_patch_function(patch, "String.ord", String__ord);
+    circa_patch_function(patch, "String.char_code", String__char_code);
+    circa_patch_function(patch, "String.from_char_code", String__from_char_code);
     circa_patch_function(patch, "String.substr", String__substr);
     circa_patch_function(patch, "String.slice", String__slice);
     circa_patch_function(patch, "String.starts_with", String__starts_with);

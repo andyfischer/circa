@@ -1,0 +1,6 @@
+
+code = 'a'.char_code
+print('code of a = ' code)
+
+a = String.make.from_char_code(code)
+print('back to a = ' a)

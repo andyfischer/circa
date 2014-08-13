@@ -267,7 +267,7 @@ void Blob__set_i32(Stack* stack)
     if ((offset + sizeof(type)) > numBytes) \
         return circa_output_error(stack, "Offset is out of bounds"); \
     \
-    type result = *((type*) data + offset); \
+    type result = *(type*) (data + offset); \
     set_int(circa_output(stack, 0), result);
 
 void Blob__u8(Stack* stack)
