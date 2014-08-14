@@ -64,6 +64,8 @@ static void bc_comment(Writer* writer, const char* msg);
 static void bc_push_frame(Writer* writer, int termIndex, int inputCount);
 static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest, Symbol moveOrCopy);
 static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest);
+static void bc_convert_to_declared_type(Writer* writer, Term* term);
+static void bc_convert_if_needed(Writer* writer, Term* term, Term* source);
 static bool term_can_consume_input(Term* term, Term* input);
 static void bc_set_null(Writer* writer, int registerDistance);
 static void bc_finish_loop_iteration(Writer* writer, Block* block, Symbol exitType);
@@ -145,10 +147,12 @@ static void bc_pop_frame(Writer* writer)
 
 static void bc_comment(Writer* writer, const char* msg)
 {
+#if DEBUG
     blob_append_u8(writer->bytecode, bc_Comment);
     u16 len = (u16) strlen(msg);
     blob_append_u16(writer->bytecode, len);
     string_append_len(writer->bytecode, msg, len);
+#endif
 }
 
 static void bc_set_zero(Writer* writer, Block* top, Term* term)
@@ -175,7 +179,7 @@ static void bc_store_frame_state(Writer* writer, Block* block)
         bc_native_call_to_builtin(writer, "#store_frame_state");
 }
 
-void bytecode_op_to_string(const char* bc, int* pc, Value* string)
+void bytecode_op_to_string(const char* bc, u32* pc, Value* string)
 {
     if (!is_string(string))
         set_string(string, "");
@@ -324,6 +328,10 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
         string_append(string, " toRegister:");
         string_append(string, blob_read_u8(bc, pc));
         break;
+    case bc_ConvertToDeclaredType:
+        string_append(string, "convert_to_declared_type termIndex:");
+        string_append(string, blob_read_u16(bc, pc));
+        break;
     case bc_Jump:
         string_append(string, "jump offset:");
         string_append(string, (i16) blob_read_u16(bc, pc));
@@ -448,7 +456,7 @@ void bytecode_op_to_string(const char* bc, int* pc, Value* string)
     }
 }
 
-int bytecode_op_to_term_index(const char* bc, int pc)
+int bytecode_op_to_term_index(const char* bc, u32 pc)
 {
     char op = blob_read_char(bc, &pc);
 
@@ -473,7 +481,7 @@ void bytecode_to_string(Value* bytecode, Value* string)
 
 void bytecode_to_string_lines(char* bytecode, Value* lines)
 {
-    int pos = 0;
+    u32 pos = 0;
 
     set_list(lines, 0);
     bool indent = false;
@@ -488,7 +496,7 @@ void bytecode_to_string_lines(char* bytecode, Value* lines)
         if (indent)
             string_append(line, " ");
 
-        int peek = pos;
+        u32 peek = pos;
         char opcode = blob_read_char(bytecode, &peek);
 
         circa::Value op;
@@ -517,12 +525,12 @@ void bytecode_dump_val(Value* bytecode)
 
 void bytecode_dump(char* data)
 {
-    int pc = 0;
+    u32 pc = 0;
     while (data[pc] != bc_End)
         bytecode_dump_next_op(data, &pc);
 }
 
-void bytecode_dump_next_op(const char* bc, int *pc)
+void bytecode_dump_next_op(const char* bc, u32 *pc)
 {
     int originalPc = *pc;
     circa::Value line;
@@ -784,6 +792,7 @@ void bc_return(Writer* writer, Term* term)
         Term* dest = get_output_placeholder(majorBlock, i);
 
         bc_copy(writer, term->owningBlock, input, dest, sym_Move);
+        bc_convert_if_needed(writer, dest, input);
     }
 
     // Pop intermediate frames
@@ -847,7 +856,11 @@ void write_term(Writer* writer, Term* term)
             blob_append_u16(writer->bytecode, term->index);
             return;
         } else {
+
             bc_copy(writer, term->owningBlock, term->input(0), term);
+            if (!term->boolProp(sym_AccumulatingOutput, false))
+                bc_convert_if_needed(writer, term, term->input(0));
+            
             return;
         }
     }
@@ -1259,6 +1272,19 @@ static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest)
     bc_copy(writer, top, source, dest, moveOrCopy);
 }
 
+static void bc_convert_to_declared_type(Writer* writer, Term* term)
+{
+    blob_append_u8(writer->bytecode, bc_ConvertToDeclaredType);
+    blob_append_u16(writer->bytecode, term->index);
+}
+
+static void bc_convert_if_needed(Writer* writer, Term* term, Term* source)
+{
+    if ((declared_type(source) != declared_type(term))
+            && declared_type(term) != TYPES.any)
+        bc_convert_to_declared_type(writer, term);
+}
+
 static void bc_set_null(Writer* writer, int registerDistance)
 {
     blob_append_char(writer->bytecode, bc_SetNull);
@@ -1409,6 +1435,11 @@ static void bytecode_write_input_instructions(Writer* writer, Term* caller, Bloc
 
 static void bytecode_write_output_instructions(Writer* writer, Term* caller, Block* block)
 {
+    CompiledTerm* cterm = find_cterm(writer->compiled, caller);
+    if (cterm->useCount == 0)
+        // output never used
+        return;
+
     if (block == NULL) {
         blob_append_char(writer->bytecode, bc_PopOutputsDynamic);
         return;
@@ -1579,6 +1610,21 @@ CompiledBlock* compiled_block(Compiled* compiled, int index)
     return &compiled->blocks[index];
 }
 
+CompiledBlock* find_cblock(Compiled* compiled, Block* block)
+{
+    block = find_enclosing_major_block(block);
+    int index = program_find_block_index(compiled, block);
+    if (index == -1)
+        return NULL;
+    return compiled->blocks + index;
+}
+
+CompiledTerm* find_cterm(Compiled* compiled, Term* term)
+{
+    CompiledBlock* cblock = find_cblock(compiled, term->owningBlock);
+    return find_cterm(cblock, term);
+}
+
 int program_find_block_index(Compiled* compiled, Block* block)
 {
     Value key;
@@ -1589,7 +1635,94 @@ int program_find_block_index(Compiled* compiled, Block* block)
     return as_int(indexVal);
 }
 
-void compile_block(Writer* writer)
+int compiled_block_add_term(CompiledBlock* cblock)
+{
+    cblock->termsCount += 1;
+    cblock->terms = (CompiledTerm*) realloc(cblock->terms, sizeof(CompiledTerm) * cblock->termsCount);
+    int newIndex = cblock->termsCount - 1;
+    memset(cblock->terms + newIndex, 0, sizeof(CompiledTerm));
+    return newIndex;
+}
+
+CompiledTerm* find_cterm(CompiledBlock* cblock, Term* term)
+{
+    Value termRef;
+    set_term_ref(&termRef, term);
+    Value* index = hashtable_get(&cblock->termIndexMap, &termRef);
+    if (index == NULL)
+        return NULL;
+    return cblock->terms + as_int(index);
+}
+
+void cblock_initialize_terms(CompiledBlock* cblock)
+{
+    Block* block = cblock->block;
+
+    free(cblock->terms);
+    cblock->terms = NULL;
+    cblock->termsCount = 0;
+    set_hashtable(&cblock->termIndexMap);
+
+    for (MinorBlockIterator it(block); it; ++it) {
+        Term* term = *it;
+        int index = compiled_block_add_term(cblock);
+        CompiledTerm* cterm = cblock->terms + index;
+
+        cterm->term = term;
+
+        Value termRef;
+        set_term_ref(&termRef, term);
+        set_int(hashtable_insert(&cblock->termIndexMap, &termRef), index);
+    }
+}
+
+void cblock_usage_pass(CompiledBlock* cblock)
+{
+    // Update useCount for externally-observable terms.
+    for (int i=0; i < cblock->termsCount; i++) {
+        CompiledTerm* cterm = cblock->terms + i;
+        if (term_is_observable_for_special_reasons(cterm->term))
+            cterm->useCount += 1;
+
+        if (term_used_by_nonlocal(cterm->term)) {
+            cterm->useCount += 1;
+            cterm->loopedUsage = true;
+        }
+    }
+    
+    // Propogate usage (starting from bottom)
+    for (int i=cblock->termsCount - 1; i >= 0; i--) {
+        CompiledTerm* cterm = cblock->terms + i;
+        Term* term = cterm->term;
+
+        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            Term* input = term->input(inputIndex);
+            CompiledTerm* inputCterm = find_cterm(cblock, input);
+
+            if (inputCterm != NULL) {
+                inputCterm->useCount++;
+
+                if (term_accesses_input_from_inside_loop(term, input))
+                    inputCterm->loopedUsage = true;
+            }
+        }
+    }
+}
+
+void cblock_register_assignment(CompiledBlock* cblock)
+{
+    int nextRegister = 0;
+    for (int i=0; i < cblock->termsCount; i++) {
+        CompiledTerm* cterm = cblock->terms + i;
+
+        if (cterm->useCount == 0)
+            cterm->registerIndex = -1;
+        else
+            cterm->registerIndex = nextRegister++;
+    }
+}
+
+void write_block_bytecode(Writer* writer)
 {
     Block* block = writer->block();
 
@@ -1608,6 +1741,15 @@ void compile_block(Writer* writer)
         bc_comment(writer, "(just a native func)");
         blob_append_char(writer->bytecode, bc_NativeCall);
         blob_append_u32(writer->bytecode, nativePatchIndex);
+
+        for (int i=0;; i++) {
+            Term* output = get_output_placeholder(block, i);
+            if (output == NULL)
+                break;
+
+            bc_convert_to_declared_type(writer, output);
+        }
+
         blob_append_char(writer->bytecode, bc_FinishFrame);
         blob_append_char(writer->bytecode, bc_End);
         return;
@@ -1647,6 +1789,12 @@ void compile_block(Compiled* compiled, int blockIndex)
         return;
     cblock->compileInProgress = true;
 
+    if (is_major_block(cblock->block)) {
+        cblock_initialize_terms(cblock);
+        cblock_usage_pass(cblock);
+        cblock_register_assignment(cblock);
+    }
+
     Value bytecode;
 
     Writer writer;
@@ -1655,9 +1803,9 @@ void compile_block(Compiled* compiled, int blockIndex)
     writer_setup(&writer, compiled);
     set_blob(&bytecode, 0);
 
-    compile_block(&writer);
+    write_block_bytecode(&writer);
 
-    // 'cblock' pointer is invalidated by compile_block.
+    // 'cblock' pointer can be invalidated by write_block_bytecode.
     cblock = compiled_block(compiled, blockIndex);
 
     blob_append_char(&compiled->bytecode, bc_NoteBlockStart);
@@ -1681,9 +1829,13 @@ int program_create_empty_entry(Compiled* compiled, Block* block)
 
     CompiledBlock* cblock = &compiled->blocks[newIndex];
 
+    memset(cblock, 0, sizeof(CompiledBlock));
+
+    cblock->terms = NULL;
     cblock->compileInProgress = false;
     cblock->block = block;
     cblock->hasWatch = false;
+    cblock->registerCount = 0;
     cblock->bytecodeOffset = -1;
     cblock->termCounter = NULL;
 
@@ -1774,8 +1926,17 @@ void compiled_reset_trace_data(Compiled* compiled)
     }
 }
 
+void compiled_block_erase(CompiledBlock* block)
+{
+    free(block->terms);
+    set_null(&block->termIndexMap);
+}
+
 void compiled_erase(Compiled* compiled)
 {
+    for (int i=0; i < compiled->blockCount; i++)
+        compiled_block_erase(&compiled->blocks[i]);
+
     set_blob(&compiled->bytecode, 0);
     free(compiled->blocks);
     compiled->blocks = NULL;
@@ -1841,7 +2002,7 @@ void compiled_to_string(Compiled* compiled, Value* out)
         }
 
         char* bytecode = as_blob(&compiled->bytecode);
-        int pos = cblock->bytecodeOffset;
+        u32 pos = cblock->bytecodeOffset;
 
         while (true) {
             string_append(out, "    [");

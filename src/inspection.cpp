@@ -125,7 +125,8 @@ bool is_minor_block(Block* block)
     return owner->function == FUNCS.if_block
         || owner->function == FUNCS.case_func
         || owner->function == FUNCS.for_func
-        || owner->function == FUNCS.while_loop;
+        || owner->function == FUNCS.while_loop
+        || owner->function == FUNCS.switch_func;
 }
 
 bool is_module(Block* block)
@@ -435,7 +436,7 @@ void print_indent(RawOutputPrefs* prefs, caValue* out)
 void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack)
 {
     int prevIndent = prefs->indentLevel;
-    int bytecodePc = 0;
+    u32 bytecodePc = 0;
     char* bytecodeData = NULL;
 
     print_indent(prefs, out);

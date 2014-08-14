@@ -37,6 +37,8 @@ const char bc_GetIndexMove = 0x22;
 const char bc_Touch = 0x26;
 const char bc_SetTermRef = 0x23;
 
+const char bc_ConvertToDeclaredType = 0x24;
+
 // Popping outputs from a finished frame
 const char bc_PopOutput = 0x30;
 const char bc_PopOutputNull = 0x31;
@@ -92,11 +94,23 @@ struct MethodCacheLine {
 const int c_methodCacheCount = 4;
 const size_t c_methodCacheSize = c_methodCacheCount * sizeof(MethodCacheLine);
 
+struct CompiledTerm {
+    Term* term;
+    i16 registerIndex; // can be -1
+    u16 useCount;
+    bool loopedUsage;
+};
+
 struct CompiledBlock {
     Block* block;
     int bytecodeOffset;
     bool compileInProgress;
     bool hasWatch;
+    u16 registerCount;
+
+    CompiledTerm* terms;
+    int termsCount;
+    Value termIndexMap;
 
     // Accumulated knowledge
     int* termCounter;
@@ -129,10 +143,10 @@ struct Compiled
 };
 
 void bytecode_to_string(caValue* bytecode, caValue* string);
-int bytecode_op_to_term_index(const char* bc, int pc);
-void bytecode_op_to_string(const char* bc, int* pc, caValue* string);
+int bytecode_op_to_term_index(const char* bc, u32 pc);
+void bytecode_op_to_string(const char* bc, u32* pc, caValue* string);
 void bytecode_to_string_lines(char* bytecode, caValue* lines);
-void bytecode_dump_next_op(const char* bc, int* pc);
+void bytecode_dump_next_op(const char* bc, u32* pc);
 void bytecode_dump_val(caValue* bytecode);
 void bytecode_dump(char* data);
 
@@ -140,6 +154,9 @@ Compiled* alloc_program(World* world);
 void free_program(Compiled* compiled);
 
 Block* program_block(Compiled* compiled, int index);
+CompiledBlock* find_cblock(Compiled* compiled, Block* block);
+CompiledTerm* find_cterm(CompiledBlock* cblock, Term* term);
+CompiledTerm* find_cterm(Compiled* compiled, Term* term);
 CompiledBlock* compiled_block(Compiled* compiled, int index);
 int program_find_block_index(Compiled* compiled, Block* block);
 void program_generate_bytecode(Compiled* compiled, int blockIndex);

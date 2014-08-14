@@ -454,14 +454,6 @@ caValue* stack_register(Stack* stack, int index)
     return &stack->registers[index];
 }
 
-caValue* stack_register_rel(Stack* stack, int relativeIndex)
-{
-    int index = top_frame(stack)->firstRegisterIndex + relativeIndex;
-    ca_assert(index >= 0);
-    ca_assert(index < stack->registerCount);
-    return &stack->registers[index];
-}
-
 caValue* frame_register(Frame* frame, int index)
 {
     ca_assert(index >= 0 && index < frame->registerCount);
@@ -542,8 +534,6 @@ void stack_on_program_change(Stack* stack)
         frame->pc = 0;
         frame->blockIndex = -1;
     }
-    stack->bytecode = NULL;
-    stack->pc = 0;
 }
 
 void stack_derive_hackset(Stack* stack, Value* hackset)
@@ -843,6 +833,7 @@ void Stack__copy(caStack* stack)
 
 void Stack__stack_push(caStack* stack)
 {
+#if 0
     Stack* self = as_stack(circa_input(stack, 0));
     Block* block = as_block(circa_input(stack, 1));
     caValue* inputs = circa_input(stack, 2);
@@ -861,13 +852,16 @@ void Stack__stack_push(caStack* stack)
             break;
         copy(list_get(inputs, i), frame_register(top, i));
     }
+#endif
 }
 
 void Stack__stack_pop(caStack* stack)
 {
+#if 0
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     pop_frame(self);
+#endif
 }
 
 void Stack__migrate(caStack* stack)

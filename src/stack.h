@@ -40,10 +40,6 @@ struct Stack
     // Stack-local random number generator.
     RandState randState;
 
-    // Program counter, only valid during vm_run.
-    char* bytecode;
-    int pc;
-
     // Current step, either StackReady, StackRunning or StackFinished.
     Symbol step;
 
@@ -156,7 +152,6 @@ Frame* prev_frame_n(Frame* frame, int distance);
 size_t frame_size(Frame* frame);
 
 caValue* stack_register(Stack* stack, int index);
-caValue* stack_register_rel(Stack* stack, int relativeIndex);
 caValue* frame_register(Frame* frame, int index);
 caValue* frame_register(Frame* frame, Term* term);
 caValue* frame_register_from_end(Frame* frame, int index);

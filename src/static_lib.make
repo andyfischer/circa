@@ -27,7 +27,7 @@ ifeq ($(config),debug)
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
-  CXXFLAGS  += $(CFLAGS) 
+  CXXFLAGS  += $(CFLAGS) -fno-rtti -fno-exceptions -std=c++0x
   LDFLAGS   += -L/usr/local/lib
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
@@ -49,7 +49,7 @@ ifeq ($(config),release)
   INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
-  CXXFLAGS  += $(CFLAGS) 
+  CXXFLAGS  += $(CFLAGS) -fno-rtti -fno-exceptions -std=c++0x
   LDFLAGS   += -L/usr/local/lib
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 

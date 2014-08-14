@@ -1,8 +1,18 @@
 
+local getcxxflags = premake.gcc.getcxxflags;
+function premake.gcc.getcxxflags(cfg)
+    local cxxflags = { Cxx0x = "-std=c++0x" }
+    local r = getcxxflags(cfg);
+    local r2 = table.translate(cfg.flags, cxxflags);
+    for _,v in ipairs(r2) do table.insert(r, v) end
+    return r;
+end
+table.insert(premake.fields.flags.allowed, "Cxx0x");
+
 solution "Circa"
     configurations { "Debug", "Release" }
     language "C++"
-    flags { "Symbols" }
+    flags { "Symbols", "Cxx0x", "NoRTTI", "NoExceptions" }
     targetdir "build"
     objdir "build/obj"
     includedirs { "include", "src", "3rdparty", "/usr/local/include" }

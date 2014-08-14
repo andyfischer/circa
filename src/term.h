@@ -187,7 +187,10 @@ bool uses_dynamic_dispatch(Term* term);
 bool calls_function_by_value(Term* term);
 Block* static_dispatch_block(Term* term);
 
+bool term_accesses_input_from_inside_loop(Term* term, Term* input);
+bool term_is_observable_for_special_reasons(Term* term);
 bool term_is_observable(Term* term);
+bool term_used_by_nonlocal(Term* term);
 bool term_is_observable_after(Term* term, Term* location);
 bool is_located_after(Term* location, Term* term);
 bool term_uses_input_multiple_times(Term* term, Term* input);

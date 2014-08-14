@@ -546,6 +546,17 @@ bool term_accesses_input_from_inside_loop(Term* term, Term* input)
     return !term_is_child_of_block(input, enclosingLoop);
 }
 
+bool term_used_by_nonlocal(Term* term)
+{
+    for (int i=0; i < user_count(term); i++) {
+        Term* user = term_user(term, i);
+
+        if (user->function == FUNCS.nonlocal)
+            return true;
+    }
+    return false;
+}
+
 bool term_is_observable_after(Term* term, Term* location)
 {
     // Check if "term" can be observed after the "location".

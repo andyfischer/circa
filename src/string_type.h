@@ -75,16 +75,16 @@ void blob_append_u32(caValue* blob, u32 val);
 void blob_append_float(caValue* blob, float f);
 void blob_append_space(caValue* blob, size_t size);
 
-char blob_read_char(const char* data, int* pos);
-u8 blob_read_u8(const char* data, int* pos);
-u16 blob_read_u16(const char* data, int* pos);
-u32 blob_read_u32(const char* data, int* pos);
-float blob_read_float(const char* data, int* pos);
-void* blob_read_pointer(const char* data, int* pos);
+char blob_read_char(const char* data, u32* pos);
+u8 blob_read_u8(const char* data, u32* pos);
+u16 blob_read_u16(const char* data, u32* pos);
+u32 blob_read_u32(const char* data, u32* pos);
+float blob_read_float(const char* data, u32* pos);
+void* blob_read_pointer(const char* data, u32* pos);
 
-void blob_write_u8(char* data, int* pos, u8 value);
-void blob_write_u32(char* data, int* pos, u32 value);
-void blob_write_pointer(char* data, int* pos, void* value);
+void blob_write_u8(char* data, u32* pos, u8 value);
+void blob_write_u32(char* data, u32* pos, u32 value);
+void blob_write_pointer(char* data, u32* pos, void* value);
 
 void blob_to_hex_string(caValue* blob, caValue* str);
 

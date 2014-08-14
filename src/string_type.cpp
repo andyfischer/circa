@@ -693,61 +693,61 @@ void blob_append_space(Value* blob, size_t additionalSize)
     memset(as_blob(blob) + size, 0, additionalSize);
 }
 
-char blob_read_char(const char* data, int* pos)
+char blob_read_char(const char* data, u32* pos)
 {
     char c = data[*pos];
     *pos += 1;
     return c;
 }
 
-u8 blob_read_u8(const char* data, int* pos)
+u8 blob_read_u8(const char* data, u32* pos)
 {
     u8 c = data[*pos];
     *pos += 1;
     return c;
 }
 
-u16 blob_read_u16(const char* data, int* pos)
+u16 blob_read_u16(const char* data, u32* pos)
 {
     u16 value = *((u16*) &data[*pos]);
     *pos += 2;
     return value;
 }
 
-u32 blob_read_u32(const char* data, int* pos)
+u32 blob_read_u32(const char* data, u32* pos)
 {
     u32 value = *((u32*) &data[*pos]);
     *pos += 4;
     return value;
 }
 
-float blob_read_float(const char* data, int* pos)
+float blob_read_float(const char* data, u32* pos)
 {
     float value = *((float*) &data[*pos]);
     *pos += 4;
     return value;
 }
 
-void* blob_read_pointer(const char* data, int* pos)
+void* blob_read_pointer(const char* data, u32* pos)
 {
     void* value = *((void**) &data[*pos]);
     *pos += sizeof(void*);
     return value;
 }
 
-void blob_write_u8(char* data, int* pos, u8 value)
+void blob_write_u8(char* data, u32* pos, u8 value)
 {
     *((u8*) &data[*pos]) = value;
     *pos += 1;
 }
 
-void blob_write_u32(char* data, int* pos, u32 value)
+void blob_write_u32(char* data, u32* pos, u32 value)
 {
     *((u32*) &data[*pos]) = value;
     *pos += 4;
 }
 
-void blob_write_pointer(char* data, int* pos, void* value)
+void blob_write_pointer(char* data, u32* pos, void* value)
 {
     *((void**) &data[*pos]) = value;
     *pos += sizeof(void*);

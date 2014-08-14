@@ -13,6 +13,7 @@
  * The 3-clause BSD License is applied to this software, see
  * LICENSE.txt
  */
+
 #include "tinymt32.h"
 #define MIN_LOOP 8
 #define PRE_LOOP 8
