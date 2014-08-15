@@ -314,61 +314,6 @@ bool current_test_has_failed()
     return gCurrentTestCase.failed;
 }
 
-void test_block_as_assertions_list(Block* block, std::string const& contextStr)
-{
-    if (has_static_errors(block)) {
-        std::cout << "Static error " << contextStr << ":" << std::endl;
-        Value str;
-        print_static_errors_formatted(block, &str);
-        std::cout << as_cstring(&str) << std::endl;
-        declare_current_test_failed();
-        return;
-    }
-
-    Value checkInvariantsOutput;
-    if (!block_check_invariants_print_result(block, &checkInvariantsOutput)) {
-        std::cout << "Failed invariant " << contextStr << std::endl;
-        std::cout << as_cstring(&checkInvariantsOutput) << std::endl;
-        declare_current_test_failed();
-        return;
-    }
-
-    Stack context;
-    evaluate_block(&context, block);
-
-    if (context.errorOccurred) {
-        std::cout << "Runtime error " << contextStr << std::endl;
-        circa_dump_stack_trace(&context);
-        declare_current_test_failed();
-        return;
-    }
-
-    int boolean_statements_found = 0;
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (!is_statement(term))
-            continue;
-
-        if (!is_bool(term_value(term)))
-            continue;
-
-        boolean_statements_found++;
-
-        if (!as_bool(term_value(term))) {
-            std::cout << "Assertion failed " << contextStr << std::endl;
-            std::cout << "failed: " << term->id << std::endl;
-            declare_current_test_failed();
-            return;
-        }
-    }
-
-    if (boolean_statements_found == 0) {
-        std::cout << "No boolean statements found " << contextStr << std::endl;
-        declare_current_test_failed();
-        return;
-    }
-}
-
 namespace block_test { void register_tests(); }
 namespace building_test { void register_tests(); }
 namespace code_iterator_test { void register_tests(); }

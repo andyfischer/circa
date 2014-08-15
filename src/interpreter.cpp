@@ -191,26 +191,6 @@ void stack_restart(Stack* stack)
     stack->step = sym_StackReady;
 }
 
-void stack_restart_discarding_state(Stack* stack)
-{
-    // FIXME: replace with stack_restart
-    if (stack->step == sym_StackReady)
-        return;
-
-    if (vm_top_frame(stack) == NULL)
-        return;
-
-    while (top_frame_parent(stack) != NULL)
-        pop_frame(stack);
-
-    Frame* top = vm_top_frame(stack);
-    top->termIndex = 0;
-    top->pc = 0;
-
-    stack->errorOccurred = false;
-    stack->step = sym_StackReady;
-}
-
 Value* stack_get_state(Stack* stack)
 {
     return &stack->state;
@@ -255,160 +235,6 @@ Value* stack_find_nonlocal(Frame* frame, Term* term)
     }
 
     return NULL;
-}
-
-static void indent(Value* out, int count)
-{
-    for (int x = 0; x < count; x++)
-        string_append(out, " ");
-}
-
-void stack_to_string(Stack* stack, Value* out, bool withBytecode)
-{
-    string_append(out, "[Stack #");
-    string_append(out, stack->id);
-    string_append(out, ", frames = ");
-    string_append(out, stack->frameCount);
-    string_append(out, "]\n");
-
-    Frame* frame = first_frame(stack);
-    int frameIndex = 0;
-    for (; frame != NULL; frame = next_frame(frame), frameIndex++) {
-
-        Frame* childFrame = next_frame(frame);
-
-        int activeTermIndex = frame->termIndex;
-        if (childFrame != NULL)
-            activeTermIndex = childFrame->parentIndex;
-
-        int depth = stack->frameCount - 1 - frameIndex;
-        Block* block = frame_block(frame);
-        string_append(out, " [Frame index ");
-        string_append(out, frameIndex);
-        string_append(out, ", depth = ");
-        string_append(out, depth);
-        string_append(out, ", regCount = ");
-        string_append(out, frame->registerCount);
-        string_append(out, ", block = ");
-        if (block == NULL) {
-            string_append(out, "NULL");
-        } else {
-            string_append(out, "#");
-            string_append(out, block->id);
-        }
-        string_append(out, ", termIndex = ");
-        string_append(out, frame->termIndex);
-        string_append(out, ", pc = ");
-        string_append(out, frame->pc);
-        string_append(out, "]\n");
-
-        if (!is_null(&frame->env)) {
-            indent(out, frameIndex+2);
-            string_append(out, "env: ");
-            to_string(&frame->env, out);
-            string_append(out, "\n");
-        }
-
-        if (!is_null(&frame->incomingState)) {
-            indent(out, frameIndex+2);
-            string_append(out, "incomingState: ");
-            to_string(&frame->incomingState, out);
-            string_append(out, "\n");
-        }
-
-        if (!is_null(&frame->outgoingState)) {
-            indent(out, frameIndex+2);
-            string_append(out, "outgoingState: ");
-            to_string(&frame->outgoingState, out);
-            string_append(out, "\n");
-        }
-
-        //char* bytecode = stack->bytecode + frame->pc;
-        //int bytecodePc = 0;
-        
-        for (int i=0; i < vm_frame_register_count(frame); i++) {
-            Term* term = NULL;
-            if (block != NULL)
-                term = block->getSafe(i);
-
-            indent(out, frameIndex+1);
-
-            if (i == activeTermIndex)
-                string_append(out, ">");
-            else
-                string_append(out, " ");
-
-            if (term == NULL) {
-                string_append(out, "[");
-                string_append(out, i);
-                string_append(out, "]");
-            } else {
-                print_term(term, out);
-            }
-
-            Value* value = vm_frame_register(frame, i);
-
-            if (value == NULL)
-                string_append(out, " <register OOB>");
-            else {
-                string_append(out, " = ");
-                to_string(value, out);
-            }
-
-#if 0
-            // bytecode
-            if (withBytecode) {
-                while (bytecode[bytecodePc] != bc_End) {
-                    int currentTermIndex = bytecode_op_to_term_index(bytecode, bytecodePc);
-                    if (currentTermIndex != -1 && currentTermIndex != i)
-                        break;
-
-                    string_append(out, "\n");
-                    indent(out, frameIndex+4);
-                    bytecode_op_to_string(bytecode, &bytecodePc, out);
-                    string_append(out, "\n");
-                }
-            }
-
-#endif
-            string_append(out, "\n");
-        }
-    }
-}
-
-void stack_trace_to_string(Stack* stack, Value* out)
-{
-    for (Frame* frame = first_frame(stack); frame != NULL; frame = next_frame(frame)) {
-
-        Term* term = frame_current_term(frame);
-
-        if (is_input_placeholder(term) || is_output_placeholder(term))
-            continue;
-
-        // Print a short location label
-        get_short_location(term, out);
-
-        string_append(out, " ");
-        if (!has_empty_name(term)) {
-            string_append(out, term_name(term));
-            string_append(out, " = ");
-        }
-        string_append(out, term_name(term->function));
-        string_append(out, "()\n");
-    }
-
-    // Print the error value
-    Frame* top = vm_top_frame(stack);
-    Value* msg = vm_frame_register(top, top->termIndex);
-    Term* errorLocation = frame_block(top)->get(top->termIndex);
-    if (is_input_placeholder(errorLocation)) {
-        string_append(out, "(input ");
-        string_append(out, errorLocation->index);
-        string_append(out, ") ");
-    }
-
-    string_append(out, msg);
-    string_append(out, "\n");
 }
 
 void fetch_stack_outputs(Stack* stack, Value* outputs)
@@ -559,18 +385,6 @@ static void start_interpreter_session(Stack* stack)
         rand_init(&stack->randState, get_hash_value(seed));
 
     compiled_reset_trace_data(stack->program);
-}
-
-void evaluate_block(Stack* stack, Block* block)
-{
-    block_finish_changes(block);
-
-    stack_init(stack, block);
-
-    vm_run(stack);
-
-    if (!stack_errored(stack))
-        pop_frame(stack);
 }
 
 void raise_error_input_type_mismatch(Stack* stack, int inputIndex)

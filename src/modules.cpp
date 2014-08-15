@@ -334,12 +334,6 @@ void modules_install_functions(NativePatch* patch)
     circa_patch_function(patch, "load_script", load_script_eval);
 }
 
-CIRCA_EXPORT void circa_run_module(caStack* stack, const char* moduleName)
-{
-    circa::Block* block = nested_contents(find_global(moduleName));
-    evaluate_block((circa::Stack*) stack, block);
-}
-
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 {
     module_add_search_path(world, path);

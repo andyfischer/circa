@@ -243,8 +243,11 @@ void unique_id(caStack* stack)
 
 void source_id(Stack* stack)
 {
+#if 0
+    // TODO
     Term* caller = frame_current_term(top_frame_parent(stack));
     get_global_name(caller, circa_output(stack, 0));
+#endif
 }
 
 void unknown_function(caStack* stack)

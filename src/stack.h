@@ -178,6 +178,9 @@ Value* stack_get_watch_observation(Stack* stack, Value* path);
 
 void stack_on_migration(Stack* stack);
 
+void stack_to_string(Stack* stack, caValue* out, bool withBytecode);
+void stack_trace_to_string(Stack* stack, caValue* out);
+
 Frame* as_frame_ref(caValue* value);
 bool is_frame_ref(caValue* value);
 void set_frame_ref(caValue* value, Frame* frame);

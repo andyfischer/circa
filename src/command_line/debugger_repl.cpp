@@ -49,12 +49,6 @@ int run_debugger_repl(std::string const& filename)
             continue;
         }
 
-        if (input == "e") {
-            Stack stack;
-            evaluate_block(&stack, &block);
-            continue;
-        }
-
         if (input == "c") {
             Value str;
             print_static_errors_formatted(&block, &str);

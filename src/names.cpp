@@ -127,53 +127,6 @@ Term* run_name_search(NameSearch* params)
         }
     }
 
-    // Check if the name is a qualified name.
-    Value namespacePrefix;
-    qualified_name_get_first_section(&params->name, &namespacePrefix);
-
-    // See if the prefix is a module name.
-    if (!is_null(&namespacePrefix)) {
-        Block* module = find_module(params->block, &namespacePrefix);
-        if (module != NULL) {
-
-            NameSearch moduleSearch;
-            moduleSearch.block = module;
-            qualified_name_get_remainder_after_first_section(&params->name, &moduleSearch.name);
-            set_symbol(&moduleSearch.position, sym_Last);
-            moduleSearch.ordinal = params->ordinal;
-            moduleSearch.lookupType = params->lookupType;
-            moduleSearch.searchParent = false;
-            Term* found = run_name_search(&moduleSearch);
-            if (found != NULL)
-                return found;
-        }
-    }
-
-    // If it's a qualified name, search for the first prefix.
-    // (Deprecated)
-    if (!is_null(&namespacePrefix)) {
-        NameSearch nsSearch;
-        nsSearch.block = params->block;
-        nsSearch.name = namespacePrefix;
-        set_value(&nsSearch.position, &params->position);
-        nsSearch.ordinal = params->ordinal;
-        nsSearch.lookupType = sym_LookupAny;
-        nsSearch.searchParent = false;
-        Term* nsPrefixTerm = run_name_search(&nsSearch);
-
-        if (nsPrefixTerm != NULL) {
-            // Recursively search inside the prefix for the remainder of the name.
-            NameSearch nestedSearch;
-            nestedSearch.block = nested_contents(nsPrefixTerm);
-            qualified_name_get_remainder_after_first_section(&params->name, &nestedSearch.name);
-            set_symbol(&nestedSearch.position, sym_Last);
-            nestedSearch.ordinal = params->ordinal;
-            nestedSearch.lookupType = params->lookupType;
-            nestedSearch.searchParent = false;
-            return run_name_search(&nestedSearch);
-        }
-    }
-
     // Did not find in the local block. Possibly continue this search upwards.
     
     if (!params->searchParent)
@@ -278,102 +231,6 @@ Term* find_local_name_at_position(Block* block, caValue* name, caValue* position
     nameSearch.lookupType = sym_LookupAny;
     nameSearch.searchParent = false;
     return run_name_search(&nameSearch);
-}
-
-void get_global_name(Term* term, caValue* nameOut)
-{
-    // Walk upwards, find all terms along the way.
-    Term* searchTerm = term;
-
-    std::vector<Term*> stack;
-
-    while (true) {
-        stack.push_back(searchTerm);
-
-        if (searchTerm->owningBlock == global_root_block())
-            break;
-
-        searchTerm = parent_term(searchTerm);
-
-        if (searchTerm == NULL) {
-            // Parent is NULL but we haven't yet reached the global root. This is
-            // a deprecated style of block that isn't connected to root. No global
-            // name is possible.
-            set_symbol(nameOut, sym_None);
-            return;
-        }
-    }
-
-    // Construct a global qualified name.
-    set_string(nameOut, "");
-    for (int i = int(stack.size())-1; i >= 0; i--) {
-        Term* subTerm = stack[i];
-
-        // If this term has no name then we can't construct a global name. Bail out.
-        if (has_empty_name(subTerm)) {
-            set_symbol(nameOut, sym_None);
-            return;
-        }
-
-        string_append(nameOut, &subTerm->nameValue);
-
-        if (subTerm->uniqueOrdinal != 0) {
-            string_append(nameOut, "#");
-            string_append(nameOut, subTerm->uniqueOrdinal);
-        }
-
-        if (i > 0)
-            string_append(nameOut, ":");
-    }
-}
-
-void get_global_name(Block* block, caValue* nameOut)
-{
-    if (block->owningTerm == NULL) {
-        set_null(nameOut);
-        return;
-    }
-    get_global_name(block->owningTerm, nameOut);
-}
-
-Term* find_from_global_name(World* world, const char* globalNameStr)
-{
-    Block* block = world->root;
-
-    // Loop, walking down the (possibly) qualified name.
-    for (int step=0;; step++) {
-
-        Value globalName;
-        set_string(&globalName, globalNameStr);
-
-        ca_assert(block != NULL);
-
-        int separatorPos = name_find_qualified_separator(globalNameStr);
-        int nameEnd = separatorPos;
-        int ordinal = name_find_ordinal_suffix(globalNameStr, &nameEnd);
-
-        NameSearch nameSearch;
-        string_slice(&globalName, 0, nameEnd, &nameSearch.name);
-        nameSearch.block = block;
-        set_symbol(&nameSearch.position, sym_Last);
-        nameSearch.ordinal = ordinal;
-        nameSearch.lookupType = sym_LookupAny;
-        nameSearch.searchParent = false;
-
-        Term* foundTerm = run_name_search(&nameSearch);
-
-        // Stop if this name wasn't found.
-        if (foundTerm == NULL)
-            return NULL;
-
-        // Stop if there's no more qualified sections.
-        if (separatorPos == -1)
-            return foundTerm;
-
-        // Otherwise, continue the search.
-        globalNameStr = globalNameStr + separatorPos + 1;
-        block = nested_contents(foundTerm);
-    }
 }
 
 Term* find_name_at(Term* term, const char* name)
@@ -730,29 +587,6 @@ Block* find_function_local(Block* block, const char* name)
     if (term == NULL)
         return NULL;
     return nested_contents(term);
-}
-
-void qualified_name_get_first_section(caValue* name, caValue* prefixResult)
-{
-    int len = string_length(name);
-    for (int i=0; i < len; i++) {
-        if (string_get(name, i) == ':') {
-            string_slice(name, 0, i, prefixResult);
-            return;
-        }
-    }
-    set_null(prefixResult);
-}
-void qualified_name_get_remainder_after_first_section(caValue* name, caValue* suffixResult)
-{
-    int len = string_length(name);
-    for (int i=0; i < len; i++) {
-        if (string_get(name, i) == ':') {
-            string_slice(name, i + 1, -1, suffixResult);
-            return;
-        }
-    }
-    set_null(suffixResult);
 }
 
 } // namespace circa

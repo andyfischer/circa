@@ -326,18 +326,6 @@ void string_append_ptr(Value* left, void* ptr)
     string_append(left, buf);
 }
 
-void string_append_qualified_name(Value* left, Value* right)
-{
-    if (string_equals(left, "")) {
-        copy(right, left);
-        return;
-    }
-    if (string_equals(right, ""))
-        return;
-    string_append(left, ":");
-    string_append(left, right);
-}
-
 void blob_append(Value* left, Value* right)
 {
     ca_assert(is_string(left));

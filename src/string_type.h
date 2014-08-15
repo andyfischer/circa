@@ -25,8 +25,6 @@ void string_append_f(caValue* left, float value);
 void string_append_char(caValue* left, char c);
 void string_append_ptr(caValue* left, void* ptr);
 
-void string_append_qualified_name(caValue* left, caValue* right);
-
 void string_resize(caValue* s, int length);
 bool string_equals(caValue* s, const char* str);
 bool string_equals(caValue* left, caValue* right);

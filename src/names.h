@@ -54,14 +54,9 @@ Term* find_local_name_at_position(Block* block, caValue* name, caValue* position
 Term* find_name_at(Term* term, const char* name);
 Term* find_name_at(Term* term, caValue* name);
 
-// If the string is a qualified name (such as "a:b:c"), returns the index
-// of the first colon. If the string isn't a qualified name then returns -1.
-int name_find_qualified_separator(const char* name);
-
 // If the name string has an ordinal (such as "a#1"), returns the ordinal value.
 // Otherwise returns -1.
-// endPos is the name's ending index (such as the one returned from
-// name_find_qualified_separator);
+// endPos is the name's ending index.
 int name_find_ordinal_suffix(const char* str, int* endPos);
 
 // Get a named term from the global namespace.
@@ -83,19 +78,9 @@ void update_unique_name(Term* term);
 caValue* unique_name(Term* term);
 
 Term* find_from_unique_name(Block* block, caValue* name);
-Term* find_from_global_name(World* world, const char* globalName);
-
-// Construct a global name for this term. May return :None if we couldn't create a global name.
-void get_global_name(Term* term, caValue* nameOut);
-void get_global_name(Block* term, caValue* nameOut);
-
-Term* find_term_from_global_name(const char* name);
 
 Type* find_type(Block* block, const char* name);
 Block* find_function(World* world, const char* name);
 Block* find_function_local(Block* block, const char* name);
-
-void qualified_name_get_first_section(caValue* name, caValue* prefixResult);
-void qualified_name_get_remainder_after_first_section(caValue* name, caValue* suffixResult);
 
 } // namespace circa

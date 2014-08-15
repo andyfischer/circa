@@ -254,10 +254,6 @@ Block* term_get_function_details(Term* call)
     if (call->function == NULL)
         return NULL;
 
-    // Check if the function is a type. (deprecated).
-    if (is_type(call->function))
-        return nested_contents(FUNCS.cast);
-
     return term_function(call);
 }
 

@@ -71,6 +71,3 @@ std::vector<std::string> list_all_test_names();
 std::string get_current_test_name();
 void declare_current_test_failed();
 bool current_test_has_failed();
-
-void test_block_as_assertions_list(Block* block, std::string const& contextStr);
-

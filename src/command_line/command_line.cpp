@@ -182,7 +182,8 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
         return;
     
     Stack* stack = create_stack(world);
-    evaluate_block(stack, &block);
+    stack_init(stack, &block);
+    vm_run(stack);
 
     if (printState) {
         caValue* state = stack_get_state(stack);
