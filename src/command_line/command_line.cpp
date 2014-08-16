@@ -28,7 +28,6 @@
 #include "world.h"
 
 #include "circa/file.h"
-#include "debugger_repl.h"
 #include "file_checker.h"
 
 #ifdef CIRCA_USE_LINENOISE
@@ -175,14 +174,23 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
         break;
     }
 
-    Block block;
-    load_script(&block, as_cstring(args->index(argIndex)));
+    Value filename;
+    resolve_possible_module_path(world, args->index(argIndex), &filename);
+
+    if (is_null(&filename)) {
+        std::cout << "Local module not found: ";
+        std::cout << as_cstring(&filename);
+        std::cout << std::endl;
+        return;
+    }
+
+    Block* block = load_module_by_filename(world, &filename);
 
     if (dontRunScript)
         return;
     
     Stack* stack = create_stack(world);
-    stack_init(stack, &block);
+    stack_init(stack, block);
     vm_run(stack);
 
     if (printState) {
@@ -218,22 +226,9 @@ void rewrite_block(Block* block, caValue* contents, caValue* reply)
     }
 }
 
-void do_write_block(caValue* blockName, caValue* contents, caValue* reply)
+void do_update_file(World* world, caValue* filename, caValue* contents, caValue* reply)
 {
-    Term* term = find_global(as_cstring(blockName));
-
-    // Create the block if needed
-    if (term == NULL)
-        term = apply(global_root_block(), FUNCS.section_block, TermList(), blockName);
-
-    // Import the new block contents
-    Block* block = nested_contents(term);
-    rewrite_block(block, contents, reply);
-}
-
-void do_update_file(caValue* filename, caValue* contents, caValue* reply)
-{
-    Block* block = find_module_from_filename(as_cstring(filename));
+    Block* block = find_module_by_filename(world, filename);
 
     if (block == NULL) {
         set_string(reply, "Module not found");
@@ -271,22 +266,6 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         parse_string_as_argument_list(input, &args);
         do_echo(&args, reply);
 
-    } else if (equals_string(&command, "write_block")) {
-
-        int nextSpace = string_find_char(input, first_space+1, ' ');
-        if (nextSpace == -1) {
-            set_string(reply, "Syntax error, not enough arguments");
-            return;
-        }
-        
-        Value blockName;
-        string_slice(input, first_space+1, nextSpace, &blockName);
-
-        Value contents;
-        string_slice(input, nextSpace+1, -1, &contents);
-
-        do_write_block(&blockName, &contents, reply);
-
     } else if (equals_string(&command, "update_file")) {
 
         int nextSpace = string_find_char(input, first_space+1, ' ');
@@ -301,7 +280,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
         Value contents;
         string_slice(input, nextSpace+1, -1, &contents);
 
-        do_update_file(&filename, &contents, reply);
+        do_update_file(world, &filename, &contents, reply);
 
     } else if (equals_string(&command, "source_repro")) {
 
@@ -313,7 +292,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
 
         Value sourceReproStr;
         set_string(&sourceReproStr, "source_repro");
-        Block* sourceRepro = load_module_by_name(world, NULL, &sourceReproStr);
+        Block* sourceRepro = load_module(world, NULL, &sourceReproStr);
         Block* to_source_string = find_function_local(sourceRepro, "block_to_string");
 
         Stack stack;
@@ -326,14 +305,7 @@ void do_admin_command(caWorld* world, caValue* input, caValue* reply)
             dump(&stack);
         else
             std::cout << as_string(circa_output(&stack, 0));
-        
-#if 0
-        Value args;
-        parse_string_as_argument_list(input, &args);
-        Block block;
-        load_script(&block, as_cstring(args.index(1)));
-        std::cout << get_block_source_text(&block);
-#endif
+       
     } else if (equals_string(&command, "dump_stats")) {
 
         circa_perf_stats_dump();
@@ -408,9 +380,6 @@ int run_command_line(caWorld* world, caValue* args)
     bool printState = false;
     bool dontRunScript = false;
     bool printTrace = false;
-
-    Value mainModuleName;
-    set_string(&mainModuleName, "main");
 
     // Prepended options
     while (true) {
@@ -506,7 +475,7 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     if (string_equals(list_get(args, 0), "-call")) {
-        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(list_get(args, 1)));
+        Block* block = load_module_by_filename(world, list_get(args, 1));
 
         caStack* stack = circa_create_stack(world);
 
@@ -545,7 +514,7 @@ int run_command_line(caWorld* world, caValue* args)
         }
 
         caValue* filename = list_get(args, 1);
-        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(filename));
+        Block* block = load_module_by_filename(world, filename);
         Stack* stack = create_stack(world);
         stack_init(stack, block);
         while (true) {
@@ -569,10 +538,6 @@ int run_command_line(caWorld* world, caValue* args)
         return 0;
     }
 
-    // Start debugger repl
-    if (string_equals(list_get(args, 0), "-d"))
-        return run_debugger_repl(as_cstring(list_get(args, 1)));
-
     // Run file checker
     if (string_equals(list_get(args, 0), "-check"))
         return run_file_checker(as_cstring(list_get(args, 1)));
@@ -585,11 +550,11 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Reproduce source text
     if (string_equals(list_get(args, 0), "-source-repro")) {
-        Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(list_get(args, 1)));
+        Block* block = load_module_by_filename(world, list_get(args, 1));
 
         Value sourceReproStr;
         set_string(&sourceReproStr, "source_repro");
-        Block* sourceRepro = load_module_by_name(world, NULL, &sourceReproStr);
+        Block* sourceRepro = load_module(world, NULL, &sourceReproStr);
         Block* to_source_string = find_function_local(sourceRepro, "block_to_string");
 
         Stack stack;
@@ -607,9 +572,15 @@ int run_command_line(caWorld* world, caValue* args)
 
     // Default behavior with no flags: run args[0] as a script filename.
 
-    caValue* filename = list_get(args, 0);
+    Value filename;
+    resolve_possible_module_path(world, list_get(args, 0), &filename);
 
-    Block* block = load_module_file_watched(world, &mainModuleName, as_cstring(filename));
+    if (is_null(&filename)) {
+        printf("Local module not found: %s\n", as_cstring(&filename));
+        return -1;
+    }
+
+    Block* block = load_module_by_filename(world, &filename);
 
     Stack* stack = create_stack(world);
     stack_init(stack, block);

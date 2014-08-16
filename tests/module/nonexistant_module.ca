@@ -1,2 +1,2 @@
 
-foo = require('jfkdsjflkds')
+foo = require jfkdsjflkds

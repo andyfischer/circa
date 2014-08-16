@@ -19,6 +19,7 @@
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
+#include "modules.h"
 #include "names.h"
 #include "native_patch.h"
 #include "string_type.h"
@@ -86,26 +87,29 @@ void free_native_patch(NativePatch* patch)
     delete patch;
 }
 
-NativePatch* find_existing_native_patch(World* world, const char* name)
+NativePatch* find_existing_native_patch(World* world, Value* name)
 {
     for (int i=0; i < world->nativePatchCount; i++) {
         NativePatch* patch = world->nativePatch[i];
-        if (string_equals(&patch->name, name))
+        if (equals(&patch->name, name))
             return patch;
     }
 
     return NULL;
 }
 
-NativePatch* insert_native_patch(World* world, const char* name)
+NativePatch* insert_native_patch(World* world, Value* name)
 {
+    // Make sure this module is loaded by name.
+    load_module(world, NULL, name);
+
     NativePatch* patch = find_existing_native_patch(world, name);
 
     if (patch != NULL)
         return patch;
 
     patch = add_native_patch(world);
-    set_string(&patch->name, name);
+    set_value(&patch->name, name);
     return patch;
 }
 
@@ -165,8 +169,11 @@ NativeFuncIndex find_native_func_index(World* world, Block* block)
     if (module == NULL)
         return -1;
 
-    NativePatch* nativePatch = find_existing_native_patch(world,
-        as_cstring(term_name(module->owningTerm)));
+    Value* moduleName = block_get_property(module, sym_Name);
+    if (moduleName == NULL)
+        return -1;
+
+    NativePatch* nativePatch = find_existing_native_patch(world, moduleName);
 
     if (nativePatch == NULL)
         return -1;
@@ -247,7 +254,9 @@ void native_patch_load_from_file(NativePatch* module, const char* filename)
 
 CIRCA_EXPORT caNativePatch* circa_create_native_patch(caWorld* world, const char* name)
 {
-    return insert_native_patch(world, name);
+    Value nameStr;
+    set_string(&nameStr, name);
+    return insert_native_patch(world, &nameStr);
 }
 
 } // namespace circa

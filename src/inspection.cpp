@@ -131,7 +131,7 @@ bool is_minor_block(Block* block)
 
 bool is_module(Block* block)
 {
-    return block->owningTerm != NULL && block->owningTerm->function == FUNCS.module;
+    return block_get_bool_prop(block, sym_IsModule, false);
 }
 
 Block* find_nearest_major_block(Block* block)
@@ -635,10 +635,6 @@ void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &
         Term* outer = find_name(get_outer_scope(block), name.c_str());
 
         if (outer == NULL)
-            continue;
-
-        // Ignore global terms
-        if (outer->owningBlock == global_root_block())
             continue;
 
         // Ignore terms that are just a simple copy

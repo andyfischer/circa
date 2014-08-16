@@ -25,6 +25,7 @@ Filename
 Builtins
 ModuleName
 StaticErrors
+IsModule
 
 # Term properties
 AccumulatingOutput
@@ -183,7 +184,6 @@ UnknownIdentifier
 LookupAny
 LookupType
 LookupFunction
-LookupModule
 
 # List-based type enumeration
 Untyped
@@ -193,7 +193,7 @@ StructType
 
 # File watch actions
 NativePatch
-PatchBlock
+RecompileModule
 
 # Filepack types
 Filesystem

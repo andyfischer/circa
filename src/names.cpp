@@ -35,13 +35,12 @@ bool fits_lookup_type(Term* term, Symbol type)
             return is_type(term);
         case sym_LookupFunction:
             return is_function(term);
-        case sym_LookupModule:
-            return (term->function == FUNCS.module);
     }
     internal_error("unknown type in fits_lookup_type");
     return false;
 }
 
+#if 0
 Block* find_module_for_require_statement(Term* term)
 {
     if (term->input(0) == NULL)
@@ -51,6 +50,7 @@ Block* find_module_for_require_statement(Term* term)
 
     return find_module(term->owningBlock, moduleName);
 }
+#endif
 
 Block* find_builtins_block(Block* block)
 {
@@ -109,6 +109,7 @@ Term* run_name_search(NameSearch* params)
                 return found;
         }
 
+        #if 0
         // Check for an 'import' statement. If found, continue this search in the designated module.
         if (term->function == FUNCS.require && term->boolProp(sym_Syntax_Import, false)) {
             Block* module = find_module_for_require_statement(term);
@@ -125,6 +126,7 @@ Term* run_name_search(NameSearch* params)
                     return found;
             }
         }
+        #endif
     }
 
     // Did not find in the local block. Possibly continue this search upwards.
@@ -156,16 +158,15 @@ Term* run_name_search(NameSearch* params)
     NameSearch parentSearch;
 
     Term* parentTerm = block->owningTerm;
-    if (parentTerm != NULL) {
-        parentSearch.block = parentTerm->owningBlock;
-        if (params->lookupType == sym_LookupFunction)
-            set_symbol(&parentSearch.position, sym_Last);
-        else
-            set_int(&parentSearch.position, parentTerm->index + 1);
-    } else {
-        parentSearch.block = global_root_block();
+    if (parentTerm == NULL)
+        return NULL;
+
+    parentSearch.block = parentTerm->owningBlock;
+    if (params->lookupType == sym_LookupFunction)
         set_symbol(&parentSearch.position, sym_Last);
-    }
+    else
+        set_int(&parentSearch.position, parentTerm->index + 1);
+
     set_value(&parentSearch.name, &params->name);
     parentSearch.lookupType = params->lookupType;
     parentSearch.ordinal = -1;
@@ -318,11 +319,6 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
-Term* find_global(const char* nameStr)
-{
-    return find_name(global_root_block(), nameStr);
-}
-
 bool name_is_reachable_from(Term* term, Block* block)
 {
     if (term->owningBlock == block)
@@ -345,10 +341,10 @@ Block* find_first_common_block(Term* left, Term* right)
     if (rightParent == NULL) return NULL;
 
     // Walk upwards from left term.
-    while (leftParent != NULL && leftParent != global_root_block()) {
+    while (leftParent != NULL) {
 
         // Walk upwards from right term.
-        while (rightParent != NULL && leftParent != global_root_block()) {
+        while (rightParent != NULL) {
             if (leftParent == rightParent)
                 return leftParent;
 
@@ -426,9 +422,6 @@ std::string get_relative_name(Block* block, Term* term)
 
 std::string get_relative_name_at(Term* location, Term* term)
 {
-    if (location == NULL)
-        return get_relative_name(global_root_block(), term);
-
     if (location->owningBlock == NULL)
         return term->name();
     else
@@ -573,13 +566,6 @@ Type* find_type(Block* block, const char* name)
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
-}
-Block* find_function(World* world, const char* name)
-{
-    caTerm* term = find_name(world->root, name, sym_LookupFunction);
-    if (term == NULL)
-        return NULL;
-    return nested_contents(term);
 }
 Block* find_function_local(Block* block, const char* name)
 {

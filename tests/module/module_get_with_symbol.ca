@@ -1,6 +1,6 @@
 
-lib1 = require('lib1')
-lib2 = require('lib2')
+require lib1
+require lib2
 
 funcs = [lib1.:f, lib2.:f]
 

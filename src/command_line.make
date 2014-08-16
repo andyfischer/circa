@@ -66,7 +66,6 @@ endif
 OBJECTS := \
 	$(OBJDIR)/command_line.o \
 	$(OBJDIR)/command_line_main.o \
-	$(OBJDIR)/debugger_repl.o \
 	$(OBJDIR)/file_checker.o \
 	$(OBJDIR)/linenoise.o \
 
@@ -133,9 +132,6 @@ $(OBJDIR)/command_line.o: command_line/command_line.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/command_line_main.o: command_line/command_line_main.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/debugger_repl.o: command_line/debugger_repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_checker.o: command_line/file_checker.cpp

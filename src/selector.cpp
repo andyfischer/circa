@@ -314,6 +314,11 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
 
 Term* find_or_create_next_unnamed_term_output(Term* term)
 {
+    // require statement has a 'soft' name binding. It can receive a name from
+    // the module name, but any applied name will replace this.
+    if (term->function == FUNCS.require)
+        return term;
+    
     for (int i=0;; i++) {
         Term* output = get_output_term(term, i);
         if (output == NULL)

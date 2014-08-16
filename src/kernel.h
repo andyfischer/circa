@@ -69,8 +69,7 @@ struct BuiltinFuncs {
     Term* map_get;
     Term* memoize;
     Term* minor_return_if_empty;
-    Term* module;
-    Term* moduleRef_get;
+    Term* module_get;
     Term* mult;
     Term* native_patch;
     Term* neg;
@@ -143,7 +142,6 @@ extern BuiltinFuncs FUNCS;
 extern BuiltinTypes TYPES;
 
 World* global_world();
-Block* global_root_block();
 Block* global_builtins_block();
 
 void empty_evaluate_function(Term* caller);

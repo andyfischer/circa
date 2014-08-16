@@ -30,7 +30,7 @@
 
 namespace circa {
 
-caValue* module_search_paths(World* world)
+Value* module_search_paths(World* world)
 {
     return &world->moduleSearchPaths;
 }
@@ -40,7 +40,7 @@ void module_add_search_path(World* world, const char* str)
     set_string(list_append(&world->moduleSearchPaths), str);
 }
 
-void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut)
+void module_get_default_name_from_filename(Value* filename, Value* moduleNameOut)
 {
     get_just_filename_for_path(filename, moduleNameOut);
 
@@ -53,35 +53,86 @@ void module_get_default_name_from_filename(caValue* filename, caValue* moduleNam
     }
 }
 
-Block* find_loaded_module(caValue* name)
+Block* find_module(World* world, Value* name)
 {
-    for (BlockIteratorFlat it(global_root_block()); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-        if (term->function == FUNCS.module && equals(term_name(term), name))
-            return nested_contents(term);
-    }
-    return NULL;
+    stat_increment(FindModule);
+
+    Value* block = hashtable_get(&world->modulesByName, name);
+    if (block == NULL)
+        return NULL;
+    return as_block(block);
 }
 
+Block* find_module_by_filename(World* world, Value* filename)
+{
+    Value* block = hashtable_get(&world->modulesByFilename, filename);
+    if (block == NULL)
+        return NULL;
+    return as_block(block);
+}
+
+#if 0
 Block* fetch_module(World* world, const char* name)
 {
     Value nameStr;
     set_string(&nameStr, name);
-    Block* existing = find_module(world->root, &nameStr);
+    Block* existing = find_module(world, &nameStr);
     if (existing != NULL)
         return existing;
 
     return create_module(world, name);
 }
+#endif
 
-Block* create_module(World* world, const char* name)
+Block* create_module(World* world)
 {
-    Term* term = apply(world->root, FUNCS.module, TermList(), name);
-    return nested_contents(term);
+    Block* block = alloc_block(world);
+    block_set_bool_prop(block, sym_IsModule, true);
+    set_block(list_append(&world->everyModule), block);
+    return block;
 }
 
-static bool check_module_search_path(World* world, caValue* moduleName,
-    caValue* searchPath, caValue* filenameOut)
+void module_set_name(World* world, Block* block, Value* name)
+{
+    copy(name, block_insert_property(block, sym_Name));
+    set_block(hashtable_insert(&world->modulesByName, name), block);
+}
+
+void module_set_filename(World* world, Block* block, Value* filename)
+{
+    copy(filename, block_insert_property(block, sym_Filename));
+    set_block(hashtable_insert(&world->modulesByFilename, filename), block);
+}
+
+void resolve_possible_module_path(World* world, Value* path, Value* result)
+{
+    if (circa_file_exists(world, as_cstring(path))) {
+        copy(path, result);
+        return;
+    }
+
+    copy(path, result);
+
+    string_append(result, ".ca");
+    if (circa_file_exists(world, as_cstring(result)))
+        return;
+        
+    copy(path, result);
+
+    Value packageStr;
+    set_string(&packageStr, "package.ca");
+
+    join_path(result, &packageStr);
+
+    if (circa_file_exists(world, as_cstring(result)))
+        return;
+
+    set_null(result);
+}
+
+#if 0
+static bool check_module_search_path(World* world, Value* moduleName,
+    Value* searchPath, Value* filenameOut)
 {
     // For each search path we'll check two places.
 
@@ -110,39 +161,47 @@ static bool check_module_search_path(World* world, caValue* moduleName,
     
     return false;
 }
+#endif
 
-static bool find_module_file(World* world, Block* loadedBy,
-    caValue* moduleName, caValue* filenameOut)
+void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut)
 {
-    // Check directory local to load location.
-    if (loadedBy != NULL) {
-        caValue* loadedByFilename = block_get_property(loadedBy, sym_Filename);
-        if (loadedByFilename != NULL) {
-            Value directory;
-            get_directory_for_filename(loadedByFilename, &directory);
-            if (check_module_search_path(world, moduleName, &directory, filenameOut))
-                return true;
-        }
-    }
+    Value* loadedByFilename = block_get_property(loadedBy, sym_Filename);
+    if (loadedByFilename != NULL) {
+        Value path;
+        get_directory_for_filename(loadedByFilename, &path);
+        join_path(&path, moduleName);
 
+        resolve_possible_module_path(world, &path, filenameOut);
+        if (!is_null(filenameOut))
+            return;
+    }
+}
+
+void find_module_file_global(World* world, Value* moduleName, Value* filenameOut)
+{
     int count = list_length(&world->moduleSearchPaths);
     for (int i=0; i < count; i++) {
 
-        caValue* searchPath = list_get(&world->moduleSearchPaths, i);
+        Value* searchPath = list_get(&world->moduleSearchPaths, i);
 
-        if (check_module_search_path(world, moduleName, searchPath, filenameOut))
-            return true;
+        Value path;
+        copy(searchPath, &path);
+        join_path(&path, moduleName);
+
+        resolve_possible_module_path(world, &path, filenameOut);
+        if (!is_null(filenameOut))
+            return;
     }
-    return false;
 }
 
-Block* load_module_file(World* world, caValue* moduleName, const char* filename)
+#if 0
+Block* load_module_file(World* world, Value* moduleName, const char* filename)
 {
-    Block* existing = find_module(world->root, moduleName);
+    Block* existing = find_module(world, moduleName);
     Block* newBlock;
 
     if (existing == NULL) {
-        newBlock = create_module(world, as_cstring(moduleName));
+        newBlock = create_module(world, moduleName, NULL);
     } else {
         newBlock = alloc_block(world);
         block_graft_replacement(existing, newBlock);
@@ -159,26 +218,27 @@ Block* load_module_file(World* world, caValue* moduleName, const char* filename)
 
     return newBlock;
 }
+#endif
 
-void install_block_as_module(World* world, caValue* moduleName, Block* block)
+void module_install_replacement(World* world, Value* filename, Block* replacement)
 {
-    Block* existing = find_module(world->root, moduleName);
+    Block* existing = find_module_by_filename(world, filename);
+    ca_assert(existing != NULL);
+    Value* existingName = block_get_property(existing, sym_Name);
 
-    if (existing == NULL) {
-        existing = create_module(world, as_cstring(moduleName));
-        block_graft_replacement(existing, block);
-
-    } else {
-        block_graft_replacement(existing, block);
-
-        Migration migration;
-        migration.oldBlock = existing;
-        migration.newBlock = block;
-        migrate_world(world, &migration);
+    for (int i=0; i < world->everyModule.length(); i++) {
+        if (as_block(world->everyModule.index(i)) == existing)
+            set_block(world->everyModule.index(i), replacement);
     }
+
+    module_set_filename(world, replacement, filename);
+
+    if (existingName != NULL)
+        module_set_name(world, replacement, existingName);
 }
 
-Block* load_module_file_watched(World* world, caValue* moduleName, const char* filename)
+#if 0
+Block* load_module_file_watched(World* world, Value* moduleName, const char* filename)
 {
     // Load and parse the script file.
     Block* block = load_module_file(world, moduleName, filename);
@@ -191,23 +251,60 @@ Block* load_module_file_watched(World* world, caValue* moduleName, const char* f
 
     return block;
 }
+#endif
 
-Block* load_module_by_name(World* world, Block* loadedBy, caValue* moduleName)
+Block* load_module_by_filename(World* world, Value* filename)
 {
-    Block* existing = find_loaded_module(moduleName);
+    Value resolved;
+    resolve_possible_module_path(world, filename, &resolved);
+    if (is_null(&resolved))
+        return NULL;
+
+    Block* block = find_module_by_filename(world, &resolved);
+    if (block != NULL)
+        return block;
+
+    block = create_module(world);
+    module_set_filename(world, block, &resolved);
+
+    load_script(block, as_cstring(&resolved));
+
+    FileWatch* watch = add_file_watch_recompile_module(world, as_cstring(&resolved));
+    file_watch_ignore_latest_change(watch);
+
+    return block;
+}
+
+Block* load_module(World* world, Block* relativeTo, Value* moduleName)
+{
+    Value filename;
+
+    if (relativeTo != NULL) {
+        Value filename;
+        find_module_file_local(world, relativeTo, moduleName, &filename);
+
+        if (!is_null(&filename))
+            return load_module_by_filename(world, &filename);
+    }
+
+    Block* existing = find_module(world, moduleName);
     if (existing != NULL)
         return existing;
-    
-    Value filename;
-    bool found = find_module_file(world, loadedBy, moduleName, &filename);
 
-    if (found)
-        return load_module_file_watched(world, moduleName, as_cstring(&filename));
+    find_module_file_global(world, moduleName, &filename);
 
+    if (!is_null(&filename)) {
+        Block* block = load_module_by_filename(world, &filename);
+        module_set_name(world, block, moduleName);
+        return block;
+    }
+
+    // Try as a builtin module
     const char* builtinText = find_builtin_module(as_cstring(moduleName));
 
     if (builtinText != NULL) {
-        Block* newBlock = create_module(world, as_cstring(moduleName));
+        Block* newBlock = create_module(world);
+        module_set_name(world, newBlock, moduleName);
         load_script_from_text(newBlock, builtinText);
         return newBlock;
     }
@@ -215,122 +312,31 @@ Block* load_module_by_name(World* world, Block* loadedBy, caValue* moduleName)
     return NULL;
 }
 
-void module_on_loaded_by_term(Block* module, Term* loadCall)
-{
-    Term* moduleTerm = module->owningTerm;
-
-    Term* callersModule = find_parent_term_in_block(loadCall, moduleTerm->owningBlock);
-
-    if (callersModule != NULL && (moduleTerm->index > callersModule->index))
-        move_before(moduleTerm, callersModule);
-}
-
-Block* find_module_from_filename(const char* filename)
-{
-    // O(n) search for a module with this filename. Could stand to be more efficient.
-    for (int i=0; i < global_root_block()->length(); i++) {
-        Term* term = global_root_block()->get(i);
-        if (term->nestedContents == NULL)
-            continue;
-
-        caValue* blockFilename = block_get_source_filename(nested_contents(term));
-        if (blockFilename == NULL)
-            continue;
-
-        if (string_equals(blockFilename, filename))
-            return nested_contents(term);
-    }
-
-    return NULL;
-}
-
-
-void load_module_eval(caStack* stack)
-{
-    Term* caller = circa_caller_term(stack);
-    caValue* moduleName = circa_input(stack, 0);
-    Block* module = load_module_by_name(stack->world, caller->owningBlock, moduleName);
-    set_block(circa_output(stack, 0), module);
-}
-
-void load_script_eval(caStack* stack)
-{
-    caValue* filename = circa_input(stack, 0);
-    Value moduleName;
-    set_string(&moduleName, "file:");
-    string_append(&moduleName, filename);
-
-    Block* module = find_module(stack->world->root, &moduleName);
-    if (module == NULL)
-        module = load_module_file_watched(stack->world, &moduleName, as_cstring(filename));
-
-    set_block(circa_output(stack, 0), module);
-}
-
-Block* find_module(Block* root, caValue* name)
-{
-    stat_increment(FindModule);
-
-    Block* moduleLevel = global_world()->root;
-
-    for (int i=0; i < moduleLevel->length(); i++) {
-        Term* term = moduleLevel->get(i);
-        if (term->function != FUNCS.module)
-            continue;
-
-        if (equals(term_name(term), name))
-            return nested_contents(term);
-    }
-
-    return NULL;
-}
-
-Block* module_ref_get_block(caValue* moduleRef)
+Block* module_ref_get_block(Value* moduleRef)
 {
     return as_block(list_get(moduleRef, 0));
 }
 
-bool is_module_ref(caValue* value)
+bool is_module_ref(Value* value)
 {
     return value->value_type == TYPES.module_ref;
 }
 
-void require_eval(caStack* stack)
+void set_module_ref(Value* value, Block* block)
 {
-    caValue* moduleName = circa_input(stack, 0);
-    Block* module = load_module_by_name(stack->world, circa_caller_block(stack), moduleName);
-
-    if (module == NULL) {
-        Value msg;
-        set_string(&msg, "Couldn't find module named: ");
-        string_append_quoted(&msg, moduleName);
-        circa_output_error(stack, as_cstring(&msg));
-        return;
-    }
-
-    if (has_static_errors_cached(module)) {
-        Value msg;
-        set_string(&msg, "Module '");
-        string_append(&msg, moduleName);
-        string_append(&msg, "' has static errors: \n");
-
-        Value errors;
-        format_static_errors(block_get_static_errors(module), &errors);
-        string_append(&msg, &errors);
-        circa_output_error(stack, as_cstring(&msg));
-        return;
-    }
-
-    // Save a ModuleRef value.
-    caValue* moduleRef = circa_output(stack, 0);
-    make(TYPES.module_ref, moduleRef);
-    set_block(list_get(moduleRef, 0), module);
+    make(TYPES.module_ref, value);
+    set_block(list_get(value, 0), block);
+}
+ 
+void load_script_eval(Stack* stack)
+{
+    Value* filename = circa_input(stack, 0);
+    Block* block = load_module_by_filename(stack->world, filename);
+    set_module_ref(circa_output(stack, 0), block);
 }
 
 void modules_install_functions(NativePatch* patch)
 {
-    circa_patch_function(patch, "require", require_eval);
-    circa_patch_function(patch, "load_module", load_module_eval);
     circa_patch_function(patch, "load_script", load_script_eval);
 }
 
@@ -342,16 +348,19 @@ CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* moduleName,
         const char* filename)
 {
+#if 0
     Value moduleNameVal;
     set_string(&moduleNameVal, moduleName);
     return load_module_file_watched(world, &moduleNameVal, filename);
+#endif
+    return NULL;
 }
 
-CIRCA_EXPORT caBlock* circa_load_module(caWorld* world, Block* loadedBy, const char* moduleName)
+CIRCA_EXPORT caBlock* circa_load_module(caWorld* world, Block* relativeTo, const char* moduleName)
 {
     Value moduleNameVal;
     set_string(&moduleNameVal, moduleName);
-    return load_module_by_name(world, loadedBy, &moduleNameVal);
+    return load_module(world, relativeTo, &moduleNameVal);
 }
 
 } // namespace circa

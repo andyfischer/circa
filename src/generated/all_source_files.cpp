@@ -51,6 +51,5 @@
 #include "../world.cpp"
 #include "../command_line/command_line.cpp"
 #include "../command_line/command_line_main.cpp"
-#include "../command_line/debugger_repl.cpp"
 #include "../command_line/file_checker.cpp"
 #include "./stdlib_script_text.cpp"

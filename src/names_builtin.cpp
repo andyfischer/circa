@@ -37,6 +37,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Builtins: return "Builtins";
     case sym_ModuleName: return "ModuleName";
     case sym_StaticErrors: return "StaticErrors";
+    case sym_IsModule: return "IsModule";
     case sym_AccumulatingOutput: return "AccumulatingOutput";
     case sym_Comment: return "Comment";
     case sym_Constructor: return "Constructor";
@@ -171,13 +172,12 @@ const char* builtin_symbol_to_string(int name)
     case sym_LookupAny: return "LookupAny";
     case sym_LookupType: return "LookupType";
     case sym_LookupFunction: return "LookupFunction";
-    case sym_LookupModule: return "LookupModule";
     case sym_Untyped: return "Untyped";
     case sym_UniformListType: return "UniformListType";
     case sym_AnonStructType: return "AnonStructType";
     case sym_StructType: return "StructType";
     case sym_NativePatch: return "NativePatch";
-    case sym_PatchBlock: return "PatchBlock";
+    case sym_RecompileModule: return "RecompileModule";
     case sym_Filesystem: return "Filesystem";
     case sym_Tarball: return "Tarball";
     case sym_Bootstrapping: return "Bootstrapping";
@@ -844,6 +844,10 @@ int builtin_symbol_from_string(const char* str)
         break;
     default: return -1;
     }
+    case 's':
+        if (strcmp(str + 2, "Module") == 0)
+            return sym_IsModule;
+        break;
     default: return -1;
     }
     case 'K':
@@ -913,10 +917,6 @@ int builtin_symbol_from_string(const char* str)
     case 'F':
         if (strcmp(str + 7, "unction") == 0)
             return sym_LookupFunction;
-        break;
-    case 'M':
-        if (strcmp(str + 7, "odule") == 0)
-            return sym_LookupModule;
         break;
     case 'T':
         if (strcmp(str + 7, "ype") == 0)
@@ -1066,10 +1066,6 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'P':
     switch (str[1]) {
-    case 'a':
-        if (strcmp(str + 2, "tchBlock") == 0)
-            return sym_PatchBlock;
-        break;
     case 'r':
     switch (str[2]) {
     case 'e':
@@ -1111,9 +1107,17 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'c':
-        if (strcmp(str + 3, "ursiveWildcard") == 0)
+    switch (str[3]) {
+    case 'o':
+        if (strcmp(str + 4, "mpileModule") == 0)
+            return sym_RecompileModule;
+        break;
+    case 'u':
+        if (strcmp(str + 4, "rsiveWildcard") == 0)
             return sym_RecursiveWildcard;
         break;
+    default: return -1;
+    }
     case 'f':
             return sym_Ref;
     case 'p':

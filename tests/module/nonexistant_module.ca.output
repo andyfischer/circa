@@ -1,4 +1,4 @@
 Error occurred:
-[tests/module/nonexistant_module.ca 2,0] foo = require()
-Couldn't find module named: 'jfkdsjflkds'
+[tests/module/nonexistant_module.ca 2,0] foo = syntax_error()
+Couldn't find module: jfkdsjflkds
 

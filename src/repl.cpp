@@ -27,7 +27,9 @@ void repl_start(Stack* stack)
     Value sym_displayRaw;
     set_symbol_from_string(&sym_displayRaw, "displayRaw");
 
-    Block* block = fetch_module(stack->world, "main");
+    Value mainStr;
+    set_string(&mainStr, "main");
+    Block* block = find_module(stack->world, &mainStr);
     set_bool(hashtable_insert(&stack->attrs, &sym_displayRaw), false);
     stack_init(stack, block);
 }

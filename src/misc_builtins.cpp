@@ -883,7 +883,7 @@ void Map__empty(caStack* stack)
     set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
 }
 
-void ModuleRef__get(caStack* stack)
+void Module__get(caStack* stack)
 {
     Value* moduleRef = circa_input(stack, 0);
     Block* moduleBlock = module_ref_get_block(moduleRef);
@@ -1373,7 +1373,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "Map.get", Map__get);
     circa_patch_function(patch, "Map.set", Map__set);
     circa_patch_function(patch, "Map.empty", Map__empty);
-    circa_patch_function(patch, "ModuleRef._get", ModuleRef__get);
+    circa_patch_function(patch, "Module._get", Module__get);
 
     circa_patch_function(patch, "String.char_at", String__char_at);
     circa_patch_function(patch, "String.ends_with", String__ends_with);

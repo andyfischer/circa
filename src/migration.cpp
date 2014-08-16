@@ -40,7 +40,7 @@ void migrate_block(Block* target, Migration* migration)
     ca_assert(target != migration->oldBlock);
 
     // Migrate term values; needs to happen whether or not the migration targets
-    // this block. Needed for ModuleRef values that are written by require().
+    // this block. Needed for Module values that are written by require().
     // Future: Might be able to change require() to make this unnecessary.
     for (BlockIterator it(target); it; ++it) {
         Term* term = *it;
@@ -290,12 +290,16 @@ void migrate_world(World* world, Migration* migration)
         migration->oldBlock->id, migration->newBlock->id);
 #endif
 
+    // FIXME
+
+#if 0
     // Update references in every module.
     for (BlockIteratorFlat it(world->root); it; ++it) {
         Term* term = it.current();
         if (term->function == FUNCS.module)
             migrate_block(term->nestedContents, migration);
     }
+#endif
 
     // Update references in every stack.
     Stack* rootStack = world->firstStack;

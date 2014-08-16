@@ -123,15 +123,13 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         case sym_NativePatch: {
             caValue* moduleName = list_get(action, 1);
 
-            NativePatch* nativeModule = insert_native_patch(world, as_cstring(moduleName));
+            NativePatch* nativeModule = insert_native_patch(world, moduleName);
             native_patch_load_from_file(nativeModule, as_cstring(&watch->filename));
             native_patch_finish_change(nativeModule);
             break;
         }
-        case sym_PatchBlock: {
+        case sym_RecompileModule: {
             // Reload this code block.
-            caValue* moduleName = list_get(action, 1);
-
             Block* block = alloc_block(world);
             load_script(block, as_cstring(&watch->filename));
 
@@ -145,7 +143,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
                 print_static_errors_formatted(block, &msg);
                 write_log(world, as_cstring(&msg));
             } else {
-                install_block_as_module(world, moduleName, block);
+                module_install_replacement(world, &watch->filename, block);
             }
             break;
         }
@@ -189,12 +187,11 @@ void file_watch_check_all(World* world)
     }
 }
 
-FileWatch* add_file_watch_module_load(World* world, const char* filename, caValue* moduleName)
+FileWatch* add_file_watch_recompile_module(World* world, const char* filename)
 {
     circa::Value action;
-    set_list(&action, 2);
-    set_symbol(list_get(&action, 0), sym_PatchBlock);
-    set_value(list_get(&action, 1), moduleName);
+    set_list(&action, 1);
+    set_symbol(list_get(&action, 0), sym_RecompileModule);
     return add_file_watch_action(world, filename, &action);
 }
 

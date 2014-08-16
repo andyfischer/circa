@@ -6,8 +6,10 @@ namespace circa {
 
 struct World {
 
-    Block* root;
     Block* builtins;
+    Value modulesByName;
+    Value modulesByFilename;
+    Value everyModule;
 
     // Private data.
     FileWatchWorld* fileWatchWorld;

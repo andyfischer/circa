@@ -59,9 +59,6 @@ Term* find_name_at(Term* term, caValue* name);
 // endPos is the name's ending index.
 int name_find_ordinal_suffix(const char* str, int* endPos);
 
-// Get a named term from the global namespace.
-Term* find_global(const char* name);
-
 bool name_is_reachable_from(Term* term, Block* block);
 
 Block* find_first_common_block(Term* left, Term* right);
@@ -80,7 +77,6 @@ caValue* unique_name(Term* term);
 Term* find_from_unique_name(Block* block, caValue* name);
 
 Type* find_type(Block* block, const char* name);
-Block* find_function(World* world, const char* name);
 Block* find_function_local(Block* block, const char* name);
 
 } // namespace circa

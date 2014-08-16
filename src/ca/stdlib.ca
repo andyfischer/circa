@@ -22,7 +22,6 @@ def section()
 def case_condition_bool(bool condition)
 def loop_condition_bool(bool condition)
 def minor_return_if_empty()
-def module()
 
 -- While-block
 def while()
@@ -459,24 +458,30 @@ def increment(int i) -> int
 def decrement(int i) -> int
   i - 1
 
--- Modules
+-- Builtin types
+struct FileSignature { String filename, int time_modified }
+struct Callable;
+struct Color { number r, number g, number b, number a }
+struct Module { Block block }
+struct Stack;
+struct Vec2 { number x, number y }
+struct Vec2i { int x, int y }
+struct Vec3 { number x, number y, number z }
+struct Vec4 { number x, number y, number z, number w }
+struct Rect { number x1, number y1, number x2, number y2 }
+struct Rect_i { int x1, int y1, int x2, int y2 }
 
-struct ModuleRef {
-  Block block
-}
+def Module._get(self, name)
+def Module.to_func(self) -> Func
+  self.block.to_func
+def Module.to_stack(self) -> Stack
+  self.block.to_stack
 
-def ModuleRef._get(self, name)
-
-def load_module(String moduleName) -> Block
-  -- Look for a loaded module with the given name, and load it if necessary.
-  -- The module search path will be used, and the result is stored in module
-  -- space.
-
-def load_script(String filename) -> Block
+def load_script(String filename) -> Module
   -- Load a script with the given filename. The result will only be available
   -- locally; it won't be loaded into module space.
 
-def require(String moduleName) -> ModuleRef
+def require() -> Module
   -- Load a module.
 
 def package(String moduleName)
@@ -510,17 +515,6 @@ def sys_arg(int index) -> String
 def sys_module_search_paths() -> List
 def _perf_stats_dump() -> Map
 
--- Builtin types
-struct FileSignature { String filename, int time_modified }
-struct Callable;
-struct Color { number r, number g, number b, number a }
-struct Stack;
-struct Vec2 { number x, number y }
-struct Vec2i { int x, int y }
-struct Vec3 { number x, number y, number z }
-struct Vec4 { number x, number y, number z, number w }
-struct Rect { number x1, number y1, number x2, number y2 }
-struct Rect_i { int x1, int y1, int x2, int y2 }
 
 def make_blob(int size) -> Blob
 def Blob.size(self) -> int
@@ -607,7 +601,7 @@ def Block.to_func(self) -> Func
   Func.make(self)
 
 def Block.to_stack(self) -> Stack
-  make_stack(self.to_func)
+  self.to_func.to_stack
 
 def Block.name(self) -> String
     self.owner.name

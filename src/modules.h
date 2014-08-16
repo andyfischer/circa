@@ -7,47 +7,30 @@
 namespace circa {
 
 // -- Search paths --
-caValue* module_search_paths(World* world);
+Value* module_search_paths(World* world);
 void module_add_search_path(World* world, const char* str);
 
 // -- Filenames --
-void module_get_default_name_from_filename(caValue* filename, caValue* moduleNameOut);
+void module_get_default_name_from_filename(Value* filename, Value* moduleNameOut);
 
-// Add a top-level with the given name, or return an existing one if it exists.
-Block* fetch_module(World* world, const char* name);
+Block* create_module(World* world);
+void module_set_name(World* world, Block* block, Value* name);
+void module_set_filename(World* world, Block* block, Value* filename);
 
-Block* create_module(World* world, const char* name);
+void module_install_replacement(World* world, Value* filename, Block* block);
 
-// Load a module from the given filename. If the module already exists, then we'll replace
-// the existing contents, and we'll update any existing references that point to the replaced
-// code. Does not create a file watch (see load_module_file_watched).
-Block* load_module_file(World* world, caValue* moduleName, const char* filename);
+Block* find_module(World* world, Value* name);
+Block* find_module_by_filename(World* world, Value* filename);
 
-void install_block_as_module(World* world, caValue* moduleName, Block* block);
+Block* load_module(World* world, Block* relativeTo, Value* moduleName);
+Block* load_module_by_filename(World* world, Value* filename);
 
-// Loads a module from the given filename, and creates a file watch.
-Block* load_module_file_watched(World* world, caValue* moduleName, const char* filename);
+void resolve_possible_module_path(World* world, Value* path, Value* result);
 
-// Load a module via name. The file will be found via standard module lookup.
-Block* load_module_by_name(World* world, Block* loadedBy, caValue* moduleName);
+Block* module_ref_get_block(Value* moduleRef);
 
-// This should be called whenever a new module is loaded by a certain term. We may
-// rearrange the global module order so that the module is located before the term.
-void module_on_loaded_by_term(Block* module, Term* loadCall);
-
-// Deprecated: does not reference World or Block.
-Block* find_loaded_module(const char* name);
-Block* find_module_from_filename(const char* filename);
-
-// Prefered:
-Block* find_module(Block* root, caValue* name);
-
-// Runtime calls (when evaluating require)
-Block* module_ref_get_block(caValue* moduleRef);
-
-// -- Bundles --
-Block* module_create_empty_bundle(World* world, const char* name);
-bool is_module_ref(caValue* value);
+bool is_module_ref(Value* value);
+void set_module_ref(Value* value, Block* block);
 
 // Install builtin modules functions.
 void modules_install_functions(NativePatch* patch);

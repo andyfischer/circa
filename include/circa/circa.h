@@ -168,10 +168,6 @@ void circa_free_stack(caStack* stack);
 // Push a function to the stack.
 void circa_push_function(caStack* stack, caBlock* func);
 
-// Find a function by name and push it to the stack. Returns whether the function
-// name was found.
-bool circa_push_function_by_name(caStack* stack, const char* name);
-
 // Push a module to the stack by name.
 void circa_push_module(caStack* stack, const char* name);
 
@@ -462,13 +458,8 @@ void circa_to_string(caValue* value, caValue* out);
 
 // -- Code Reflection --
 
-// Access the root block for a caWorld.
-caBlock* circa_kernel(caWorld* world);
-
 // Find a Term by name, looking in the given block.
 caTerm* circa_find_term(caBlock* block, const char* name);
-
-caTerm* circa_find_global(caWorld* world, const char* name);
 
 // Find a Function by name, looking in the given block.
 caBlock* circa_find_function_local(caBlock* block, const char* name);

@@ -99,11 +99,6 @@ void reflect__this_block(caStack* stack)
     set_block(circa_output(stack, 0), (Block*) circa_caller_block(stack));
 }
 
-void reflect__kernel(caStack* stack)
-{
-    set_block(circa_output(stack, 0), global_root_block());
-}
-
 void sys__module_search_paths(caStack* stack)
 {
     copy(module_search_paths(stack->world), circa_output(stack, 0));
@@ -307,27 +302,9 @@ void output_explicit_postCompile(Term* term)
     hide_from_source(out);
 }
 
-void require_postCompile(Term* term)
-{
-    caValue* moduleName = term_value(term->input(0));
-    Block* module = load_module_by_name(global_world(), term->owningBlock, moduleName);
-    if (module != NULL)
-        module_on_loaded_by_term(module, term);
-
-    // Save a ModuleRef value.
-    caValue* moduleRef = term_value(term);
-    make(TYPES.module_ref, moduleRef);
-    set_block(list_get(moduleRef, 0), module);
-}
-
 World* global_world()
 {
     return g_world;
-}
-
-Block* global_root_block()
-{
-    return global_world()->root;
 }
 
 Block* global_builtins_block()
@@ -489,13 +466,14 @@ void bootstrap_kernel()
     type_t::setup_type(TYPES.type);
     void_setup_type(TYPES.void_type);
 
-    // Create root Block.
-    g_world->root = new Block();
+    // Finish initializing World (this requires List and Hashtable types)
+    world_initialize(g_world);
 
     // Create builtins block.
-    Term* builtinsTerm = g_world->root->appendNew();
-    rename(builtinsTerm, "builtins");
-    Block* builtins = make_nested_contents(builtinsTerm);
+    Value builtinsStr;
+    set_string(&builtinsStr, "builtins");
+    Block* builtins = create_module(g_world);
+    module_set_name(world, builtins, &builtinsStr);
     g_world->builtins = builtins;
 
     // Create function_decl function.
@@ -550,9 +528,6 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.void_type, "void");
     create_type_value(builtins, TYPES.map, "Map");
 
-    // Finish initializing World (this requires List and Hashtable types)
-    world_initialize(g_world);
-
     // Create global symbol table (requires Hashtable type)
     symbol_initialize_global_table();
 
@@ -595,7 +570,6 @@ void bootstrap_kernel()
     circa_patch_function(world->builtinPatch, "test_spy", test_spy);
     circa_patch_function(world->builtinPatch, "test_oracle", test_oracle);
     circa_patch_function(world->builtinPatch, "reflect_this_block", reflect__this_block);
-    circa_patch_function(world->builtinPatch, "reflect_kernel", reflect__kernel);
     circa_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
     circa_patch_function(world->builtinPatch, "_perf_stats_dump", perf_stats_dump);
     circa_patch_function(world->builtinPatch, "syntax_error", syntax_error);
@@ -611,8 +585,6 @@ void bootstrap_kernel()
     stack_install_functions(world->builtinPatch);
     type_install_functions(world->builtinPatch);
 
-    // Fix 'builtins' module now that the module() function is created.
-    change_function(builtinsTerm, FUNCS.module);
     block_set_bool_prop(builtins, sym_Builtins, true);
 
     ca_assert(FUNCS.declared_state != NULL);
@@ -631,7 +603,6 @@ void bootstrap_kernel()
     FUNCS.native_patch = builtins->get("native_patch");
     FUNCS.output_explicit = builtins->get("output");
     FUNCS.package = builtins->get("package");
-    FUNCS.module = builtins->get("module");
 
     nested_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
 
@@ -642,7 +613,7 @@ void bootstrap_kernel()
     TYPES.color = as_type(builtins->get("Color"));
     TYPES.file_signature = as_type(builtins->get("FileSignature"));
     TYPES.func = as_type(builtins->get("Func"));
-    TYPES.module_ref = as_type(builtins->get("ModuleRef"));
+    TYPES.module_ref = as_type(builtins->get("Module"));
     TYPES.stack = as_type(builtins->get("Stack"));
     TYPES.frame = as_type(builtins->get("Frame"));
     TYPES.module_frame = as_type(builtins->get("ModuleFrame"));
@@ -737,7 +708,6 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         find_func(make, "make");
         find_func(memoize, "memoize");
         find_func(minor_return_if_empty, "minor_return_if_empty");
-        find_func(module, "module");
         find_func(native_patch, "native_patch");
         find_func(neg, "neg");
         find_func(not_equals, "not_equals");
@@ -776,7 +746,7 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         find_func(func_apply, "Func.apply");
         find_func(get_with_selector, "get_with_selector");
         find_func(map_get, "Map.get");
-        find_func(moduleRef_get, "ModuleRef._get");
+        find_func(module_get, "Module._get");
         find_func(not_equals, "not_equals");
         find_func(nonlocal, "_nonlocal");
         find_func(require, "require");
@@ -812,7 +782,6 @@ void on_new_function_parsed(Term* func, caValue* functionName)
         has_post_compile("break", controlFlow_postCompile);
         has_post_compile("continue", controlFlow_postCompile);
         has_post_compile("output", output_explicit_postCompile);
-        has_post_compile("require", require_postCompile);
 
     #undef has_post_compile
 }
@@ -864,9 +833,6 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
 
     world_uninitialize(world);
 
-    delete world->root;
-    world->root = NULL;
-
     for_each_root_type(predelete_type);
     for_each_root_type(delete_type);
 
@@ -874,11 +840,6 @@ CIRCA_EXPORT void circa_shutdown(caWorld* world)
     memset(&TYPES, 0, sizeof(TYPES));
 
     dealloc_world(world);
-}
-
-CIRCA_EXPORT caBlock* circa_kernel(caWorld* world)
-{
-    return world->root;
 }
 
 } // namespace circa

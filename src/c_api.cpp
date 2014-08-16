@@ -150,10 +150,6 @@ caTerm* circa_find_term(caBlock* block, const char* name)
 {
     return (caTerm*) find_name((Block*) block, name);
 }
-caTerm* circa_find_global(caWorld* world, const char* name)
-{
-    return (caTerm*) find_name(world->root, name);
-}
 caBlock* circa_find_function_local(caBlock* block, const char* name)
 {
     return find_function_local(block, name);
@@ -161,10 +157,6 @@ caBlock* circa_find_function_local(caBlock* block, const char* name)
 caType* circa_find_type(caBlock* block, const char* name)
 {
     return find_type(block, name);
-}
-caBlock* circa_find_function(caWorld* world, const char* name)
-{
-    return find_function(world, name);
 }
 
 int circa_term_num_inputs(caTerm* term)
@@ -280,20 +272,6 @@ void circa_restart(caStack* stack)
     stack_restart(stack);
 }
 
-bool circa_push_function_by_name(caStack* stack, const char* name)
-{
-    caBlock* func = circa_find_function(NULL, name);
-
-    if (func == NULL) {
-        // TODO: Save this error on the stack instead of stdout
-        std::cout << "Function not found: " << name << std::endl;
-        return false;
-    }
-
-    circa_push_function(stack, func);
-    return true;
-}
-
 void circa_push_function(caStack* stack, caBlock* func)
 {
     block_finish_changes(func);
@@ -304,7 +282,7 @@ void circa_push_module(caStack* stack, const char* name)
 {
     Value nameStr;
     set_string(&nameStr, name);
-    Block* block = find_module(stack->world->root, &nameStr);
+    Block* block = find_module(stack->world, &nameStr);
     if (block == NULL) {
         // TODO: Save this error on the stack instead of stdout
         std::cout << "in circa_push_module, module not found: " << name << std::endl;

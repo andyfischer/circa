@@ -269,7 +269,8 @@ if __name__ == '__main__':
     else:
         run_all_tests(suite)
 
-    print("Ran",suite.totalCount,"tests,",len(suite.failedTests),"failed,",suite.totalDisabled,"disabled.")
+    if not OnlyPrintCommands:
+        print("Ran",suite.totalCount,"tests,",len(suite.failedTests),"failed,",suite.totalDisabled,"disabled.")
 
     if DumpStats:
         for line in process.run("dump_stats"):

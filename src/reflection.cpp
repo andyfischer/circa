@@ -517,7 +517,9 @@ void Term__is_null(caStack* stack)
 void Term__is_value(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), is_value(t));
+
+    bool consideredValue = is_value(t) || t->function == FUNCS.require;
+    set_bool(circa_output(stack, 0), consideredValue);
 }
 
 void Term__source_location(caStack* stack)

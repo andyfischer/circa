@@ -12,6 +12,7 @@
 
 namespace modules_test {
 
+#if 0
 void source_file_location()
 {
     test_write_fake_file("block.ca", 1, "a = 1");
@@ -62,13 +63,16 @@ void non_required_module_is_not_visible()
     test_assert(find_name(module_a, "a") != NULL);
     test_assert(find_name(module_b, "a") == NULL);
 }
+#endif
 
 void register_tests()
 {
+#if 0
     REGISTER_TEST_CASE(modules_test::source_file_location);
     REGISTER_TEST_CASE(modules_test::test_explicit_output);
     REGISTER_TEST_CASE(modules_test::module_always_has_primary_output);
     REGISTER_TEST_CASE(modules_test::non_required_module_is_not_visible);
+#endif
 }
 
 } // namespace modules_test

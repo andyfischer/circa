@@ -63,14 +63,20 @@ void dealloc_world(World* world)
 
 void world_initialize(World* world)
 {
+    initialize_null(&world->modulesByName);
+    initialize_null(&world->modulesByFilename);
+    initialize_null(&world->everyModule);
     initialize_null(&world->fileSources);
     initialize_null(&world->moduleSearchPaths);
 
+    set_hashtable(&world->modulesByName);
+    set_hashtable(&world->modulesByFilename);
+    set_list(&world->everyModule);
     set_list(&world->moduleSearchPaths);
     set_list(&world->fileSources);
 
     world->fileWatchWorld = alloc_file_watch_world();
-    world->builtinPatch = insert_native_patch(world, "builtins");
+    world->builtinPatch = circa_create_native_patch(world, "builtins");
 
     #if CIRCA_ENABLE_LIBUV
         world->libuvWorld = alloc_libuv_world();

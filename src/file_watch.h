@@ -56,7 +56,7 @@ void file_watch_ignore_latest_change(FileWatch* watch);
 void file_watch_check_all(World* world);
 
 // Add a watch to reload the given module.
-FileWatch* add_file_watch_module_load(World* world, const char* filename, caValue* moduleName);
+FileWatch* add_file_watch_recompile_module(World* world, const char* filename);
 
 // Add a watch to reload the given module.
 FileWatch* add_file_watch_native_patch(World* world, const char* filename, const char* moduleName);

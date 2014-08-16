@@ -25,19 +25,20 @@ int file_get_mtime(const char* filename)
     struct stat s;
     s.st_mtime = 0;
 
-    stat(filename, &s);
+    if (stat(filename, &s) != 0)
+        return 0;
+
     return (int) s.st_mtime;
 }
 
 bool file_exists(const char* filename)
 {
-    FILE* fp = fopen(filename, "r");
+    struct stat s;
 
-    if (fp == NULL)
+    if (stat(filename, &s) != 0)
         return false;
 
-    fclose(fp);
-    return true;
+    return S_ISREG(s.st_mode);
 }
 
 bool is_absolute_path(caValue* path)
@@ -190,8 +191,15 @@ void write_text_file(const char* filename, const char* contents)
 
 void read_text_file(const char* filename, caValue* contentsOut)
 {
+    if (!file_exists(filename)) {
+        set_null(contentsOut);
+        return;
+    }
+
     FILE* fp = fopen(filename, "r");
+
     if (fp == NULL) {
+        // Unlikely to reach here since we just checked file_exists. But possible.
         set_null(contentsOut);
         return;
     }

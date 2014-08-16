@@ -48,7 +48,6 @@ solution "Circa"
         files {
             "src/command_line/command_line.cpp",
             "src/command_line/command_line_main.cpp",
-            "src/command_line/debugger_repl.cpp",
             "src/command_line/file_checker.cpp",
             "3rdparty/linenoise/linenoise.c",
         }

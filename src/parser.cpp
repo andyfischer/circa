@@ -392,11 +392,6 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_Case)) {
         result = case_statement(block, tokens, context);
     }
-    
-    // Require statement
-    else if (tokens.nextIs(tok_Require) || tokens.nextIs(tok_Import)) {
-        result = require_statement(block, tokens, context);
-    }
 
     // Package statement
     else if (tokens.nextIs(tok_Package)) {
@@ -1199,24 +1194,42 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     tokens.consume(); // either 'import' or 'require'
     possible_whitespace(tokens);
 
-    Term* moduleName = NULL;
-
-    if (tokens.nextIs(tok_Identifier)) {
-        moduleName = create_string(block, tokens.consumeStr().c_str());
-    } else if (tokens.nextIs(tok_String)) {
-        moduleName = literal_string(block, tokens, context).term;
-    } else {
+    if (!tokens.nextIs(tok_Identifier)) 
         return syntax_error(block, tokens, startPosition,
-            "Expected module name (as a string or identifier)");
+            "Expected path after 'require'");
+
+    Value path;
+    while (true) {
+        tokens.consumeStr(&path);
+
+        if (!tokens.nextIs(tok_Identifier) && !tokens.nextIs(tok_Slash))
+            break;
     }
 
-    Term* term;
+    Block* module = load_module(block->world, block, &path);
+    
+    if (module == NULL) {
+        Value msg;
+        set_string(&msg, "Couldn't find module: ");
+        string_append(&msg, &path);
+        return syntax_error(block, tokens, startPosition, as_cstring(&msg));
+    }
+
+    Value localName;
+    int slashLoc = string_find_char_from_end(&path, '/');
+    if (slashLoc == -1) {
+        move(&path, &localName);
+    } else {
+        string_substr(&path, slashLoc + 1, -1, &localName);
+    }
+
+    Term* term = apply(block, FUNCS.require, TermList(), &localName);
+
+    set_module_ref(term_value(term), module);
 
     if (keyword == tok_Import) {
-        term = apply(block, FUNCS.require, TermList(moduleName));
         term->setBoolProp(sym_Syntax_Import, true);
     } else {
-        term = apply(block, FUNCS.require, TermList(moduleName), term_value(moduleName));
         term->setBoolProp(sym_Syntax_Require, true);
     }
 
@@ -1653,6 +1666,8 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
         parseResult = switch_block(block, tokens, context);
     else if (tokens.nextIs(tok_While))
         parseResult = while_block(block, tokens, context);
+    else if (tokens.nextIs(tok_Require) || tokens.nextIs(tok_Import))
+        parseResult = require_statement(block, tokens, context);
     else
         parseResult = infix_expression(block, tokens, context, 0);
 

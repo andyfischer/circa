@@ -91,6 +91,7 @@ bool compiled_should_ignore_term(Compiled* compiled, Term* term)
 {
     if (term == NULL
             || is_value(term)
+            || term->function == FUNCS.require
             || term->function == FUNCS.lambda
             || term->function == FUNCS.block_unevaluated
             || term->function == FUNCS.case_func)
@@ -1218,7 +1219,9 @@ static void write_fixed_value(Writer* writer, Value* value, int destReg)
 
 static bool should_use_term_value(Writer* writer, Term* term)
 {
-    return is_value(term) || term->owningBlock == global_builtins_block();
+    return is_value(term)
+        || term->owningBlock == global_builtins_block()
+        || term->function == FUNCS.require;
 }
 
 static void bc_copy_term_value(Writer* writer, Term* source, int destReg)

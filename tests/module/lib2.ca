@@ -1,5 +1,5 @@
 
-lib1 = require('lib1')
+require lib1
 
 print('evaluating lib2.ca')
 

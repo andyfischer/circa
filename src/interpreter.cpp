@@ -200,7 +200,7 @@ Value* stack_find_nonlocal(Frame* frame, Term* term)
 {
     ca_assert(term != NULL);
 
-    if (is_value(term))
+    if (is_value(term) || term->function == FUNCS.require)
         return term_value(term);
 
     Value termRef;
@@ -226,11 +226,6 @@ Value* stack_find_nonlocal(Frame* frame, Term* term)
     if (term->function == FUNCS.function_decl) {
         if (is_null(term_value(term)))
             set_closure(term_value(term), term->nestedContents, NULL);
-        return term_value(term);
-    }
-
-    // Ditto for require() values.
-    if (term->function == FUNCS.require) {
         return term_value(term);
     }
 
@@ -713,7 +708,7 @@ void vm_resolve_dynamic_method_to_module_access(Stack* stack, Value* object)
     } else if (is_type(term)) {
         stack_resize_top_frame(stack, 2);
         copy(elementName, vm_frame_register(top, 1));
-        int blockIndex = program_create_entry(stack->program, FUNCS.moduleRef_get->nestedContents);
+        int blockIndex = program_create_entry(stack->program, FUNCS.module_get->nestedContents);
         vm_prepare_top_frame(stack, blockIndex);
     } else {
         set_term_ref(vm_frame_register(top, 0), term);
@@ -896,6 +891,9 @@ void vm_run(Stack* stack)
                     stat_increment(Interpreter_DynamicMethod_CacheHit);
                     pc += c_methodCacheSize;
                     vm_dynamic_method_dispatch_from_cache(stack, cacheLine, object);
+                    if (stack_errored(stack))
+                        return;
+
                     goto next_op;
                 }
             }
@@ -933,6 +931,8 @@ void vm_run(Stack* stack)
             }
 
             vm_dynamic_method_dispatch_from_cache(stack, firstCacheLine, object);
+            if (stack_errored(stack))
+                return;
             pc += c_methodCacheSize;
 
             vm_fix_bytecode_pointer();
