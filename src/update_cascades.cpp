@@ -27,7 +27,7 @@ void fix_forward_function_references(Block* block)
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             // See if we can now find this function
-            caValue* functionName = term->getProp(sym_Syntax_FunctionName);
+            Value* functionName = term->getProp(sym_Syntax_FunctionName);
 
             if (functionName != NULL) {
                 Term* func = find_name(block, functionName, sym_LookupFunction);

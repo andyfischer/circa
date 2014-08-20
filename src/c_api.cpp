@@ -47,101 +47,101 @@ caBlock* caTerm::parent()
     return circa_parent_block(this);
 }
 
-caValue* circa_set_default_input(caStack* stack, int index)
+Value* circa_set_default_input(caStack* stack, int index)
 {
-    caValue* val = circa_input(stack, index);
+    Value* val = circa_input(stack, index);
     caBlock* top = circa_stack_top_block(stack);
     caTerm* placeholder = circa_input_placeholder(top, index);
     circa_make(val, circa_term_declared_type(placeholder));
     return val;
 }
 
-caValue* circa_set_default_output(caStack* stack, int index)
+Value* circa_set_default_output(caStack* stack, int index)
 {
-    caValue* val = circa_output(stack, index);
+    Value* val = circa_output(stack, index);
     caBlock* top = circa_stack_top_block(stack);
     caTerm* placeholder = circa_output_placeholder(top, index);
     circa_make(val, circa_term_declared_type(placeholder));
     return val;
 }
 
-void* circa_as_pointer(caValue* container)
+void* circa_as_pointer(Value* container)
 {
     return as_opaque_pointer(container);
 }
 
-void circa_init_value(caValue* container)
+void circa_init_value(Value* container)
 {
     initialize_null(container);
 }
 
-caValue* circa_alloc_value()
+Value* circa_alloc_value()
 {
-    caValue* value = (caValue*) malloc(sizeof(caValue));
+    Value* value = (Value*) malloc(sizeof(Value));
     circa_init_value(value);
     return value;
 }
 
-caValue* circa_alloc_list(int size)
+Value* circa_alloc_list(int size)
 {
-    caValue* val = circa_alloc_value();
+    Value* val = circa_alloc_value();
     circa_set_list(val, size);
     return val;
 }
 
-void circa_dealloc_value(caValue* value)
+void circa_dealloc_value(Value* value)
 {
     circa_set_null(value);
     free(value);
 }
 
-void circa_string_append(caValue* container, const char* str)
+void circa_string_append(Value* container, const char* str)
 {
     string_append(container, str);
 }
 
-void circa_string_append_val(caValue* str, caValue* suffix)
+void circa_string_append_val(Value* str, Value* suffix)
 {
     string_append(str, suffix);
 }
 
-void circa_string_append_len(caValue* container, const char* str, int len)
+void circa_string_append_len(Value* container, const char* str, int len)
 {
     string_append_len(container, str, len);
 }
 
-void circa_string_append_char(caValue* container, char c)
+void circa_string_append_char(Value* container, char c)
 {
     string_append(container, c);
 }
 
-bool circa_string_equals(caValue* container, const char* str)
+bool circa_string_equals(Value* container, const char* str)
 {
     return string_equals(container, str);
 }
-void circa_set_list(caValue* list, int numElements)
+void circa_set_list(Value* list, int numElements)
 {
     set_list(list, numElements);
 }
-caValue* circa_append(caValue* list)
+Value* circa_append(Value* list)
 {
     return list_append(list);
 }
-void circa_resize(caValue* list, int count)
+void circa_resize(Value* list, int count)
 {
     list_resize(list, count);
 }
 
-void* circa_raw_pointer(caValue* value)
+void* circa_raw_pointer(Value* value)
 {
     return value->value_data.ptr;
 }
-void circa_set_raw_pointer(caValue* value, void* ptr)
+void circa_set_raw_pointer(Value* value, void* ptr)
 {
     value->value_data.ptr = ptr;
 }
 
-void circa_make(caValue* value, caType* type)
+void circa_make(Value* value, caType* type)
 {
     make((Type*) type, value);
 }
@@ -178,7 +178,7 @@ caBlock* circa_term_get_function(caTerm* term)
     return nested_contents(term->function);
 }
 
-caValue* circa_function_get_name(caBlock* func)
+Value* circa_function_get_name(caBlock* func)
 {
     return term_name(func->owningTerm);
 }
@@ -220,7 +220,7 @@ caTerm* circa_owning_term(caBlock* block)
 caTerm* circa_owning_term(caBlock*);
 
 // Access the fixed value of the given Term.
-caValue* circa_term_value(caTerm* term)
+Value* circa_term_value(caTerm* term)
 {
     if (!is_value((Term*) term))
         return NULL;
@@ -231,7 +231,7 @@ int circa_term_get_index(caTerm* term)
     return ((Term*)term)->index;
 }
 
-caValue* circa_declare_value(caBlock* block, const char* name)
+Value* circa_declare_value(caBlock* block, const char* name)
 {
     Term* term = create_value((Block*) block, TYPES.any, name);
     return term_value(term);
@@ -291,7 +291,7 @@ void circa_push_module(caStack* stack, const char* name)
     stack_init(stack, block);
 }
 
-caValue* circa_frame_input(caStack* stack, int index)
+Value* circa_frame_input(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);
     
@@ -306,7 +306,7 @@ caValue* circa_frame_input(caStack* stack, int index)
     return get_top_register(stack, term);
 }
 
-caValue* circa_frame_output(caStack* stack, int index)
+Value* circa_frame_output(caStack* stack, int index)
 {
     Frame* top = top_frame(stack);
 
@@ -359,7 +359,7 @@ const char* circa_string_input(caStack* stack, int index)
     return circa_string(circa_input(stack, index));
 }
 
-void circa_output_error_val(caStack* stack, caValue* val)
+void circa_output_error_val(caStack* stack, Value* val)
 {
     copy(val, circa_output(stack, 0));
     Block* block = frame_block(top_frame(stack));
@@ -402,7 +402,7 @@ void circa_dump_stack_trace(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-caValue* circa_env_insert(caStack* stack, const char* name)
+Value* circa_env_insert(caStack* stack, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);

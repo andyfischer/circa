@@ -94,31 +94,31 @@ struct WorldFramesIterator
     void operator++() { advance(); }
 };
 
-caValue* change_event_type(caValue* event)
+Value* change_event_type(Value* event)
 {
     return list_get(event, 0);
 }
-caValue* change_event_attrs(caValue* event)
+Value* change_event_attrs(Value* event)
 {
     return list_get(event, 1);
 }
-caValue* change_event_target(caValue* event)
+Value* change_event_target(Value* event)
 {
     return list_get(event, 2);
 }
 
-static Block* get_single_block_target(caValue* target)
+static Block* get_single_block_target(Value* target)
 {
     // Future: This might support alternate ways of indicating a block.
     return as_block(target);
 }
 
-caValue* change_event_field(caValue* event, int index)
+Value* change_event_field(Value* event, int index)
 {
     return list_get(event, 3 + index);
 }
 
-void change_event_set_blank(caValue* value, int eventSpecificFields)
+void change_event_set_blank(Value* value, int eventSpecificFields)
 {
     set_list(value, 3 + eventSpecificFields);
     set_symbol(change_event_type(value), sym_None);
@@ -129,7 +129,7 @@ void change_event_make_rename(Value* event, Term* target, const char* newName)
 {
 }
 
-void change_event_make_append(Value* event, Block* target, caValue* expression)
+void change_event_make_append(Value* event, Block* target, Value* expression)
 {
     change_event_set_blank(event, 1);
     set_symbol(change_event_type(event), sym_ChangeAppend);
@@ -137,7 +137,7 @@ void change_event_make_append(Value* event, Block* target, caValue* expression)
     set_value(change_event_field(event, 0), expression);
 }
 
-static void commit_append(caWorld* world, caValue* event, bool dryRun, caValue* result)
+static void commit_append(caWorld* world, Value* event, bool dryRun, Value* result)
 {
     // Always succeeds.
     set_bool(result, true);
@@ -149,7 +149,7 @@ static void commit_append(caWorld* world, caValue* event, bool dryRun, caValue* 
     compile(block, as_cstring(change_event_field(event, 0)));
 }
 
-void change_event_commit(caWorld* world, caValue* event, bool dryRun, caValue* result)
+void change_event_commit(caWorld* world, Value* event, bool dryRun, Value* result)
 {
     Symbol type = as_symbol(change_event_type(event));
 
@@ -162,7 +162,7 @@ void change_event_commit(caWorld* world, caValue* event, bool dryRun, caValue* r
     }
 }
 
-void change_event_save_inverse(caValue* world, caValue* event, caValue* inverse)
+void change_event_save_inverse(Value* world, Value* event, Value* inverse)
 {
     // TODO
 }

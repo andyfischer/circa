@@ -114,14 +114,14 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
 
     // Walk through each action and execute it.
     for (int i = 0; i < list_length(&watch->onChangeActions); i++) {
-        caValue* action = list_get(&watch->onChangeActions, i);
+        Value* action = list_get(&watch->onChangeActions, i);
 
         Symbol label = first_symbol(action);
         ca_assert(label != sym_None);
 
         switch (label) {
         case sym_NativePatch: {
-            caValue* moduleName = list_get(action, 1);
+            Value* moduleName = list_get(action, 1);
 
             NativePatch* nativeModule = insert_native_patch(world, moduleName);
             native_patch_load_from_file(nativeModule, as_cstring(&watch->filename));

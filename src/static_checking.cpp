@@ -20,7 +20,7 @@ namespace circa {
 
 void append_static_error(Value* errors, Term* term, const char* type)
 {
-    caValue* item = set_list(list_append(errors), 3);
+    Value* item = set_list(list_append(errors), 3);
     set_term_ref(list_get(item, 0), term);
     set_string(list_get(item, 1), type);
     set_int(list_get(item, 2), -1);
@@ -29,7 +29,7 @@ void append_static_error(Value* errors, Term* term, const char* type)
 void append_static_error_for_input(Value* errors, Term* term, const char* type,
         int inputIndex)
 {
-    caValue* item = set_list(list_append(errors), 3);
+    Value* item = set_list(list_append(errors), 3);
     set_term_ref(list_get(item, 0), term);
     set_string(list_get(item, 1), type);
     set_int(list_get(item, 2), inputIndex);
@@ -142,7 +142,7 @@ int count_static_errors(Block* block)
     return block_get_static_errors(block)->length();
 }
 
-void format_static_error(caValue* error, caValue* stringOutput)
+void format_static_error(Value* error, Value* stringOutput)
 {
     Term* term = as_term_ref(list_get(error, 0));
     const char* type = as_cstring(list_get(error, 1));
@@ -200,7 +200,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
     set_string(stringOutput, out.str());
 }
 
-void format_static_error(Term* term, caValue* out)
+void format_static_error(Term* term, Value* out)
 {
     Value errors;
     set_list(&errors, 0);
@@ -210,7 +210,7 @@ void format_static_error(Term* term, caValue* out)
     format_static_error(errors.index(0), out);
 }
 
-void format_static_errors(caValue* errorList, caValue* output)
+void format_static_errors(Value* errorList, Value* output)
 {
     set_string(output, "");
     for (int i=0; i < list_length(errorList); i++) {
@@ -221,7 +221,7 @@ void format_static_errors(caValue* errorList, caValue* output)
     }
 }
 
-bool print_static_errors_formatted(Block* block, caValue* out)
+bool print_static_errors_formatted(Block* block, Value* out)
 {
     update_static_error_list(block);
     if (block_get_static_errors(block)->isEmpty())
@@ -229,7 +229,7 @@ bool print_static_errors_formatted(Block* block, caValue* out)
     return print_static_errors_formatted(block_get_static_errors(block), out);
 }
 
-bool print_static_errors_formatted(caValue* result, caValue* out)
+bool print_static_errors_formatted(Value* result, Value* out)
 {
     if (!is_string(out))
         set_string(out, "");
@@ -282,7 +282,7 @@ void mark_static_error(Term* term, const char* msg)
     term->setStringProp(sym_Error, msg);
 }
 
-void mark_static_error(Term* term, caValue* error)
+void mark_static_error(Term* term, Value* error)
 {
     term->setProp(sym_Error, error);
 }

@@ -39,8 +39,8 @@ static bool vm_matches_watch_path(Stack* stack, Value* path);
 static inline Frame* vm_top_frame(Stack* stack);
 static inline Value* vm_frame_register(Frame* frame, int index);
 static inline int vm_frame_register_count(Frame* frame);
-static inline caValue* vm_register(Stack* stack, int absoluteIndex);
-static inline caValue* vm_register_rel(Stack* stack, int relativeIndex);
+static inline Value* vm_register(Stack* stack, int absoluteIndex);
+static inline Value* vm_register_rel(Stack* stack, int relativeIndex);
 
 void get_stack_path(Frame* frame, Value* out);
 
@@ -316,7 +316,7 @@ static inline int vm_frame_register_count(Frame* frame)
     return frame->registerCount;
 }
 
-static inline caValue* vm_register(Stack* stack, int absoluteIndex)
+static inline Value* vm_register(Stack* stack, int absoluteIndex)
 {
     ca_assert(absoluteIndex < stack->registerCount);
     return &stack->registers[absoluteIndex];

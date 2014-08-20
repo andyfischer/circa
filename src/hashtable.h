@@ -4,51 +4,51 @@
 
 namespace circa {
 
-void set_mutable_hashtable(caValue* value);
-void hashtable_touch(caValue* value);
-bool hashtable_touch_is_necessary(caValue* value);
+void set_mutable_hashtable(Value* value);
+void hashtable_touch(Value* value);
+bool hashtable_touch_is_necessary(Value* value);
 
-caValue* hashtable_get(caValue* table, caValue* key);
-caValue* hashtable_get(caValue* table, const char* keyStr);
-caValue* hashtable_insert(caValue* table, caValue* key, bool moveKey);
-caValue* hashtable_insert(caValue* table, caValue* key);
-void hashtable_remove(caValue* table, caValue* key);
+Value* hashtable_get(Value* table, Value* key);
+Value* hashtable_get(Value* table, const char* keyStr);
+Value* hashtable_insert(Value* table, Value* key, bool moveKey);
+Value* hashtable_insert(Value* table, Value* key);
+void hashtable_remove(Value* table, Value* key);
 
-caValue* hashtable_get_int_key(caValue* table, int key);
-caValue* hashtable_insert_int_key(caValue* table, int key);
-void hashtable_remove_int_key(caValue* table, int key);
+Value* hashtable_get_int_key(Value* table, int key);
+Value* hashtable_insert_int_key(Value* table, int key);
+void hashtable_remove_int_key(Value* table, int key);
 
-caValue* hashtable_get_symbol_key(caValue* table, Symbol key);
-caValue* hashtable_insert_symbol_key(caValue* table, Symbol key);
-void hashtable_remove_symbol_key(caValue* table, Symbol key);
+Value* hashtable_get_symbol_key(Value* table, Symbol key);
+Value* hashtable_insert_symbol_key(Value* table, Symbol key);
+void hashtable_remove_symbol_key(Value* table, Symbol key);
 
-caValue* hashtable_insert_string(caValue* table, const char* str);
-caValue* hashtable_get_string(caValue* table, const char* str);
+Value* hashtable_insert_string(Value* table, const char* str);
+Value* hashtable_get_string(Value* table, const char* str);
 
-bool hashtable_is_empty(caValue* table);
-void hashtable_get_keys(caValue* table, caValue* keysOut);
+bool hashtable_is_empty(Value* table);
+void hashtable_get_keys(Value* table, Value* keysOut);
 
-int hashtable_count(caValue* table);
-int hashtable_slot_count(caValue* table);
-caValue* hashtable_key_by_index(caValue* table, int index);
-caValue* hashtable_value_by_index(caValue* table, int index);
+int hashtable_count(Value* table);
+int hashtable_slot_count(Value* table);
+Value* hashtable_key_by_index(Value* table, int index);
+Value* hashtable_value_by_index(Value* table, int index);
 
 void hashtable_setup_type(Type* type);
 
 struct HashtableIterator
 {
-    caValue* table;
+    Value* table;
     int index;
 
-    HashtableIterator(caValue* table);
+    HashtableIterator(Value* table);
 
-    caValue* currentKey();
-    caValue* current();
+    Value* currentKey();
+    Value* current();
     void advance();
     bool finished();
 
-    caValue* key() { return currentKey(); }
-    caValue* value() { return current(); }
+    Value* key() { return currentKey(); }
+    Value* value() { return current(); }
 
     operator bool() { return !finished(); }
     void operator++() { advance(); }

@@ -37,7 +37,7 @@ struct TokenStream
     TokenList tokens;
     unsigned int _position;
 
-    TokenStream(caValue* sourceText);
+    TokenStream(Value* sourceText);
     TokenStream(const char* sourceText);
 
     Token operator[](int index) {
@@ -47,7 +47,7 @@ struct TokenStream
         return tokens[index];
     }
 
-    void reset(caValue* inputString);
+    void reset(Value* inputString);
     void reset(const char* inputString);
 
     int length() { return (int) tokens.size(); }
@@ -56,7 +56,7 @@ struct TokenStream
     bool finished() { return (_position >= tokens.size()); }
 
     Token& next(int lookahead=0);
-    void getNextStr(caValue* value, int lookahead=0);
+    void getNextStr(Value* value, int lookahead=0);
 
     // Return true if the given lookahead is past the end of the list.
     bool nextIsEof(int lookahead);
@@ -75,8 +75,8 @@ struct TokenStream
     // Like consume(), but also returns the text of the consumed token.
     std::string consumeStr(int match = -1);
 
-    // Like consume(), but appends the text of the consumed token to a caValue.
-    void consumeStr(caValue* output, int match = -1);
+    // Like consume(), but appends the text of the consumed token to a Value.
+    void consumeStr(Value* output, int match = -1);
 
     void dropRemainder();
 

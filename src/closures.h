@@ -8,13 +8,13 @@ void insert_nonlocal_terms(Block* block);
 
 void closure_block_evaluate(caStack* stack);
 
-void closure_save_bindings_for_frame(caValue* closure, Frame* frame);
-void closure_save_all_bindings(caValue* closure, Stack* stack);
+void closure_save_bindings_for_frame(Value* closure, Frame* frame);
+void closure_save_all_bindings(Value* closure, Stack* stack);
 
-bool is_closure(caValue* value);
-void set_closure(caValue* value, Block* block, caValue* bindings);
-caValue* closure_get_block(caValue* value);
-caValue* closure_get_bindings(caValue* value);
+bool is_closure(Value* value);
+void set_closure(Value* value, Block* block, Value* bindings);
+Value* closure_get_block(Value* value);
+Value* closure_get_bindings(Value* value);
 
 void closures_install_functions(NativePatch* patch);
 

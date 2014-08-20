@@ -131,7 +131,7 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     return placeholder;
 }
 
-Term* if_block_append_output(Block* block, caValue* description)
+Term* if_block_append_output(Block* block, Value* description)
 {
     // Check if such an output already exists.
     Term* existing = find_output_from_description(block, description);
@@ -360,7 +360,7 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
     list_remove_nulls(&names);
 
     for (int i=0; i < names.length(); i++) {
-        caValue* name = names.index(i);
+        Value* name = names.index(i);
 
         // Skip if name is already bound
         if (find_output_placeholder_with_name(contents, name) != NULL)

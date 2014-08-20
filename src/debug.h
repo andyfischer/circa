@@ -23,8 +23,8 @@ void dump(Block* block);
 void dump_with_props(Block* block);
 void dump_with_props(Block& block);
 void dump(Term* term);
-void dump(caValue& value);
-void dump(caValue* value);
+void dump(Value& value);
+void dump(Value* value);
 void dump(Stack* context);
 void dump(caStack* stack);
 
@@ -34,8 +34,8 @@ void internal_error(std::string const& message);
 
 void ca_debugger_break();
 
-void perf_stats_to_list(caValue* list);
-void perf_stats_to_map(caValue* map);
+void perf_stats_to_list(Value* list);
+void perf_stats_to_map(Value* map);
 void perf_stat_inc(int name);
 void perf_stat_add(int name, int n);
 

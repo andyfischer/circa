@@ -11,24 +11,24 @@
 
 namespace circa {
 
-static void set_patch_replace(caValue* newValue, caValue* result)
+static void set_patch_replace(Value* newValue, Value* result)
 {
     result->append()->set_list(2)->set_element_sym(0, sym_Replace)->set_element(1, newValue);
 }
 
-static void compute_patch_list(caValue* base, caValue* latest, caValue* patch, caValue* error)
+static void compute_patch_list(Value* base, Value* latest, Value* patch, Value* error)
 {
     // Future: Look for insert/deletion
 
     for (int i=0; i < list_length(latest); i++) {
         if (i >= list_length(base)) {
-            caValue* elementPatch = patch->append()->set_list(2);
+            Value* elementPatch = patch->append()->set_list(2);
             elementPatch->set_element_sym(0, sym_Append);
             elementPatch->set_element(1, latest->index(i));
         }
             
         else if (!strict_equals(base->index(i), latest->index(i))) {
-            caValue* elementPatch = patch->append()->set_list(3);
+            Value* elementPatch = patch->append()->set_list(3);
             elementPatch->set_element_sym(0, sym_Element);
             elementPatch->set_element_int(1, i);
             compute_value_patch(base->index(i), latest->index(i),
@@ -39,26 +39,26 @@ static void compute_patch_list(caValue* base, caValue* latest, caValue* patch, c
     }
 
     if (list_length(latest) < list_length(base)) {
-        caValue* p = patch->append()->set_list(2);
+        Value* p = patch->append()->set_list(2);
         p->set_element_sym(0, sym_Truncate);
         p->set_element_int(1, list_length(latest));
     }
 }
 
-static void compute_patch_hashtable(caValue* base, caValue* latest, caValue* patch, caValue* error)
+static void compute_patch_hashtable(Value* base, Value* latest, Value* patch, Value* error)
 {
     for (HashtableIterator it(latest); it; ++it) {
         Value* key = it.currentKey();
         Value* old = hashtable_get(base, key);
 
         if (old == NULL) {
-            caValue* elementPatch = patch->append()->set_list(3);
+            Value* elementPatch = patch->append()->set_list(3);
             elementPatch->set_element_sym(0, sym_Insert);
             elementPatch->set_element(1, key);
             elementPatch->set_element(2, it.current());
 
         } else {
-            caValue* elementPatch = patch->append()->set_list(3);
+            Value* elementPatch = patch->append()->set_list(3);
             elementPatch->set_element_sym(0, sym_Key);
             elementPatch->set_element(1, key);
             compute_value_patch(old, it.current(), elementPatch->index(2), error);
@@ -71,14 +71,14 @@ static void compute_patch_hashtable(caValue* base, caValue* latest, caValue* pat
         Value* key = it.currentKey();
         Value* newValue = hashtable_get(latest, key);
         if (newValue == NULL) {
-            caValue* elementPatch = patch->append()->set_list(2);
+            Value* elementPatch = patch->append()->set_list(2);
             elementPatch->set_element_sym(0, sym_Delete);
             elementPatch->set_element(1, key);
         }
     }
 }
 
-void compute_value_patch(caValue* base, caValue* latest, caValue* patch, caValue* error)
+void compute_value_patch(Value* base, Value* latest, Value* patch, Value* error)
 {
     set_list(patch);
 
@@ -117,7 +117,7 @@ void compute_value_patch(caValue* base, caValue* latest, caValue* patch, caValue
     string_append(error, &latest->value_type->name);
 }
 
-void apply_patch(caValue* val, caValue* patch)
+void apply_patch(Value* val, Value* patch)
 {
     if (is_null(patch))
         return;

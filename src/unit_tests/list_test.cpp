@@ -6,13 +6,13 @@
 
 namespace list_test {
 
-void set_list_1(caValue* list, int x1)
+void set_list_1(Value* list, int x1)
 {
     set_list(list, 0);
     set_int(list_append(list), x1);
 }
 
-void set_list_5(caValue* list, int x1, int x2, int x3, int x4, int x5)
+void set_list_5(Value* list, int x1, int x2, int x3, int x4, int x5)
 {
     set_list(list, 0);
     set_int(list_append(list), x1);
@@ -51,9 +51,9 @@ void test_sort()
     test_equals(&list, "[5]");
 }
 
-int sort_backwards(void* context, caValue* left, caValue* right)
+int sort_backwards(void* context, Value* left, Value* right)
 {
-    test_equals((caValue*) context, "context");
+    test_equals((Value*) context, "context");
     return -1 * compare(left, right);
 }
 

@@ -21,7 +21,7 @@ Term* if_block_get_output_by_name(Block* block, const char* name);
 void if_block_start(Block* block);
 Term* if_block_append_case(Block* block);
 void case_add_condition_check(Block* caseBlock, Term* condition);
-Term* if_block_append_output(Block* block, caValue* description);
+Term* if_block_append_output(Block* block, Value* description);
 void if_block_finish_appended_case(Block* block, Term* caseTerm);
 void finish_if_block(Term* ifBlock);
 void switch_block_post_compile(Term* term);

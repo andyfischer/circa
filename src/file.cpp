@@ -41,7 +41,7 @@ bool file_exists(const char* filename)
     return S_ISREG(s.st_mode);
 }
 
-bool is_absolute_path(caValue* path)
+bool is_absolute_path(Value* path)
 {
     int len = string_length(path);
 
@@ -52,7 +52,7 @@ bool is_absolute_path(caValue* path)
     return false;
 }
     
-void get_directory_for_filename(caValue* filename, caValue* result)
+void get_directory_for_filename(Value* filename, Value* result)
 {
     // TODO: This function is bad, need to use an existing library for dealing
     // with paths.
@@ -71,12 +71,12 @@ void get_directory_for_filename(caValue* filename, caValue* result)
     circa_set_string_size(result, as_cstring(filename), last_slash);
 }
 
-CIRCA_EXPORT void circa_get_directory_for_filename(caValue* filename, caValue* result)
+CIRCA_EXPORT void circa_get_directory_for_filename(Value* filename, Value* result)
 {
     get_directory_for_filename(filename, result);
 }
 
-void get_parent_directory(caValue* filename, caValue* result)
+void get_parent_directory(Value* filename, Value* result)
 {
     int end = string_length(filename);
 
@@ -107,12 +107,12 @@ void get_parent_directory(caValue* filename, caValue* result)
         string_slice(filename, 0, end, result);
 }
 
-CIRCA_EXPORT void circa_get_parent_directory(caValue* filename, caValue* result)
+CIRCA_EXPORT void circa_get_parent_directory(Value* filename, Value* result)
 {
     get_parent_directory(filename, result);
 }
 
-void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue* result)
+void get_path_relative_to_source(caBlock* relativeTo, Value* relPath, Value* result)
 {
     if (relativeTo == NULL) {
         copy(relPath, result);
@@ -142,7 +142,7 @@ void get_path_relative_to_source(caBlock* relativeTo, caValue* relPath, caValue*
 }
 
 
-void join_path(caValue* left, caValue* right)
+void join_path(Value* left, Value* right)
 {
     const char* leftStr = as_cstring(left);
     const char* rightStr = as_cstring(right);
@@ -172,7 +172,7 @@ void join_path(caValue* left, caValue* right)
     string_append(left, right);
 }
 
-void get_just_filename_for_path(caValue* path, caValue* filenameOut)
+void get_just_filename_for_path(Value* path, Value* filenameOut)
 {
     int start = string_length(path) - 1;
     while (start > 0 && !is_path_seperator(string_get(path, start - 1)))
@@ -189,7 +189,7 @@ void write_text_file(const char* filename, const char* contents)
     file.close();
 }
 
-void read_text_file(const char* filename, caValue* contentsOut)
+void read_text_file(const char* filename, Value* contentsOut)
 {
     if (!file_exists(filename)) {
         set_null(contentsOut);

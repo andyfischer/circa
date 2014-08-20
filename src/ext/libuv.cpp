@@ -103,7 +103,7 @@ static uv_buf_t alloc_buffer(uv_handle_t* handle,
 
 // Send 'msg' to the stream. 'msg' must be a string value. This function takes ownership
 // of 'msg'.
-static void circa_uv_write(uv_stream_t* stream, caValue* msg, bool addNull)
+static void circa_uv_write(uv_stream_t* stream, Value* msg, bool addNull)
 {
     uv_write_t *wr = (uv_write_t*) malloc(sizeof *wr);
     wr->data = msg;
@@ -121,7 +121,7 @@ static void circa_uv_write(uv_stream_t* stream, caValue* msg, bool addNull)
 
 static void after_write(uv_write_t* req, int status) {
 
-    caValue* msg = (caValue*) req->data;
+    Value* msg = (Value*) req->data;
     circa_dealloc_value(msg);
     req->data = NULL;
 
@@ -139,9 +139,9 @@ static void after_write(uv_write_t* req, int status) {
 
 void make_server(caStack* stack)
 {
-    caValue* ip = circa_input(stack, 0);
-    caValue* port = circa_input(stack, 1);
-    caValue* type = circa_input(stack, 2);
+    Value* ip = circa_input(stack, 0);
+    Value* port = circa_input(stack, 1);
+    Value* type = circa_input(stack, 2);
 
     Server* server = new Server();
 
@@ -187,7 +187,7 @@ void make_server(caStack* stack)
         return;
     }
 
-    caValue* out = circa_set_default_output(stack, 0);
+    Value* out = circa_set_default_output(stack, 0);
     circa_set_native_ptr(circa_index(out, 0), server, ServerRelease);
 }
 
@@ -223,7 +223,7 @@ static void server_on_connect(uv_stream_t *uv_server, int status)
     if (uv_read_start((uv_stream_t*) &connection->uv_tcp, alloc_buffer, on_read) != 0)
         internal_error("uv_read_start error\n");
 
-    caValue* wrapped = circa_append(&server->connections);
+    Value* wrapped = circa_append(&server->connections);
     circa_set_list(wrapped, 1);
     circa_set_native_ptr(circa_index(wrapped, 0), connection, ConnectionRelease);
     
@@ -244,14 +244,14 @@ static void buf_append(uv_buf_t* buf, uv_buf_t suffix)
     memcpy(buf->base + oldSize, suffix.base, suffix.len);
 }
 
-static void try_parse(caValue* str, caValue* msgList) 
+static void try_parse(Value* str, Value* msgList) 
 {
     int msgStart = 0;
 
     for (int i=0; i < circa_string_length(str); i++) {
         if (circa_string(str)[i] == 0) {
             if (i > msgStart) {
-                caValue* msg = circa_append(msgList);
+                Value* msg = circa_append(msgList);
                 circa_parse_string_len(circa_string(str), i - msgStart, msg);
             }
             msgStart = i + 1;
@@ -264,7 +264,7 @@ static void try_parse(caValue* str, caValue* msgList)
 
 static void http_write_upgrade_response(uv_stream_t* stream)
 {
-    caValue* msg = circa_alloc_value();
+    Value* msg = circa_alloc_value();
 
     circa_set_string(msg, "HTTP/1.1 101 Switching Protocols\r\n"
         "Upgrade: websocket\r\n"
@@ -433,8 +433,8 @@ void make_client(caStack* stack)
     uv_tcp_init(stack->world->libuvWorld->uv_loop, &connection->uv_tcp);
     connection->uv_tcp.data = connection;
 
-    caValue* ip = circa_input(stack, 0);
-    caValue* port = circa_input(stack, 1);
+    Value* ip = circa_input(stack, 0);
+    Value* port = circa_input(stack, 1);
 
     sockaddr_in bind_addr = uv_ip4_addr(circa_string(ip), circa_int(port));
 #if 0
@@ -450,7 +450,7 @@ void make_client(caStack* stack)
         printf("uv_tcp_connect error\n");
     }
 
-    caValue* out = circa_set_default_output(stack, 0);
+    Value* out = circa_set_default_output(stack, 0);
     circa_set_native_ptr(circa_index(out, 0), connection, ConnectionRelease);
     printf("make_client fin\n");
 }
@@ -459,7 +459,7 @@ void Connection__send(caStack* stack)
 {
     Connection* connection = (Connection*) circa_native_ptr(circa_index(circa_input(stack, 0), 0));
 
-    caValue* asStr = circa_alloc_value();
+    Value* asStr = circa_alloc_value();
     circa_to_string(circa_input(stack, 1), asStr);
     circa_uv_write((uv_stream_t*) &connection->uv_tcp, asStr, true);
 }

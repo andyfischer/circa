@@ -31,12 +31,12 @@ struct NameSearch
 
 // Finds a name in this block or a visible parent block.
 Term* find_name(Block* block,
-                caValue* name,
+                Value* name,
                 Symbol lookupType = sym_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
-                      caValue* name,
+                      Value* name,
                       Symbol lookupType = sym_LookupAny);
 
 // Convenient overloads for using a string as a name
@@ -49,10 +49,10 @@ Term* find_local_name(Block* block,
                       const char* name,
                       Symbol lookupType = sym_LookupAny);
 
-Term* find_local_name_at_position(Block* block, caValue* name, caValue* position);
+Term* find_local_name_at_position(Block* block, Value* name, Value* position);
 
 Term* find_name_at(Term* term, const char* name);
-Term* find_name_at(Term* term, caValue* name);
+Term* find_name_at(Term* term, Value* name);
 
 // If the name string has an ordinal (such as "a#1"), returns the ordinal value.
 // Otherwise returns -1.
@@ -68,13 +68,13 @@ bool term_is_child_of_block(Term* term, Block* block);
 // or if term is inside a namespace or object, this would return a colon-separated name.
 std::string get_relative_name(Block* block, Term* term);
 std::string get_relative_name_at(Term* location, Term* term);
-void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutput);
-Term* find_from_relative_name_list(caValue* name, Block* relativeTo);
+void get_relative_name_as_list(Term* term, Block* relativeTo, Value* nameOutput);
+Term* find_from_relative_name_list(Value* name, Block* relativeTo);
 
 void update_unique_name(Term* term);
-caValue* unique_name(Term* term);
+Value* unique_name(Term* term);
 
-Term* find_from_unique_name(Block* block, caValue* name);
+Term* find_from_unique_name(Block* block, Value* name);
 
 Type* find_type(Block* block, const char* name);
 Block* find_function_local(Block* block, const char* name);

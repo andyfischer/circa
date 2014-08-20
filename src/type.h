@@ -25,32 +25,32 @@ struct CastResult
 
 struct Type
 {
-    typedef void (*Initialize)(Type* type, caValue* value);
-    typedef void (*Copy)(caValue* source, caValue* dest);
-    typedef void (*Reset)(Type* type, caValue* value);
-    typedef bool (*Equals)(caValue* lhs, caValue* rhs);
+    typedef void (*Initialize)(Type* type, Value* value);
+    typedef void (*Copy)(Value* source, Value* dest);
+    typedef void (*Reset)(Type* type, Value* value);
+    typedef bool (*Equals)(Value* lhs, Value* rhs);
 
     // Attempts to cast 'value' to the given type. If the cast isn't possible, callee will
     // record the failure in the CastResult.
     //
     // If checkOnly is true, then callee should only record whether the cast is possible,
     // and not actually modify 'dest'.
-    typedef void (*Cast)(CastResult* result, caValue* value, Type* type, bool checkOnly);
+    typedef void (*Cast)(CastResult* result, Value* value, Type* type, bool checkOnly);
 
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
-    typedef void (*ToString)(caValue* value, caValue* asStr);
-    typedef caValue* (*GetIndex)(caValue* value, int index);
-    typedef void (*SetIndex)(caValue* value, int index, caValue* element);
-    typedef int (*NumElements)(caValue* value);
+    typedef void (*ToString)(Value* value, Value* asStr);
+    typedef Value* (*GetIndex)(Value* value, int index);
+    typedef void (*SetIndex)(Value* value, int index, Value* element);
+    typedef int (*NumElements)(Value* value);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
-    typedef int (*HashFunc)(caValue* value);
-    typedef void (*VisitHeapCallback)(caValue* value, caValue* relativeIdentifier,
-            caValue* context);
-    typedef void (*VisitHeap)(Type* type, caValue* value,
-            VisitHeapCallback callback, caValue* context);
+    typedef int (*HashFunc)(Value* value);
+    typedef void (*VisitHeapCallback)(Value* value, Value* relativeIdentifier,
+            Value* context);
+    typedef void (*VisitHeap)(Type* type, Value* value,
+            VisitHeapCallback callback, Value* context);
 
-    typedef int (*ChecksumFunc)(caValue* value);
+    typedef int (*ChecksumFunc)(Value* value);
 
     ObjectHeader header;
 
@@ -139,8 +139,8 @@ struct StaticTypeQuery
 
 namespace type_t {
 
-    void initialize(Type* type, caValue* value);
-    void copy(Type*, caValue* source, caValue* dest);
+    void initialize(Type* type, Value* value);
+    void copy(Type*, Value* source, Value* dest);
     std::string to_string(Term *caller);
     void remap_pointers(Term *term, TermMap const& map);
     void setup_type(Type* type);
@@ -163,14 +163,14 @@ bool type_is_root(Type* type);
 void type_set_root(Type* type);
 
 Type* unbox_type(Term* type);
-Type* unbox_type(caValue* val);
+Type* unbox_type(Value* val);
 
 Type* get_output_type(Term* term, int outputIndex);
 Type* get_output_type(Term* term);
 Type* get_type_of_input(Term* term, int inputIndex);
-caValue* get_type_property(Type* type, const char* name);
-caValue* type_property_insert(Type* type, const char* name);
-void set_type_property(Type* type, const char* name, caValue* value);
+Value* get_type_property(Type* type, const char* name);
+Value* type_property_insert(Type* type, const char* name);
+void set_type_property(Type* type, const char* name, Value* value);
 
 Block* type_declaration_block(Type* type);
 
@@ -184,15 +184,15 @@ void clear_type_contents(Type* type);
 
 void initialize_simple_pointer_type(Type* type);
 
-Term* find_method(Block* block, Type* type, caValue* name);
+Term* find_method(Block* block, Type* type, Value* name);
 
 // Change the type value for an existing type. 'term' should be a value of
 // type Type.
 void install_type(Term* term, Type* type);
 
-void set_type_list(caValue* value, Type* type1);
-void set_type_list(caValue* value, Type* type1, Type* type2);
-void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3);
+void set_type_list(Value* value, Type* type1);
+void set_type_list(Value* value, Type* type1, Type* type2);
+void set_type_list(Value* value, Type* type1, Type* type2, Type* type3);
 
 Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fieldType);
 

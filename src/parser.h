@@ -42,7 +42,7 @@ struct ParseResult {
 
 typedef ParseResult (*ParsingStep)(Block* block, TokenStream& tokens, ParserCxt* context);
 
-Term* compile(Block* block, ParsingStep step, caValue* input);
+Term* compile(Block* block, ParsingStep step, Value* input);
 Term* compile(Block* block, ParsingStep step, const char* input);
 
 // Parsing steps:

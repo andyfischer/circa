@@ -17,7 +17,7 @@ namespace circa {
 struct ParseContext
 {
     TokenStream* tokens;
-    caValue* out;
+    Value* out;
 };
 
 static void drop_whitespace(TokenStream* tokens)
@@ -26,7 +26,7 @@ static void drop_whitespace(TokenStream* tokens)
         tokens->consume();
 }
 
-static void parse_value(TokenStream* tokens, caValue* out)
+static void parse_value(TokenStream* tokens, Value* out)
 {
     // ignore leading whitespace
     drop_whitespace(tokens);
@@ -54,7 +54,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
         set_list(out, 0);
 
         while (!tokens->nextIs(tok_RSquare) && !tokens->finished()) {
-            caValue* element = list_append(out);
+            Value* element = list_append(out);
             parse_value(tokens, element);
 
             if (tokens->nextIs(tok_Comma))
@@ -95,7 +95,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
     drop_whitespace(tokens);
 }
 
-void parse_string_repr(const char* str, int len, caValue* out)
+void parse_string_repr(const char* str, int len, Value* out)
 {
     Value strVal;
     set_string(&strVal, str, len);
@@ -103,13 +103,13 @@ void parse_string_repr(const char* str, int len, caValue* out)
     parse_value(&tokens, out);
 }
 
-void parse_string_repr(caValue* str, caValue* out)
+void parse_string_repr(Value* str, Value* out)
 {
     TokenStream tokens(str);
     parse_value(&tokens, out);
 }
 
-void write_string_repr(caValue* value, caValue* out)
+void write_string_repr(Value* value, Value* out)
 {
     // For certain types, just use to_string
     if (is_int(value) || is_float(value) || is_bool(value)) {
@@ -137,17 +137,17 @@ void write_string_repr(caValue* value, caValue* out)
     }
 }
 
-CIRCA_EXPORT void circa_to_string(caValue* value, caValue* out)
+CIRCA_EXPORT void circa_to_string(Value* value, Value* out)
 {
     write_string_repr(value, out);
 }
 
-CIRCA_EXPORT void circa_parse_string(const char* str, caValue* valueOut)
+CIRCA_EXPORT void circa_parse_string(const char* str, Value* valueOut)
 {
     parse_string_repr(str, (int) strlen(str), valueOut);
 }
 
-CIRCA_EXPORT void circa_parse_string_len(const char* str, int len, caValue* valueOut)
+CIRCA_EXPORT void circa_parse_string_len(const char* str, int len, Value* valueOut)
 {
     parse_string_repr(str, len, valueOut);
 }

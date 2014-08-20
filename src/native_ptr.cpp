@@ -17,19 +17,19 @@ struct NativePtr
     caNativePtrRelease release;
 };
 
-bool is_native_ptr(caValue* value)
+bool is_native_ptr(Value* value)
 {
     return value->value_type == TYPES.native_ptr;
 }
 
-void* as_native_ptr(caValue* value)
+void* as_native_ptr(Value* value)
 {
     ca_assert(is_native_ptr(value));
     NativePtr* data = (NativePtr*) value->value_data.ptr;
     return data->ptr;
 }
 
-void set_native_ptr(caValue* value, void* ptr, caNativePtrRelease release)
+void set_native_ptr(Value* value, void* ptr, caNativePtrRelease release)
 {
     make_no_initialize(TYPES.native_ptr, value);
     NativePtr* data = new NativePtr();
@@ -39,7 +39,7 @@ void set_native_ptr(caValue* value, void* ptr, caNativePtrRelease release)
     value->value_data.ptr = data;
 }
 
-void native_ptr_initialize(Type*, caValue* value)
+void native_ptr_initialize(Type*, Value* value)
 {
     NativePtr* data = new NativePtr();
     data->refCount = 1;
@@ -57,7 +57,7 @@ void native_ptr_copy(Value* source, Value* dest)
     dest->value_data.ptr = data;
 }
 
-void native_ptr_release(caValue* value)
+void native_ptr_release(Value* value)
 {
     NativePtr* data = (NativePtr*) value->value_data.ptr;
     data->refCount--;
@@ -79,12 +79,12 @@ void native_ptr_setup_type(Type* type)
     type->hashFunc = shallow_hash_func;
 }
 
-CIRCA_EXPORT void* circa_native_ptr(caValue* val)
+CIRCA_EXPORT void* circa_native_ptr(Value* val)
 {
     return as_native_ptr(val);
 }
 
-CIRCA_EXPORT void circa_set_native_ptr(caValue* val, void* ptr, caNativePtrRelease release)
+CIRCA_EXPORT void circa_set_native_ptr(Value* val, void* ptr, caNativePtrRelease release)
 {
     set_native_ptr(val, ptr, release);
 }

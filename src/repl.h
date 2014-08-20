@@ -3,6 +3,6 @@
 namespace circa {
 
 void repl_start(Stack* stack);
-void repl_run_line(Stack* stack, caValue* line, caValue* output);
+void repl_run_line(Stack* stack, Value* line, Value* output);
 
 } // namespace circa

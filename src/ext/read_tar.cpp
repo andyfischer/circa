@@ -60,7 +60,7 @@ static const char* file_name(char* data)
     return header->name;
 }
 
-static void file_copy_contents(char* data, caValue* out)
+static void file_copy_contents(char* data, Value* out)
 {
     int size = file_size(data);
     char* file = data + 512;
@@ -83,7 +83,7 @@ static bool eof(char* data)
     return file_name(data)[0] == 0;
 }
 
-void tar_read_file(caValue* tarBlob, const char* filename, caValue* fileOut)
+void tar_read_file(Value* tarBlob, const char* filename, Value* fileOut)
 {
     ca_assert(is_string(tarBlob));
     char* data = as_blob(tarBlob);
@@ -100,7 +100,7 @@ void tar_read_file(caValue* tarBlob, const char* filename, caValue* fileOut)
     set_null(fileOut);
 }
 
-bool tar_file_exists(caValue* tarBlob, const char* filename)
+bool tar_file_exists(Value* tarBlob, const char* filename)
 {
     char* data = as_blob(tarBlob);
     while (!eof(data)) {
@@ -127,7 +127,7 @@ CIRCA_EXPORT void circa_load_tar_in_memory(World* world, char* data, uint32_t nu
     }
 }
 
-void tar_debug_dump_listing(caValue* tarBlob)
+void tar_debug_dump_listing(Value* tarBlob)
 {
     char* data = as_blob(tarBlob);
 

@@ -21,7 +21,7 @@ void remove_native_patch(World* world, const char* name);
 // Add a function patch on the given module.
 void module_patch_function(NativePatch* module, const char* name, EvaluateFunc func);
 
-void native_patch_add_platform_specific_suffix(caValue* filename);
+void native_patch_add_platform_specific_suffix(Value* filename);
 void native_patch_load_from_file(NativePatch* module, const char* filename);
 
 // Called during bytecode compilation. Find the native func (if any) that should be used in

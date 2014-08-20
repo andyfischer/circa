@@ -51,7 +51,7 @@ ListData* Value::listData() { return (ListData*) this->value_data.ptr; }
 Value* Value::index(int i) { return list_get(this, i); }
 int Value::length() { return list_length(this); }
 
-Value* Value::set_value(caValue* v)
+Value* Value::set_value(Value* v)
 {
     ::set_value(this, v);
     return this;
@@ -138,14 +138,14 @@ void Value::dump()
     printf("%s\n", as_cstring(&str));
 }
 
-void initialize_null(caValue* value)
+void initialize_null(Value* value)
 {
     ca_assert(TYPES.null != NULL);
     value->value_type = TYPES.null;
     value->value_data.ptr = NULL;
 }
 
-void make(Type* type, caValue* value)
+void make(Type* type, Value* value)
 {
     stat_increment(Make);
 
@@ -159,7 +159,7 @@ void make(Type* type, caValue* value)
     type_incref(type);
 }
 
-void make_no_initialize(Type* type, caValue* value)
+void make_no_initialize(Type* type, Value* value)
 {
     set_null(value);
     value->value_type = type;
@@ -167,13 +167,13 @@ void make_no_initialize(Type* type, caValue* value)
     type_incref(type);
 }
 
-void make_no_initialize_ptr(Type* type, caValue* value, void* ptr)
+void make_no_initialize_ptr(Type* type, Value* value, void* ptr)
 {
     make_no_initialize(type, value);
     value->value_data.ptr = ptr;
 }
 
-Type* get_value_type(caValue* v)
+Type* get_value_type(Value* v)
 {
     return v->value_type;
 }
@@ -183,7 +183,7 @@ int value_type_id(Value* v)
     return v->value_type->id;
 }
 
-void set_null(caValue* value)
+void set_null(Value* value)
 {
     if (value->value_type == NULL || value->value_type == TYPES.null)
         return;
@@ -196,7 +196,7 @@ void set_null(caValue* value)
     value->value_data.ptr = NULL;
 }
 
-void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
+void cast(CastResult* result, Value* value, Type* type, bool checkOnly)
 {
     result->success = true;
 
@@ -222,21 +222,21 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     result->success = false;
 }
 
-bool cast(caValue* value, Type* type)
+bool cast(Value* value, Type* type)
 {
     CastResult result;
     cast(&result, value, type, false);
     return result.success;
 }
 
-bool cast_possible(caValue* source, Type* type)
+bool cast_possible(Value* source, Type* type)
 {
     CastResult result;
     cast(&result, source, type, true);
     return result.success;
 }
 
-void copy(caValue* source, caValue* dest)
+void copy(Value* source, Value* dest)
 {
     stat_increment(Copy);
 
@@ -244,7 +244,7 @@ void copy(caValue* source, caValue* dest)
     ca_assert(dest);
 
 #ifdef DEBUG
-    caValue* nocopy = get_type_property(source->value_type, "nocopy");
+    Value* nocopy = get_type_property(source->value_type, "nocopy");
     if (nocopy != NULL && as_bool(nocopy))
         internal_error("Tried to copy a :nocopy type");
     
@@ -267,7 +267,7 @@ void copy(caValue* source, caValue* dest)
     }
 }
 
-void swap(caValue* left, caValue* right)
+void swap(Value* left, Value* right)
 {
     Type* temp_type = left->value_type;
     caValueData temp_data = left->value_data;
@@ -277,7 +277,7 @@ void swap(caValue* left, caValue* right)
     right->value_data = temp_data;
 }
 
-void move(caValue* source, caValue* dest)
+void move(Value* source, Value* dest)
 {
     set_null(dest);
     dest->value_type = source->value_type;
@@ -285,9 +285,9 @@ void move(caValue* source, caValue* dest)
     initialize_null(source);
 }
 
-void reset(caValue* value)
+void reset(Value* value)
 {
-    // Check for NULL. Most caValue functions don't do this, but reset() is
+    // Check for NULL. Most Value functions don't do this, but reset() is
     // a convenient special case.
     if (value->value_type == NULL)
         return set_null(value);
@@ -305,7 +305,7 @@ void reset(caValue* value)
     make(type, value);
 }
 
-void touch(caValue* value)
+void touch(Value* value)
 {
     stat_increment(Touch);
 
@@ -315,7 +315,7 @@ void touch(caValue* value)
         hashtable_touch(value);
 }
 
-bool touch_is_necessary(caValue* value)
+bool touch_is_necessary(Value* value)
 {
     if (is_list_based(value))
         return list_touch_is_necessary(value);
@@ -325,7 +325,7 @@ bool touch_is_necessary(caValue* value)
     return false;
 }
 
-void to_string(caValue* value, caValue* out)
+void to_string(Value* value, Value* out)
 {
     if (value->value_type == NULL) {
         set_string(out, "<type is NULL>");
@@ -346,7 +346,7 @@ void to_string(caValue* value, caValue* out)
     string_append(out, ">");
 }
 
-void to_string_annotated(caValue* value, caValue* out)
+void to_string_annotated(Value* value, Value* out)
 {
     if (value->value_type == NULL) {
         set_string(out, "<type is NULL>");
@@ -369,7 +369,7 @@ void to_string_annotated(caValue* value, caValue* out)
     }
 }
 
-caValue* get_index(caValue* value, int index)
+Value* get_index(Value* value, int index)
 {
     Type::GetIndex getIndex = value->value_type->getIndex;
 
@@ -380,7 +380,7 @@ caValue* get_index(caValue* value, int index)
     return getIndex(value, index);
 }
 
-void set_index(caValue* value, int index, caValue* element)
+void set_index(Value* value, int index, Value* element)
 {
     Type::SetIndex setIndex = value->value_type->setIndex;
 
@@ -393,7 +393,7 @@ void set_index(caValue* value, int index, caValue* element)
     setIndex(value, index, element);
 }
 
-caValue* get_field(caValue* value, caValue* field, caValue* error)
+Value* get_field(Value* value, Value* field, Value* error)
 {
     if (is_hashtable(value)) {
         return hashtable_get(value, field);
@@ -420,14 +420,14 @@ caValue* get_field(caValue* value, caValue* field, caValue* error)
     return list_get(value, fieldIndex);
 }
 
-caValue* get_field(caValue* value, const char* field, caValue* error)
+Value* get_field(Value* value, const char* field, Value* error)
 {
     circa::Value fieldStr;
     set_string(&fieldStr, field);
     return get_field(value, &fieldStr, error);
 }
 
-int num_elements(caValue* value)
+int num_elements(Value* value)
 {
     Type::NumElements numElements = value->value_type->numElements;
 
@@ -438,7 +438,7 @@ int num_elements(caValue* value)
     return numElements(value);
 }
 
-bool value_hashable(caValue* value)
+bool value_hashable(Value* value)
 {
     if (is_list_based(value)) {
         for (int i=0; i < list_length(value); i++)
@@ -466,7 +466,7 @@ bool value_hashable(caValue* value)
     return true;
 }
 
-int get_hash_value(caValue* value)
+int get_hash_value(Value* value)
 {
     Type::HashFunc f = value->value_type->hashFunc;
     if (f == NULL) {
@@ -477,12 +477,12 @@ int get_hash_value(caValue* value)
     return f(value);
 }
 
-bool shallow_equals(caValue* lhs, caValue* rhs)
+bool shallow_equals(Value* lhs, Value* rhs)
 {
     return lhs->value_data.ptr == rhs->value_data.ptr;
 }
 
-bool equals(caValue* lhs, caValue* rhs)
+bool equals(Value* lhs, Value* rhs)
 {
     ca_assert(lhs->value_type != NULL);
 
@@ -502,21 +502,21 @@ bool equals(caValue* lhs, caValue* rhs)
     return shallow_equals(lhs, rhs);
 }
 
-bool equals_string(caValue* value, const char* s)
+bool equals_string(Value* value, const char* s)
 {
     if (!is_string(value))
         return false;
     return strcmp(as_cstring(value), s) == 0;
 }
 
-bool equals_int(caValue* value, int i)
+bool equals_int(Value* value, int i)
 {
     if (!is_int(value))
         return false;
     return as_int(value) == i;
 }
 
-bool strict_equals(caValue* left, caValue* right)
+bool strict_equals(Value* left, Value* right)
 {
     if (left->value_type != right->value_type)
         return false;
@@ -553,7 +553,7 @@ static int rank_for_compare_based_on_type(Type* type)
         return 5;
 }
 
-int compare(caValue* left, caValue* right)
+int compare(Value* left, Value* right)
 {
     if (strict_equals(left, right))
         return 0;
@@ -604,82 +604,82 @@ int compare(caValue* left, caValue* right)
     return 0;
 }
 
-void set_value(caValue* target, caValue* value)
+void set_value(Value* target, Value* value)
 {
     copy(value, target);
 }
 
-void set_bool(caValue* value, bool b)
+void set_bool(Value* value, bool b)
 {
     make_no_initialize(TYPES.bool_type, value);
     value->value_data.asbool = b;
 }
-void set_true(caValue* value)
+void set_true(Value* value)
 {
     make_no_initialize(TYPES.bool_type, value);
     value->value_data.asbool = true;
 }
-void set_false(caValue* value)
+void set_false(Value* value)
 {
     make_no_initialize(TYPES.bool_type, value);
     value->value_data.asbool = false;
 }
 
-void set_error_string(caValue* value, const char* s)
+void set_error_string(Value* value, const char* s)
 {
     set_string(value, s);
     value->value_type = TYPES.error;
 }
 
-void set_hashtable(caValue* value)
+void set_hashtable(Value* value)
 {
     make(TYPES.map, value);
 }
 
-void set_int(caValue* value, int i)
+void set_int(Value* value, int i)
 {
     make_no_initialize(TYPES.int_type, value);
     value->value_data.asint = i;
 }
 
-void set_float(caValue* value, float f)
+void set_float(Value* value, float f)
 {
     make_no_initialize(TYPES.float_type, value);
     value->value_data.asfloat = f;
 }
 
-caValue* set_list(caValue* value)
+Value* set_list(Value* value)
 {
     make(TYPES.list, value);
     return value;
 }
 
-void set_string(caValue* value, std::string const& s)
+void set_string(Value* value, std::string const& s)
 {
     set_string(value, s.c_str());
 }
 
-void set_symbol(caValue* tv, Symbol val)
+void set_symbol(Value* tv, Symbol val)
 {
     set_null(tv);
     tv->value_type = TYPES.symbol;
     tv->value_data.asint = val;
 }
 
-caValue* set_list(caValue* value, int size)
+Value* set_list(Value* value, int size)
 {
     set_list(value);
     list_resize(value, size);
     return value;
 }
 
-void set_term_ref(caValue* val, Term* term)
+void set_term_ref(Value* val, Term* term)
 {
     make_no_initialize(TYPES.term, val);
     val->value_data.ptr = term;
 }
 
-void set_type(caValue* value, Type* type)
+void set_type(Value* value, Type* type)
 {
     set_null(value);
     value->value_type = TYPES.type;
@@ -688,91 +688,91 @@ void set_type(caValue* value, Type* type)
         type_incref(type);
 }
 
-void set_opaque_pointer(caValue* value, void* addr)
+void set_opaque_pointer(Value* value, void* addr)
 {
     make_no_initialize(TYPES.opaque_pointer, value);
     value->value_data.ptr = addr;
 }
 
-void set_stack(caValue* value, Stack* stack)
+void set_stack(Value* value, Stack* stack)
 {
     stack_incref(stack);
     make_no_initialize(TYPES.stack, value);
     value->value_data.ptr = stack;
 }
 
-void set_block(caValue* value, Block* block)
+void set_block(Value* value, Block* block)
 {
     make_no_initialize(TYPES.block, value);
     value->value_data.ptr = block;
 }
 
-void set_pointer(caValue* value, void* ptr)
+void set_pointer(Value* value, void* ptr)
 {
     value->value_data.ptr = ptr;
 }
 
-int as_int(caValue* value)
+int as_int(Value* value)
 {
     ca_assert(is_int(value));
     return value->value_data.asint;
 }
 
-float as_float(caValue* value)
+float as_float(Value* value)
 {
     ca_assert(is_float(value));
     return value->value_data.asfloat;
 }
 
-bool as_bool(caValue* value)
+bool as_bool(Value* value)
 {
     ca_assert(is_bool(value));
     return value->value_data.asbool;
 }
 
-Block* as_block(caValue* value)
+Block* as_block(Value* value)
 {
     ca_assert(is_block(value));
     return (Block*) value->value_data.ptr;
 }
 
-void* as_opaque_pointer(caValue* value)
+void* as_opaque_pointer(Value* value)
 {
     ca_assert(value->value_type->storageType == sym_StorageTypeOpaquePointer);
     return value->value_data.ptr;
 }
 
-Stack* as_stack(caValue* value)
+Stack* as_stack(Value* value)
 {
     ca_assert(is_stack(value));
     return (Stack*) value->value_data.ptr;
 }
 
-Symbol as_symbol(caValue* tv)
+Symbol as_symbol(Value* tv)
 {
     return tv->value_data.asint;
 }
 
-Term* as_term_ref(caValue* val)
+Term* as_term_ref(Value* val)
 {
     ca_assert(is_term_ref(val));
     return (Term*) val->value_data.ptr;
 }
 
-Type* as_type(caValue* value)
+Type* as_type(Value* value)
 {
     ca_assert(is_type(value));
     return (Type*) value->value_data.ptr;
 }
 
-bool as_bool_opt(caValue* value, bool defaultValue)
+bool as_bool_opt(Value* value, bool defaultValue)
 {
     if (value == NULL || !is_bool(value))
         return defaultValue;
     return as_bool(value);
 }
 
-void* get_pointer(caValue* value)
+void* get_pointer(Value* value)
 {
     return value->value_data.ptr;
 }
@@ -784,7 +784,7 @@ const char* get_name_for_type(Type* type)
     else return as_cstring(&type->name);
 }
 
-void* get_pointer(caValue* value, Type* expectedType)
+void* get_pointer(Value* value, Type* expectedType)
 {
     if (value->value_type != expectedType) {
         std::stringstream strm;
@@ -796,26 +796,26 @@ void* get_pointer(caValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-bool is_blob(caValue* value) { return value->value_type == TYPES.blob; }
-bool is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
-bool is_block(caValue* value) { return value->value_type == TYPES.block; }
-bool is_error(caValue* value) { return value->value_type == TYPES.error; }
-bool is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
-bool is_func(caValue* value) { return value->value_type == TYPES.func; }
-bool is_int(caValue* value) { return value->value_type == TYPES.int_type; }
-bool is_stack(caValue* value) { return value->value_type == TYPES.stack; }
-bool is_hashtable(caValue* value) { return value->value_type->storageType == sym_StorageTypeHashtable; }
-bool is_list(caValue* value) { return value->value_type == TYPES.list; }
-bool is_list_based(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
-bool is_null(caValue* value) { return value->value_type == TYPES.null; }
-bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }
-bool is_ref(caValue* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
-bool is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
-bool is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
-bool is_term_ref(caValue* val) { return val->value_type == TYPES.term; }
-bool is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
+bool is_blob(Value* value) { return value->value_type == TYPES.blob; }
+bool is_bool(Value* value) { return value->value_type->storageType == sym_StorageTypeBool; }
+bool is_block(Value* value) { return value->value_type == TYPES.block; }
+bool is_error(Value* value) { return value->value_type == TYPES.error; }
+bool is_float(Value* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
+bool is_func(Value* value) { return value->value_type == TYPES.func; }
+bool is_int(Value* value) { return value->value_type == TYPES.int_type; }
+bool is_stack(Value* value) { return value->value_type == TYPES.stack; }
+bool is_hashtable(Value* value) { return value->value_type->storageType == sym_StorageTypeHashtable; }
+bool is_list(Value* value) { return value->value_type == TYPES.list; }
+bool is_list_based(Value* value) { return value->value_type->storageType == sym_StorageTypeList; }
+bool is_null(Value* value) { return value->value_type == TYPES.null; }
+bool is_opaque_pointer(Value* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }
+bool is_ref(Value* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
+bool is_string(Value* value) { return value->value_type->storageType == sym_StorageTypeString; }
+bool is_symbol(Value* value) { return value->value_type == TYPES.symbol; }
+bool is_term_ref(Value* val) { return val->value_type == TYPES.term; }
+bool is_type(Value* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
-bool is_leaf_value(caValue* value)
+bool is_leaf_value(Value* value)
 {
     return is_int(value)
         || is_float(value)
@@ -826,17 +826,17 @@ bool is_leaf_value(caValue* value)
         || is_opaque_pointer(value);
 }
 
-bool is_struct(caValue* value)
+bool is_struct(Value* value)
 {
     return is_struct_type(value->value_type);
 }
 
-bool is_number(caValue* value)
+bool is_number(Value* value)
 {
     return is_int(value) || is_float(value);
 }
 
-float to_float(caValue* value)
+float to_float(Value* value)
 {
     if (is_int(value))
         return (float) as_int(value);
@@ -847,7 +847,7 @@ float to_float(caValue* value)
     return 0.0;
 }
 
-int to_int(caValue* value)
+int to_int(Value* value)
 {
     if (is_int(value))
         return as_int(value);
@@ -858,7 +858,7 @@ int to_int(caValue* value)
     return 0;
 }
 
-Symbol first_symbol(caValue* value)
+Symbol first_symbol(Value* value)
 {
     if (is_symbol(value))
         return as_symbol(value);
@@ -873,58 +873,58 @@ using namespace circa;
 
 extern "C" {
 
-bool circa_is_bool(caValue* value) { return value->value_type->storageType == sym_StorageTypeBool; }
-bool circa_is_block(caValue* value) { return value->value_type == TYPES.block; }
-bool circa_is_error(caValue* value) { return value->value_type == TYPES.error; }
-bool circa_is_float(caValue* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
-bool circa_is_func(caValue* value) { return value->value_type == TYPES.func; }
-bool circa_is_int(caValue* value) { return value->value_type->storageType == sym_StorageTypeInt; }
-bool circa_is_list(caValue* value) { return value->value_type->storageType == sym_StorageTypeList; }
-bool circa_is_null(caValue* value)  { return value->value_type == TYPES.null; }
-bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
-bool circa_is_stack(caValue* value) { return is_stack(value); }
-bool circa_is_string(caValue* value) { return value->value_type->storageType == sym_StorageTypeString; }
-bool circa_is_symbol(caValue* value) { return value->value_type == TYPES.symbol; }
-bool circa_is_type(caValue* value) { return value->value_type->storageType == sym_StorageTypeType; }
+bool circa_is_bool(Value* value) { return value->value_type->storageType == sym_StorageTypeBool; }
+bool circa_is_block(Value* value) { return value->value_type == TYPES.block; }
+bool circa_is_error(Value* value) { return value->value_type == TYPES.error; }
+bool circa_is_float(Value* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
+bool circa_is_func(Value* value) { return value->value_type == TYPES.func; }
+bool circa_is_int(Value* value) { return value->value_type->storageType == sym_StorageTypeInt; }
+bool circa_is_list(Value* value) { return value->value_type->storageType == sym_StorageTypeList; }
+bool circa_is_null(Value* value)  { return value->value_type == TYPES.null; }
+bool circa_is_number(Value* value) { return circa_is_int(value) || circa_is_float(value); }
+bool circa_is_stack(Value* value) { return is_stack(value); }
+bool circa_is_string(Value* value) { return value->value_type->storageType == sym_StorageTypeString; }
+bool circa_is_symbol(Value* value) { return value->value_type == TYPES.symbol; }
+bool circa_is_type(Value* value) { return value->value_type->storageType == sym_StorageTypeType; }
 
-bool circa_bool(caValue* value) {
+bool circa_bool(Value* value) {
     ca_assert(circa_is_bool(value));
     return value->value_data.asbool;
 }
-char* circa_blob(caValue* value) {
+char* circa_blob(Value* value) {
     return as_blob(value);
 }
-caBlock* circa_block(caValue* value) {
+caBlock* circa_block(Value* value) {
     ca_assert(circa_is_block(value));
     return (caBlock*) value->value_data.ptr;
 }
-float circa_float(caValue* value) {
+float circa_float(Value* value) {
     // TODO: Rename circa_to_float to circa_float
     return circa_to_float(value);
 }
-int circa_int(caValue* value) {
+int circa_int(Value* value) {
     ca_assert(circa_is_int(value));
     return value->value_data.asint;
 }
-caStack* circa_stack(caValue* value)
+caStack* circa_stack(Value* value)
 {
     return as_stack(value);
 }
-const char* circa_string(caValue* value) {
+const char* circa_string(Value* value) {
     ca_assert(circa_is_string(value));
     return as_cstring(value);
 }
-void* circa_get_pointer(caValue* value)
+void* circa_get_pointer(Value* value)
 {
     return value->value_data.ptr;
 }
 
-caType* circa_type(caValue* value) {
+caType* circa_type(Value* value) {
     ca_assert(circa_is_type(value));
     return (Type*) value->value_data.ptr;
 }
 
-float circa_to_float(caValue* value)
+float circa_to_float(Value* value)
 {
     if (is_int(value))
         return (float) as_int(value);
@@ -936,105 +936,105 @@ float circa_to_float(caValue* value)
     }
 }
 
-caValue* circa_index(caValue* container, int index)
+Value* circa_index(Value* container, int index)
 {
     return get_index(container, index);
 }
-int circa_count(caValue* container)
+int circa_count(Value* container)
 {
     return list_length(container);
 }
-int circa_length(caValue* container)
+int circa_length(Value* container)
 {
     return list_length(container);
 }
 
-void circa_vec2(caValue* vec2, float* xOut, float* yOut)
+void circa_vec2(Value* vec2, float* xOut, float* yOut)
 {
     *xOut = circa_to_float(get_index(vec2, 0));
     *yOut = circa_to_float(get_index(vec2, 1));
 }
-void circa_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
+void circa_vec3(Value* vec3, float* xOut, float* yOut, float* zOut)
 {
     *xOut = circa_to_float(get_index(vec3, 0));
     *yOut = circa_to_float(get_index(vec3, 1));
     *zOut = circa_to_float(get_index(vec3, 2));
 }
-void circa_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
+void circa_vec4(Value* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
 {
     *xOut = circa_to_float(get_index(vec4, 0));
     *yOut = circa_to_float(get_index(vec4, 1));
     *zOut = circa_to_float(get_index(vec4, 2));
     *wOut = circa_to_float(get_index(vec4, 3));
 }
-void circa_touch(caValue* value)
+void circa_touch(Value* value)
 {
     touch(value);
 }
-bool circa_equals(caValue* left, caValue* right)
+bool circa_equals(Value* left, Value* right)
 {
     return equals(left, right);
 }
-caType* circa_type_of(caValue* value)
+caType* circa_type_of(Value* value)
 {
     return value->value_type;
 }
 
-void circa_set_blob(caValue* container, int size)
+void circa_set_blob(Value* container, int size)
 {
     set_blob(container, size);
 }
 
-void circa_set_bool(caValue* container, bool b)
+void circa_set_bool(Value* container, bool b)
 {
     make_no_initialize(TYPES.bool_type, container);
     container->value_data.asbool = b;
 }
-void circa_set_error(caValue* container, const char* msg)
+void circa_set_error(Value* container, const char* msg)
 {
     set_error_string(container, msg);
 }
-void circa_set_float(caValue* container, float f)
+void circa_set_float(Value* container, float f)
 {
     make_no_initialize(TYPES.float_type, container);
     container->value_data.asfloat = f;
 }
-void circa_set_int(caValue* container, int i)
+void circa_set_int(Value* container, int i)
 {
     make_no_initialize(TYPES.int_type, container);
     container->value_data.asint = i;
 }
-void circa_set_null(caValue* container)
+void circa_set_null(Value* container)
 {
     set_null(container);
 }
-void circa_set_pointer(caValue* container, void* ptr)
+void circa_set_pointer(Value* container, void* ptr)
 {
     set_opaque_pointer(container, ptr);
 }
-void circa_set_stack(caValue* container, caStack* stack)
+void circa_set_stack(Value* container, caStack* stack)
 {
     set_stack(container, stack);
 }
-void circa_set_term(caValue* container, caTerm* term)
+void circa_set_term(Value* container, caTerm* term)
 {
     set_term_ref(container, (Term*) term);
 }
 
-void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)
+void circa_set_typed_pointer(Value* container, caType* type, void* ptr)
 {
     if (type == NULL)
         type = TYPES.any;
     make(type, container);
     container->value_data.ptr = ptr;
 }
-void circa_set_vec2(caValue* container, float x, float y)
+void circa_set_vec2(Value* container, float x, float y)
 {
     make(TYPES.vec2, container);
     circa_set_float(circa_index(container, 0), x);
     circa_set_float(circa_index(container, 1), y);
 }
-void circa_set_vec3(caValue* container, float x, float y, float z)
+void circa_set_vec3(Value* container, float x, float y, float z)
 {
     if (!circa_is_list(container))
         circa_set_list(container, 3);
@@ -1047,7 +1047,7 @@ void circa_set_vec3(caValue* container, float x, float y, float z)
     circa_set_float(circa_index(container, 1), y);
     circa_set_float(circa_index(container, 2), z);
 }
-void circa_set_vec4(caValue* container, float x, float y, float z, float w)
+void circa_set_vec4(Value* container, float x, float y, float z, float w)
 {
     if (!circa_is_list(container))
         circa_set_list(container, 4);
@@ -1061,35 +1061,35 @@ void circa_set_vec4(caValue* container, float x, float y, float z, float w)
     circa_set_float(circa_index(container, 2), z);
     circa_set_float(circa_index(container, 3), w);
 }
-void circa_set_string(caValue* container, const char* str)
+void circa_set_string(Value* container, const char* str)
 {
     set_string(container, str);
 }
-void circa_set_symbol(caValue* container, const char* str)
+void circa_set_symbol(Value* container, const char* str)
 {
     set_symbol_from_string(container, str);
 }
-void circa_set_string_size(caValue* container, const char* str, int size)
+void circa_set_string_size(Value* container, const char* str, int size)
 {
     set_string(container, str, size);
 }
 
-void circa_set_empty_string(caValue* container, int size)
+void circa_set_empty_string(Value* container, int size)
 {
     set_string(container, "");
     string_resize(container, size);
 }
 
-void circa_copy(caValue* source, caValue* dest)
+void circa_copy(Value* source, Value* dest)
 {
     copy(source, dest);
 }
 
-void circa_swap(caValue* left, caValue* right)
+void circa_swap(Value* left, Value* right)
 {
     swap(left, right);
 }
-void circa_move(caValue* source, caValue* dest)
+void circa_move(Value* source, Value* dest)
 {
     move(source, dest);
 }

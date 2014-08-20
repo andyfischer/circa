@@ -82,7 +82,7 @@ bool term_has_variable_args(Term* term);
 // extra_output terms).
 int count_actual_output_terms(Term* term);
 
-Term* find_input_placeholder_with_name(Block* block, caValue* name);
+Term* find_input_placeholder_with_name(Block* block, Value* name);
 
 Term* find_expression_for_implicit_output(Block* block);
 Term* find_term_with_function(Block* block, Term* func);
@@ -110,23 +110,23 @@ struct RawOutputPrefs
 };
 
 
-void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack=NULL);
-void print_term(Term* term, RawOutputPrefs* prefs, caValue* out);
-void print_term(Term* term, caValue* out);
+void print_block(Block* block, RawOutputPrefs* prefs, Value* out, Stack* stack=NULL);
+void print_term(Term* term, RawOutputPrefs* prefs, Value* out);
+void print_term(Term* term, Value* out);
 
 // Convenient overloads for raw format printing
-void print_block(Block* block, caValue* out);
-void print_block_with_properties(Block* block, caValue* out);
-void get_block_raw(Block* block, caValue* out);
-void get_term_to_string_extended(Term*, caValue* out);
-void get_term_to_string_extended_with_props(Term*, caValue* out);
+void print_block(Block* block, Value* out);
+void print_block_with_properties(Block* block, Value* out);
+void get_block_raw(Block* block, Value* out);
+void get_term_to_string_extended(Term*, Value* out);
+void get_term_to_string_extended_with_props(Term*, Value* out);
 
 // Print a short source-code location for this term.
-void get_short_location(Term* term, caValue* str);
+void get_short_location(Term* term, Value* str);
 
 // Print the source file that this term came from, if any.
 std::string get_source_filename(Term* term);
-caValue* get_parent_module_name(Block* block);
+Value* get_parent_module_name(Block* block);
 
 void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &names);
 
@@ -134,12 +134,12 @@ void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &
 // as descendants.
 TermList get_involved_terms(TermList inputs, TermList outputs);
 
-typedef bool (*NamedTermVisitor) (Term* term, const char* name, caValue* context);
-void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context);
+typedef bool (*NamedTermVisitor) (Term* term, const char* name, Value* context);
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, Value* context);
 
 // Path expressions
-void parse_path_expression(const char* expr, caValue* valueOut);
-Term* find_term_from_path(Block* root, caValue* path);
+void parse_path_expression(const char* expr, Value* valueOut);
+Term* find_term_from_path(Block* root, Value* path);
 Term* find_term_from_path(Block* root, const char* pathExpr);
 Block* find_block_from_path(Block* root, const char* pathExpr);
 

@@ -105,7 +105,7 @@ static Symbol max_exit_level(Symbol left, Symbol right)
     return sym_None;
 }
 
-void create_output_from_minor_block(Block* block, caValue* description)
+void create_output_from_minor_block(Block* block, Value* description)
 {
     if (is_case_block(block)) {
         Block* ifBlock = get_block_for_case_block(block);

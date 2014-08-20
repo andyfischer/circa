@@ -44,8 +44,8 @@ World* g_world = NULL;
 BuiltinFuncs FUNCS;
 BuiltinTypes TYPES;
 
-caValue* g_oracleValues;
-caValue* g_spyValues;
+Value* g_oracleValues;
+Value* g_spyValues;
 
 Term* find_builtin_func(Block* builtins, const char* name);
 
@@ -115,7 +115,7 @@ void global_script_version(caStack* stack)
     set_int(circa_output(stack, 0), world->globalScriptVersion);
 }
 
-std::string stackVariable_toString(caValue* value)
+std::string stackVariable_toString(Value* value)
 {
     short relativeFrame = value->value_data.asint >> 16;
     short index = (value->value_data.asint & 0xffff);
@@ -312,7 +312,7 @@ Block* global_builtins_block()
     return global_world()->builtins;
 }
 
-void term_toString(caValue* val, caValue* out)
+void term_toString(Value* val, Value* out)
 {
     Term* t = as_term_ref(val);
     if (t == NULL)
@@ -323,7 +323,7 @@ void term_toString(caValue* val, caValue* out)
     }
 }
 
-int term_hashFunc(caValue* val)
+int term_hashFunc(Value* val)
 {
     Term* term = as_term_ref(val);
     if (term == NULL)
@@ -346,7 +346,7 @@ void test_spy_clear()
         g_spyValues = circa_alloc_value();
     set_list(g_spyValues, 0);
 }
-caValue* test_spy_get_results()
+Value* test_spy_get_results()
 {
     return g_spyValues;
 }
@@ -356,11 +356,11 @@ void test_oracle_clear()
         g_oracleValues = circa_alloc_value();
     set_list(g_oracleValues, 0);
 }
-void test_oracle_send(caValue* value)
+void test_oracle_send(Value* value)
 {
     copy(value, list_append(g_oracleValues));
 }
-caValue* test_oracle_append()
+Value* test_oracle_append()
 {
     return list_append(g_oracleValues);
 }
@@ -662,7 +662,7 @@ Term* find_builtin_func(Block* builtins, const char* name)
     return term;
 }
 
-void on_new_function_parsed(Term* func, caValue* functionName)
+void on_new_function_parsed(Term* func, Value* functionName)
 {
     if (global_world()->bootstrapStatus == sym_Done)
         return;
@@ -813,7 +813,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
         string_split(&libPathStr, ';', &libPaths);
 
         for (int i=0; i < list_length(&libPaths); i++) {
-            caValue* path = list_get(&libPaths, i);
+            Value* path = list_get(&libPaths, i);
             if (string_equals(path, ""))
                 continue;
             module_add_search_path(world, as_cstring(path));

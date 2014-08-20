@@ -4,7 +4,7 @@
 
 namespace circa {
 
-void compute_value_patch(caValue* base, caValue* latest, caValue* patchResult, caValue* error);
-void apply_patch(caValue* val, caValue* patch);
+void compute_value_patch(Value* base, Value* latest, Value* patchResult, Value* error);
+void apply_patch(Value* val, Value* patch);
 
 } // namespace circa

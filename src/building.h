@@ -8,20 +8,20 @@
 namespace circa {
 
 // Examine 'function' and 'inputs' and returns a result term.
-Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name = NULL);
+Term* apply(Block* block, Term* function, TermList const& inputs, Value* name = NULL);
 
 // Find the named function in this block, and then call the above apply.
 Term* apply(Block* block, const char* functionName, TermList const& inputs,
-        caValue* name = NULL);
+        Value* name = NULL);
 
 Term* apply(Block* block, Term* function, TermList const& inputs, const char* name);
 
 // Call apply using a spec value.
 // Example:  [Term#add [Term#a Term#b] :name 'c']
-Term* apply_spec(Block* block, caValue* spec);
+Term* apply_spec(Block* block, Value* spec);
 
 // Create a duplicate of the given term. Doesn't duplicate nestedContents.
-Term* create_duplicate(Block* block, Term* original, caValue* name);
+Term* create_duplicate(Block* block, Term* original, Value* name);
 
 // Inputs and user lists:
 void set_input(Term* term, int index, Term* input);
@@ -48,13 +48,13 @@ void set_declared_type(Term* term, Type* type);
 void respecialize_type(Term* term);
 
 // Rename term, modify the name binding of the owning block if necessary
-void rename(Term* term, caValue* name);
+void rename(Term* term, Value* name);
 void rename(Term* term, const char* name);
 
 // Create a new value term with the given type.
 Term* create_value(Block* block, Type* type, const char* name=NULL);
 Term* create_value(Block* block, const char* typeName, const char* name=NULL);
-Term* create_value(Block* block, caValue* initialValue, const char* name=NULL);
+Term* create_value(Block* block, Value* initialValue, const char* name=NULL);
 
 Term* create_string(Block* block, const char* s, const char* name=NULL);
 Term* create_int(Block* block, int i, const char* name=NULL);
@@ -73,14 +73,14 @@ Term* duplicate_value(Block* block, Term* term);
 // Add an input_placeholder() term after the existing placeholders.
 Term* append_input_placeholder(Block* block);
 Term* append_output_placeholder(Block* block, Term* result);
-Term* append_output_placeholder_with_description(Block* block, caValue* description);
+Term* append_output_placeholder_with_description(Block* block, Value* description);
 Term* prepend_output_placeholder(Block* block, Term* result);
 Term* insert_output_placeholder(Block* block, Term* result, int location);
 
-void get_input_description(Term* input, caValue* result);
-Term* find_output_placeholder_with_name(Block* block, caValue* name);
-Term* find_output_from_description(Block* block, caValue* description);
-void get_output_description(Term* output, caValue* result);
+void get_input_description(Term* input, Value* result);
+Term* find_output_placeholder_with_name(Block* block, Value* name);
+Term* find_output_from_description(Block* block, Value* description);
+void get_output_description(Term* output, Value* result);
 
 // Extra outputs
 Term* get_output_term(Term* term, int index);

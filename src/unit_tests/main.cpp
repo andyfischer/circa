@@ -134,7 +134,7 @@ void test_equals_function(std::string a, std::string b,
     }
 }
 
-void test_equals_function(caValue* a, std::string b,
+void test_equals_function(Value* a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
@@ -143,7 +143,7 @@ void test_equals_function(caValue* a, std::string b,
     return test_equals_function(as_string(&a_str), b, aText, bText, line, file);
 }
 
-void test_equals_function(caValue* a, float b,
+void test_equals_function(Value* a, float b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
@@ -175,7 +175,7 @@ bool test_fail_on_runtime_error(Stack& context)
     return false;
 }
 
-caValue* temp_string(const char* str)
+Value* temp_string(const char* str)
 {
     if (gTempValue == NULL)
         gTempValue = new Value();
@@ -192,7 +192,7 @@ void test_write_fake_file(const char* filename, int version, const char* content
 {
     Value key;
     set_string(&key, filename);
-    caValue* entry = hashtable_insert(gFakeFileMap, &key);
+    Value* entry = hashtable_insert(gFakeFileMap, &key);
     set_list(entry, 2);
     set_int(list_get(entry, 0), version);
     set_string(list_get(entry, 1), contents);

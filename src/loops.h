@@ -21,7 +21,7 @@ Block* find_enclosing_for_loop_contents(Term* term);
 bool loop_produces_output_value(Term* forTerm);
 bool enclosing_loop_produces_output_value(Term* term);
 
-void list_names_that_must_be_looped(Block* contents, caValue* names);
+void list_names_that_must_be_looped(Block* contents, Value* names);
 
 void loop_add_condition_check(Block* caseBlock, Term* condition);
 Term* loop_find_condition_check(Block* block);

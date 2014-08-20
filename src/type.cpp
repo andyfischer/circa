@@ -25,17 +25,17 @@ static void dealloc_type(Type* type);
 
 namespace type_t {
 
-    void initialize(Type*, caValue* value)
+    void initialize(Type*, Value* value)
     {
         Type* type = create_type();
         set_pointer(value, type);
     }
-    void release(caValue* value)
+    void release(Value* value)
     {
         Type* type = as_type(value);
         type_decref(type);
     }
-    void copy(caValue* source, caValue* dest)
+    void copy(Value* source, Value* dest)
     {
         ca_assert(is_type(source));
         make_no_initialize(source->value_type, dest);
@@ -44,7 +44,7 @@ namespace type_t {
         dest->value_data.ptr = type;
     }
 
-    void toString(caValue* value, caValue* out)
+    void toString(Value* value, Value* out)
     {
         string_append(out, "<Type ");
         string_append(out, &as_type(value)->name);
@@ -121,7 +121,7 @@ Type* get_type_of_input(Term* term, int inputIndex)
     return get_output_type(term->input(inputIndex), 0);
 }
 
-caValue* get_type_property(Type* type, const char* name)
+Value* get_type_property(Type* type, const char* name)
 {
     if (!is_hashtable(&type->properties))
         return NULL;
@@ -131,7 +131,7 @@ caValue* get_type_property(Type* type, const char* name)
     return hashtable_get(&type->properties, &str);
 }
 
-caValue* type_property_insert(Type* type, const char* name)
+Value* type_property_insert(Type* type, const char* name)
 {
     Value str;
     set_string(&str, name);
@@ -140,7 +140,7 @@ caValue* type_property_insert(Type* type, const char* name)
     return hashtable_insert(&type->properties, &str);
 }
 
-void set_type_property(Type* type, const char* name, caValue* value)
+void set_type_property(Type* type, const char* name, Value* value)
 {
     copy(value, type_property_insert(type, name));
 }
@@ -217,7 +217,7 @@ Type* unbox_type(Term* term)
     return as_type(term);
 }
 
-Type* unbox_type(caValue* val)
+Type* unbox_type(Value* val)
 {
     return as_type(val);
 }
@@ -367,7 +367,7 @@ Term* find_method_with_search_name(Block* block, Type* type, const char* searchN
     return NULL;
 }
 
-Term* find_method(Block* block, Type* type, caValue* name)
+Term* find_method(Block* block, Type* type, Value* name)
 {
     if (string_equals(&type->name, ""))
         return NULL;
@@ -410,20 +410,20 @@ void install_type(Term* term, Type* type)
     set_type(term_value(term), type);
 }
 
-void set_type_list(caValue* value, Type* type1)
+void set_type_list(Value* value, Type* type1)
 {
     set_list(value, 1);
     set_type(list_get(value,0), type1);
 }
 
-void set_type_list(caValue* value, Type* type1, Type* type2)
+void set_type_list(Value* value, Type* type1, Type* type2)
 {
     set_list(value, 2);
     set_type(list_get(value,0), type1);
     set_type(list_get(value,1), type2);
 }
 
-void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3)
+void set_type_list(Value* value, Type* type1, Type* type2, Type* type3)
 {
     set_list(value, 3);
     set_type(list_get(value,0), type1);
@@ -511,8 +511,8 @@ void Type__declaringTerm(caStack* stack)
 void Type__make(caStack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
-    caValue* args = circa_input(stack, 1);
-    caValue* output = circa_output(stack, 0);
+    Value* args = circa_input(stack, 1);
+    Value* output = circa_output(stack, 0);
     
     if (!is_list_based_type(type)) {
         make(type, output);
@@ -531,7 +531,7 @@ void Type__make(caStack* stack)
     }
 
     int expectedFieldCount = 0;
-    caValue* fields = list_get_type_list_from_type(type);
+    Value* fields = list_get_type_list_from_type(type);
     if (fields != NULL)
         expectedFieldCount = list_length(fields);
 
@@ -550,8 +550,8 @@ void Type__make(caStack* stack)
         }
 
         CastResult castResult;
-        caValue* source = list_get(args, i);
-        caValue* dest = list_get(output, i);
+        Value* source = list_get(args, i);
+        Value* dest = list_get(output, i);
 
         copy(source, dest);
         cast(&castResult, dest, as_type(list_get(fields, i)), false);
@@ -572,7 +572,7 @@ void Type__make(caStack* stack)
     // Create defaults for remaining items.
     for (int i=list_length(args); i < expectedFieldCount; i++) {
         Type* type = as_type(list_get(fields, i));
-        caValue* dest = list_get(output, i);
+        Value* dest = list_get(output, i);
         make(type, dest);
     }
 
@@ -591,7 +591,7 @@ void Type__property(caStack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
     const char* str = as_cstring(circa_input(stack, 1));
-    caValue* prop = get_type_property(type, str);
+    Value* prop = get_type_property(type, str);
     if (prop == NULL)
         set_null(circa_output(stack, 0));
     else

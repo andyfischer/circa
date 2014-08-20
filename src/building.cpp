@@ -29,7 +29,7 @@ void on_term_created(Term* term)
     // debugging hook
 }
 
-Term* apply(Block* block, Term* function, TermList const& inputs, caValue* name)
+Term* apply(Block* block, Term* function, TermList const& inputs, Value* name)
 {
     ca_assert(function != NULL);
 
@@ -96,10 +96,10 @@ Term* apply(Block* block, Term* function, TermList const& inputs, const char* na
     return apply(block, function, inputs, &name);
 }
 
-Term* apply_spec(Block* block, caValue* spec)
+Term* apply_spec(Block* block, Value* spec)
 {
     Term* function = as_term_ref(list_get(spec, 0));
-    caValue* inputs = list_get(spec, 1);
+    Value* inputs = list_get(spec, 1);
 
     TermList inputList;
     for (int i=0; i < list_length(inputs); i++) {
@@ -109,7 +109,7 @@ Term* apply_spec(Block* block, caValue* spec)
     Term* result = apply(block, function, inputList, "");
 
     for (int i=2; i < list_length(spec); i++) {
-        caValue* key = list_get(spec, i);
+        Value* key = list_get(spec, i);
         if (symbol_eq(key, sym_Name)) {
             i++;
             rename(result, list_get(spec, i));
@@ -287,7 +287,7 @@ void respecialize_type(Term* term)
         set_declared_type(term, outputType);
 }
 
-void rename(Term* termToRename, caValue* name)
+void rename(Term* termToRename, Value* name)
 {
     // No-op if term already has this name.
     if (equals(&termToRename->nameValue, name))
@@ -379,7 +379,7 @@ void rename(Term* term, const char* name)
     return rename(term, &nameVal);
 }
 
-Term* create_duplicate(Block* block, Term* original, caValue* name)
+Term* create_duplicate(Block* block, Term* original, Value* name)
 {
     ca_assert(original != NULL);
 
@@ -401,7 +401,7 @@ Term* create_duplicate(Block* block, Term* original, caValue* name)
     return term;
 }
 
-Term* apply(Block* block, std::string const& functionName, TermList const& inputs, caValue* name)
+Term* apply(Block* block, std::string const& functionName, TermList const& inputs, Value* name)
 {
     Term* function = find_name(block, functionName.c_str());
     if (function == NULL)
@@ -443,7 +443,7 @@ Term* create_value(Block* block, const char* typeName, const char* name)
     return create_value(block, as_type(term_value(type)), name);
 }
 
-Term* create_value(Block* block, caValue* initialValue, const char* name)
+Term* create_value(Block* block, Value* initialValue, const char* name)
 {
     Term* term = create_value(block, initialValue->value_type, name);
     copy(initialValue, term_value(term));
@@ -551,7 +551,7 @@ Term* append_output_placeholder(Block* block, Term* result)
     block->move(term, block->length() - count - 1);
     return term;
 }
-Term* append_output_placeholder_with_description(Block* block, caValue* description)
+Term* append_output_placeholder_with_description(Block* block, Value* description)
 {
     if (is_string(description)) {
         Term* result = append_output_placeholder(block, find_name(block, description));
@@ -559,10 +559,10 @@ Term* append_output_placeholder_with_description(Block* block, caValue* descript
         return result;
     }
 
-    caValue* descriptionTag = list_get(description, 0);
+    Value* descriptionTag = list_get(description, 0);
 
     if (as_symbol(descriptionTag) == sym_Name) {
-        caValue* name = list_get(description, 1);
+        Value* name = list_get(description, 1);
         Term* result = append_output_placeholder(block, find_name(block, name));
         rename(result, name);
         return result;
@@ -589,7 +589,7 @@ Term* insert_output_placeholder(Block* block, Term* result, int location)
     return term;
 }
 
-void get_input_description(Term* input, caValue* result)
+void get_input_description(Term* input, Value* result)
 {
     // Primary input.
     if (input_placeholder_index(input) == 0) {
@@ -602,7 +602,7 @@ void get_input_description(Term* input, caValue* result)
     set_symbol(result, sym_Anonymous);
 }
 
-Term* find_output_placeholder_with_name(Block* block, caValue* name)
+Term* find_output_placeholder_with_name(Block* block, Value* name)
 {
     for (int i=0;; i++) {
         Term* placeholder = get_output_placeholder(block, i);
@@ -613,12 +613,12 @@ Term* find_output_placeholder_with_name(Block* block, caValue* name)
     }
 }
 
-Term* find_output_from_description(Block* block, caValue* description)
+Term* find_output_from_description(Block* block, Value* description)
 {
     if (is_string(description))
         return find_output_placeholder_with_name(block, description);
 
-    caValue* tag = list_get(description, 0);
+    Value* tag = list_get(description, 0);
     if (as_symbol(tag) == sym_Name) {
         return find_output_placeholder_with_name(block, list_get(description, 1));
     }
@@ -645,7 +645,7 @@ Term* find_output_from_description(Block* block, caValue* description)
     return NULL;
 }
 
-void get_output_description(Term* output, caValue* result)
+void get_output_description(Term* output, Value* result)
 {
     // control output
     if (output->hasProperty(sym_Control)) {
@@ -737,7 +737,7 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
 {
     Value description;
     get_output_description(output, &description);
-    caValue* descriptionTag = list_get(&description, 0);
+    Value* descriptionTag = list_get(&description, 0);
 
     // Control value
     if (as_symbol(descriptionTag) == sym_Control) {

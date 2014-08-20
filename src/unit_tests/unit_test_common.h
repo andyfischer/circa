@@ -20,10 +20,10 @@ void test_equals_function(float a, float b,
 void test_equals_function(std::string a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file);
-void test_equals_function(caValue* a, std::string b,
+void test_equals_function(Value* a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file);
-void test_equals_function(caValue* a, float b,
+void test_equals_function(Value* a, float b,
         const char* aText, const char* bText,
         int line, const char* file);
 
@@ -41,7 +41,7 @@ bool test_fail_on_static_error(Block* block);
 // there was no error.
 bool test_fail_on_runtime_error(Stack& context);
 
-caValue* temp_string(const char* str);
+Value* temp_string(const char* str);
 World* test_world();
 void test_write_fake_file(const char* filename, int version, const char* contents);
 

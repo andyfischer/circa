@@ -122,20 +122,20 @@ int stack_frame_count(Stack* stack);
 Frame* top_frame_parent(Stack* stack);
 Block* stack_top_block(Stack* stack);
 
-caValue* stack_state(Stack* stack);
+Value* stack_state(Stack* stack);
 
 // Returns whether evaluation has been stopped due to an error.
 bool stack_errored(Stack* stack);
 
-caValue* stack_env_insert(Stack* stack, caValue* name);
-caValue* stack_env_get(Stack* stack, caValue* name);
+Value* stack_env_insert(Stack* stack, Value* name);
+Value* stack_env_get(Stack* stack, Value* name);
 
-void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame);
+void stack_extract_current_path(Stack* stack, Value* path, Frame* untilFrame);
 
 Stack* stack_duplicate(Stack* stack);
 
-caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex);
-caValue* stack_active_value_for_term(Frame* frame, Term* term);
+Value* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex);
+Value* stack_active_value_for_term(Frame* frame, Term* term);
 
 // Returns "first" frame; the first one to be executed; the first one in memory.
 Frame* first_frame(Stack* stack);
@@ -151,17 +151,17 @@ Frame* prev_frame(Frame* frame);
 Frame* prev_frame_n(Frame* frame, int distance);
 size_t frame_size(Frame* frame);
 
-caValue* stack_register(Stack* stack, int index);
-caValue* frame_register(Frame* frame, int index);
-caValue* frame_register(Frame* frame, Term* term);
-caValue* frame_register_from_end(Frame* frame, int index);
+Value* stack_register(Stack* stack, int index);
+Value* frame_register(Frame* frame, int index);
+Value* frame_register(Frame* frame, Term* term);
+Value* frame_register_from_end(Frame* frame, int index);
 int frame_register_count(Frame* frame);
-void frame_registers_to_list(Frame* frame, caValue* list);
+void frame_registers_to_list(Frame* frame, Value* list);
 int frame_find_index(Frame* frame);
 Term* frame_caller(Frame* frame);
 Term* frame_term(Frame* frame, int index);
 Term* frame_current_term(Frame* frame);
-caValue* frame_state(Frame* frame);
+Value* frame_state(Frame* frame);
 Block* frame_block(Frame* frame);
 
 // Prepare stack's bytecode for a VM run.
@@ -171,19 +171,19 @@ void stack_on_program_change(Stack* stack);
 
 void stack_derive_hackset(Stack* stack, Value* hackset);
 
-caValue* stack_demand_value_insert(Stack* stack, Term* key);
-caValue* stack_demand_value_get(Stack* stack, Term* key);
+Value* stack_demand_value_insert(Stack* stack, Term* key);
+Value* stack_demand_value_get(Stack* stack, Term* key);
 void stack_save_watch_observation(Stack* stack, Value* path, Value* value);
 Value* stack_get_watch_observation(Stack* stack, Value* path);
 
 void stack_on_migration(Stack* stack);
 
-void stack_to_string(Stack* stack, caValue* out, bool withBytecode);
-void stack_trace_to_string(Stack* stack, caValue* out);
+void stack_to_string(Stack* stack, Value* out, bool withBytecode);
+void stack_trace_to_string(Stack* stack, Value* out);
 
-Frame* as_frame_ref(caValue* value);
-bool is_frame_ref(caValue* value);
-void set_frame_ref(caValue* value, Frame* frame);
+Frame* as_frame_ref(Value* value);
+bool is_frame_ref(Value* value);
+void set_frame_ref(Value* value, Frame* frame);
 
 void stack_setup_type(Type* stackType);
 void stack_install_functions(NativePatch* patch);

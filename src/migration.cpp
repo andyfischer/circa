@@ -18,10 +18,10 @@
 
 namespace circa {
 
-bool value_may_need_migration(caValue* value, Migration* migration);
-bool list_value_may_need_migration(caValue* value, Migration* migration);
+bool value_may_need_migration(Value* value, Migration* migration);
+bool list_value_may_need_migration(Value* value, Migration* migration);
 
-bool value_may_need_migration(caValue* value, Migration* migration)
+bool value_may_need_migration(Value* value, Migration* migration)
 {
     if (is_list_based(value))
         return list_value_may_need_migration(value, migration);
@@ -131,7 +131,7 @@ Type* migrate_type(Type* type, Migration* migration)
     return as_type(newTerm);
 }
 
-void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migration* migration)
+void migrate_state_list(Value* list, Block* oldBlock, Block* newBlock, Migration* migration)
 {
     if (is_null(list))
         return;
@@ -147,7 +147,7 @@ void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migrati
 
     // Copy state values with matching names.
     for (int i=0; i < list_length(&oldList); i++) {
-        caValue* oldValue = list_get(&oldList, i);
+        Value* oldValue = list_get(&oldList, i);
         if (is_null(oldValue))
             continue;
 
@@ -160,7 +160,7 @@ void migrate_state_list(caValue* list, Block* oldBlock, Block* newBlock, Migrati
 #endif
 
         if (newTerm != NULL) {
-            caValue* newSlot = list_get(list, newTerm->index);
+            Value* newSlot = list_get(list, newTerm->index);
             move(oldValue, newSlot);
 
 #if 0
@@ -207,7 +207,7 @@ void migrate_stack(Stack* stack, Migration* migration)
     }
 }
 
-bool list_value_may_need_migration(caValue* value, Migration* migration)
+bool list_value_may_need_migration(Value* value, Migration* migration)
 {
     for (int i=0; i < list_length(value); i++)
         if (value_may_need_migration(value->index(i), migration))
@@ -220,7 +220,7 @@ bool list_value_may_need_migration(caValue* value, Migration* migration)
     return false;
 }
 
-void migrate_list_value(caValue* value, Migration* migration)
+void migrate_list_value(Value* value, Migration* migration)
 {
     if (!list_value_may_need_migration(value, migration))
         return;
@@ -228,7 +228,7 @@ void migrate_list_value(caValue* value, Migration* migration)
     touch(value);
 
     for (int i=0; i < list_length(value); i++) {
-        caValue* element = list_get(value, i);
+        Value* element = list_get(value, i);
         migrate_value(element, migration);
     }
 
@@ -247,7 +247,7 @@ void migrate_list_value(caValue* value, Migration* migration)
     }
 }
 
-void migrate_value(caValue* value, Migration* migration)
+void migrate_value(Value* value, Migration* migration)
 {
     if (is_ref(value)) {
         set_term_ref(value, migrate_term_pointer(as_term_ref(value), migration));
@@ -264,19 +264,19 @@ void migrate_value(caValue* value, Migration* migration)
         move(value, &oldHashtable);
 
         set_hashtable(value);
-        caValue* hashtable = value;
+        Value* hashtable = value;
 
         for (int i=0; i < hashtable_slot_count(&oldHashtable); i++) {
-            caValue* oldKey = hashtable_key_by_index(&oldHashtable, i);
+            Value* oldKey = hashtable_key_by_index(&oldHashtable, i);
             if (oldKey == NULL || is_null(oldKey))
                 continue;
 
-            caValue* oldValue = hashtable_value_by_index(&oldHashtable, i);
+            Value* oldValue = hashtable_value_by_index(&oldHashtable, i);
 
             Value key;
             copy(oldKey, &key);
             migrate_value(&key, migration);
-            caValue* newValue = hashtable_insert(hashtable, &key);
+            Value* newValue = hashtable_insert(hashtable, &key);
             copy(oldValue, newValue);
             migrate_value(newValue, migration);
         }
@@ -343,7 +343,7 @@ void migrate_stack(Stack* stack, Block* oldBlock, Block* newBlock)
     return migrate_stack(stack, &migration);
 }
 
-void migrate_value(caValue* value, Block* oldBlock, Block* newBlock)
+void migrate_value(Value* value, Block* oldBlock, Block* newBlock)
 {
     Migration migration;
     migration.oldBlock = oldBlock;

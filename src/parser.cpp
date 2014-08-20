@@ -40,11 +40,11 @@ static void lookahead_skip_whitespace_and_newlines(TokenStream& tokens, int* loo
 static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
-static void token_position_to_short_source_location(int position, TokenStream& tokens, caValue* str);
+static void token_position_to_short_source_location(int position, TokenStream& tokens, Value* str);
 
-static ParseResult right_apply_to_function(Block* block, Term* lhs, caValue* functionName);
+static ParseResult right_apply_to_function(Block* block, Term* lhs, Value* functionName);
 
-Term* compile(Block* block, ParsingStep step, caValue* input)
+Term* compile(Block* block, ParsingStep step, Value* input)
 {
     log_start(0, "parser::compile");
     log_arg("block.id", block->id);
@@ -102,7 +102,7 @@ struct ListSyntaxHints {
 
         set_string(hashtable_insert_int_key(inputs.index(index), key), value.c_str());
     }
-    void set(int index, Symbol key, caValue* value)
+    void set(int index, Symbol key, Value* value)
     {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
@@ -115,7 +115,7 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_hashtable(inputs.append());
 
-        caValue* existing = hashtable_insert_int_key(inputs.index(index), key);
+        Value* existing = hashtable_insert_int_key(inputs.index(index), key);
         if (!is_string(existing))
             set_string(existing, "");
 
@@ -1860,7 +1860,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                     set_is_statement(set, true);
 
                     // Move an input's post-whitespace to this term.
-                    caValue* existingPostWhitespace =
+                    Value* existingPostWhitespace =
                         term_get_input_property(newValue, 0, sym_Syntax_PostWs);
 
                     if (existingPostWhitespace != NULL)
@@ -2094,7 +2094,7 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(result);
 }
 
-ParseResult right_apply_to_function(Block* block, Term* lhs, caValue* functionName)
+ParseResult right_apply_to_function(Block* block, Term* lhs, Value* functionName)
 {
     Term* function = find_name(block, functionName);
 
@@ -2554,7 +2554,7 @@ ParseResult literal_color(Block* block, TokenStream& tokens, ParserCxt* context)
     text = text.substr(1, text.length()-1);
 
     Term* resultTerm = create_value(block, TYPES.color);
-    caValue* result = term_value(resultTerm);
+    Value* result = term_value(resultTerm);
 
     float r = 0;
     float g = 0;
@@ -2789,7 +2789,7 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     term->sourceLoc.grow(loc);
 }
 
-static void token_position_to_short_source_location(int position, TokenStream& tokens, caValue* str)
+static void token_position_to_short_source_location(int position, TokenStream& tokens, Value* str)
 {
     if (!is_string(str))
         set_string(str, "");

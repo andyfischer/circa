@@ -45,7 +45,7 @@ void Block__input(caStack* stack)
 void Block__inputs(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     set_list(output, 0);
     for (int i=0;; i++) {
         Term* term = get_input_placeholder(block, i);
@@ -74,7 +74,7 @@ void Block__output_placeholder(caStack* stack)
 void Block__outputs(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     set_list(output, 0);
     for (int i=0;; i++) {
         Term* term = get_output_placeholder(block, i);
@@ -112,7 +112,7 @@ void Block__property(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "null block");
 
-    caValue* value = block_get_property(block, as_symbol(circa_input(stack, 1)));
+    Value* value = block_get_property(block, as_symbol(circa_input(stack, 1)));
 
     if (value == NULL)
         set_null(circa_output(stack, 0));
@@ -135,7 +135,7 @@ void Block__source_filename(caStack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     while (block != NULL) {
-        caValue* filename = block_get_source_filename(block);
+        Value* filename = block_get_source_filename(block);
 
         if (filename != NULL) {
             copy(filename, circa_output(stack, 0));
@@ -177,7 +177,7 @@ void Block__get_static_errors_formatted(caStack* stack)
         return;
     }
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     set_list(out, circa_count(errors));
     for (int i=0; i < circa_count(out); i++)
         format_static_error(circa_index(errors, i), circa_index(out, i));
@@ -191,7 +191,7 @@ void Block__term_named(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    caValue* name = circa_input(stack, 1);
+    Value* name = circa_input(stack, 1);
 
     set_term_ref(circa_output(stack, 0), find_local_name(block, name));
 }
@@ -202,7 +202,7 @@ void Block__terms(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     set_list(out, block->length());
 
     for (int i=0; i < block->length(); i++)
@@ -215,7 +215,7 @@ void Block__walk_terms(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     set_list(out, 0);
     for (BlockIterator it(block); it; ++it)
         set_term_ref(list_append(out), *it);
@@ -250,7 +250,7 @@ void Block__list_configs(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
@@ -265,7 +265,7 @@ void Block__functions(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     set_list(output, 0);
 
     for (BlockIteratorFlat it(block); it.unfinished(); it.advance()) {
@@ -293,7 +293,7 @@ void Block__statements(caStack* stack)
     if (block == NULL)
         return circa_output_error(stack, "NULL block");
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
 
     circa_set_list(out, 0);
 
@@ -356,7 +356,7 @@ void Term__assign(caStack* stack)
         return;
     }
 
-    caValue* source = circa_input(stack, 1);
+    Value* source = circa_input(stack, 1);
 
     circa::copy(source, term_value(target));
 
@@ -393,7 +393,7 @@ void Term__tweak(caStack* stack)
 
     int steps = tweak_round(to_float(circa_input(stack, 1)));
 
-    caValue* val = term_value(t);
+    Value* val = term_value(t);
 
     if (steps == 0)
         return;
@@ -468,7 +468,7 @@ void Term__inputs(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     circa_set_list(output, t->numInputs());
 
     for (int i=0; i < t->numInputs(); i++)
@@ -528,7 +528,7 @@ void Term__source_location(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    caValue* out = circa_set_default_output(stack, 0);
+    Value* out = circa_set_default_output(stack, 0);
     touch(out);
     set_int(list_get(out, 0), t->sourceLoc.col);
     set_int(list_get(out, 1), t->sourceLoc.line);
@@ -564,7 +564,7 @@ void Term__has_property(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     Symbol key = as_symbol(circa_input(stack, 1));
-    caValue* value = term_get_property(t, key);
+    Value* value = term_get_property(t, key);
     set_bool(circa_output(stack, 0), value != NULL);
 }
 void Term__property(caStack* stack)
@@ -574,7 +574,7 @@ void Term__property(caStack* stack)
         return circa_output_error(stack, "NULL reference");
 
     Symbol key = as_symbol(circa_input(stack, 1));
-    caValue* value = term_get_property(t, key);
+    Value* value = term_get_property(t, key);
 
     if (value == NULL)
         set_null(circa_output(stack, 0));
@@ -589,8 +589,8 @@ void Term__property_opt(caStack* stack)
         return circa_output_error(stack, "NULL reference");
 
     Symbol key = as_symbol(circa_input(stack, 1));
-    caValue* value = term_get_property(t, key);
-    caValue* defaultValue = circa_input(stack, 2);
+    Value* value = term_get_property(t, key);
+    Value* defaultValue = circa_input(stack, 2);
 
     if (value == NULL)
         copy(defaultValue, circa_output(stack, 0));
@@ -606,8 +606,8 @@ void Term__input_property_opt(caStack* stack)
 
     int index = as_int(circa_input(stack, 1));
     Symbol key = as_symbol(circa_input(stack, 2));
-    caValue* value = term_get_input_property(t, index, key);
-    caValue* defaultValue = circa_input(stack, 3);
+    Value* value = term_get_input_property(t, index, key);
+    Value* defaultValue = circa_input(stack, 3);
 
     if (value == NULL)
         copy(defaultValue, circa_output(stack, 0));
@@ -623,8 +623,8 @@ void Term__input_property(caStack* stack)
 
     int index = as_int(circa_input(stack, 1));
     Symbol key = as_symbol(circa_input(stack, 2));
-    caValue* value = term_get_input_property(t, index, key);
-    caValue* defaultValue = circa_input(stack, 3);
+    Value* value = term_get_input_property(t, index, key);
+    Value* defaultValue = circa_input(stack, 3);
 
     if (value == NULL)
         copy(defaultValue, circa_output(stack, 0));
@@ -649,7 +649,7 @@ void Term__trace_dependents(caStack* stack)
     Term* term = as_term_ref(circa_input(stack, 0));
     Block* untilBlock = as_block(circa_input(stack, 1));
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     set_list(out, 0);
     std::set<Term*> included;
 

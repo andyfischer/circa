@@ -74,7 +74,7 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
             writer.write(str(' = circa_float(circa_input(stack, ' index '))'))
             writer.writeln(';')
         else
-            writer.write('caValue* ')
+            writer.write('Value* ')
             writer.write(name)
             writer.write(str(' = circa_input(stack, ' index ')'))
             writer.writeln(';')
@@ -96,7 +96,7 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         else
             name = str('output_' index)
 
-        writer.write('caValue* ')
+        writer.write('Value* ')
         writer.write(name)
         writer.write(str(' = circa_output(stack, ' index ')'))
         writer.writeln(';')

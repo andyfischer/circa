@@ -134,9 +134,9 @@ struct BuiltinTypes {
     Type* void_type;
 };
 
-extern caValue* str_evaluationEmpty;
-extern caValue* str_hasEffects;
-extern caValue* str_origin;
+extern Value* str_evaluationEmpty;
+extern Value* str_hasEffects;
+extern Value* str_origin;
 
 extern BuiltinFuncs FUNCS;
 extern BuiltinTypes TYPES;
@@ -160,14 +160,14 @@ namespace return_function {
 
 // Interact with special debugging functions test_spy() and test_oracle()
 void test_spy_clear();
-caValue* test_spy_get_results();
+Value* test_spy_get_results();
 void test_oracle_clear();
-caValue* test_oracle_append();
-void test_oracle_send(caValue* value);
+Value* test_oracle_append();
+void test_oracle_send(Value* value);
 void test_oracle_send(int i);
 
 void install_standard_library(Block* kernel);
-void on_new_function_parsed(Term* func, caValue* functionName);
+void on_new_function_parsed(Term* func, Value* functionName);
 
 // find_builtin_module is defined in generated/stdlib_script_text.cpp
 const char* find_builtin_module(const char* name);

@@ -103,7 +103,7 @@ void world_clear_file_sources(World* world)
     set_list(&world->fileSources, 0);
 }
 
-caValue* world_append_file_source(World* world)
+Value* world_append_file_source(World* world)
 {
     return list_append(&world->fileSources);
 }
@@ -124,7 +124,7 @@ void circa_use_local_filesystem(caWorld* world, const char* rootDir)
     file_source_create_using_filesystem(world_append_file_source(world), rootDir);
 }
 
-void circa_use_tarball_filesystem(caWorld* world, caValue* tarball)
+void circa_use_tarball_filesystem(caWorld* world, Value* tarball)
 {
     world_clear_file_sources(world);
     file_source_create_from_tarball(world_append_file_source(world), tarball);

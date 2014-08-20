@@ -73,7 +73,7 @@ void test_apply_spec()
     Value spec;
     set_list(&spec, 6);
     set_term_ref(list_get(&spec, 0), FUNCS.mult);
-    caValue* inputs = list_get(&spec, 1);
+    Value* inputs = list_get(&spec, 1);
     set_list(inputs, 2);
     set_term_ref(list_get(inputs, 0), a);
     set_term_ref(list_get(inputs, 1), a);

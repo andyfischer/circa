@@ -205,7 +205,7 @@ Value* get_native_func_name(World* world, NativeFuncIndex index)
     return &world->funcTable[index].name;
 }
 
-void native_patch_add_platform_specific_suffix(caValue* filename)
+void native_patch_add_platform_specific_suffix(Value* filename)
 {
     // Future: Windows support.
     string_append(filename, ".so");

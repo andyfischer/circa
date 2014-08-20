@@ -26,12 +26,12 @@ Type* migrate_type(Type* type, Migration* migration);
 // Migrate (possibly modify) all code references inside the stack.
 void migrate_stack(Stack* stack, Migration* migration);
 
-void migrate_retained_frame(caValue* retainedFrame, Migration* migration);
+void migrate_retained_frame(Value* retainedFrame, Migration* migration);
 
-void migrate_list_value(caValue* value, Migration* migration);
+void migrate_list_value(Value* value, Migration* migration);
 
 // Migrate (possibly modify) all code references inside the value.
-void migrate_value(caValue* value, Migration* migration);
+void migrate_value(Value* value, Migration* migration);
 
 // Migrate (possibly modify) all code references inside every module and every root stack
 // in the world.
@@ -42,6 +42,6 @@ Term* migrate_term_pointer(Term* term, Block* oldBlock, Block* newBlock);
 Type* migrate_type(Type* type, Block* oldBlock, Block* newBlock);
 void migrate_block(Block* block, Block* oldBlock, Block* newBlock);
 void migrate_stack(Stack* stack, Block* oldBlock, Block* newBlock);
-void migrate_value(caValue* value, Block* oldBlock, Block* newBlock);
+void migrate_value(Value* value, Block* oldBlock, Block* newBlock);
 
 } // namespace circa

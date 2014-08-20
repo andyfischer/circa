@@ -32,9 +32,9 @@ struct Hashtable {
     // after buckets is Slot[capacity]
 };
 
-int hashtable_insert(Hashtable** dataPtr, caValue* key, bool moveKey);
-int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash);
-caValue* hashtable_get(Hashtable* table, caValue* key);
+int hashtable_insert(Hashtable** dataPtr, Value* key, bool moveKey);
+int hashtable_find_key_index(Hashtable* table, Value* key, u32 keyHash);
+Value* hashtable_get(Hashtable* table, Value* key);
 
 // How many slots to create for a brand new table.
 const int INITIAL_SIZE = 8;
@@ -166,7 +166,7 @@ void hashtable_copy(Value* sourceVal, Value* destVal)
     destVal->value_data.ptr = source;
 }
 
-void hashtable_touch(caValue* value)
+void hashtable_touch(Value* value)
 {
     Hashtable* table = (Hashtable*) value->value_data.ptr;
     if (table == NULL || table->mut || table->refCount == 1)
@@ -177,13 +177,13 @@ void hashtable_touch(caValue* value)
     value->value_data.ptr = copy;
 }
 
-bool hashtable_touch_is_necessary(caValue* value)
+bool hashtable_touch_is_necessary(Value* value)
 {
     Hashtable* table = (Hashtable*) value->value_data.ptr;
     return !(table == NULL || table->mut || table->refCount == 1);
 }
 
-int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash)
+int hashtable_find_key_index(Hashtable* table, Value* key, u32 keyHash)
 {
     if (table == NULL)
         return -1;
@@ -209,7 +209,7 @@ int hashtable_find_key_index(Hashtable* table, caValue* key, u32 keyHash)
 // Insert the given key into the dictionary, returns the index.
 // This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int hashtable_insert(Hashtable** dataPtr, caValue* key, bool moveKey)
+int hashtable_insert(Hashtable** dataPtr, Value* key, bool moveKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
@@ -255,14 +255,14 @@ int hashtable_insert(Hashtable** dataPtr, caValue* key, bool moveKey)
     return newSlotIndex;
 }
 
-void insert_value(Hashtable** dataPtr, caValue* key, caValue* value)
+void insert_value(Hashtable** dataPtr, Value* key, Value* value)
 {
     int index = hashtable_insert(dataPtr, key, false);
     Slot* slot = get_slot(*dataPtr, index);
     copy(value, &slot->value);
 }
 
-caValue* hashtable_get(Hashtable* table, caValue* key)
+Value* hashtable_get(Hashtable* table, Value* key)
 {
     int index = hashtable_find_key_index(table, key, get_hash_value(key));
     if (index == -1)
@@ -271,7 +271,7 @@ caValue* hashtable_get(Hashtable* table, caValue* key)
     return &slot->value;
 }
 
-caValue* get_index(Hashtable* data, int index)
+Value* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);
     Slot* slot = get_slot(data, index);
@@ -306,7 +306,7 @@ void move_slot(Hashtable* table, int fromIndex, int toIndex)
     }
 }
 
-void remove(Hashtable* table, caValue* key)
+void remove(Hashtable* table, Value* key)
 {
     if (table == NULL)
         return;
@@ -369,7 +369,7 @@ void clear(Hashtable* table)
     table->count = 0;
 }
 
-static void hashtable_to_string(caValue* table, caValue* out)
+static void hashtable_to_string(Value* table, Value* out)
 {
     if (table == NULL || hashtable_count(table) == 0) {
         string_append(out, "{}");
@@ -386,9 +386,9 @@ static void hashtable_to_string(caValue* table, caValue* out)
         if (i > 0)
             string_append(out, ", ");
 
-        caValue* key = list_get(&keys, i);
+        Value* key = list_get(&keys, i);
 
-        caValue* value = hashtable_get(table, key);
+        Value* value = hashtable_get(table, key);
 
         if (is_string(key)) {
             string_append(out, as_string(key).c_str());
@@ -410,11 +410,11 @@ static void hashtable_to_string(caValue* table, caValue* out)
 
 namespace tagged_value_wrappers {
 
-    void initialize(Type* type, caValue* value)
+    void initialize(Type* type, Value* value)
     {
         value->value_data.ptr = NULL;
     }
-    void release(caValue* value)
+    void release(Value* value)
     {
         Hashtable* table = (Hashtable*) value->value_data.ptr;
         if (table == NULL)
@@ -424,7 +424,7 @@ namespace tagged_value_wrappers {
     }
 } // namespace tagged_value_wrappers
 
-void set_mutable_hashtable(caValue* value)
+void set_mutable_hashtable(Value* value)
 {
     make_no_initialize(TYPES.map, value);
     Hashtable* table = create_table();
@@ -432,20 +432,20 @@ void set_mutable_hashtable(caValue* value)
     value->value_data.ptr = table;
 }
 
-caValue* hashtable_get(caValue* table, caValue* key)
+Value* hashtable_get(Value* table, Value* key)
 {
     ca_assert(table->value_type->storageType == sym_StorageTypeHashtable);
     return hashtable_get((Hashtable*) table->value_data.ptr, key);
 }
 
-caValue* hashtable_get(caValue* table, const char* keystr)
+Value* hashtable_get(Value* table, const char* keystr)
 {
     Value str;
     set_string(&str, keystr);
     return hashtable_get(table, &str);
 }
 
-caValue* hashtable_insert(caValue* tableTv, caValue* key, bool moveKey)
+Value* hashtable_insert(Value* tableTv, Value* key, bool moveKey)
 {
     ca_assert(is_hashtable(tableTv));
     hashtable_touch(tableTv);
@@ -455,12 +455,12 @@ caValue* hashtable_insert(caValue* tableTv, caValue* key, bool moveKey)
     return &get_slot(table, index)->value;
 }
 
-caValue* hashtable_insert(caValue* table, caValue* key)
+Value* hashtable_insert(Value* table, Value* key)
 {
     return hashtable_insert(table, key, false);
 }
 
-caValue* hashtable_get_int_key(caValue* table, int key)
+Value* hashtable_get_int_key(Value* table, int key)
 {
     // Future: Optimize by not creating a Value.
     Value boxedKey;
@@ -468,42 +468,42 @@ caValue* hashtable_get_int_key(caValue* table, int key)
     return hashtable_get(table, &boxedKey);
 }
 
-caValue* hashtable_insert_int_key(caValue* table, int key)
+Value* hashtable_insert_int_key(Value* table, int key)
 {
     Value boxedKey;
     set_int(&boxedKey, key);
     return hashtable_insert(table, &boxedKey);
 }
 
-caValue* hashtable_get_symbol_key(caValue* table, Symbol key)
+Value* hashtable_get_symbol_key(Value* table, Symbol key)
 {
     Value boxedKey;
     set_symbol(&boxedKey, key);
     return hashtable_get(table, &boxedKey);
 }
 
-caValue* hashtable_insert_symbol_key(caValue* table, Symbol key)
+Value* hashtable_insert_symbol_key(Value* table, Symbol key)
 {
     Value boxedKey;
     set_symbol(&boxedKey, key);
     return hashtable_insert(table, &boxedKey);
 }
 
-void hashtable_remove_symbol_key(caValue* table, Symbol key)
+void hashtable_remove_symbol_key(Value* table, Symbol key)
 {
     Value boxedKey;
     set_symbol(&boxedKey, key);
     hashtable_remove(table, &boxedKey);
 }
 
-void hashtable_remove_int_key(caValue* table, int key)
+void hashtable_remove_int_key(Value* table, int key)
 {
     Value boxedKey;
     set_int(&boxedKey, key);
     hashtable_remove(table, &boxedKey);
 }
 
-void hashtable_remove(caValue* tableTv, caValue* key)
+void hashtable_remove(Value* tableTv, Value* key)
 {
     ca_assert(is_hashtable(tableTv));
     hashtable_touch(tableTv);
@@ -511,14 +511,14 @@ void hashtable_remove(caValue* tableTv, caValue* key)
     remove(table, key);
 }
 
-bool hashtable_is_empty(caValue* value)
+bool hashtable_is_empty(Value* value)
 {
     ca_assert(is_hashtable(value));
     Hashtable* table = (Hashtable*) value->value_data.ptr;
     return is_empty(table);
 }
 
-void hashtable_get_keys(caValue* tableVal, caValue* keysOut)
+void hashtable_get_keys(Value* tableVal, Value* keysOut)
 {
     set_list(keysOut);
 
@@ -533,7 +533,7 @@ void hashtable_get_keys(caValue* tableVal, caValue* keysOut)
     }
 }
 
-int hashtable_count(caValue* tableVal)
+int hashtable_count(Value* tableVal)
 {
     ca_assert(is_hashtable(tableVal));
     Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
@@ -542,27 +542,27 @@ int hashtable_count(caValue* tableVal)
     return table->count;
 }
 
-int hashtable_slot_count(caValue* tableVal)
+int hashtable_slot_count(Value* tableVal)
 {
     ca_assert(is_hashtable(tableVal));
     if (hashtable_is_empty(tableVal))
         return 0;
     return ((Hashtable*) tableVal->value_data.ptr)->capacity;
 }
-caValue* hashtable_key_by_index(caValue* tableVal, int index)
+Value* hashtable_key_by_index(Value* tableVal, int index)
 {
     ca_assert(is_hashtable(tableVal));
     Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
     return &get_slot(table, index)->key;
 }
-caValue* hashtable_value_by_index(caValue* tableVal, int index)
+Value* hashtable_value_by_index(Value* tableVal, int index)
 {
     ca_assert(is_hashtable(tableVal));
     Hashtable* table = (Hashtable*) tableVal->value_data.ptr;
     return &get_slot(table, index)->value;
 }
 
-bool hashtable_equals(caValue* left, caValue* right)
+bool hashtable_equals(Value* left, Value* right)
 {
     if (!is_hashtable(right))
         return false;
@@ -576,7 +576,7 @@ bool hashtable_equals(caValue* left, caValue* right)
 
     for (int i=0; i < leftTable->count; i++) {
         Slot* leftSlot = get_slot(leftTable, i);
-        caValue* rightValue = hashtable_get(right, &leftSlot->key);
+        Value* rightValue = hashtable_get(right, &leftSlot->key);
         if (rightValue == NULL)
             return false;
         if (!equals(&leftSlot->value, rightValue))
@@ -594,7 +594,7 @@ u32 circular_shift(u32 value, int shift)
         return (value << shift) | (value >> (32 - shift));
 }
 
-int hashtable_hash(caValue* value)
+int hashtable_hash(Value* value)
 {
     int hash = 0;
     Hashtable* table = (Hashtable*) value->value_data.ptr;
@@ -622,18 +622,18 @@ void hashtable_setup_type(Type* type)
     type->storageType = sym_StorageTypeHashtable;
 }
 
-HashtableIterator::HashtableIterator(caValue* _table)
+HashtableIterator::HashtableIterator(Value* _table)
   : table(_table), index(0)
 {
     _advanceWhileInvalid();
 }
 
-caValue* HashtableIterator::currentKey()
+Value* HashtableIterator::currentKey()
 {
     return hashtable_key_by_index(table, index);
 }
 
-caValue* HashtableIterator::current()
+Value* HashtableIterator::current()
 {
     return hashtable_value_by_index(table, index);
 }
@@ -653,29 +653,29 @@ void HashtableIterator::_advanceWhileInvalid()
 {
 }
 
-CIRCA_EXPORT caValue* circa_map_insert(caValue* map, caValue* key)
+CIRCA_EXPORT Value* circa_map_insert(Value* map, Value* key)
 {
     return hashtable_insert(map, key, false);
 }
 
-CIRCA_EXPORT caValue* circa_map_get(caValue* map, caValue* key)
+CIRCA_EXPORT Value* circa_map_get(Value* map, Value* key)
 {
     return hashtable_get(map, key);
 }
 
-CIRCA_EXPORT caValue* circa_map_insert_move(caValue* map, caValue* key)
+CIRCA_EXPORT Value* circa_map_insert_move(Value* map, Value* key)
 {
     return hashtable_insert(map, key, true);
 }
 
-CIRCA_EXPORT void circa_map_set_int(caValue* map, caValue* key, int val)
+CIRCA_EXPORT void circa_map_set_int(Value* map, Value* key, int val)
 {
     Value wrapped;
     set_int(&wrapped, val);
     move(&wrapped, circa_map_insert(map, key));
 }
 
-CIRCA_EXPORT void circa_set_map(caValue* value)
+CIRCA_EXPORT void circa_set_map(Value* value)
 {
     set_hashtable(value);
 }

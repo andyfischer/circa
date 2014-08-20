@@ -273,7 +273,7 @@ Block* stack_top_block(Stack* stack)
     return frame_block(frame);
 }
 
-caValue* stack_state(Stack* stack)
+Value* stack_state(Stack* stack)
 {
     return &stack->state;
 }
@@ -283,17 +283,17 @@ bool stack_errored(Stack* stack)
     return stack->errorOccurred;
 }
 
-caValue* stack_env_insert(Stack* stack, caValue* name)
+Value* stack_env_insert(Stack* stack, Value* name)
 {
     return hashtable_insert(&stack->env, name);
 }
 
-caValue* stack_env_get(Stack* stack, caValue* name)
+Value* stack_env_get(Stack* stack, Value* name)
 {
     return hashtable_get(&stack->env, name);
 }
 
-void stack_extract_current_path(Stack* stack, caValue* path, Frame* untilFrame)
+void stack_extract_current_path(Stack* stack, Value* path, Frame* untilFrame)
 {
     set_list(path);
 
@@ -350,7 +350,7 @@ Stack* stack_duplicate(Stack* stack)
     return dupe;
 }
 
-caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex)
+Value* stack_active_value_for_block_index(Frame* frame, int blockIndex, int termIndex)
 {
     Stack* stack = frame->stack;
 
@@ -372,14 +372,14 @@ caValue* stack_active_value_for_block_index(Frame* frame, int blockIndex, int te
     Block* block = program_block(stack->program, blockIndex);
     Term* term = block->get(termIndex);
 
-    caValue* demandValue = stack_demand_value_get(stack, term);
+    Value* demandValue = stack_demand_value_get(stack, term);
     if (demandValue != NULL)
         return demandValue;
 
     return NULL;
 }
 
-caValue* stack_active_value_for_term(Frame* frame, Term* term)
+Value* stack_active_value_for_term(Frame* frame, Term* term)
 {
     int blockIndex = program_find_block_index(frame->stack->program, term->owningBlock);
     if (blockIndex == -1)
@@ -448,24 +448,24 @@ CompiledBlock* frame_compiled_block(Frame* frame)
     return compiled_block(frame->stack->program, frame->blockIndex);
 }
 
-caValue* stack_register(Stack* stack, int index)
+Value* stack_register(Stack* stack, int index)
 {
     ca_assert(index < stack->registerCount);
     return &stack->registers[index];
 }
 
-caValue* frame_register(Frame* frame, int index)
+Value* frame_register(Frame* frame, int index)
 {
     ca_assert(index >= 0 && index < frame->registerCount);
     return stack_register(frame->stack, frame->firstRegisterIndex + index);
 }
 
-caValue* frame_register(Frame* frame, Term* term)
+Value* frame_register(Frame* frame, Term* term)
 {
     return frame_register(frame, term->index);
 }
 
-caValue* frame_register_from_end(Frame* frame, int index)
+Value* frame_register_from_end(Frame* frame, int index)
 {
     return frame_register(frame, frame->registerCount - 1 - index);
 }
@@ -475,7 +475,7 @@ int frame_register_count(Frame* frame)
     return frame->registerCount;
 }
 
-void frame_registers_to_list(Frame* frame, caValue* list)
+void frame_registers_to_list(Frame* frame, Value* list)
 {
     set_list(list, frame_register_count(frame));
     for (int i=0; i < frame_register_count(frame); i++)
@@ -540,7 +540,7 @@ void stack_derive_hackset(Stack* stack, Value* hackset)
 {
     set_list(hackset);
 
-    caValue* hacks = hashtable_get_symbol_key(&stack->env, sym__hacks);
+    Value* hacks = hashtable_get_symbol_key(&stack->env, sym__hacks);
 
     if (hacks == NULL)
         return;
@@ -549,14 +549,14 @@ void stack_derive_hackset(Stack* stack, Value* hackset)
     copy(hacks, hackset);
 }
 
-caValue* stack_demand_value_insert(Stack* stack, Term* term)
+Value* stack_demand_value_insert(Stack* stack, Term* term)
 {
     Value key;
     set_term_ref(&key, term);
     return hashtable_insert(&stack->demandValues, &key);
 }
 
-caValue* stack_demand_value_get(Stack* stack, Term* term)
+Value* stack_demand_value_get(Stack* stack, Term* term)
 {
     Value key;
     set_term_ref(&key, term);
@@ -739,17 +739,17 @@ void stack_trace_to_string(Stack* stack, Value* out)
     string_append(out, "\n");
 }
 
-Stack* frame_ref_get_stack(caValue* value)
+Stack* frame_ref_get_stack(Value* value)
 {
     return as_stack(list_get(value, 0));
 }
 
-int frame_ref_get_index(caValue* value)
+int frame_ref_get_index(Value* value)
 {
     return as_int(list_get(value, 1));
 }
 
-Frame* as_frame_ref(caValue* value)
+Frame* as_frame_ref(Value* value)
 {
     ca_assert(value->value_type == TYPES.frame);
 
@@ -761,12 +761,12 @@ Frame* as_frame_ref(caValue* value)
     return next_frame_n(first_frame(stack), index);
 }
 
-bool is_frame_ref(caValue* value)
+bool is_frame_ref(Value* value)
 {
     return value->value_type == TYPES.frame;
 }
 
-void set_frame_ref(caValue* value, Frame* frame)
+void set_frame_ref(Value* value, Frame* frame)
 {
     set_list(value, 2);
     set_stack(list_get(value, 0), frame->stack);
@@ -787,7 +787,7 @@ void frame_copy(Frame* left, Frame* right)
     right->pc = left->pc;
 }
 
-void stack_value_copy(caValue* source, caValue* dest)
+void stack_value_copy(Value* source, Value* dest)
 {
     Stack* stack = (Stack*) source->value_data.ptr;
     if (stack != NULL)
@@ -796,7 +796,7 @@ void stack_value_copy(caValue* source, caValue* dest)
     dest->value_data.ptr = stack;
 }
 
-void stack_value_release(caValue* value)
+void stack_value_release(Value* value)
 {
     Stack* stack = (Stack*) value->value_data.ptr;
     stack_decref(stack);
@@ -849,7 +849,7 @@ void Stack__find_active_value(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_active_value_for_term(top_frame(self), term);
+    Value* value = stack_active_value_for_term(top_frame(self), term);
 
     if (value == NULL)
         set_null(circa_output(stack, 0));
@@ -891,7 +891,7 @@ void Stack__id(caStack* stack)
 void Stack__init(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    caValue* closure = circa_input(stack, 1);
+    Value* closure = circa_input(stack, 1);
     stack_init_with_closure(self, closure);
 }
 
@@ -900,7 +900,7 @@ void Stack__env(caStack* stack)
     Stack* self = as_stack(circa_input(stack, 0));
     Value* name = circa_input(stack, 1);
 
-    caValue* value = hashtable_get(&self->env, name);
+    Value* value = hashtable_get(&self->env, name);
     if (value == NULL)
         set_null(circa_output(stack, 0));
     else
@@ -916,8 +916,8 @@ void Stack__env_map(caStack* stack)
 void Stack__set_env(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    caValue* name = circa_input(stack, 1);
-    caValue* val = circa_input(stack, 2);
+    Value* name = circa_input(stack, 1);
+    Value* val = circa_input(stack, 2);
 
     copy(val, stack_env_insert(self, name));
 }
@@ -925,7 +925,7 @@ void Stack__set_env(caStack* stack)
 void Stack__set_env_map(caStack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
-    caValue* map = circa_input(stack, 1);
+    Value* map = circa_input(stack, 1);
     copy(map, &self->env);
 }
 
@@ -963,7 +963,7 @@ void Stack__call(caStack* stack)
     stack_restart(self);
 
     // Populate inputs.
-    caValue* inputs = circa_input(stack, 1);
+    Value* inputs = circa_input(stack, 1);
     for (int i=0; i < list_length(inputs); i++)
         copy(list_get(inputs, i), circa_input(self, i));
 
@@ -971,7 +971,7 @@ void Stack__call(caStack* stack)
 
     self->caller = NULL;
 
-    caValue* output = circa_output(self, 0);
+    Value* output = circa_output(self, 0);
     if (output != NULL)
         copy(output, circa_output(stack, 0));
     else
@@ -990,7 +990,7 @@ void Stack__stack_push(caStack* stack)
 #if 0
     Stack* self = as_stack(circa_input(stack, 0));
     Block* block = as_block(circa_input(stack, 1));
-    caValue* inputs = circa_input(stack, 2);
+    Value* inputs = circa_input(stack, 2);
 
     ca_assert(self != NULL);
 
@@ -1094,7 +1094,7 @@ void Stack__eval_on_demand(caStack* stack)
 
     vm_evaluate_module_on_demand(self, term, true);
     vm_run(self);
-    caValue* result = stack_active_value_for_term(top_frame(self), term);
+    Value* result = stack_active_value_for_term(top_frame(self), term);
 #endif
 
     self->caller = NULL;
@@ -1161,7 +1161,7 @@ void Stack__error_message(caStack* stack)
         return;
     }
 
-    caValue* errorReg = frame_register(frame, frame->termIndex);
+    Value* errorReg = frame_register(frame, frame->termIndex);
 
     set_string(circa_output(stack, 0), "");
     string_append(circa_output(stack, 0), errorReg);
@@ -1180,7 +1180,7 @@ void Frame__registers(caStack* stack)
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
 
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     int count = frame_register_count(frame);
     set_list(out, count);
     for (int i=0; i < count; i++)
@@ -1191,7 +1191,7 @@ void Frame__active_value(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_find_nonlocal(frame, term);
+    Value* value = stack_find_nonlocal(frame, term);
     if (value == NULL)
         set_null(circa_output(stack, 0));
     else
@@ -1205,7 +1205,7 @@ void Frame__set_active_value(caStack* stack)
         return raise_error_msg(stack, "Bad frame reference");
 
     Term* term = as_term_ref(circa_input(stack, 1));
-    caValue* value = stack_find_nonlocal(frame, term);
+    Value* value = stack_find_nonlocal(frame, term);
     if (value == NULL)
         return raise_error_msg(stack, "Value not found");
 
@@ -1275,7 +1275,7 @@ void Frame__current_term(caStack* stack)
 void Frame__extract_state(caStack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
+    Value* output = circa_output(stack, 0);
     extract_state(frame_block(frame), &frame->state, output);
 }
 #endif

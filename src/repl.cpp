@@ -34,14 +34,14 @@ void repl_start(Stack* stack)
     stack_init(stack, block);
 }
 
-void repl_run_line(Stack* stack, caValue* line, caValue* output)
+void repl_run_line(Stack* stack, Value* line, Value* output)
 {
     Block* block = stack_top_block(stack);
     set_list(output, 0);
 
     Value sym_displayRaw;
     set_symbol_from_string(&sym_displayRaw, "displayRaw");
-    caValue* displayRaw = hashtable_get(&stack->attrs, &sym_displayRaw);
+    Value* displayRaw = hashtable_get(&stack->attrs, &sym_displayRaw);
 
     if (string_equals(line, "exit") || string_equals(line, "/exit")) {
         pop_frame(stack);
@@ -152,7 +152,7 @@ CIRCA_EXPORT void circa_repl_start(caStack* stack)
     return repl_start(stack);
 }
 
-CIRCA_EXPORT void circa_repl_run_line(caStack* stack, caValue* input, caValue* output)
+CIRCA_EXPORT void circa_repl_run_line(caStack* stack, Value* input, Value* output)
 {
     return repl_run_line(stack, input, output);
 }

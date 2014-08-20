@@ -46,7 +46,7 @@ Block* find_module_for_require_statement(Term* term)
     if (term->input(0) == NULL)
         return NULL;
 
-    caValue* moduleName = term_value(term->input(0));
+    Value* moduleName = term_value(term->input(0));
 
     return find_module(term->owningBlock, moduleName);
 }
@@ -174,7 +174,7 @@ Term* run_name_search(NameSearch* params)
     return run_name_search(&parentSearch);
 }
 
-Term* find_name(Block* block, caValue* name, Symbol lookupType)
+Term* find_name(Block* block, Value* name, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
@@ -186,7 +186,7 @@ Term* find_name(Block* block, caValue* name, Symbol lookupType)
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name(Block* block, caValue* name, Symbol lookupType)
+Term* find_local_name(Block* block, Value* name, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
@@ -222,7 +222,7 @@ Term* find_local_name(Block* block, const char* nameStr, Symbol lookupType)
     return run_name_search(&nameSearch);
 }
 
-Term* find_local_name_at_position(Block* block, caValue* name, caValue* position)
+Term* find_local_name_at_position(Block* block, Value* name, Value* position)
 {
     NameSearch nameSearch;
     nameSearch.block = block;
@@ -246,7 +246,7 @@ Term* find_name_at(Term* term, const char* name)
     return run_name_search(&nameSearch);
 }
 
-Term* find_name_at(Term* term, caValue* name)
+Term* find_name_at(Term* term, Value* name)
 {
     NameSearch nameSearch;
     nameSearch.block = term->owningBlock;
@@ -428,7 +428,7 @@ std::string get_relative_name_at(Term* location, Term* term)
         return get_relative_name(location->owningBlock, term);
 }
 
-void get_relative_name_as_list(Term* term, Block* relativeTo, caValue* nameOutput)
+void get_relative_name_as_list(Term* term, Block* relativeTo, Value* nameOutput)
 {
     set_list(nameOutput, 0);
 
@@ -540,12 +540,12 @@ void update_unique_name(Term* term)
     }
 }
 
-caValue* unique_name(Term* term)
+Value* unique_name(Term* term)
 {
     return &term->uniqueName.name;
 }
 
-Term* find_from_unique_name(Block* block, caValue* name)
+Term* find_from_unique_name(Block* block, Value* name)
 {
     // O(n) search; this should be made more efficient.
 

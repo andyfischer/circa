@@ -81,30 +81,30 @@ void insert_nonlocal_terms(Block* block)
 void closure_block_evaluate(caStack* stack)
 {
     Term* term = circa_caller_term(stack);
-    caValue* closureOutput = circa_set_default_output(stack, 0);
+    Value* closureOutput = circa_set_default_output(stack, 0);
     Block* block = nested_contents(term);
     set_block(list_get(closureOutput, 0), block);
     closure_save_all_bindings(closureOutput, stack);
 }
 
-bool is_closure(caValue* value)
+bool is_closure(Value* value)
 {
     return value->value_type == TYPES.func;
 }
 
-caValue* closure_get_block(caValue* value)
+Value* closure_get_block(Value* value)
 {
     ca_assert(is_closure(value));
     return list_get(value, 0);
 }
 
-caValue* closure_get_bindings(caValue* value)
+Value* closure_get_bindings(Value* value)
 {
     ca_assert(is_closure(value));
     return list_get(value, 1);
 }
 
-void set_closure(caValue* value, Block* block, caValue* bindings)
+void set_closure(Value* value, Block* block, Value* bindings)
 {
     make(TYPES.func, value);
     touch(value);
@@ -113,17 +113,17 @@ void set_closure(caValue* value, Block* block, caValue* bindings)
         set_value(closure_get_bindings(value), bindings);
 }
 
-Block* func_block(caValue* value)
+Block* func_block(Value* value)
 {
     return as_block(list_get(value, 0));
 }
 
-caValue* func_bindings(caValue* value)
+Value* func_bindings(Value* value)
 {
     return list_get(value, 1);
 }
 
-void closure_save_bindings_for_frame(caValue* closure, Frame* frame)
+void closure_save_bindings_for_frame(Value* closure, Frame* frame)
 {
     Block* closureBlock = func_block(closure);
 
@@ -146,7 +146,7 @@ void closure_save_bindings_for_frame(caValue* closure, Frame* frame)
 
         Value key;
         set_term_ref(&key, input);
-        caValue* value = frame_register(frame, input);
+        Value* value = frame_register(frame, input);
 
         // Don't overwrite an existing binding.
         if (hashtable_get(func_bindings(closure), &key) != NULL)
@@ -157,7 +157,7 @@ void closure_save_bindings_for_frame(caValue* closure, Frame* frame)
     }
 }
 
-void closure_save_all_bindings(caValue* closure, Stack* stack)
+void closure_save_all_bindings(Value* closure, Stack* stack)
 {
     Block* closureBlock = func_block(closure);
 
@@ -173,7 +173,7 @@ void closure_save_all_bindings(caValue* closure, Stack* stack)
 
         Value key;
         set_term_ref(&key, input);
-        caValue* value = stack_find_nonlocal(top_frame(stack), input);
+        Value* value = stack_find_nonlocal(top_frame(stack), input);
 
         // Don't overwrite an existing binding.
         if (hashtable_get(func_bindings(closure), &key) != NULL)

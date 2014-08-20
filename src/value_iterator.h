@@ -10,15 +10,15 @@ namespace circa {
 struct ValueIterator
 {
     struct IteratorFrame {
-        caValue* value;
+        Value* value;
         int index;
 
-        IteratorFrame(caValue* v, int i) : value(v), index(i) {}
+        IteratorFrame(Value* v, int i) : value(v), index(i) {}
     };
 
     std::vector<IteratorFrame> _stack;
 
-    ValueIterator(caValue* value)
+    ValueIterator(Value* value)
     {
         if (is_list(value)) {
             _stack.push_back(IteratorFrame(value, 0));
@@ -30,14 +30,14 @@ struct ValueIterator
         return _stack.empty();
     }
     bool unfinished() { return !finished(); }
-    caValue* current()
+    Value* current()
     {
         IteratorFrame& frame = _stack.back();
         return list_get(_stack.back().value, frame.index);
     }
     void advance()
     {
-        caValue* c = current();
+        Value* c = current();
 
         if (is_list(c) && list_length(c) > 0) {
             _stack.push_back(IteratorFrame(c, 0));
@@ -69,7 +69,7 @@ struct ValueIterator
         }
     }
 
-    caValue* operator*() { return current(); }
+    Value* operator*() { return current(); }
     void operator++() { advance(); }
 };
 

@@ -2,7 +2,7 @@
 
 namespace circa {
 
-int shallow_hash_func(caValue* value);
+int shallow_hash_func(Value* value);
 
 void any_setup_type(Type* type);
 void bool_setup_type(Type* type);

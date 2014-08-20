@@ -96,18 +96,18 @@ struct Term
     // Shorthand for nested_contents()[name]
     Term* contents(const char* name);
 
-    void toString(caValue* out);
+    void toString(Value* out);
 
     bool hasProperty(Symbol key);
     void removeProperty(Symbol key);
-    caValue* getProp(Symbol key);
+    Value* getProp(Symbol key);
 
     int intProp(Symbol key, int defaultValue);
     float floatProp(Symbol key, float defaultValue);
     bool boolProp(Symbol key, bool defaultValue);
     std::string stringProp(Symbol key, const char* defaultValue);
 
-    void setProp(Symbol key, caValue* value);
+    void setProp(Symbol key, Value* value);
     void setIntProp(Symbol key, int i);
     void setFloatProp(Symbol key, float f);
     void setBoolProp(Symbol key, bool b);
@@ -131,13 +131,13 @@ int user_count(Term* term);
 bool is_located_after(Term* location, Term* term);
 
 // Fetches a term property, creating it if it doesn't exist.
-caValue* term_insert_property(Term* term, Symbol key);
+Value* term_insert_property(Term* term, Symbol key);
 
 // Fetches a term property.
-caValue* term_get_property(Term* term, Symbol key);
+Value* term_get_property(Term* term, Symbol key);
 
 // Assigns a property with the given name and value. The argument 'value' is consumed.
-void term_set_property(Term* term, Symbol key, caValue* value);
+void term_set_property(Term* term, Symbol key, Value* value);
 
 // Removes a term property.
 void term_remove_property(Term* term, Symbol key);
@@ -147,8 +147,8 @@ void term_remove_property(Term* term, Symbol key);
 void term_move_property(Term* source, Term* dest, Symbol key);
 
 // Fetches an input property.
-caValue* term_get_input_property(Term* term, int inputIndex, Symbol key);
-caValue* term_insert_input_property(Term* term, int inputIndex, Symbol key);
+Value* term_get_input_property(Term* term, int inputIndex, Symbol key);
+Value* term_insert_input_property(Term* term, int inputIndex, Symbol key);
 bool term_get_bool_input_prop(Term* term, int inputIndex, Symbol key, bool defaultValue);
 const char* term_get_string_input_prop(Term* term, int inputIndex, Symbol key,
     const char* defaultValue);
@@ -169,8 +169,8 @@ void set_input_hidden(Term* term, int inputIndex, bool hidden);
 // Mark the given term as hidden from source reproduction.
 void hide_from_source(Term* term);
 
-caValue* term_name(Term* term);
-caValue* term_value(Term* term);
+Value* term_name(Term* term);
+Value* term_value(Term* term);
 Block* term_function(Term* term);
 bool is_type(Term* term);
 bool is_function(Term* term);

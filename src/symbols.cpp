@@ -28,12 +28,12 @@ Symbol symbol_from_string(const char* str)
     Value strVal;
     set_string(&strVal, str);
 
-    caValue* foundRuntime = hashtable_get(g_runtimeSymbolMap, &strVal);
+    Value* foundRuntime = hashtable_get(g_runtimeSymbolMap, &strVal);
     if (foundRuntime != NULL)
         return as_symbol(foundRuntime);
 
     // Create a new runtime symbol.
-    caValue* newRuntime = hashtable_insert(g_runtimeSymbolMap, &strVal);
+    Value* newRuntime = hashtable_insert(g_runtimeSymbolMap, &strVal);
     int index = g_nextRuntimeSymbol++;
     set_int(newRuntime, index);
     list_resize(g_runtimeSymbolTable, index+1);
@@ -41,30 +41,30 @@ Symbol symbol_from_string(const char* str)
     return index;
 }
 
-void set_symbol_from_string(caValue* val, caValue* str)
+void set_symbol_from_string(Value* val, Value* str)
 {
     set_symbol(val, symbol_from_string(as_cstring(str)));
 }
 
-void set_symbol_from_string(caValue* val, const char* str)
+void set_symbol_from_string(Value* val, const char* str)
 {
     set_symbol(val, symbol_from_string(str));
 }
 
-const char* symbol_as_string(caValue* symbol)
+const char* symbol_as_string(Value* symbol)
 {
     const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));
     if (builtinName != NULL)
         return builtinName;
 
-    caValue* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
+    Value* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
     if (tableVal != NULL)
         return as_cstring(tableVal);
 
     return NULL;
 }
 
-void symbol_as_string(caValue* symbol, caValue* str)
+void symbol_as_string(Value* symbol, Value* str)
 {
     const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));
     if (builtinName != NULL) {
@@ -72,7 +72,7 @@ void symbol_as_string(caValue* symbol, caValue* str)
         return;
     }
 
-    caValue* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
+    Value* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
     if (tableVal != NULL) {
         ca_assert(is_string(tableVal));
         copy(tableVal, str);
@@ -82,18 +82,18 @@ void symbol_as_string(caValue* symbol, caValue* str)
     set_string(str, "");
 }
 
-static void symbol_to_source_string(caValue* value, caValue* out)
+static void symbol_to_source_string(Value* value, Value* out)
 {
     string_append(out, ":");
     string_append(out, symbol_as_string(value));
 }
 
-static int hash_func(caValue* value)
+static int hash_func(Value* value)
 {
     return as_symbol(value);
 }
 
-bool symbol_eq(caValue* val, Symbol s)
+bool symbol_eq(Value* val, Symbol s)
 {
     return is_symbol(val) && as_symbol(val) == s;
 }
@@ -125,12 +125,12 @@ void symbol_setup_type(Type* type)
     type->hashFunc = hash_func;
 }
 
-CIRCA_EXPORT const char* circa_symbol_text(caValue* symbol)
+CIRCA_EXPORT const char* circa_symbol_text(Value* symbol)
 {
     return symbol_as_string(symbol);
 }
 
-CIRCA_EXPORT bool circa_symbol_equals(caValue* symbol, const char* text)
+CIRCA_EXPORT bool circa_symbol_equals(Value* symbol, const char* text)
 {
     return strcmp(symbol_as_string(symbol), text) == 0;
 }

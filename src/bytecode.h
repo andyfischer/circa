@@ -142,12 +142,12 @@ struct Compiled
     Value constList;
 };
 
-void bytecode_to_string(caValue* bytecode, caValue* string);
+void bytecode_to_string(Value* bytecode, Value* string);
 int bytecode_op_to_term_index(const char* bc, u32 pc);
-void bytecode_op_to_string(const char* bc, u32* pc, caValue* string);
-void bytecode_to_string_lines(char* bytecode, caValue* lines);
+void bytecode_op_to_string(const char* bc, u32* pc, Value* string);
+void bytecode_to_string_lines(char* bytecode, Value* lines);
 void bytecode_dump_next_op(const char* bc, u32* pc);
-void bytecode_dump_val(caValue* bytecode);
+void bytecode_dump_val(Value* bytecode);
 void bytecode_dump(char* data);
 
 Compiled* alloc_program(World* world);
@@ -163,13 +163,13 @@ void program_generate_bytecode(Compiled* compiled, int blockIndex);
 int program_create_empty_entry(Compiled* compiled, Block* block);
 int program_create_entry(Compiled* compiled, Block* block);
 
-caValue* compiled_add_const(Compiled* compiled, int* index);
-caValue* compiled_const(Compiled* compiled, int index);
+Value* compiled_add_const(Compiled* compiled, int* index);
+Value* compiled_const(Compiled* compiled, int index);
 
 Value* compiled_get_watch_path(Compiled* compiled, int watchIndex);
 
-void program_add_watch(Compiled* compiled, caValue* key, caValue* path);
-void program_set_hackset(Compiled* compiled, caValue* hackset);
+void program_add_watch(Compiled* compiled, Value* key, Value* path);
+void program_set_hackset(Compiled* compiled, Value* hackset);
 void compiled_reset_trace_data(Compiled* compiled);
 void compiled_erase(Compiled* compiled);
 

@@ -30,7 +30,7 @@ void test_cast_first_inputs()
     Stack* stack = create_stack(test_world());
     stack_init(stack, nested_contents(f));
 
-    caValue* in = circa_input(stack, 0);
+    Value* in = circa_input(stack, 0);
     circa_set_list(in, 1);
     circa_set_int(circa_index(in, 0), 5);
 

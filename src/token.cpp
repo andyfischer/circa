@@ -746,7 +746,7 @@ void consume_symbol(TokenizeContext &context)
     context.consume(tok_ColonString, lookahead);
 }
 
-TokenStream::TokenStream(caValue* sourceText)
+TokenStream::TokenStream(Value* sourceText)
 {
     reset(sourceText);
 }
@@ -756,7 +756,7 @@ TokenStream::TokenStream(const char* sourceText)
     reset(sourceText);
 }
 
-void TokenStream::reset(caValue* inputString)
+void TokenStream::reset(Value* inputString)
 {
     _position = 0;
     tokens.clear();
@@ -785,7 +785,7 @@ TokenStream::next(int lookahead)
     return tokens[i];
 }
 
-void TokenStream::getNextStr(caValue* value, int lookahead)
+void TokenStream::getNextStr(Value* value, int lookahead)
 {
     int startPos = next(lookahead).start;
     int length = next(lookahead).length();
@@ -861,7 +861,7 @@ TokenStream::consumeStr(int match)
 }
 
 void
-TokenStream::consumeStr(caValue* output, int match)
+TokenStream::consumeStr(Value* output, int match)
 {
     if (!is_string(output))
         set_string(output, "");

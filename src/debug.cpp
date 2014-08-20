@@ -65,13 +65,13 @@ void dump(Term* term)
     std::cout << as_cstring(&str);
 }
 
-void dump(caValue& value)
+void dump(Value& value)
 {
     Value str;
     to_string(&value, &str);
     std::cout << as_cstring(&str) << std::endl;
 }
-void dump(caValue* value)
+void dump(Value* value)
 {
     Value str;
     to_string(value, &str);
@@ -128,13 +128,13 @@ CIRCA_EXPORT void circa_perf_stats_reset()
     for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++)
         PERF_STATS[i - c_firstStatIndex] = 0;
 }
-void perf_stats_to_list(caValue* list)
+void perf_stats_to_list(Value* list)
 {
     set_list(list, c_numPerfStats);
     for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++) {
         Symbol name = i;
         int64 value = PERF_STATS[i - c_firstStatIndex];
-        caValue* element = list_get(list, i - c_firstStatIndex);
+        Value* element = list_get(list, i - c_firstStatIndex);
         set_list(element, 2);
         set_symbol(list_get(element, 0), name);
         char buf[100];
@@ -143,7 +143,7 @@ void perf_stats_to_list(caValue* list)
     }
 }
 
-void perf_stats_to_map(caValue* map)
+void perf_stats_to_map(Value* map)
 {
     u64 frozenStats[c_numPerfStats];
 

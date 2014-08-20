@@ -121,7 +121,7 @@ Term::contents(const char* name)
 }
 
 void
-Term::toString(caValue* out)
+Term::toString(Value* out)
 {
     to_string(term_value(this), out);
 }
@@ -136,14 +136,14 @@ void Term::removeProperty(Symbol key)
     term_remove_property(this, key);
 }
 
-caValue* Term::getProp(Symbol key)
+Value* Term::getProp(Symbol key)
 {
     return term_get_property(this, key);
 }
 
 bool Term::boolProp(Symbol key, bool defaultValue)
 {
-    caValue* value = term_get_property(this, key);
+    Value* value = term_get_property(this, key);
     if (value == NULL)
         return defaultValue;
     else
@@ -152,7 +152,7 @@ bool Term::boolProp(Symbol key, bool defaultValue)
 
 float Term::floatProp(Symbol key, float defaultValue)
 {
-    caValue* value = term_get_property(this, key);
+    Value* value = term_get_property(this, key);
     if (value == NULL)
         return defaultValue;
     else
@@ -161,7 +161,7 @@ float Term::floatProp(Symbol key, float defaultValue)
 
 int Term::intProp(Symbol key, int defaultValue)
 {
-    caValue* value = term_get_property(this, key);
+    Value* value = term_get_property(this, key);
     if (value == NULL)
         return defaultValue;
     else
@@ -169,40 +169,40 @@ int Term::intProp(Symbol key, int defaultValue)
 }
 std::string Term::stringProp(Symbol key, const char* defaultValue)
 {
-    caValue* value = term_get_property(this, key);
+    Value* value = term_get_property(this, key);
     if (value == NULL)
         return defaultValue;
     else
         return as_string(value);
 }
 
-void Term::setProp(Symbol key, caValue* value)
+void Term::setProp(Symbol key, Value* value)
 {
-    caValue* t = term_insert_property(this, key);
+    Value* t = term_insert_property(this, key);
     copy(value, t);
 }
 
 void Term::setIntProp(Symbol key, int i)
 {
-    caValue* t = term_insert_property(this, key);
+    Value* t = term_insert_property(this, key);
     set_int(t, i);
 }
 
 void Term::setFloatProp(Symbol key, float f)
 {
-    caValue* t = term_insert_property(this, key);
+    Value* t = term_insert_property(this, key);
     set_float(t, f);
 }
 
 void Term::setBoolProp(Symbol key, bool b)
 {
-    caValue* t = term_insert_property(this, key);
+    Value* t = term_insert_property(this, key);
     set_bool(t, b);
 }
 
 void Term::setStringProp(Symbol key, std::string const& s)
 {
-    caValue* t = term_insert_property(this, key);
+    Value* t = term_insert_property(this, key);
     set_string(t, s);
 }
 
@@ -266,17 +266,17 @@ int real_user_count(Term* term)
     return count;
 }
 
-caValue* term_insert_property(Term* term, Symbol key)
+Value* term_insert_property(Term* term, Symbol key)
 {
     return hashtable_insert_symbol_key(&term->properties, key);
 }
 
-void term_set_property(Term* term, Symbol key, caValue* value)
+void term_set_property(Term* term, Symbol key, Value* value)
 {
     swap(value, term_insert_property(term, key));
 }
 
-caValue* term_get_property(Term* term, Symbol key)
+Value* term_get_property(Term* term, Symbol key)
 {
     return hashtable_get_symbol_key(&term->properties, key);
 }
@@ -288,7 +288,7 @@ void term_remove_property(Term* term, Symbol key)
 
 void term_move_property(Term* from, Term* to, Symbol key)
 {
-    caValue* existing = term_get_property(from, key);
+    Value* existing = term_get_property(from, key);
     if (existing == NULL)
         return;
 
@@ -296,21 +296,21 @@ void term_move_property(Term* from, Term* to, Symbol key)
     term_remove_property(from, key);
 }
 
-caValue* term_get_input_property(Term* term, int inputIndex, Symbol key)
+Value* term_get_input_property(Term* term, int inputIndex, Symbol key)
 {
     Term::Input* info = term->inputInfo(inputIndex);
     if (info == NULL)
         return NULL;
     return hashtable_get_symbol_key(&info->properties, key);
 }
-caValue* term_insert_input_property(Term* term, int inputIndex, Symbol key)
+Value* term_insert_input_property(Term* term, int inputIndex, Symbol key)
 {
     return hashtable_insert_symbol_key(&term->inputInfo(inputIndex)->properties, key);
 }
 
 bool term_get_bool_input_prop(Term* term, int inputIndex, Symbol key, bool defaultValue)
 {
-    caValue* value = term_get_input_property(term, inputIndex, key);
+    Value* value = term_get_input_property(term, inputIndex, key);
     if (value == NULL)
         return defaultValue;
     return as_bool(value);
@@ -318,7 +318,7 @@ bool term_get_bool_input_prop(Term* term, int inputIndex, Symbol key, bool defau
 
 const char* term_get_string_input_prop(Term* term, int inputIndex, Symbol key, const char* defaultValue)
 {
-    caValue* value = term_get_input_property(term, inputIndex, key);
+    Value* value = term_get_input_property(term, inputIndex, key);
     if (value == NULL)
         return defaultValue;
     return as_cstring(value);
@@ -350,7 +350,7 @@ void term_set_bool_prop(Term* term, Symbol prop, bool value)
 }
 bool is_input_implicit(Term* term, int index)
 {
-    caValue* val = term_get_input_property(term, index, sym_Implicit);
+    Value* val = term_get_input_property(term, index, sym_Implicit);
     if (val == NULL)
         return false;
     return as_bool(val);
@@ -361,7 +361,7 @@ void set_input_implicit(Term* term, int index, bool implicit)
 }
 bool is_input_hidden(Term* term, int index)
 {
-    caValue* val = term_get_input_property(term, index, sym_Hidden);
+    Value* val = term_get_input_property(term, index, sym_Hidden);
     if (val == NULL)
         return false;
     return as_bool(val);
@@ -377,12 +377,12 @@ void hide_from_source(Term* term)
     term->setBoolProp(sym_Hidden, true);
 }
 
-caValue* term_name(Term* term)
+Value* term_name(Term* term)
 {
     return &term->nameValue;
 }
 
-caValue* term_value(Term* term)
+Value* term_value(Term* term)
 {
     return &term->value;
 }

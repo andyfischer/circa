@@ -4,7 +4,7 @@
 
 namespace circa {
 
-void json_parse(const char* str, caValue* valueOut);
-void json_write(caValue* value, caValue* stringOut);
+void json_parse(const char* str, Value* valueOut);
+void json_write(Value* value, Value* stringOut);
 
 }

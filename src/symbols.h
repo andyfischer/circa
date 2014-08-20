@@ -5,13 +5,13 @@
 namespace circa {
 
 Symbol symbol_from_string(const char* str);
-void set_symbol_from_string(caValue* val, caValue* str);
-void set_symbol_from_string(caValue* val, const char* str);
+void set_symbol_from_string(Value* val, Value* str);
+void set_symbol_from_string(Value* val, const char* str);
 
-void symbol_as_string(caValue* symbol, caValue* str);
-const char* symbol_as_string(caValue* symbol);
+void symbol_as_string(Value* symbol, Value* str);
+const char* symbol_as_string(Value* symbol);
 
-bool symbol_eq(caValue* val, Symbol s);
+bool symbol_eq(Value* val, Symbol s);
 
 void symbol_initialize_global_table();
 void symbol_deinitialize_global_table();

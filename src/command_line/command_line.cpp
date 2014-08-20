@@ -40,7 +40,7 @@ namespace circa {
 
 void run_repl_stdin(World* world);
 
-bool circa_get_line(caValue* lineOut)
+bool circa_get_line(Value* lineOut)
 {
 #ifdef CIRCA_USE_LINENOISE
     char* input = linenoise("> ");
@@ -61,7 +61,7 @@ bool circa_get_line(caValue* lineOut)
     return true;
 }
 
-void read_stdin_line(caValue* line)
+void read_stdin_line(Value* line)
 {
     char* buf = NULL;
     size_t size = 0;
@@ -83,7 +83,7 @@ void read_stdin_line(caValue* line)
     free(buf);
 }
 
-void parse_string_as_argument_list(caValue* str, Value* output)
+void parse_string_as_argument_list(Value* str, Value* output)
 {
     // Read the tokens as a space-seperated list of strings.
     // TODO is to be more smart about word boundaries: spaces inside
@@ -120,12 +120,12 @@ void parse_string_as_argument_list(caValue* str, Value* output)
     }
 }
 
-void do_echo(Value* args, caValue* reply)
+void do_echo(Value* args, Value* reply)
 {
     to_string(args, reply);
 }
 
-void do_file_command(caWorld* world, Value* args, caValue* reply)
+void do_file_command(caWorld* world, Value* args, Value* reply)
 {
     RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
@@ -194,7 +194,7 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
     vm_run(stack);
 
     if (printState) {
-        caValue* state = stack_get_state(stack);
+        Value* state = stack_get_state(stack);
         if (state == NULL)
             std::cout << "state = null";
         else
@@ -212,7 +212,7 @@ void do_file_command(caWorld* world, Value* args, caValue* reply)
     free_stack(stack);
 }
 
-void rewrite_block(Block* block, caValue* contents, caValue* reply)
+void rewrite_block(Block* block, Value* contents, Value* reply)
 {
     clear_block(block);
     parser::compile(block, parser::statement_list, as_cstring(contents));
@@ -226,7 +226,7 @@ void rewrite_block(Block* block, caValue* contents, caValue* reply)
     }
 }
 
-void do_update_file(World* world, caValue* filename, caValue* contents, caValue* reply)
+void do_update_file(World* world, Value* filename, Value* contents, Value* reply)
 {
     Block* block = find_module_by_filename(world, filename);
 
@@ -238,7 +238,7 @@ void do_update_file(World* world, caValue* filename, caValue* contents, caValue*
     rewrite_block(block, contents, reply);
 }
 
-void do_admin_command(caWorld* world, caValue* input, caValue* reply)
+void do_admin_command(caWorld* world, Value* input, Value* reply)
 {
     // Identify the command
     int first_space = string_find_char(input, 0, ' ');
@@ -373,7 +373,7 @@ void print_usage()
         << std::endl;
 }
 
-int run_command_line(caWorld* world, caValue* args)
+int run_command_line(caWorld* world, Value* args)
 {
     RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
@@ -441,7 +441,7 @@ int run_command_line(caWorld* world, caValue* args)
         }
 
         if (string_equals(list_get(args, 0), "-load")) {
-            caValue* filename = list_get(args, 1);
+            Value* filename = list_get(args, 1);
 
             Value moduleName;
             module_get_default_name_from_filename(filename, &moduleName);
@@ -485,7 +485,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         // Push inputs
         for (int i=3, inputIndex = 0; i < circa_count(args); i++) {
-            caValue* val = circa_input(stack, inputIndex++);
+            Value* val = circa_input(stack, inputIndex++);
             parse_string_repr(list_get(args, i), val);
         }
 
@@ -496,7 +496,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         // Print outputs
         for (int i=0;; i++) {
-            caValue* out = circa_output(stack, i);
+            Value* out = circa_output(stack, i);
             if (out == NULL)
                 break;
 
@@ -513,7 +513,7 @@ int run_command_line(caWorld* world, caValue* args)
             return 1;
         }
 
-        caValue* filename = list_get(args, 1);
+        Value* filename = list_get(args, 1);
         Block* block = load_module_by_filename(world, filename);
         Stack* stack = create_stack(world);
         stack_init(stack, block);
@@ -597,7 +597,7 @@ int run_command_line(caWorld* world, caValue* args)
     circa_run(stack);
 
     if (printState) {
-        caValue* state = stack_get_state(stack);
+        Value* state = stack_get_state(stack);
         if (state == NULL)
             std::cout << "state = null";
         else

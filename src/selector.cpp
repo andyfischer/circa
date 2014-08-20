@@ -15,7 +15,7 @@
 
 namespace circa {
 
-caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* error)
+Value* selector_advance(Value* value, Value* selectorElement, Value* error)
 {
     if (is_int(selectorElement)) {
         int selectorIndex = as_int(selectorElement);
@@ -40,7 +40,7 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
         return get_index(value, selectorIndex);
 
     } else if (is_string(selectorElement)) {
-        caValue* field = get_field(value, selectorElement, NULL);
+        Value* field = get_field(value, selectorElement, NULL);
         if (field == NULL) {
             if (error != NULL) {
                 set_error_string(error, "Field not found: ");
@@ -58,7 +58,7 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
     }
 }
 
-Type* element_type_from_selector(Type* type, caValue* selectorElement)
+Type* element_type_from_selector(Type* type, Value* selectorElement)
 {
     if (!is_struct_type(type))
         return TYPES.any;
@@ -73,12 +73,12 @@ Type* element_type_from_selector(Type* type, caValue* selectorElement)
     return TYPES.any;
 }
 
-caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
+Value* get_with_selector(Value* root, Value* selector, Value* error)
 {
-    caValue* element = root;
+    Value* element = root;
 
     for (int i=0; i < list_length(selector); i++) {
-        caValue* selectorElement = list_get(selector, i);
+        Value* selectorElement = list_get(selector, i);
         element = selector_advance(element, selectorElement, error);
 
         if (element == NULL)
@@ -88,7 +88,7 @@ caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
     return element;
 }
 
-void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caValue* error)
+void set_with_selector(Value* value, Value* selector, Value* newValue, Value* error)
 {
     if (list_empty(selector)) {
         copy(newValue, value);
@@ -103,8 +103,8 @@ void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
             stat_increment(SetWithSelector_Touch_Hashtable);
 
         touch(value);
-        caValue* selectorElement = list_get(selector, selectorIndex);
-        caValue* element = selector_advance(value, selectorElement, error);
+        Value* selectorElement = list_get(selector, selectorIndex);
+        Value* element = selector_advance(value, selectorElement, error);
 
         if (element == NULL)
             return;
@@ -136,16 +136,16 @@ void set_with_selector(caValue* value, caValue* selector, caValue* newValue, caV
     return;
 }
 
-Value* path_touch_and_init_map(caValue* value, caValue* path)
+Value* path_touch_and_init_map(Value* value, Value* path)
 {
-    caValue* currentElement = value;
+    Value* currentElement = value;
     for (int i=0; i < list_length(path); i++) {
         touch(currentElement);
 
         if (!is_hashtable(currentElement))
             set_hashtable(currentElement);
 
-        caValue* nextElement = hashtable_insert(currentElement, path->index(i));
+        Value* nextElement = hashtable_insert(currentElement, path->index(i));
 
         currentElement = nextElement;
     }
@@ -171,7 +171,7 @@ Value* path_get(Value* value, Value* path)
 
 void path_delete(Value* value, Value* path)
 {
-    caValue* currentElement = value;
+    Value* currentElement = value;
     for (int i=0; i < list_length(path); i++) {
 
         if (!is_hashtable(currentElement))
@@ -184,7 +184,7 @@ void path_delete(Value* value, Value* path)
             return;
         }
 
-        caValue* nextElement = hashtable_get(currentElement, path->index(i));
+        Value* nextElement = hashtable_get(currentElement, path->index(i));
 
         if (nextElement == NULL)
             return;
@@ -353,7 +353,7 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
         if (termBeforeHead == term)
             inputIndexOfInterest = inputIndex;
 
-        caValue* identifierRebindHint = term_get_input_property(termBeforeHead,
+        Value* identifierRebindHint = term_get_input_property(termBeforeHead,
                 inputIndexOfInterest, sym_Syntax_IdentifierRebind);
         if (head == NULL || has_empty_name(head)
                 || identifierRebindHint == NULL
@@ -387,12 +387,12 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
 
 void get_with_selector_evaluate(caStack* stack)
 {
-    caValue* root = circa_input(stack, 0);
-    caValue* selector = circa_input(stack, 1);
+    Value* root = circa_input(stack, 0);
+    Value* selector = circa_input(stack, 1);
 
     circa::Value error;
 
-    caValue* result = get_with_selector(root, selector, &error);
+    Value* result = get_with_selector(root, selector, &error);
 
     if (!is_null(&error)) {
         copy(&error, circa_output(stack, 0));
@@ -405,11 +405,11 @@ void get_with_selector_evaluate(caStack* stack)
 
 void set_with_selector_evaluate(caStack* stack)
 {
-    caValue* out = circa_output(stack, 0);
+    Value* out = circa_output(stack, 0);
     move(circa_input(stack, 0), out);
     
-    caValue* selector = circa_input(stack, 1);
-    caValue* newValue = circa_input(stack, 2);
+    Value* selector = circa_input(stack, 1);
+    Value* newValue = circa_input(stack, 2);
 
     circa::Value error;
     set_with_selector(out, selector, newValue, &error);

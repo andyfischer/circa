@@ -9,13 +9,13 @@
 
 namespace circa {
 
-bool number_equals(caValue* a, caValue* b);
+bool number_equals(Value* a, Value* b);
 
-void any_to_string(caValue*, caValue* out)
+void any_to_string(Value*, Value* out)
 {
     string_append(out, "<any>");
 }
-void any_initialize(Type*, caValue* value)
+void any_initialize(Type*, Value* value)
 {
     // Attempting to create an instance of 'any' will result in a value of null.
     value->value_type = TYPES.null;
@@ -33,15 +33,15 @@ void any_setup_type(Type* type)
     type->storageType = sym_InterfaceType;
 }
 
-void bool_reset(Type*, caValue* value)
+void bool_reset(Type*, Value* value)
 {
     set_bool(value, false);
 }
-int bool_hashFunc(caValue* a)
+int bool_hashFunc(Value* a)
 {
     return as_bool(a) ? 1 : 0;
 }
-void bool_to_string(caValue* value, caValue* out)
+void bool_to_string(Value* value, Value* out)
 {
     if (as_bool(value))
         string_append(out, "true");
@@ -57,7 +57,7 @@ void bool_setup_type(Type* type)
     type->toString = bool_to_string;
 }
 
-void get_color(caValue* value, float* r, float* g, float* b, float* a)
+void get_color(Value* value, float* r, float* g, float* b, float* a)
 {
     *r = to_float(get_index(value, 0));
     *g = to_float(get_index(value, 1));
@@ -65,17 +65,17 @@ void get_color(caValue* value, float* r, float* g, float* b, float* a)
     *a = to_float(get_index(value, 3));
 }
 
-int shallow_hash_func(caValue* value)
+int shallow_hash_func(Value* value)
 {
     return value->value_data.asint;
 }
 
-void int_reset(Type*, caValue* v)
+void int_reset(Type*, Value* v)
 {
     set_int(v, 0);
 }
 
-bool int_equals(caValue* a, caValue* b)
+bool int_equals(Value* a, Value* b)
 {
     if (is_float(b))
         return number_equals(a, b);
@@ -83,11 +83,11 @@ bool int_equals(caValue* a, caValue* b)
         return false;
     return as_int(a) == as_int(b);
 }
-int int_hashFunc(caValue* a)
+int int_hashFunc(Value* a)
 {
     return as_int(a);
 }
-void int_to_string(caValue* value, caValue* asStr)
+void int_to_string(Value* value, Value* asStr)
 {
     string_append(asStr, as_int(value));
 }
@@ -102,7 +102,7 @@ void int_setup_type(Type* type)
     type->toString = int_to_string;
 }
 
-void null_toString(caValue* value, caValue* out)
+void null_toString(Value* value, Value* out)
 {
     string_append(out, "null");
 }
@@ -112,11 +112,11 @@ void null_setup_type(Type* type)
     type->toString = null_toString;
 }
 
-void number_reset(Type*, caValue* value)
+void number_reset(Type*, Value* value)
 {
     set_float(value, 0);
 }
-void number_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
+void number_cast(CastResult* result, Value* value, Type* type, bool checkOnly)
 {
     if (!(is_int(value) || is_float(value))) {
         result->success = false;
@@ -129,13 +129,13 @@ void number_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     set_float(value, to_float(value));
 }
 
-bool number_equals(caValue* a, caValue* b)
+bool number_equals(Value* a, Value* b)
 {
     if (!is_float(b) && !is_int(b))
         return false;
     return to_float(a) == to_float(b);
 }
-void number_to_string(caValue* value, caValue* out)
+void number_to_string(Value* value, Value* out)
 {
     string_append_f(out, as_float(value));
 }
@@ -174,7 +174,7 @@ void number_setup_type(Type* type)
     type->toString = number_to_string;
 }
 
-void opaque_pointer_toString(caValue* val, caValue* out)
+void opaque_pointer_toString(Value* val, Value* out)
 {
     char buf[17];
     sprintf(buf, "%p", as_opaque_pointer(val));
@@ -190,11 +190,11 @@ void opaque_pointer_setup_type(Type* type)
     type->hashFunc = shallow_hash_func;
 }
 
-void void_to_string(caValue*, caValue* out)
+void void_to_string(Value*, Value* out)
 {
     string_append(out, "<void>");
 }
-void void_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
+void void_cast(CastResult* result, Value* value, Type* type, bool checkOnly)
 {
     if (!is_null(value)) {
         result->success = false;

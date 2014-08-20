@@ -17,7 +17,7 @@ namespace circa {
 struct ParseContext
 {
     TokenStream* tokens;
-    caValue* out;
+    Value* out;
 };
 
 static void drop_whitespace(TokenStream* tokens)
@@ -26,7 +26,7 @@ static void drop_whitespace(TokenStream* tokens)
         tokens->consume();
 }
 
-static void parse_value(TokenStream* tokens, caValue* out)
+static void parse_value(TokenStream* tokens, Value* out)
 {
     // ignore leading whitespace
     drop_whitespace(tokens);
@@ -54,7 +54,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
         set_list(out, 0);
 
         while (!tokens->nextIs(tok_RSquare) && !tokens->finished()) {
-            caValue* element = list_append(out);
+            Value* element = list_append(out);
             parse_value(tokens, element);
 
             if (tokens->nextIs(tok_Comma))
@@ -95,7 +95,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
     drop_whitespace(tokens);
 }
 
-void json_parse(const char* in, caValue* out)
+void json_parse(const char* in, Value* out)
 {
     Value inStr;
     set_string(&inStr, in);
@@ -103,7 +103,7 @@ void json_parse(const char* in, caValue* out)
     parse_value(&tokens, out);
 }
 
-void json_write(caValue* in, caValue* out)
+void json_write(Value* in, Value* out)
 {
     if (!is_string(out))
         set_string(out, "");
@@ -134,12 +134,12 @@ void json_write(caValue* in, caValue* out)
     }
 }
 
-CIRCA_EXPORT void circa_parse_json(caValue* in, caValue* out)
+CIRCA_EXPORT void circa_parse_json(Value* in, Value* out)
 {
     json_parse(as_cstring(in), out);
 }
 
-CIRCA_EXPORT void circa_to_json(caValue* in, caValue* out)
+CIRCA_EXPORT void circa_to_json(Value* in, Value* out)
 {
     json_write(in, out);
 }

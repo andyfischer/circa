@@ -66,14 +66,14 @@ struct TermList;
 struct TermMap;
 struct Type;
 
-typedef bool (*TermVisitor)(Term* term, caValue* context);
+typedef bool (*TermVisitor)(Term* term, Value* context);
 typedef int Symbol;
 
 // Function-related typedefs:
 
 typedef void (*EvaluateFunc)(caStack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
-typedef void (*ReleaseFunc)(caValue* value);
+typedef void (*ReleaseFunc)(Value* value);
 typedef void (*PostCompileFunc)(Term*);
 
 // Garbage collection

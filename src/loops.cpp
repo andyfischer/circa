@@ -72,7 +72,7 @@ void start_building_for_loop(Term* forTerm, Value* indexName, Value* iteratorNam
     }
 }
 
-void list_names_that_must_be_looped(Block* contents, caValue* names)
+void list_names_that_must_be_looped(Block* contents, Value* names)
 {
     // Find all names within 'contents' that must be looped. A name must be looped when
     // a term inside the loop binds a name that was already used outside the loop.
@@ -127,7 +127,7 @@ void insert_looped_placeholders(Block* contents)
     }
 }
 
-void list_names_that_should_be_used_as_minor_block_output(Block* block, caValue* names)
+void list_names_that_should_be_used_as_minor_block_output(Block* block, Value* names)
 {
     Value namesMap;
     set_hashtable(&namesMap);

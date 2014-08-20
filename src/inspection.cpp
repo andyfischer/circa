@@ -362,7 +362,7 @@ Term* find_term_with_function(Block* block, Term* func)
     return NULL;
 }
 
-Term* find_input_placeholder_with_name(Block* block, caValue* name)
+Term* find_input_placeholder_with_name(Block* block, Value* name)
 {
     for (int i=0;; i++) {
         Term* placeholder = get_input_placeholder(block, i);
@@ -423,13 +423,13 @@ std::string block_namespace_to_string(Block* block)
     return out.str();
 }
 
-void print_indent(RawOutputPrefs* prefs, caValue* out)
+void print_indent(RawOutputPrefs* prefs, Value* out)
 {
     for (int i=0; i < prefs->indentLevel; i++)
         string_append(out, " ");
 }
 
-void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack)
+void print_block(Block* block, RawOutputPrefs* prefs, Value* out, Stack* stack)
 {
     int prevIndent = prefs->indentLevel;
     u32 bytecodePc = 0;
@@ -491,13 +491,13 @@ void print_block(Block* block, RawOutputPrefs* prefs, caValue* out, Stack* stack
     prefs->indentLevel = prevIndent;
 }
 
-void get_block_raw(Block* block, caValue* out)
+void get_block_raw(Block* block, Value* out)
 {
     RawOutputPrefs prefs;
     print_block(block, &prefs, out);
 }
 
-void get_short_location(Term* term, caValue* str)
+void get_short_location(Term* term, Value* str)
 {
     if (!is_string(str))
         set_string(str, "");
@@ -506,7 +506,7 @@ void get_short_location(Term* term, caValue* str)
 
     std::string filename = get_source_filename(term);
     if (filename == "") {
-        caValue* moduleName = get_parent_module_name(term->owningBlock);
+        Value* moduleName = get_parent_module_name(term->owningBlock);
         if (moduleName != NULL) {
             string_append(str, moduleName);
             string_append(str, " ");
@@ -542,7 +542,7 @@ std::string get_source_filename(Term* term)
     Block* block = term->owningBlock;
 
     while (block != NULL) {
-        caValue* filename = block_get_source_filename(block);
+        Value* filename = block_get_source_filename(block);
 
         if (filename != NULL)
             return as_string(filename);
@@ -553,7 +553,7 @@ std::string get_source_filename(Term* term)
     return "";
 }
 
-caValue* get_parent_module_name(Block* block)
+Value* get_parent_module_name(Block* block)
 {
     if (block == NULL)
         return NULL;
@@ -646,7 +646,7 @@ void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &
     }
 }
 
-void print_term(Term* term, RawOutputPrefs* prefs, caValue* out)
+void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
 {
     for (int i=0; i < prefs->indentLevel; i++)
         string_append(out, " ");
@@ -721,39 +721,39 @@ void print_term(Term* term, RawOutputPrefs* prefs, caValue* out)
     }
 }
 
-void print_term(Term* term, caValue* out)
+void print_term(Term* term, Value* out)
 {
     RawOutputPrefs prefs;
     print_term(term, &prefs, out);
 }
 
-void print_block(Block* block, caValue* out)
+void print_block(Block* block, Value* out)
 {
     RawOutputPrefs prefs;
     print_block(block, &prefs, out);
 }
 
-void print_block_with_properties(Block* block, caValue* out)
+void print_block_with_properties(Block* block, Value* out)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
     print_block(block, &prefs, out);
 }
 
-void get_term_to_string_extended(Term* term, caValue* out)
+void get_term_to_string_extended(Term* term, Value* out)
 {
     RawOutputPrefs prefs;
     print_term(term, &prefs, out);
 }
 
-void get_term_to_string_extended_with_props(Term* term, caValue* out)
+void get_term_to_string_extended_with_props(Term* term, Value* out)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
     print_term(term, &prefs, out);
 }
 
-void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context)
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, Value* context)
 {
     if (location->owningBlock == NULL)
         return;
@@ -775,7 +775,7 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caVal
         visit_name_accessible_terms(block->owningTerm, visitor, context);
 }
 
-void parse_path_expression(const char* expr, caValue* valueOut)
+void parse_path_expression(const char* expr, Value* valueOut)
 {
     set_list(valueOut, 0);
 
@@ -804,13 +804,13 @@ void parse_path_expression(const char* expr, caValue* valueOut)
             tokens.consume();
 
             if (!tokens.nextIs(tok_Equals)) {
-                caValue* err = list_append(valueOut);
+                Value* err = list_append(valueOut);
                 set_string(err, "Expected = after 'function'");
                 return;
             }
             tokens.consume(tok_Equals);
 
-            caValue* node = list_append(valueOut);
+            Value* node = list_append(valueOut);
             set_list(node, 2);
             set_symbol(list_get(node, 0), sym_Function);
             tokens.consumeStr(list_get(node, 1));
@@ -821,7 +821,7 @@ void parse_path_expression(const char* expr, caValue* valueOut)
         }
 
         else {
-            caValue* err = list_append(valueOut);
+            Value* err = list_append(valueOut);
             set_string(err, "Unrecognized syntax: ");
             Value next;
             tokens.getNextStr(&next);
@@ -845,7 +845,7 @@ void parse_path_expression(const char* expr, caValue* valueOut)
     }
 }
 
-static bool term_matches_path_expression_node(Term* term, caValue* node)
+static bool term_matches_path_expression_node(Term* term, Value* node)
 {
     if (is_string(node))
         return equals(&term->nameValue, node);
@@ -860,12 +860,12 @@ static bool term_matches_path_expression_node(Term* term, caValue* node)
     return false;
 }
 
-Term* find_term_from_path(Block* root, caValue* path, int offset)
+Term* find_term_from_path(Block* root, Value* path, int offset)
 {
     if (offset >= list_length(path))
         return NULL;
 
-    caValue* node = list_get(path, offset);
+    Value* node = list_get(path, offset);
 
     // Recursive wildcard.
     if (is_symbol(node) && as_symbol(node) == sym_RecursiveWildcard) {
@@ -910,7 +910,7 @@ Term* find_term_from_path(Block* root, caValue* path, int offset)
     return NULL;
 }
 
-Term* find_term_from_path(Block* root, caValue* path)
+Term* find_term_from_path(Block* root, Value* path)
 {
     return find_term_from_path(root, path, 0);
 }
