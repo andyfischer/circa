@@ -340,12 +340,13 @@ void string_resize(Value* s, int length)
     StringData** data = (StringData**) &s->value_data.ptr;
     string_resize(data, length);
 }
+
 bool string_equals(Value* s, const char* str)
 {
     if (is_string(s))
         return strcmp(as_cstring(s), str) == 0;
 
-    // Preparing for the future, strings and symbols will be one data type.
+    // Deprecated method to compare to a symbol value.
     if (is_symbol(s)) {
         if (str[0] != ':')
             return false;
@@ -355,6 +356,7 @@ bool string_equals(Value* s, const char* str)
 
     return false;
 }
+
 bool string_empty(Value* s)
 {
     return is_null(s) || string_equals(s, "");

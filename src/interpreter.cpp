@@ -483,57 +483,6 @@ void raise_error_too_many_inputs(Stack* stack)
     raise_error(stack);
 }
 
-#if 0
-inline char vm_read_char(Stack* stack) {
-    return blob_read_char(stack->bytecode, &stack->pc);
-}
-inline char vm_peek_char(Stack* stack) {
-    int lookahead = stack->pc;
-    return blob_read_char(stack->bytecode, &lookahead);
-}
-
-inline int vm_read_u32(Stack* stack)
-{
-    return blob_read_u32(stack->bytecode, &stack->pc);
-}
-
-inline u16 vm_read_u16(Stack* stack)
-{
-    return blob_read_u16(stack->bytecode, &stack->pc);
-}
-
-inline u8 vm_read_u8(Stack* stack)
-{
-    return blob_read_u8(stack->bytecode, &stack->pc);
-}
-
-inline float vm_read_float(Stack* stack)
-{
-    return blob_read_float(stack->bytecode, &stack->pc);
-}
-
-inline void* vm_read_pointer(Stack* stack)
-{
-    return blob_read_pointer(stack->bytecode, &stack->pc);
-}
-
-inline Value* vm_read_register(Stack* stack)
-{
-    i16 distance = (i16) vm_read_u16(stack);
-    return vm_register_rel(stack, distance);
-}
-
-inline void vm_skip_bytecode(Stack* stack, size_t size)
-{
-    stack->pc += size;
-}
-
-inline char* vm_get_bytecode_raw(Stack* stack)
-{
-    return stack->bytecode + stack->pc;
-}
-#endif
-
 void vm_pop_frame_and_store_error(Stack* stack, Value* msg)
 {
     pop_frame(stack);
@@ -760,7 +709,6 @@ void vm_dynamic_method_dispatch_from_cache(Stack* stack, MethodCacheLine* cacheL
 
 static Value* vm_read_local_value(Frame* referenceFrame, u16 stackDistance, u16 index)
 {
-
     Frame* frame = prev_frame_n(referenceFrame, stackDistance);
 
     Term* term = frame_block(frame)->get(index);
@@ -1269,9 +1217,9 @@ void vm_run(Stack* stack)
                 return;
             }
 
-            if (as_bool(condition)) {
+            if (as_bool(condition))
                 pc += offset - 7;
-            }
+            
             continue;
         }
         case bc_JumpIfIteratorDone: {
@@ -1311,6 +1259,7 @@ void vm_run(Stack* stack)
             set_bool(dest, value);
             continue;
         }
+
         #define INLINE_MATH_OP_HEADER \
             vm_unpack_u32(termIndex); \
             Frame* top = vm_top_frame(stack); \
@@ -1351,18 +1300,19 @@ void vm_run(Stack* stack)
         }
         case bc_Divf: {
             INLINE_MATH_OP_HEADER;
-            if (to_float(right) == 0.0) {
+
+            if (to_float(right) == 0.0)
                 return circa_output_error(stack, "Division by 0.0");
-            }
 
             set_float(slot, to_float(left) / to_float(right));
             continue;
         }
         case bc_Divi: {
             INLINE_MATH_OP_HEADER;
-            if (as_int(right) == 0) {
+
+            if (as_int(right) == 0)
                 return circa_output_error(stack, "Division by 0");
-            }
+            
             set_int(slot, as_int(left) / as_int(right));
             continue;
         }

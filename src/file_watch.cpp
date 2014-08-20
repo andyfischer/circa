@@ -125,7 +125,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
 
             NativePatch* nativeModule = insert_native_patch(world, moduleName);
             native_patch_load_from_file(nativeModule, as_cstring(&watch->filename));
-            native_patch_finish_change(nativeModule);
+            circa_finish_native_patch(nativeModule);
             break;
         }
         case sym_RecompileModule: {

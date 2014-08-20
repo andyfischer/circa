@@ -100,9 +100,6 @@ NativePatch* find_existing_native_patch(World* world, Value* name)
 
 NativePatch* insert_native_patch(World* world, Value* name)
 {
-    // Make sure this module is loaded by name.
-    load_module(world, NULL, name);
-
     NativePatch* patch = find_existing_native_patch(world, name);
 
     if (patch != NULL)
@@ -110,6 +107,11 @@ NativePatch* insert_native_patch(World* world, Value* name)
 
     patch = add_native_patch(world);
     set_value(&patch->name, name);
+
+    // Make sure this module is loaded by a global name. The native patch won't
+    // work if the module has only been loaded by filename or relative name.
+    load_module(world, NULL, name);
+
     return patch;
 }
 
@@ -136,13 +138,9 @@ CIRCA_EXPORT void circa_patch_function(caNativePatch* patch, const char* nameStr
     }
 }
 
-void native_patch_finish_change(NativePatch* module)
-{
-}
-
 CIRCA_EXPORT void circa_finish_native_patch(caNativePatch* module)
 {
-    native_patch_finish_change(module);
+    // This once did something.
 }
 
 Block* find_enclosing_module(Block* block)
@@ -216,7 +214,7 @@ void native_patch_add_platform_specific_suffix(caValue* filename)
 void native_patch_close(NativePatch* module)
 {
 #ifdef CIRCA_DISABLE_DLL
-    internal_error("native_patch_close failed, DLL support compiled out");
+    internal_error("native_patch_close failed: this binary was not compiled with DLL support");
 #else
     if (module->dll != NULL)
         dlclose(module->dll);
@@ -228,7 +226,7 @@ void native_patch_close(NativePatch* module)
 void native_patch_load_from_file(NativePatch* module, const char* filename)
 {
 #ifdef CIRCA_DISABLE_DLL
-    internal_error("native_patch_load_from_file failed, DLL support compiled out");
+    internal_error("native_patch_load_from_file failed: this binary was not compiled with DLL support");
 #else
     native_patch_close(module);
 
