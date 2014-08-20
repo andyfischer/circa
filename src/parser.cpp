@@ -2461,7 +2461,7 @@ ParseResult literal_float(Block* block, TokenStream& tokens, ParserCxt* context)
     // Assign a default step value, using the # of decimal figures
     int decimalFigures = get_number_of_decimal_figures(text);
     float step = (float) std::pow(0.1, decimalFigures);
-    set_step(term, step);
+    term->setFloatProp(sym_Step, step);
 
     // Store the original string
     term->setStringProp(sym_Syntax_OriginalFormat, text);

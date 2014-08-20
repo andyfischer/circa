@@ -401,17 +401,6 @@ Term* create_duplicate(Block* block, Term* original, Value* name)
     return term;
 }
 
-Term* apply(Block* block, std::string const& functionName, TermList const& inputs, Value* name)
-{
-    Term* function = find_name(block, functionName.c_str());
-    if (function == NULL)
-        internal_error("function not found: "+functionName);
-
-    Term* result = apply(block, function, inputs, name);
-    result->setStringProp(sym_Syntax_FunctionName, functionName.c_str());
-    return result;
-}
-
 Term* create_value(Block* block, Type* type, const char* name)
 {
     // This function is safe to call while bootstrapping.
@@ -492,19 +481,6 @@ Term* create_list(Block* block, const char* name)
 Block* create_block(Block* owner, const char* name)
 {
     return nested_contents(apply(owner, FUNCS.section_block, TermList(), name));
-}
-
-Block* find_or_create_block(Block* owner, const char* name)
-{
-    Term* existing = find_local_name(owner, name);
-    if (existing != NULL)
-        return nested_contents(existing);
-    return create_block(owner, name);
-}
-
-Block* create_block_unevaluated(Block* owner, const char* name)
-{
-    return nested_contents(apply(owner, FUNCS.block_unevaluated, TermList(), name));
 }
 
 Term* create_type(Block* block, const char* name)
@@ -827,16 +803,6 @@ void update_extra_outputs(Term* term)
 
         set_declared_type(extra_output, placeholder->type);
     }
-}
-
-void set_step(Term* term, float step)
-{
-    term->setFloatProp(sym_Step, step);
-}
-
-float get_step(Term* term)
-{
-    return term->floatProp(sym_Step, 1.0);
 }
 
 Symbol block_has_state(Block* block)

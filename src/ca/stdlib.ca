@@ -232,8 +232,6 @@ def number.div(left, right) -> number
 
 def rand() -> number
 
-def block_unevaluated()
-
 def copy(any val) -> any
 
 def cast_declared_type(any val) -> any
@@ -1119,7 +1117,6 @@ def Term.value(self) -> any
     -- For a value term, this fetches the actual value.
 def Term.set_value(self, any val)
     -- For a value term, permanently change the value.
-def Term.tweak(self, number steps)
 def Term.input(self, int index) -> Term
     -- Fetch an input term by index.
 def Term.inputs(self) -> List

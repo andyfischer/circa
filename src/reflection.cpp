@@ -381,36 +381,6 @@ void Term__set_value(caStack* stack)
     copy(circa_input(stack, 1), term_value(target));
 }
 
-int tweak_round(double a) {
-    return int(a + 0.5);
-}
-
-void Term__tweak(caStack* stack)
-{
-    Term* t = as_term_ref(circa_input(stack, 0));
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-
-    int steps = tweak_round(to_float(circa_input(stack, 1)));
-
-    Value* val = term_value(t);
-
-    if (steps == 0)
-        return;
-
-    if (is_float(val)) {
-        float step = get_step(t);
-
-        // Do the math like this so that rounding errors are not accumulated
-        float new_value = (tweak_round(as_float(val) / step) + steps) * step;
-        set_float(val, new_value);
-
-    } else if (is_int(val))
-        set_int(val, as_int(val) + steps);
-    else
-        circa_output_error(stack, "Ref is not an int or number");
-}
-
 void Term__asint(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
@@ -718,7 +688,6 @@ void reflection_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Term.index", Term__index);
     circa_patch_function(patch, "Term.function", Term__function);
     circa_patch_function(patch, "Term.get_type", Term__type);  // TODO: rename to just .type
-    circa_patch_function(patch, "Term.tweak", Term__tweak);
     circa_patch_function(patch, "Term.input", Term__input);
     circa_patch_function(patch, "Term.inputs", Term__inputs);
     circa_patch_function(patch, "Term.name", Term__name);

@@ -93,7 +93,6 @@ bool compiled_should_ignore_term(Compiled* compiled, Term* term)
             || is_value(term)
             || term->function == FUNCS.require
             || term->function == FUNCS.lambda
-            || term->function == FUNCS.block_unevaluated
             || term->function == FUNCS.case_func)
 
         return true;

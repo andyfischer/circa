@@ -12,7 +12,6 @@ struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
     Term* and_func;
-    Term* block_unevaluated;
     Term* break_func;
     Term* case_func;
     Term* case_condition_bool;

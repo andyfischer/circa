@@ -63,8 +63,6 @@ Term* create_bool(Block* block, bool b, const char* name=NULL);
 Term* create_void(Block* block, const char* name=NULL);
 Term* create_list(Block* block, const char* name=NULL);
 Block* create_block(Block* owner, const char* name);
-Block* find_or_create_block(Block* owner, const char* name);
-Block* create_block_unevaluated(Block* owner, const char* name);
 Term* create_type(Block* block, const char* name);
 Term* create_type_value(Block* block, Type* value, const char* name=NULL);
 Term* create_symbol_value(Block* block, int value, const char* name=NULL);
@@ -97,9 +95,6 @@ int count_anonymous_outputs(Block* block);
 
 // Extra outputs
 void update_extra_outputs(Term* term);
-
-void set_step(Term* term, float step);
-float get_step(Term* term);
 
 Symbol block_has_state(Block* block);
 

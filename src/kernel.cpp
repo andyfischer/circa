@@ -643,7 +643,6 @@ void bootstrap_kernel()
         set_evaluation_empty(discard);
         set_evaluation_empty(break_func);
         set_evaluation_empty(continue_func);
-        set_evaluation_empty(block_unevaluated);
         set_evaluation_empty(comment);
         set_evaluation_empty(extra_output);
         set_evaluation_empty(loop_index);
@@ -670,7 +669,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
     #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
         find_func(add_i, "add_i"); find_func(add_f, "add_f");
         find_func(and_func, "and");
-        find_func(block_unevaluated, "block_unevaluated");
         find_func(break_func, "break");
         find_func(case_func, "case");
         find_func(case_condition_bool, "case_condition_bool");
