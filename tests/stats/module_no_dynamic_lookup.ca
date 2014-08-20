@@ -1,0 +1,9 @@
+
+require dummy_lib
+
+_perf_stats_dump()
+
+dummy_lib.f
+
+stats = _perf_stats_dump()
+print('lookup count (should be 0) = ' stats.get(:stat_Interpreter_DynamicMethod_ModuleLookup))

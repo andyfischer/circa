@@ -572,11 +572,12 @@ int run_command_line(caWorld* world, Value* args)
 
     // Default behavior with no flags: run args[0] as a script filename.
 
+    Value* arg = list_get(args, 0);
     Value filename;
-    resolve_possible_module_path(world, list_get(args, 0), &filename);
+    resolve_possible_module_path(world, arg, &filename);
 
     if (is_null(&filename)) {
-        printf("Local module not found: %s\n", as_cstring(&filename));
+        printf("Local module not found: %s\n", as_cstring(arg));
         return -1;
     }
 

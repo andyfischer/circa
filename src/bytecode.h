@@ -158,10 +158,11 @@ CompiledBlock* find_cblock(Compiled* compiled, Block* block);
 CompiledTerm* find_cterm(CompiledBlock* cblock, Term* term);
 CompiledTerm* find_cterm(Compiled* compiled, Term* term);
 CompiledBlock* compiled_block(Compiled* compiled, int index);
-int program_find_block_index(Compiled* compiled, Block* block);
-void program_generate_bytecode(Compiled* compiled, int blockIndex);
-int program_create_empty_entry(Compiled* compiled, Block* block);
-int program_create_entry(Compiled* compiled, Block* block);
+
+int compiled_find_entry_index(Compiled* compiled, Block* block);
+int compiled_create_empty_entry(Compiled* compiled, Block* block);
+int compiled_create_entry(Compiled* compiled, Block* block);
+void compile_block(Compiled* compiled, int blockIndex);
 
 Value* compiled_add_const(Compiled* compiled, int* index);
 Value* compiled_const(Compiled* compiled, int index);

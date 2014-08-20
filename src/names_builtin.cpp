@@ -313,7 +313,7 @@ const char* builtin_symbol_to_string(int name)
     case stat_Interpreter_Step: return "stat_Interpreter_Step";
     case stat_Interpreter_DynamicMethod_CacheHit: return "stat_Interpreter_DynamicMethod_CacheHit";
     case stat_Interpreter_DynamicMethod_SlowLookup: return "stat_Interpreter_DynamicMethod_SlowLookup";
-    case stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef: return "stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef";
+    case stat_Interpreter_DynamicMethod_SlowLookup_Module: return "stat_Interpreter_DynamicMethod_SlowLookup_Module";
     case stat_Interpreter_DynamicMethod_SlowLookup_Hashtable: return "stat_Interpreter_DynamicMethod_SlowLookup_Hashtable";
     case stat_Interpreter_DynamicMethod_ModuleLookup: return "stat_Interpreter_DynamicMethod_ModuleLookup";
     case stat_Interpreter_DynamicFuncToClosureCall: return "stat_Interpreter_DynamicFuncToClosureCall";
@@ -2215,8 +2215,8 @@ int builtin_symbol_from_string(const char* str)
             return stat_Interpreter_DynamicMethod_SlowLookup_Hashtable;
         break;
     case 'M':
-        if (strcmp(str + 43, "oduleRef") == 0)
-            return stat_Interpreter_DynamicMethod_SlowLookup_ModuleRef;
+        if (strcmp(str + 43, "odule") == 0)
+            return stat_Interpreter_DynamicMethod_SlowLookup_Module;
         break;
     default: return -1;
     }

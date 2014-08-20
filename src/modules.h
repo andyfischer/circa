@@ -27,7 +27,9 @@ Block* load_module_by_filename(World* world, Value* filename);
 
 void resolve_possible_module_path(World* world, Value* path, Value* result);
 
-Block* module_ref_get_block(Value* moduleRef);
+Block* module_ref_get_block(Value* module);
+
+Term* module_lookup(Value* module, Term* caller);
 
 bool is_module_ref(Value* value);
 void set_module_ref(Value* value, Block* block);

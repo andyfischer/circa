@@ -327,6 +327,14 @@ void set_module_ref(Value* value, Block* block)
     make(TYPES.module_ref, value);
     set_block(list_get(value, 0), block);
 }
+
+Term* module_lookup(Value* module, Term* caller)
+{
+    Block* block = module_ref_get_block(module);
+    Value* elementName = caller->getProp(sym_MethodName);
+    Term* term = find_local_name(block, elementName);
+    return term;
+}
  
 void load_script_eval(Stack* stack)
 {

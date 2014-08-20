@@ -1,0 +1,2 @@
+called dummy_lib.f
+lookup count (should be 0) = 0

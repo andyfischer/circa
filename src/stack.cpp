@@ -381,7 +381,7 @@ Value* stack_active_value_for_block_index(Frame* frame, int blockIndex, int term
 
 Value* stack_active_value_for_term(Frame* frame, Term* term)
 {
-    int blockIndex = program_find_block_index(frame->stack->program, term->owningBlock);
+    int blockIndex = compiled_find_entry_index(frame->stack->program, term->owningBlock);
     if (blockIndex == -1)
         return NULL;
     return stack_active_value_for_block_index(frame, blockIndex, term->index);
