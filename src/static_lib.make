@@ -80,7 +80,6 @@ OBJECTS := \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/hashtable.o \
-	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing.o \
 	$(OBJDIR)/inspection.o \
 	$(OBJDIR)/interpreter.o \
@@ -105,6 +104,7 @@ OBJECTS := \
 	$(OBJDIR)/static_checking.o \
 	$(OBJDIR)/string_repr.o \
 	$(OBJDIR)/string_type.o \
+	$(OBJDIR)/switch.o \
 	$(OBJDIR)/symbols.o \
 	$(OBJDIR)/tagged_value.o \
 	$(OBJDIR)/term.o \
@@ -228,9 +228,6 @@ $(OBJDIR)/function.o: function.cpp
 $(OBJDIR)/hashtable.o: hashtable.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/if_block.o: if_block.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/importing.o: importing.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -301,6 +298,9 @@ $(OBJDIR)/string_repr.o: string_repr.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_type.o: string_type.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/switch.o: switch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/symbols.o: symbols.cpp

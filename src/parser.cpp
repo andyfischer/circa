@@ -7,7 +7,6 @@
 #include "closures.h"
 #include "loops.h"
 #include "function.h"
-#include "if_block.h"
 #include "hashtable.h"
 #include "inspection.h"
 #include "interpreter.h"
@@ -19,6 +18,7 @@
 #include "selector.h"
 #include "static_checking.h"
 #include "string_type.h"
+#include "switch.h"
 #include "symbols.h"
 #include "names.h"
 #include "term.h"
@@ -187,7 +187,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
     if (!foundNewline) {
         while (!tokens.finished()) {
 
-            // Certain tokens are considered the end of block
+            // Certain tokens will signal the end of this block.
             if (tokens.nextIs(tok_Else)
                     || tokens.nextIs(tok_Elif)
                     || tokens.nextIs(tok_RParen)
@@ -388,9 +388,14 @@ ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
         result = continue_statement(block, tokens, context);
     }
 
-    // Case statement
+    // Case block
     else if (tokens.nextIs(tok_Case)) {
-        result = case_statement(block, tokens, context);
+        result = case_block(block, tokens, context);
+    }
+
+    // Else block
+    else if (tokens.nextIs(tok_Else)) {
+        result = else_block(block, tokens, context);
     }
 
     // Package statement
@@ -1142,7 +1147,7 @@ ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context)
     set_starting_source_location(result, startPosition, tokens);
     consume_block(nested_contents(result), tokens, context);
 
-    // case_statement may have appended some terms to our block, so move this
+    // case_block may have appended some terms to our block, so move this
     // term to compensate.
     move_before_final_terms(result);
 
@@ -1152,7 +1157,7 @@ ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(result);
 }
 
-ParseResult case_statement(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult case_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
@@ -1178,6 +1183,30 @@ ParseResult case_statement(Block* block, TokenStream& tokens, ParserCxt* context
     }
     
     case_add_condition_check(contents, caseInput);
+
+    consume_block(contents, tokens, context);
+    set_source_location(result, startPosition, tokens);
+    set_is_statement(result, true);
+    return ParseResult(result);
+}
+
+ParseResult else_block(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(tok_Else);
+    possible_whitespace(tokens);
+
+    // Find the parent 'switch' block.
+    Term* switchTerm = block->owningTerm;
+    if (switchTerm == NULL || switchTerm->function != FUNCS.switch_func) {
+        return syntax_error(block, tokens, startPosition,
+            "'else' keyword must occur inside 'if' or 'switch' block");
+    }
+
+    Term* result = apply(block, FUNCS.case_func, TermList());
+    set_starting_source_location(result, startPosition, tokens);
+    Block* contents = nested_contents(result);
 
     consume_block(contents, tokens, context);
     set_source_location(result, startPosition, tokens);

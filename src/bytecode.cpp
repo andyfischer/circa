@@ -7,7 +7,6 @@
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "hashtable.h"
-#include "if_block.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -17,6 +16,7 @@
 #include "native_patch.h"
 #include "string_type.h"
 #include "symbols.h"
+#include "switch.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "term_list.h"
@@ -629,13 +629,6 @@ static char get_inline_bc_for_term(Writer* writer, Term* term)
     return 0;
 }
 
-Block* case_condition_get_next_case_block(Block* currentCase)
-{
-    Block* ifBlock = get_parent_block(currentCase);
-    int caseIndex = case_block_get_index(currentCase) + 1;
-    return get_case_block(ifBlock, caseIndex);
-}
-
 Value* get_statically_known_value(Term* term)
 {
     if (term == NULL)
@@ -982,7 +975,7 @@ void write_term(Writer* writer, Term* term)
 
         Block* caseBlock = term->owningBlock;
         ca_assert(is_case_block(caseBlock));
-        Block* nextCase = case_condition_get_next_case_block(caseBlock);
+        Block* nextCase = get_next_case_block(caseBlock);
         Block* switchBlock = get_parent_block(caseBlock);
 
         // At the end of every if/switch block, there must be an 'else' case block which

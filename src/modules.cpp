@@ -235,6 +235,11 @@ void module_install_replacement(World* world, Value* filename, Block* replacemen
 
     if (existingName != NULL)
         module_set_name(world, replacement, existingName);
+
+    Migration migration;
+    migration.oldBlock = existing;
+    migration.newBlock = replacement;
+    migrate_world(world, &migration);
 }
 
 #if 0

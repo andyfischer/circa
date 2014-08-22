@@ -241,28 +241,12 @@ bool is_input_meta(Block* block, int index)
     return placeholder->boolProp(sym_Meta, false);
 }
 
-Block* term_get_function_details(Term* call)
-{
-    // TODO: Shouldn't need to special case these functions.
-    if (call->function == FUNCS.if_block
-        || call->function == FUNCS.switch_func
-        || call->function == FUNCS.for_func
-        || call->function == FUNCS.while_loop
-        || call->function == FUNCS.include_func)
-        return nested_contents(call);
-
-    if (call->function == NULL)
-        return NULL;
-
-    return term_function(call);
-}
-
 Term* term_get_input_placeholder(Term* call, int index)
 {
     if (!is_function(call->function))
         return NULL;
 
-    Block* contents = term_get_function_details(call);
+    Block* contents = term_get_dispatch_block(call);
     if (contents == NULL)
         return NULL;
     if (index >= contents->length())
@@ -286,7 +270,7 @@ Term* term_get_output_placeholder(Term* call, int index)
     if (!is_function(call->function))
         return NULL;
 
-    Block* contents = term_get_function_details(call);
+    Block* contents = term_get_dispatch_block(call);
     if (contents == NULL)
         return NULL;
     if (index >= contents->length())
@@ -298,7 +282,7 @@ Term* term_get_output_placeholder(Term* call, int index)
 }
 bool term_has_variable_args(Term* term)
 {
-    return has_variable_args(term_get_function_details(term));
+    return has_variable_args(term_get_dispatch_block(term));
 }
 
 int count_actual_output_terms(Term* term)

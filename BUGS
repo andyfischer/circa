@@ -1,5 +1,8 @@
 
 Miscellanous (most-recent first)
+
+  When pressing the reset_state button in Improv, suddenly got an old syntax
+  error. As if it was no longer using my recently-updated module.
   
   Really confusing the way @ symbol is not added to field assignment
 

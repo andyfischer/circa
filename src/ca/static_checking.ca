@@ -1,0 +1,47 @@
+
+struct Check {
+  List errors
+}
+
+def Check.term(@self, Term term)
+  if term.function.is_null
+    @self.errors.append([term :null_function])
+
+  if term.function == unknown_function.block
+    @self.errors.append([term :unknown_function])
+
+  if term.function == unknown_identifier.block
+    @self.errors.append([term :unknown_identifier])
+
+  if term.function == syntax_error.block
+    msg = term.input(0).value
+    @self.errors.append([term msg])
+
+def Check.block(@self, Block block)
+  for term in block.terms
+    @self.term(term)
+
+def check_block(Block block) -> List
+  result = Check.make.block(block)
+  result.errors
+
+def format_error_list(List errors) -> String
+  result = ''
+
+  for error in errors
+    term = error[0]
+    msg = error[1]
+
+    str(@result term.location_string ' ')
+
+    switch msg
+      case :null_function
+        str(@result 'NULL function reference')
+      case :unknown_function
+        str(@result 'Unknown function: ' term.property_opt(:Syntax_FunctionName ''))
+      case :unknown_identifier
+        str(@result 'Unknown identifier: ' term.name)
+      else
+        str(@result msg)
+
+  result

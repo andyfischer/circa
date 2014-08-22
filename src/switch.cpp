@@ -12,12 +12,11 @@
 #include "inspection.h"
 #include "list.h"
 #include "string_type.h"
+#include "switch.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
 #include "update_cascades.h"
-
-#include "if_block.h"
 
 namespace circa {
 
@@ -77,7 +76,7 @@ int if_block_count_cases(Block* block)
 
 int case_block_get_index(Block* caseBlock)
 {
-    Block* parentBlock = get_block_for_case_block(caseBlock);
+    Block* parentBlock = get_parent_block(caseBlock);
 
     int index = 0;
     for (int i=0; i < parentBlock->length(); i++) {
@@ -167,6 +166,13 @@ Block* get_case_block(Block* block, int index)
     return NULL;
 }
 
+Block* get_next_case_block(Block* caseBlock)
+{
+    Block* ifBlock = get_parent_block(caseBlock);
+    int caseIndex = case_block_get_index(caseBlock) + 1;
+    return get_case_block(ifBlock, caseIndex);
+}
+
 void if_block_start(Block* block)
 {
     // Create a placeholder for primary output
@@ -219,10 +225,7 @@ void case_add_condition_check(Block* caseBlock, Term* condition)
 {
     apply(caseBlock, FUNCS.case_condition_bool, TermList(condition));
 }
-Block* get_block_for_case_block(Block* block)
-{
-    return get_parent_block(block);
-}
+
 Term* if_block_get_output_by_name(Block* block, const char* name)
 {
     for (int i=0;; i++) {
@@ -248,9 +251,8 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
     TermList outerTerms;
 
     // Find outer pointers across each case
-    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+    for (CaseIterator it(contents); it.unfinished(); it.advance())
         list_outer_pointers(nested_contents(it.current()), &outerTerms);
-    }
 
     ca_assert(ifCall->numInputs() == 0);
 
@@ -291,29 +293,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Block *caseBloc
 
         // This term rebinds an outer name.
 
-        // First, bring in the outer name as an input to the block.
-        
-#if 0
-        // Check if we already have an output for this name.
-        Term* inputPlaceholder = find_input_placeholder_with_name(mainBlock, name);
-
-        // Create it if necessary
-        if (inputPlaceholder == NULL) {
-            inputPlaceholder = if_block_add_input(ifCall, outer);
-            rename(inputPlaceholder, name);
-
-            // Fix the new input placeholders to have the correct name and input.
-            for (CaseIterator it(mainBlock); it.unfinished(); it.advance()) {
-                Block* caseContents = nested_contents(it.current());
-                Term* casePlaceholder = get_input_placeholder(caseContents,
-                    inputPlaceholder->index);
-                ca_assert(casePlaceholder != NULL);
-                rename(casePlaceholder, name);
-            }
-        }
-#endif
-
-        // Now make sure there is an output placeholder for this name.
+        // Make sure there is an output placeholder for this name.
         Term* outputPlaceholder = find_output_placeholder_with_name(mainBlock, name);
 
         if (outputPlaceholder == NULL)
@@ -420,7 +400,9 @@ bool switch_has_default_case(Block* block)
 {
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        if (term != NULL && term->function == FUNCS.case_condition_bool && term->numInputs() == 0)
+        if (term->function != FUNCS.case_func)
+            continue;
+        if (case_find_condition_check(nested_contents(term)) == NULL)
             return true;
     }
     return false;
@@ -433,7 +415,6 @@ void switch_block_post_compile(Term* term)
     // Add a default case (if needed)
     if (!switch_has_default_case(block)) {
         Term* defaultCase = apply(block, FUNCS.case_func, TermList());
-        rename(defaultCase, "else");
         hide_from_source(defaultCase);
     }
 

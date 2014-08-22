@@ -70,9 +70,6 @@ Term* find_input_with_name(Block* block, Value* name);
 // Other properties on inputs.
 bool is_input_meta(Block* block, int index);
 
-// Accessors that use a term's 'details' block, which may be the nested block,
-// or it might be the function's block, depending on the function.
-Block* term_get_function_details(Term* call);
 Term* term_get_input_placeholder(Term* call, int index);
 int term_count_input_placeholders(Term* term);
 Term* term_get_output_placeholder(Term* call, int index);

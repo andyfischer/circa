@@ -184,6 +184,11 @@ Term* parent_term(Term* term, int levels);
 
 bool is_declared_state(Term* term);
 bool uses_dynamic_dispatch(Term* term);
+
+// Returns a (statically-known) block that will be used for this term's evaluation.
+// May return NULL.
+Block* term_get_dispatch_block(Term* term);
+
 bool calls_function_by_value(Term* term);
 Block* static_dispatch_block(Term* term);
 

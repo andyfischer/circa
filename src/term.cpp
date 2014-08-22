@@ -7,10 +7,10 @@
 #include "debug.h"
 #include "hashtable.h"
 #include "kernel.h"
-#include "if_block.h"
 #include "inspection.h"
 #include "names.h"
 #include "string_type.h"
+#include "switch.h"
 #include "term.h"
 #include "type.h"
 #include "world.h"
@@ -462,6 +462,24 @@ bool uses_dynamic_dispatch(Term* term)
         || term->function == FUNCS.func_apply
         || term->function == FUNCS.func_call
         || calls_function_by_value(term);
+}
+
+Block* term_get_dispatch_block(Term* term)
+{
+    if (uses_dynamic_dispatch(term))
+        return NULL;
+
+    if (term->function == FUNCS.if_block
+        || term->function == FUNCS.switch_func
+        || term->function == FUNCS.for_func
+        || term->function == FUNCS.while_loop
+        || term->function == FUNCS.include_func)
+        return nested_contents(term);
+
+    if (term->function == NULL)
+        return NULL;
+
+    return nested_contents(term->function);
 }
 
 bool calls_function_by_value(Term* term)

@@ -8,7 +8,6 @@
 #include "building.h"
 #include "interpreter.h"
 #include "function.h"
-#include "if_block.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
@@ -17,6 +16,7 @@
 #include "parser.h"
 #include "selector.h"
 #include "string_type.h"
+#include "switch.h"
 #include "symbols.h"
 #include "term.h"
 #include "type.h"
@@ -759,13 +759,13 @@ int count_anonymous_outputs(Block* block)
 void update_extra_outputs(Term* term)
 {
     Block* block = term->owningBlock;
-    Block* function = term_get_function_details(term);
+    Block* targetBlock = term_get_dispatch_block(term);
 
-    if (function == NULL)
+    if (targetBlock == NULL)
         return;
 
     for (int index=1; ; index++) {
-        Term* placeholder = get_output_placeholder(function, index);
+        Term* placeholder = get_output_placeholder(targetBlock, index);
         if (placeholder == NULL)
             break;
 

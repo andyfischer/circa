@@ -6,12 +6,12 @@
 #include "debug.h"
 #include "function.h"
 #include "kernel.h"
-#include "if_block.h"
 #include "inspection.h"
 #include "list.h"
 #include "modules.h"
 #include "names_builtin.h"
 #include "string_type.h"
+#include "switch.h"
 #include "term.h"
 #include "world.h"
 

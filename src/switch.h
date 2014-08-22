@@ -12,9 +12,9 @@ int case_block_get_index(Block* block);
 Term* case_find_condition(Block* block);
 Term* case_find_condition_check(Block* block);
 Block* get_case_block(Block* block, int index);
+Block* get_next_case_block(Block* caseBlock);
 bool is_case_block(Block* block);
 bool is_switch_block(Block* block);
-Block* get_block_for_case_block(Block* caseBlock);
 Term* if_block_get_output_by_name(Block* block, const char* name);
 
 // Building

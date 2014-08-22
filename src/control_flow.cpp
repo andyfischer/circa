@@ -9,11 +9,11 @@
 #include "inspection.h"
 #include "interpreter.h"
 #include "function.h"
-#include "if_block.h"
 #include "importing.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "string_type.h"
+#include "switch.h"
 #include "term.h"
 
 namespace circa {
@@ -108,7 +108,7 @@ static Symbol max_exit_level(Symbol left, Symbol right)
 void create_output_from_minor_block(Block* block, Value* description)
 {
     if (is_case_block(block)) {
-        Block* ifBlock = get_block_for_case_block(block);
+        Block* ifBlock = get_parent_block(block);
         if_block_append_output(ifBlock, description);
     } else if (is_minor_block(block)) {
         append_output_placeholder_with_description(block, description);

@@ -129,6 +129,8 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             break;
         }
         case sym_RecompileModule: {
+            printf("recompiling changed module: %s\n", as_cstring(&watch->filename));
+
             // Reload this code block.
             Block* block = alloc_block(world);
             load_script(block, as_cstring(&watch->filename));
