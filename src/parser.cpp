@@ -1767,7 +1767,6 @@ InfixOperatorInfo get_infix_operator_info(int tokenMatch)
 ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* context,
         int minimumPrecedence)
 {
-
     ParseResult left = unary_expression(block, tokens, context);
 
     bool consumeNewlines = context->openParens > 0;

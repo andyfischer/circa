@@ -17,8 +17,6 @@ Miscellanous (most-recent first)
         case 1
           1
 
-  switch-else not implemented?
-
   "else if" (instead of the correct elif) causes bad parsing. Example:
       if t < 1/6
         p + (q - p) * 6 * t
@@ -53,3 +51,12 @@ Code reload
 Modules
   When compiling a module, the last value is automatically turned into an output (just
     like a function). This should probably be explicit for modules?
+
+Functions
+  Return multiple values from a function, without using a `return` keyword.
+
+Anonymous functions
+  Allow the same input syntax on non-anonymous functions (such as, explicit types, :multiple keyword, and etc)
+
+Methods
+  Add a way to use a method as a closure
