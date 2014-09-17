@@ -4,9 +4,8 @@ struct SourceRepro {
 }
 
 struct Phrase {
-  Symbol t
+  Symbol type
   any val
-  Map attrs
 }
 
 def Phrase.term(self) -> Term
@@ -16,19 +15,22 @@ def Phrase.block(self) -> Block
   self.val
 
 def Phrase.text(self) -> String
-  if type(self.val) == String
-    self.val
-  elif self.t == :name_ref
-    self.term.name
-  else
-    self.val | to_string
+  switch
+    case type(self.val) == String
+      self.val
+    case self.type == :name_ref
+      self.term.name
+    case self.type == :block_start or self.type == :block_end
+      ''
+    else
+      self.val | to_string
 
 def new()
-  SourceRepro.make
+  SourceRepro.make([] 1 0)
 
 def Term.is_neg(term)
   term.function == neg.block
-def Term.is_unanon_function_decl(term)
+def Term.is_def_function_decl(term)
   term.function == function_decl.block and not term.property_opt(:Syntax_AnonFunction false)
 def Term.is_anon_function_decl(term)
   term.function == function_decl.block and term.property_opt(:Syntax_AnonFunction false)
@@ -71,19 +73,20 @@ def break_apart_newlines(String str) -> List
   else
     [str]
 
-def SourceRepro.ws_phrase(self, str) -> SourceRepro
-  for s in break_apart_newlines(str)
-    if s == ''
-      discard
-    @self.phrases.append(Phrase.make(:ws s))
-  self
+def SourceRepro.append_phrase(@self, Symbol type, val)
+  phrase = Phrase.make(type val)
+  @self.phrases.append(phrase)
 
-def SourceRepro.phrase(self, Symbol t, val) -> SourceRepro
-  if t == :ws
-    @self.ws_phrase(val)
+def SourceRepro.phrase(@self, Symbol type, val)
+  if type == :ws
+    for s in break_apart_newlines(val)
+      if s == ''
+        discard
+      @self.append_phrase(:ws s)
+    -- language defect: this 'self' shouldn't be necessary:
+    self
   else
-    @self.phrases.append(Phrase.make(t val))
-  self
+    @self.append_phrase(type val)
 
 def SourceRepro.neg(self, Term term) -> SourceRepro
   @self.phrase(:operator '-')
@@ -160,21 +163,18 @@ def SourceRepro.anon_function_decl(self, Term term) -> SourceRepro
   if inputs != []
     @self.phrase(:text '(')
 
-    first = true
-    for input in inputs
-      if not first
+    for i,input in inputs
+      if i > 0
         @self.phrase(:text ',')
 
       @self.phrase(:name input.name)
-
-      first = false
 
     @self.phrase(:text ') ')
 
   @self.phrase(:text '->')
   
   @self.block_pre(term)
-  @self.phrase(:contents term.contents)
+  @self.block_contents(term.contents)
   @self.block_post(term)
 
 def SourceRepro.function_decl(self, Term term) -> SourceRepro
@@ -186,12 +186,11 @@ def SourceRepro.function_decl(self, Term term) -> SourceRepro
 
   inputs = term.contents.inputs.filter((term) -> not term.property_opt(:HiddenInput false) )
 
-  first = true
-  for input in inputs
+  for i,input in inputs
     if input.property_opt(:State false)
       @self.phrase(:text "state ")
 
-    if not first
+    if i > 0
       @self.phrase(:text ", ")
 
     if input.property_opt(:Syntax_ExplicitType true)
@@ -241,7 +240,7 @@ def SourceRepro.function_decl(self, Term term) -> SourceRepro
       @self.phrase(:text ")")
 
   @self.block_pre(term)
-  @self.phrase(:contents term.contents)
+  @self.block_contents(term.contents)
   @self.block_post(term)
 
   self
@@ -353,8 +352,9 @@ def SourceRepro.for_loop(self, Term term) -> SourceRepro
   if term.property_opt(:ModifyList false)
     @self.phrase(:text '@')
   @self.term_input(term 0)
+
   @self.block_pre(term)
-  @self.phrase(:contents term.contents)
+  @self.block_contents(term.contents)
   @self.block_post(term)
 
 def SourceRepro.while_loop(self, Term term) -> SourceRepro
@@ -362,20 +362,21 @@ def SourceRepro.while_loop(self, Term term) -> SourceRepro
   @self.phrase(:text 'while ')
   @self.term_input(term.contents.find_while_condition, 0)
   @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
+
   @self.block_pre(term)
-  @self.phrase(:contents term.contents)
+  @self.block_contents(term.contents)
   @self.block_post(term)
+
   @self.phrase(:ws term.property_opt(:Syntax_WhitespaceBeforeEnd ''))
 
 def SourceRepro.if_block(self, Term term) -> SourceRepro
   @self.name_binding_source(term)
-  first = true
   cases = term.contents.if_block_cases.filter((term) -> not term.property_opt(:Hidden false))
-  for caseTerm in cases
+  for i,caseTerm in cases
     @self.phrase(:ws caseTerm.property_opt(:Syntax_PreWs ''))
 
     if caseTerm.name != 'else'
-      if first
+      if i == 0
         @self.phrase(:text 'if ')
       else
         @self.phrase(:text 'elif ')
@@ -386,11 +387,10 @@ def SourceRepro.if_block(self, Term term) -> SourceRepro
     else
       @self.phrase(:text 'else')
     @self.phrase(:ws caseTerm.property_opt(:Syntax_LineEnding ''))
-    @self.block_pre(caseTerm)
-    @self.phrase(:contents caseTerm.contents)
-    @self.block_post(caseTerm)
 
-    first = false
+    @self.block_pre(caseTerm)
+    @self.block_contents(caseTerm.contents)
+    @self.block_post(caseTerm)
   self
 
 def SourceRepro.switch_block(self, Term term) -> SourceRepro
@@ -418,7 +418,7 @@ def SourceRepro.switch_block(self, Term term) -> SourceRepro
 
     @self.phrase(:ws caseTerm.property_opt(:Syntax_LineEnding ''))
     @self.block_pre(caseTerm)
-    @self.phrase(:contents caseTerm.contents)
+    @self.block_contents(caseTerm.contents)
     @self.block_post(caseTerm)
   self
 
@@ -429,14 +429,14 @@ def SourceRepro.implicit_copy(self, Term term) -> SourceRepro
 def SourceRepro.nonlocal(self, Term term) -> SourceRepro
   @self.phrase(:name term.input(0).name)
 
-def SourceRepro.term(self, Term term) -> SourceRepro
+def SourceRepro.term(@self, Term term)
   if term.is_comment
     @self.phrase(:comment term.property_opt(:Comment ''))
   elif term.is_neg
     @self.neg(term)
   elif term.is_require
     @self.require_statement(term)
-  elif term.is_unanon_function_decl
+  elif term.is_def_function_decl
     @self.function_decl(term)
   elif term.is_struct_decl
     @self.struct_decl(term)
@@ -473,6 +473,7 @@ def SourceRepro.term(self, Term term) -> SourceRepro
 
   @self.phrase(:ws term.property_opt(:Syntax_PostWs ''))
   @self.phrase(:ws term.property_opt(:Syntax_LineEnding ''))
+  self
 
 def Term.has_implicit_name_binding(term) -> bool
   if term.name == ""
@@ -514,7 +515,7 @@ def Term.input_visible(term, int index) -> bool
 
 def SourceRepro.term_expr(self, Term term) -> SourceRepro
   if term.name == ''
-    @self.phrase(:sub_expr term)
+    @self.term(term)
   else
     @self.phrase(:name_ref term)
   self
@@ -526,7 +527,7 @@ def SourceRepro.term_input_inner(self, Term term, int index) -> SourceRepro
   inputTerm = term.input(index)
 
   if inputTerm.name == ''
-    @self.phrase(:sub_expr inputTerm)
+    @self.term(inputTerm)
   else
     if term.input_property_opt(index :Syntax_IdentifierRebind false)
       @self.phrase(:text '@')
@@ -659,6 +660,12 @@ def SourceRepro.block_pre(self, Term term) -> SourceRepro
     @self.phrase(:text '{')
   self
 
+def SourceRepro.block_contents(@self, Block block)
+  @self.phrase(:block_start block)
+  @self.block(block)
+  @self.phrase(:block_end block)
+
+
 def SourceRepro.block_post(self, Term term) -> SourceRepro
   if term.property_opt(:Syntax_BlockStyle '') == 'braces'
     @self.phrase(:text '}')
@@ -676,8 +683,7 @@ def SourceRepro.block(self, Block block) -> SourceRepro
       newlineNeeded = false
 
     @self.phrase(:ws term.property_opt(:Syntax_PreWs ''))
-
-    @self.phrase(:sub_expr term)
+    @self.term(term)
 
     if term.has_property(:Syntax_LineEnding) or term.has_property(:Syntax_PostHeadingWs)
       -- no newline needed
@@ -688,12 +694,7 @@ def SourceRepro.block(self, Block block) -> SourceRepro
 
 def phrases_to_string(List phrases) -> String
   strs = for phrase in phrases
-    if phrase.t == :sub_expr
-      phrase.term | term_phrases | phrases_to_string
-    elif phrase.t == :contents
-      phrase.block | block_phrases | phrases_to_string
-    else
-      phrase.text
+    phrase.text
   strs.join('')
 
 def term_phrases(Term term) -> List
@@ -701,13 +702,6 @@ def term_phrases(Term term) -> List
 
 def block_phrases(Block block) -> List
   SourceRepro.make.block(block).phrases
-
-def expand_block_contents(List phrases) -> List
-  for phrase in @phrases
-    if phrase.t == :contents
-      phrase = block_phrases(phrase.block)
-
-  phrases.flatten
 
 def block_to_string(Block block)
   block | block_phrases | phrases_to_string
