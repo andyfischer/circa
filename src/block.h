@@ -187,7 +187,7 @@ void remove_nulls(Block* block);
 
 Term* find_term_by_id(Block* block, int id);
 
-std::string get_source_file_location(Block* block);
+void get_source_file_location(Block* block, Value* out);
 
 // Block properties
 bool block_has_property(Block* block, Symbol name);

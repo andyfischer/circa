@@ -125,14 +125,15 @@ void get_path_relative_to_source(caBlock* relativeTo, Value* relPath, Value* res
         return;
     }
 
-    std::string scriptLocation = get_source_file_location((Block*) relativeTo);
+    Value scriptLocation;
+    get_source_file_location(relativeTo, &scriptLocation);
 
-    if (scriptLocation == "" || scriptLocation == ".") {
-        copy(relPath, result);
+    if (string_equals(&scriptLocation, "") || string_equals(&scriptLocation, ".")) {
+        set_value(result, relPath);
         return;
     }
 
-    set_string(result, scriptLocation.c_str());
+    set_value(result, &scriptLocation);
 
     if (!string_equals(relPath,"")) {
         string_append(result, "/");

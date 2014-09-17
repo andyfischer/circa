@@ -118,11 +118,8 @@ void get_block_raw(Block* block, Value* out);
 void get_term_to_string_extended(Term*, Value* out);
 void get_term_to_string_extended_with_props(Term*, Value* out);
 
-// Print a short source-code location for this term.
 void get_short_location(Term* term, Value* str);
-
-// Print the source file that this term came from, if any.
-std::string get_source_filename(Term* term);
+void get_source_filename(Term* term, Value* out);
 Value* get_parent_module_name(Block* block);
 
 void list_names_that_this_block_rebinds(Block* block, std::vector<std::string> &names);

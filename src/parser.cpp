@@ -119,7 +119,7 @@ struct ListSyntaxHints {
         if (!is_string(existing))
             set_string(existing, "");
 
-        set_string(existing, as_string(existing) + value);
+        string_append(existing, value.c_str());
     }
 
     void apply(Term* term)

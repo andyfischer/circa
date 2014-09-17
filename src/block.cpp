@@ -367,24 +367,21 @@ void block_graft_replacement(Block* target, Block* replacement)
     target->owningTerm = NULL;
 }
 
-std::string get_source_file_location(Block* block)
+void get_source_file_location(Block* block, Value* out)
 {
     // Search upwards until we find a block that has source-file defined.
     while (block != NULL && block_get_source_filename(block) == NULL)
         block = get_parent_block(block);
 
     if (block == NULL)
-        return "";
+        return set_string(out, "");
 
     Value* sourceFilename = block_get_source_filename(block);
 
     if (sourceFilename == NULL)
-        return "";
+        return set_string(out, "");
 
-    Value directory;
-    get_directory_for_filename(sourceFilename, &directory);
-
-    return as_string(&directory);
+    get_directory_for_filename(sourceFilename, out);
 }
 
 Block* get_outer_scope(Block* block)

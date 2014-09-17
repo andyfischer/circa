@@ -74,6 +74,9 @@ def diff_command_against_file(process, command, filename):
         print(command)
         return
 
+    if not Quiet:
+        print(command)
+
     if not os.path.exists(filename):
         expectedOutput = []
     else:
@@ -100,7 +103,7 @@ def test_file(process, filename):
 
     # Diff test
     try:
-        diff = diff_command_against_file(process, "file "+filename, filename + ".output")
+        diff = diff_command_against_file(process, filename, filename + ".output")
     except Exception as e:
         traceback.print_exc()
         process.kill()
@@ -116,7 +119,7 @@ def test_file(process, filename):
 
     if TestSourceRepro:
         try:
-            diff = diff_command_against_file(process, "source_repro "+filename, filename)
+            diff = diff_command_against_file(process, "-source-repro "+filename, filename)
         except Exception as e:
             traceback.print_exc()
             process.kill()
@@ -194,9 +197,6 @@ def run_all_tests(suite):
 
         if skip:
             continue
-
-        if not Quiet:
-            print(file)
 
         run_one_test(suite, file)
 

@@ -30,6 +30,8 @@
 #include "circa/file.h"
 #include "file_checker.h"
 
+#include "command_line.h"
+
 #ifdef CIRCA_USE_LINENOISE
     extern "C" {
         #include "linenoise/linenoise.h"
@@ -120,204 +122,6 @@ void parse_string_as_argument_list(Value* str, Value* output)
     }
 }
 
-void do_echo(Value* args, Value* reply)
-{
-    to_string(args, reply);
-}
-
-void do_file_command(caWorld* world, Value* args, Value* reply)
-{
-    RawOutputPrefs rawOutputPrefs;
-    bool printRaw = false;
-    bool printState = false;
-    bool dontRunScript = false;
-
-    int argIndex = 1;
-
-    while (true) {
-
-        if (argIndex >= args->length()) {
-            set_string(reply, "No filename found");
-            return;
-        }
-
-        if (string_equals(args->index(argIndex), "-p")) {
-            printRaw = true;
-            argIndex++;
-            continue;
-        }
-
-        if (string_equals(args->index(argIndex), "-pp")) {
-            printRaw = true;
-            rawOutputPrefs.showProperties = true;
-            argIndex++;
-            continue;
-        }
-        
-        if (string_equals(args->index(argIndex), "-b") || string_equals(args->index(argIndex), "-pb")) {
-            printRaw = true;
-            rawOutputPrefs.showBytecode = true;
-            argIndex++;
-            continue;
-        }
-
-        if (string_equals(args->index(argIndex), "-print-state")) {
-            printState = true;
-            argIndex++;
-            continue;
-        }
-        if (string_equals(args->index(argIndex), "-n")) {
-            dontRunScript = true;
-            argIndex++;
-            continue;
-        }
-        break;
-    }
-
-    Value filename;
-    resolve_possible_module_path(world, args->index(argIndex), &filename);
-
-    if (is_null(&filename)) {
-        std::cout << "Local module not found: ";
-        std::cout << as_cstring(&filename);
-        std::cout << std::endl;
-        return;
-    }
-
-    Block* block = load_module_by_filename(world, &filename);
-
-    if (dontRunScript)
-        return;
-    
-    Stack* stack = create_stack(world);
-    stack_init(stack, block);
-    vm_run(stack);
-
-    if (printState) {
-        Value* state = stack_get_state(stack);
-        if (state == NULL)
-            std::cout << "state = null";
-        else
-            dump(state);
-    }
-
-    if (stack_errored(stack)) {
-        std::cout << "Error occurred:\n";
-        Value str;
-        stack_trace_to_string(stack, &str);
-        std::cout << as_cstring(&str);
-        std::cout << std::endl;
-    }
-
-    free_stack(stack);
-}
-
-void rewrite_block(Block* block, Value* contents, Value* reply)
-{
-    clear_block(block);
-    parser::compile(block, parser::statement_list, as_cstring(contents));
-
-    if (has_static_errors(block)) {
-        std::stringstream errors;
-        print_static_errors_formatted(block);
-        set_string(reply, errors.str());
-    } else {
-        set_symbol(reply, sym_Success);
-    }
-}
-
-void do_update_file(World* world, Value* filename, Value* contents, Value* reply)
-{
-    Block* block = find_module_by_filename(world, filename);
-
-    if (block == NULL) {
-        set_string(reply, "Module not found");
-        return;
-    }
-
-    rewrite_block(block, contents, reply);
-}
-
-void do_admin_command(caWorld* world, Value* input, Value* reply)
-{
-    // Identify the command
-    int first_space = string_find_char(input, 0, ' ');
-    if (first_space == -1)
-        first_space = string_length(input);
-
-    Value command;
-    string_slice(input, 0, first_space, &command);
-
-    set_null(reply);
-
-    if (equals_string(&command, "add_lib_path")) {
-        //Value args;
-        //parse_tokens_as_argument_list(&tokens, &args);
-
-    } else if (equals_string(&command, "file")) {
-
-        Value args;
-        parse_string_as_argument_list(input, &args);
-        do_file_command(world, &args, reply);
-
-    } else if (equals_string(&command, "echo")) {
-
-        Value args;
-        parse_string_as_argument_list(input, &args);
-        do_echo(&args, reply);
-
-    } else if (equals_string(&command, "update_file")) {
-
-        int nextSpace = string_find_char(input, first_space+1, ' ');
-        if (nextSpace == -1) {
-            set_string(reply, "Syntax error, not enough arguments");
-            return;
-        }
-        
-        Value filename;
-        string_slice(input, first_space+1, nextSpace, &filename);
-
-        Value contents;
-        string_slice(input, nextSpace+1, -1, &contents);
-
-        do_update_file(world, &filename, &contents, reply);
-
-    } else if (equals_string(&command, "source_repro")) {
-
-        Value args;
-        parse_string_as_argument_list(input, &args);
-
-        Block block;
-        load_script(&block, as_cstring(args.index(1)));
-
-        Value sourceReproStr;
-        set_string(&sourceReproStr, "source_repro");
-        Block* sourceRepro = load_module(world, NULL, &sourceReproStr);
-        Block* to_source_string = find_function_local(sourceRepro, "block_to_string");
-
-        Stack stack;
-        stack_init(&stack, to_source_string);
-        set_block(circa_input(&stack, 0), &block);
-
-        vm_run(&stack);
-
-        if (stack_errored(&stack))
-            dump(&stack);
-        else
-            std::cout << as_string(circa_output(&stack, 0));
-       
-    } else if (equals_string(&command, "dump_stats")) {
-
-        circa_perf_stats_dump();
-        std::cout << ":done" << std::endl;
-
-    } else {
-
-        set_string(reply, "Unrecognized command: ");
-        string_append(reply, &command);
-    }
-}
-
 void run_commands_from_stdin(caWorld* world)
 {
     while (true) {
@@ -326,17 +130,9 @@ void run_commands_from_stdin(caWorld* world)
         if (!is_string(&line))
             break;
 
-        Value reply;
-        do_admin_command(world, &line, &reply);
-
-        Value str;
-
-        if (is_null(&reply))
-            ; // no op
-        else {
-            to_string(&reply, &str);
-            std::cout << as_cstring(&str) << std::endl;
-        }
+        Value args;
+        parse_string_as_argument_list(&line, &args);
+        run_command_line(world, &args);
 
         // We need to tell the stdout reader that we have finished. The proper
         // way to do this would probably be to format the entire output as an
@@ -380,6 +176,7 @@ int run_command_line(caWorld* world, Value* args)
     bool printState = false;
     bool dontRunScript = false;
     bool printTrace = false;
+    bool dumpOption = false;
 
     // Prepended options
     while (true) {
@@ -447,6 +244,12 @@ int run_command_line(caWorld* world, Value* args)
             module_get_default_name_from_filename(filename, &moduleName);
 
             list_remove_index(args, 0);
+            list_remove_index(args, 0);
+            continue;
+        }
+
+        if (string_equals(list_get(args, 0), "-dump")) {
+            dumpOption = true;
             list_remove_index(args, 0);
             continue;
         }
@@ -622,10 +425,16 @@ int run_command_line(caWorld* world, Value* args)
 
     if (stack_errored(stack)) {
         std::cout << "Error occurred:\n";
-        circa_dump_stack_trace(stack);
+        Value str;
+        stack_trace_to_string(stack, &str);
+        std::cout << as_cstring(&str);
         std::cout << std::endl;
-        std::cout << "Stack:\n";
-        dump(stack);
+
+        if (dumpOption) {
+            std::cout << "Stack:\n";
+            dump(stack);
+        }
+
         return 1;
     }
 

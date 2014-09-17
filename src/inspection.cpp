@@ -488,15 +488,16 @@ void get_short_location(Term* term, Value* str)
 
     string_append(str, "[");
 
-    std::string filename = get_source_filename(term);
-    if (filename == "") {
+    Value filename;
+    get_source_filename(term, &filename);
+    if (string_equals(&filename, "")) {
         Value* moduleName = get_parent_module_name(term->owningBlock);
         if (moduleName != NULL) {
             string_append(str, moduleName);
             string_append(str, " ");
         }
     } else {
-        string_append(str, filename.c_str());
+        string_append(str, &filename);
         string_append(str, " ");
     }
 
@@ -518,10 +519,10 @@ void get_short_location(Term* term, Value* str)
     string_append(str, "]");
 }
 
-std::string get_source_filename(Term* term)
+void get_source_filename(Term* term, Value* out)
 {
     if (term->owningBlock == NULL)
-        return "";
+        return set_string(out, "");
 
     Block* block = term->owningBlock;
 
@@ -529,12 +530,12 @@ std::string get_source_filename(Term* term)
         Value* filename = block_get_source_filename(block);
 
         if (filename != NULL)
-            return as_string(filename);
+            return set_value(out, filename);
 
         block = get_parent_block(block);
     }
 
-    return "";
+    set_string(out, "");
 }
 
 Value* get_parent_module_name(Block* block)
