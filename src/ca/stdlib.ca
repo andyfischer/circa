@@ -991,19 +991,18 @@ def Map.empty(self) -> bool
 def Map.apply(@self, any key, Func func)
   @self.set(key, func.call(self.get(key)))
 
-def Map.modify(self, any key, Func func)
+def Map.modify(@self, any key, Func func)
   @self.set(key, func.call(self.get(key)))
 
-def Map.list_append(self, any key, any value) -> Map
+def Map.list_append(@self, any key, any value) -> Map
   if self.contains(key)
     @self.modify(key, (l) -> l.append(value))
   else
     @self.set(key, [value])
 
-def Map.bucketize(self, List list, Func getKey) -> Map
+def Map.bucketize(@self, List list, Func getKey) -> Map
   for el in list
     @self.list_append(getKey.call(el), el)
-  self
 
 def Map.keys(self) -> List
 
@@ -1011,13 +1010,13 @@ struct Set {
   Map m
 }
 
-def Set.add(self, element) -> Set
+def Set.add(@self, element) -> Set
   @self.m.set(element, true)
 
-def Set.contains(self, element) -> bool
+def Set.contains(@self, element) -> bool
   self.m.contains(element)
 
-def Set.remove(self, element) -> Set
+def Set.remove(@self, element) -> Set
   @self.m.remove(element)
 
 def Set.elements(self) -> List

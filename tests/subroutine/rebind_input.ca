@@ -1,0 +1,12 @@
+
+
+def my_rebinding_func(@a)
+  a += 1
+  0
+
+a = 3
+my_rebinding_func(@a)
+assert(a == 4)
+my_rebinding_func(@a)
+assert(a == 5)
+
