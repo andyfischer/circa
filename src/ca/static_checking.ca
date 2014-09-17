@@ -20,28 +20,36 @@ def Check.term(@self, Term term)
 def Check.block(@self, Block block)
   for term in block.terms
     @self.term(term)
+  self
 
 def check_block(Block block) -> List
   result = Check.make.block(block)
   result.errors
 
-def format_error_list(List errors) -> String
+def check_block_and_report(Block block)
+  errors = check_block(block)
+  if errors.length == 0
+    print("No errors found")
+  else
+    print(errors.length " error(s) found:")
+    for error in errors
+      print('  ' format_error(error))
+
+def format_error(error) -> String
+  term = error[0]
+  msg = error[1]
+
   result = ''
+  str(@result term.location_string ' ')
 
-  for error in errors
-    term = error[0]
-    msg = error[1]
-
-    str(@result term.location_string ' ')
-
-    switch msg
-      case :null_function
-        str(@result 'NULL function reference')
-      case :unknown_function
-        str(@result 'Unknown function: ' term.property_opt(:Syntax_FunctionName ''))
-      case :unknown_identifier
-        str(@result 'Unknown identifier: ' term.name)
-      else
-        str(@result msg)
+  switch msg
+    case :null_function
+      str(@result 'NULL function reference')
+    case :unknown_function
+      str(@result 'Unknown function: ' term.property_opt(:Syntax_FunctionName ''))
+    case :unknown_identifier
+      str(@result 'Unknown identifier: ' term.name)
+    else
+      str(@result msg)
 
   result

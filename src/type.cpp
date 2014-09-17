@@ -335,15 +335,7 @@ void initialize_simple_pointer_type(Type* type)
     reset_type(type);
 }
 
-std::string get_base_type_name(std::string const& typeName)
-{
-    size_t pos = typeName.find_first_of("<");
-    if (pos != std::string::npos)
-        return typeName.substr(0, pos);
-    return "";
-}
-
-Term* find_method_with_search_name(Block* block, Type* type, const char* searchName)
+Term* find_method_with_search_name(Block* block, Type* type, Value* searchName)
 {
     // Local name search.
     if (block != NULL) {
@@ -373,24 +365,16 @@ Term* find_method(Block* block, Type* type, Value* name)
         return NULL;
 
     // Construct the search name, which looks like TypeName.functionName.
-    std::string searchName = std::string(as_cstring(&type->name)) + "." + as_cstring(name);
+    Value searchName;
+    set_value(&searchName, &type->name);
+    string_append(&searchName, ".");
+    string_append(&searchName, name);
 
     // Standard search.
-    Term* result = find_method_with_search_name(block, type, searchName.c_str());
+    Term* result = find_method_with_search_name(block, type, &searchName);
 
     if (result != NULL)
         return result;
-
-    // If the type name is complex (such as List<int>), then try searching
-    // for the base type name (such as List).
-    std::string baseTypeSymbol = get_base_type_name(as_cstring(&type->name));
-    if (baseTypeSymbol != "") {
-        std::string searchName = baseTypeSymbol + "." + as_cstring(name);
-        result = find_method_with_search_name(block, type, searchName.c_str());
-
-        if (result != NULL)
-            return result;
-    }
 
     // Look inside the type definition, which contains simulated methods and
     // possibly other stuff.

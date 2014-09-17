@@ -539,8 +539,23 @@ int run_command_line(caWorld* world, Value* args)
     }
 
     // Run file checker
-    if (string_equals(list_get(args, 0), "-check"))
-        return run_file_checker(as_cstring(list_get(args, 1)));
+    if (string_equals(list_get(args, 0), "-check")) {
+        Block* inputBlock = load_module_by_filename(world, list_get(args, 1));
+
+        Value str_static_checking;
+        set_string(&str_static_checking, "static_checking");
+        Block* staticChecking = load_module(world, NULL, &str_static_checking);
+        Block* func = find_function_local(staticChecking, "check_block_and_report");
+
+        Stack stack;
+        stack_init(&stack, func);
+        set_block(circa_input(&stack, 0), inputBlock);
+
+        circa_run(&stack);
+        if (stack_errored(&stack))
+            dump(&stack);
+        return 0;
+    }
 
     // Command reader (from stdin)
     if (string_equals(list_get(args, 0), "-run-stdin")) {
@@ -566,7 +581,7 @@ int run_command_line(caWorld* world, Value* args)
         if (stack_errored(&stack))
             dump(&stack);
         else
-            std::cout << as_string(circa_output(&stack, 0));
+            printf("%s\n", as_cstring(circa_output(&stack, 0)));
         return 0;
     }
 

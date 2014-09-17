@@ -1888,6 +1888,63 @@ const char* BUILTIN_MODULE_matrix =
     "def Mat3.translate(self, Vec2 vec) -> Mat3\n"
     "  self.mult(make_translate3(vec))\n";
 
+const char* BUILTIN_MODULE_static_checking = 
+    "\n"
+    "struct Check {\n"
+    "  List errors\n"
+    "}\n"
+    "\n"
+    "def Check.term(@self, Term term)\n"
+    "  if term.function.is_null\n"
+    "    @self.errors.append([term :null_function])\n"
+    "\n"
+    "  if term.function == unknown_function.block\n"
+    "    @self.errors.append([term :unknown_function])\n"
+    "\n"
+    "  if term.function == unknown_identifier.block\n"
+    "    @self.errors.append([term :unknown_identifier])\n"
+    "\n"
+    "  if term.function == syntax_error.block\n"
+    "    msg = term.input(0).value\n"
+    "    @self.errors.append([term msg])\n"
+    "\n"
+    "def Check.block(@self, Block block)\n"
+    "  for term in block.terms\n"
+    "    @self.term(term)\n"
+    "  self\n"
+    "\n"
+    "def check_block(Block block) -> List\n"
+    "  result = Check.make.block(block)\n"
+    "  result.errors\n"
+    "\n"
+    "def check_block_and_report(Block block)\n"
+    "  errors = check_block(block)\n"
+    "  if errors.length == 0\n"
+    "    print(\"No errors found\")\n"
+    "  else\n"
+    "    print(errors.length \" errors found:\")\n"
+    "    for error in errors\n"
+    "      print('  ' format_error(error))\n"
+    "\n"
+    "def format_error(error) -> String\n"
+    "  term = error[0]\n"
+    "  msg = error[1]\n"
+    "\n"
+    "  result = ''\n"
+    "  str(@result term.location_string ' ')\n"
+    "\n"
+    "  switch msg\n"
+    "    case :null_function\n"
+    "      str(@result 'NULL function reference')\n"
+    "    case :unknown_function\n"
+    "      str(@result 'Unknown function: ' term.property_opt(:Syntax_FunctionName ''))\n"
+    "    case :unknown_identifier\n"
+    "      str(@result 'Unknown identifier: ' term.name)\n"
+    "    else\n"
+    "      str(@result msg)\n"
+    "\n"
+    "  result\n";
+
 const char* BUILTIN_MODULE_source_repro = 
     "\n"
     "struct SourceRepro {\n"
@@ -2708,6 +2765,8 @@ const char* find_builtin_module(const char* name) {
         return BUILTIN_MODULE_error_trace;
     if (strcmp(name, "matrix") == 0)
         return BUILTIN_MODULE_matrix;
+    if (strcmp(name, "static_checking") == 0)
+        return BUILTIN_MODULE_static_checking;
     if (strcmp(name, "source_repro") == 0)
         return BUILTIN_MODULE_source_repro;
     if (strcmp(name, "stack_dump") == 0)
