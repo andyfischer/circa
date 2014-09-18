@@ -1,0 +1,4 @@
+
+require ./lib2
+
+lib2.lib1.f(5)

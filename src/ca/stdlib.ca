@@ -826,6 +826,7 @@ def List.resize(self, int length) -> List
   -- Resize the list to have the given length. If the length is increased, then
   -- null values are appended on the right; if the length is decreased then
   -- existing values on the right are dropped.
+
 def List.count(self) -> int
   -- Return the number of elements in this list.
 

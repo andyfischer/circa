@@ -1,4 +1,4 @@
 
-require lib1
+require ./lib1
 
 lib1.f(123)

@@ -239,9 +239,7 @@ int run_command_line(caWorld* world, Value* args)
 
         if (string_equals(list_get(args, 0), "-load")) {
             Value* filename = list_get(args, 1);
-
-            Value moduleName;
-            module_get_default_name_from_filename(filename, &moduleName);
+            load_module(world, NULL, filename);
 
             list_remove_index(args, 0);
             list_remove_index(args, 0);

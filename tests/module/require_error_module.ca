@@ -1,2 +1,2 @@
 
-require lib_with_static_error
+require ./lib_with_static_error

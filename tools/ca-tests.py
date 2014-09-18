@@ -205,7 +205,7 @@ def run_all_tests(suite):
 
 def accept_output_for_test(file):
     outfile = file + '.output'
-    command = "file " + file
+    command = file
 
     print('[Accepting output for: '+command+']')
 

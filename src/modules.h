@@ -11,8 +11,6 @@ Value* module_search_paths(World* world);
 void module_add_search_path(World* world, const char* str);
 
 // -- Filenames --
-void module_get_default_name_from_filename(Value* filename, Value* moduleNameOut);
-
 Block* create_module(World* world);
 void module_set_name(World* world, Block* block, Value* name);
 void module_set_filename(World* world, Block* block, Value* filename);

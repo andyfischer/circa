@@ -1,5 +1,5 @@
 
-require dummy_lib
+require ./dummy_lib
 
 _perf_stats_dump()
 

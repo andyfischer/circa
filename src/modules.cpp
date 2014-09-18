@@ -40,19 +40,6 @@ void module_add_search_path(World* world, const char* str)
     set_string(list_append(&world->moduleSearchPaths), str);
 }
 
-void module_get_default_name_from_filename(Value* filename, Value* moduleNameOut)
-{
-    get_just_filename_for_path(filename, moduleNameOut);
-
-    // Chop off everything after the last dot (if there is one)
-    int dotPos = string_find_char_from_end(moduleNameOut, '.');
-    if (dotPos != -1) {
-        Value temp;
-        copy(moduleNameOut, &temp);
-        string_slice(&temp, 0, dotPos, moduleNameOut);
-    }
-}
-
 Block* find_module(World* world, Value* name)
 {
     stat_increment(FindModule);
@@ -70,19 +57,6 @@ Block* find_module_by_filename(World* world, Value* filename)
         return NULL;
     return as_block(block);
 }
-
-#if 0
-Block* fetch_module(World* world, const char* name)
-{
-    Value nameStr;
-    set_string(&nameStr, name);
-    Block* existing = find_module(world, &nameStr);
-    if (existing != NULL)
-        return existing;
-
-    return create_module(world, name);
-}
-#endif
 
 Block* create_module(World* world)
 {
@@ -130,39 +104,6 @@ void resolve_possible_module_path(World* world, Value* path, Value* result)
     set_null(result);
 }
 
-#if 0
-static bool check_module_search_path(World* world, Value* moduleName,
-    Value* searchPath, Value* filenameOut)
-{
-    // For each search path we'll check two places.
-
-    // Look under searchPath/moduleName.ca
-    Value computedPath;
-    copy(searchPath, &computedPath);
-    join_path(&computedPath, moduleName);
-    string_append(&computedPath, ".ca");
-
-    if (circa_file_exists(world, as_cstring(&computedPath))) {
-        move(&computedPath, filenameOut);
-        return true;
-    }
-
-    // Look under searchPath/moduleName/moduleName.ca
-    copy(searchPath, &computedPath);
-
-    join_path(&computedPath, moduleName);
-    join_path(&computedPath, moduleName);
-    string_append(&computedPath, ".ca");
-
-    if (circa_file_exists(world, as_cstring(&computedPath))) {
-        move(&computedPath, filenameOut);
-        return true;
-    }
-    
-    return false;
-}
-#endif
-
 void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut)
 {
     Value* loadedByFilename = block_get_property(loadedBy, sym_Filename);
@@ -194,32 +135,6 @@ void find_module_file_global(World* world, Value* moduleName, Value* filenameOut
     }
 }
 
-#if 0
-Block* load_module_file(World* world, Value* moduleName, const char* filename)
-{
-    Block* existing = find_module(world, moduleName);
-    Block* newBlock;
-
-    if (existing == NULL) {
-        newBlock = create_module(world, moduleName, NULL);
-    } else {
-        newBlock = alloc_block(world);
-        block_graft_replacement(existing, newBlock);
-    }
-
-    load_script(newBlock, filename);
-
-    if (existing != NULL) {
-        Migration migration;
-        migration.oldBlock = existing;
-        migration.newBlock = newBlock;
-        migrate_world(world, &migration);
-    }
-
-    return newBlock;
-}
-#endif
-
 void module_install_replacement(World* world, Value* filename, Block* replacement)
 {
     Block* existing = find_module_by_filename(world, filename);
@@ -241,22 +156,6 @@ void module_install_replacement(World* world, Value* filename, Block* replacemen
     migration.newBlock = replacement;
     migrate_world(world, &migration);
 }
-
-#if 0
-Block* load_module_file_watched(World* world, Value* moduleName, const char* filename)
-{
-    // Load and parse the script file.
-    Block* block = load_module_file(world, moduleName, filename);
-
-    // Create implicit file watch.
-    FileWatch* watch = add_file_watch_module_load(world, filename, moduleName);
-
-    // Since we just loaded the script, update the file watch.
-    file_watch_ignore_latest_change(watch);
-
-    return block;
-}
-#endif
 
 Block* load_module_by_filename(World* world, Value* filename)
 {
@@ -361,11 +260,6 @@ CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* moduleName,
         const char* filename)
 {
-#if 0
-    Value moduleNameVal;
-    set_string(&moduleNameVal, moduleName);
-    return load_module_file_watched(world, &moduleNameVal, filename);
-#endif
     return NULL;
 }
 

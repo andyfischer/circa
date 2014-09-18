@@ -1,7 +1,7 @@
 
 print('pre require')
 
-require lib1
+require ./lib1
 
 print('pre access')
 

@@ -18,24 +18,6 @@ void test_get_just_filename_for_path()
     test_equals(&filename, "path.ca");
 }
 
-void test_module_get_default_name_from_filename()
-{
-    Value val;
-    Value filename;
-
-    set_string(&val, "a/long/path.ca");
-    module_get_default_name_from_filename(&val, &filename);
-    test_equals(&filename, "path");
-
-    set_string(&val, "path");
-    module_get_default_name_from_filename(&val, &filename);
-    test_equals(&filename, "path");
-
-    set_string(&val, "my.website/path");
-    module_get_default_name_from_filename(&val, &filename);
-    test_equals(&filename, "path");
-}
-
 void test_get_parent_directory()
 {
     Value path, result;
@@ -76,7 +58,6 @@ void test_get_parent_directory()
 void register_tests()
 {
     REGISTER_TEST_CASE(file_test::test_get_just_filename_for_path);
-    REGISTER_TEST_CASE(file_test::test_module_get_default_name_from_filename);
     REGISTER_TEST_CASE(file_test::test_get_parent_directory);
 }
 

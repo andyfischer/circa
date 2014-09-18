@@ -1223,19 +1223,35 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     tokens.consume(); // either 'import' or 'require'
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(tok_Identifier)) 
-        return syntax_error(block, tokens, startPosition,
-            "Expected path after 'require'");
-
     Value path;
     while (true) {
         tokens.consumeStr(&path);
 
-        if (!tokens.nextIs(tok_Identifier) && !tokens.nextIs(tok_Slash))
+        bool accept = false;
+
+        switch (tokens.nextMatch()) {
+        case tok_Identifier:
+        case tok_Slash:
+        case tok_Dot:
+            accept = true;
+        }
+
+        if (!accept)
             break;
     }
 
-    Block* module = load_module(block->world, block, &path);
+    if (is_null(&path))
+        return syntax_error(block, tokens, startPosition, "Expected path after 'require'");
+
+
+    Block* moduleRelativeTo = NULL;
+
+    if (string_starts_with(&path, "./")) {
+        string_slice(&path, 2, -1);
+        moduleRelativeTo = block;
+    }
+
+    Block* module = load_module(block->world, moduleRelativeTo, &path);
     
     if (module == NULL) {
         Value msg;

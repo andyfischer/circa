@@ -1,6 +1,10 @@
 
 Miscellanous (most-recent first)
 
+  make 'make' optional on a type. As in, "Type.something" is equivalent to "Type.make.something"
+ 
+  to_string should escape the stuff inside the string.. quotes and newlines and etc.
+
   When pressing the reset_state button in Improv, suddenly got an old syntax
   error. As if it was no longer using my recently-updated module.
   

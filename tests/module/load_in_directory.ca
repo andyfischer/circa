@@ -1,4 +1,4 @@
 
-lib = require in_directory/lib
+lib = require ./in_directory/lib
 
 lib.f('input value')
