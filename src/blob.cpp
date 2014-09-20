@@ -161,7 +161,7 @@ char* blob_touch(Value* blobVal)
     return set_blob_alloc_raw(blobVal, data, numBytes);
 }
 
-u32 blob_size(Value* blobVal)
+CIRCA_EXPORT uint32_t circa_blob_size(Value* blobVal)
 {
     BlobAbstract* blob = (BlobAbstract*) blobVal->value_data.ptr;
     if (blob == NULL)

@@ -1005,6 +1005,9 @@ def Map.bucketize(@self, List list, Func getKey) -> Map
   for el in list
     @self.list_append(getKey.call(el), el)
 
+  -- language defect, shouldn't be required:
+  self
+
 def Map.keys(self) -> List
 
 struct Set {
