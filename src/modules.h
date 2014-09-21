@@ -17,20 +17,22 @@ void module_set_filename(World* world, Block* block, Value* filename);
 
 void module_install_replacement(World* world, Value* filename, Block* block);
 
-Block* find_module(World* world, Value* name);
+Block* find_module(World* world, Block* relativeTo, Value* name);
 Block* find_module_by_filename(World* world, Value* filename);
+void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut);
 
 Block* load_module(World* world, Block* relativeTo, Value* moduleName);
 Block* load_module_by_filename(World* world, Value* filename);
 
 void resolve_possible_module_path(World* world, Value* path, Value* result);
 
-Block* module_ref_get_block(Value* module);
+Block* module_ref_resolve(World* world, Value* module);
 
-Term* module_lookup(Value* module, Term* caller);
+Term* module_lookup(Block* module, Term* caller);
+Term* module_ref_lookup(Value* moduleRef, Term* caller);
 
 bool is_module_ref(Value* value);
-void set_module_ref(Value* value, Block* block);
+void set_module_ref(Value* value, Value* path, Block* relativeTo);
 
 // Install builtin modules functions.
 void modules_install_functions(NativePatch* patch);

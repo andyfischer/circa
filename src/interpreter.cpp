@@ -625,7 +625,7 @@ void vm_resolve_dynamic_method_to_module_access(Stack* stack, Value* object)
     Frame* top = vm_top_frame(stack);
     Frame* parent = top_frame_parent(stack);
     Term* caller = frame_current_term(parent);
-    Term* term = module_lookup(object, caller);
+    Term* term = module_ref_lookup(object, caller);
     Value* elementName = caller->getProp(sym_MethodName);
 
     stat_increment(Interpreter_DynamicMethod_ModuleLookup);

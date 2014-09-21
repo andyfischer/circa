@@ -282,7 +282,7 @@ void circa_push_module(caStack* stack, const char* name)
 {
     Value nameStr;
     set_string(&nameStr, name);
-    Block* block = find_module(stack->world, &nameStr);
+    Block* block = find_module(stack->world, NULL, &nameStr);
     if (block == NULL) {
         // TODO: Save this error on the stack instead of stdout
         std::cout << "in circa_push_module, module not found: " << name << std::endl;

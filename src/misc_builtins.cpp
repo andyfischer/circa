@@ -115,6 +115,11 @@ void cast_evaluate(caStack* stack)
     set_bool(circa_output(stack, 1), success);
 }
 
+void debug_break(Stack* stack)
+{
+    printf("debug_break..\n");
+}
+
 void div_f(caStack* stack)
 {
     set_float(circa_output(stack, 0), circa_float_input(stack, 0) / circa_float_input(stack, 1));
@@ -883,14 +888,20 @@ void Map__empty(caStack* stack)
     set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
 }
 
+void Module__block(caStack* stack)
+{
+    Value* moduleRef = circa_input(stack, 0);
+    Block* moduleBlock = module_ref_resolve(stack->world, moduleRef);
+    set_block(circa_output(stack, 0), moduleBlock);
+}
+
 void Module__get(caStack* stack)
 {
     Value* moduleRef = circa_input(stack, 0);
-    Block* moduleBlock = module_ref_get_block(moduleRef);
+    Block* moduleBlock = module_ref_resolve(stack->world, moduleRef);
     Term* term = find_local_name(moduleBlock, circa_input(stack, 1));
     copy(term_value(term), circa_output(stack, 0));
 }
-
 
 void String__char_at(caStack* stack)
 {
@@ -1214,14 +1225,14 @@ void error(caStack* stack)
     circa_output_error_val(stack, &out);
 }
 
-void get_with_symbol(caStack* stack)
+void get_with_symbol(Stack* stack)
 {
     Value* left = circa_input(stack, 0);
     Value str;
     symbol_as_string(circa_input(stack, 1), &str);
 
     if (is_module_ref(left)) {
-        Block* block = module_ref_get_block(left);
+        Block* block = module_ref_resolve(stack->world, left);
         Term* term = find_local_name(block, &str);
 
         if (term != NULL) {
@@ -1283,6 +1294,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "assert", assert_func);
     circa_patch_function(patch, "cast_declared_type", cast_declared_type);
     circa_patch_function(patch, "cast", cast_evaluate);
+    circa_patch_function(patch, "debug_break", debug_break);
     circa_patch_function(patch, "str", str);
     circa_patch_function(patch, "cond", cond);
     circa_patch_function(patch, "copy", copy_eval);
@@ -1373,6 +1385,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "Map.get", Map__get);
     circa_patch_function(patch, "Map.set", Map__set);
     circa_patch_function(patch, "Map.empty", Map__empty);
+    circa_patch_function(patch, "Module.block", Module__block);
     circa_patch_function(patch, "Module._get", Module__get);
 
     circa_patch_function(patch, "String.char_at", String__char_at);

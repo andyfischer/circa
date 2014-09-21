@@ -1243,7 +1243,6 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     if (is_null(&path))
         return syntax_error(block, tokens, startPosition, "Expected path after 'require'");
 
-
     Block* moduleRelativeTo = NULL;
 
     if (string_starts_with(&path, "./")) {
@@ -1263,14 +1262,14 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     Value localName;
     int slashLoc = string_find_char_from_end(&path, '/');
     if (slashLoc == -1) {
-        move(&path, &localName);
+        copy(&path, &localName);
     } else {
         string_substr(&path, slashLoc + 1, -1, &localName);
     }
 
     Term* term = apply(block, FUNCS.require, TermList(), &localName);
 
-    set_module_ref(term_value(term), module);
+    set_module_ref(term_value(term), &path, moduleRelativeTo);
 
     if (keyword == tok_Import) {
         term->setBoolProp(sym_Syntax_Import, true);

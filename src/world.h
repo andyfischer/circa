@@ -60,6 +60,8 @@ void world_initialize(World* world);
 void world_uninitialize(World* world);
 World* create_world();
 
+World* get_world(Term* term);
+
 void world_clear_file_sources(World* world);
 Value* world_append_file_source(World* world);
 void world_use_local_filesystem(World* world, const char* rootDir);

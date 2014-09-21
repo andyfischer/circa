@@ -460,7 +460,7 @@ def decrement(int i) -> int
 struct FileSignature { String filename, int time_modified }
 struct Callable;
 struct Color { number r, number g, number b, number a }
-struct Module { Block block }
+struct Module { String moduleName, Block relativeTo }
 struct Stack;
 struct Vec2 { number x, number y }
 struct Vec2i { int x, int y }
@@ -470,16 +470,16 @@ struct Rect { number x1, number y1, number x2, number y2 }
 struct Rect_i { int x1, int y1, int x2, int y2 }
 
 def Module._get(self, name)
+def Module.block(self) -> Block
 def Module.to_func(self) -> Func
   self.block.to_func
 def Module.to_stack(self) -> Stack
   self.block.to_stack
 
-def load_script(String filename) -> Module
-  -- Load a script with the given filename. The result will only be available
-  -- locally; it won't be loaded into module space.
+def load_script(String filename) -> Block
+  -- Load a script file with the given filename.
 
-def require() -> Module
+def require(String name) -> Module
   -- Load a module.
 
 def package(String moduleName)
@@ -768,6 +768,14 @@ def Stack.frame(self, int depth) -> Frame
 def Stack.frame_from_base(self, int height) -> Frame
   -- Return the Frame with the given height.
 def Stack.frame_count(self) -> int
+
+def Stack.frames_from_top(self) -> List
+  for i in 0..self.frame_count
+    self.frame(i)
+
+def Stack.frames_from_start(self) -> List
+  for i in self.frame_count..0
+    self.frame(i-1)
 
 def Stack.top(self) -> Frame
   -- Return the topmost Frame.
@@ -1620,3 +1628,5 @@ def noise(number x)
 -- Codechange objects
 def codechange_set_value(Term target, any newValue) -> List
   [:set_value target newValue]
+
+def debug_break()

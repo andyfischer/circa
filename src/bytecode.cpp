@@ -640,13 +640,12 @@ Value* get_statically_known_value(Term* term)
 
 bool bc_try_to_statically_resolve_module_call(Writer* writer, Term* term)
 {
-    // Try to statically resolve a module reference.
     Value* staticLHS = get_statically_known_value(term->input(0));
 
     if (staticLHS == NULL || !is_module_ref(staticLHS))
         return false;
 
-    Term* result = module_lookup(staticLHS, term);
+    Term* result = module_ref_lookup(staticLHS, term);
 
     if (result == NULL)
         return false;

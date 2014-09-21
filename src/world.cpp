@@ -98,6 +98,11 @@ World* create_world()
     return world;
 }
 
+World* get_world(Term* term)
+{
+    return term->owningBlock->world;
+}
+
 void world_clear_file_sources(World* world)
 {
     set_list(&world->fileSources, 0);

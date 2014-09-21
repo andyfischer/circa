@@ -338,11 +338,16 @@ Stack* stack_duplicate(Stack* stack)
 
         dupeFrame->parentIndex = sourceFrame->parentIndex;
         dupeFrame->block = sourceFrame->block;
+        dupeFrame->blockIndex = -1;
         dupeFrame->termIndex = sourceFrame->termIndex;
         set_value(&dupeFrame->bindings, &sourceFrame->bindings);
         set_value(&dupeFrame->env, &sourceFrame->env);
         set_value(&dupeFrame->incomingState, &sourceFrame->incomingState);
         set_value(&dupeFrame->outgoingState, &sourceFrame->outgoingState);
+
+        // Compile bytecode
+        dupeFrame->blockIndex = compiled_create_entry(dupe->program, dupeFrame->block);
+        dupeFrame->pc = 0;
 
         sourceFrame = next_frame(sourceFrame);
     }
@@ -624,6 +629,8 @@ void stack_to_string(Stack* stack, Value* out, bool withBytecode)
             string_append(out, "#");
             string_append(out, block->id);
         }
+        string_append(out, ", blockIndex = ");
+        string_append(out, frame->blockIndex);
         string_append(out, ", termIndex = ");
         string_append(out, frame->termIndex);
         string_append(out, ", pc = ");
@@ -811,8 +818,8 @@ void stack_setup_type(Type* type)
 
 void Stack__block(caStack* stack)
 {
-    Stack* actor = as_stack(circa_input(stack, 0));
-    set_block(circa_output(stack, 0), frame_block(top_frame(actor)));
+    Stack* self = as_stack(circa_input(stack, 0));
+    set_block(circa_output(stack, 0), frame_block(top_frame(self)));
 }
 
 void Stack__dump(caStack* stack)
@@ -1271,15 +1278,6 @@ void Frame__current_term(caStack* stack)
     set_term_ref(circa_output(stack, 0), frame_current_term(frame));
 }
 
-#if 0
-void Frame__extract_state(caStack* stack)
-{
-    Frame* frame = as_frame_ref(circa_input(stack, 0));
-    Value* output = circa_output(stack, 0);
-    extract_state(frame_block(frame), &frame->state, output);
-}
-#endif
-
 void stack_install_functions(NativePatch* patch)
 {
     circa_patch_function(patch, "Stack.block", Stack__block);
@@ -1330,9 +1328,6 @@ void stack_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Frame.pc", Frame__pc);
     circa_patch_function(patch, "Frame.parentIndex", Frame__parentPc);
     circa_patch_function(patch, "Frame.set_active_value", Frame__set_active_value);
-#if 0
-    circa_patch_function(patch, "Frame.extract_state", Frame__extract_state);
-#endif
 }
 
 } // namespace circa

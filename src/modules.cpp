@@ -40,9 +40,23 @@ void module_add_search_path(World* world, const char* str)
     set_string(list_append(&world->moduleSearchPaths), str);
 }
 
-Block* find_module(World* world, Value* name)
+Block* find_module_local(World* world, Block* relativeTo, Value* name)
+{
+    Value filename;
+    find_module_file_local(world, relativeTo, name, &filename);
+
+    if (is_null(&filename))
+        return NULL;
+
+    return find_module_by_filename(world, &filename);
+}
+
+Block* find_module(World* world, Block* relativeTo, Value* name)
 {
     stat_increment(FindModule);
+
+    if (relativeTo != NULL)
+        return find_module_local(world, relativeTo, name);
 
     Value* block = hashtable_get(&world->modulesByName, name);
     if (block == NULL)
@@ -191,7 +205,7 @@ Block* load_module(World* world, Block* relativeTo, Value* moduleName)
             return load_module_by_filename(world, &filename);
     }
 
-    Block* existing = find_module(world, moduleName);
+    Block* existing = find_module(world, NULL, moduleName);
     if (existing != NULL)
         return existing;
 
@@ -216,9 +230,11 @@ Block* load_module(World* world, Block* relativeTo, Value* moduleName)
     return NULL;
 }
 
-Block* module_ref_get_block(Value* moduleRef)
+Block* module_ref_resolve(World* world, Value* moduleRef)
 {
-    return as_block(list_get(moduleRef, 0));
+    Value* name = moduleRef->index(0);
+    Block* relativeTo = as_block(moduleRef->index(1));
+    return find_module(world, relativeTo, name);
 }
 
 bool is_module_ref(Value* value)
@@ -226,25 +242,30 @@ bool is_module_ref(Value* value)
     return value->value_type == TYPES.module_ref;
 }
 
-void set_module_ref(Value* value, Block* block)
+void set_module_ref(Value* value, Value* path, Block* relativeTo)
 {
     make(TYPES.module_ref, value);
-    set_block(list_get(value, 0), block);
+    set_value(value->index(0), path);
+    set_block(value->index(1), relativeTo);
 }
 
-Term* module_lookup(Value* module, Term* caller)
+Term* module_lookup(Block* module, Term* caller)
 {
-    Block* block = module_ref_get_block(module);
     Value* elementName = caller->getProp(sym_MethodName);
-    Term* term = find_local_name(block, elementName);
+    Term* term = find_local_name(module, elementName);
     return term;
+}
+
+Term* module_ref_lookup(Value* moduleRef, Term* caller)
+{
+    return module_lookup(module_ref_resolve(get_world(caller), moduleRef), caller);
 }
  
 void load_script_eval(Stack* stack)
 {
     Value* filename = circa_input(stack, 0);
     Block* block = load_module_by_filename(stack->world, filename);
-    set_module_ref(circa_output(stack, 0), block);
+    set_block(circa_output(stack, 0), block);
 }
 
 void modules_install_functions(NativePatch* patch)

@@ -39,14 +39,6 @@ void migrate_block(Block* target, Migration* migration)
 {
     ca_assert(target != migration->oldBlock);
 
-    // Migrate term values; needs to happen whether or not the migration targets
-    // this block. Needed for Module values that are written by require().
-    // Future: Might be able to change require() to make this unnecessary.
-    for (BlockIterator it(target); it; ++it) {
-        Term* term = *it;
-        migrate_value(term_value(term), migration);
-    }
-
     if (target == migration->newBlock)
         return;
 
