@@ -267,6 +267,7 @@ def from_string(String s) -> any
 
 def error(any msg :multiple)
 
+
 -- Comparison
 def less_than_i(int a,int b) -> bool
 def less_than_f(number a,number b) -> bool
@@ -460,7 +461,7 @@ def decrement(int i) -> int
 struct FileSignature { String filename, int time_modified }
 struct Callable;
 struct Color { number r, number g, number b, number a }
-struct Module { String moduleName, Block relativeTo }
+struct Module { String name, Block relativeTo }
 struct Stack;
 struct Vec2 { number x, number y }
 struct Vec2i { int x, int y }
@@ -471,6 +472,8 @@ struct Rect_i { int x1, int y1, int x2, int y2 }
 
 def Module._get(self, name)
 def Module.block(self) -> Block
+def Module.resolve(self) -> Block
+  self.block
 def Module.to_func(self) -> Func
   self.block.to_func
 def Module.to_stack(self) -> Stack
@@ -481,6 +484,15 @@ def load_script(String filename) -> Block
 
 def require(String name) -> Module
   -- Load a module.
+
+def require_check(Module module)
+  block = module.resolve
+  if block.has_static_error
+    msg = [str("Module '" module.name "' has static errors: ")]
+    for error in block.get_static_errors_formatted
+      @msg.append(str('  ' error))
+
+    print(msg.join('\n'))
 
 def package(String moduleName)
   -- Declare that the current module is a reusable library with the given name.

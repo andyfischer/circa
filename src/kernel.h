@@ -50,6 +50,7 @@ struct BuiltinFuncs {
     Term* has_effects;
     Term* if_block;
     Term* require;
+    Term* require_check;
     Term* include_func;
     Term* input;
     Term* inputs_fit_function;

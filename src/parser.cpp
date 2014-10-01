@@ -1277,6 +1277,12 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
         term->setBoolProp(sym_Syntax_Require, true);
     }
 
+    // Possibly add a require_check()
+    if (FUNCS.require_check != NULL) {
+        Term* check = apply(block, FUNCS.require_check, TermList(term));
+        hide_from_source(check);
+    }
+
     return ParseResult(term);
 }
 

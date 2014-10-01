@@ -716,6 +716,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(range, "range");
         find_func(return_func, "return");
         find_func(remainder, "remainder");
+        find_func(require_check, "require_check");
         find_func(section_block, "section");
         find_func(selector, "selector");
         find_func(set_index, "set_index");
