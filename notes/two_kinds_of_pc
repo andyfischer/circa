@@ -1,6 +1,0 @@
-
-Moving forward with bytecode
-
-Need to divorce the two uses of PC (program counter)
-  - bytecodePC - an offset into our bytecode data.
-  - termPC - a term index that represents our current saved position
