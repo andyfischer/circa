@@ -1,7 +1,3 @@
-# submodules:
-/gh-pages
-/improv
-
 # build results:
 /build
 /src/build

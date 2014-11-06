@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>26F8D0F4-8CD1-42A0-90CF-0538DB77B6DB</string>
+	<key>IDESourceControlProjectName</key>
+	<string>improv</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>3B580563A6D0CDD4CEFC5A9627DB22B98891B385</key>
+		<string>ec2:~/circa</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>improv/improv.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>3B580563A6D0CDD4CEFC5A9627DB22B98891B385</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ec2:~/circa</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>3B580563A6D0CDD4CEFC5A9627DB22B98891B385</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>3B580563A6D0CDD4CEFC5A9627DB22B98891B385</string>
+			<key>IDESourceControlWCCName</key>
+			<string>circa</string>
+		</dict>
+	</array>
+</dict>
+</plist>
