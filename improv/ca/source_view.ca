@@ -1,0 +1,65 @@
+
+require source_repro
+
+struct SourceView {
+  List entities
+  Map termToId
+}
+
+struct TermEntity {
+  int id
+  Term term
+  List elements -- List of (String or EntityId)
+}
+
+struct BlockEntity {
+  int id
+  Block block
+  List elements -- List of (String or EntityId)
+}
+
+def SourceView.add_term(@self, Term term)
+  id = self.entities.length
+
+  entity = TermEntity.make(id term)
+
+  def phrase_to_element(phrase)
+    if phrase.t == :sub_expr
+      self.termToId.get(phrase.term)
+    else
+      phrase.text
+
+  for phrase in source_repro.term_phrases(term)
+    @entity.elements.append(phrase_to_element(phrase))
+
+  @self.entities.append(entity)
+  @self.termToId.set(term id)
+
+def SourceView.add_block(@self, Block block)
+  id = self.entities.length
+
+  entity = BlockEntity.make(id block)
+  
+  for term in block.terms
+    @self.add_term(term)
+
+  @self.entities.append(entity)
+
+def test()
+  def func()
+    a = 1 + 2
+    print(a)
+
+    for i in [1 2 3]
+      print(i)
+    if true
+      print(1)
+
+
+  sourceView = SourceView.make
+  @sourceView.add_block(func.block)
+
+  print(sourceView)
+  
+
+test()

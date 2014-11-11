@@ -1,0 +1,112 @@
+
+require cairo
+require draw
+input = require input
+require time
+
+def image(String filename)
+  cached({ cairo.load_image(filename) })
+
+sprites = image('assets/Platformer Art Pixel Redux/spritesheet.png')
+
+struct Clip {
+  Surface img
+  Rect area
+  Vec2 anchor
+  bool flipped
+}
+
+def Clip.draw(self, Vec2 center)
+  env(:canvas).draw_image_clip(self.img, self.area, center.translate(self.anchor * -1), self.flipped)
+
+def Clip.flip(self)
+  not(@self.flipped)
+
+def get_sprite_clip(int x, int y) -> Clip
+  spriteSize = 23
+  rect = Rect.cast(for i in [x, y, x+1, y+1] { i * spriteSize })
+  rect.x1 += 2
+  rect.y1 += 2
+  Clip.make(sprites, rect)
+
+{-
+for i in 0..12
+ for j in 0..10
+  get_sprite_clip(i + 19, j).draw([50 * (i + 1), 50 * (j + 1)])
+-}
+
+def dude_clip(dude, pose)
+  x = if pose == :standing
+    0
+  elif pose == :walk1
+    1
+  elif pose == :walk2
+    10
+  elif pose == :walk3
+    9
+  else
+    3
+  
+  y = if dude == :green
+    0
+  elif dude == :blue
+    1
+  else
+    2
+
+  get_sprite_clip(19 + x, y)
+
+struct Dude {
+  Vec2 position
+  Symbol facing
+  Vec2 speed
+}
+
+floor_y = 100
+walk_speed = 6
+
+state dude = Dude.make([50 floor_y] :right)
+
+def Dude.update(@dude)
+  walkDir = if input.key_down(:left)
+    dude.facing = :left
+    [-1 0]
+  elif input.key_down(:right)
+    dude.facing = :right
+    [1 0]
+  else
+    [0 0]
+
+  if walkDir == [0 0]
+    pose = :standing
+  else
+    pose = time.cycle([:walk1 :walk2 :walk2 :walk3], .1)
+
+  walkDelta = Vec2.cast(walkDir).mult(walk_speed)
+  time.momentum(@walkDelta, cond(walkDir == [0 0], .8, 0))
+
+  @dude.position.add(walkDelta)
+
+  clip = dude_clip(:green, pose)
+
+  @clip.set_flipped(dude.facing == :left)
+
+  @dude.physics
+
+  clip.draw(dude.position)
+
+def Dude.physics(@dude)
+  if input.key_pressed(:up)
+    @dude.speed.y = -6
+  else
+    @dude.speed.y.add(.4)
+
+  @dude.position.add(dude.speed)
+
+  if dude.position.y >= floor_y
+    dude.speed = Vec2.make(0 0)
+    dude.position.y = floor_y
+
+  dude
+
+@dude.update

@@ -1,0 +1,23 @@
+
+require draw
+width = env(:size).x
+height = env(:size).y
+
+-- Example 1-1: Bouncing Ball, with Vec2!
+state Vec2 location = [100, 100]
+state Vec2 velocity = [2.5,5]
+
+draw.background(#fff)
+
+-- Add the current speed to the location.
+@location.add(velocity)
+
+if (location.x > width) or (location.x < 0)
+  velocity.x = velocity.x * -1
+
+if (location.y > height) or (location.y < 0)
+  velocity.y = velocity.y * -1
+
+-- Display circle at x location
+draw.fill_ellipse(#555 location [48 48])
+draw.draw_ellipse(#111 location [48 48] 3.0)

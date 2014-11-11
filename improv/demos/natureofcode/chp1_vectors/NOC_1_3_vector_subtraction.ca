@@ -1,0 +1,9 @@
+
+require draw
+require input
+
+draw.background(#fff)
+
+center = env(:size).mult(1/2)
+
+draw.line(#000 center, input.mouse 2.0)

@@ -1,0 +1,318 @@
+
+require draw
+require time
+require input
+
+windowRect = env(:canvasRect) -> Rect.cast
+windowSize = windowRect.size
+
+def random_location() -> Vec2
+  for i in windowSize
+    i * rand()
+
+-- Black background
+draw.background(#000)
+
+struct Ship {
+  Vec2 loc
+  Vec2 momentum
+  number facing
+}
+
+struct Bullet {
+  number lifespan,
+  Vec2 loc,
+  Vec2 direction
+}
+
+struct Asteroid {
+  int size
+  List edges
+  Vec2 location
+  Vec2 vel
+  number rotation
+  number rotation_vel
+  number age
+}
+
+def Asteroid.radius(self) -> number
+  if self.size == 2
+    50.0
+  elif self.size == 1
+    27.0
+  else
+    12.0
+
+def Asteroid.size_speed_mod(self) -> number
+  if self.size == 2
+    1.0
+  elif self.size == 1
+    2.0
+  else
+    3.0
+
+-- Return a point that is wrapped around the playable area
+def wrap_around(Vec2 p) -> Vec2
+  [mod(p.x, windowSize.x), mod(p.y, windowSize.y)]
+
+def new_ship() -> Ship
+  [[windowSize.x/2, windowSize.y/2] [0 0] 0]
+
+state Ship ship = new_ship()
+state List bullets = []
+
+accelration_per_s = 10.0
+rotation_speed = 270.0
+ship_drag = 0.991
+speed_limit = 5.0
+bullet_speed = 300.0
+bullet_width = 2.0
+
+ship_size = 1.2
+ship_front = 10.0
+ship_back = 6.4
+ship_wing_size = 11.4
+ship_wing_rot = 140
+ship_radius = ship_size * ship_front
+
+asteroid_speed = 3.0
+
+draw_intersection_circles = false
+
+state gstate = :playing
+
+def srand() -> number
+  "srand"
+  state number value = rand()
+  return value
+
+drift = Vec2.cast(repeat(time.elapsed 2))
+mult(@drift 5)
+
+num_stars = 100
+points = for i in 0..num_stars
+  state Vec2 original_loc = random_location()
+  loc = add(original_loc, drift)
+  wrap_around(@loc)
+  loc
+
+draw.points(points, #fff)
+
+ship_thrust = 0
+
+-- Ship control
+if gstate == :playing
+  rotation = cond(input.key_down(:left), -1, 0)
+  cond(input.key_down(:right), 1, @rotation)
+  ship.facing = ship.facing + rotation * rotation_speed * time.delta
+
+  -- Keyboard controls for acceleration
+  ship_thrust = cond(input.key_down(:up), 1, 0)
+
+  ship.momentum += polar(ship.facing) * ship_thrust * accelration_per_s * time.delta
+
+  -- Press space to shoot a bullet
+  if input.key_pressed(:space)
+    @bullets.append(Bullet.make(0, ship.loc polar(ship.facing)))
+
+-- Add drag
+ship.momentum = ship.momentum * ship_drag
+
+-- Enforce a speed limit on ship.momentum
+speed = ship.momentum.magnitude
+if speed > speed_limit
+  ship.momentum = ship.momentum * (speed_limit / speed)
+
+-- Move ship
+ship.loc += ship.momentum
+ship.loc = wrap_around(ship.loc)
+
+-- Move bullets
+for Bullet bullet in @bullets
+  loc = bullet.loc + bullet.direction * bullet_speed * time.delta
+  wrap_around(@loc)
+  bullet = Bullet.make(bullet.lifespan+time.delta, loc, bullet.direction)
+
+-- Remove old bullets
+bullet_max_lifespan = 1.8
+for Bullet bullet in @bullets
+  if bullet.lifespan >= bullet_max_lifespan
+    discard
+
+-- Draw bullets
+for Bullet bullet in bullets
+  points = [bullet.loc + [-1 -1] * bullet_width,
+            bullet.loc + [1 -1] * bullet_width,
+            bullet.loc + [1 1] * bullet_width,
+            bullet.loc + [-1 1] * bullet_width
+           ]
+  draw.line_loop(#fff points 1)
+
+struct Particle {
+  number age
+  Vec2 loc
+  Vec2 vel
+}
+
+state List particles
+
+asteroid_collision_radius = 20.0
+asteroid_num_edges = 10
+asteroid_jagginess = 1 -- input.mouse_screen_norm.y
+
+def new_asteroid() -> Asteroid
+
+  asteroid = Asteroid.make(2)
+
+  edges = for index in 0..asteroid_num_edges
+    rand()
+
+  rotation = (rand() * .2 - .1) * 360
+  asteroid.edges = edges
+  asteroid.location = random_location()
+  asteroid.vel = random_norm_vector()*10
+  asteroid.rotation_vel = rotation
+  asteroid
+
+def new_child_asteroid(Asteroid parent) -> Asteroid
+  asteroid = new_asteroid()
+  asteroid.size = parent.size - 1
+  asteroid.location = parent.location
+  @asteroid.location.translate(asteroid.vel.norm.mult(.5 * parent.radius))
+  asteroid
+
+def generate_particle_burst(List particles, Vec2 loc, Vec2 vel) -> List
+  for i in 0..6
+    for v in @vel { v = v * rand() + (rand()-.5)*100 }
+    @particles.append(Particle.make(0.0 loc vel))
+  return particles
+
+state List asteroids = []
+
+-- Initalize starting asteroids
+if once()
+  for i in 0..5
+    as = new_asteroid()
+    @asteroids.append(as)
+
+-- move asteroids
+for Asteroid asteroid in @asteroids
+  speed = asteroid_speed * asteroid.size_speed_mod
+  asteroid.location += asteroid.vel * time.delta * speed
+  asteroid.rotation += asteroid.rotation_vel * time.delta * speed
+  asteroid.location = wrap_around(asteroid.location)
+  asteroid.age += time.delta
+
+def interp(number start, number fin, number ratio) -> number
+  -- Linear interpolation
+  start + (fin - start) * ratio
+
+-- draw asteroids
+for Asteroid asteroid in asteroids
+  points = for i,r in asteroid.edges
+    angle = i / (asteroid.edges.length-1) * 360
+    p = polar(angle)
+    @p.mult(interp(1, r + 0.4, asteroid_jagginess))
+    @p.mult(asteroid.radius)
+    @p.rotate(asteroid.rotation)
+    add(@p, asteroid.location)
+    p
+
+  draw.line_loop(#fff points 1)
+
+-- Check for collisions of asteroids and bullets
+spawned = []
+
+for Asteroid asteroid in @asteroids
+  collides = false
+
+  for Bullet bullet in @bullets
+    if asteroid.location.distance(bullet.loc) < asteroid.radius
+      collides = true
+
+      bullet_vel = Vec2.cast(bullet.direction * bullet_speed)
+      generate_particle_burst(@particles, asteroid.location, bullet_vel)
+
+      discard
+
+  if collides and asteroid.size > 0
+    @spawned.append(new_child_asteroid(asteroid))
+    @spawned.append(new_child_asteroid(asteroid))
+    if rand() > .5
+      @spawned.append(new_child_asteroid(asteroid))
+
+  if collides
+    discard
+
+for spawn in spawned
+  @asteroids.append(spawn)
+
+-- Check for collisions of asteroids and ship
+for Asteroid asteroid in asteroids
+  if asteroid.location.distance(ship.loc) < (asteroid.radius + ship_radius)
+    gstate = :dying
+
+def Ship.draw(ship)
+  def ship_point(number rot, number dist) -> Vec2
+    polar(rot + ship.facing) * dist*ship_size + ship.loc
+
+  points = [ship_point(0 ship_front)
+            ship_point(ship_wing_rot ship_wing_size)
+            ship_point(180 ship_back)
+            ship_point(-ship_wing_rot ship_wing_size)]
+
+  sides = for i in 0..4
+    [points[i], points[(i+1)%4]]
+
+  -- If we're dying then the ship is coming apart
+  if gstate == :dying
+    for side in @sides
+      drift = (srand()-.5) * time.elapsed() * 100
+      for p in @side
+        for c in @p
+          c += drift
+
+  lines = for side in sides
+    [side[0] side[1]]
+
+  draw.lines(#fff lines 1)
+
+  if ship_thrust > 0 and gstate != :dying
+    -- Draw rocket
+    rear = ship_point(180, ship_back + 5.0)
+    l = ship_point(160, ship_back + 1)
+    r = ship_point(200, ship_back + 1)
+    draw.line(#fff rear l 1)
+    draw.line(#fff rear r 1)
+
+ship.draw
+
+-- Update the dying state
+if gstate == :dying
+  death_time = time.elapsed()
+
+  if death_time > 1.5
+    gstate = :playing
+    ship = new_ship()
+
+max_particle_age = 3.0
+
+def previous(val) -> any
+  state prev = val
+  result = prev
+  prev = val
+  return result
+
+-- Draw/update particles
+for Particle particle in @particles
+  lifespan = particle.age.map([0 max_particle_age], [1 0])
+  color = Color.make(1 1 1 lifespan)
+
+  prev = previous(particle.loc)
+  draw.line(color prev particle.loc 1)
+
+  particle.loc = particle.loc + particle.vel * time.delta
+  particle.age = particle.age + time.delta
+
+  if particle.age > max_particle_age
+    discard

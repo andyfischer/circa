@@ -1,0 +1,105 @@
+
+struct UserInput {
+  List recentEvents
+  Set buttonsPressed
+}
+
+struct MouseEvent {
+  Symbol t
+  Vec2 pos
+}
+
+struct KeyEvent {
+  Symbol t
+  Symbol key
+}
+
+def UserInput.handleEvents(self, events) -> UserInput
+  self.recentEvents = events
+  for event in events
+    if event[0] == :down
+      @self.buttonsPressed.add(event[1])
+    elif event[0] == :up
+      @self.buttonsPressed.remove(event[1])
+  self
+
+def new() -> UserInput
+  UserInput.make
+
+def key_pressed(Symbol key) -> bool
+  userInput = env(:userInput) -> UserInput.cast
+  for event in userInput.recentEvents
+    if event == [:down key]
+      return true
+  return false
+
+def key_down(Symbol key) -> bool
+  userInput = env(:userInput)
+  userInput.buttonsPressed.contains(key)
+
+def mouse() -> Vec2
+  env(:mouse)
+
+def Vec2.vdiv(self, Vec2 b) -> Vec2
+  [self.x/b.x, self.y/b.y]
+
+def mouse_ratio() -> Vec2
+  env(:mouse).vdiv(env(:canvasRect).size)
+
+def mouse_in(Rect rect) -> bool
+  rect.contains(env(:mouse))
+
+def mouse_pressed() -> bool
+  for event in env(:userInput).recentEvents
+    if event.slice(0 2) == [:down :left_mouse]
+      return true
+
+def mouse_click_in(Rect rect) -> bool
+  for event in env(:userInput).recentEvents
+    if event.slice(0 2) == [:down :left_mouse] and mouse_in(rect)
+      return true
+  return false
+
+def wheel_delta() -> Vec2
+  result = Vec2.make
+  for event in env(:userInput).recentEvents
+    if event[0] == :mouse_wheel
+      @result.add(event[1])
+  result
+
+{-
+type ClickArea {
+    Rect rect
+    Func listener
+}
+
+def click_resolver(any message)
+
+    state clickAreas = []
+
+    -- Language defect: Ridiculous code that could be improved by pattern matching
+    if is_list(message)
+        if message[0] == :add
+            rect = message[1]
+            listener = message[2]
+            @clickAreas.append(ClickArea.make(rect listener))
+        elif message[0] == :resolve
+            mousePos = message[1] -> Vec2.cast
+            event = message[2]
+
+            listener = null
+            for ClickArea area in clickAreas
+                if area.rect.contains(mousePos)
+                    listener = area.listener
+
+            if listener != null
+                -- Language defect: Unnecessary cast
+                Func.cast(@listener)
+                listener.call(mousePos event)
+
+    elif message == :clear
+        clickAreas = []
+
+def new_click_resolver() -> Stack
+    make_stack(click_resolver)
+-}

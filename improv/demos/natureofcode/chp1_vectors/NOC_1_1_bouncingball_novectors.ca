@@ -1,0 +1,26 @@
+
+require draw
+width = env(:size).x
+height = env(:size).y
+
+-- Example 1-1: Bouncing Ball, no vectors
+state float x = 100
+state float y = 100
+state float xspeed = 2.5
+state float yspeed = 2
+
+draw.background(#fff)
+
+-- Add the current speed to the location.
+x = x + xspeed
+y = y + yspeed
+
+if (x > width) or (x < 0)
+  xspeed = xspeed * -1
+
+if (y > height) or (y < 0)
+  yspeed = yspeed * -1
+
+-- Display circle at x location
+draw.fill_ellipse(#555 [x y] [48 48])
+draw.draw_ellipse(#111 [x y] [48 48] 3.0)

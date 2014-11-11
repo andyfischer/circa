@@ -1,0 +1,162 @@
+
+require cairo
+require draw
+require input
+require time
+
+canvas = env(:canvas)
+
+def asset_path(str)
+  str('assets/ransom/' str)
+
+def draw_image(canvas, image, loc)
+  canvas.save
+  canvas.scale([2 2])
+  canvas.set_source_surface(image, loc)
+  canvas.paint
+  canvas.restore
+
+draw_image(canvas, image(asset_path('bg.png')), [10 10])
+
+def image(String filename)
+  cached({ cairo.load_image(filename) })
+
+sprites = image(asset_path('sprites.png'))
+
+userInput = env(:userInput)
+
+def Vec2.to_rect_with(self, Vec2 right) -> Rect
+  [self.x self.y right.x right.y]
+
+def mouse_down() -> bool
+  state down = false
+  if userInput.mouseDown
+    down = true
+  else if userInput.mouseUp
+    down = false
+  down
+
+def Rect.horizontal_flip(self) -> Rect
+  [self.x2, self.y1, self.x1, self.y2]
+
+struct Clip {
+  Surface img
+  Rect area
+  Vec2 anchor
+  bool flipped
+}
+
+def Clip.draw(self, canvas, Vec2 center)
+  canvas.draw_image_clip(self.img, self.area, center.translate(self.anchor * -1), self.flipped)
+
+def Clip.flip(self)
+  not(@self.flipped)
+
+kick1 = Clip.make(sprites [1 0 19 32] [10 33])
+kick2 = Clip.make(sprites [27 0 55 32] [12 33])
+kick3 = Clip.make(sprites [61 2 95 33] [12 32])
+punch1 = Clip.make(sprites [99 2 121 35] [13 32])
+punch2 = Clip.make(sprites [132 2 153 36] [11 32])
+punch3 = Clip.make(sprites [163 4 188 36] [0 32])
+walk1 = Clip.make(sprites [195 2 214 33] [11 31])
+walk2 = Clip.make(sprites [220 4 240 36] [11 31])
+normal = Clip.make(sprites [249 1 267 34] [10 32])
+whip1 = Clip.make(sprites [3 33 36 71] [11 38])
+whip2 = Clip.make(sprites [42 38 86 70] [10 32])
+
+kick_cycle = [kick1 kick2 kick3]
+punch_cycle = [punch1 punch2 punch3]
+walk_cycle = [normal walk1 walk2]
+whip_cycle = [whip1 whip2]
+
+--canvas.draw_image_clip(sprites, kick_cycle[i], [10 300])
+
+struct Sprite {
+  Vec2 position
+  bool left
+  number walking_duration
+}
+
+def Sprite.draw(self, canvas)
+  if self.walking_duration > 0
+    clip = walk_cycle.cycle(1 + floor(self.walking_duration / .3))
+  else
+    clip = normal
+
+  if self.left
+    @clip.flip
+
+  clip.draw(canvas, self.position)
+
+struct Segment {
+  Vec2 a
+  Vec2 b
+}
+
+def Segment.stay_within_rect(self, Rect rect) -> Segment
+  if not rect.contains(self.b)
+    max(@self.b.x, rect.x1)
+    min(@self.b.x, rect.x2)
+    max(@self.b.y, rect.y1)
+    min(@self.b.y, rect.y2)
+
+  self
+
+playerBounds = [20 110 env(:canvasRect).right/2 - 10, 170]
+--draw_rect(playerBounds, #f00)
+
+def keyboard_to_direction() -> Vec2
+  Vec2.make(
+    cond(input.key_down(:left) -1 0) + cond(input.key_down(:right) 1 0),
+    cond(input.key_down(:up) -1 0) + cond(input.key_down(:down) 1 0))
+
+def Sprite.control(self, Vec2 dir) -> Sprite
+  mult(@dir 1.2)
+
+  movementSeg = Segment.make(self.position, self.position + dir)
+  @movementSeg.stay_within_rect(playerBounds)
+
+  self.position = movementSeg.b
+
+  -- draw_rect(self.position.to_rect_topleft([1 1]), #0f0)
+
+  if dir == [0 0]
+      self.walking_duration = 0
+  else
+      self.walking_duration = time.elapsed
+
+  -- Language defect: unecessary cast
+  Vec2.cast(@dir)
+  
+  if dir.x < 0
+      self.left = true
+  if dir.x > 0
+      self.left = false
+
+  self
+
+def random_dir_part() -> int
+  r = rand()
+  if r < 0.33
+    -1
+  elif r < 0.66
+    0
+  else
+    1
+
+def random_dir() -> Vec2
+  state dir
+  if once() or time.every(.2)
+    dir = [random_dir_part(), random_dir_part()]
+  dir
+
+state guy2 = Sprite.make([100 150] false)
+@guy2.control(keyboard_to_direction())
+guy2.draw(canvas)
+
+for i in 0..10
+  state guy = Sprite.make([10 + 30*i, 150] false)
+  @guy.control(random_dir())
+  guy.draw(canvas)
+
+-- draw.draw_text(str('Current time: ' env(:time)), [40 360] #fff)

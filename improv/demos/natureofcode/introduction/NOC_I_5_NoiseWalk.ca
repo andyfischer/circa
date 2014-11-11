@@ -1,0 +1,26 @@
+
+require draw
+require time
+
+width = env(:size).x
+height = env(:size).y
+
+struct Walker {
+  Vec2 loc
+}
+
+def Walker.draw(self)
+  draw.fill_ellipse(#888 self.loc [48 48])
+  draw.draw_ellipse(#000 self.loc [48 48] 2.0)
+  
+def Walker.now(self)
+  x = noise(.5*time.elapsed() + seed()*1000).map([0 1] [0 width])
+  y = noise(.5*time.elapsed() + seed()*1000).map([0 1] [0 height])
+
+  self.loc = [x y]
+  self
+
+draw.background(#fff)
+
+walker = Walker.make.now
+walker.draw

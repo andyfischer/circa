@@ -1,0 +1,28 @@
+
+require draw
+require cairo
+require codeviewb
+
+font = cairo.font('assets/Inconsolata.otf')
+
+func = ->
+  def my_rebinding_func(@a)
+    a += 1
+    print('done')
+
+  a = 3
+  my_rebinding_func(@a)
+  print(a)
+
+draw.background(#fff)
+
+cairo.draw_to_screen([0 0 500 300], (canvas) ->
+  canvas.set_font_face(font)
+  canvas.set_font_size(20)
+  canvas.set_color(#000)
+  phrases = codeviewb.layout.Layout.make.get_phrases(func.block)
+  w = codeviewb.window.new([0 0] [10 8])
+  @w.using_font_extents(canvas.font_extents)
+  @w.add_phrases(phrases)
+  w.draw(canvas)
+)

@@ -176,16 +176,12 @@ void append_user(Term* user, Term* usee)
     if (usee == NULL)
         return;
 
-    int originalUserCount = user_count(usee);
-
     if (usee != NULL && user != NULL)
         usee->users.appendUnique(user);
 }
 
 static void remove_user(Term* usee, Term* user)
 {
-    int originalUserCount = user_count(usee);
-
     usee->users.remove(user);
 }
 

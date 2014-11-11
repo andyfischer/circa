@@ -1,0 +1,78 @@
+
+def now() -> number
+  env(:time)
+
+def delta() -> number
+  env(:timeDelta)
+
+def elapsed() -> number
+  state number el = 0
+  el += env(:timeDelta)
+  el
+
+def calls_per_second() -> number
+
+  state number start = env(:time)
+  state int calls = 0
+
+  elapsed = env(:time) - start
+  calls += 1
+
+  if elapsed == 0
+    result = 0
+  else
+    result = calls / elapsed
+
+  interval = 1
+  if elapsed > interval
+    start = env(:time)
+    calls = 0
+
+  return result
+
+def every(number period) -> bool
+  -- Return true once every 'period' seconds.
+
+  state timeTillEvent = period
+
+  timeTillEvent -= env(:timeDelta)
+
+  if timeTillEvent < 0
+    timeTillEvent += period
+    true
+  else
+    false
+
+def cycles(number period) -> int
+  -- Return the number of times that 'period' has elapsed, since the last call.
+  state elapsed = 0.0
+  elapsed += env(:timeDelta)
+
+  result = floor(elapsed / period)
+  remainder(@elapsed, period)
+  result
+
+def cycle(List list, number itemDuration) -> any
+  state index = 0
+  mod(add(@index, cycles(itemDuration)), list.length)
+  list[index]
+
+def alternate(number onDuration, number offDuration) -> bool
+  -- Alternate between true and false
+  el = elapsed()
+  wrapped = mod(el, onDuration + offDuration)
+  wrapped < onDuration
+
+def approach(number target, number perSec) -> number
+  state current = target
+  if target > current
+    current += min(env(:timeDelta) * perSec, target - current)
+  elif target < current
+    current -= min(env(:timeDelta) * perSec, current - target)
+  current
+
+def momentum(delta, falloff) -> any
+  state prev = delta
+  result = delta.add(prev.mult(falloff))
+  prev = result
+  result

@@ -1,0 +1,92 @@
+
+require input
+
+struct Element {
+    String text
+    Func listener
+}
+
+struct PopupMenu {
+    List elements
+}
+
+def PopupMenu.append(@self, String text, Func listener)
+    @self.elements.append(Element.make(text, listener))
+
+def max_list(List list) -> number
+    result = list[0]
+    for item in list
+        if item > result
+            result = item
+    result
+
+def Rect.expand(self, Vec2 size) -> Rect
+    [self.x1 - size.x, self.y1 - size.y, self.x2 + size.x, self.y2 + size.y]
+
+def Vec2.to_rect_bottomleft(self, Vec2 size) -> Rect
+    -- Returns a Rect with this point as the top-left, and the given size.
+    [self.x, self.y - size.y, self.x + size.x, self.y]
+
+def PopupMenu.draw(self, canvas:Context canvas, Vec2 topLeft) -> Symbol
+
+    --print('drawing popup menu ' self ', ' canvas ', ' topLeft)
+
+    userInput = env(:userInput) -> UserInput.cast
+    clickResolver = env(:clickResolver) -> Actor.cast
+
+    -- canvas.select_font_face('Open sans')
+    canvas.set_font_size(24)
+    fontExtents = canvas.font_extents
+
+    overallWidth = max_list(for Element element in self.elements
+        extents = canvas.text_extents(element.text)
+        extents.size.x)
+        
+    overallRect = topLeft.to_rect_topleft([overallWidth,
+        fontExtents.height * self.elements.length])
+
+    if overallRect.bottom > env(:canvasRect).bottom
+        moveUp = overallRect.bottom - env(:canvasRect).bottom
+        topLeft = Vec2.cast(topLeft + [0 -moveUp])
+        @overallRect.translate([0 -moveUp])
+
+    bgRect = overallRect.expand([10 10])
+
+    canvas.rectangle(bgRect)
+    canvas.set_source_color(#fff)
+    canvas.fill
+    canvas.rectangle(bgRect)
+    canvas.set_source_color(#33f)
+    canvas.set_line_width(3)
+    canvas.stroke
+
+    for i, Element element in self.elements
+        pos = [topLeft.x, topLeft.y + fontExtents.height * i + fontExtents.ascent]
+        Vec2.cast(@pos)
+        elementRect = Vec2.cast(pos + [0 fontExtents.descent]).to_rect_bottomleft([overallWidth, fontExtents.ascent])
+        @elementRect.expand([3 3])
+
+        textColor = #222
+
+        if elementRect.contains(userInput.mousePos)
+
+            canvas.rectangle(elementRect)
+            canvas.set_source_color(#f0f)
+            textColor = #222
+            canvas.fill
+
+        canvas.move_to(pos)
+        canvas.set_source_color(textColor)
+        canvas.show_text(element.text)
+        
+        clickResolver.call([:add elementRect {
+            pos = input()
+            event = input()
+            if event == :down
+                element.listener.call()
+        }])
+
+    if userInput.mouseDown and not overallRect.contains(userInput.mousePos)
+        :outside_click
+    else
+        :ok

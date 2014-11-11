@@ -1,0 +1,18 @@
+
+require draw
+
+-- TODO
+
+draw.background(#fff)
+
+width = env(:size).x
+height = env(:size).y
+sd = 60
+mean = width/2
+xloc = rand_gaussian()*sd + mean
+
+state List xs = []
+@xs.append(xloc)
+
+for x in xs
+  draw.fill_ellipse(#0001 [x height/2] [16 16])

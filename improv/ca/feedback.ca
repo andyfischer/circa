@@ -1,0 +1,211 @@
+
+
+{-
+observe_listener = make_actor({
+    msg = input()
+
+    state Stack stack
+
+    if msg[0] == :set
+        stack = msg[1] -> Stack
+    elif msg[0] == :get
+        return stack
+})
+
+def observe(any)
+    listener = env(:observe_listener)
+    stack = capture_stack()
+    stack.pop_frame
+    listener.call([:set, stack])
+
+def func2(number x)
+    n = x + 1
+    observe(n)
+
+def func1()
+    a = 1 + 3
+    func2(a)
+
+one = 1
+stack = capture_stack()
+print('One is ', one)
+
+subject = make_stack()
+subject.push_frame(func1.block, [])
+subject.set_env_val(:observe_listener, observe_listener)
+subject.run
+
+observed = observe_listener.call([:get])
+if observed != null
+    observed.dump
+else
+    print('null observed')
+-}
+
+struct StackIterator {
+    Frame frame
+    int index
+}
+
+def StackIterator.next(self) -> Term
+    self.frame.block.get_term(self.index)
+
+def StackIterator.finished(self) -> bool
+    return self.frame == null
+
+def StackIterator.advance(@self)
+    if self.index == 0
+        if self.frame.has_parent
+            self.frame = self.frame.parent
+            self.index = self.frame.current_term.index
+        else
+            self.frame = null
+    else
+        self.index -= 1
+
+def start_stack_iterator(Stack stack, Term term) -> StackIterator
+    it = make(StackIterator)
+    it.frame = stack.find_active_frame_for_term(term)
+    it.index = term.index
+    it
+
+struct FeedbackOperation {
+    Stack stack
+    List modifyTargets
+    Map pendingFeedback
+}
+
+def start_feedback_operation(Stack stack) -> FeedbackOperation
+    op = make(FeedbackOperation)
+    op.stack = stack
+    op
+    
+def FeedbackOperation.set_modify_targets(@self, List targets)
+    self.modifyTargets = targets
+
+def FeedbackOperation.set_desired(@self, Term term, any desired)
+    @self.pendingFeedback.set(term, [:desired desired])
+    print('starting on term ' term ' with desired: ' desired)
+
+def Term.is_copying_call(self) -> bool
+    self.function.name == 'cast1' or self.function.name == 'copy'
+
+def FeedbackOperation.feedback_propogate(self, Term term, any signal) -> List
+
+    if term.function.name == 'value'
+        if signal[0] == :desired
+            return [[:modify_literal term signal[1]]]
+            {-
+    elif term.function == add.block
+        result = []
+        if signal[0] == :desired
+            delta_ = signal[1] - self.stack.active_value(term)
+            delta_per_input = delta * (1 / term.inputs.length)
+            for input in term.inputs
+                desired = self.stack.active_value(input) + delta_per_input
+                @result.append([:send input [:desired desired]])
+
+        return result
+
+    elif term.function.name == 'mult'
+        result = []
+        desired = signal[1]
+        left = term.input(0)
+        right = term.input(1)
+        leftVal = self.stack.active_value(term.input(0))
+        rightVal = self.stack.active_value(term.input(1))
+
+        --if leftVal != 0
+        --    @result.append([:send right [:desired desired / leftVal]])
+        elif rightVal != 0
+            @result.append([:send left [:desired desired / rightVal]])
+
+        return result
+        -}
+
+    elif term.function.name == 'input_placeholder'
+        result = []
+        if signal[0] == :desired
+            frame = self.stack.find_active_frame_for_term(term)
+            outerCaller = frame.parent.current_term
+            outerTarget = outerCaller.input(term.index)
+            @result.append([:send outerTarget signal])
+
+        return result
+
+    elif term.is_copying_call
+        result = []
+        if signal[0] == :desired
+            @result.append([:send term.input(0) signal])
+
+        return result
+
+    elif term.function.name == 'list'
+        result = []
+        if signal[0] == :desired
+            for i,item in signal[1]
+                @result.append([:send term.input(i) [:desired item]])
+
+        return result
+
+    print('term name: ' term.name)
+    return [:unknown]
+
+struct MapOfLists {
+    Map map
+}
+
+def MapOfLists.add(@self, any key, any val)
+    if self.map.contains(key)
+        @self.map.apply(key, { input().append(val) })
+    else
+        @self.map.set(key, [val])
+
+def MapOfLists.remove(@self, any key)
+    @self.map.remove(key)
+
+def MapOfLists.get(self, any key)
+    self.map.get_opt(key, [])
+
+def FeedbackOperation.run(@self)
+
+    iterator = start_stack_iterator(self.stack, self.stack.current_term)
+
+    -- language defect: need support for unbounded loops
+    for i in 0..100
+
+        if iterator.finished
+            break
+        if self.pendingFeedback.empty
+            break
+
+        term = iterator.next
+        @iterator.advance
+
+        if self.pendingFeedback.contains(term)
+            signal = self.pendingFeedback.get(term)
+
+            propogations = self.feedback_propogate(term, signal)
+
+            print('propogations = ' propogations)
+
+            for prop in propogations
+                
+                if prop == :unknown
+                    print("didn't know how to propogate on: " term " with func: " term.function.name)
+                else
+                    if prop[0] == :send
+                        @self.pendingFeedback.set(prop[1] prop[2])
+
+                    elif prop[0] == :modify_literal
+                        -- make changes immediately
+                        term.set_value(prop[2])
+
+
+
+{-
+feedback = start_feedback_operation(observed)
+print('feedback = ' feedback)
+@feedback.set_desired(0)
+@feedback.run
+-}

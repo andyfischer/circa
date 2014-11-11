@@ -1,0 +1,186 @@
+
+require cairo
+require draw
+
+def round_rect(canvas, Rect rect, number cornerRadius)
+  @rect.grow_s(-cornerRadius)
+  canvas.new_sub_path
+  canvas.arc(rect.top_left, cornerRadius, 180, -90)
+  canvas.arc(rect.top_right, cornerRadius, -90, 0)
+  canvas.arc(rect.bottom_right, cornerRadius, 0, 90)
+  canvas.arc(rect.bottom_left, cornerRadius, 90, 180)
+  canvas.close_path
+
+def play_icon(canvas, button)
+  size = button.size
+  scale = size.x / 100
+
+  arrow_width = scale * 50
+  arrow_height = scale * 50
+
+  canvas.set_source_color(button.highColor)
+  canvas.new_sub_path
+  canvas.move_to(size.half + [-arrow_width/2, -arrow_height/2])
+  canvas.line_to(size.half + [arrow_width/2, 0])
+  canvas.line_to(size.half + [-arrow_width/2, arrow_height/2])
+  canvas.close_path
+  canvas.fill
+
+def pause_icon(canvas, button)
+
+  size = button.size
+  scale = size.x / 100
+
+  bar_width = scale * 18
+  bar_space = scale * 16
+  bar_height = scale * 50
+
+  for xs in [1 -1]
+    canvas.set_source_color(button.highColor)
+    rect_center = size.half - [xs * bar_space, 0]
+    canvas.rectangle(rect_center.to_rect_center([bar_width, bar_height]))
+    canvas.fill
+
+def branch_icon(canvas, button)
+
+  size = button.size
+  scale = size.x / 100
+
+  center = size.half
+
+  leftDot = center
+  add(@leftDot, [scale * -20, 0])
+  canvas.arc(leftDot, scale * 10, 0, 360)
+  canvas.close_path
+  canvas.set_source_color(button.highColor)
+  canvas.fill
+
+  for ydir in [1 -1]
+
+    dot = center + [1 ydir] * scale * 20
+
+    canvas.move_to(leftDot)
+    canvas.line_to(dot)
+    canvas.set_line_width(scale*5)
+    canvas.stroke
+
+    canvas.arc(dot, scale * 10, 0, 360)
+    canvas.fill
+
+def cassette_icon(canvas, button)
+
+  size = button.size
+  scale = size.x / 100
+
+  cassette_rect = size.half.to_rect_center([70 50]*scale)
+
+  round_rect(canvas, cassette_rect, 3.0*scale)
+  canvas.set_line_width(2.0)
+  canvas.set_source_color(button.highColor)
+  canvas.stroke
+
+  for xs in [-1 1]
+    spindle = size.half + [xs*16, -3] * scale
+
+    canvas.set_source_color(button.subColor)
+    canvas.arc(spindle, scale * cond(xs == -1, 18, 12), 0, 360)
+    canvas.fill
+
+    canvas.set_source_color(button.backColor)
+    canvas.arc(spindle, scale * 8, 0, 360)
+    canvas.fill
+
+    canvas.set_source_color(button.highColor)
+    canvas.arc(spindle, scale * 8, 0, 360)
+    canvas.stroke
+
+    canvas.move_to(cassette_rect.bottom_center + [xs*24, 0] * scale)
+    canvas.line_to(cassette_rect.bottom_center + [xs*22, -8] * scale)
+    canvas.line_to(cassette_rect.bottom_center + [0, -8] * scale)
+    canvas.stroke
+
+def Vec2.half(self)
+  self.mult(.5)
+
+def code_listing(canvas, button)
+
+  size = button.size
+  scale = size.x / 100
+
+  canvas.set_source_color(button.highColor)
+
+  lineHeight = 15 * scale
+  lineCount = 5
+  lineTotalHeight = lineHeight * (lineCount - .5)
+  lineLength = 60*scale
+
+  topLeft = size.half - [lineLength/2 lineTotalHeight/2]
+
+  for i,len in [:s :l :s :l :s]
+    length = cond(len == :l, lineLength, lineLength * .6)
+    rect = topLeft.to_rect_topleft([length, 6])
+    @rect.translate([0, i * lineHeight])
+    canvas.rectangle(rect)
+    canvas.fill
+
+def refresh_icon(canvas, button)
+
+  size = button.size
+  center = size.half
+  scale = size.x / 100
+
+  canvas.set_source_color(button.highColor)
+
+  radius1 = 15 * scale
+  radius2 = 24 * scale
+  tail_angle = -45
+  head_angle = tail_angle + 90
+
+  -- C shape
+  canvas.move_to(center + polar(tail_angle) * radius1)
+  canvas.new_sub_path
+  canvas.line_to(center + polar(tail_angle) * radius2)
+
+  canvas.arc_negative(center, radius2, tail_angle, head_angle)
+  canvas.line_to(center + polar(head_angle) * radius1)
+  canvas.arc(center, radius1, head_angle, tail_angle)
+  canvas.close_path
+  canvas.fill
+
+  -- Arrow
+  arrow_base = center + polar(tail_angle) * (radius1+radius2) / 2
+  arrow_dir = Vec2.make(1 1).norm
+
+  arrow_width = 30 * scale
+  arrow_height = 30 * scale
+
+  canvas.new_sub_path
+  canvas.move_to(arrow_base.translate(arrow_dir.perpendicular * arrow_width/2))
+  canvas.line_to(arrow_base.translate(arrow_dir * arrow_height/2))
+  canvas.line_to(arrow_base.translate(arrow_dir.perpendicular * -arrow_width/2))
+  canvas.close_path
+  canvas.fill
+
+  {-
+
+  --canvas.move_to(center + polar(45) * radius2)
+
+  --canvas.line_to(center + polar(-45) * 30 * scale)
+  -}
+
+  canvas.stroke
+
+def divider(canvas, button)
+
+  size = button.size
+  
+  canvas.rectangle(size)
+  canvas.set_source_color(button.backColor)
+  canvas.fill
+
+  canvas.rectangle(size.half.to_rect_center([2 size.y * .8]))
+  canvas.set_source_color(button.highColor)
+  canvas.fill
+
+--draw.background(#fff)
+--draw.image(cached(cassette_icon), [0 0])

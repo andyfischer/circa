@@ -1,0 +1,13 @@
+
+require draw
+require input
+
+draw.background(#fff)
+
+center = env(:size).mult(1/2)
+mouse = input.mouse.sub(center)
+
+m = mouse.magnitude
+
+draw.fill_rect(#000 [0 0 m 10])
+draw.line(#000 center, center.add(mouse) 2.0)

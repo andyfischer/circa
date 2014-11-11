@@ -1,0 +1,4 @@
+
+require websocket
+
+server = websocket.listen(8080)

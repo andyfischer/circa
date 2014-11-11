@@ -1,0 +1,14 @@
+
+require draw
+require input
+
+draw.background(#fff)
+
+center = env(:size).mult(1/2)
+
+mouse = input.mouse.sub(center)
+
+-- Multiplying a vector!  The vector is now half its original size (multiplied by 0.5).
+@mouse.mult(.5)
+
+draw.line(#000 center, center.add(mouse) 2.0)

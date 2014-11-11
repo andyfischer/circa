@@ -1,0 +1,25 @@
+
+Interconnected pseudorandom systems
+
+Each layer creates a semantic-noise channel that affects another layer.
+
+Pond theme
+  Fish layer
+  Lilipad layer
+  Particle layer
+  Sound wave layer
+
+
+Brainstorming
+
+Player can drag locations of lilipads
+
+Lilipads cause shadows
+
+Shadows affect algae growth
+
+Algae growth creates food particles
+
+Fish are autonomous agents that move towards nearest food particles.
+
+Fish positions cause waves in the soundwave layer.

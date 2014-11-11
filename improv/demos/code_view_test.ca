@@ -1,0 +1,61 @@
+
+require cairo
+require code_view
+draw = require('drawing')
+require vertical_layout
+require source_repro
+
+-- Hodgepodge logger --
+struct Log {
+  Stack vm
+}
+
+def Log.reset(self)
+  self.vm.call(:reset 0)
+def Log.append(self, i)
+  self.vm.call(:append i)
+def Log.get(self) -> List
+  self.vm.call(:get 0)
+
+def append_actor()
+  Log.make(make_vm({
+    cmd = input()
+    val = input()
+
+    state List list
+
+    if cmd == :get
+      return list
+    elif cmd == :append
+      @list.append(val)
+    elif cmd == :reset
+      list = []
+  }))
+
+state log = append_actor()
+
+log.reset
+log.append('hello')
+log.append('hi')
+
+-- SourceMap --
+
+canvas = env(:canvas)
+
+def func()
+  a = 1 + 2
+  b = a + 1
+
+
+phrase = code_view.block_source(func.block) | code_view.source_to_phrase
+
+console = vertical_layout.new
+
+
+for line in log.get()
+  @console.append_text(to_string(line))
+canvas.set_source_color(#fff)
+canvas.set_font_face(cairo.font('assets/Inconsolata.otf'))
+canvas.set_font_size(18)
+console.draw(env(:canvasRect))
+

@@ -1,0 +1,35 @@
+
+require draw
+width = env(:size).x
+height = env(:size).y
+
+struct Ball {
+  Vec2 location
+  Vec2 velocity
+}
+
+def Ball.new(@self)
+  self.location = [100 100]
+  self.velocity = [2.5 5]
+
+
+def Ball.update(@self)
+  -- Add the current speed to the location.
+  @self.location.add(self.velocity)
+
+  if (self.location.x > width) or (self.location.x < 0)
+    self.velocity.x = self.velocity.x * -1
+
+  if (self.location.y > height) or (self.location.y < 0)
+    self.velocity.y = self.velocity.y * -1
+
+def Ball.display(self)
+  draw.fill_ellipse(#555 self.location [48 48])
+  draw.draw_ellipse(#111 self.location [48 48] 3.0)
+  
+draw.background(#fff)
+
+state Ball ball = Ball.make.new
+@ball.update()
+ball.display
+

@@ -1,0 +1,15 @@
+
+require draw
+require cairo
+
+blue = #0000ff
+green = #00ff00
+
+center = Vec2.make(200 200)
+
+draw.background(#fff)
+
+cairo.draw_to_screen([0 0 200 200], (canvas) ->
+  canvas.set_color(blue)
+  canvas.show_text_centered("KidFriendly" center)
+)

@@ -1,0 +1,40 @@
+
+env = input() -> Environment
+
+struct TextElement {
+    String text
+    Font font
+    Color fgcolor
+}
+
+struct HorizontalGrid {
+    List elements
+}
+
+struct VerticalGrid {
+    List elements
+}
+
+struct BoxPosition {
+    Rect position
+}
+
+struct TopLevelUI {
+    any root
+}
+
+menu = vertical_menu([
+    label("Item 1", env.painter.mediumSans, #fff)
+    label("Item 2", env.painter.mediumSans, #fff)
+    label("Item 3", env.painter.mediumSans, #fff)
+    ])
+
+def UIElement.layout(@self, Vec2 position)
+    size = self.getSize
+
+    self.rect = position.to_rect_topleft(size)
+
+
+print(menu)
+menu.layout([40 40])
+menu.draw(env.painter)

@@ -1,0 +1,19 @@
+
+require gl
+require matrix
+require sample_backgrounds
+require time
+require user_input
+mouse = user_input.mouse_ratio
+require draw
+
+--sample_backgrounds.grey_shaded
+sample_backgrounds.flat_color(#000)
+
+count = mouse.x * 10 | round
+thickness = mouse.y * 10
+radius = 100
+center = vec2(200 200)
+points = for i in 0..count
+  center + polar(i / count * 360) * radius
+draw.line_loop(#fff points thickness)

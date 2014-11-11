@@ -1,0 +1,45 @@
+
+gl_env = require gl/env
+require input
+
+struct EditorEnv {
+  Rect rect
+  bool paused
+  number scriptPauseTime
+  Stack ui_control
+}
+
+def EditorEnv.pre(self, Stack vm)
+
+  vm.forward_env(:userInput)
+
+  if input.key_pressed(:r)
+    vm.reset_state
+
+  if self.paused
+    vm.set_env(:time self.scriptPauseTime)
+    vm.set_env(:timeDelta 0)
+    vm.append_hack(:no_save_state)
+  else
+    vm.set_env(:time env(:time))
+    vm.set_env(:timeDelta, delta(env(:time)))
+
+  vm.set_env(:mouse, Vec2.cast(env(:mouse)) - self.rect.top_left)
+  vm.set_env(:canvasRect, self.rect)
+  vm.set_env(:size, self.rect.size)
+  -- vm.append_hack(:TermCounter)
+  
+  gl_env.pre(vm)
+
+def EditorEnv.post(self, Stack vm)
+  gl_env.post(vm)
+
+  if input.key_pressed(:p)
+    vm.dump_compiled
+    print(_perf_stats_dump())
+
+def new()
+  env = EditorEnv.make
+  require ui_script_control
+  env.ui_control = make_vm(ui_script_control.:main)
+  return env

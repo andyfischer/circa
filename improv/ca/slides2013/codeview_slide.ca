@@ -1,0 +1,185 @@
+
+require code_view
+require drawing
+require feedback
+
+codesample_trees = {
+background(#36bfff)
+
+tree = image('assets/tree.png')
+
+fill_rect([0 250 400 500], #3a3)
+
+good_tree_y = 150
+bad_tree_y = 60
+
+draw_image(tree, [40 good_tree_y])
+draw_image(tree, [140 bad_tree_y])
+draw_image(tree, [240 good_tree_y])
+}
+
+def seconds_to_time_str(number seconds) -> String
+    minutesStr = str(floor(seconds / 60) % 60)
+    if minutesStr.length == 1
+        minutesStr = str('0' minutesStr)
+
+    str(floor(seconds / 60 / 60) % 24, ':', minutesStr)
+
+codesample_clock = {
+background(#ccc)
+
+current_time = 12*60*60 + 34*60 + elapsed()
+
+draw_text(seconds_to_time_str(current_time)
+    [100 40] #fff)
+
+clock_x = 200
+clock_y = 200
+clock_radius = 120
+
+clock_center = Vec2([clock_x clock_y])
+
+angle_to_loc = (angle) ->
+    (Vec2([0 -1]).rotate(angle)
+        * clock_radius + clock_center)
+
+hour_tip = angle_to_loc.call(
+    current_time / 60 / 60 / 12 * 360)
+minute_tip = angle_to_loc.call(
+    current_time / 60 / 60 * 360)
+second_tip = angle_to_loc.call(
+    current_time / 60 * 360)
+
+line(clock_center, hour_tip, 6.0, #000)
+line(clock_center, minute_tip, 2.0, #000)
+line(clock_center, second_tip, 1.5, #f00)
+}
+
+state Func codesample = codesample_trees
+state script = make_stack2(codesample)
+state contextMenu = make_actor(load_module('code_context_menu').to_func)
+state whichSample = :trees
+
+def simple_queue_actor(any msg)
+    state msgs = []
+    out = null
+
+    if msg == :get
+        out = msgs
+        msgs = []
+    else
+        @msgs.append(msg)
+
+    return out
+
+state feedback_manager = make_actor({
+
+    msg = input()
+
+    state Term target
+
+    out = null
+
+    if msg[0] == :start
+        target = msg[1]
+    elif msg[0] == :get_target
+        out = target
+    elif msg[0] == :send_feedback
+        print('send feedback to ' msg[1])
+        print('desired: ' msg[2])
+
+        term = msg[1]
+        desired = msg[2]
+        stack = msg[3]
+
+        operation = start_feedback_operation(stack)
+        operation.set_desired(term, desired)
+        operation.run
+
+    out
+})
+
+state context_menu_listener = make_actor(simple_queue_actor)
+state game_scene_listener = make_actor(simple_queue_actor)
+
+def draw(cairo:Context canvas)
+    windowSize = Vec2(env(:windowSize))
+
+    leftHalf = [0, 0, windowSize.x/2, windowSize.y]
+
+    canvas.save
+    canvas.translate([windowSize.x/2, 0])
+
+    script.restart
+    script.set_env_val(:canvas canvas)
+    script.set_env_val(:mouse Vec2(env(:mouse)) - [windowSize.x/2 0])
+    script.set_env_val(:userInput env(:userInput))
+    script.set_env_val(:clickResolver env(:clickResolver))
+    script.set_env_val(:elapsedTime env(:elapsedTime))
+    script.set_env_val(:windowRect leftHalf)
+    script.set_env_val(:eventListener game_scene_listener)
+    script.set_env_val(:contextMenu contextMenu)
+    script.set_env_val(:feedbackManager feedback_manager)
+    script.run
+
+    if script.errored
+        script.dump
+
+    canvas.restore
+
+    -- canvas.select_font_face('Monaco')
+
+    view = code_view:start_code_view()
+    @view.use_block(codesample.block)
+
+    if whichSample == :clock
+        view.actualFirstLineNumber = 24
+        canvas.set_font_size(11.5)
+    else
+        view.actualFirstLineNumber = 5
+        canvas.set_font_size(14)
+    view.listener = game_scene_listener
+
+    state any filter = :none
+
+    for msg in game_scene_listener.call(:get)
+        if msg[0] == :right_click_term
+            pos = Vec2(msg[2])
+            contextMenu.call([:term_details msg[1] pos])
+        elif msg[0] == :add_click_area
+            rect = msg[1]
+            callback = msg[2]
+            @rect.translate([windowSize.x/2, 0])
+            env(:clickResolver).call([:add rect callback])
+
+    for msg in context_menu_listener.call(:get)
+        if msg[0] == :filter
+            target = msg[1]
+            filter = [:dependents msg[1]]
+        elif msg[0] == :reset_filter
+            filter = :none
+        elif msg[0] == :drag_feedback
+            feedback_manager.call([:start msg[1]])
+
+    if filter != :none
+        if filter[0] == :dependents
+            target = filter[1]
+            dependents = target.trace_dependents(codesample.block).to_set
+
+            filterFunc = {
+                term = input()
+                return term == target or dependents.contains(term)
+            }
+
+            @view.enable_filter(str("Trace view to result " target), filterFunc)
+
+    @view.run(canvas, leftHalf)
+    contextMenu.call([:set_listener context_menu_listener])
+    contextMenu.call([:draw canvas])
+
+if msg[0] == :draw
+    draw(msg[1])
+elif msg[0] == :use_clock
+    script = make_stack2(codesample_clock)
+    codesample = codesample_clock
+    whichSample = :clock

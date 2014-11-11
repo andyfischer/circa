@@ -1,0 +1,6 @@
+
+require ./layout
+require ./window
+
+def get_phrases(Block block)
+  layout.Layout.make.get_phrases(block)

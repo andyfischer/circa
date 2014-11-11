@@ -1,0 +1,187 @@
+
+require draw
+require time
+input = require input
+
+
+struct FallingPiece {
+  Symbol name
+  int rotation
+  Vec2 pos
+  bool fastFall
+}
+
+def List.pick_random(self) -> any
+  self.get(rand_i(length(self)))
+
+def Vec2.to_rect(self) -> Rect
+  [self.x self.y self.x self.y]
+
+def Rect.grow(self, Vec2 size) -> Rect
+  x = size.x / 2
+  y = size.y / 2
+  [self.x1 - x, self.y1 - y, self.x2 + x, self.y2 + y]
+
+def Rect.resize(self, Vec2 size) -> Rect
+  [self.x1, self.y1, self.x1 + size.x, self.y1 + size.y]
+
+def Rect.resize_s(self, number size) -> Rect
+  [self.x1, self.y1, self.x1 + size, self.y1 + size]
+
+def Rect.grow_s(self, number size) -> Rect
+  [self.x1 - size/2, self.y1 - size/2, self.x2 + size/2, self.y2 + size/2]
+
+def map_keyed(List list, Func getKey) -> Map
+  m = Map.make
+  for el in list
+    @m.set(getKey.call(el) el)
+  m
+
+def Vec2i.rotate(self, int rotation) -> Vec2i
+  mod(@rotation 4)
+  switch rotation
+    case 0
+      self
+    case 1
+      [self.y -self.x]
+    case 2
+      [-self.x -self.y]
+    case 3
+      [-self.y self.x]
+
+struct BlockDef {
+  Symbol name
+  int startY
+  Color color
+  List blocks
+}
+
+blocks = [
+  BlockDef.make(:l1, 1, #f80,     [[-1 -1] [0 -1] [0 0] [0 1]])
+  BlockDef.make(:l2, 1, #00f,     [[1 -1] [0 -1] [0 0] [0 1]])
+  BlockDef.make(:square, 1, #ff0, [[-1 1] [0 1] [0 0] [-1 0]])
+  BlockDef.make(:t, 1, #f0f,      [[-1 0] [0 0] [1 0] [0 1]])
+  BlockDef.make(:line, 2, #88f,   [[0 -1] [0 0] [0 1] [0 2]])
+  BlockDef.make(:s1, 1, #0f0,     [[-1 -1] [-1 0] [0 0] [0 1]])
+  BlockDef.make(:s2, 1, #f00,     [[-1 1] [-1 0] [0 0] [0 -1]])
+]
+
+def f(block)
+  block.name
+blocksByName = map_keyed(blocks, f)
+
+def FallingPiece.blocks(self)
+  blocks = blocksByName.get(self.name).blocks
+
+  if self.name == :square
+    self.rotation = 0
+
+  for Vec2i block in @blocks
+    @block.rotate(self.rotation)
+
+  for Vec2 block in @blocks
+    @block.translate(self.pos)
+
+  blocks
+
+pieceSize = 10
+
+--boardRect = boardSize.to_rect(pieceSize).
+
+struct BlockMap { Map map }
+
+def BlockMap.normalizeKey(self, block)
+  [round(block.x) round(block.y)]
+
+def BlockMap.contains(self, block)
+  self.map.contains(self.normalizeKey(block))
+
+def BlockMap.get(self, block)
+  self.map.get(self.normalizeKey(block))
+
+def BlockMap.set(self, block, val)
+  @self.map.set(self.normalizeKey(block), val)
+
+def BlockMap.keys(self)
+  self.map.keys
+
+
+struct Board {
+  BlockMap placed
+  Vec2 pos
+  Vec2 gridSize
+}
+
+def Board.pixelSize(self) -> Vec2
+  self.gridSize.mult(pieceSize)
+
+def Board.pixelRect(self) -> Rect
+  size = self.pixelSize
+  self.pos.to_rect_topleft(size)
+
+def Board.place(self, FallingPiece piece)
+  for block in piece.blocks
+    b = Vec2i.make(block.x|round, block.y|round)
+    color = blocksByName.get(piece.name).color
+    @self.placed.set(b color)
+  self
+
+def Board.collides(self, FallingPiece piece) -> bool
+  for block in piece.blocks
+    if block.x < 0 or block.y < 0 or block.x >= self.gridSize.x or block.y >= self.gridSize.y
+      return true
+    if self.placed.contains(block)
+      return true
+  false
+
+def FallingPiece.tryMove(self, Board board, int x_delta)
+  moved = self
+  moved.pos.x += x_delta
+  if not board.collides(moved)
+    self = moved
+  self
+  
+def Board.draw(self)
+
+  draw.draw_rect(#0f0, self.pos.to_rect.resize(self.pixelSize), 1)
+
+  for Vec2 block in self.placed.keys
+    rect = block.mult(pieceSize).to_rect.resize_s(pieceSize-1)
+    @rect.translate(self.pos)
+    color = self.placed.get(block)
+    draw.fill_rect(color rect)
+
+draw.background(#000)
+
+def newBoard()
+  board = Board.make
+  board.pos = [50 50]
+  board.gridSize = [10 20]
+  board
+
+def nextPiece()
+  FallingPiece.make(blocks.pick_random.name 0 [5 1])
+
+state board = newBoard()
+state piece = nextPiece()
+
+if input.key_pressed(:left)
+  @piece.tryMove(board, -1)
+if input.key_pressed(:right)
+  @piece.tryMove(board, 1)
+
+if input.key_pressed(:up)
+  piece.rotation += 1
+if input.key_pressed(:down)
+  piece.fastFall = true
+
+if time.every(.5) or piece.fastFall
+  fallingPiece = piece
+  fallingPiece.pos.y += 1
+  if board.collides(fallingPiece)
+    @board.place(piece)
+    piece = nextPiece()
+  else
+    piece = fallingPiece
+
+board.place(piece).draw

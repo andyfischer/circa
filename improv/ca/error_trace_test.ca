@@ -1,0 +1,16 @@
+
+require error_trace
+
+def f()
+  assert(false)
+
+def g()
+  f()
+
+def main()
+  g()
+
+int = make_stack(main)
+int.run
+
+error_trace.trace_to_string(int) | print

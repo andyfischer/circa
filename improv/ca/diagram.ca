@@ -1,0 +1,109 @@
+struct Box {
+    Rect rect
+    int layer
+    List inputs
+    String text
+}
+
+def box(Vec2 p) -> Box
+    box = make(Box)
+    box.rect = p.to_rect_topleft([100 50])
+    box
+
+struct Arrow {
+    Vec2 a
+    Vec2 b
+}
+
+def box_to_box(Box a, Box b)
+    a = a.rect
+    b = b.rect
+    arrow = make(Arrow)
+    arrow.a = [(a.x1 + a.x2) / 2, a.y2]
+    arrow.b = [(b.x1 + b.x2) / 2, b.y1]
+    arrow
+
+def Arrow.stroke(self, canvas)
+    direction = (Vec2.cast(self.b - self.a)).norm
+    canvas.move_to(self.a)
+    canvas.line_to(self.b)
+    canvas.line_to(self.b + direction.rotate(90 + 60) * 14)
+    canvas.move_to(self.b)
+    canvas.line_to(self.b + direction.rotate(-90 - 60) * 14)
+    canvas.stroke
+
+def Box.draw(self, canvas)
+
+    box_center = self.rect.center
+    extents = canvas.text_extents(self.text)
+    canvas.move_to([box_center.x - extents.size.x * 0.5,
+        box_center.y + extents.size.y * 0.5])
+    canvas.show_text(self.text)
+
+    boxWidth = self.rect.width
+    max(@boxWidth, extents.size.x + 10)
+    rect = self.rect.grow([boxWidth - self.rect.width, 0])
+
+    canvas.rectangle(rect)
+    canvas.stroke
+
+def Box.body(self, canvas, String text)
+
+def draw_arrow(canvas, Vec2 a, Vec2 b)
+    direction = (Vec2.cast(b - a)).norm
+    canvas.move_to(a)
+    canvas.line_to(b)
+    canvas.line_to(b + direction.rotate(90 + 45) * 20)
+    canvas.move_to(b)
+    canvas.line_to(b + direction.rotate(-90 - 45) * 20)
+    canvas.stroke
+
+struct Diagram {
+    List boxes
+    int layer
+    Map nameToIndex
+}
+
+def Diagram.countInLayer(self, layer) -> int
+    count = 0
+    for Box box in self.boxes
+        if box.layer == layer
+            count += 1
+    count
+
+def Diagram.boxByName(self, name) -> Box
+    self.boxes[self.nameToIndex.get(name)]
+
+def Diagram.add(@self, name, inputs, String text) -> Box
+    index = self.boxes.length
+
+    layer = self.layer
+    {-
+    for i in inputs
+        box = self.boxes[self.nameToIndex.get(i)]
+        layer = max(layer, box.layer + 1)
+        -}
+
+    box = make(Box)
+    box.inputs = inputs
+    box.layer = layer
+    box.text = text
+
+    loc = Vec2.cast([150 + 200 * self.countInLayer(layer),
+        60 + 90 * layer])
+
+    box.rect = loc.to_rect_topleft([100 50])
+
+    @self.boxes.append(box)
+    @self.nameToIndex.set(name, index)
+
+    box
+
+def Diagram.draw(self, canvas)
+    for Box box in self.boxes
+        box.draw(canvas)
+
+        for i in box.inputs
+            inputbox = self.boxByName(i)
+            box_to_box(inputbox box).stroke(canvas)
+

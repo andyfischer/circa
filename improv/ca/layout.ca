@@ -1,0 +1,101 @@
+
+struct Node {
+    int parent
+    List children
+    Name strategy
+    Map props
+    any data
+}
+
+struct Layout {
+    List nodes
+    Vec2 size
+    int cursor
+}
+
+def start(Vec2 size) -> Layout
+    layout = make(Layout)
+    layout.size = size
+
+    -- set up the initial element
+    root = make(Node)
+    root.parent = -1
+    @layout.nodes.append(root)
+    layout.cursor = 0
+
+    layout
+
+def Node.setStrategy(@self, Name strategy)
+    self.nodes[self.cursor].strategy = strategy
+
+def Layout.addNode(self, int cursor, data) -> Layout
+    element = make(Node)
+    element.data = data
+    element.parent = cursor
+
+    newCursor = self.nodes.length
+
+    @self.nodes.append(element)
+    @self.nodes[cursor].children.append(newCursor)
+
+    self.cursor = newCursor
+
+    return self
+
+def Layout.modifyCurrentNode(self, Func f) -> Layout
+    @self.nodes.apply(self.cursor, f)
+    self
+
+def Layout.setProp(self, name, value) -> Layout
+    @self.modifyCurrentNode({ 
+        node = Node.cast(input())
+        @node.props.set(name,value)
+    })
+    self
+
+def Layout.solveDim(self, String dim) -> List
+    -- Return a [(Number,Number)] list of pairs for each node.
+    results = empty_list(null, self.nodes.length)
+    results[0] = [0 self.size.x]
+
+    for Node node in self.nodes
+        availableStart = results[0][0]
+        availableFin = results[0][1]
+        nextLoc = availableStart
+
+        for int childIndex in node.children
+            child = self.nodes[childIndex]
+            prop = child.props.get(dim)
+
+            if first_symbol(prop) == :percent
+                percent = prop[1] -> number.cast / 100.0
+                desiredSize = (availableFin - availableStart) * percent
+            else
+                desiredSize = prop -> number.cast
+            
+            min(@desiredSize, availableFin - nextLoc)
+
+            start = nextLoc
+            fin = nextLoc + desiredSize
+
+            results[childIndex] = [start fin]
+            nextLoc = fin
+
+    return results
+
+-- Returns a list of layed-out [Rect, any] pairs.
+def Layout.getRects(self) -> List
+    positions = empty_list(null, self.nodes.length)
+
+    -- Position the root element
+    positions[0] = rect(0 0 self.size.x self.size.y)
+
+    x_ranges = self.solveDim('width')
+    y_ranges = self.solveDim('height')
+
+    for i,node in self.nodes
+        x_range = x_ranges[i]
+        y_range = y_ranges[i]
+        positions[i] = [x_range[0] y_range[0] x_range[1] y_range[1]]
+
+    positions

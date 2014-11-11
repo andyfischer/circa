@@ -1,0 +1,137 @@
+
+require ui_icons
+require draw
+require input
+require time
+require cairo
+
+dividerWidth = 20
+
+buttons = [
+  :codeview
+  :pause
+  :refresh
+]
+
+struct Button {
+  Symbol name
+  Rect rect
+  bool selected
+  bool rollover
+  Color highColor
+}
+
+def Button.size(self) self.rect.size
+def Button.backColor(self) #403f3f
+def Button.subColor(self) #505050
+
+def draw_button(Button button)
+  cairo.draw_to_screen(button.rect, (canvas) ->
+    switch button.name
+      case :codeview
+        ui_icons.code_listing(canvas, button)
+      case :play
+        ui_icons.play_icon(canvas, button)
+      case :pause
+        ui_icons.pause_icon(canvas, button)
+      case :cassette
+        ui_icons.cassette_icon(canvas, button)
+      case :branch
+        ui_icons.branch_icon(canvas, button)
+      case :refresh
+        ui_icons.refresh_icon(canvas, button)
+  )
+
+
+def Button.setHighColor(self)
+  color = if self.selected
+    cond(time.alternate(.8 .8) #88f #fff)
+  else
+    #737373
+
+  if self.rollover
+    @color.lighten(.1)
+
+  self.highColor = color
+
+struct ScriptControl {
+  bool paused
+  bool codeviewEnabled
+  List events
+}
+
+def ScriptControl.run(self, Rect overallRect)
+  -- print('in ui_script_control.ca: ' ScriptControl.declaringTerm)
+
+  self.events = []
+
+  iconSize = Vec2.make(overallRect.height overallRect.height)
+
+  loc = overallRect.top_left + [10 0]
+
+  --draw.fill_rect(backColor overallRect)
+
+  for i, button in buttons
+    lastItem = i == buttons.length - 1
+
+    rect = loc.to_rect_topleft(iconSize)
+
+    buttonState = Button.make(iconSize)
+
+    if input.mouse_in(rect)
+      buttonState.rollover = input.mouse_in(rect)
+
+    if button.name == :pause
+      buttonState.selected = self.paused
+    if button.name == :codeview
+      buttonState.selected = self.codeviewEnabled
+
+    @buttonState.setHighColor
+    surface = cached(-> button.draw.call(buttonState))
+
+    draw.image(surface, loc)
+    loc.x += surface.size.x - 1
+
+    if not lastItem
+      status = Button.make([dividerWidth, iconSize.y])
+      @status.setHighColor
+      divider = cached(-> ui_icons.divider(status))
+      draw.image(divider, loc)
+      loc.x += divider.size.x - 1
+
+    if input.mouse_click_in(rect)
+      if button.name == :pause
+        not(@self.paused)
+      elif button.name == :codeview
+        not(@self.codeviewEnabled)
+      elif button.name == :refresh
+        @self.events.append(:refresh)
+
+  draw.set_font_size(13)
+  draw.text(str("FPS: ", time.calls_per_second),
+    overallRect.bottom_right.translate([-60 -10]), #fff)
+  
+  self
+
+def new()
+  ScriptControl.make
+
+def show(Rect rect) -> List
+  events = []
+
+  iconSize = Vec2.make(rect.height rect.height)
+
+  loc = rect.top_left + [10 0]
+
+  for id in buttons
+    button = Button.make
+
+def main()
+  draw.background(#fff)
+
+  state ScriptControl control
+
+  bar_size = env(:canvasRect).set_y2(50)
+
+  @control.run(bar_size)
+

@@ -1,0 +1,15 @@
+
+
+require draw
+require time
+
+draw.background(#fff)
+
+width = env(:size).x
+height = env(:size).y
+
+points = for x in 0..round(width)
+  y = rand() * height
+  [x y]
+
+draw.line_list(#000 points 2.0)

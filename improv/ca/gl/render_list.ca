@@ -1,0 +1,182 @@
+
+require gl
+require gl/shader_builder
+require matrix
+
+def screenspace_mat3()
+  scale = Vec2.make(2 / env(:canvasRect).width, 2 / env(:canvasRect).height)
+  matrix.make_mat3.scale([1 -1]).translate([-1 -1]).scale(scale)
+
+struct TrianglesCommand {
+  Symbol name
+  List data
+}
+
+def bucketize(List list, Func key)
+  result = Map.make
+  for el in list
+    @result.list_append(key.call(el) el)
+  result
+
+def submit(List commands)
+  layers = commands.split(:layer_boundary)
+  for layer in layers
+    submit_layer(layer)
+
+def submit_layer(List commands)
+  byName = Map.make.bucketize(commands, (command) -> command.name)
+
+  if byName.contains(:Polys)
+    triangleDatas = for command in byName.get(:Polys)
+      command.data
+
+    submit_triangles_data(triangleDatas.flatten)
+
+  if byName.contains(:PolysMono)
+    byColor = Map.make.bucketize(byName.get(:PolysMono), (command) -> command.color)
+
+    for color in byColor.keys
+      datas = for command in byColor.get(color)
+        command.data
+      submit_triangles_monocolor(color, datas.flatten)
+
+  if byName.contains(:sprite)
+    for command in byName.get(:sprite)
+      submit_sprite(command.texture, command.rect)
+
+  for command in byName.get_opt(:custom_shader [])
+    gl.use_shader(command.shader)
+    command.vbo.draw
+
+  for command in byName.get_opt(:callback [])
+    command.func.call
+
+geom_shader = call(->
+  trace('compiling shader: geom')
+  builder = shader_builder.new
+  @builder.attribute('vec2', 'pos')
+  @builder.attribute('vec4', 'color')
+  @builder.vertexUniform('mat3', 'view')
+  @builder.varying('vec4', '_color')
+
+  @builder.vertexBody(
+    <<<
+    void main()
+    {
+        gl_Position = vec4(view * vec3(pos, 1.0), 1.0);
+        _color = color;
+    }
+    >>>
+  )
+
+  @builder.fragmentBody(
+    <<<
+    void main()
+    {
+        gl_FragColor = _color;
+    }
+    >>>
+  )
+  builder.to_shader
+)
+
+def submit_triangles_data(List data)
+  vbo = cached(->
+    gl.new_vertex_buffer
+      .set_draw_type(:triangles)
+      .set_attribs([:pos 2] [:color 4])
+  )
+  
+  vbo.set_data(data)
+
+  gl.use_shader(geom_shader)
+  gl.uniform_mat3(:view screenspace_mat3())
+  vbo.draw
+
+geom_monocolor_shader = call(->
+  trace('compiling shader: geom monocolor')
+  builder = shader_builder.new
+  @builder.attribute('vec2', 'pos')
+  @builder.vertexUniform('mat3', 'view')
+  @builder.fragmentUniform('vec4', 'color')
+
+  @builder.vertexBody(
+    <<<
+    void main()
+    {
+        gl_Position = vec4(view * vec3(pos, 1.0), 1.0);
+    }
+    >>>
+  )
+
+  @builder.fragmentBody(
+    <<<
+    void main()
+    {
+        gl_FragColor = color;
+    }
+    >>>
+  )
+
+  builder.to_shader
+)
+
+def submit_triangles_monocolor(Color color, List data)
+  vbo = cached(->
+    gl.new_vertex_buffer
+      .set_draw_type(:triangles)
+      .set_attribs([:pos 2])
+  )
+  
+  vbo.set_data(data)
+
+  gl.use_shader(geom_monocolor_shader)
+  gl.uniform_mat3(:view screenspace_mat3())
+  gl.uniform_vec4(:color color)
+  vbo.draw
+
+sprite_shader = call(->
+  builder = shader_builder.new
+  @builder.attribute('vec2', 'pos')
+  @builder.attribute('vec2', 'uv')
+  @builder.varying('vec2', '_uv')
+  @builder.vertexUniform('mat3', 'view')
+  @builder.fragmentUniform('sampler2D', 'sampler')
+
+  @builder.vertexBody(
+    <<<
+    void main()
+    {
+        _uv = uv;
+        gl_Position = vec4(view * vec3(pos, 1.0), 1.0);
+    }
+    >>>
+  )
+
+  @builder.fragmentBody(
+    <<<
+    void main()
+    {
+        gl_FragColor = texture2D(sampler, _uv);
+        //gl_FragColor = vec4(1.0,0,0,1.0);
+    }
+    >>>
+  )
+
+  builder.to_shader
+)
+
+def submit_sprite(Texture texture, Rect loc)
+  vbo = cached(->
+    gl.new_vertex_buffer
+      .set_draw_type(:triangle_strip)
+      .set_attribs([:pos 2] [:uv 2])
+  )
+
+  vbo.set_data([loc.top_left [0 0] loc.top_right [1 0] loc.bottom_left [0 1] loc.bottom_right [1 1]].flatten)
+
+  gl.use_shader(sprite_shader)
+  gl.uniform_mat3(:view screenspace_mat3())
+  gl.bind_texture(texture :sampler)
+  vbo.draw
+  gl.unbind_texture

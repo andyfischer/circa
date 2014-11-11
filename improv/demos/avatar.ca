@@ -1,0 +1,98 @@
+
+env = input() -> Environment
+
+def Vec2.to_rect_center(self, Vec2 size) -> Rect
+    size_half = (size * 0.5) -> Vec2
+    [self.x - size_half.x,
+        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
+
+def Vec2.magnitude(self) -> number
+    return sqrt(sqr(self.x) + sqr(self.y))
+
+def Rect.to_poly(self) -> List
+    [[self.x1 self.y1] [self.x2 self.y1] [self.x2 self.y2] [self.x1 self.y2]]
+
+def Rect.translate(self, Vec2 p) -> Rect
+    [self.x1 + p.x, self.y1 + p.y, self.x2 + p.x, self.y2 + p.y]
+
+struct Avatar {
+    Vec2 loc
+    Vec2 looking
+    number scale
+}
+
+def Avatar.lookAtVec2(@self, Vec2 p)
+    looking = Vec2(p - self.loc)
+    magn = looking.magnitude
+    if magn > 1.0
+        mult(@looking 1.0 / magn)
+    self.looking = looking
+
+struct Poly {
+    Color color
+    List points
+}
+
+def Avatar.draw(self, Painter painter)
+
+    head = [0 0] -> Vec2
+
+    head_rect = head.to_rect_center([1 1])
+
+    eye_width = .13
+    eye_height = .4
+    eye_gap = .24
+    eye_face_gap = .02
+
+    eye_center = Vec2([0 0]).to_rect_center([eye_width eye_height])
+
+    eye_center = eye_center.translate(self.looking * self.scale * .002)
+
+    eye1 = eye_center.translate([eye_gap * -.5, 0])
+    eye2 = eye_center.translate([eye_gap *  .5, 0])
+
+    shoulder_width = .3
+    neck_height = .2
+    shoulder_y = head_rect.y2 + neck_height
+
+    shoulder_l = head + [-shoulder_width shoulder_y]
+    shoulder_r = head + [shoulder_width shoulder_y]
+    body_lb = shoulder_l + [0 2]
+    body_rb = shoulder_r + [0 2]
+
+    arm_joint_l = shoulder_l + [-.2 0]
+    elbow_l = arm_joint_l + [-.2 1.0]
+
+    upper_arm_vector = Vec2(elbow_l - arm_joint_l).norm
+
+    arm_points = [arm_joint_l + [-.1 0],
+        arm_joint_l + [.1 0],
+        elbow_l + [.1 0],
+        elbow_l + [-.1 0]]
+
+    r_arm_points = for Vec2 p in arm_points
+        p.x = -p.x
+
+    figure = [
+      Poly([#eef head_rect.to_poly])
+      Poly([#eef [shoulder_l shoulder_r body_rb body_lb]])
+      Poly([#eef arm_points])
+      Poly([#eef r_arm_points])
+      Poly([#000 eye1.to_poly])
+      Poly([#000 eye2.to_poly])
+    ]
+
+    for poly in figure
+        points = poly.points
+        for point in @points
+            mult(@point self.scale)
+            add(@point self.loc)
+        painter.polygon(points poly.color)
+
+env.background(#000)
+guy = make(Avatar)
+guy.loc = [200 150]
+guy.scale = 100.0
+
+guy.lookAtVec2(env.mouse)
+guy.draw(env.painter)

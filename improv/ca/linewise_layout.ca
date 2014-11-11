@@ -1,0 +1,96 @@
+
+struct LinewiseLayout {
+  List lines
+  int lineIndex
+}
+
+def LinewiseLayout.append(self, item)
+  if self.lines == []
+    self.lines = [[]]
+
+  @self.lines.apply(self.lineIndex, { input().append(item) })
+
+def LinewiseLayout.newline(self)
+  @self.lines.append([])
+  self.lineIndex += 1
+
+def LinewiseLayout.positioned_elements(self) -> List
+  out = []
+
+  cursor = Vec2.make(0 0)
+  for line in self.lines
+
+    lineHeight = 0
+
+    for item in line
+      size = item.size
+      max(@lineHeight size.y)
+
+    for item in line
+
+      size = item.size
+      centeredY = cursor.y + (lineHeight - size.y) / 2
+
+      pos = cursor.set_y(centeredY)
+
+      @out.append(Map.make.set(:pos pos).set(:content item))
+
+      cursor.x += item.size.x
+
+    cursor.x = 0
+    cursor.y += lineHeight
+
+  out
+
+struct TestElement {
+  String s
+  Symbol t
+}
+
+def TestElement.size(self)
+  canvas = env(:canvas)
+  size = Vec2.make(canvas.text_extents(self.s).advance.x, canvas.font_extents.height)
+
+  if self.t == :tall
+    mult(@size.y 2)
+
+  size
+
+def TestElement.draw(self, Vec2 pos)
+  canvas = env(:canvas)
+
+  canvas.rectangle(pos.to_rect_topleft(self.size))
+  canvas.set_source_color(#222)
+  canvas.fill
+
+  canvas.move_to(pos)
+  canvas.set_source_color(#fff)
+  canvas.save
+  lineHeight = canvas.font_extents.ascent
+  if self.t == :tall
+    mult(@lineHeight 2)
+  canvas.rel_move_to([0, lineHeight])
+  canvas.show_text(self.s)
+
+  canvas.restore
+
+
+def run_test()
+  layout = LinewiseLayout.make
+
+  @layout.append(TestElement.make("Line 1"))
+  @layout.newline
+  @layout.append(TestElement.make("Line 2"))
+  @layout.newline
+  @layout.append(TestElement.make("Line 3"))
+  @layout.append(TestElement.make(" ... "))
+  @layout.append(TestElement.make(" ... "))
+  @layout.newline
+  @layout.append(TestElement.make("Line 4"))
+  @layout.append(TestElement.make(" with a "))
+  @layout.append(TestElement.make(" tall " :tall))
+  @layout.append(TestElement.make(" element "))
+
+  for element in layout.positioned_elements
+    element.get(:content).draw(element.get(:pos))
+

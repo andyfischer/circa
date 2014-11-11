@@ -1,0 +1,42 @@
+
+require source_repro
+
+{-
+
+    Layout process generates a list of Phrases (each with locations)
+      Each Phrase has a location
+    Draw the Phrase list
+-}
+
+struct Position {
+  int line
+  int col
+}
+
+struct Phrase {
+  -- Based on source_repro.Phrase, with pos added.
+  Symbol type
+  String text
+  Position pos
+}
+
+def Position.advance(@self, String s)
+  if s == '\n'
+    self.line += 1
+    self.col = 0
+  else
+    self.col += s.length
+
+struct Layout {
+}
+
+def Layout.get_phrases(self, Block block) -> List
+
+  pos = Position.make(1 0)
+
+  phrases = for rawPhrase in source_repro.block_phrases(block)
+    phrase = Phrase.make(rawPhrase.type rawPhrase.text pos)
+    @pos.advance(phrase.text)
+    phrase
+
+  phrases

@@ -1,0 +1,187 @@
+require cairo
+require sample_backgrounds
+
+struct Polys {
+  Symbol name
+  List data
+}
+
+struct PolysMono {
+  Symbol name
+  Color color
+  List data
+}
+
+def List.after_each(self, suffix) -> List
+  out = []
+  for el in self
+    @out.append(el)
+    @out.append(suffix)
+  out
+
+def triangle(Color color, Vec2 a, Vec2 b, Vec2 c)
+  command = PolysMono.make(:PolysMono color [a b c].flatten)
+  channel_send(:render_commands command)
+
+def quad(Color color, Vec2 a, Vec2 b, Vec2 c, Vec2 d)
+  command = PolysMono.make(:PolysMono color [a b c c d a].flatten)
+  channel_send(:render_commands command)
+
+def line(Color color, Vec2 a, Vec2 b, number thickness)
+  if a.distance(b) < 0.1
+    return
+  perp = b.sub(a).perpendicular.norm.mult(thickness/2)
+  quad(color a.add(perp), b.add(perp), b.sub(perp), a.sub(perp))
+
+def lines(Color color, List list, number thickness)
+  for l in list
+    line(color l[0] l[1] thickness)
+
+def line_list(Color color, List points, number thickness)
+  if points.length < 2
+    return
+
+  for i in 0 .. (points.length - 1)
+    a = points[i]
+    b = points[i+1]
+    line(color a b thickness)
+
+def line_loop(Color color, List points, number thickness)
+  if points.length < 2
+    return
+
+  @points.append(points[0])
+  line_list(color, points, thickness)
+
+def points(List points, Color color)
+  tris = for point in points
+    [point point.add([1.5 0]) point.add([0 1.5])]
+  @tris.flatten
+
+  command = PolysMono.make(:PolysMono color tris.flatten)
+  channel_send(:render_commands command)
+
+struct Circle {
+  Vec2 center
+  number radius
+}
+
+def Circle.contains(self, Vec2 b) -> bool
+  self.center.distance(b) <= self.radius
+
+def Circle.path(self, canvas)
+  canvas.arc(self.center, self.radius, 0, 360)
+
+def background(Color color)
+  sample_backgrounds.flat_color(color)
+
+def fill_rect(Color color, Rect rect)
+  points = [rect.top_left rect.top_right rect.bottom_left rect.top_right rect.bottom_right rect.bottom_left]
+
+  command = PolysMono.make(:PolysMono color points.flatten)
+  channel_send(:render_commands command)
+
+def fill_ellipse(Color color, Vec2 center, Vec2 size)
+  edgeCount = 30
+  tris = for i in 0..edgeCount
+    angle1 = 360*i/edgeCount
+    angle2 = 360*(i+1)/edgeCount
+    p1 = polar(angle1).mult(size).add(center)
+    p2 = polar(angle2).mult(size).add(center)
+    [p1 p2 center]
+
+  @tris.flatten
+  command = PolysMono.make(:PolysMono color tris.flatten)
+  channel_send(:render_commands command)
+
+def draw_rect(Color color, Rect rect, number thickness)
+  line(color rect.top_left rect.top_right thickness)
+  line(color rect.top_right rect.bottom_right thickness)
+  line(color rect.bottom_right rect.bottom_left thickness)
+  line(color rect.bottom_left rect.top_left thickness)
+
+def draw_ellipse(Color color, Vec2 center, Vec2 size, number thickness)
+  pointCount = 50
+  points = for i in 0..pointCount
+    angle1 = 360*i/pointCount
+    angle2 = 360*(i+1)/pointCount
+    polar(angle1).mult(size).add(center)
+
+  line_loop(color, points, thickness)
+
+def pixel(Color color, Vec2 loc)
+  fill_rect(color, loc.to_rect_topleft([1 1]))
+    
+def mousePos() -> Vec2
+  env(:mouse)
+
+def draggable(Rect rect) -> (bool, Vec2)
+  state is_dragging = false
+  state Vec2 dragStart
+  if env(:userInput).leftMousePressed and rect.contains(mousePos())
+    is_dragging = true
+    dragStart = mousePos()
+  elif not env(:userInput).leftMouseDown
+    is_dragging = false
+
+  dragDistance = [0 0]
+  if is_dragging
+    dragDistance = mousePos() - dragStart
+
+  return is_dragging, dragDistance
+
+struct SpriteCommand {
+  Symbol name
+  Texture texture
+  Rect rect
+}
+
+def image(texture, Rect rect)
+  channel_send(:render_commands SpriteCommand.make(:sprite texture rect))
+
+def draggable_point(Vec2 a, Term callerTerm)
+  -- todo: delete this func
+  circle = make(Circle)
+  circle.center = a
+  circle.radius = 10
+    
+  state is_dragging = false
+  state Vec2 dragStart
+  if env(:userInput).leftMousePressed and circle.contains(mousePos())
+    is_dragging = true
+    dragStart = mousePos()
+  elif not env(:userInput).leftMouseDown
+    is_dragging = false
+
+  dragDistance = [0 0]
+
+  canvas = env(:canvas)
+
+  if callerTerm == env(:feedbackManager).call([:get_target])
+    circle.path(canvas)
+    canvas.set_source_color(#faaa)
+    canvas.fill
+
+    dragDistance = mousePos() - dragStart
+
+  if is_dragging
+    state Vec2 dragStart = a
+    env(:feedbackManager).call([:send_feedback, term_ref(a),
+      dragStart + dragDistance, capture_stack()])
+
+def set_font_size(number size)
+  env(:canvas).set_font_size(size)
+
+struct Pen {
+    Vec2 pos
+    Canvas canvas
+}
+
+def start_pen(Vec2 initialPos) -> Pen
+  [initialPos env(:canvas)]
+
+def Pen.move(self, Vec2 delta) -> Pen
+  newPos = @self.pos.translate(delta)
+  self.canvas.line_to(self.pos, newPos)
+  self.pos = newPos
+def Pen.line(self, Vec2 delta) -> Pen

@@ -1,0 +1,32 @@
+
+require draw
+
+struct Window {
+  Vec2 loc
+  Vec2 letterSize
+  List elements
+}
+
+def new(Vec2 loc, Vec2 letterSize)
+  Window.make(loc letterSize)
+
+def Window.using_font_extents(@self, extents)
+  self.letterSize = [extents.max_advance.x, extents.height]
+
+struct CodeElement {
+  any phrase
+  String text
+  Vec2 loc
+}
+
+def Window.add_phrases(@self, phrases)
+  for phrase in phrases
+    element = CodeElement.make(phrase phrase.text)
+    element.loc = self.letterSize * [phrase.pos.col phrase.pos.line]
+    @self.elements.append(element)
+  self
+
+def Window.draw(self, canvas)
+  for el in self.elements
+    canvas.move_to(el.loc)
+    canvas.show_text(el.text)

@@ -1,0 +1,74 @@
+
+require time
+require input
+
+--mouse = env.mouse
+--bounds = env.bounds
+
+env.draw_poly([[0 0] [100 0] [0 100]] #f00)
+
+struct Star {
+    Vec2 loc
+    number rot
+    number size
+}
+
+star_color = #f39
+global_scale = 1.0
+
+def draw_star(Star star)
+  radius = star.size * global_scale -> number
+  num_points = 5
+
+  rot = star.rot + time/3 * 360
+
+  def draw_tip(int index)
+    angle = index / num_points * 360 + rot
+    l_angle = (index+.5) / num_points * 360 + rot
+    r_angle = (index-.5) / num_points * 360 + rot
+    outer_point = polar(angle)*radius + star.loc
+    l_point = polar(l_angle)*(radius / 2) + star.loc
+    r_point = polar(r_angle)*(radius / 2) + star.loc
+
+    env.draw_poly([outer_point l_point star.loc r_point] star_color)
+
+  for t in 0..num_points
+    draw_tip(t)
+
+state List stars = []
+
+-- Draw a black background
+env.background(#000)
+
+-- Draw an X where the mouse is
+namespace draw_x
+  cross_color = #f396
+  cross_thickness = 4.0
+  cross_length = 15.0
+
+  def draw_arm(number rot)
+      near_center = polar(rot) * cross_thickness + mouse
+      near_l = polar(rot - 30) * (cross_thickness/2) + near_center
+      near_r = polar(rot + 30) * (cross_thickness/2) + near_center
+      far_center = polar(rot) * cross_length + mouse
+      far_l = polar(rot - 30) * (cross_thickness/2) + far_center
+      far_r = polar(rot + 30) * (cross_thickness/2) + far_center
+      env.draw_poly([near_l far_l far_r near_r] cross_color)
+
+  for rot in [0 90 180 270]
+      draw_arm(rot + -time * 360)
+
+
+-- Clicking will create a new spinning star
+if env.mouse_clicked
+  -- Check if we clicked on an existing star
+  stars.append([mouse rand() 40])
+
+-- Draw each star
+for star in stars
+  draw_star(star)
+
+-- Draw some text showing the mouse position
+--env.setColor(#fff)
+--env.draw_text([10, bounds.y - 40] 0, str("Mouse location: " mouse.x ' ' mouse.y))
+--env.draw_text([10, bounds.y - 20] 0, str("Pressed: " mouse.pressed))

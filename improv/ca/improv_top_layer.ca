@@ -1,0 +1,25 @@
+
+require input
+require ./editor_main
+
+state editorStack = editor_main.to_stack
+state userInput = input.new
+
+windowSize = env(:windowSize) -> Vec2.cast
+windowRect = Rect.make(0 0 windowSize.x windowSize.y)
+
+@userInput.handleEvents(env(:inputEvents))
+
+editorStack.init_env()
+editorStack.set_env(:userInput userInput)
+editorStack.set_env(:canvasRect windowRect)
+editorStack.set_env(:mouse env(:mouse))
+editorStack.set_env(:scriptName, env(:scriptName))
+editorStack.set_env(:time env(:time))
+editorStack.set_env(:timeDelta, delta(env(:time)))
+
+editorStack.run
+
+if editorStack.has_error
+  require error_trace
+  error_trace.trace_to_string(editorStack) | print

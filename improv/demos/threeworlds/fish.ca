@@ -1,0 +1,74 @@
+
+require window
+require draw
+require time
+
+length = 160.0
+girth = 20.0
+segment_count = 10
+
+struct Fish {
+  Vec2 pos
+  number angle
+}
+
+def Fish.new(self) -> Fish
+  self.pos = window.random_location()
+  self.angle = rand() * 360
+  self
+
+def List.second_to_last(self)
+  self.get(self.length - 2)
+
+struct Segment {
+  number s
+  Vec2 pos
+  Vec2 dir
+}
+
+def Fish.update(self)
+  speed = 100.0 * time.delta
+  @self.angle.add(20.0 * time.delta)
+  @self.pos.add(polar(self.angle) * speed)
+
+def Fish.draw(self)
+
+  flap = sin(time.now * 1000)
+
+  sample_count = 10
+
+  head = self.pos.add(polar(self.angle) * length * 0.5)
+
+  spineSegments = for i in 0..sample_count
+    s = i / (sample_count - 1)
+    angle = self.angle + flap * s * 20
+    facing = polar(angle)
+    pos = head.sub(facing * length * s)
+    Segment.make(s pos facing)
+
+  spinePoints = for seg in spineSegments
+    seg.pos
+
+  draw.line_list(#ccc, spinePoints 3.0)
+
+  bodyWidth = (s) ->
+    sin(s * 180) * girth
+
+  tailWidth = (s) ->
+    sub(@s 0.8)
+    mult(@s 100)
+    max(@s 0)
+
+  tail = spineSegments.last.pos
+  tail_facing = spineSegments.last.dir
+
+  for side in [-1 1]
+    sidePoints = for index, seg in spineSegments
+      width = max(bodyWidth(seg.s) tailWidth(seg.s))
+      seg.pos.add(seg.dir.perpendicular * width * side)
+
+    draw.line_list(#fff, sidePoints 3.0)
+    draw.line(#fff, tail, tail.add(tail_facing.perpendicular * girth * side), 2.0)
+
+def new()
+  Fish.make.new

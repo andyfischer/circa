@@ -1,0 +1,7 @@
+
+def size() -> Vec2
+  env(:canvasRect).size
+
+def random_location() -> Vec2
+  s = size()
+  [s.x * rand(), s.y * rand()]

@@ -1,0 +1,11 @@
+
+struct ContextMenu {
+}
+event = input(Symbol)
+data = input()
+
+if event == :term_details
+    term = data[0]
+    pos = data[1]
+
+

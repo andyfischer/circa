@@ -1,0 +1,36 @@
+
+require draw
+
+struct Walker {
+  Vec2 loc
+}
+
+def Walker.new(self) -> Walker
+  size = env(:size)
+  [size/2]
+
+def Walker.draw(self)
+  draw.pixel(#fff self.loc)
+  
+def Walker.step(self)
+  dir = weighted_rand(
+    [.4 [1 0]]
+    [.2 [-1 0]]
+    [.2 [0 1]]
+    [.2 [0 -1]])
+
+  self.loc += dir
+  self
+
+state walker = Walker.make.new
+
+draw.background(#000)
+
+-- future: use a render buffer that we draw to, instead of redrawing the whole
+-- path each frame
+state history = []
+
+@walker.step
+@history.append(walker)
+for w in history
+  w.draw

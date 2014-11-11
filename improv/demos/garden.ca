@@ -1,0 +1,138 @@
+
+require time
+require input
+mouse = env.mouse
+
+def random_color() -> Color
+  [rand() rand() rand() 1.0]
+
+background_color = #eeeeff
+branch_color = #40cc10
+
+env.background(background_color)
+
+global_scale = 3.0
+base_grow_rate = 40.0
+max_segment_length = 10.0 -- 10 to 30
+generation_limit = 14
+distance_between_branches = 20.0
+distance_between_branches_var = 30.0
+base_thickness = 7.0
+
+def seed() -> number
+    state r = rand()
+    return r
+
+def interp(number progress, number limit) -> number
+    if progress >= limit
+        return 1.0
+    return progress / limit
+
+def rotate(Vec2 p, number angle) -> Vec2
+    p = [cos(angle) * p.x - sin(angle) * p.y, sin(angle) * p.x + cos(angle) * p.y]
+    return p
+
+type Segment {
+  int generation
+  number distance_from_base
+  number distance_till_branch
+  number base_radius
+  number end_radius
+  Vec2 base_loc
+  number base_angle
+  number growth_rate
+}
+
+def Segment.step(seg)
+    state wiggle_value = rand() - .5
+    state thickness_ratio = 1.0
+    age = env.elapsed
+
+    -- whether this is the tip
+    reached_last_gen = seg.generation >= generation_limit
+
+    -- length
+    target_length = max_segment_length
+    if target_length > seg.distance_till_branch
+        target_length = seg.distance_till_branch
+        reached_branch = true
+    else
+        reached_branch = false
+    
+    length = base_grow_rate * seg.growth_rate * age
+    if length > target_length
+        length = target_length
+        growth_finished = true
+    else
+        growth_finished = false
+
+    mult(@length global_scale)
+    end_loc = seg.base_loc + polar(seg.base_angle) * length
+
+    -- thickness
+    thickness = global_scale * base_thickness * 1 / (seg.generation + 1)
+    mult(@thickness interp(age, 2.0))
+    tip_thickness = global_scale * base_thickness * 1 / (seg.generation + 2)
+    mult(@tip_thickness interp(age, 3.0))
+
+    cond(reached_last_gen, 0.0, @tip_thickness)
+
+    base_l = seg.base_loc + polar(seg.base_angle - 90) * (thickness/2)
+    base_r = seg.base_loc + polar(seg.base_angle + 90) * (thickness/2)
+
+    tip_angle = seg.base_angle
+
+    tip_l = end_loc + polar(tip_angle - 90) * (tip_thickness/2)
+    tip_r = end_loc + polar(tip_angle + 90) * (tip_thickness/2)
+
+    env.painter.polygon([base_l tip_l tip_r base_r] branch_color)
+
+    -- Don't grow past generation
+    if seg.generation >= generation_limit
+        return
+
+    -- Don't grow until we've reached a certain time
+    if not growth_finished
+        return
+
+    -- Check to split
+    if reached_branch
+
+        -- Grow branches
+        splits = [-1 1]
+        if seg.generation < 5
+            splits = [-1 0 1]
+        for direction in splits
+            spread_progress = log(env.elapsed + 1)
+            min(@spread_progress 1.0)
+            angle_target = 80.0
+            angle_delt = seed() * angle_target * direction * spread_progress
+
+            child = make(Segment)
+            child.base_loc = end_loc
+            child.base_angle = tip_angle + angle_delt
+            child.generation = seg.generation + 1
+            child.distance_till_branch = distance_between_branches + 20.0 * seed()
+            child.growth_rate = seg.growth_rate * .9
+
+            child.step
+
+    -- Grow a single child segment
+    else
+        angle_delt = (seed() - 0.5) * 30.0
+        
+        child = make(Segment)
+        child.base_loc = end_loc
+        child.base_angle = tip_angle + angle_delt
+        child.generation = seg.generation + 1
+        child.distance_till_branch = seg.distance_till_branch - target_length
+        child.growth_rate = seg.growth_rate * .9
+
+        child.step
+
+
+root = make(Segment)
+root.base_loc = [300 500]
+root.distance_till_branch = 20.0
+root.growth_rate = 1.0
+root.step()

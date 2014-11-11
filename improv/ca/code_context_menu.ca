@@ -1,0 +1,38 @@
+
+require popup_menu
+
+state Vec2 pos
+state any menuDef = :none
+state Actor listener
+
+menu = make(PopupMenu)
+
+-- Language defect: ridiculous code that would be improved by pattern matching
+if menuDef != :none
+    if menuDef[0] == :term_details
+        @menu.append("Trace" { listener.call([:filter menuDef[1]]) })
+        @menu.append("Reset trace" { listener.call([:reset_filter menuDef[1]]) })
+        @menu.append("Start drag feedback" { listener.call([:drag_feedback menuDef[1]]) })
+        @menu.append("Constrain feedback" { listener.call([:drag_feedback menuDef[1]]) })
+    elif menuDef[0] == :sprite_details
+        @menu.append("Trace" { listener.call([:filter menuDef[1]]) })
+        @menu.append("Start drag feedback" { listener.call([:drag_feedback menuDef[1]]) })
+
+if msg[0] == :move
+    pos = msg[1] -> Vec2.cast
+elif msg[0] == :set_listener
+    listener = msg[1]
+elif msg[0] == :term_details
+    menuDef = [:term_details, msg[1]]
+    pos = msg[2] -> Vec2.cast
+elif msg[0] == :sprite_details
+    menuDef = [:sprite_details, msg[1]]
+    pos = msg[2] -> Vec2.cast
+elif msg[0] == :draw and menuDef != :none
+
+    canvas = msg[1] -> canvas:Canvas.cast
+    menu.draw(canvas, pos)
+
+    if env(:userInput).mouseDown
+        menuDef = :none
+

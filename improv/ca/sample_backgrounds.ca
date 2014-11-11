@@ -1,0 +1,105 @@
+
+require gl
+require gl/shader_builder
+
+struct CustomShaderCommand {
+  Symbol name
+  any shader
+  any vbo
+}
+
+struct CallbackCommand {
+  Symbol name
+  Func func
+}
+
+def grey_shaded()
+  shader = cached(->
+    builder = shader_builder.new
+    @builder.attribute('vec2', 'uv')
+    @builder.varying('vec2', '_uv')
+
+    @builder.vertexBody(
+        <<<
+        void main()
+        {
+            vec2 pos = uv * vec2(2, 2) + vec2(-1, -1);
+            gl_Position = vec4(pos, 0.0, 1.0);
+            _uv = uv;
+        }
+        >>>
+    )
+
+    @builder.fragmentBody(
+        <<<
+        float random(vec2 n)
+        {
+            // thanks to http://3thelarch.wordpress.com/2014/02/03/15/
+            return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+        }
+
+        void main()
+        {
+            vec2 center = vec2(.5, .5);
+            float d = distance(center, _uv);
+            d = 1.0 - cos(d * 2.0);
+            vec3 color = mix(vec3(1), vec3(.2), d);
+            color += vec3(0.01 * random(color.xy));
+            gl_FragColor = vec4(color, 1.0);
+        }
+        >>>
+    )
+    builder.to_shader
+  )
+
+  vbo = cached(->
+      gl.new_vertex_buffer
+        .set_data([0 0, 1 0, 0 1, 1 1])
+        .set_draw_type(:triangle_strip)
+        .set_attribs([:uv 2])
+  )
+
+  channel_send(:render_commands CustomShaderCommand.make(:custom_shader shader vbo))
+  channel_send(:render_commands :layer_boundary)
+
+def flat_color(Color color)
+  shader = cached(->
+    builder = shader_builder.new
+    @builder.attribute('vec2', 'uv')
+    @builder.fragmentUniform('vec4', 'color')
+    @builder.vertexBody(
+        <<<
+        void main()
+        {
+            vec2 pos = uv * vec2(2, 2) + vec2(-1, -1);
+            gl_Position = vec4(pos, 0.0, 1.0);
+        }
+        >>>
+    )
+
+    @builder.fragmentBody(
+        <<<
+        void main()
+        {
+            gl_FragColor = color;
+        }
+        >>>
+    )
+    builder.to_shader
+  )
+
+  vbo = cached(->
+      gl.new_vertex_buffer
+        .set_data([0 0, 1 0, 0 1, 1 1])
+        .set_draw_type(:triangle_strip)
+        .set_attribs([:uv 2])
+  )
+
+  func = ->
+    gl.use_shader(shader)
+    gl.uniform_vec4(:color color)
+    vbo.draw
+
+  channel_send(:render_commands CallbackCommand.make(:callback func))
+  channel_send(:render_commands :layer_boundary)
+

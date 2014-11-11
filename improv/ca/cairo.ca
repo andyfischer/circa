@@ -1,0 +1,146 @@
+
+require gl
+require draw
+
+package cairo
+
+struct Canvas {
+    native_ptr native
+}
+
+struct Surface {
+    native_ptr native
+}
+
+struct FontFace {
+    native_ptr native
+}
+
+struct TextExtents {
+    Vec2 bearing;
+    Vec2 size;
+    Vec2 advance
+}
+
+struct FontExtents {
+    number ascent
+    number descent
+    number height
+    Vec2 max_advance
+}
+
+-- Canvas
+
+def Canvas.save(self)
+def Canvas.restore(self)
+def Canvas.stroke(self)
+def Canvas.fill(self)
+def Canvas.paint(self)
+def Canvas.clip(self)
+def Canvas.clip_preserve(self)
+def Canvas.reset_clip(self)
+def Canvas.set_source_color(self, Color color)
+def Canvas.set_color(self, Color color)
+  self.set_source_color(color)
+def Canvas.fill_preserve(self)
+def Canvas.set_operator(self, Symbol operator)
+
+def Canvas.scale(self, Vec2 scale)
+def Canvas.translate(self, Vec2 translate)
+
+-- Surfaces
+def make_image_surface(Vec2 size) -> Surface
+def load_image(String filename) -> Surface
+def Surface.start_drawing(self) -> Canvas
+def Surface.write_to_png(self, String filename)
+def Surface.size(self) -> Vec2
+def Surface.image_blob(self) -> Blob
+def Surface.set_color_to_transparent(self, Color c) -> Surface
+
+-- Text
+def load_font(String filename) -> FontFace
+def font(String filename) -> FontFace
+  cached(-> load_font(filename))
+def Canvas.set_font_size(self, number size)
+def Canvas.set_font_face(self, FontFace font)
+def Canvas.show_text(self, String s)
+def Canvas.text_extents(self, String s) -> TextExtents
+def Canvas.font_extents(self) -> FontExtents
+
+def Canvas.show_text_ralign(self, String s, Vec2 right)
+    extents = self.text_extents(s)
+    self.move_to([right.x - extents.size.x, right.y])
+    self.show_text(s)
+
+def Canvas.show_text_centered(self, String s, Vec2 center)
+    extents = self.text_extents(s)
+    self.move_to([center.x - extents.size.x/2, center.y + extents.size.y/2])
+    self.show_text(s)
+
+-- Paths
+def Canvas.get_current_point(self) -> Vec2
+def Canvas.curve_to(self, Vec2 control1, Vec2 control2, Vec2 p3)
+def Canvas.move_to(self, Vec2 p)
+def Canvas.rel_move_to(self, Vec2 p)
+def Canvas.rectangle(self, Rect r)
+def Canvas.rect(self, Rect r)
+    self.rectangle(r)
+
+def Canvas.line_to(self, Vec2 p)
+def Canvas.rel_line_to(self, Vec2 p)
+def Canvas.arc(self, Vec2 center, number radius, number angle1, number angle2)
+def Canvas.arc_negative(self, Vec2 center, number radius, number angle1, number angle2)
+def Canvas.new_sub_path(self)
+def Canvas.close_path(self)
+def Canvas.set_line_width(self, number width)
+
+-- Surfaces
+def Canvas.set_source_surface(self, Surface surface, Vec2 origin)
+
+-- Helper functions
+def Canvas.draw_image(self, Surface surface, Vec2 loc)
+    self.set_source_surface(surface, loc)
+    self.paint
+
+def Canvas.draw_image_clip(canvas, Surface img, Rect clip, Vec2 scenePos, bool horizFlip)
+  canvas.save
+  
+  if horizFlip
+    canvas.scale([-1 1])
+    add(@scenePos.x clip.width)
+    mult(@scenePos.x -1)
+    Vec2.cast(@scenePos)
+
+  surfaceOrigin = scenePos.translate(clip.top_left * -1)
+
+  canvas.set_source_surface(img, surfaceOrigin)
+
+  canvas.rectangle(clip.translate(clip.top_left * -1).translate(scenePos))
+  canvas.clip
+
+  canvas.paint
+  canvas.restore
+
+def Canvas.round_rect(canvas, Rect rect, number cornerRadius)
+  @rect.grow_s(-cornerRadius)
+  canvas.new_sub_path
+  canvas.arc(rect.top_left, cornerRadius, 180, -90)
+  canvas.arc(rect.top_right, cornerRadius, -90, 0)
+  canvas.arc(rect.bottom_right, cornerRadius, 0, 90)
+  canvas.arc(rect.bottom_left, cornerRadius, 90, 180)
+  canvas.close_path
+
+def draw_gl_texture(Vec2 size, Func paint)
+  cached(->
+    surface = make_image_surface(size)
+    context = surface.start_drawing
+    paint.call(context)
+    data = surface.image_blob
+    texture = gl.new_texture(:2d)
+    texture.set_data(size, data)
+    texture
+  )
+
+def draw_to_screen(Rect rect, Func paint)
+  texture = draw_gl_texture(rect.size, paint)
+  draw.image(texture, rect)

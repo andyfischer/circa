@@ -1,0 +1,34 @@
+
+require audio
+require improv
+require draw
+require input
+require ui_icons
+require ui_script_control
+
+draw.background(#000)
+
+for i,n in [:play :cassette :codeview :pause :branch :refresh]
+  x = i * 100
+  rect = [x 100 x+100 200]
+  button = ui_script_control.Button.make(n rect false false #fff)
+  ui_script_control.draw_button(button)
+
+def Blob.to_list_u16(self, int offset, int len)
+  count = len // 2
+  out = for c in 0..count
+    self.u16(offset + c*2)
+  return out
+
+def gen_beep() -> Blob
+  audio.render(10.0, (t) ->
+    sin(t * 360 * 440)
+  )
+
+state sample
+
+if input.key_pressed(:g)
+  sample = gen_beep()
+
+if input.key_pressed(:b)
+  improv.play_audio(sample)

@@ -1,0 +1,540 @@
+
+msg = input()
+
+require canvas
+require code_view
+require diagram
+require drawing
+
+state slideIndex = 0
+state autoplay = true
+timePerSlide = 20
+
+showFps = false
+
+def draw_lines_lalign(Canvas canvas, List lines, Vec2 topleft)
+    font_extents = canvas.font_extents
+
+    cur = topleft + [0 font_extents.height]
+    for String line in lines
+        canvas.move_to(cur)
+        canvas.show_text(line)
+        cur += [0 font_extents.height * 1.2]
+
+def whiteishBackground()
+    background(#eee)
+
+state intro_slide = make_actor({
+    require drawing
+
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        canvas.set_source_color(#333)
+
+        windowSize = Vec2.cast(env(:windowSize))
+
+        canvas.set_font_size(50)
+        draw_lines_lalign(canvas, ["Introducing Circa:",
+            "A Dataflow-Based",
+            "Language for"
+            "Live Programming"], [10 40])
+
+        canvas.set_font_size(40)
+        canvas.show_text_ralign("andy.fischer@gmail.com", windowSize - [10 10])
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state intro_details = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        canvas.set_source_color(#333)
+
+        canvas.set_font_size(35)
+        draw_lines_lalign(canvas, ["At a glance"
+        "   Experimental, pre-alpha"
+        "   About 25k LOC of C++",
+        "   Open source",
+        "   Targetted towards games"], [10 10])
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state black_box = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        windowSize = Vec2.cast(env(:windowSize))
+
+        radius = 10
+        blackBox = Vec2.cast([360 200]).to_rect_center([240 100])
+
+        canvas.new_sub_path
+        canvas.arc([blackBox.right - radius, blackBox.top + radius], radius, -90, 0)
+        canvas.arc([blackBox.right - radius, blackBox.bottom - radius], radius, 0, 90)
+        canvas.arc([blackBox.left + radius, blackBox.bottom - radius], radius, 90, 180)
+        canvas.arc([blackBox.left + radius, blackBox.top + radius], radius, 180, 270)
+        canvas.close_path
+
+        canvas.set_source_color(#000)
+        canvas.fill
+
+        canvas.set_source_color(#fff)
+        canvas.show_text_centered("Program", blackBox.center)
+
+        {-
+        canvas.set_source_color(#333)
+        canvas.set_font_size(40)
+        canvas.move_to([120 100])
+        canvas.show_text("IDE")
+
+        canvas.set_line_width(3)
+        canvas.rel_move_to([10 -10])
+        canvas.rel_line_to([140 0])
+        radius = 10
+        canvas.arc(canvas.get_current_point + [radius radius], radius, 270, 0)
+        canvas.rel_line_to([0 25])
+        canvas.rel_move_to([-10 -10])
+        canvas.rel_line_to([10 10])
+        canvas.rel_line_to([10 -10])
+        canvas.stroke
+        -}
+
+        canvas.set_source_color(#000)
+        canvas.move_to([blackBox.center.x blackBox.top] + [0 -100])
+        canvas.rel_line_to([0 80])
+        canvas.rel_move_to([-10 -10])
+        canvas.rel_line_to([10 10])
+        canvas.rel_line_to([10 -10])
+        canvas.stroke
+
+        canvas.set_font_size(35)
+        canvas.move_to([blackBox.right blackBox.center.y] + [20 0])
+        canvas.rel_line_to([50 0])
+        canvas.rel_move_to([-10 -10])
+        canvas.rel_line_to([10 10])
+        canvas.rel_line_to([-10 10])
+        canvas.rel_move_to([30 0])
+        canvas.show_text("Effects?")
+        canvas.stroke
+
+        canvas.move_to([blackBox.center.x blackBox.bottom] + [0 20])
+        canvas.rel_line_to([0 40])
+        canvas.rel_move_to([-10 -10])
+        canvas.rel_line_to([10 10])
+        canvas.rel_line_to([10 -10])
+        canvas.rel_move_to([0 40])
+        canvas.show_text_centered("Outputs?", canvas.get_current_point)
+        canvas.stroke
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state undecidability = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        img = image('assets/c_sample.png')
+        canvas.save
+        canvas.scale([.9 .9])
+        canvas.set_source_surface(img, [-200 -100])
+        canvas.paint
+        canvas.restore
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state limited_language = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        canvas.set_source_color(#333)
+        canvas.set_font_size(40)
+
+        draw_lines_lalign(canvas, ["Limited language",
+        "  No shared mutable state",
+        "  Simple control flow"
+        "  Traceability"
+        ], [10 10])
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state dataflow_intro = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+
+        canvas.set_line_width(3.0)
+
+        diagram = make(Diagram)
+
+        diagram.add(:filename, [], "assets/tree.png")
+        diagram.layer = 1
+        diagram.add(:a, [:filename], "load_image")
+        diagram.add(:b, [], "[40, 150]")
+        diagram.layer = 2
+        diagram.add(:d, [:a :b], "draw_image")
+
+        canvas.set_font_size(30)
+        diagram.draw(canvas)
+
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state slide_first_code_view = make_actor(load_module('codeview_slide').to_func)
+state slide_first_code_view_cant_click_drag = make_actor(load_module('codeview_slide').to_func)
+state code_view_with_dataflow = make_actor(load_module('codeview_slide').to_func)
+state code_view_with_dataflow_2 = make_actor(load_module('codeview_slide').to_func)
+state code_view_backprop = make_actor(load_module('codeview_slide').to_func)
+state clock_view = make_actor(load_module('codeview_slide').to_func)
+state clock_view2 = make_actor(load_module('codeview_slide').to_func)
+
+if once()
+    clock_view.call([:use_clock])
+    clock_view2.call([:use_clock])
+
+state backprop_1 = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        canvas.set_font_size(20)
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.set_line_width(3.0)
+
+        diagram = make(Diagram)
+
+        diagram.add(:filename, [], "assets/tree.png")
+        a1_rect = diagram.add(:a1 [] "[40, 0]")
+        diagram.layer = 1
+        diagram.add(:a, [:filename], "load_image")
+        func_rect = diagram.add(:b, [:a1], "func")
+        diagram.layer = 2
+        diagram.add(:d, [:a :b], "draw_image")
+        diagram.draw(canvas)
+
+        desired_loc = func_rect.rect.center + [80 40]
+        canvas.set_source_color(#00a)
+        canvas.move_to(desired_loc)
+        Arrow.make(canvas.get_current_point() - [0 8], canvas.get_current_point() - [25 30]).stroke(canvas)
+        canvas.move_to(desired_loc)
+        canvas.show_text("Desired: [41, 39]")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state backprop_2 = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+
+        canvas.set_font_size(20)
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.set_line_width(3.0)
+
+        diagram = make(Diagram)
+
+        diagram.add(:filename, [], "assets/tree.png")
+        a1_rect = diagram.add(:a1 [] "[40, 0]")
+        diagram.layer = 1
+        diagram.add(:a, [:filename], "load_image")
+        diagram.add(:b, [:a1], "func")
+        diagram.layer = 2
+        diagram.add(:d, [:a :b], "draw_image")
+        diagram.draw(canvas)
+
+        desired_loc = a1_rect.rect.center + [80 40]
+        canvas.set_source_color(#00a)
+        canvas.move_to(desired_loc)
+
+        Arrow.make(canvas.get_current_point() - [0 8], canvas.get_current_point() - [25 30]).stroke(canvas)
+        canvas.move_to(desired_loc)
+
+        canvas.show_text("Desired: ...")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state neural_network_intro = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.show_text("Neural network")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state neural_network_2 = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.show_text("Neural network 2")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state backprop_against_code = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_font_size(40)
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.show_text("Backprop against code")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state backprop_against_code_2 = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_font_size(40)
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.show_text("Backprop against code 2")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state unknown_slide = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_font_size(40)
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.show_text("Unknown slide!")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state feedback_repl = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        img = image('assets/feedback_repl.png')
+        canvas.save
+        canvas.scale([.9 .9])
+        canvas.set_source_surface(img, [60 100])
+        canvas.paint
+        canvas.restore
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state summary = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_font_size(40)
+        canvas.set_source_color(#333)
+        canvas.move_to([100 100])
+        canvas.show_text("Summary")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state hypothetical_web_page = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        img = image('assets/icse_dataflow.png')
+        canvas.save
+        canvas.scale([.7 .7])
+        canvas.set_source_surface(img, [0 0])
+        canvas.paint
+        canvas.restore
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state future_work = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_font_size(35)
+        canvas.set_source_color(#333)
+        draw_lines_lalign(canvas,
+            ["Future work"
+             "   Stable release"
+             "   Generalize the feedback-based solver"
+             "   More methods of code viewing & editing"]
+             [20 100])
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state summary = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        whiteishBackground()
+        canvas.set_font_size(35)
+        canvas.set_source_color(#333)
+        draw_lines_lalign(canvas,
+            ["Summary"
+             "   Limited language = more power to the IDE"
+             "   Editing code through dataflow"]
+             [20 60])
+
+        canvas.set_font_size(35)
+        canvas.move_to([20, 200])
+        draw_lines_lalign(canvas,
+            ["Contact info"
+             "   andy.fischer@gmail.com"
+             "   circa-lang.org"]
+             [20 240])
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+state done_red_screen = make_actor({
+    msg = input()
+    def draw(Canvas canvas)
+        background(#f00)
+        canvas.set_font_size(40)
+        canvas.set_source_color(#000)
+        canvas.move_to([100 100])
+        canvas.show_text("Done!")
+
+    if msg[0] == :draw
+        draw(msg[1])
+})
+
+slides = [intro_slide
+
+    intro_details
+    slide_first_code_view
+
+    black_box
+    undecidability
+    
+    limited_language
+    dataflow_intro
+    code_view_with_dataflow
+
+    backprop_1
+
+    backprop_2
+    code_view_with_dataflow
+
+    clock_view
+    hypothetical_web_page
+    future_work
+    summary
+    ]
+
+
+input = env(:userInput)
+
+state slideTimer = make_actor({
+    state number finishTime
+
+    msg = input()
+    result = null
+    if msg == :get
+        result = finishTime - env(:elapsedTime)
+    else
+        if msg[0] == :reset
+            finishTime = env(:elapsedTime) + msg[1]
+
+    result
+})
+
+def get_time_per_slide(int slideIndex) -> number
+    if slideIndex == 2 or slideIndex == 7 or slideIndex == 11 or slideIndex == 12
+        return 40
+    else
+        return 20
+
+if input.keyPressed('left')
+    slideIndex = max(0, slideIndex - 1)
+    slideTimer.call([:reset get_time_per_slide(slideIndex)])
+elif input.keyPressed('right')
+    slideIndex = min(slides.length - 1, slideIndex + 1)
+    slideTimer.call([:reset get_time_per_slide(slideIndex)])
+elif input.keyPressed('space')
+    autoplay = not autoplay
+
+remainingTimeOnSlide = slideTimer.call(:get)
+--drawTimer = slideIndex != 0
+drawTimer = false
+
+def draw(Canvas canvas)
+
+    -- canvas.select_font_face("Helvetica")
+    canvas.set_source_color(#fff8)
+    canvas.set_font_size(20)
+
+    windowSize = Vec2(env(:windowSize))
+
+    if drawTimer
+
+        if autoplay
+            canvas.move_to([0 windowSize.y])
+            canvas.show_text(str("autoplay on"))
+
+        canvas.show_text_ralign(str("time: " round(remainingTimeOnSlide)),
+            Vec2.cast(env(:windowSize)) - [20 0])
+
+    if showFps
+        canvas.show_text_ralign(str("fps: " calls_per_second()),
+            Vec2.cast(env(:windowSize)) - [20 60])
+
+if msg[0] == :draw
+    canvas = msg[1]
+
+    set_env(:canvas msg[1])
+    set_env(:canvasRect Vec2.make(0 0).to_rect_topleft(env(:windowSize)))
+
+    canvas.set_font_size(40)
+    slides[slideIndex].call(msg)
+    draw(msg[1])
+
+def previous(number value)
+    state st = value
+    prev = st
+    st = value
+    return prev
+
+
+if drawTimer and autoplay and remainingTimeOnSlide < 0 and previous(remainingTimeOnSlide) >= 0
+    if slideIndex + 1 < slides.length
+        slideIndex += 1
+        slideTimer.call([:reset get_time_per_slide(slideIndex)])

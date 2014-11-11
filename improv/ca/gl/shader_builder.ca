@@ -1,0 +1,37 @@
+
+require gl
+
+struct ShaderBuilder {
+  String vertexText
+  String fragmentText
+}
+
+def new()
+  make(ShaderBuilder)
+
+def ShaderBuilder.attribute(self, String type, String name)
+  precision = if env_opt(:gl_es2 false) 'mediump ' else ''
+  @self.vertexText.append(str("attribute " precision type " " name ";\n")) 
+
+def ShaderBuilder.vertexUniform(self, String type, String name)
+  precision = if env_opt(:gl_es2 false) 'mediump ' else ''
+  @self.vertexText.append(str("uniform " precision type " " name ";\n")) 
+
+def ShaderBuilder.fragmentUniform(self, String type, String name)
+  precision = if env_opt(:gl_es2 false) 'mediump ' else ''
+  @self.fragmentText.append(str("uniform " precision type " " name ";\n")) 
+
+def ShaderBuilder.varying(self, String type, String name)
+  precision = if env_opt(:gl_es2 false) 'mediump ' else ''
+  line = str("varying " precision type " " name ";\n")
+  @self.fragmentText.append(line)
+  @self.vertexText.append(line)
+
+def ShaderBuilder.vertexBody(self, String s)
+  @self.vertexText.append(str('\n' s))
+
+def ShaderBuilder.fragmentBody(self, String s)
+  @self.fragmentText.append(str('\n' s))
+
+def ShaderBuilder.to_shader(self)
+  gl.shader_from_text(self.vertexText, self.fragmentText)

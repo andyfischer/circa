@@ -1,0 +1,16 @@
+
+samples_per_sec = 44000
+bytes_per_sample = 4
+
+def render(number duration, Func func) -> Blob
+  samples = round(duration * samples_per_sec)
+  sample = make_blob(samples * bytes_per_sample)
+  for s in 0..samples
+    t = s / samples_per_sec
+
+    v = func.call(t)
+
+    @sample.set_u16(s * 4, round((v + 1.0) / 2 * 32000))
+    @sample.set_u16(s * 4 + 2, round((v + 1.0) / 2 * 32000))
+
+  sample

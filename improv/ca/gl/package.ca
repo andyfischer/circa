@@ -1,0 +1,36 @@
+
+struct Shader {
+  native_ptr native
+}
+
+def shader_from_text(String vertex, String fragment) -> Shader
+
+struct VertexBuffer {
+  native_ptr native
+}
+
+def new_vertex_buffer() -> VertexBuffer
+def VertexBuffer.set_data(self, List vertices) -> VertexBuffer
+def VertexBuffer.set_draw_type(self, Symbol t) -> VertexBuffer
+def VertexBuffer.set_attribs(self, List attribs :multiple) -> VertexBuffer
+def VertexBuffer.draw(self)
+
+def clear(Symbol flags :multiple)
+def use_shader(Shader shader)
+def uniform_vec2(Symbol name, Vec2 vec)
+def uniform_vec3(Symbol name, Vec3 vec)
+def uniform_vec4(Symbol name, Vec4 vec)
+def uniform_mat2(Symbol name, Mat2 mat)
+def uniform_mat3(Symbol name, Mat3 mat)
+def uniform_mat4(Symbol name, Mat4 mat)
+
+struct Texture {
+  native_ptr native
+}
+
+def new_texture(Symbol type) -> Texture
+  -- valid types are: ( :2d )
+
+def Texture.set_data(self, Vec2 size, Blob data)
+def bind_texture(Texture texture, Symbol samplerName)
+def unbind_texture()

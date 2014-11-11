@@ -1,0 +1,34 @@
+
+struct VerticalLayout {
+  List lines
+}
+
+def VerticalLayout.append(self, item)
+  @self.lines.append(item)
+
+struct TextItem {
+  String str
+}
+
+def TextItem.height(self)
+  env(:canvas).font_extents.height
+
+def TextItem.draw(self, Rect rect)
+  canvas = env(:canvas)
+  canvas.move_to(rect.bottom_left)
+  canvas.show_text(self.str)
+
+def VerticalLayout.append_text(self, String str)
+  @self.append(TextItem.make(str))
+
+def VerticalLayout.draw(self, rect)
+
+  cursor = rect.top_left
+
+  for line in self.lines
+    height = line.height
+    line.draw(cursor.to_rect_topleft([rect.width height]))
+    @cursor.add([0 height])
+
+def new()
+  VerticalLayout.make

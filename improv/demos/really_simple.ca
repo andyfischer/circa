@@ -1,0 +1,8 @@
+
+a = 1 + 2
+b = mult(a, (1 + 2))
+c = div(b 2)
+
+def f(a,b)
+  -- a function
+  a + b

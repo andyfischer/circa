@@ -1,0 +1,16 @@
+
+require draw
+
+draw.background(#fff)
+
+state randomCounts = repeat(0, 20)
+
+index = floor(rand() * randomCounts.length)
+randomCounts[index] += 1
+
+size = env(:size)
+w = size.x / randomCounts.length
+for x in 0..randomCounts.length
+  rect = [x*w, size.y - randomCounts[x], (x+1)*w, size.y]
+  draw.fill_rect(#666 rect)
+  draw.draw_rect(#000 rect 2.0)

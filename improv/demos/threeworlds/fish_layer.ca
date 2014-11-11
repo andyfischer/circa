@@ -1,0 +1,17 @@
+
+require draw
+fish_module = require ./fish
+
+fish_count = 3
+
+draw.background(#00f)
+
+state fishes = init_fishes()
+
+def init_fishes()
+  for i in 0..fish_count
+    fish_module.new
+
+for fish in @fishes
+  @fish.update
+  fish.draw

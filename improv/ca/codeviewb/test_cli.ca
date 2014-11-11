@@ -1,0 +1,20 @@
+
+require ./layout
+require ./window
+
+func = ->
+  def my_rebinding_func(@a)
+    a += 1
+
+    print('done')
+
+  a = 3
+  my_rebinding_func(@a)
+  print(a)
+
+phrases = layout.Layout.make.get_phrases(func.block)
+w = window.new([20 20] [10 8])
+@w.add_phrases(phrases)
+
+for e in w.elements
+  print(e)

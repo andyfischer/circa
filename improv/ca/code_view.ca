@@ -1,0 +1,293 @@
+
+require cairo
+require input
+require time
+require source_repro
+
+struct CodeLine {
+  int lineNumber
+  Term term
+  String text
+}
+
+struct CodeLineMetric {
+  Rect rect
+}
+
+struct CodeFilter {
+  String msg
+  Func func
+}
+
+struct CodeView {
+  Block block
+  Map lineMetrics
+  int selectedLine
+  int actualFirstLineNumber
+  Actor listener
+
+  any filter
+}
+
+def List.max(self) -> any
+  if self.length == 0
+    null
+  else
+    m = self[0]
+    for i in self
+      if i > m
+        m = i
+    m
+
+def Vec2.to_rect(self, Vec2 size) -> Rect
+  Rect.make(self.x, self.y, self.x + size.x, self.y + size.y)
+
+def Vec2.to_rect_anchor(self, anchor, size) -> Rect
+  if anchor == :topleft
+    Rect.make(self.x, self.y, self.x + size.x, self.y + size.y)
+  elif anchor == :bottomright
+    Rect.make(self.x - size.x, self.y - size.y, self.x, self.y)
+
+def new_code_view(Block block) -> CodeView
+  view = make(CodeView)
+  view.block = block
+  view.selectedLine = -1
+  view
+
+def CodeView.enable_filter(@self, String description, Func func)
+  self.filter = CodeFilter.make(description func)
+
+struct Phrase {
+  any val
+  int depth
+  Rect rect
+}
+
+def Phrase.nested_phrases(self)
+  self.val
+
+def Phrase.size(self)
+  self.rect.size
+
+def Phrase.is_newline(self)
+  self.val == "\n"
+
+def Phrase.update_depth(self, int depth)
+  self.depth = depth
+  if type(self.val) == List
+    for phrase in @self.val
+      @phrase.update_depth(depth + 1)
+  self
+
+struct Line {
+  List phrases
+  number height
+}
+
+def phrase_list_to_lines(List phrases) -> List
+  lines = [Line.make]
+  
+  lineIndex = 0
+
+  for phrase in phrases
+    if phrase.is_newline
+      @lines.append(Line.make)
+      lineIndex += 1
+    else
+      @lines.apply(lineIndex, (el) -> @el.phrases.append(phrase) )
+
+  lines
+
+def Phrase.set_position(self, Vec2 pos)
+
+  if type(self.val) == String
+    canvas = env(:canvas)
+    size = Vec2.make(canvas.text_extents(self.val).advance.x, canvas.font_extents.height)
+    @self.set_rect(pos.to_rect(size))
+
+  elif type(self.val) == List
+
+    rect = pos.to_rect(self.margin)
+
+    lines = phrase_list_to_lines(self.val)
+
+    for line in @lines
+      height = 0
+      for phrase in line.phrases
+        max(@height, phrase.size.y)
+
+      @line.set_height(height)
+
+    cursor = pos.add(self.margin)
+    for line in @lines
+      for phrase in line.phrases
+        @phrase.set_position(cursor)
+        cursor.x += phrase.size.x
+
+        max(@rect.x2, phrase.rect.x2)
+        max(@rect.y2, phrase.rect.y2)
+
+      cursor.x = pos.x
+      cursor.y += line.height
+
+    rect.x2 += 2 * self.margin.x
+    rect.y2 += 2 * self.margin.y
+
+    self.set_rect(rect)
+
+def Phrase.margin(self) -> Vec2
+  [5 5]
+
+def Phrase.expr_space(self) -> number
+  5
+
+def Phrase.draw(self)
+  canvas = env(:canvas)
+
+  pos = self.rect.top_left
+  size = self.size
+
+  if type(self.val) == String
+
+    canvas.move_to(pos)
+    canvas.set_source_color(#fff)
+    canvas.save
+    canvas.rel_move_to([0, canvas.font_extents.ascent])
+    canvas.show_text(self.val)
+    canvas.restore
+
+  elif type(self.val) == List
+
+    canvas.set_source_color(#222.lighten(self.depth / 16 % 1))
+    p = Vec2.make(0 0)
+    canvas.move_to(pos)
+    canvas.round_rect(pos.to_rect(self.size) 5.0)
+    canvas.fill
+
+    for phrase in self.nested_phrases
+      phrase.draw
+
+def term_source(Term term)
+  phrases = source_repro.term_phrases(term)
+  source_repro.expand_block_contents(@phrases)
+
+def block_source(Block block)
+  phrases = source_repro.block_phrases(block)
+  source_repro.expand_block_contents(@phrases)
+
+def source_to_phrase(sourceList)
+  nestedPhrases = for source in sourceList
+    if source.t == :sub_expr
+      term_source(source.term) | source_to_phrase
+    else
+      Phrase.make(source.text)
+
+  phrase = Phrase.make(nestedPhrases)
+  @phrase.set_position([0 0])
+  @phrase.update_depth(0)
+
+def CodeView.run(@self, Rect rect)
+
+  state Vec2 scroll
+
+  scrollDelta = input.wheel_delta.mult(3)
+  @scroll.add(scrollDelta)
+  min(@scroll.y, 20)
+
+  canvas = env(:canvas)
+
+  canvas.save
+
+  canvas.set_font_face(cairo.font('assets/Inconsolata.otf'))
+  canvas.set_font_size(14)
+
+  lines = self.block.to_code_lines
+
+  -- fill background
+  canvas.set_source_color(#000)
+  canvas.rectangle(rect)
+  canvas.fill
+
+  cursor = rect.top_left + scroll
+
+  canvas.set_font_size(18)
+
+  phrase = block_source(self.block) | source_to_phrase
+  phrase.draw
+
+  canvas.restore
+
+def CodeView.oldRun(@self, Rect rect)
+  --userInput = env(:userInput)
+  --clickResolver = env(:clickResolver)
+
+  canvas = env(:canvas)
+  state Vec2 scroll
+  
+  fontExtents = canvas.font_extents
+
+  cursor = rect.top_left + scroll
+
+  if self.filter != null
+    areaTop = cursor
+    cursor += [0 fontExtents.ascent]
+    lineRect = Rect.make(rect.left, areaTop.y, rect.right, cursor.y + fontExtents.descent)
+    canvas.rectangle(lineRect)
+    canvas.set_source_color(#33d)
+    canvas.fill
+    canvas.move_to(cursor + [10 0])
+    canvas.set_source_color(#fff)
+    canvas.show_text(self.filter.msg)
+    cursor += [0 fontExtents.descent]
+
+  lines = []
+  for i, CodeLine line in lines
+    if self.filter != null
+      if not self.filter.func(line.term)
+        continue
+    
+    areaTop = cursor
+
+    cursor += [0 fontExtents.ascent]
+
+    -- Draw background rect
+    lineRect = Rect.make(rect.left, areaTop.y, rect.right, cursor.y + fontExtents.descent)
+    lineColor = cond(i % 2 == 1, #000, #222)
+
+    if self.selectedLine == i
+      lineColor = #888
+    elif lineRect.contains(input.mouse)
+      lineColor = #444
+
+{-
+    -- Handle drag input
+    dragging, dragDistance = input.draggable(lineRect)
+    if dragging
+      line.term.tweak(delta(dragDistance.y) / 2)
+      lineColor = #888
+      -}
+
+    canvas.set_source_color(lineColor)
+    canvas.rectangle(lineRect)
+    canvas.fill
+
+    canvas.set_source_color(#fff)
+
+    -- Draw source line
+    canvas.move_to([10 cursor.y])
+    canvas.show_text(line.text)
+
+    -- Handle clicks
+    {-
+    clickResolver.call([:add, lineRect, {
+      pos = input()
+      event = input()
+
+      if event == :right_down and self.listener != null
+          self.listener.call([:right_click_term line.term pos])
+      }])
+    -}
+
+    cursor += [0 fontExtents.descent]
+
+  canvas.restore
