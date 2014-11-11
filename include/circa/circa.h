@@ -165,6 +165,10 @@ caStack* circa_create_stack(caWorld* world);
 // Deallocate a Stack object.
 void circa_free_stack(caStack* stack);
 
+// (Re)initialize the stack to have just one frame, using 'main' as its block. Existing data
+// is erased.
+void circa_stack_init(caStack* stack, caBlock* block);
+
 // Push a function to the stack.
 void circa_push_function(caStack* stack, caBlock* func);
 

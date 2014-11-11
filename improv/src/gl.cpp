@@ -26,6 +26,17 @@ struct Context {
 
 Context g_context;
 
+int next_power_of_two(int i)
+{
+    i--;
+    i |= i >> 1;
+    i |= i >> 2;
+    i |= i >> 4;
+    i |= i >> 8;
+    i |= i >> 16;
+    return i + 1;
+}
+
 void gl_check_error()
 {
 #if DEBUG
@@ -191,8 +202,8 @@ struct Texture
 
     void loadCheckerPattern(int w, int h)
     {
-        w = NextPowerOfTwo(w);
-        h = NextPowerOfTwo(h);
+        w = next_power_of_two(w);
+        h = next_power_of_two(h);
         
         char* data = (char*) malloc(w * h * 4);
         

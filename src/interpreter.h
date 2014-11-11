@@ -14,7 +14,7 @@ namespace circa {
 
 // (Re)initialize the stack to have just one frame, using 'main' as its block. Existing data
 // is erased.
-void stack_init(Stack* stack, Block* main);
+#define stack_init circa_stack_init
 
 void stack_init_with_closure(Stack* stack, Value* closure);
 

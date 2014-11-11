@@ -10,13 +10,22 @@
 #include <sstream>
 #include <iostream>
 
+#ifdef __MACH__
+  #include <mach/clock.h>
+  #include <mach/mach.h>
+#endif
+
 #include <cairo/cairo.h>
 #include <cairo/cairo-ft.h>
 
 #include "cairo_surface.h"
+#include "gl.h"
 #include "key_codes.h"
 
 namespace improv {
+
+double get_time();
+
 
 struct ImprovWindow {
 
@@ -26,20 +35,45 @@ struct ImprovWindow {
     float _width;
     float _height;
     caValue* _inputEvents;
+    caWorld* _world;
+    caStack* _stack;
     
     float _mouseX;
     float _mouseY;
     
     double _elapsedTime;
+    double _lastFrameDuration;
 
     ImprovWindow() :
+        _sdl_window(NULL),
         _sdl_screen(NULL)
     {}
 
+    void init(caWorld* world);
     void initOpenGL();
     void mainLoop();
     void setSize(float w, float h);
+    void redraw();
 };
+
+void ImprovWindow::init(caWorld* world)
+{
+    _world = world;
+
+    _inputEvents = circa_alloc_value();
+    circa_set_list(_inputEvents, 0);
+
+    _stack = circa_create_stack(_world);
+
+    caBlock* main = circa_load_module(_world, NULL, "improv_top_layer");
+
+    if (main == NULL) {
+        printf("fatal: Couldn't load improv_top_layer.ca module\n");
+        return;
+    }
+
+    circa_stack_init(_stack, main);
+}
 
 void ImprovWindow::mainLoop()
 {
@@ -155,10 +189,18 @@ void ImprovWindow::setSize(float w, float h)
 {
     _width = w;
     _height = h;
+
+    if (_sdl_window == NULL) {
+        _sdl_window = SDL_CreateWindow("improv", 50, 50,
+            _width, _height,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+
+        SDL_GL_CreateContext(_sdl_window);
+    }
     
     glViewport(0, 0, _width, _height);
     
-    printf(buf, "glViewport %d %d", _width, _height);
+    printf("glViewport %d %d", _width, _height);
     
     // Other GL setup
     glDisable(GL_CULL_FACE);
@@ -178,11 +220,11 @@ void ImprovWindow::redraw()
 {
 
 #ifndef NACL
-    circa_update_changed_files(m_world);
+    circa_update_changed_files(_world);
 #endif
     
-    if (m_windowWidth == 0 && m_windowHeight == 0) {
-        log("error: App::redraw() called before setSize()");
+    if (_width == 0 && _height == 0) {
+        printf("error: App::redraw() called before setSize()\n");
         return;
     }
     
@@ -190,25 +232,21 @@ void ImprovWindow::redraw()
     
     glClear( GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/ );
     
-    circa_update_changed_files(m_world);
+    circa_copy(_inputEvents, circa_env_insert(_stack, "inputEvents"));
     
-    circa_copy(m_inputEvents, circa_env_insert(m_stack, "inputEvents"));
-    
-    circa_set_vec2(circa_env_insert(m_stack, "mouse"),
-                   m_context.mouseX, m_context.mouseY);
-    circa_set_vec2(circa_env_insert(m_stack, "windowSize"),
-                   m_windowWidth, m_windowHeight);
-    circa_set_float(circa_env_insert(m_stack, "time"), m_context.elapsedTime);
-    circa_set_float(circa_env_insert(m_stack, "lastFrameDuration"), m_context.lastFrameDuration);
+    circa_set_vec2(circa_env_insert(_stack, "mouse"), _mouseX, _mouseY);
+    circa_set_vec2(circa_env_insert(_stack, "windowSize"), _width, _height);
+    circa_set_float(circa_env_insert(_stack, "time"), _elapsedTime);
+    circa_set_float(circa_env_insert(_stack, "lastFrameDuration"), _lastFrameDuration);
     
 #ifdef NACL
-    circa_set_bool(circa_env_insert(m_stack, "gl_es2"), true);
+    circa_set_bool(circa_env_insert(_stack, "gl_es2"), true);
 #endif
     
-    circa_run(m_stack);
+    circa_run(_stack);
     
-    if (circa_has_error(m_stack)) {
-        circa_dump_stack_trace(m_stack);
+    if (circa_has_error(_stack)) {
+        circa_dump_stack_trace(_stack);
         
 #ifndef NACL
         exit(1);
@@ -216,16 +254,16 @@ void ImprovWindow::redraw()
     }
     
     // Cleanup stack
-    circa_restart(m_stack);
+    circa_restart(_stack);
     
     // Cleanup
-    circa_set_list(m_inputEvents, 0);
+    circa_set_list(_inputEvents, 0);
     
-    m_context.lastFrameDuration = get_time() - startTime;
+    _lastFrameDuration = get_time() - startTime;
     
 #define DUMP_PERF_STATS 0
 #if DUMP_PERF_STATS
-    printf("frame duration = %f\n", (float) m_context.lastFrameDuration);
+    printf("frame duration = %f\n", (float) _lastFrameDuration);
     circa_perf_stats_dump();
     circa_perf_stats_reset();
 #endif
@@ -340,38 +378,40 @@ void setup_sdl_audio()
     }
 }
 
-extern "C" int main(int argc, char *argv[])
+double get_time()
 {
-    if (argc <= 1) {
-        printf("Missing script argument\n");
-        return 1;
-    }
-    
-    caWorld* world = circa_initialize();
+    timespec time;
 
-    fix_current_directory();
+    #ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
+        clock_serv_t cclock;
+        mach_timespec_t mts;
+        host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+        clock_get_time(cclock, &mts);
+        mach_port_deallocate(mach_task_self(), cclock);
+        time.tv_sec = mts.tv_sec;
+        time.tv_nsec = mts.tv_nsec;
 
-    circa_use_local_filesystem(world, "");
+    #else
+        clock_gettime(CLOCK_REALTIME, &time);
+    #endif
 
+    return 1.0 * time.tv_sec + time.tv_nsec / 1000000000.0;
+}
+
+void setup_native_patches(caWorld* world)
+{
     caNativePatch* improvPatch = circa_create_native_patch(world, "improv");
     circa_patch_function(improvPatch, "play_audio", play_audio);
     circa_finish_native_patch(improvPatch);
 
-    setup_sdl_audio();
+    gl_native_patch(circa_create_native_patch(world, "gl"));
+}
 
-    improv::App app;
-    app.m_world = world;
-
-    app.start();
-
-    const char* arg = argv[1];
-    circa_set_string(circa_env_insert(app.m_stack, "scriptName"), arg);
-
-    ImprovWindow window(&app);
-
-    // Initialize SDL surface.
+bool sdl_init()
+{
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE) < 0) {
-        return 1;
+        printf("SDL_Init failed\n");
+        return false;
     }
 
     SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
@@ -381,23 +421,43 @@ extern "C" int main(int argc, char *argv[])
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
     SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, 4 );
+    return true;
+}
+
+} // namespace improv
+
+extern "C" int main(int argc, char *argv[])
+{
+    if (argc <= 1) {
+        printf("Missing script argument\n");
+        return 1;
+    }
+    
+    caWorld* world = circa_initialize();
+
+    improv::fix_current_directory();
+
+    circa_use_local_filesystem(world, "");
+    circa_add_module_search_path(world, "ca");
+
+    improv::setup_sdl_audio();
+
+    improv::ImprovWindow window;
+    window.init(world);
+
+    const char* arg = argv[1];
+    circa_set_string(circa_env_insert(window._stack, "scriptName"), arg);
+
+    if (!improv::sdl_init())
+        return 1;
 
     const int width = 1000;
     const int height = 600;
 
-    window._sdl_window = SDL_CreateWindow("improv", 50, 50,
-        width, height,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-
-    SDL_GL_CreateContext(window._sdl_window);
-
-    app.setSize(width, height);
+    window.setSize(width, height);
 
     SDL_PauseAudio(0);
 
     window.mainLoop();
     return 0;
 }
-
-
-} // namespace improv

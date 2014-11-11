@@ -129,7 +129,7 @@ void get_stack_path(Frame* frame, Value* out);
 #define vm_fix_bytecode_pointer() \
   bytecode = as_blob(&stack->program->bytecode);
 
-void stack_init(Stack* stack, Block* block)
+CIRCA_EXPORT void circa_stack_init(Stack* stack, Block* block)
 {
     ca_assert(block != NULL);
 

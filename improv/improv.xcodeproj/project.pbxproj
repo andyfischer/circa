@@ -623,8 +623,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					3rdparty,
+					"$(inherited)"
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -633,8 +632,7 @@
 					../3rdparty,
 					/usr/local/include,
 					/usr/local/Cellar/freetype/2.4.10/include/freetype2,
-					/usr/local/Cellar/freetype/2.4.10/include,
-					3rdparty,
+					/usr/local/Cellar/freetype/2.4.10/include
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -643,9 +641,9 @@
 					"-luv",
 					"-lcairo",
 					"-lfreetype",
+                    "-lSDL2",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = 3rdparty/SDL2.framework/Headers;
 			};
 			name = Debug;
 		};
@@ -653,8 +651,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					3rdparty,
+					"$(inherited)"
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
@@ -665,8 +662,7 @@
 					../3rdparty,
 					/usr/local/include,
 					/usr/local/Cellar/freetype/2.4.10/include/freetype2,
-					/usr/local/Cellar/freetype/2.4.10/include,
-					3rdparty,
+					/usr/local/Cellar/freetype/2.4.10/include
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -675,9 +671,9 @@
 					"-luv",
 					"-lcairo",
 					"-lfreetype",
+                    "-lSDL2",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = 3rdparty/SDL2.framework/Headers;
 			};
 			name = Release;
 		};
