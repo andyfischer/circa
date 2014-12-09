@@ -28,9 +28,9 @@
 namespace circa {
 
 struct ParserFrame {
-    bool typeDecl;
+    bool insideTypeDecl;
 
-    ParserFrame() : typeDecl(false) {}
+    ParserFrame() : insideTypeDecl(false) {}
 };
 
 struct ParserCxt {
@@ -51,9 +51,21 @@ struct ParserCxt {
     {
         frames.resize(frames.size()+1);
     }
+
     void pop()
     {
         frames.resize(frames.size()-1);
+    }
+
+    ParserFrame* frame()
+    {
+        return &frames[frames.size()-1];
+    }
+
+    void pushInsideTypeDecl()
+    {
+        push();
+        frame()->insideTypeDecl = true;
     }
 };
 
@@ -808,8 +820,11 @@ consume_next_output: {
     ca_assert(is_function(result));
 
     // Consume contents, if there are still tokens left. It's okay to reach EOF here.
-    if (!tokens.finished() && lookahead_next_non_whitespace(tokens, false) != tok_Semicolon)
+    if (!tokens.finished() && lookahead_next_non_whitespace(tokens, false) != tok_Semicolon) {
+        context->push();
         consume_block(contents, tokens, context);
+        context->pop();
+    }
 
     // Finish up
     finish_building_function(contents);
@@ -855,7 +870,9 @@ ParseResult anon_function_decl(Block* block, TokenStream& tokens, ParserCxt* con
     possible_whitespace_or_newline(tokens);
     tokens.consume(tok_RightArrow);
 
+    context->push();
     consume_block(contents, tokens, context);
+    context->pop();
 
     if (get_output_placeholder(contents, 0) == NULL)
         append_output_placeholder(contents, NULL);
@@ -1001,53 +1018,14 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     Block* contents = nested_contents(result);
 
     while (!tokens.nextIs(closingToken)) {
-        std::string preWs = possible_whitespace_or_newline(tokens);
 
-        if (tokens.nextIs(closingToken)) {
+        if (lookahead_next_non_whitespace(tokens, false) == closingToken) {
+            std::string preWs = possible_whitespace_or_newline(tokens);
             result->setStringProp(sym_Syntax_PreRBracketWs, preWs);
             break;
         }
 
-        // Look for comment
-        if (tokens.nextIs(tok_Comment)) {
-            Term* commentTerm = comment(contents, tokens, context).term;
-            std::string lineEnding = possible_whitespace_or_newline(tokens);
-            if (lineEnding != "")
-                commentTerm->setStringProp(sym_Syntax_LineEnding, lineEnding);
-            continue;
-        }
-
-        if (!tokens.nextIs(tok_Identifier))
-            return syntax_error(block, tokens, startPosition);
-
-        Term* fieldType = type_expr(block, tokens, context).term;
-
-        std::string postNameWs = possible_whitespace(tokens);
-
-        std::string fieldName;
-
-        if (tokens.nextIs(tok_Identifier))
-            fieldName = tokens.consumeStr(tok_Identifier);
-
-        // Create the accessor function.
-        Term* accessor = type_decl_append_field(contents, fieldName.c_str(), fieldType);
-        accessor->setStringProp(sym_Syntax_PreWs, preWs);
-        accessor->setStringProp(sym_Syntax_PostNameWs, postNameWs);
-
-        Value postWhitespace;
-        if (tokens.nextIs(tok_Whitespace))
-            tokens.consumeStr(&postWhitespace);
-        if (tokens.nextIs(tok_Semicolon))
-            tokens.consumeStr(&postWhitespace);
-        if (tokens.nextIs(tok_Comma))
-            tokens.consumeStr(&postWhitespace);
-        if (tokens.nextIs(tok_Whitespace))
-            tokens.consumeStr(&postWhitespace);
-        if (tokens.nextIs(tok_Newline))
-            tokens.consumeStr(&postWhitespace);
-
-        if (!is_null(&postWhitespace))
-            accessor->setProp(sym_Syntax_PostWs, &postWhitespace);
+        struct_decl_line(contents, tokens, context);
     }
 
     tokens.consume(closingToken);
@@ -1055,6 +1033,55 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     list_type_initialize_from_decl(as_type(result), contents);
 
     return ParseResult(result);
+}
+
+ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+    std::string preWs = possible_whitespace_or_newline(tokens);
+
+    // Look for comment
+    if (tokens.nextIs(tok_Comment)) {
+        Term* commentTerm = comment(block, tokens, context).term;
+        std::string lineEnding = possible_whitespace_or_newline(tokens);
+        if (lineEnding != "")
+            commentTerm->setStringProp(sym_Syntax_LineEnding, lineEnding);
+        return ParseResult(commentTerm);
+    }
+
+    if (!tokens.nextIs(tok_Identifier))
+        return syntax_error(block, tokens, startPosition);
+
+    Term* fieldType = type_expr(block, tokens, context).term;
+
+    std::string postNameWs = possible_whitespace(tokens);
+
+    std::string fieldName;
+
+    if (tokens.nextIs(tok_Identifier))
+        fieldName = tokens.consumeStr(tok_Identifier);
+
+    // Create the accessor function.
+    Term* accessor = type_decl_append_field(block, fieldName.c_str(), fieldType);
+    accessor->setStringProp(sym_Syntax_PreWs, preWs);
+    accessor->setStringProp(sym_Syntax_PostNameWs, postNameWs);
+
+    Value postWhitespace;
+    if (tokens.nextIs(tok_Whitespace))
+        tokens.consumeStr(&postWhitespace);
+    if (tokens.nextIs(tok_Semicolon))
+        tokens.consumeStr(&postWhitespace);
+    if (tokens.nextIs(tok_Comma))
+        tokens.consumeStr(&postWhitespace);
+    if (tokens.nextIs(tok_Whitespace))
+        tokens.consumeStr(&postWhitespace);
+    if (tokens.nextIs(tok_Newline))
+        tokens.consumeStr(&postWhitespace);
+
+    if (!is_null(&postWhitespace))
+        accessor->setProp(sym_Syntax_PostWs, &postWhitespace);
+    
+    return ParseResult(accessor);
 }
 
 ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -1119,7 +1146,11 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
         caseTerm->setStringProp(sym_Syntax_PreWs, preKeywordWhitespace);
         set_starting_source_location(caseTerm, leadingTokenPosition, tokens);
+
+        context->push();
         consume_block(nested_contents(caseTerm), tokens, context);
+        context->pop();
+
         block_finish_changes(nested_contents(caseTerm));
 
         // Figure out whether to iterate to consume another case.
@@ -1178,7 +1209,10 @@ ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context)
     Term* result = apply(block, FUNCS.switch_func, switchInputs);
 
     set_starting_source_location(result, startPosition, tokens);
+
+    context->push();
     consume_block(nested_contents(result), tokens, context);
+    context->pop();
 
     // case_block may have appended some terms to our block, so move this
     // term to compensate.
@@ -1217,7 +1251,10 @@ ParseResult case_block(Block* block, TokenStream& tokens, ParserCxt* context)
     
     case_add_condition_check(contents, caseInput);
 
+    context->push();
     consume_block(contents, tokens, context);
+    context->pop();
+
     set_source_location(result, startPosition, tokens);
     set_is_statement(result, true);
     return ParseResult(result);
@@ -1241,7 +1278,10 @@ ParseResult else_block(Block* block, TokenStream& tokens, ParserCxt* context)
     set_starting_source_location(result, startPosition, tokens);
     Block* contents = nested_contents(result);
 
+    context->push();
     consume_block(contents, tokens, context);
+    context->pop();
+
     set_source_location(result, startPosition, tokens);
     set_is_statement(result, true);
     return ParseResult(result);
@@ -1417,7 +1457,9 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     start_building_for_loop(forTerm, &indexName, &iteratorName, explicitIteratorType);
 
+    context->push();
     consume_block(contents, tokens, context);
+    context->pop();
 
     finish_for_loop(forTerm);
     set_source_location(forTerm, startPosition, tokens);
@@ -1443,7 +1485,10 @@ ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context)
     Term* condition = infix_expression(contents, tokens, context, 0).term;
     loop_add_condition_check(contents, condition);
 
+    context->push();
     consume_block(contents, tokens, context);
+    context->pop();
+
     set_source_location(result, startPosition, tokens);
     finish_while_loop(contents);
     block_finish_changes(contents);

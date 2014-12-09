@@ -39,6 +39,7 @@ ParseResult blank_line(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult anon_function_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult switch_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult case_block(Block* block, TokenStream& tokens, ParserCxt* context);
