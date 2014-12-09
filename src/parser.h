@@ -6,21 +6,7 @@ namespace circa {
 
 struct Block;
 struct TokenStream;
-
-namespace parser {
-
-struct ParserCxt {
-
-    TokenStream* tokens;
-
-    // Number of open parenthesis in the current expression. (This affects whether we'll
-    // consume newlines as part of an expression).
-    int openParens;
-
-    ParserCxt()
-      : openParens(0)
-    {}
-};
+struct ParserCxt;
 
 struct ParseResult {
     Term* term;
@@ -42,12 +28,12 @@ struct ParseResult {
 
 typedef ParseResult (*ParsingStep)(Block* block, TokenStream& tokens, ParserCxt* context);
 
-Term* compile(Block* block, ParsingStep step, Value* input);
-Term* compile(Block* block, ParsingStep step, const char* input);
+Term* parse(Block* block, ParsingStep step, Value* input);
+Term* parse(Block* block, ParsingStep step, const char* input);
 
 // Parsing steps:
-ParseResult statement_list(Block* block, TokenStream& tokens, ParserCxt* context);
-ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult parse_statement_list(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult parse_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult blank_line(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context);
@@ -125,5 +111,4 @@ bool is_multiline_block(Term* term);
 
 int get_number_of_decimal_figures(std::string const& str);
 
-} // namespace parser
 } // namespace circa

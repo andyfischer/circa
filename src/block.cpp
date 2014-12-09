@@ -305,7 +305,7 @@ void Block::remapPointers(TermMap const& map)
 Term*
 Block::compile(const char* code)
 {
-    return parser::compile(this, parser::statement_list, code);
+    return parse(this, parse_statement_list, code);
 }
 
 bool has_nested_contents(Term* term)
@@ -686,12 +686,12 @@ void duplicate_block(Block* source, Block* dest)
 
 Term* compile(Block* block, const char* str)
 {
-    return parser::compile(block, parser::statement_list, str);
+    return parse(block, parse_statement_list, str);
 }
 
 void load_script_from_text(Block* block, const char* text)
 {
-    parser::compile(block, parser::statement_list, text);
+    parse(block, parse_statement_list, text);
 
     // Make sure the block has a primary output.
     if (get_output_placeholder(block, 0) == NULL)
@@ -718,7 +718,7 @@ void load_script(Block* block, const char* filename)
         return;
     }
 
-    parser::compile(block, parser::statement_list, &contents);
+    parse(block, parse_statement_list, &contents);
 
     // Make sure the block has a primary output.
     if (get_output_placeholder(block, 0) == NULL)

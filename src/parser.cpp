@@ -26,7 +26,36 @@
 #include "type.h"
 
 namespace circa {
-namespace parser {
+
+struct ParserFrame {
+    bool typeDecl;
+
+    ParserFrame() : typeDecl(false) {}
+};
+
+struct ParserCxt {
+
+    TokenStream* tokens;
+
+    // Number of open parenthesis in the current expression. (This affects whether we'll
+    // consume newlines as part of an expression).
+    int openParens;
+
+    std::vector<ParserFrame> frames;
+
+    ParserCxt()
+      : openParens(0)
+    {}
+
+    void push()
+    {
+        frames.resize(frames.size()+1);
+    }
+    void pop()
+    {
+        frames.resize(frames.size()-1);
+    }
+};
 
 ParseResult syntax_error(Block* block, TokenStream &tokens, int start,
         std::string const& message="");
@@ -44,12 +73,14 @@ static void token_position_to_short_source_location(int position, TokenStream& t
 
 static ParseResult right_apply_to_function(Block* block, Term* lhs, Value* functionName);
 
-Term* compile(Block* block, ParsingStep step, Value* input)
+Term* parse(Block* block, ParsingStep step, Value* input)
 {
+#if 0
     log_start(0, "parser::compile");
     log_arg("block.id", block->id);
     log_arg("input", input);
     log_finish();
+#endif
 
     block_start_changes(block);
 
@@ -63,18 +94,20 @@ Term* compile(Block* block, ParsingStep step, Value* input)
     Value invariantsCheck;
     ca_assert(block_check_invariants_print_result(block, &invariantsCheck));
 
+#if 0
     log_start(0, "parser::compile finished");
     log_arg("block.length", block->length());
     log_finish();
+#endif
 
     return result;
 }
 
-Term* compile(Block* block, ParsingStep step, const char* input)
+Term* parse(Block* block, ParsingStep step, const char* input)
 {
     Value inputVal;
     set_string(&inputVal, input);
-    return compile(block, step, &inputVal);
+    return parse(block, step, &inputVal);
 }
 
 // -------------------------- Utility functions -------------------------------
@@ -194,7 +227,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
                     || tokens.nextIs(tok_RSquare))
                 return;
 
-            Term* statement = parser::statement(block, tokens, context).term;
+            Term* statement = parse_statement(block, tokens, context).term;
 
             std::string const& lineEnding = statement->stringProp(sym_Syntax_LineEnding, "");
             bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
@@ -269,7 +302,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
         if (find_indentation_of_next_statement(tokens) <= parentTermIndent)
             return;
         
-        Term* statement = parser::statement(block, tokens, context).term;
+        Term* statement = parse_statement(block, tokens, context).term;
 
         if (statement->function != FUNCS.comment) {
             indentationLevel = int(statement->stringProp(
@@ -294,7 +327,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
         if (!ignore && (indentationLevel != nextIndent))
             break;
 
-        parser::statement(block, tokens, context);
+        parse_statement(block, tokens, context);
     }
 }
 
@@ -314,7 +347,7 @@ void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* con
             return;
         }
 
-        parser::statement(block, tokens, context);
+        parse_statement(block, tokens, context);
     }
 }
 
@@ -329,17 +362,17 @@ void apply_hints_from_parsed_input(Term* term, int index, ParseResult const& par
 
 // ---------------------------- Parsing steps ---------------------------------
 
-ParseResult statement_list(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult parse_statement_list(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     ParseResult result;
 
     while (!tokens.finished())
-        result = statement(block, tokens, context);
+        result = parse_statement(block, tokens, context);
 
     return result;
 }
 
-ParseResult statement(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult parse_statement(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int initialPosition = tokens.getPosition();
     std::string preWhitespace = possible_whitespace(tokens);
@@ -2966,7 +2999,5 @@ int get_number_of_decimal_figures(std::string const& str)
 
     return result;
 }
-
-} // namespace parser
 
 } // namespace circa

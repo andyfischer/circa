@@ -561,7 +561,7 @@ void bootstrap_kernel()
     FUNCS.comment = apply(builtins, FUNCS.function_decl, TermList(), "comment");
 
     // Parse stdlib.ca
-    parser::compile(builtins, parser::statement_list, find_builtin_module("stdlib"));
+    parse(builtins, parse_statement_list, find_builtin_module("stdlib"));
     set_string(block_insert_property(builtins, sym_ModuleName), "stdlib");
 
     // Install native functions.
