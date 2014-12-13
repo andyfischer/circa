@@ -180,11 +180,15 @@ struct ListSyntaxHints {
 void consume_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     Term* parentTerm = block->owningTerm;
+    ParsingStep inside_block_step = parse_statement;
+
+    if (context->frame()->insideTypeDecl)
+        inside_block_step = struct_decl_line;
 
     if (tok_LBrace == lookahead_next_non_whitespace(tokens, false))
-        consume_block_with_braces(block, tokens, context, parentTerm);
+        consume_block_with_braces(block, tokens, context, parentTerm, inside_block_step);
     else
-        consume_block_with_significant_indentation(block, tokens, context, parentTerm);
+        consume_block_with_significant_indentation(block, tokens, context, parentTerm, inside_block_step);
 
     return;
 }
@@ -209,7 +213,7 @@ int find_indentation_of_next_statement(TokenStream& tokens)
 }
 
 void consume_block_with_significant_indentation(Block* block, TokenStream& tokens,
-        ParserCxt* context, Term* parentTerm)
+        ParserCxt* context, Term* parentTerm, ParsingStep inside_block_step)
 {
     ca_assert(parentTerm != NULL);
     ca_assert(parentTerm->sourceLoc.defined());
@@ -239,7 +243,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
                     || tokens.nextIs(tok_RSquare))
                 return;
 
-            Term* statement = parse_statement(block, tokens, context).term;
+            Term* statement = inside_block_step(block, tokens, context).term;
 
             std::string const& lineEnding = statement->stringProp(sym_Syntax_LineEnding, "");
             bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
@@ -314,7 +318,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
         if (find_indentation_of_next_statement(tokens) <= parentTermIndent)
             return;
         
-        Term* statement = parse_statement(block, tokens, context).term;
+        Term* statement = inside_block_step(block, tokens, context).term;
 
         if (statement->function != FUNCS.comment) {
             indentationLevel = int(statement->stringProp(
@@ -339,12 +343,12 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
         if (!ignore && (indentationLevel != nextIndent))
             break;
 
-        parse_statement(block, tokens, context);
+        inside_block_step(block, tokens, context);
     }
 }
 
 void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* context,
-        Term* parentTerm)
+        Term* parentTerm, ParsingStep inside_block_step)
 {
     parentTerm->setStringProp(sym_Syntax_BlockStyle, "braces");
 
@@ -359,7 +363,7 @@ void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* con
             return;
         }
 
-        parse_statement(block, tokens, context);
+        inside_block_step(block, tokens, context);
     }
 }
 
@@ -1002,11 +1006,16 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         return ParseResult(result);
     }
 
+    #if 0
     if (!tokens.nextIs(tok_LBrace) && !tokens.nextIs(tok_LSquare))
         return syntax_error(block, tokens, startPosition);
+    #endif
+
+    list_t::setup_type(unbox_type(result));
+    Block* contents = nested_contents(result);
 
     // Parse as compound type.
-    list_t::setup_type(unbox_type(result));
+    #if 0
 
     // Opening brace.
     int closingToken = tokens.nextIs(tok_LBrace) ? tok_RBrace : tok_RSquare;
@@ -1014,8 +1023,6 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     result->setStringProp(sym_Syntax_PostLBracketWs,
             possible_whitespace_or_newline(tokens));
-
-    Block* contents = nested_contents(result);
 
     while (!tokens.nextIs(closingToken)) {
 
@@ -1029,9 +1036,13 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     tokens.consume(closingToken);
+    #endif
+
+    context->pushInsideTypeDecl();
+    consume_block(contents, tokens, context);
+    context->pop();
 
     list_type_initialize_from_decl(as_type(result), contents);
-
     return ParseResult(result);
 }
 
@@ -2763,6 +2774,7 @@ ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context
     return ParseResult(term);
 }
 
+#if 0
 ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -2780,6 +2792,7 @@ ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     return ParseResult(term);
 }
+#endif
 
 ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
@@ -2798,7 +2811,7 @@ ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
     Term* term = apply(block, FUNCS.section_block, TermList(), as_cstring(&name));
     Block* resultBlock = nested_contents(term);
     set_source_location(term, startPosition, tokens);
-    consume_block_with_braces(resultBlock, tokens, context, term);
+    consume_block(resultBlock, tokens, context);
     block_finish_changes(resultBlock);
 
     return ParseResult(term);

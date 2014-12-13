@@ -85,9 +85,9 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
 // Helper functions:
 void consume_block(Block* block, TokenStream& tokens, ParserCxt* context);
 void consume_block_with_significant_indentation(Block* block, TokenStream& tokens,
-        ParserCxt* context, Term* parent);
+        ParserCxt* context, Term* parent, ParsingStep inside_block_step);
 void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* context,
-        Term* parentTerm);
+        Term* parentTerm, ParsingStep inside_block_step);
 bool lookahead_match_whitespace_statement(TokenStream& tokens);
 bool lookahead_match_comment_statement(TokenStream& tokens);
 bool lookahead_match_rebind_argument(TokenStream& tokens);
