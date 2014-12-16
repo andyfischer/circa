@@ -42,7 +42,7 @@ def switch(any input :optional) -> any
 -- Explicit input/output (future questionable)
 def output(any _)
 
--- Lists
+-- List values
 def list(any vals :multiple) -> List
 def blank_list(int count) -> List
 
@@ -52,6 +52,9 @@ def and(bool a, bool b) -> bool
 def or(bool a, bool b) -> bool
   -- Return whether a or b are both true
 def not(bool b) -> bool
+
+-- Map values
+def map(any vals :multiple) -> Map
 
 -- Math
 def add_i(int a, int b) -> int

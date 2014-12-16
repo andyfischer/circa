@@ -1,0 +1,6 @@
+
+print('with numbers: ' map(1, 2, 3, 4))
+
+print('with symbols: ' map(:fruit 'apple' :vegetable 'broccoli'))
+
+print('empty: ' map())

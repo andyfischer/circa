@@ -324,6 +324,22 @@ void make_list(caStack* stack)
         circa_set_list(out, 0);
 }
 
+void make_map(Stack* stack)
+{
+    Value* out = circa_output(stack, 0);
+    Value* args = circa_input(stack, 0);
+    int len = list_length(args);
+    if ((len % 2) != 0)
+        return circa_output_error(stack, "Number of arguments must be an even number");
+
+    set_hashtable(out);
+    for (int i=0; i < len; i += 2) {
+        Value* key = list_get(args, i);
+        Value* val = list_get(args, i+1);
+        move(val, hashtable_insert(out, key, true));
+    }
+}
+
 void blank_list(caStack* stack)
 {
     Value* out = circa_output(stack, 0);
@@ -1328,6 +1344,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "greater_than_eq_f", greater_than_eq_f);
     circa_patch_function(patch, "list", make_list);
     circa_patch_function(patch, "blank_list", blank_list);
+    circa_patch_function(patch, "map", make_map);
     circa_patch_function(patch, "and", and_func);
     circa_patch_function(patch, "or", or_func);
     circa_patch_function(patch, "not", not_func);

@@ -703,6 +703,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(loop_index, "loop_index");
         find_func(loop_get_element, "loop_get_element");
         find_func(loop_output_index, "loop_output_index");
+        find_func(map, "map");
         find_func(make, "make");
         find_func(memoize, "memoize");
         find_func(minor_return_if_empty, "minor_return_if_empty");

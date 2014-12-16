@@ -47,6 +47,13 @@ struct ParserCxt {
       : openParens(0)
     {}
 
+    // TokenStream accessors
+    Token& next(int lookahead=0) { return tokens->next(lookahead); }
+    bool nextIs(int match, int lookahead=0) { return tokens->nextIs(match, lookahead); }
+    void consume(int match = -1) { return tokens->consume(match); }
+    void consumeStr(Value* output, int match = -1) { return tokens->consumeStr(output, match); }
+    int getPosition() { return tokens->getPosition(); }
+
     void push()
     {
         frames.resize(frames.size()+1);
@@ -2732,31 +2739,6 @@ ParseResult literal_color(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(resultTerm);
 }
 
-ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-
-    tokens.consume(tok_LSquare);
-
-    TermList inputs;
-    ListSyntaxHints listHints;
-
-    function_call_inputs(block, tokens, context, inputs, listHints);
-
-    if (!tokens.nextIs(tok_RSquare))
-        return syntax_error(block, tokens, startPosition, "Expected: ]");
-    tokens.consume(tok_RSquare);
-
-    Term* term = apply(block, FUNCS.list, inputs);
-    listHints.apply(term);
-
-    term->setBoolProp(sym_Syntax_LiteralList, true);
-    term->setStringProp(sym_Syntax_DeclarationStyle, "bracket-list");
-    set_source_location(term, startPosition, tokens);
-
-    return ParseResult(term);
-}
-
 ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -2774,25 +2756,40 @@ ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context
     return ParseResult(term);
 }
 
-#if 0
-ParseResult closure_block(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
 {
-    int startPosition = tokens.getPosition();
-    Term* term = apply(block, FUNCS.closure_block, TermList());
-    Block* resultBlock = nested_contents(term);
+    int startPosition = context->getPosition();
 
+    context->consume(tok_LSquare);
+
+    TermList inputs;
+    ListSyntaxHints listHints;
+
+    function_call_inputs(block, tokens, context, inputs, listHints);
+
+    if (!context->nextIs(tok_RSquare))
+        return syntax_error(block, tokens, startPosition, "Expected: ]");
+    context->consume(tok_RSquare);
+
+    Term* term = apply(block, FUNCS.list, inputs);
+    listHints.apply(term);
+
+    term->setBoolProp(sym_Syntax_LiteralList, true);
+    term->setStringProp(sym_Syntax_DeclarationStyle, "bracket-list");
     set_source_location(term, startPosition, tokens);
-    consume_block_with_braces(resultBlock, tokens, context, term);
-    insert_nonlocal_terms(resultBlock);
-    block_finish_changes(resultBlock);
-    
-    // Primary output
-    insert_output_placeholder(resultBlock,
-        find_expression_for_implicit_output(resultBlock), 0);
 
     return ParseResult(term);
 }
-#endif
+
+ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = context->getPosition();
+    context->consume(tok_LBrace);
+    context->consume(tok_RBrace);
+
+    Term* term = apply(block, FUNCS.map, TermList());
+    return ParseResult(term);
+}
 
 ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
@@ -2811,7 +2808,11 @@ ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context)
     Term* term = apply(block, FUNCS.section_block, TermList(), as_cstring(&name));
     Block* resultBlock = nested_contents(term);
     set_source_location(term, startPosition, tokens);
+
+    context->push();
     consume_block(resultBlock, tokens, context);
+    context->pop();
+
     block_finish_changes(resultBlock);
 
     return ParseResult(term);

@@ -66,6 +66,7 @@ struct BuiltinFuncs {
     Term* loop_get_element;
     Term* loop_output_index;
     Term* make;
+    Term* map;
     Term* map_get;
     Term* memoize;
     Term* minor_return_if_empty;
