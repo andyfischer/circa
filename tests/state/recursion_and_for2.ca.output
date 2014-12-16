@@ -2,14 +2,14 @@ reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 1st iter: {_for: [{_recr: {_for: [{_recr: {_for: [{_recr: {s: 0}, t: 2}], s: 2}, t: 4}], s: 4}, t: 6}], s: 6}
+after 1st iter: {'_for' => [{'_recr' => {'_for' => [{'_recr' => {'_for' => [{'_recr' => {'s' => 0}, 't' => 2}], 's' => 2}, 't' => 4}], 's' => 4}, 't' => 6}], 's' => 6}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 2nd iter: {_for: [{_recr: {_for: [{_recr: {_for: [{_recr: {s: 0}, t: 4}], s: 4}, t: 8}], s: 8}, t: 12}], s: 12}
+after 2nd iter: {'_for' => [{'_recr' => {'_for' => [{'_recr' => {'_for' => [{'_recr' => {'s' => 0}, 't' => 4}], 's' => 4}, 't' => 8}], 's' => 8}, 't' => 12}], 's' => 12}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 3rd iter: {_for: [{_recr: {_for: [{_recr: {_for: [{_recr: {s: 0}, t: 8}], s: 8}, t: 16}], s: 16}, t: 24}], s: 24}
+after 3rd iter: {'_for' => [{'_recr' => {'_for' => [{'_recr' => {'_for' => [{'_recr' => {'s' => 0}, 't' => 8}], 's' => 8}, 't' => 16}], 's' => 16}, 't' => 24}], 's' => 24}

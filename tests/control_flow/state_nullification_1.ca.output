@@ -1,5 +1,5 @@
-after 1 call without early return: {bottom: 101, top: 2}
-after 2 calls without early return: {bottom: 102, top: 3}
-after 1 call with early return: {top: 4}
-after 2 calls with early return: {top: 5}
-after another call without early return: {bottom: 101, top: 6}
+after 1 call without early return: {'bottom' => 101, 'top' => 2}
+after 2 calls without early return: {'bottom' => 102, 'top' => 3}
+after 1 call with early return: {'top' => 4}
+after 2 calls with early return: {'top' => 5}
+after another call without early return: {'bottom' => 101, 'top' => 6}

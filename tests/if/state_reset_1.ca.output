@@ -1,5 +1,5 @@
-Call 1 to s branch: {_if: {0: {s: 1}}}
-Call 2 to s branch: {_if: {0: {s: 2}}}
-Call 1 to t branch: {_if: {1: {t: 1}}}
-Call 2 to t branch: {_if: {1: {t: 2}}}
-Call 3 to s branch: {_if: {0: {s: 1}}}
+Call 1 to s branch: {'_if' => {0 => {'s' => 1}}}
+Call 2 to s branch: {'_if' => {0 => {'s' => 2}}}
+Call 1 to t branch: {'_if' => {1 => {'t' => 1}}}
+Call 2 to t branch: {'_if' => {1 => {'t' => 2}}}
+Call 3 to s branch: {'_if' => {0 => {'s' => 1}}}

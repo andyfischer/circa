@@ -24,16 +24,16 @@ void test_safe_copy()
 
     set_hashtable(&val1);
     set_int(hashtable_insert(&val1, temp_string("a")), 5);
-    test_equals(&val1, "{a: 5}");
+    test_equals(&val1, "{'a' => 5}");
 
     copy(&val1, &val2);
-    test_equals(&val2, "{a: 5}");
+    test_equals(&val2, "{'a' => 5}");
     test_assert(val1.value_data.ptr == val2.value_data.ptr);
 
     touch(&val1);
     set_int(hashtable_insert(&val1, temp_string("a")), 10);
-    test_equals(&val1, "{a: 10}");
-    test_equals(&val2, "{a: 5}");
+    test_equals(&val1, "{'a' => 10}");
+    test_equals(&val2, "{'a' => 5}");
     test_assert(val1.value_data.ptr != val2.value_data.ptr);
 }
 
@@ -50,13 +50,13 @@ void test_mutable_hashtable()
 
     set_mutable_hashtable(&val1);
     set_int(hashtable_insert(&val1, temp_string("a")), 5);
-    test_equals(&val1, "{a: 5}");
+    test_equals(&val1, "{'a' => 5}");
 
     copy(&val1, &val2);
     touch(&val1);
     set_int(hashtable_insert(&val1, temp_string("a")), 10);
-    test_equals(&val1, "{a: 10}");
-    test_equals(&val2, "{a: 10}");
+    test_equals(&val1, "{'a' => 10}");
+    test_equals(&val2, "{'a' => 10}");
 }
 
 void test_get_keys()

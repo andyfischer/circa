@@ -390,18 +390,14 @@ static void hashtable_to_string(Value* table, Value* out)
 
         Value* value = hashtable_get(table, key);
 
-        if (is_string(key)) {
-            string_append(out, as_string(key).c_str());
-        } else {
-            Value keyAsString;
-            to_string(key, &keyAsString);
-            string_append(out, &keyAsString);
-        }
+        Value keyAsString;
+        to_string(key, &keyAsString);
+        string_append(out, &keyAsString);
 
         Value valueAsString;
         to_string(value, &valueAsString);
 
-        string_append(out, ": ");
+        string_append(out, " => ");
         string_append(out, &valueAsString);
     }
 

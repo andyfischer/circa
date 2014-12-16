@@ -1,2 +1,2 @@
 Check (should only print once)
-final state: {_if: {0: {_once: {s: false}}}}
+final state: {'_if' => {0 => {'_once' => {'s' => false}}}}

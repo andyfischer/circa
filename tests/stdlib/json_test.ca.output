@@ -12,5 +12,5 @@ true -> true -> true
 false -> false -> false
 null -> null -> null
 {} -> {} -> {}
-{"a":"b"} -> {a: 'b'} -> {"a": "b"}
-{"a":"b", "c":"d"} -> {a: 'b', c: 'd'} -> {"a": "b", "c": "d"}
+{"a":"b"} -> {'a' => 'b'} -> {"a": "b"}
+{"a":"b", "c":"d"} -> {'a' => 'b', 'c' => 'd'} -> {"a": "b", "c": "d"}

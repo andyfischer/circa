@@ -1,1 +1,1 @@
-{_for: [{_othercall: {s: 123}}, {_othercall: {s: 123}}, {_othercall: {s: 123}}], outer: 4}
+{'_for' => [{'_othercall' => {'s' => 123}}, {'_othercall' => {'s' => 123}}, {'_othercall' => {'s' => 123}}], 'outer' => 4}

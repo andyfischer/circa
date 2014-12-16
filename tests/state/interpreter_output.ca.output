@@ -1,1 +1,1 @@
-{mouse_was_down: false, something: 0.0}
+{'mouse_was_down' => false, 'something' => 0.0}
