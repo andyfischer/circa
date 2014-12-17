@@ -1,9 +1,0 @@
-
-def f(i)
-  for j in 0..i
-    i
-
-result = [1 2 3].flatMap(f)
-
-assert(result == [1 2 2 3 3 3])
-

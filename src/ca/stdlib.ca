@@ -977,19 +977,12 @@ def List.flatten(self) -> List
     @out.concat(el)
   out
 
-def List.map_all(self, Func func) -> List
+def List.each(self, Func func) -> List
   for i in self
     func.call(i)
 
 def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
-
-def List.flatMap(self, Func func) -> List
-  out = []
-  for el in self
-    result = func.call(el)
-    @out.concat(result)
-  out
 
 def Map.contains(self, any key) -> bool
   -- Returns true if the map contains the given key.
