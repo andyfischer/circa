@@ -546,6 +546,10 @@ def SourceRepro.term_input(self, Term term, int index) -> SourceRepro
   @self.term_input_inner(term index)
   @self.term_input_post(term index)
 
+def SourceRepro.term_inputs_new_style(self, Term term) -> SourceRepro
+  for element in term.property_opt(:Syntax_InputFormat [])
+    match
+
 def SourceRepro.term_default_format(self, Term term) -> SourceRepro
 
   declarationStyle = term.property_opt(:Syntax_DeclarationStyle, 'function-call')
@@ -641,6 +645,10 @@ def SourceRepro.term_default_format(self, Term term) -> SourceRepro
     for index in 0..(term.num_inputs)
       @self.term_input(term index)
     @self.phrase(:text ']')
+  elif declarationStyle == 'braces-map'
+    @self.phrase(:text '{')
+    @self.term_inputs_new_style(term)
+    @self.phrase(:text '}')
 
   else
     error('unrecognized declaration style: ' declarationStyle)

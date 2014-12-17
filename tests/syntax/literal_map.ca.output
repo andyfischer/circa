@@ -1,0 +1,7 @@
+empty map = {}
+1 => 2 : {1 => 2}
+apple => banana : {'apple' => 'banana'}
+1 + 2 => 3 + 4 : {3 => 7}
+1=>2, 3=>4, 5=>6 : {1 => 2, 3 => 4, 5 => 6}
+{'on left side' => 'of pipe'}
+with dot syntax

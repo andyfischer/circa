@@ -2832,6 +2832,7 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
     context->consume(tok_RBrace);
 
     Term* term = apply(block, FUNCS.map, inputs);
+    term->setStringProp(sym_Syntax_DeclarationStyle, "braces-map");
     return ParseResult(term);
 }
 
