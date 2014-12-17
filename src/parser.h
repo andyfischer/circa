@@ -103,6 +103,7 @@ Term* find_and_apply(Block* block, std::string const& functionName,
 
 // Helper functions
 bool is_infix_operator_rebinding(int match);
+void possible_whitespace(ParserCxt* context);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);

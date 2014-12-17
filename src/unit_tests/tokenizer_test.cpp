@@ -157,7 +157,7 @@ void test_misc2()
 
 void test_misc3()
 {
-    TokenStream tokens("&&!=..::@.@|");
+    TokenStream tokens("&&!=..::@.@|=>");
     tokens.consume(tok_DoubleAmpersand);
     tokens.consume(tok_NotEquals);
     tokens.consume(tok_TwoDots);
@@ -165,6 +165,7 @@ void test_misc3()
     tokens.consume(tok_At);
     tokens.consume(tok_DotAt);
     tokens.consume(tok_VerticalBar);
+    tokens.consume(tok_FatArrow);
     test_assert(tokens.finished());
 }
 

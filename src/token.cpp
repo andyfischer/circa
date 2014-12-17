@@ -54,6 +54,7 @@ const char* get_token_text(int match)
         case tok_SlashEquals: return "/=";
         case tok_ColonEquals: return ":=";
         case tok_RightArrow: return "->";
+        case tok_FatArrow: return "=>";
         case tok_LeftArrow: return "<-";
         case tok_Ampersand: return "&";
         case tok_DoubleAmpersand: return "&&";
@@ -384,7 +385,10 @@ void top_level_consume_token(TokenizeContext &context)
             if (context.next(1) == '=') {
                 context.consume(tok_DoubleEquals, 2);
                 return;
-            } 
+            }  else if (context.next(1) == '>') {
+                context.consume(tok_FatArrow, 2);
+                return;
+            }
 
             context.consume(tok_Equals, 1);
             return;

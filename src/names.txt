@@ -276,6 +276,7 @@ tok_StarEquals
 tok_SlashEquals
 tok_ColonEquals
 tok_RightArrow
+tok_FatArrow
 tok_LeftArrow
 tok_Ampersand
 tok_DoubleAmpersand

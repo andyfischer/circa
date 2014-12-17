@@ -247,6 +247,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_SlashEquals: return "tok_SlashEquals";
     case tok_ColonEquals: return "tok_ColonEquals";
     case tok_RightArrow: return "tok_RightArrow";
+    case tok_FatArrow: return "tok_FatArrow";
     case tok_LeftArrow: return "tok_LeftArrow";
     case tok_Ampersand: return "tok_Ampersand";
     case tok_DoubleAmpersand: return "tok_DoubleAmpersand";
@@ -2901,9 +2902,17 @@ int builtin_symbol_from_string(const char* str)
     case 'F':
     switch (str[5]) {
     case 'a':
-        if (strcmp(str + 6, "lse") == 0)
+    switch (str[6]) {
+    case 'l':
+        if (strcmp(str + 7, "se") == 0)
             return tok_False;
         break;
+    case 't':
+        if (strcmp(str + 7, "Arrow") == 0)
+            return tok_FatArrow;
+        break;
+    default: return -1;
+    }
     case 'l':
         if (strcmp(str + 6, "oat") == 0)
             return tok_Float;

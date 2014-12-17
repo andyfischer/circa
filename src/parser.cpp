@@ -53,6 +53,7 @@ struct ParserCxt {
     void consume(int match = -1) { return tokens->consume(match); }
     void consumeStr(Value* output, int match = -1) { return tokens->consumeStr(output, match); }
     int getPosition() { return tokens->getPosition(); }
+    bool finished() { return tokens->finished(); }
 
     void push()
     {
@@ -2528,6 +2529,10 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_LSquare))
         result = literal_list(block, tokens, context);
 
+    // literal map?
+    else if (tokens.nextIs(tok_LBrace))
+        result = literal_map(block, tokens, context);
+
     // literal symbol?
     else if (tokens.nextIs(tok_ColonString))
         result = literal_symbol(block, tokens, context);
@@ -2785,9 +2790,48 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = context->getPosition();
     context->consume(tok_LBrace);
+
+    TermList inputs;
+
+    bool first = true;
+
+    while (!context->nextIs(tok_RBrace) && !tokens.nextIs(tok_RSquare) && !context->finished()) {
+
+        possible_whitespace(context);
+
+        if (!first) {
+            if (!context->nextIs(tok_Comma)) {
+                return syntax_error(block, tokens, startPosition, "Expected ','");
+            }
+
+            context->consume(tok_Comma);
+            possible_whitespace(context);
+        }
+        first = false;
+
+        possible_whitespace(context);
+        Term* key = expression(block, tokens, context).term;
+        possible_whitespace(context);
+
+        if (!context->nextIs(tok_FatArrow)) {
+            return syntax_error(block, tokens, startPosition, "Expected '=>' inside map value");
+        }
+
+        context->consume(tok_FatArrow);
+
+        possible_whitespace(context);
+
+        Term* value = expression(block, tokens, context).term;
+
+        possible_whitespace(context);
+
+        inputs.append(key);
+        inputs.append(value);
+    }
+
     context->consume(tok_RBrace);
 
-    Term* term = apply(block, FUNCS.map, TermList());
+    Term* term = apply(block, FUNCS.map, inputs);
     return ParseResult(term);
 }
 
@@ -2972,6 +3016,12 @@ ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
     ca_assert(has_static_error(result));
 
     return ParseResult(result);
+}
+
+void possible_whitespace(ParserCxt* context)
+{
+    if (context->nextIs(tok_Whitespace))
+        context->consume(tok_Whitespace);
 }
 
 std::string possible_whitespace(TokenStream& tokens)
