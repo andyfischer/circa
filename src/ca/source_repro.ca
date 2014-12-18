@@ -548,7 +548,19 @@ def SourceRepro.term_input(self, Term term, int index) -> SourceRepro
 
 def SourceRepro.term_inputs_new_style(self, Term term) -> SourceRepro
   for element in term.property_opt(:Syntax_InputFormat [])
-    match
+    if is_list(element)
+      tag = element[0]
+
+      switch tag
+        case :ident
+          index = element[1]
+          @self.phrase(:name_ref inputTerm)
+        case :expr
+          index = element[1]
+          @self.term(term.input(index))
+    else
+      @self.phrase(:text element)
+  self
 
 def SourceRepro.term_default_format(self, Term term) -> SourceRepro
 

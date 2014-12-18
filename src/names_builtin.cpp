@@ -71,6 +71,8 @@ const char* builtin_symbol_to_string(int name)
     case sym_Output: return "Output";
     case sym_PreferSpecialize: return "PreferSpecialize";
     case sym_Error_UnknownType: return "Error_UnknownType";
+    case sym_ident: return "ident";
+    case sym_expr: return "expr";
     case sym_Syntax_AnonFunction: return "Syntax_AnonFunction";
     case sym_Syntax_BlockStyle: return "Syntax_BlockStyle";
     case sym_Syntax_Brackets: return "Syntax_Brackets";
@@ -81,6 +83,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Syntax_IdentifierRebind: return "Syntax_IdentifierRebind";
     case sym_Syntax_ImplicitName: return "Syntax_ImplicitName";
     case sym_Syntax_Import: return "Syntax_Import";
+    case sym_Syntax_InputFormat: return "Syntax_InputFormat";
     case sym_Syntax_IntegerFormat: return "Syntax_IntegerFormat";
     case sym_Syntax_LineEnding: return "Syntax_LineEnding";
     case sym_Syntax_LiteralList: return "Syntax_LiteralList";
@@ -1396,9 +1399,17 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'n':
-        if (strcmp(str + 9, "tegerFormat") == 0)
+    switch (str[9]) {
+    case 'p':
+        if (strcmp(str + 10, "utFormat") == 0)
+            return sym_Syntax_InputFormat;
+        break;
+    case 't':
+        if (strcmp(str + 10, "egerFormat") == 0)
             return sym_Syntax_IntegerFormat;
         break;
+    default: return -1;
+    }
     default: return -1;
     }
     case 'L':
@@ -1818,8 +1829,20 @@ int builtin_symbol_from_string(const char* str)
             return sym__hacks;
         break;
     case 'e':
-        if (strcmp(str + 1, "ffect") == 0)
+    switch (str[1]) {
+    case 'f':
+        if (strcmp(str + 2, "fect") == 0)
             return sym_effect;
+        break;
+    case 'x':
+        if (strcmp(str + 2, "pr") == 0)
+            return sym_expr;
+        break;
+    default: return -1;
+    }
+    case 'i':
+        if (strcmp(str + 1, "dent") == 0)
+            return sym_ident;
         break;
     case 'n':
     switch (str[1]) {

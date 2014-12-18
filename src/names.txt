@@ -63,6 +63,8 @@ PreferSpecialize
 
 Error_UnknownType
 
+ident
+expr
 Syntax_AnonFunction
 Syntax_BlockStyle
 Syntax_Brackets
@@ -73,6 +75,7 @@ Syntax_FunctionName
 Syntax_IdentifierRebind
 Syntax_ImplicitName
 Syntax_Import
+Syntax_InputFormat
 Syntax_IntegerFormat
 Syntax_LineEnding
 Syntax_LiteralList

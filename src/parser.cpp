@@ -51,7 +51,7 @@ struct ParserCxt {
     Token& next(int lookahead=0) { return tokens->next(lookahead); }
     bool nextIs(int match, int lookahead=0) { return tokens->nextIs(match, lookahead); }
     void consume(int match = -1) { return tokens->consume(match); }
-    void consumeStr(Value* output, int match = -1) { return tokens->consumeStr(output, match); }
+    void consume(Value* output, int match = -1) { return tokens->consumeStr(output, match); }
     int getPosition() { return tokens->getPosition(); }
     bool finished() { return tokens->finished(); }
 
@@ -2792,46 +2792,75 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
     context->consume(tok_LBrace);
 
     TermList inputs;
+    Value format;
+    format.set_list(0);
+
+    possible_whitespace_or_newline(context, &format);
 
     bool first = true;
 
     while (!context->nextIs(tok_RBrace) && !tokens.nextIs(tok_RSquare) && !context->finished()) {
 
-        possible_whitespace(context);
+        possible_whitespace_or_newline(context, &format);
 
         if (!first) {
             if (!context->nextIs(tok_Comma)) {
                 return syntax_error(block, tokens, startPosition, "Expected ','");
             }
 
-            context->consume(tok_Comma);
-            possible_whitespace(context);
+            context->consume(format.append(), tok_Comma);
+            possible_whitespace_or_newline(context, &format);
         }
         first = false;
 
-        possible_whitespace(context);
-        Term* key = expression(block, tokens, context).term;
-        possible_whitespace(context);
+        possible_whitespace_or_newline(context, &format);
+        ParseResult keyExpr = expression(block, tokens, context);
 
-        if (!context->nextIs(tok_FatArrow)) {
-            return syntax_error(block, tokens, startPosition, "Expected '=>' inside map value");
+        // @format.append([:ident inputIndex])
+        // or
+        // @format.append([:expr inputIndex])
+        int inputIndex = inputs.length();
+        Value* formatElement = format.append();
+        formatElement->set_list(2);
+        if (keyExpr.isIdentifier()) {
+            formatElement->set_element_sym(0, sym_ident);
+        } else {
+            formatElement->set_element_sym(0, sym_expr);
         }
+        formatElement->set_element_int(1, inputIndex);
 
-        context->consume(tok_FatArrow);
+        inputs.append(keyExpr.term);
 
-        possible_whitespace(context);
+        possible_whitespace_or_newline(context, &format);
 
-        Term* value = expression(block, tokens, context).term;
+        if (!context->nextIs(tok_FatArrow))
+            return syntax_error(block, tokens, startPosition, "Expected '=>' inside map value");
 
-        possible_whitespace(context);
+        context->consume(format.append(), tok_FatArrow);
 
-        inputs.append(key);
-        inputs.append(value);
+        possible_whitespace_or_newline(context, &format);
+
+        ParseResult valueExpr = expression(block, tokens, context);
+        
+        inputIndex = inputs.length();
+        formatElement = format.append();
+        formatElement->set_list(2);
+        if (valueExpr.isIdentifier()) {
+            formatElement->set_element_sym(0, sym_ident);
+        } else {
+            formatElement->set_element_sym(0, sym_expr);
+        }
+        formatElement->set_element_int(1, inputIndex);
+
+        possible_whitespace_or_newline(context, &format);
+
+        inputs.append(valueExpr.term);
     }
 
     context->consume(tok_RBrace);
 
     Term* term = apply(block, FUNCS.map, inputs);
+    term->setProp(sym_Syntax_InputFormat, &format);
     term->setStringProp(sym_Syntax_DeclarationStyle, "braces-map");
     return ParseResult(term);
 }
@@ -3019,10 +3048,16 @@ ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
     return ParseResult(result);
 }
 
-void possible_whitespace(ParserCxt* context)
+void possible_whitespace(ParserCxt* context, Value* destList)
 {
     if (context->nextIs(tok_Whitespace))
-        context->consume(tok_Whitespace);
+        context->consume(destList->append(), tok_Whitespace);
+}
+
+void possible_whitespace_or_newline(ParserCxt* context, Value* destList)
+{
+    while (context->nextIs(tok_Whitespace) || context->nextIs(tok_Newline))
+        context->consume(destList->append());
 }
 
 std::string possible_whitespace(TokenStream& tokens)
