@@ -752,6 +752,25 @@ int count_anonymous_outputs(Block* block)
     return result;
 }
 
+void update_extra_output_count(Term* term, int count)
+{
+    Block* block = term->owningBlock;
+
+    for (int i=0; i < count; i++) {
+
+        int expectedIndex = term->index + i + 1;
+
+        Term* existing = block->getSafe(expectedIndex);
+        if (existing != NULL && existing->function != FUNCS.extra_output)
+            existing = NULL;
+        
+        if (existing == NULL) {
+            Term* output = apply(block, FUNCS.extra_output, TermList(term));
+            move_to_index(output, expectedIndex);
+        }
+    }
+}
+
 void update_extra_outputs(Term* term)
 {
     Block* block = term->owningBlock;
@@ -760,44 +779,31 @@ void update_extra_outputs(Term* term)
     if (targetBlock == NULL)
         return;
 
+    update_extra_output_count(term, count_output_placeholders(targetBlock) - 1);
+
     for (int index=1; ; index++) {
         Term* placeholder = get_output_placeholder(targetBlock, index);
         if (placeholder == NULL)
             break;
 
-        Value name;
+        Term* extraOutput = get_output_term(term, index);
 
         // Find the associated input placeholder (if any).
         int rebindsInput = placeholder->intProp(sym_RebindsInput, -1);
 
         // Use the appropriate name
         if (rebindsInput >= 0) {
+            extraOutput->setIntProp(sym_RebindsInput, rebindsInput);
             Term* input = term->input(rebindsInput);
 
-            if (input != NULL) {
-                copy(&input->nameValue, &name);
-            }
+            if (input != NULL)
+                rename(extraOutput, &input->nameValue);
 
         } else {
-            copy(&placeholder->nameValue, &name);
+            rename(extraOutput, &placeholder->nameValue);
         }
 
-        Term* extra_output = NULL;
-
-        // Check if this extra_output() already exists
-        Term* existingSlot = block->getSafe(term->index + index);
-        if (existingSlot != NULL && existingSlot->function == FUNCS.extra_output)
-            extra_output = existingSlot;
-        
-        if (extra_output == NULL) {
-            extra_output = apply(block, FUNCS.extra_output, TermList(term), &name);
-            move_to_index(extra_output, term->index + index);
-
-            if (rebindsInput >= 0)
-                extra_output->setIntProp(sym_RebindsInput, rebindsInput);
-        }
-
-        set_declared_type(extra_output, placeholder->type);
+        set_declared_type(extraOutput, placeholder->type);
     }
 }
 

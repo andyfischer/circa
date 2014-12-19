@@ -23,6 +23,9 @@ def case_condition_bool(bool condition)
 def loop_condition_bool(bool condition)
 def minor_return_if_empty()
 
+-- Destructuring
+def destructure_list(List list, int count)
+
 -- While-block
 def while()
 

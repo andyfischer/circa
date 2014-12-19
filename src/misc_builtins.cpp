@@ -1302,6 +1302,18 @@ void apply_patch_hosted(caStack* stack)
     apply_patch(result, circa_input(stack, 1));
 }
 
+void destructure_list(Stack* stack)
+{
+    Value* list = circa_input(stack, 0);
+    int count = circa_int_input(stack, 1);
+    int listLength = list->length();
+    for (int i=0; i < count; i++)
+        if (count >= listLength)
+            set_null(circa_output(stack, i));
+        else
+            copy(list->index(i), circa_output(stack, i));
+}
+
 void misc_builtins_setup_functions(NativePatch* patch)
 {
     circa_patch_function(patch, "add_i", add_i_evaluate);
@@ -1314,6 +1326,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "str", str);
     circa_patch_function(patch, "cond", cond);
     circa_patch_function(patch, "copy", copy_eval);
+    circa_patch_function(patch, "destructure_list", destructure_list);
     circa_patch_function(patch, "div_f", div_f);
     circa_patch_function(patch, "div_i", div_i);
     circa_patch_function(patch, "empty_list", empty_list);

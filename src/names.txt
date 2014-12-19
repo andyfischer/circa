@@ -13,6 +13,7 @@ No
 Maybe
 Index
 Last
+Count
 
 # Block properties
 EvaluationEmpty

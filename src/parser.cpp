@@ -2954,6 +2954,13 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
     return result;
 }
 
+void lhs_expression(ParserCxt* context, Value* parsed, Value* format)
+{
+    format->set_list(0);
+
+    //if (context->nextIs
+}
+
 // --- More Utility functions ---
 
 void prepend_whitespace(Term* term, std::string const& whitespace)

@@ -286,7 +286,9 @@ void Block::bindName(Term* term, Value* name)
         internal_error(std::string("term already has a name: ") + term->nameStr());
     }
 
-    names.bind(term, as_cstring(name));
+    if (!is_null(name))
+        names.bind(term, as_cstring(name));
+
     copy(name, &term->nameValue);
     update_unique_name(term);
 }

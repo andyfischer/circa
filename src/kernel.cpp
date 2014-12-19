@@ -677,6 +677,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(cond, "cond");
         find_func(continue_func, "continue");
         find_func(copy, "copy");
+        find_func(destructure_list, "destructure_list");
         find_func(declare_field, "declare_field");
         find_func(discard, "discard");
         find_func(div_f, "div_f"); find_func(div_i, "div_i");
