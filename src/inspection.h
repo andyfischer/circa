@@ -61,6 +61,7 @@ Term* get_effective_input_placeholder(Block* block, int inputIndex);
 Term* get_output_placeholder(Block* block, int index);
 int count_input_placeholders(Block* block);
 int count_output_placeholders(Block* block);
+int get_function_output_count(Block* block);
 int input_placeholder_index(Term* inputPlaceholder);
 int output_placeholder_index(Term* outputPlaceholder);
 bool is_input_placeholder(Term* term);

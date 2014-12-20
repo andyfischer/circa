@@ -205,6 +205,7 @@ int count_output_placeholders(Block* block)
         result++;
     return result;
 }
+
 int input_placeholder_index(Term* inputPlaceholder)
 {
     return inputPlaceholder->index;

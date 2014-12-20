@@ -779,7 +779,14 @@ void update_extra_outputs(Term* term)
     if (targetBlock == NULL)
         return;
 
-    update_extra_output_count(term, count_output_placeholders(targetBlock) - 1);
+    int extraOutputCount = count_output_placeholders(targetBlock) - 1;
+
+    // Special case: number of outputs in destructure_list depends on input.
+    if (term->function == FUNCS.destructure_list) {
+        extraOutputCount = as_int(term_value(term->input(1)));
+    }
+
+    update_extra_output_count(term, extraOutputCount);
 
     for (int index=1; ; index++) {
         Term* placeholder = get_output_placeholder(targetBlock, index);
