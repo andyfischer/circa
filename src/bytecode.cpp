@@ -150,6 +150,7 @@ static Jump bc_jump_if_iterator_done(Writer* writer, Block* top, Term* index, Te
     return jump;
 }
 
+
 static void bc_pop_frame(Writer* writer)
 {
     blob_append_u8(writer->bytecode, bc_PopFrame);
@@ -189,6 +190,14 @@ static void bc_store_frame_state(Writer* writer, Block* block)
         bc_native_call_to_builtin(writer, "#store_frame_state");
 }
 
+static void bc_get_const_index(Writer* writer, u16 listReg, u16 index, u16 destReg, bool move)
+{
+    blob_append_char(writer->bytecode, move ? bc_GetConstIndexMove : bc_GetConstIndexCopy);
+    blob_append_u16(writer->bytecode, listReg);
+    blob_append_u16(writer->bytecode, destReg);
+    blob_append_u16(writer->bytecode, index);
+}
+
 void bytecode_op_to_string(const char* bc, u32* pc, Value* string)
 {
     if (!is_string(string))
@@ -223,6 +232,22 @@ void bytecode_op_to_string(const char* bc, u32* pc, Value* string)
         break;
     case bc_GetIndexMove:
         string_append(string, "get_index_move ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        break;
+    case bc_GetConstIndexMove:
+        string_append(string, "get_const_index_move ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        string_append(string, " ");
+        string_append(string, (i16) blob_read_u16(bc, pc));
+        break;
+    case bc_GetConstIndexCopy:
+        string_append(string, "get_const_index_copy ");
         string_append(string, (i16) blob_read_u16(bc, pc));
         string_append(string, " ");
         string_append(string, (i16) blob_read_u16(bc, pc));
@@ -337,6 +362,9 @@ void bytecode_op_to_string(const char* bc, u32* pc, Value* string)
         string_append(string, blob_read_u16(bc, pc));
         string_append(string, " toRegister:");
         string_append(string, blob_read_u8(bc, pc));
+        break;
+    case bc_DestructureList:
+        string_append(string, "destructure_list");
         break;
     case bc_ConvertToDeclaredType:
         string_append(string, "convert_to_declared_type termIndex:");
@@ -1007,6 +1035,16 @@ void write_term(Writer* writer, Term* term)
 
         jump.jumpHere();
         bc_comment(writer, "loop condition is true");
+        return;
+    }
+
+    else if (term->function == FUNCS.destructure_list) {
+        bc_comment(writer, "destructure list");
+        int count = term->intProp(sym_Count, 0);
+
+        for (int i=0; i < count; i++)
+            bc_get_const_index(writer, term->index, i, get_output_term(term, i)->index, false);
+        
         return;
     }
 

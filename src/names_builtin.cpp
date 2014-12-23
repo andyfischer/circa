@@ -27,6 +27,7 @@ const char* builtin_symbol_to_string(int name)
     case sym_Maybe: return "Maybe";
     case sym_Index: return "Index";
     case sym_Last: return "Last";
+    case sym_Count: return "Count";
     case sym_EvaluationEmpty: return "EvaluationEmpty";
     case sym_HasEffects: return "HasEffects";
     case sym_HasControlFlow: return "HasControlFlow";
@@ -483,6 +484,10 @@ int builtin_symbol_from_string(const char* str)
     case 'p':
         if (strcmp(str + 3, "y") == 0)
             return sym_Copy;
+        break;
+    case 'u':
+        if (strcmp(str + 3, "nt") == 0)
+            return sym_Count;
         break;
     default: return -1;
     }

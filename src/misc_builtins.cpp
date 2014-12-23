@@ -1305,13 +1305,14 @@ void apply_patch_hosted(caStack* stack)
 void destructure_list(Stack* stack)
 {
     Value* list = circa_input(stack, 0);
-    int count = circa_int_input(stack, 1);
+    int declaredCount = circa_int_input(stack, 1);
     int listLength = list->length();
-    for (int i=0; i < count; i++)
-        if (count >= listLength)
+    for (int i=0; i < declaredCount; i++) {
+        if (i >= listLength)
             set_null(circa_output(stack, i));
         else
             copy(list->index(i), circa_output(stack, i));
+    }
 }
 
 void misc_builtins_setup_functions(NativePatch* patch)

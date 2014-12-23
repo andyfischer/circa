@@ -87,6 +87,12 @@ void get_stack_path(Frame* frame, Value* out);
   Value* reg3 = vm_register_rel(stack, *((i16*) (bytecode + pc + 4))); \
   pc += 6;
 
+#define vm_unpack_reg_reg_16(reg1, reg2, val) \
+  Value* reg1 = vm_register_rel(stack, *((i16*) (bytecode + pc))); \
+  Value* reg2 = vm_register_rel(stack, *((i16*) (bytecode + pc + 2))); \
+  u16 val = *((u16*) (bytecode + pc + 4)); \
+  pc += 6;
+
 #define vm_unpack_set_term_ref(blockIndex, termIndex, registerIndex) \
   u16 blockIndex = *((u16*) (bytecode + pc)); \
   u16 termIndex = *((u16*) (bytecode + pc + 2)); \
@@ -1047,6 +1053,23 @@ void vm_run(Stack* stack)
             vm_unpack_reg_reg_reg(list, index, to);
 
             Value* element = get_index(list, as_int(index));
+            move(element, to);
+            #if DEBUG
+                set_symbol(element, sym_Unobservable);
+            #endif
+            continue;
+        }
+        case bc_GetConstIndexCopy: {
+            vm_unpack_reg_reg_16(list, to, index);
+
+            Value* element = get_index(list, index);
+            copy(element, to);
+            continue;
+        }
+        case bc_GetConstIndexMove: {
+            vm_unpack_reg_reg_16(list, to, index);
+
+            Value* element = get_index(list, index);
             move(element, to);
             #if DEBUG
                 set_symbol(element, sym_Unobservable);

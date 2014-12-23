@@ -34,10 +34,13 @@ const char bc_Increment = 0x1f;
 const char bc_AppendMove = 0x20;
 const char bc_GetIndexCopy = 0x21;
 const char bc_GetIndexMove = 0x22;
-const char bc_Touch = 0x26;
-const char bc_SetTermRef = 0x23;
+const char bc_GetConstIndexCopy = 0x23;
+const char bc_GetConstIndexMove = 0x24;
+const char bc_Touch = 0x25;
+const char bc_SetTermRef = 0x26;
+const char bc_DestructureList = 0x27;
 
-const char bc_ConvertToDeclaredType = 0x24;
+const char bc_ConvertToDeclaredType = 0x28;
 
 // Popping outputs from a finished frame
 const char bc_PopOutput = 0x30;
