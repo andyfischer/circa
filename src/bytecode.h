@@ -38,7 +38,6 @@ const char bc_GetConstIndexCopy = 0x23;
 const char bc_GetConstIndexMove = 0x24;
 const char bc_Touch = 0x25;
 const char bc_SetTermRef = 0x26;
-const char bc_DestructureList = 0x27;
 
 const char bc_ConvertToDeclaredType = 0x28;
 

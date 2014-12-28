@@ -1063,14 +1063,24 @@ void vm_run(Stack* stack)
             vm_unpack_reg_reg_16(list, to, index);
 
             Value* element = get_index(list, index);
-            copy(element, to);
+
+            if (element == NULL)
+                set_null(to);
+            else
+                copy(element, to);
+
             continue;
         }
         case bc_GetConstIndexMove: {
             vm_unpack_reg_reg_16(list, to, index);
 
             Value* element = get_index(list, index);
-            move(element, to);
+
+            if (element == NULL)
+                set_null(to);
+            else
+                move(element, to);
+
             #if DEBUG
                 set_symbol(element, sym_Unobservable);
             #endif

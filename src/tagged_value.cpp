@@ -117,7 +117,66 @@ Value* Value::set_list(int size)
 
 Value* Value::append()
 {
+    if (!is_list(this))
+        ::set_list(this, 0);
     return list_append(this);
+}
+
+Value* Value::append_sym(caSymbol s)
+{
+    Value* value = append();
+    ::set_symbol(value, s);
+    return value;
+}
+
+Value* Value::append_str(const char* str)
+{
+    Value* value = append();
+    ::set_string(value, str);
+    return value;
+}
+
+Value* Value::extend(Value* rhsList)
+{
+    list_extend(this, rhsList);
+    return this;
+}
+
+Value* Value::set_hashtable()
+{
+    ::set_hashtable(this);
+    return this;
+}
+
+Value* Value::field(caSymbol field)
+{
+    return hashtable_get_symbol_key(this, field);
+}
+
+Value* Value::set_field_int(caSymbol field, int i)
+{
+    Value* value = hashtable_insert_symbol_key(this, field);
+    ::set_int(value, i);
+    return value;
+}
+
+Value* Value::set_field_str(caSymbol field, const char* str)
+{
+    Value* value = hashtable_insert_symbol_key(this, field);
+    ::set_string(value, str);
+    return value;
+}
+
+Value* Value::set_field_sym(caSymbol field, caSymbol s)
+{
+    Value* value = hashtable_insert_symbol_key(this, field);
+    ::set_symbol(value, s);
+    return value;
+}
+
+Value* Value::insert(caSymbol field)
+{
+    return hashtable_insert_symbol_key(this, field);
 }
 
 Value* Value::resize(int size)

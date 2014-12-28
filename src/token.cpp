@@ -77,6 +77,7 @@ const char* get_token_text(int match)
         case tok_Struct: return "struct";
         case tok_Return: return "return";
         case tok_In: return "in";
+        case tok_Let: return "let";
         case tok_True: return "true";
         case tok_False: return "false";
         case tok_Namespace: return "namespace";
@@ -314,6 +315,7 @@ void top_level_consume_token(TokenizeContext &context)
             if (try_to_consume_keyword(context, tok_In)) return;
             if (try_to_consume_keyword(context, tok_Import)) return;
             if (try_to_consume_keyword(context, tok_Include)) return;
+            if (try_to_consume_keyword(context, tok_Let)) return;
         } else {
             // n through z
             if (try_to_consume_keyword(context, tok_Namespace)) return;

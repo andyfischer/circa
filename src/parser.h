@@ -47,6 +47,7 @@ ParseResult else_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult while_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* context);
+ParseResult let_statement(Block* block, ParserCxt* context);
 ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* context);

@@ -109,9 +109,8 @@ struct Value
     Value* set_int(int i);
     Value* set_symbol(caSymbol s);
 
-    // List
+    // List utils
     Value* set_list(int size);
-    Value* append();
     Value* resize(int size);
     bool isEmpty();
     Value* set_element_int(int index, int i);
@@ -119,6 +118,18 @@ struct Value
     Value* set_element_str(int index, const char* s);
     Value* set_element_sym(int index, caSymbol s);
     Value* set_element(int index, Value* val);
+    Value* append();
+    Value* append_sym(caSymbol s);
+    Value* append_str(const char* s);
+    Value* extend(Value* rhsList);
+
+    // Hashtable utils
+    Value* set_hashtable();
+    Value* field(caSymbol field);
+    Value* set_field_int(caSymbol field, int i);
+    Value* set_field_str(caSymbol field, const char*);
+    Value* set_field_sym(caSymbol field, caSymbol sym);
+    Value* insert(caSymbol field);
 
     // For debugging:
     void dump();

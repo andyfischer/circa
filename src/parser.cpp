@@ -220,6 +220,73 @@ int find_indentation_of_next_statement(TokenStream& tokens)
     return tokens.next(lookahead).colStart;
 }
 
+void lhs_expression(ParserCxt* context, Value* result)
+{
+    result->set_hashtable();
+
+    Value* format = result->insert(sym_format);
+
+    if (context->nextIs(tok_Identifier)) {
+        result->set_field_sym(sym_type, sym_ident);
+        format->append_sym(sym_ident);
+        context->consume(result->insert(sym_ident));
+
+    } else if (context->nextIs(tok_LSquare)) {
+
+        Value* items = result->insert(sym_items);
+        items->set_list(0);
+        context->consume(format->append());
+        result->set_field_sym(sym_type, sym_list);
+
+        while (true) {
+            possible_whitespace_or_newline(context, format);
+            if (context->nextIs(tok_RSquare)) {
+                context->consume(format->append());
+                break;
+            }
+
+            lhs_expression(context, items->append());
+
+            possible_whitespace_or_newline(context, format);
+            if (context->nextIs(tok_Comma))
+                context->consume(format->append());
+            possible_whitespace_or_newline(context, format);
+        }
+
+    } else {
+        result->set_field_sym(sym_type, sym_error);
+        result->set_field_str(sym_message, "Unexpected token");
+    }
+}
+
+Term* apply_lhs(Block* block, Term* term, Value* lhs)
+{
+    switch (lhs->field(sym_type)->asSymbol()) {
+    case sym_ident:
+        rename(term, lhs->field(sym_ident));
+        return term;
+
+    case sym_list: {
+        term = apply(block, FUNCS.destructure_list, TermList(term));
+
+        Value* items = lhs->field(sym_items);
+        term->setIntProp(sym_Count, items->length());
+        update_extra_outputs(term);
+
+        for (int i=0; i < items->length(); i++) {
+            Value* item = items->index(i);
+            apply_lhs(block, get_output_term(term, i), item);
+        }
+
+        return term;
+    }
+    default:
+        internal_error("type not recognized in apply_lhs");
+    }
+
+    return NULL;
+}
+
 void consume_block_with_significant_indentation(Block* block, TokenStream& tokens,
         ParserCxt* context, Term* parentTerm, ParsingStep inside_block_step)
 {
@@ -458,6 +525,11 @@ ParseResult parse_statement(Block* block, TokenStream& tokens, ParserCxt* contex
     // Package statement
     else if (tokens.nextIs(tok_Package)) {
         result = package_statement(block, tokens, context);
+    }
+
+    // Let statement
+    else if (tokens.nextIs(tok_Let)) {
+        result = let_statement(block, context);
     }
 
     // Otherwise, expression statement
@@ -1399,6 +1471,33 @@ ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     Term* term = apply(block, FUNCS.package, TermList(moduleName));
 
     return ParseResult(term);
+}
+
+ParseResult let_statement(Block* block, ParserCxt* context)
+{
+    int startPosition = context->getPosition();
+
+    Value format;
+    format.set_list(0);
+
+    context->consume(format.append(), tok_Let);
+    possible_whitespace_or_newline(context, &format);
+
+    Value lhs;
+    lhs_expression(context, &lhs);
+
+    possible_whitespace_or_newline(context, &format);
+
+    if (!context->nextIs(tok_Equals))
+        return syntax_error(block, *context->tokens, startPosition, "Expected '='");
+
+    context->consume(&format, tok_Equals);
+    possible_whitespace_or_newline(context, &format);
+
+    ParseResult rhs = expression(block, *context->tokens, context);
+    Term* result = rhs.term;
+    result = apply_lhs(block, result, &lhs);
+    return ParseResult(result);
 }
 
 ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -2954,12 +3053,6 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
     return result;
 }
 
-void lhs_expression(ParserCxt* context, Value* parsed, Value* format)
-{
-    format->set_list(0);
-
-    //if (context->nextIs
-}
 
 // --- More Utility functions ---
 

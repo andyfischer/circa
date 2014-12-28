@@ -363,9 +363,6 @@ void bytecode_op_to_string(const char* bc, u32* pc, Value* string)
         string_append(string, " toRegister:");
         string_append(string, blob_read_u8(bc, pc));
         break;
-    case bc_DestructureList:
-        string_append(string, "destructure_list");
-        break;
     case bc_ConvertToDeclaredType:
         string_append(string, "convert_to_declared_type termIndex:");
         string_append(string, blob_read_u16(bc, pc));
@@ -1043,7 +1040,7 @@ void write_term(Writer* writer, Term* term)
         int count = term->intProp(sym_Count, 0);
 
         for (int i=0; i < count; i++)
-            bc_get_const_index(writer, term->index, i, get_output_term(term, i)->index, false);
+            bc_get_const_index(writer, term->input(0)->index, i, get_output_term(term, i)->index, false);
         
         return;
     }

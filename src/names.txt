@@ -64,8 +64,15 @@ PreferSpecialize
 
 Error_UnknownType
 
-ident
+error
 expr
+format
+ident
+items
+message
+list
+type
+
 Syntax_AnonFunction
 Syntax_BlockStyle
 Syntax_Brackets
@@ -306,6 +313,7 @@ tok_While
 tok_State
 tok_Return
 tok_In
+tok_Let
 tok_True
 tok_False
 tok_Namespace

@@ -72,8 +72,14 @@ const char* builtin_symbol_to_string(int name)
     case sym_Output: return "Output";
     case sym_PreferSpecialize: return "PreferSpecialize";
     case sym_Error_UnknownType: return "Error_UnknownType";
-    case sym_ident: return "ident";
+    case sym_error: return "error";
     case sym_expr: return "expr";
+    case sym_format: return "format";
+    case sym_ident: return "ident";
+    case sym_items: return "items";
+    case sym_message: return "message";
+    case sym_list: return "list";
+    case sym_type: return "type";
     case sym_Syntax_AnonFunction: return "Syntax_AnonFunction";
     case sym_Syntax_BlockStyle: return "Syntax_BlockStyle";
     case sym_Syntax_Brackets: return "Syntax_Brackets";
@@ -276,6 +282,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_State: return "tok_State";
     case tok_Return: return "tok_Return";
     case tok_In: return "tok_In";
+    case tok_Let: return "tok_Let";
     case tok_True: return "tok_True";
     case tok_False: return "tok_False";
     case tok_Namespace: return "tok_Namespace";
@@ -1839,15 +1846,39 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 2, "fect") == 0)
             return sym_effect;
         break;
+    case 'r':
+        if (strcmp(str + 2, "ror") == 0)
+            return sym_error;
+        break;
     case 'x':
         if (strcmp(str + 2, "pr") == 0)
             return sym_expr;
         break;
     default: return -1;
     }
+    case 'f':
+        if (strcmp(str + 1, "ormat") == 0)
+            return sym_format;
+        break;
     case 'i':
-        if (strcmp(str + 1, "dent") == 0)
+    switch (str[1]) {
+    case 'd':
+        if (strcmp(str + 2, "ent") == 0)
             return sym_ident;
+        break;
+    case 't':
+        if (strcmp(str + 2, "ems") == 0)
+            return sym_items;
+        break;
+    default: return -1;
+    }
+    case 'l':
+        if (strcmp(str + 1, "ist") == 0)
+            return sym_list;
+        break;
+    case 'm':
+        if (strcmp(str + 1, "essage") == 0)
+            return sym_message;
         break;
     case 'n':
     switch (str[1]) {
@@ -3046,9 +3077,15 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'e':
-        if (strcmp(str + 6, "ftArrow") == 0)
+    switch (str[6]) {
+    case 'f':
+        if (strcmp(str + 7, "tArrow") == 0)
             return tok_LeftArrow;
         break;
+    case 't':
+            return tok_Let;
+    default: return -1;
+    }
     default: return -1;
     }
     case 'M':
@@ -3377,6 +3414,10 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'y':
+        if (strcmp(str + 2, "pe") == 0)
+            return sym_type;
+        break;
     default: return -1;
     }
     case 'w':
