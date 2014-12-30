@@ -6,7 +6,7 @@ def f(int i)
 def check1()
   f(3)
 
-int = make_stack(check1)
+int = make_vm(check1)
 int.call
 print(int.extract_state)
 
@@ -18,7 +18,7 @@ def g(int i) -> int
 def check2()
   g(8)
 
-int = make_stack(check2)
+int = make_vm(check2)
 int.call
 print(int.extract_state)
 
@@ -30,6 +30,6 @@ def h(int i) -> int
 def check3()
   h(14)
 
-int = make_stack(check3)
+int = make_vm(check3)
 int.call
 print(int.extract_state)

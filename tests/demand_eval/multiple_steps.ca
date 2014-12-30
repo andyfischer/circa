@@ -19,7 +19,7 @@ def main()
   d = get_d(get_c(get_a()))
   b = get_b()
 
-stack = make_stack(->)
+stack = make_vm(->)
 
 print('Evaluating on demand..')
 val = stack.eval_on_demand(main.block.find_term('d'))

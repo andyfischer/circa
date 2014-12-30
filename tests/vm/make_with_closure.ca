@@ -7,12 +7,12 @@ closure = get_closure(1)
 
 print('sanity check, should say f(1, 2): ', closure.call(2))
 
-stack = make_stack(get_closure(3))
+vm = make_vm(get_closure(3))
 
-def Stack.rethrow(self)
-  -- If the stack has an error, raise it in this context.
+def VM.rethrow(self)
+  -- If the vm has an error, raise it in this context.
   if self.has_error
     error(self.error_message)
 
-print('calling stack, should say f(3, 4): ', stack.call(4))
-stack.rethrow
+print('calling vm, should say f(3, 4): ', vm.call(4))
+vm.rethrow

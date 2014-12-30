@@ -16,7 +16,7 @@ def main()
   b = get_b(a)
   c = get_c(a)
 
-stack = make_stack(->)
+stack = make_vm(->)
 
 print('Evaluating b:')
 

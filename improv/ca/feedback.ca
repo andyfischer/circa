@@ -4,10 +4,10 @@
 observe_listener = make_actor({
     msg = input()
 
-    state Stack stack
+    state VM stack
 
     if msg[0] == :set
-        stack = msg[1] -> Stack
+        stack = msg[1] -> VM
     elif msg[0] == :get
         return stack
 })
@@ -30,7 +30,7 @@ one = 1
 stack = capture_stack()
 print('One is ', one)
 
-subject = make_stack()
+subject = make_vm()
 subject.push_frame(func1.block, [])
 subject.set_env_val(:observe_listener, observe_listener)
 subject.run
@@ -42,18 +42,18 @@ else
     print('null observed')
 -}
 
-struct StackIterator {
+struct VMIterator {
     Frame frame
     int index
 }
 
-def StackIterator.next(self) -> Term
+def VMIterator.next(self) -> Term
     self.frame.block.get_term(self.index)
 
-def StackIterator.finished(self) -> bool
+def VMIterator.finished(self) -> bool
     return self.frame == null
 
-def StackIterator.advance(@self)
+def VMIterator.advance(@self)
     if self.index == 0
         if self.frame.has_parent
             self.frame = self.frame.parent
@@ -63,19 +63,19 @@ def StackIterator.advance(@self)
     else
         self.index -= 1
 
-def start_stack_iterator(Stack stack, Term term) -> StackIterator
-    it = make(StackIterator)
+def start_stack_iterator(VM stack, Term term) -> VMIterator
+    it = make(VMIterator)
     it.frame = stack.find_active_frame_for_term(term)
     it.index = term.index
     it
 
 struct FeedbackOperation {
-    Stack stack
+    VM stack
     List modifyTargets
     Map pendingFeedback
 }
 
-def start_feedback_operation(Stack stack) -> FeedbackOperation
+def start_feedback_operation(VM stack) -> FeedbackOperation
     op = make(FeedbackOperation)
     op.stack = stack
     op

@@ -22,6 +22,6 @@ def f()
     elif true
     elif true
 
-int = make_stack(f)
+int = make_vm(f)
 int.run
 print(int.extract_state)

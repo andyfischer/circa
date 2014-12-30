@@ -5,7 +5,7 @@ def test()
 
   test2()
 
-int = make_stack(test).run
+int = make_vm(test).run
 
 int.has_error | assert
 

@@ -100,6 +100,6 @@ def click_resolver(any message)
     elif message == :clear
         clickAreas = []
 
-def new_click_resolver() -> Stack
-    make_stack(click_resolver)
+def new_click_resolver() -> VM
+    make_vm(click_resolver)
 -}

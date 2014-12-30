@@ -6,7 +6,7 @@ def right()
   state String a = 'new'
   print('after migration, a is: ' a)
 
-int = make_stack(left)
+int = make_vm(left)
 int.run
 
 int.migrate_to(right)

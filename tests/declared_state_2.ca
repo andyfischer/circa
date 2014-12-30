@@ -2,6 +2,6 @@
 def main()
   state s = add(1 2) + add(3 4)
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 print(int.extract_state)

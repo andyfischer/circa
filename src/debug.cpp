@@ -157,7 +157,7 @@ void perf_stats_to_map(Value* map)
     for (int name = c_firstStatIndex; name < sym_LastStatIndex-1; name++) {
         int i = name - c_firstStatIndex;
         u64 value = frozenStats[i];
-        set_int(hashtable_insert_symbol_key(map, name), value);
+        set_int(hashtable_insert_symbol_key(map, name), (int) value);
     }
 }
 

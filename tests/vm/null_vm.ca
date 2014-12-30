@@ -1,6 +1,6 @@
 
 struct T {
-  Stack stack
+  VM vm
 }
 
 t = T.make

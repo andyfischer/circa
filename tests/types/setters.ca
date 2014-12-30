@@ -16,6 +16,6 @@ assert(to_string(t) == "{a: 5, b: 'y'}")
 def error_test(t)
   t.set_a('hi')
 
-int = make_stack(error_test)
+int = make_vm(error_test)
 int.call(t)
 assert(int.errored)

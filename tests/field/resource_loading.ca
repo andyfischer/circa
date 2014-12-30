@@ -217,7 +217,7 @@ def main()
       l3 = label(lowTempFont lowTemp [x + 20, y + 120])
 
 -- Run three times
-vm = make_stack(main)
+vm = make_vm(main)
 vm.call
 vm.call
 vm.call

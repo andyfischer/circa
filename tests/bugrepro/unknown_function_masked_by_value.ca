@@ -7,6 +7,6 @@ def main()
 
     print(cl.call)
 
-stack = make_stack(main)
+stack = make_vm(main)
 stack.run
 assert(stack.errored)

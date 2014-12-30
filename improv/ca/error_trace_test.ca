@@ -10,7 +10,7 @@ def g()
 def main()
   g()
 
-int = make_stack(main)
+int = make_vm(main)
 int.run
 
 error_trace.trace_to_string(int) | print

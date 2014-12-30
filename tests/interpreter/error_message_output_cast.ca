@@ -5,7 +5,7 @@ def main()
 
     f()
 
-int = make_stack(main)
+int = make_vm(main)
 int.run
 
 print(int.error_message)

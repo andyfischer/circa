@@ -16,7 +16,7 @@ def main(bool b)
   any.cast(@val)
   val.f
 
-stack = make_stack(main)
+stack = make_vm(main)
 
 for i in 0..10
   stack.call(i % 2 == 1)

@@ -14,7 +14,7 @@ def main(bool b)
       state t = 0
       t += 1
 
-int = make_stack(main)
+int = make_vm(main)
 int.call(true)
 print('Call 1 to s branch: ' int.extract_state)
 int.call(true)

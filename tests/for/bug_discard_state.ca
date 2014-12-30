@@ -17,6 +17,6 @@ def main()
 
       i
 
-int = make_stack(main)
+int = make_vm(main)
 int.run
 int.run

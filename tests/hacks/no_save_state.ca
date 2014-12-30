@@ -5,7 +5,7 @@ def main()
   s += 1
   s
 
-vm = make_stack(main)
+vm = make_vm(main)
 vm.call
 vm.call
 vm.call

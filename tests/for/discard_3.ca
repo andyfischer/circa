@@ -7,6 +7,6 @@ def f()
 
     state b = 2
 
-int = make_stack(f)
+int = make_vm(f)
 int.call
 print(int.extract_state)

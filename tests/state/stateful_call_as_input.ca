@@ -6,7 +6,7 @@ def f(int i)
 def check1()
   list(f(1) f(2) f(3))
 
-int = make_stack(check1)
+int = make_vm(check1)
 int.call
 print(int.extract_state)
 
@@ -19,6 +19,6 @@ def check2()
   if sbool()
     a = 1
 
-int = make_stack(check2)
+int = make_vm(check2)
 int.call
 print(int.extract_state)

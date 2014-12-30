@@ -6,7 +6,7 @@ def f(int i, int j) -> int
   s += i
   return s
   
-int = make_stack(f)
+int = make_vm(f)
 result = int.call(1, 5)
 print('should be 6: ' result)
 result = int.call(3, 0)

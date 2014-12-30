@@ -18,7 +18,7 @@ def main(_val)
   state val = _val
   val
 
-stack = make_stack(main)
+stack = make_vm(main)
 stack.call(func1)
 
 assert(func_to_name(stack.call(->)) == 'func1')

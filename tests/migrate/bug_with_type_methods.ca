@@ -23,7 +23,7 @@ def right()
   any.cast(@t)
   t
  
-int = make_stack(left)
+int = make_vm(left)
 t_from_left = int.call
 print('Calling t_from_left.func:')
 t_from_left.func

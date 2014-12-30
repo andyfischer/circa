@@ -468,7 +468,7 @@ struct FileSignature { String filename, int time_modified }
 struct Callable;
 struct Color { number r, number g, number b, number a }
 struct Module { String name, Block relativeTo }
-struct Stack;
+struct VM;
 struct Vec2 { number x, number y }
 struct Vec2i { int x, int y }
 struct Vec3 { number x, number y, number z }
@@ -482,7 +482,7 @@ def Module.resolve(self) -> Block
   self.block
 def Module.to_func(self) -> Func
   self.block.to_func
-def Module.to_stack(self) -> Stack
+def Module.to_stack(self) -> VM
   self.block.to_stack
 
 def load_script(String filename) -> Block
@@ -616,7 +616,7 @@ def Block.walk_terms(self) -> List
 def Block.to_func(self) -> Func
   Func.make(self)
 
-def Block.to_stack(self) -> Stack
+def Block.to_stack(self) -> VM
   self.to_func.to_stack
 
 def Block.name(self) -> String
@@ -674,7 +674,7 @@ def Block.find_while_condition(self) -> Term
       return term
   return null
 
-struct Frame { Stack stack, int index }
+struct Frame { VM vm, int index }
 struct ModuleFrame { Block block, List registers }
 
 def Frame.active_value(self, Term) -> any
@@ -709,124 +709,121 @@ def Frame.output(self, int nth) -> any
 def Frame.extract_state(self) -> Map
   -- Returns the frame's state as a plain object (composite of maps and lists).
 
-def capture_stack() -> Stack
+def capture_stack() -> VM
   -- Returns a frozen copy of the currently executing stack.
 
-def Stack.apply(self, List inputs) -> any
-def Stack.block(self) -> Block
+def VM.apply(self, List inputs) -> any
+def VM.block(self) -> Block
   -- Returns the (topmost) block.
-def Stack.call(self, any inputs :multiple) -> any
-def Stack.copy(self) -> Stack
-def Stack.current_term(self) -> Term
+def VM.call(self, any inputs :multiple) -> any
+def VM.copy(self) -> VM
+def VM.current_term(self) -> Term
   self.top.current_term
-def Stack.dump(self)
+def VM.dump(self)
   -- Dumps a string representation to stdout.
-def Stack.dump_with_bytecode(self)
-def Stack.dump_compiled(self)
-def Stack.eval_on_demand(self, Term term) -> any
-def Stack.find_active_value(self, Term term) -> any
-def Stack.rethrow(self)
+def VM.dump_with_bytecode(self)
+def VM.dump_compiled(self)
+def VM.eval_on_demand(self, Term term) -> any
+def VM.find_active_value(self, Term term) -> any
+def VM.rethrow(self)
   -- If the stack has an error, raise it in this context.
   if self.has_error
     error(self.error_message)
-def Stack.extract_state(self) -> Map
-def Stack.find_active_frame_for_term(self, Term term) -> Frame
-def Stack.id(self) -> int
-def Stack.init(self, Func func)
-def Stack.has_incoming_state(self) -> bool
+def VM.extract_state(self) -> Map
+def VM.find_active_frame_for_term(self, Term term) -> Frame
+def VM.id(self) -> int
+def VM.init(self, Func func)
+def VM.has_incoming_state(self) -> bool
 
-def Stack.env(self, name) -> any
-def Stack.env_map(self) -> Map
-def Stack.set_env(self, any name, any val)
-def Stack.set_env_map(self, Map map)
+def VM.env(self, name) -> any
+def VM.env_map(self) -> Map
+def VM.set_env(self, any name, any val)
+def VM.set_env_map(self, Map map)
 
-def Stack.init_env(self)
+def VM.init_env(self)
   self.set_env_map(Map.make)
 
-def Stack.modify_env(self, Func func)
+def VM.modify_env(self, Func func)
   self.set_env_map(func.call(self.env_map))
 
-def Stack.append_hack(self, any hack)
+def VM.append_hack(self, any hack)
   self.modify_env((env) -> env.list_append(:_hacks hack))
 
-def Stack.forward_env(self, names :multiple)
+def VM.forward_env(self, names :multiple)
   for name in names
     self.set_env(name env(name))
 
-def Stack.init_channel(self, any name)
+def VM.init_channel(self, any name)
   self.set_env(name, [])
 
-def Stack.read_channel(self, any name)
+def VM.read_channel(self, any name)
   out = self.env_map.get(name)
   self.set_env(name, [])
   return out
 
-def Stack.get_watch_result(self, key) -> any
-def Stack.stack_push(self, Block b, List inputs)
+def VM.get_watch_result(self, key) -> any
+def VM.stack_push(self, Block b, List inputs)
   -- Push a new frame, using the given block and input list.
-def Stack.stack_push2(self, Func func)
+def VM.stack_push2(self, Func func)
   self.stack_push(func.block, [])
-def Stack.stack_pop(self)
+def VM.stack_pop(self)
   -- Pop the topmost frame.
-def Stack.set_state_input(self, any)
-def Stack.get_state(self) -> any
-def Stack.migrate(self, Block from, Block to)
-def Stack.migrate_to(self, Func func)
+def VM.set_state_input(self, any)
+def VM.get_state(self) -> any
+def VM.migrate(self, Block from, Block to)
+def VM.migrate_to(self, Func func)
   -- Use 'func' as the new root, and migrate data and state.
-def Stack.reset(self)
-def Stack.reset_state(self)
-def Stack.restart(self)
+def VM.reset(self)
+def VM.reset_state(self)
+def VM.restart(self)
   -- Restart or "rewind" the stack, so the program counter is returned to the start
   -- of the topmost frame. State is preserved.
-def Stack.run(self) -> Stack
+def VM.run(self) -> VM
   -- Run the interpreter until either the topmost frame is finished, or an error
   -- is raised.
-def Stack.frame(self, int depth) -> Frame
+def VM.frame(self, int depth) -> Frame
   -- Return the Frame with the given depth. The top of the stack has depth 0.
-def Stack.frame_from_base(self, int height) -> Frame
+def VM.frame_from_base(self, int height) -> Frame
   -- Return the Frame with the given height.
-def Stack.frame_count(self) -> int
+def VM.frame_count(self) -> int
 
-def Stack.frames_from_top(self) -> List
+def VM.frames_from_top(self) -> List
   for i in 0..self.frame_count
     self.frame(i)
 
-def Stack.frames_from_start(self) -> List
+def VM.frames_from_start(self) -> List
   for i in self.frame_count..0
     self.frame(i-1)
 
-def Stack.top(self) -> Frame
+def VM.top(self) -> Frame
   -- Return the topmost Frame.
   self.frame(0)
 
-def Stack.active_value(self, Term term) -> any
+def VM.active_value(self, Term term) -> any
   self.top.active_value(term)
 
-def Stack.set_active_value(self, Term term, any val)
+def VM.set_active_value(self, Term term, any val)
   self.top.set_active_value(term, val)
 
-def Stack.output(self, int index) -> any
+def VM.output(self, int index) -> any
   -- Fetch the value in the nth output register.
 
-def Stack.errored(self) -> bool
+def VM.errored(self) -> bool
   -- Returns true if the interpreter has stopped due to error.
 
-def Stack.has_error(self) -> bool
+def VM.has_error(self) -> bool
   self.errored
 
-def Stack.error_message(self) -> String
+def VM.error_message(self) -> String
   -- If there is a recorded error, returns a human-readable description string.
 
-def Stack.toString(self) -> String
+def VM.toString(self) -> String
 
-def make_stack(Func func) -> Stack
-  -- Create a new stack (deprecated name, see make_vm)
+def make_vm(Func func) -> VM
+  -- Create a new VM
 
-def make_vm(Func func) -> Stack
-  -- Create a new Stack
-
-def Func.to_stack(self) -> Stack
-  make_stack(self)
+def Func.to_stack(self) -> VM
+  make_vm(self)
 
 def repeat(any val, int count) -> List
 

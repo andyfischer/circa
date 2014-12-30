@@ -8,6 +8,6 @@ def f() -> bool
 def main()
     if f() {}
         
-int = make_stack(main)
+int = make_vm(main)
 int.call
 int.call

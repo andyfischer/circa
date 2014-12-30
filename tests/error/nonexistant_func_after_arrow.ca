@@ -2,7 +2,7 @@
 def main()
   1 -> NonexistantFunc
 
-stack = make_stack(main)
+stack = make_vm(main)
 stack.run
 
 assert(stack.has_error)

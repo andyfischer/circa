@@ -6,7 +6,7 @@ def main()
     s += 1
     print('new s = ' s)
 
-stack = make_stack(main)
+stack = make_vm(main)
 stack.run
 stack.run
 stack.run

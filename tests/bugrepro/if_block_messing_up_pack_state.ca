@@ -8,6 +8,6 @@ def main()
 
   state b = 3
 
-int = make_stack(main)
+int = make_vm(main)
 int.run
 print(int.extract_state)

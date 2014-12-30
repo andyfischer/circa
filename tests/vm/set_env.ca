@@ -2,7 +2,7 @@
 def main() -> String
   return env(:key)
 
-int = make_stack(main)
+int = make_vm(main)
 assert(int.call == null)
 
 int.set_env(:key 'value')

@@ -17,8 +17,8 @@ def run_code_view()
   view = code_view.new_code_view(env(:userScript).block)
   view.run(env(:canvasRect))
 
-state scriptControlStack = make_stack(run_script_control)
-state codeviewStack = make_stack(run_code_view)
+state scriptControlVM = make_vm(run_script_control)
+state codeviewVM = make_vm(run_code_view)
 state paused = false
 state codeviewEnabled = false
 
@@ -35,7 +35,7 @@ codeviewWindowSize = time.approach(cond(codeviewEnabled 500 0), 1500)
 codeviewRect = @userScriptRect.subtractFrom(:left, codeviewWindowSize)
 controlsRect = @userScriptRect.subtractFrom(:top, 50)
 
-def run_script(id, Stack vm, Rect rect)
+def run_script(id, VM vm, Rect rect)
 
   {-
   canvas = env(:canvas)
@@ -68,15 +68,15 @@ def run_script(id, Stack vm, Rect rect)
   --canvas.restore
   output
 
---scriptControl = run_script(:ui_control scriptControlStack, controlsRect)
+--scriptControl = run_script(:ui_control scriptControlVM, controlsRect)
 
 if codeviewRect.width > 0
-  run_script(:codeview codeviewStack codeviewRect)
+  run_script(:codeview codeviewVM codeviewRect)
 
 run_script(:game userScript userScriptRect.translate([0 0]))
 
 {-
-if not scriptControlStack.has_error
+if not scriptControlVM.has_error
   if scriptControl.paused and not paused
     scriptPauseTime = env(:time)
 

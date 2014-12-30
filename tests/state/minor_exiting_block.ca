@@ -5,6 +5,6 @@ def main()
     s = 2
     return
 
-vm = make_stack(main)
+vm = make_vm(main)
 vm.call
 print(vm.extract_state)

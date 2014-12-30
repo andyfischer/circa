@@ -10,7 +10,7 @@ def right()
   state term
   print('after migration, term points to: ' term.value)
 
-int = make_stack(left)
+int = make_vm(left)
 int.run
 
 int.migrate_to(right)

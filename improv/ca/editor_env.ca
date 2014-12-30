@@ -6,10 +6,10 @@ struct EditorEnv {
   Rect rect
   bool paused
   number scriptPauseTime
-  Stack ui_control
+  VM ui_control
 }
 
-def EditorEnv.pre(self, Stack vm)
+def EditorEnv.pre(self, VM vm)
 
   vm.forward_env(:userInput)
 
@@ -31,7 +31,7 @@ def EditorEnv.pre(self, Stack vm)
   
   gl_env.pre(vm)
 
-def EditorEnv.post(self, Stack vm)
+def EditorEnv.post(self, VM vm)
   gl_env.post(vm)
 
   if input.key_pressed(:p)

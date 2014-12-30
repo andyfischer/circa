@@ -6,6 +6,6 @@ def main()
   if true
     return
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 print(int.extract_state)

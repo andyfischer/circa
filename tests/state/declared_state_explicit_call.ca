@@ -3,7 +3,7 @@ def main()
     s = _declared_state(any, -> 0)
     s += 1
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 assert(to_string(int.extract_state) == "{s: 1}")
 int.call
@@ -15,7 +15,7 @@ def main()
     state s = 0
     s += 1
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 assert(to_string(int.extract_state) == "{s: 1}")
 int.call

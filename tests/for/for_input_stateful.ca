@@ -9,7 +9,7 @@ def main()
   for i in stateful_call()
       print(i)
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 int.call
 int.call

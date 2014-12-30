@@ -3,6 +3,6 @@ def f()
     for i in [10 12 14]
         state s = i
 
-int = make_stack(f)
+int = make_vm(f)
 int.call
 print(int.extract_state)

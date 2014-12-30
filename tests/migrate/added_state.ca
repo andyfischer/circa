@@ -8,7 +8,7 @@ def right()
   print('after migration, a is: ' a)
   print('b is: ' b)
 
-int = make_stack(left)
+int = make_vm(left)
 int.run
 
 int.migrate_to(right)

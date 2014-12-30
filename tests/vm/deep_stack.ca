@@ -7,5 +7,5 @@ def main(int i)
 
   return i + main(i - 1)
 
-vm = make_stack(main)
+vm = make_vm(main)
 vm.call(1000) | print

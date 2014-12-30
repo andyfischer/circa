@@ -3,6 +3,6 @@ f = ->
   -- This caused an interpreter crash at one point
   1[1] = 1
 
-int = make_stack(f)
+int = make_vm(f)
 int.run
 assert(int.errored)

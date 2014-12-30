@@ -11,7 +11,7 @@ def main(bool b)
 
 
 
-int = make_stack(main)
+int = make_vm(main)
 int.call(false)
 print('after 1 call without early return: ' int.extract_state)
 int.call(false)

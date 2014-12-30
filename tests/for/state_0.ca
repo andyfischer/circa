@@ -9,7 +9,7 @@ def g()
         s += 1
 
 print('calling g')
-int = make_stack(g)
+int = make_vm(g)
 int.call
 print('state: ' int.extract_state)
 int.call

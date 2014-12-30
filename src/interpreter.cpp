@@ -1424,7 +1424,7 @@ static bool vm_matches_watch_path(Stack* stack, Value* path)
     return true;
 }
 
-void make_stack(caStack* stack)
+void make_vm(caStack* stack)
 {
     Stack* newStack = create_stack(stack->world);
     Value* closure = circa_input(stack, 0);
@@ -1682,8 +1682,8 @@ void dbg_set_outgoing_state(Stack* stack)
 
 void interpreter_install_functions(NativePatch* patch)
 {
-    circa_patch_function(patch, "make_stack", make_stack);
-    circa_patch_function(patch, "make_vm", make_stack);
+    circa_patch_function(patch, "make_vm", make_vm);
+    circa_patch_function(patch, "make_vm", make_vm);
     circa_patch_function(patch, "capture_stack", capture_stack);
     circa_patch_function(patch, "_extract_stack_path", hosted_extract_path);
     circa_patch_function(patch, "reflect_caller", reflect__caller);

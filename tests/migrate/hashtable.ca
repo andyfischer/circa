@@ -19,7 +19,7 @@ def right()
 
   print('  map has: 3 -> ' map.get(term_ref(a)).value)
 
-int = make_stack(left)
+int = make_vm(left)
 int.run
 
 int.migrate_to(right)

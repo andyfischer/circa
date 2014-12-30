@@ -12,7 +12,7 @@ def main()
 
   t.f()
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 print(int.extract_state)
 int.call

@@ -2,7 +2,7 @@
 testBlock = ->
   print(a)
 
-int = make_stack(testBlock)
+int = make_vm(testBlock)
 int.run
 
 assert(int.error_message == "Unknown identifier: a")

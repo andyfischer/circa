@@ -10,6 +10,6 @@ def main()
         s = 2
         return
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 print(int.extract_state)

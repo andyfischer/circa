@@ -11,7 +11,7 @@ def right()
 
   closure.call
 
-int = make_stack(left)
+int = make_vm(left)
 int.run
 
 int.migrate_to(right)

@@ -3,6 +3,6 @@ def f()
     if true
         state a = 1
 
-int = make_stack(f)
+int = make_vm(f)
 int.call
 print('f state: ' int.extract_state)

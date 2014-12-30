@@ -39,7 +39,7 @@ def main(int i)
   any.cast(@val)
   val.f
 
-stack = make_stack(main)
+stack = make_vm(main)
 
 for i in 0..20
   stack.call(i)

@@ -2,7 +2,7 @@
 def main()
   Vec2([0 0])
 
-stack = make_stack(main)
+stack = make_vm(main)
 stack.run
 
 assert(stack.has_error)

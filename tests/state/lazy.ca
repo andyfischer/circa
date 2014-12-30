@@ -7,7 +7,7 @@ def main()
   print('called main')
   state s = lazyCall()
 
-int = make_stack(main)
+int = make_vm(main)
 int.run
 int.run
 int.run

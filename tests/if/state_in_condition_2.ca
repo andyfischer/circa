@@ -9,6 +9,6 @@ def main()
   if f()
   else
 
-int = make_stack(main)
+int = make_vm(main)
 int.call
 int.call

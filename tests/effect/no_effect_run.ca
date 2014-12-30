@@ -14,7 +14,7 @@ def main()
   no_effect(@i)
   i + 1
 
-vm = make_stack(main)
+vm = make_vm(main)
 
 print('Regular run:')
 result = vm.call

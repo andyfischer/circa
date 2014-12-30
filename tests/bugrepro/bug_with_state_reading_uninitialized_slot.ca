@@ -8,6 +8,6 @@ def f()
     -- (Update 9/13 - Disregard above comment, unpack_state was factored out)
     state any u = 2
 
-int = make_stack(f)
+int = make_vm(f)
 int.call
 print(int.extract_state)

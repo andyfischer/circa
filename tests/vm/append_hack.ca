@@ -1,5 +1,5 @@
 
-vm = make_stack(->)
+vm = make_vm(->)
 
 print(vm.env_map)
 

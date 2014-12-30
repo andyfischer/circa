@@ -4,7 +4,7 @@ def main() -> int
   s += 1
   return s
   
-int = make_stack(main)
+int = make_vm(main)
 result = int.call
 print('should be 1: ' result)
 print('should be {s: 1}: ' int.extract_state)

@@ -3,7 +3,7 @@ def f() -> int
   s += 1
   return s
   
-int = make_stack(f)
+int = make_vm(f)
 int.call
 result = int.call
 print('should be 2: ' result)

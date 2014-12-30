@@ -1,6 +1,6 @@
 
 
-int = make_stack(->
+int = make_vm(->
     l = []
     l[0]
 )

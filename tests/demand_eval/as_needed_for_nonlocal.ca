@@ -16,6 +16,6 @@ def module()
     print('in main, a = ' a)
 
 
-stack = make_stack(module.block.find_term('main').contents.to_func)
+stack = make_vm(module.block.find_term('main').contents.to_func)
 stack.run
 assert(not(stack.has_error))

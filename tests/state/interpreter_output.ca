@@ -7,6 +7,6 @@ def b(a)
 
     a + 1
 
-int = make_stack(b)
+int = make_vm(b)
 int.call(1)
 print(int.extract_state)
