@@ -5,28 +5,28 @@ require draw
 package cairo
 
 struct Canvas {
-    native_ptr native
+  native_ptr native
 }
 
 struct Surface {
-    native_ptr native
+  native_ptr native
 }
 
 struct FontFace {
-    native_ptr native
+  native_ptr native
 }
 
 struct TextExtents {
-    Vec2 bearing;
-    Vec2 size;
-    Vec2 advance
+  Vec2 bearing
+  Vec2 size
+  Vec2 advance
 }
 
 struct FontExtents {
-    number ascent
-    number descent
-    number height
-    Vec2 max_advance
+  number ascent
+  number descent
+  number height
+  Vec2 max_advance
 }
 
 -- Canvas
