@@ -158,7 +158,7 @@ CIRCA_EXPORT void circa_read_file(caWorld* world, const char* filename, Value* c
     set_null(contentsOut);
 }
 
-CIRCA_EXPORT void circa_read_file_with_stack(caStack* stack, const char* filename, Value* contentsOut)
+CIRCA_EXPORT void circa_read_file_with_stack(Stack* stack, const char* filename, Value* contentsOut)
 {
     return ::circa_read_file(stack->world, filename, contentsOut);
 }

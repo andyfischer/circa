@@ -329,7 +329,7 @@ void copy(Value* source, Value* dest)
 void swap(Value* left, Value* right)
 {
     Type* temp_type = left->value_type;
-    caValueData temp_data = left->value_data;
+    ValueData temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;
@@ -965,7 +965,7 @@ int circa_int(Value* value) {
     ca_assert(circa_is_int(value));
     return value->value_data.asint;
 }
-caStack* circa_stack(Value* value)
+Stack* circa_stack(Value* value)
 {
     return as_stack(value);
 }
@@ -1071,7 +1071,7 @@ void circa_set_pointer(Value* container, void* ptr)
 {
     set_opaque_pointer(container, ptr);
 }
-void circa_set_stack(Value* container, caStack* stack)
+void circa_set_stack(Value* container, Stack* stack)
 {
     set_stack(container, stack);
 }

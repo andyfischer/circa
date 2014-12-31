@@ -1424,7 +1424,7 @@ static bool vm_matches_watch_path(Stack* stack, Value* path)
     return true;
 }
 
-void make_vm(caStack* stack)
+void make_vm(Stack* stack)
 {
     Stack* newStack = create_stack(stack->world);
     Value* closure = circa_input(stack, 0);
@@ -1439,20 +1439,20 @@ void make_vm(caStack* stack)
     set_pointer(circa_set_default_output(stack, 0), newStack);
 }
 
-void capture_stack(caStack* stack)
+void capture_stack(Stack* stack)
 {
     Stack* newStack = stack_duplicate(stack);
     // TODO: Fix 'newStack', right now it has the capture_stack call still in progress.
     set_pointer(circa_set_default_output(stack, 0), newStack);
 }
 
-void hosted_extract_path(caStack* stack)
+void hosted_extract_path(Stack* stack)
 {
     Frame* untilFrame = top_frame_parent(stack);
     stack_extract_current_path(stack, circa_output(stack, 0), untilFrame);
 }
 
-void reflect__caller(caStack* stack)
+void reflect__caller(Stack* stack)
 {
     Frame* frame = top_frame_parent(stack);
     Frame* callerFrame = prev_frame(frame);
@@ -1545,7 +1545,7 @@ Frame* find_frame_with_block(Stack* stack, Block* block)
     return NULL;
 }
 
-void get_demand_value(caStack* stack)
+void get_demand_value(Stack* stack)
 {
     Term* key = as_term_ref(circa_input(stack, 0));
     Value* value = stack_demand_value_get(stack, key);
@@ -1558,7 +1558,7 @@ void get_demand_value(caStack* stack)
     }
 }
 
-void store_demand_value(caStack* stack)
+void store_demand_value(Stack* stack)
 {
     Term* key = as_term_ref(circa_input(stack, 0));
     Value* value = circa_input(stack, 1);
@@ -1579,7 +1579,7 @@ void save_state_result(Stack* stack)
     move(result, hashtable_insert(&frame->outgoingState, unique_name(target)));
 }
 
-void load_frame_state(caStack* stack)
+void load_frame_state(Stack* stack)
 {
     stat_increment(LoadFrameState);
 
@@ -1607,7 +1607,7 @@ void load_frame_state(caStack* stack)
     copy(slot, &top->incomingState);
 }
 
-void store_frame_state(caStack* stack)
+void store_frame_state(Stack* stack)
 {
     stat_increment(StoreFrameState);
 

@@ -47,7 +47,7 @@ caBlock* caTerm::parent()
     return circa_parent_block(this);
 }
 
-Value* circa_set_default_input(caStack* stack, int index)
+Value* circa_set_default_input(Stack* stack, int index)
 {
     Value* val = circa_input(stack, index);
     caBlock* top = circa_stack_top_block(stack);
@@ -56,7 +56,7 @@ Value* circa_set_default_input(caStack* stack, int index)
     return val;
 }
 
-Value* circa_set_default_output(caStack* stack, int index)
+Value* circa_set_default_output(Stack* stack, int index)
 {
     Value* val = circa_output(stack, index);
     caBlock* top = circa_stack_top_block(stack);
@@ -237,7 +237,7 @@ Value* circa_declare_value(caBlock* block, const char* name)
     return term_value(term);
 }
 
-void circa_dump_s(caStack* stack)
+void circa_dump_s(Stack* stack)
 {
     dump((Stack*) stack);
 }
@@ -247,38 +247,38 @@ void circa_dump_b(caBlock* block)
     dump((Block*) block);
 }
 
-caStack* circa_create_stack(caWorld* world)
+Stack* circa_create_stack(caWorld* world)
 {
     return create_stack(world);
 }
 
-void circa_free_stack(caStack* stack)
+void circa_free_stack(Stack* stack)
 {
     free_stack(stack);
 }
 
-bool circa_has_error(caStack* stack)
+bool circa_has_error(Stack* stack)
 {
     return stack_errored(stack);
 }
 
-void circa_clear_stack(caStack* stack)
+void circa_clear_stack(Stack* stack)
 {
     stack_reset(stack);
 }
 
-void circa_restart(caStack* stack)
+void circa_restart(Stack* stack)
 {
     stack_restart(stack);
 }
 
-void circa_push_function(caStack* stack, caBlock* func)
+void circa_push_function(Stack* stack, caBlock* func)
 {
     block_finish_changes(func);
     stack_init(stack, func);
 }
 
-void circa_push_module(caStack* stack, const char* name)
+void circa_push_module(Stack* stack, const char* name)
 {
     Value nameStr;
     set_string(&nameStr, name);
@@ -291,7 +291,7 @@ void circa_push_module(caStack* stack, const char* name)
     stack_init(stack, block);
 }
 
-Value* circa_frame_input(caStack* stack, int index)
+Value* circa_frame_input(Stack* stack, int index)
 {
     Frame* top = top_frame(stack);
     
@@ -306,7 +306,7 @@ Value* circa_frame_input(caStack* stack, int index)
     return get_top_register(stack, term);
 }
 
-Value* circa_frame_output(caStack* stack, int index)
+Value* circa_frame_output(Stack* stack, int index)
 {
     Frame* top = top_frame(stack);
 
@@ -319,47 +319,47 @@ Value* circa_frame_output(caStack* stack, int index)
     return get_top_register(stack, term);
 }
 
-void circa_run(caStack* stack)
+void circa_run(Stack* stack)
 {
     vm_run(stack);
 }
 
-void circa_pop(caStack* stack)
+void circa_pop(Stack* stack)
 {
     pop_frame(stack);
 }
 
-caBlock* circa_stack_top_block(caStack* stack)
+caBlock* circa_stack_top_block(Stack* stack)
 {
     return (caBlock*) frame_block(top_frame(stack));
 }
 
-int circa_num_inputs(caStack* stack)
+int circa_num_inputs(Stack* stack)
 {
     return num_inputs(stack);
 }
 
-int circa_int_input(caStack* stack, int index)
+int circa_int_input(Stack* stack, int index)
 {
     return circa_int(circa_input(stack, index));
 }
 
-float circa_float_input(caStack* stack, int index)
+float circa_float_input(Stack* stack, int index)
 {
     return circa_to_float(circa_input(stack, index));
 }
 
-float circa_bool_input(caStack* stack, int index)
+float circa_bool_input(Stack* stack, int index)
 {
     return circa_bool(circa_input(stack, index));
 }
 
-const char* circa_string_input(caStack* stack, int index)
+const char* circa_string_input(Stack* stack, int index)
 {
     return circa_string(circa_input(stack, index));
 }
 
-void circa_output_error_val(caStack* stack, Value* val)
+void circa_output_error_val(Stack* stack, Value* val)
 {
     copy(val, circa_output(stack, 0));
     Block* block = frame_block(top_frame(stack));
@@ -370,19 +370,19 @@ void circa_output_error_val(caStack* stack, Value* val)
     raise_error(stack);
 }
 
-void circa_output_error(caStack* stack, const char* msg)
+void circa_output_error(Stack* stack, const char* msg)
 {
     Value val;
     set_error_string(&val, msg);
     circa_output_error_val(stack, &val);
 }
 
-caTerm* circa_caller_input_term(caStack* stack, int index)
+caTerm* circa_caller_input_term(Stack* stack, int index)
 {
     return circa_term_get_input(circa_caller_term(stack), index);
 }
 
-caBlock* circa_caller_block(caStack* stack)
+caBlock* circa_caller_block(Stack* stack)
 {
     Frame* frame = top_frame_parent(stack);
     if (frame == NULL)
@@ -390,19 +390,19 @@ caBlock* circa_caller_block(caStack* stack)
     return frame_block(frame);
 }
 
-caTerm* circa_caller_term(caStack* stack)
+caTerm* circa_caller_term(Stack* stack)
 {
     return frame_caller(top_frame(stack));
 }
 
-void circa_dump_stack_trace(caStack* stack)
+void circa_dump_stack_trace(Stack* stack)
 {
     Value str;
     stack_trace_to_string(stack, &str);
     write_log(as_cstring(&str));
 }
 
-Value* circa_env_insert(caStack* stack, const char* name)
+Value* circa_env_insert(Stack* stack, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);

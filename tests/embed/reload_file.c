@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     const int iteratations = 100;
 
     caWorld* world = circa_initialize();
-    caStack* stack = circa_create_stack(world);
+    Stack* stack = circa_create_stack(world);
 
     // Write initial version
     write_script_to_file(0);

@@ -438,7 +438,7 @@ const char* find_builtin_file(const char* filename) {
         "    writer.write('void ')\n"
         "    cname = circa_name_to_c_name(func.name)\n"
         "    writer.write(cname)\n"
-        "    writer.write('(caStack* stack)')\n"
+        "    writer.write('(Stack* stack)')\n"
         "    writer.writeln('')\n"
         "    writer.writeln('{')\n"
         "    writer.indent()\n"

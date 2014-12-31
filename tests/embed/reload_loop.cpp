@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
     while (true) {
 
-        caValue* value = circa_alloc_value();
+        Value* value = circa_alloc_value();
         circa_set_int(value, iteration);
 
         circa_actor_run_message(world, "TestA", value);

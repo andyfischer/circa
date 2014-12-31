@@ -71,7 +71,7 @@ typedef int Symbol;
 
 // Function-related typedefs:
 
-typedef void (*EvaluateFunc)(caStack* stack);
+typedef void (*EvaluateFunc)(Stack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*ReleaseFunc)(Value* value);
 typedef void (*PostCompileFunc)(Term*);

@@ -28,36 +28,36 @@
 
 namespace circa {
 
-void abs(caStack* stack)
+void abs(Stack* stack)
 {
     set_float(circa_output(stack, 0), std::abs(circa_float_input(stack, 0)));
 }
 
-void add_i_evaluate(caStack* stack)
+void add_i_evaluate(Stack* stack)
 {
     int sum = circa_int_input(stack, 0) + circa_int_input(stack, 1);
     set_int(circa_output(stack, 0), sum);
 }
 
-void add_f_evaluate(caStack* stack)
+void add_f_evaluate(Stack* stack)
 {
     float sum = circa_float_input(stack, 0) + circa_float_input(stack, 1);
     set_float(circa_output(stack, 0), sum);
 }
 
-void assert_func(caStack* stack)
+void assert_func(Stack* stack)
 {
     if (!circa_bool_input(stack, 0))
         circa_output_error(stack, "Assert failed");
 }
 
-void cond(caStack* stack)
+void cond(Stack* stack)
 {
     int index = circa_bool_input(stack, 0) ? 1 : 2;
     copy(circa_input(stack, index), circa_output(stack, 0));
 }
 
-void str(caStack* stack)
+void str(Stack* stack)
 {
     Value* args = circa_input(stack, 0);
     Value* out = circa_output(stack, 0);
@@ -69,12 +69,12 @@ void str(caStack* stack)
     }
 }
 
-void copy_eval(caStack* stack)
+void copy_eval(Stack* stack)
 {
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void cast_declared_type(caStack* stack)
+void cast_declared_type(Stack* stack)
 {
     Value* source = circa_input(stack, 0);
 
@@ -103,7 +103,7 @@ void cast_declared_type(caStack* stack)
         return circa_output_error(stack, "cast failed");
 }
 
-void cast_evaluate(caStack* stack)
+void cast_evaluate(Stack* stack)
 {
     // 'cast' is used by scripts. In this version, the type is passed via the 2nd param
     Value* result = circa_output(stack, 0);
@@ -120,19 +120,19 @@ void debug_break(Stack* stack)
     printf("debug_break..\n");
 }
 
-void div_f(caStack* stack)
+void div_f(Stack* stack)
 {
     set_float(circa_output(stack, 0), circa_float_input(stack, 0) / circa_float_input(stack, 1));
 }
 
-void div_i(caStack* stack)
+void div_i(Stack* stack)
 {
     int a = to_int(circa_input(stack, 0));
     int b = to_int(circa_input(stack, 1));
     set_int(circa_output(stack, 0), a / b);
 }
 
-void empty_list(caStack* stack)
+void empty_list(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     int size = circa_int_input(stack, 1);
@@ -143,55 +143,55 @@ void empty_list(caStack* stack)
     }
 }
 
-void equals_func(caStack* stack)
+void equals_func(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             equals(circa_input(stack, 0), circa_input(stack, 1)));
 }
 
-void hosted_is_compound(caStack* stack)
+void hosted_is_compound(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_struct(circa_input(stack, 0)));
 }
 
-void hosted_is_list(caStack* stack)
+void hosted_is_list(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_list(circa_input(stack, 0)));
 }
-void hosted_is_int(caStack* stack)
+void hosted_is_int(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_int(circa_input(stack, 0)));
 }
-void hosted_is_map(caStack* stack)
+void hosted_is_map(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_hashtable(circa_input(stack, 0)));
 }
-void hosted_is_number(caStack* stack)
+void hosted_is_number(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
 }
-void hosted_is_bool(caStack* stack)
+void hosted_is_bool(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_bool(circa_input(stack, 0)));
 }
-void hosted_is_string(caStack* stack)
+void hosted_is_string(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_string(circa_input(stack, 0)));
 }
-void hosted_is_null(caStack* stack)
+void hosted_is_null(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_null(circa_input(stack, 0)));
 }
-void hosted_is_function(caStack* stack)
+void hosted_is_function(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_func(circa_input(stack, 0)));
 }
-void hosted_is_type(caStack* stack)
+void hosted_is_type(Stack* stack)
 {
     set_bool(circa_output(stack, 0), is_type(circa_input(stack, 0)));
 }
 
-void inputs_fit_function(caStack* stack)
+void inputs_fit_function(Stack* stack)
 {
     Value* inputs = circa_input(stack, 0);
     Term* function = circa_caller_input_term(stack, 1);
@@ -220,7 +220,7 @@ void inputs_fit_function(caStack* stack)
 
     set_bool(result, true);
 }
-void overload_error_no_match(caStack* stack)
+void overload_error_no_match(Stack* stack)
 {
     Value* inputs = circa_input(stack, 00);
 
@@ -240,7 +240,7 @@ void overload_error_no_match(caStack* stack)
     circa_output_error(stack, as_cstring(&msg));
 }
 
-void unique_id(caStack* stack)
+void unique_id(Stack* stack)
 {
     static int nextId = 1; // TODO: this should probably be stored on World?
     set_int(circa_output(stack, 0), nextId++);
@@ -255,7 +255,7 @@ void source_id(Stack* stack)
 #endif
 }
 
-void unknown_function(caStack* stack)
+void unknown_function(Stack* stack)
 {
     std::string out;
     out += "Unknown function: ";
@@ -264,7 +264,7 @@ void unknown_function(caStack* stack)
     circa_output_error(stack, out.c_str());
 }
 
-void unknown_identifier(caStack* stack)
+void unknown_identifier(Stack* stack)
 {
     Value msg;
     set_string(&msg, "Unknown identifier: ");
@@ -272,12 +272,12 @@ void unknown_identifier(caStack* stack)
     circa_output_error(stack, as_cstring(&msg));
 }
 
-void write_text_file_func(caStack* stack)
+void write_text_file_func(Stack* stack)
 {
     write_text_file(circa_string_input(stack, 0), circa_string_input(stack, 1));
 }
 
-void get_field(caStack* stack)
+void get_field(Stack* stack)
 {
     Value* head = circa_input(stack, 0);
 
@@ -294,7 +294,7 @@ void get_field(caStack* stack)
     copy(value, circa_output(stack, 0));
 }
 
-void get_index(caStack* stack)
+void get_index(Stack* stack)
 {
     Value* list = circa_input(stack, 0);
     int index = circa_int_input(stack, 1);
@@ -315,7 +315,7 @@ void get_index(caStack* stack)
     cast(circa_output(stack, 0), declared_type((Term*) circa_caller_term(stack)));
 }
 
-void make_list(caStack* stack)
+void make_list(Stack* stack)
 {
     // Variadic arg handling will already have turned this into a list
     Value* out = circa_output(stack, 0);
@@ -340,65 +340,65 @@ void make_map(Stack* stack)
     }
 }
 
-void blank_list(caStack* stack)
+void blank_list(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     int count = circa_int_input(stack, 0);
     circa_set_list(out, count);
 }
 
-void and_func(caStack* stack)
+void and_func(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
         circa_bool_input(stack, 0) && circa_bool_input(stack, 1));
 }
 
-void or_func(caStack* stack)
+void or_func(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
         circa_bool_input(stack, 0) || circa_bool_input(stack, 1));
 }
 
-void not_func(caStack* stack)
+void not_func(Stack* stack)
 {
     set_bool(circa_output(stack, 0), !circa_bool_input(stack, 0));
 }
 
-void make_func(caStack* stack)
+void make_func(Stack* stack)
 {
     make(as_type(circa_input(stack, 0)), circa_output(stack, 0));
 }
 
-void max_f(caStack* stack)
+void max_f(Stack* stack)
 {
     set_float(circa_output(stack, 0),
             std::max(circa_float_input(stack, 0), circa_float_input(stack, 1)));
 }
 
-void max_i(caStack* stack)
+void max_i(Stack* stack)
 {
     set_int(circa_output(stack, 0),
             std::max(circa_int_input(stack, 0), circa_int_input(stack, 1)));
 }
 
-void min_f(caStack* stack)
+void min_f(Stack* stack)
 {
     set_float(circa_output(stack, 0),
             std::min(circa_float_input(stack, 0), circa_float_input(stack, 1)));
 }
 
-void min_i(caStack* stack)
+void min_i(Stack* stack)
 {
     set_int(circa_output(stack, 0),
             std::min(circa_int_input(stack, 0), circa_int_input(stack, 1)));
 }
 
-void remainder_i(caStack* stack)
+void remainder_i(Stack* stack)
 {
     set_int(circa_output(stack, 0), circa_int_input(stack, 0) % circa_int_input(stack, 1));
 }
 
-void remainder_f(caStack* stack)
+void remainder_f(Stack* stack)
 {
     set_float(circa_output(stack, 0), fmodf(circa_float_input(stack, 0), circa_float_input(stack, 1)));
 }
@@ -411,7 +411,7 @@ void remainder_f(caStack* stack)
 // For a function that works the same as C's modulo, use remainder() . The % operator
 // also uses remainder(), so that it works the same as C's % operator.
 
-void mod_i(caStack* stack)
+void mod_i(Stack* stack)
 {
     int a = circa_int_input(stack, 0);
     int n = circa_int_input(stack, 1);
@@ -423,7 +423,7 @@ void mod_i(caStack* stack)
     set_int(circa_output(stack, 0), out);
 }
 
-void mod_f(caStack* stack)
+void mod_f(Stack* stack)
 {
     float a = circa_float_input(stack, 0);
     float n = circa_float_input(stack, 1);
@@ -436,7 +436,7 @@ void mod_f(caStack* stack)
     set_float(circa_output(stack, 0), out);
 }
 
-void round(caStack* stack)
+void round(Stack* stack)
 {
     float input = circa_float_input(stack, 0);
     if (input > 0.0)
@@ -445,17 +445,17 @@ void round(caStack* stack)
         set_int(circa_output(stack, 0), int(input - 0.5));
 }
 
-void floor(caStack* stack)
+void floor(Stack* stack)
 {
     set_int(circa_output(stack, 0), (int) std::floor(circa_float_input(stack, 0)));
 }
 
-void ceil(caStack* stack)
+void ceil(Stack* stack)
 {
     set_int(circa_output(stack, 0), (int) std::ceil(circa_float_input(stack, 0)));
 }
 
-void average(caStack* stack)
+void average(Stack* stack)
 {
     Value* args = circa_input(stack, 0);
     int count = circa_count(args);
@@ -473,62 +473,62 @@ void average(caStack* stack)
     set_float(out, sum / count);
 }
 
-void pow(caStack* stack)
+void pow(Stack* stack)
 {
     set_float(circa_output(stack, 0),
             std::pow((float) to_float(circa_input(stack, 0)), to_float(circa_input(stack, 1))));
 }
 
-void sqr(caStack* stack)
+void sqr(Stack* stack)
 {
     float in = circa_float_input(stack, 0);
     set_float(circa_output(stack, 0), in * in);
 }
-void cube(caStack* stack)
+void cube(Stack* stack)
 {
     float in = circa_float_input(stack, 0);
     set_float(circa_output(stack, 0), in * in * in);
 }
 
-void sqrt(caStack* stack)
+void sqrt(Stack* stack)
 {
     set_float(circa_output(stack, 0), std::sqrt(circa_float_input(stack, 0)));
 }
 
-void log(caStack* stack)
+void log(Stack* stack)
 {
     set_float(circa_output(stack, 0), std::log(circa_float_input(stack, 0)));
 }
 
 
-void mult_f(caStack* stack)
+void mult_f(Stack* stack)
 {
     float product = circa_float_input(stack, 0) * circa_float_input(stack, 1);
     set_float(circa_output(stack, 0), product);
 }
 
-void mult_i(caStack* stack)
+void mult_i(Stack* stack)
 {
     int product = circa_int_input(stack, 0) * circa_int_input(stack, 1);
     set_int(circa_output(stack, 0), product);
 }
 
-void neg_f(caStack* stack)
+void neg_f(Stack* stack)
 {
     set_float(circa_output(stack, 0), -circa_float_input(stack, 0));
 }
 
-void neg_i(caStack* stack)
+void neg_i(Stack* stack)
 {
     set_int(circa_output(stack, 0), -circa_int_input(stack, 0));
 }
 
-void sub_i(caStack* stack)
+void sub_i(Stack* stack)
 {
     set_int(circa_output(stack, 0), circa_int_input(stack, 0) - circa_int_input(stack, 1));
 }
 
-void sub_f(caStack* stack)
+void sub_f(Stack* stack)
 {
     set_float(circa_output(stack, 0), circa_float_input(stack, 0) - circa_float_input(stack, 1));
 }
@@ -536,41 +536,41 @@ void sub_f(caStack* stack)
 float radians_to_degrees(float radians) { return radians * 180.0f / M_PI; }
 float degrees_to_radians(float unit) { return unit * M_PI / 180.0f; }
 
-void sin_func(caStack* stack)
+void sin_func(Stack* stack)
 {
     float input = circa_float_input(stack, 0);
 
     set_float(circa_output(stack, 0), sin(degrees_to_radians(input)));
 }
-void cos_func(caStack* stack)
+void cos_func(Stack* stack)
 {
     float input = circa_float_input(stack, 0);
 
     set_float(circa_output(stack, 0), cos(degrees_to_radians(input)));
 }
-void tan_func(caStack* stack)
+void tan_func(Stack* stack)
 {
     float input = circa_float_input(stack, 0);
 
     set_float(circa_output(stack, 0), tan(degrees_to_radians(input)));
 }
-void arcsin_func(caStack* stack)
+void arcsin_func(Stack* stack)
 {
     float result = asin(circa_float_input(stack, 0));
     set_float(circa_output(stack, 0), radians_to_degrees(result));
 }
-void arccos_func(caStack* stack)
+void arccos_func(Stack* stack)
 {
     float result = acos(circa_float_input(stack, 0));
     set_float(circa_output(stack, 0), radians_to_degrees(result));
 }
-void arctan_func(caStack* stack)
+void arctan_func(Stack* stack)
 {
     float result = atan(circa_float_input(stack, 0));
     set_float(circa_output(stack, 0), radians_to_degrees(result));
 }
 
-void range(caStack* stack)
+void range(Stack* stack)
 {
     int start = circa_int_input(stack, 0);
     int max = circa_int_input(stack, 1);
@@ -591,13 +591,13 @@ void range(caStack* stack)
     }
 }
 
-void rpath(caStack* stack)
+void rpath(Stack* stack)
 {
     caBlock* block = circa_caller_block(stack);
     get_path_relative_to_source(block, circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void set_field(caStack* stack)
+void set_field(Stack* stack)
 {
     stat_increment(SetField);
 
@@ -618,7 +618,7 @@ void set_field(caStack* stack)
     copy(circa_input(stack, 2), slot);
 }
 
-void set_index(caStack* stack)
+void set_index(Stack* stack)
 {
     stat_increment(SetIndex);
 
@@ -628,12 +628,12 @@ void set_index(caStack* stack)
     int index = circa_int_input(stack, 1);
     copy(circa_input(stack, 2), list_get(output, index));
 }
-void rand(caStack* stack)
+void rand(Stack* stack)
 {
     set_float(circa_output(stack, 0), rand_next_double(&stack->randState));
 }
 
-void repeat(caStack* stack)
+void repeat(Stack* stack)
 {
     Value* source = circa_input(stack, 0);
     int repeatCount = circa_int_input(stack, 1);
@@ -645,69 +645,69 @@ void repeat(caStack* stack)
         copy(source, circa_index(out, i));
 }
 
-void int__to_hex_string(caStack* stack)
+void int__to_hex_string(Stack* stack)
 {
     std::stringstream strm;
     strm << std::hex << as_int(circa_input(stack, 0));
     set_string(circa_output(stack, 0), strm.str().c_str());
 }
 
-void less_than_i(caStack* stack)
+void less_than_i(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_int_input(stack, 0) < circa_int_input(stack, 1));
 }
 
-void less_than_f(caStack* stack)
+void less_than_f(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_float_input(stack, 0) < circa_float_input(stack, 1));
 }
 
-void less_than_eq_i(caStack* stack)
+void less_than_eq_i(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_int_input(stack, 0) <= circa_int_input(stack, 1));
 }
 
-void less_than_eq_f(caStack* stack)
+void less_than_eq_f(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_float_input(stack, 0) <= circa_float_input(stack, 1));
 }
 
-void greater_than_i(caStack* stack)
+void greater_than_i(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_int_input(stack, 0) > circa_int_input(stack, 1));
 }
 
-void greater_than_f(caStack* stack)
+void greater_than_f(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_float_input(stack, 0) > circa_float_input(stack, 1));
 }
 
-void greater_than_eq_i(caStack* stack)
+void greater_than_eq_i(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_int_input(stack, 0) >= circa_int_input(stack, 1));
 }
 
-void greater_than_eq_f(caStack* stack)
+void greater_than_eq_f(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             circa_float_input(stack, 0) >= circa_float_input(stack, 1));
 }
 
-void List__append(caStack* stack)
+void List__append(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     move(circa_input(stack, 0), out);
     move(circa_input(stack, 1), list_append(out));
 }
 
-void List__concat(caStack* stack)
+void List__concat(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     move(circa_input(stack, 0), out);
@@ -723,7 +723,7 @@ void List__concat(caStack* stack)
         move(list_get(additions, i), list_get(out, oldLength + i));
 }
 
-void List__resize(caStack* stack)
+void List__resize(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
@@ -731,7 +731,7 @@ void List__resize(caStack* stack)
     circa_resize(out, count);
 }
 
-void List__extend(caStack* stack)
+void List__extend(Stack* stack)
 {
     Value* out = circa_output(stack, 1);
     copy(circa_input(stack, 0), out);
@@ -746,16 +746,16 @@ void List__extend(caStack* stack)
         copy(list_get(additions, i), list_get(out, oldLength + i));
 }
 
-void List__count(caStack* stack)
+void List__count(Stack* stack)
 {
     set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
 }
-void List__length(caStack* stack)
+void List__length(Stack* stack)
 {
     set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
 }
 
-void List__insert(caStack* stack)
+void List__insert(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
@@ -763,7 +763,7 @@ void List__insert(caStack* stack)
     copy(circa_input(stack, 2), list_insert(out, circa_int_input(stack, 1)));
 }
 
-void List__slice(caStack* stack)
+void List__slice(Stack* stack)
 {
     Value* input = circa_input(stack, 0);
     int start = circa_int_input(stack, 1);
@@ -792,7 +792,7 @@ void List__slice(caStack* stack)
         copy(list_get(input, start + i), list_get(output, i));
 }
 
-void List__join(caStack* stack)
+void List__join(Stack* stack)
 {
     Value* input = circa_input(stack, 0);
     Value* joiner = circa_input(stack, 1);
@@ -808,7 +808,7 @@ void List__join(caStack* stack)
     }
 }
 
-void List__get(caStack* stack)
+void List__get(Stack* stack)
 {
     Value* self = circa_input(stack, 0);
     int index = circa_int_input(stack, 1);
@@ -818,7 +818,7 @@ void List__get(caStack* stack)
     copy(list_get(self, index), circa_output(stack, 0));
 }
 
-void List__set(caStack* stack)
+void List__set(Stack* stack)
 {
     Value* self = circa_output(stack, 0);
     move(circa_input(stack, 0), self);
@@ -830,7 +830,7 @@ void List__set(caStack* stack)
     move(value, list_get(self, index));
 }
 
-void List__remove(caStack* stack)
+void List__remove(Stack* stack)
 {
     Value* self = circa_output(stack, 0);
     move(circa_input(stack, 0), self);
@@ -842,7 +842,7 @@ void List__remove(caStack* stack)
     list_remove_index(self, index);
 }
 
-void Map__contains(caStack* stack)
+void Map__contains(Stack* stack)
 {
     Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
@@ -852,13 +852,13 @@ void Map__contains(caStack* stack)
     set_bool(circa_output(stack, 0), value != NULL);
 }
 
-void Map__keys(caStack* stack)
+void Map__keys(Stack* stack)
 {
     Value* table = circa_input(stack, 0);
     hashtable_get_keys(table, circa_output(stack, 0));
 }
 
-void Map__remove(caStack* stack)
+void Map__remove(Stack* stack)
 {
     Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
@@ -869,7 +869,7 @@ void Map__remove(caStack* stack)
     hashtable_remove(self, key);
 }
 
-void Map__get(caStack* stack)
+void Map__get(Stack* stack)
 {
     Value* table = circa_input(stack, 0);
     Value* key = circa_input(stack, 1);
@@ -886,7 +886,7 @@ void Map__get(caStack* stack)
     copy(value, circa_output(stack, 0));
 }
 
-void Map__set(caStack* stack)
+void Map__set(Stack* stack)
 {
     Value* key = circa_input(stack, 1);
     if (!value_hashable(key))
@@ -899,19 +899,19 @@ void Map__set(caStack* stack)
     move(value, hashtable_insert(self, key, false));
 }
 
-void Map__empty(caStack* stack)
+void Map__empty(Stack* stack)
 {
     set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
 }
 
-void Module__block(caStack* stack)
+void Module__block(Stack* stack)
 {
     Value* moduleRef = circa_input(stack, 0);
     Block* moduleBlock = module_ref_resolve(stack->world, moduleRef);
     set_block(circa_output(stack, 0), moduleBlock);
 }
 
-void Module__get(caStack* stack)
+void Module__get(Stack* stack)
 {
     Value* moduleRef = circa_input(stack, 0);
     Block* moduleBlock = module_ref_resolve(stack->world, moduleRef);
@@ -919,7 +919,7 @@ void Module__get(caStack* stack)
     copy(term_value(term), circa_output(stack, 0));
 }
 
-void String__char_at(caStack* stack)
+void String__char_at(Stack* stack)
 {
     const char* str = circa_string_input(stack, 0);
     int index = circa_int_input(stack, 1);
@@ -939,13 +939,13 @@ void String__char_at(caStack* stack)
     set_string(circa_output(stack, 0), output, 1);
 }
 
-void String__length(caStack* stack)
+void String__length(Stack* stack)
 {
     const char* str = circa_string_input(stack, 0);
     set_int(circa_output(stack, 0), (int) strlen(str));
 }
 
-void String__char_code(caStack* stack)
+void String__char_code(Stack* stack)
 {
     const char* str = circa_string_input(stack, 0);
     if (strlen(str) != 1)
@@ -962,7 +962,7 @@ void String__from_char_code(Stack* stack)
     set_string(circa_output(stack, 0), str);
 }
 
-void String__substr(caStack* stack)
+void String__substr(Stack* stack)
 {
     Value* self = circa_input(stack, 0);
     int start = circa_int_input(stack, 1);
@@ -995,7 +995,7 @@ char character_to_lower(char c)
     return c;
 }
 
-void String__to_camel_case(caStack* stack)
+void String__to_camel_case(Stack* stack)
 {
     const char* in = circa_string_input(stack, 0);
     set_string(circa_output(stack, 0), in);
@@ -1007,7 +1007,7 @@ void String__to_camel_case(caStack* stack)
     out[0] = character_to_lower(out[0]);
 }
 
-void String__to_lower(caStack* stack)
+void String__to_lower(Stack* stack)
 {
     const char* in = circa_string_input(stack, 0);
     int len = (int) strlen(in);
@@ -1024,19 +1024,19 @@ void String__to_lower(caStack* stack)
     }
 }
 
-void String__to_number(caStack* stack)
+void String__to_number(Stack* stack)
 {
     float n = atof(circa_string_input(stack, 0));
     set_float(circa_output(stack, 0), n);
 }
 
-void String__to_int(caStack* stack)
+void String__to_int(Stack* stack)
 {
     int n = atoi(circa_string_input(stack, 0));
     set_int(circa_output(stack, 0), n);
 }
 
-void String__to_upper(caStack* stack)
+void String__to_upper(Stack* stack)
 {
     const char* in = circa_string_input(stack, 0);
     int len = (int) strlen(in);
@@ -1053,7 +1053,7 @@ void String__to_upper(caStack* stack)
     }
 }
 
-void String__slice(caStack* stack)
+void String__slice(Stack* stack)
 {
     int start = circa_int_input(stack, 1);
     int end = circa_int_input(stack, 2);
@@ -1078,21 +1078,21 @@ void String__slice(caStack* stack)
     set_string(circa_output(stack, 0), s.substr(start, end - start));
 }
 
-void String__ends_with(caStack* stack)
+void String__ends_with(Stack* stack)
 {
     set_bool(circa_output(stack, 0), string_ends_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
 }
-void String__starts_with(caStack* stack)
+void String__starts_with(Stack* stack)
 {
     set_bool(circa_output(stack, 0), string_starts_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
 }
 
-void String__split(caStack* stack)
+void String__split(Stack* stack)
 {
     string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
 }
 
-Value* find_env_value(caStack* stack, Value* key)
+Value* find_env_value(Stack* stack, Value* key)
 {
     stat_increment(FindEnvValue);
 
@@ -1117,7 +1117,7 @@ Value* find_env_value(caStack* stack, Value* key)
     return NULL;
 }
 
-void get_env(caStack* stack)
+void get_env(Stack* stack)
 {
     Value* value = find_env_value(stack, circa_input(stack, 0));
     if (value != NULL)
@@ -1126,7 +1126,7 @@ void get_env(caStack* stack)
         set_null(circa_output(stack, 0));
 }
 
-void get_env_opt(caStack* stack)
+void get_env_opt(Stack* stack)
 {
     Value* value = find_env_value(stack, circa_input(stack, 0));
     if (value != NULL)
@@ -1135,7 +1135,7 @@ void get_env_opt(caStack* stack)
         copy(circa_input(stack, 1), circa_output(stack, 0));
 }
 
-void set_env(caStack* stack)
+void set_env(Stack* stack)
 {
     Value* key = circa_input(stack, 0);
     Value* value = circa_input(stack, 1);
@@ -1143,23 +1143,23 @@ void set_env(caStack* stack)
     copy(value, stack_env_insert(stack, key));
 }
 
-void file__exists(caStack* stack)
+void file__exists(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
         circa_file_exists(stack->world, circa_string_input(stack, 0)));
 }
-void file__version(caStack* stack)
+void file__version(Stack* stack)
 {
     set_int(circa_output(stack, 0),
         circa_file_get_version(stack->world, circa_string_input(stack, 0)));
 }
 
-void file__read_text(caStack* stack)
+void file__read_text(Stack* stack)
 {
     circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
 }
 
-void channel_send(caStack* stack)
+void channel_send(Stack* stack)
 {
     Value* name = circa_input(stack, 0);
     Value* channel = find_env_value(stack, name);
@@ -1171,7 +1171,7 @@ void channel_send(caStack* stack)
     move(circa_input(stack, 1), list_append(channel));
 }
 
-void channel_read(caStack* stack)
+void channel_read(Stack* stack)
 {
     Value* name = circa_input(stack, 0);
     Value* channel = find_env_value(stack, name);
@@ -1183,7 +1183,7 @@ void channel_read(caStack* stack)
     }
 }
 
-void find_active_value(caStack* stack)
+void find_active_value(Stack* stack)
 {
     Term* term = as_term_ref(circa_input(stack, 0));
     Value* value = stack_find_nonlocal(top_frame(stack), term);
@@ -1196,20 +1196,20 @@ void find_active_value(caStack* stack)
     }
 }
 
-void typeof_func(caStack* stack)
+void typeof_func(Stack* stack)
 {
     Value* in = circa_input(stack, 0);
     set_type(circa_output(stack, 0), in->value_type);
 }
 
-void static_type_func(caStack* stack)
+void static_type_func(Stack* stack)
 {
     Term* caller = (Term*) circa_caller_term(stack);
     Term* input = caller->input(0);
     set_type(circa_output(stack, 0), input->type);
 }
 
-void length(caStack* stack)
+void length(Stack* stack)
 {
     set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
 }
@@ -1221,13 +1221,13 @@ void noise(Stack* stack)
     set_float(circa_output(stack, 0), out);
 }
 
-void not_equals(caStack* stack)
+void not_equals(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
             !equals(circa_input(stack, 0), circa_input(stack, 1)));
 }
 
-void error(caStack* stack)
+void error(Stack* stack)
 {
     Value* args = circa_input(stack, 0);
 
@@ -1260,7 +1260,7 @@ void get_with_symbol(Stack* stack)
     circa_output_error(stack, "Symbol not found");
 }
 
-void print(caStack* stack)
+void print(Stack* stack)
 {
     Value* args = circa_input(stack, 0);
 
@@ -1277,14 +1277,14 @@ void print(caStack* stack)
     set_null(circa_output(stack, 0));
 }
 
-void to_string(caStack* stack)
+void to_string(Stack* stack)
 {
     Value* in = circa_input(stack, 0);
     Value* out = circa_output(stack, 0);
     to_string(in, out);
 }
 
-void compute_patch_hosted(caStack* stack)
+void compute_patch_hosted(Stack* stack)
 {
     Value error;
 
@@ -1295,7 +1295,7 @@ void compute_patch_hosted(caStack* stack)
         circa_output_error_val(stack, &error);
 }
 
-void apply_patch_hosted(caStack* stack)
+void apply_patch_hosted(Stack* stack)
 {
     Value* result = circa_output(stack, 0);
     copy(circa_input(stack, 0), result);

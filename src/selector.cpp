@@ -193,7 +193,7 @@ void path_delete(Value* value, Value* path)
     }
 }
 
-void evaluate_selector(caStack* stack)
+void evaluate_selector(Stack* stack)
 {
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
@@ -385,7 +385,7 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
     return NULL;
 }
 
-void get_with_selector_evaluate(caStack* stack)
+void get_with_selector_evaluate(Stack* stack)
 {
     Value* root = circa_input(stack, 0);
     Value* selector = circa_input(stack, 1);
@@ -403,7 +403,7 @@ void get_with_selector_evaluate(caStack* stack)
     copy(result, circa_output(stack, 0));
 }
 
-void set_with_selector_evaluate(caStack* stack)
+void set_with_selector_evaluate(Stack* stack)
 {
     Value* out = circa_output(stack, 0);
     move(circa_input(stack, 0), out);

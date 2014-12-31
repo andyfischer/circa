@@ -816,13 +816,13 @@ void stack_setup_type(Type* type)
     type->copy = stack_value_copy;
 }
 
-void Stack__block(caStack* stack)
+void Stack__block(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     set_block(circa_output(stack, 0), frame_block(top_frame(self)));
 }
 
-void Stack__dump(caStack* stack)
+void Stack__dump(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value str;
@@ -830,7 +830,7 @@ void Stack__dump(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-void Stack__dump_compiled(caStack* stack)
+void Stack__dump_compiled(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value str;
@@ -838,7 +838,7 @@ void Stack__dump_compiled(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-void Stack__dump_with_bytecode(caStack* stack)
+void Stack__dump_with_bytecode(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value str;
@@ -846,13 +846,13 @@ void Stack__dump_with_bytecode(caStack* stack)
     write_log(as_cstring(&str));
 }
 
-void Stack__extract_state(caStack* stack)
+void Stack__extract_state(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     copy(&self->state, circa_output(stack, 0));
 }
 
-void Stack__find_active_value(caStack* stack)
+void Stack__find_active_value(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
@@ -864,7 +864,7 @@ void Stack__find_active_value(caStack* stack)
         set_value(circa_output(stack, 0), value);
 }
 
-void Stack__find_active_frame_for_term(caStack* stack)
+void Stack__find_active_frame_for_term(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
@@ -889,20 +889,20 @@ void Stack__find_active_frame_for_term(caStack* stack)
     set_null(circa_output(stack, 0));
 }
 
-void Stack__id(caStack* stack)
+void Stack__id(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     set_int(circa_output(stack, 0), self->id);
 }
 
-void Stack__init(caStack* stack)
+void Stack__init(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value* closure = circa_input(stack, 1);
     stack_init_with_closure(self, closure);
 }
 
-void Stack__env(caStack* stack)
+void Stack__env(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value* name = circa_input(stack, 1);
@@ -914,13 +914,13 @@ void Stack__env(caStack* stack)
         copy(value, circa_output(stack, 0));
 }
 
-void Stack__env_map(caStack* stack)
+void Stack__env_map(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     copy(&self->env, circa_output(stack, 0));
 }
 
-void Stack__set_env(caStack* stack)
+void Stack__set_env(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value* name = circa_input(stack, 1);
@@ -929,20 +929,20 @@ void Stack__set_env(caStack* stack)
     copy(val, stack_env_insert(self, name));
 }
 
-void Stack__set_env_map(caStack* stack)
+void Stack__set_env_map(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value* map = circa_input(stack, 1);
     copy(map, &self->env);
 }
 
-void Stack__get_state(caStack* stack)
+void Stack__get_state(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     copy(&self->state, circa_output(stack, 0));
 }
 
-void Stack__get_watch_result(caStack* stack)
+void Stack__get_watch_result(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value* path = circa_input(stack, 1);
@@ -955,7 +955,7 @@ void Stack__get_watch_result(caStack* stack)
         set_value(circa_output(stack, 0), observation);
 }
 
-void Stack__call(caStack* stack)
+void Stack__call(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
 
@@ -985,14 +985,14 @@ void Stack__call(caStack* stack)
         set_null(circa_output(stack, 0));
 }
 
-void Stack__copy(caStack* stack)
+void Stack__copy(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
 
     set_stack(circa_output(stack, 0), stack_duplicate(self));
 }
 
-void Stack__stack_push(caStack* stack)
+void Stack__stack_push(Stack* stack)
 {
 #if 0
     Stack* self = as_stack(circa_input(stack, 0));
@@ -1016,7 +1016,7 @@ void Stack__stack_push(caStack* stack)
 #endif
 }
 
-void Stack__stack_pop(caStack* stack)
+void Stack__stack_pop(Stack* stack)
 {
 #if 0
     Stack* self = as_stack(circa_input(stack, 0));
@@ -1025,7 +1025,7 @@ void Stack__stack_pop(caStack* stack)
 #endif
 }
 
-void Stack__migrate(caStack* stack)
+void Stack__migrate(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Block* fromBlock = as_block(circa_input(stack, 1));
@@ -1033,7 +1033,7 @@ void Stack__migrate(caStack* stack)
     migrate_stack(self, fromBlock, toBlock);
 }
 
-void Stack__migrate_to(caStack* stack)
+void Stack__migrate_to(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
@@ -1043,27 +1043,27 @@ void Stack__migrate_to(caStack* stack)
     migrate_stack(self, frame_block(top_frame(self)), toBlock);
 }
 
-void Stack__reset(caStack* stack)
+void Stack__reset(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     stack_reset(self);
 }
 
-void Stack__reset_state(caStack* stack)
+void Stack__reset_state(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     set_hashtable(&self->state);
 }
 
-void Stack__restart(caStack* stack)
+void Stack__restart(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
     stack_restart(self);
 }
 
-void Stack__run(caStack* stack)
+void Stack__run(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     ca_assert(self != NULL);
@@ -1079,7 +1079,7 @@ void Stack__run(caStack* stack)
     move(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void Stack__eval_on_demand(caStack* stack)
+void Stack__eval_on_demand(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     Value* termRef = circa_input(stack, 1);
@@ -1108,7 +1108,7 @@ void Stack__eval_on_demand(caStack* stack)
     move(circa_output(self, 0), circa_output(stack, 0));
 }
 
-void Stack__frame_from_base(caStack* stack)
+void Stack__frame_from_base(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
@@ -1119,7 +1119,7 @@ void Stack__frame_from_base(caStack* stack)
     Frame* frame = next_frame_n(first_frame(self), index);
     set_frame_ref(circa_output(stack, 0), frame);
 }
-void Stack__frame(caStack* stack)
+void Stack__frame(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
@@ -1131,13 +1131,13 @@ void Stack__frame(caStack* stack)
     set_frame_ref(circa_output(stack, 0), frame);
 }
 
-void Stack__frame_count(caStack* stack)
+void Stack__frame_count(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     set_int(circa_output(stack, 0), stack_frame_count(self));
 }
 
-void Stack__output(caStack* stack)
+void Stack__output(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
@@ -1151,13 +1151,13 @@ void Stack__output(caStack* stack)
         copy(frame_register(frame, output), circa_output(stack, 0));
 }
 
-void Stack__errored(caStack* stack)
+void Stack__errored(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), stack_errored(self));
 }
 
-void Stack__error_message(caStack* stack)
+void Stack__error_message(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
 
@@ -1174,7 +1174,7 @@ void Stack__error_message(caStack* stack)
     string_append(circa_output(stack, 0), errorReg);
 }
 
-void Stack__toString(caStack* stack)
+void Stack__toString(Stack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
@@ -1182,7 +1182,7 @@ void Stack__toString(caStack* stack)
     stack_to_string(self, circa_output(stack, 0), false);
 }
 
-void Frame__registers(caStack* stack)
+void Frame__registers(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
@@ -1194,7 +1194,7 @@ void Frame__registers(caStack* stack)
         copy(frame_register(frame, i), list_get(out, i));
 }
 
-void Frame__active_value(caStack* stack)
+void Frame__active_value(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     Term* term = as_term_ref(circa_input(stack, 1));
@@ -1205,7 +1205,7 @@ void Frame__active_value(caStack* stack)
         set_value(circa_output(stack, 0), value);
 }
 
-void Frame__set_active_value(caStack* stack)
+void Frame__set_active_value(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     if (frame == NULL)
@@ -1219,14 +1219,14 @@ void Frame__set_active_value(caStack* stack)
     set_value(value, circa_input(stack, 2));
 }
 
-void Frame__block(caStack* stack)
+void Frame__block(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_block(circa_output(stack, 0), frame_block(frame));
 }
 
-void Frame__parent(caStack* stack)
+void Frame__parent(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     Frame* parent = prev_frame(frame);
@@ -1236,20 +1236,20 @@ void Frame__parent(caStack* stack)
         set_frame_ref(circa_output(stack, 0), parent);
 }
 
-void Frame__height(caStack* stack)
+void Frame__height(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     set_int(circa_output(stack, 0), frame_find_index(frame));
 }
 
-void Frame__has_parent(caStack* stack)
+void Frame__has_parent(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     Frame* parent = prev_frame(frame);
     set_bool(circa_output(stack, 0), parent != NULL);
 }
 
-void Frame__register(caStack* stack)
+void Frame__register(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
@@ -1257,21 +1257,21 @@ void Frame__register(caStack* stack)
     copy(frame_register(frame, index), circa_output(stack, 0));
 }
 
-void Frame__pc(caStack* stack)
+void Frame__pc(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_int(circa_output(stack, 0), frame->termIndex);
 }
 
-void Frame__parentPc(caStack* stack)
+void Frame__parentPc(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);
     set_int(circa_output(stack, 0), frame->parentIndex);
 }
 
-void Frame__current_term(caStack* stack)
+void Frame__current_term(Stack* stack)
 {
     Frame* frame = as_frame_ref(circa_input(stack, 0));
     ca_assert(frame != NULL);

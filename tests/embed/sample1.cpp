@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 
     // circa_dump_b(circa_kernel(world));
 
-    caStack* stack = circa_create_stack(world);
+    Stack* stack = circa_create_stack(world);
 
     circa_push_function_by_name(stack, "create_ClassA");
     circa_run(stack);
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     if (circa_has_error(stack))
         circa_print_error_to_stdout(stack);
 
-    caValue* classA = circa_alloc_value();
+    Value* classA = circa_alloc_value();
     circa_move(circa_output(stack, 0), classA);
     circa_pop(stack);
 

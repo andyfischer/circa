@@ -486,13 +486,13 @@ void setup_interface_type(Type* type)
     type->hashFunc = NULL;
 }
 
-void Type__declaringTerm(caStack* stack)
+void Type__declaringTerm(Stack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
     set_term_ref(circa_output(stack, 0), type->declaringTerm);
 }
 
-void Type__make(caStack* stack)
+void Type__make(Stack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
     Value* args = circa_input(stack, 1);
@@ -565,13 +565,13 @@ void Type__make(caStack* stack)
     type_incref(type);
 }
 
-void Type__name(caStack* stack)
+void Type__name(Stack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
     copy(&type->name, circa_output(stack, 0));
 }
 
-void Type__property(caStack* stack)
+void Type__property(Stack* stack)
 {
     Type* type = as_type(circa_input(stack, 0));
     const char* str = as_cstring(circa_input(stack, 1));

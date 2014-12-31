@@ -25,24 +25,24 @@
 
 namespace circa {
 
-void Block__dump(caStack* stack)
+void Block__dump(Stack* stack)
 {
     dump(as_block(circa_input(stack, 0)));
 }
 
-void Block__id(caStack* stack)
+void Block__id(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     set_int(circa_output(stack, 0), block->id);
 }
 
-void Block__input(caStack* stack)
+void Block__input(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     set_term_ref(circa_output(stack, 0),
         get_input_placeholder(block, circa_int_input(stack, 1)));
 }
-void Block__inputs(caStack* stack)
+void Block__inputs(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     Value* output = circa_output(stack, 0);
@@ -54,24 +54,24 @@ void Block__inputs(caStack* stack)
         set_term_ref(list_append(output), term);
     }
 }
-void Block__is_null(caStack* stack)
+void Block__is_null(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), block == NULL);
 }
-void Block__output(caStack* stack)
+void Block__output(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     Term* placeholder = get_output_placeholder(block, circa_int_input(stack, 1));
     set_term_ref(circa_output(stack, 0), placeholder->input(0));
 }
-void Block__output_placeholder(caStack* stack)
+void Block__output_placeholder(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     Term* placeholder = get_output_placeholder(block, circa_int_input(stack, 1));
     set_term_ref(circa_output(stack, 0), placeholder);
 }
-void Block__outputs(caStack* stack)
+void Block__outputs(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     Value* output = circa_output(stack, 0);
@@ -83,7 +83,7 @@ void Block__outputs(caStack* stack)
         set_term_ref(list_append(output), term);
     }
 }
-void Block__owner(caStack* stack)
+void Block__owner(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL) {
@@ -94,7 +94,7 @@ void Block__owner(caStack* stack)
     set_term_ref(circa_output(stack, 0), block->owningTerm);
 }
 
-void Block__parent(caStack* stack)
+void Block__parent(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL) {
@@ -105,7 +105,7 @@ void Block__parent(caStack* stack)
     set_block(circa_output(stack, 0), get_parent_block(block));
 }
 
-void Block__property(caStack* stack)
+void Block__property(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
@@ -119,7 +119,7 @@ void Block__property(caStack* stack)
     else
         copy(value, circa_output(stack, 0));
 }
-void Block__properties(caStack* stack)
+void Block__properties(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
@@ -131,7 +131,7 @@ void Block__properties(caStack* stack)
     else
         copy(&block->properties, circa_output(stack, 0));
 }
-void Block__source_filename(caStack* stack)
+void Block__source_filename(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     while (block != NULL) {
@@ -147,13 +147,13 @@ void Block__source_filename(caStack* stack)
     set_string(circa_output(stack, 0), "");
 }
 
-void Block__has_static_error(caStack* stack)
+void Block__has_static_error(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), has_static_errors_cached(block));
 }
 
-void Block__get_static_errors(caStack* stack)
+void Block__get_static_errors(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
 
@@ -165,7 +165,7 @@ void Block__get_static_errors(caStack* stack)
         copy(errors, circa_output(stack, 0));
 }
 
-void Block__get_static_errors_formatted(caStack* stack)
+void Block__get_static_errors_formatted(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -185,7 +185,7 @@ void Block__get_static_errors_formatted(caStack* stack)
 
 // Reflection
 
-void Block__term_named(caStack* stack)
+void Block__term_named(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -196,7 +196,7 @@ void Block__term_named(caStack* stack)
     set_term_ref(circa_output(stack, 0), find_local_name(block, name));
 }
 
-void Block__terms(caStack* stack)
+void Block__terms(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -209,7 +209,7 @@ void Block__terms(caStack* stack)
         set_term_ref(circa_index(out, i), block->get(i));
 }
 
-void Block__walk_terms(caStack* stack)
+void Block__walk_terms(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -221,7 +221,7 @@ void Block__walk_terms(caStack* stack)
         set_term_ref(list_append(out), *it);
 }
 
-void Block__get_term(caStack* stack)
+void Block__get_term(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -244,7 +244,7 @@ bool is_considered_config(Term* term)
     return true;
 }
 
-void Block__list_configs(caStack* stack)
+void Block__list_configs(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -259,7 +259,7 @@ void Block__list_configs(caStack* stack)
     }
 }
 
-void Block__functions(caStack* stack)
+void Block__functions(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -276,7 +276,7 @@ void Block__functions(caStack* stack)
     }
 }
 
-void Block__find_term(caStack* stack)
+void Block__find_term(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
     if (block == NULL)
@@ -287,7 +287,7 @@ void Block__find_term(caStack* stack)
     set_term_ref(circa_output(stack, 0), term);
 }
 
-void Block__statements(caStack* stack)
+void Block__statements(Stack* stack)
 {
     Block* block = (Block*) circa_block(circa_input(stack, 0));
     if (block == NULL)
@@ -302,7 +302,7 @@ void Block__statements(caStack* stack)
             circa_set_term(circa_append(out), (caTerm*) block->get(i));
 }
 
-void Block__link(caStack* stack)
+void Block__link(Stack* stack)
 {
     Block* self = (Block*) circa_block(circa_input(stack, 0));
     Block* source = (Block*) circa_block(circa_input(stack, 1));
@@ -310,7 +310,7 @@ void Block__link(caStack* stack)
     block_link_missing_functions(self, source);
 }
 
-void Term__name(caStack* stack)
+void Term__name(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -320,35 +320,35 @@ void Term__name(caStack* stack)
     else
         copy(term_name(t), circa_output(stack, 0));
 }
-void Term__to_string(caStack* stack)
+void Term__to_string(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     circa::to_string(term_value(t), circa_output(stack, 0));
 }
-void Term__unique_name(caStack* stack)
+void Term__unique_name(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_value(circa_output(stack, 0), unique_name(t));
 }
-void Term__function(caStack* stack)
+void Term__function(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_block(circa_output(stack, 0), term_function(t));
 }
-void Term__type(caStack* stack)
+void Term__type(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_type(circa_output(stack, 0), t->type);
 }
-void Term__assign(caStack* stack)
+void Term__assign(Stack* stack)
 {
     Term* target = as_term_ref(circa_input(stack, 0));
     if (target == NULL) {
@@ -363,7 +363,7 @@ void Term__assign(caStack* stack)
     // Probably should update term->type at this point.
 }
 
-void Term__value(caStack* stack)
+void Term__value(Stack* stack)
 {
     Term* target = as_term_ref(circa_input(stack, 0));
     if (target == NULL)
@@ -372,7 +372,7 @@ void Term__value(caStack* stack)
     copy(term_value(target), circa_output(stack, 0));
 }
 
-void Term__set_value(caStack* stack)
+void Term__set_value(Stack* stack)
 {
     Term* target = as_term_ref(circa_input(stack, 0));
     if (target == NULL)
@@ -381,7 +381,7 @@ void Term__set_value(caStack* stack)
     copy(circa_input(stack, 1), term_value(target));
 }
 
-void Term__asint(caStack* stack)
+void Term__asint(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
@@ -394,7 +394,7 @@ void Term__asint(caStack* stack)
     }
     set_int(circa_output(stack, 0), as_int(term_value(t)));
 }
-void Term__asfloat(caStack* stack)
+void Term__asfloat(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
@@ -404,12 +404,12 @@ void Term__asfloat(caStack* stack)
     
     set_float(circa_output(stack, 0), to_float(term_value(t)));
 }
-void Term__id(caStack* stack)
+void Term__id(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     set_int(circa_output(stack, 0), t->id);
 }
-void Term__index(caStack* stack)
+void Term__index(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
@@ -419,7 +419,7 @@ void Term__index(caStack* stack)
     
     set_int(circa_output(stack, 0), t->index);
 }
-void Term__input(caStack* stack)
+void Term__input(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
@@ -432,7 +432,7 @@ void Term__input(caStack* stack)
     else
         set_term_ref(circa_output(stack, 0), t->input(index));
 }
-void Term__inputs(caStack* stack)
+void Term__inputs(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -444,7 +444,7 @@ void Term__inputs(caStack* stack)
     for (int i=0; i < t->numInputs(); i++)
         set_term_ref(circa_index(output, i), t->input(i));
 }
-void Term__num_inputs(caStack* stack)
+void Term__num_inputs(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
@@ -453,7 +453,7 @@ void Term__num_inputs(caStack* stack)
     }
     set_int(circa_output(stack, 0), t->numInputs());
 }
-void Term__parent(caStack* stack)
+void Term__parent(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
@@ -462,29 +462,29 @@ void Term__parent(caStack* stack)
     }
     set_block(circa_output(stack, 0), t->owningBlock);
 }
-void Term__contents(caStack* stack)
+void Term__contents(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_block(circa_output(stack, 0), t->nestedContents);
 }
-void Term__is_input(caStack* stack)
+void Term__is_input(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), t != NULL && is_input_placeholder(t));
 }
-void Term__is_output(caStack* stack)
+void Term__is_output(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), t != NULL && is_output_placeholder(t));
 }
-void Term__is_null(caStack* stack)
+void Term__is_null(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     set_bool(circa_output(stack, 0), t == NULL);
 }
-void Term__is_value(caStack* stack)
+void Term__is_value(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
 
@@ -492,7 +492,7 @@ void Term__is_value(caStack* stack)
     set_bool(circa_output(stack, 0), consideredValue);
 }
 
-void Term__source_location(caStack* stack)
+void Term__source_location(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -505,7 +505,7 @@ void Term__source_location(caStack* stack)
     set_int(list_get(out, 2), t->sourceLoc.colEnd);
     set_int(list_get(out, 3), t->sourceLoc.lineEnd);
 }
-void Term__location_string(caStack* stack)
+void Term__location_string(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -513,7 +513,7 @@ void Term__location_string(caStack* stack)
 
     get_short_location(t, circa_output(stack, 0));
 }
-void Term__global_id(caStack* stack)
+void Term__global_id(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -521,14 +521,14 @@ void Term__global_id(caStack* stack)
 
     set_int(circa_output(stack, 0), t->id);
 }
-void Term__properties(caStack* stack)
+void Term__properties(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     circa::copy(&t->properties, circa_output(stack, 0));
 }
-void Term__has_property(caStack* stack)
+void Term__has_property(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -537,7 +537,7 @@ void Term__has_property(caStack* stack)
     Value* value = term_get_property(t, key);
     set_bool(circa_output(stack, 0), value != NULL);
 }
-void Term__property(caStack* stack)
+void Term__property(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -552,7 +552,7 @@ void Term__property(caStack* stack)
         circa::copy(value, circa_output(stack, 0));
 }
 
-void Term__property_opt(caStack* stack)
+void Term__property_opt(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -568,7 +568,7 @@ void Term__property_opt(caStack* stack)
         copy(value, circa_output(stack, 0));
 }
 
-void Term__input_property_opt(caStack* stack)
+void Term__input_property_opt(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -585,7 +585,7 @@ void Term__input_property_opt(caStack* stack)
         copy(value, circa_output(stack, 0));
 }
 
-void Term__input_property(caStack* stack)
+void Term__input_property(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -602,7 +602,7 @@ void Term__input_property(caStack* stack)
         copy(value, circa_output(stack, 0));
 }
 
-void Term__has_input_property(caStack* stack)
+void Term__has_input_property(Stack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -614,7 +614,7 @@ void Term__has_input_property(caStack* stack)
     set_bool(circa_output(stack, 0), term_get_input_property(t, index, key) == NULL);
 }
 
-void Term__trace_dependents(caStack* stack)
+void Term__trace_dependents(Stack* stack)
 {
     Term* term = as_term_ref(circa_input(stack, 0));
     Block* untilBlock = as_block(circa_input(stack, 1));

@@ -11,18 +11,18 @@
 namespace native_patch_test {
 #if 0
 
-void my_add(caStack* stack)
+void my_add(Stack* stack)
 {
     circa_set_int(circa_output(stack, 0),
             circa_int_input(stack, 0) + circa_int_input(stack, 1));
 }
 
-void my_5(caStack* stack)
+void my_5(Stack* stack)
 {
     circa_set_int(circa_output(stack, 0), 5);
 }
 
-void my_6(caStack* stack)
+void my_6(Stack* stack)
 {
     circa_set_int(circa_output(stack, 0), 6);
 }
@@ -124,7 +124,7 @@ void patch_manually_public_api()
     circa_patch_function(npatch, "my_5", my_5);
     circa_finish_native_patch(npatch);
 
-    caStack* stack = circa_create_stack(world);
+    Stack* stack = circa_create_stack(world);
     circa_push_module(stack, "Module");
     circa_run(stack);
 

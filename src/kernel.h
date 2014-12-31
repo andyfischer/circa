@@ -153,7 +153,7 @@ namespace assign_function {
 }
 
 namespace copy_function {
-    void evaluate(caStack* stack);
+    void evaluate(Stack* stack);
 }
 
 namespace return_function {

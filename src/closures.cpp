@@ -78,7 +78,7 @@ void insert_nonlocal_terms(Block* block)
     }
 }
 
-void closure_block_evaluate(caStack* stack)
+void closure_block_evaluate(Stack* stack)
 {
     Term* term = circa_caller_term(stack);
     Value* closureOutput = circa_set_default_output(stack, 0);

@@ -137,7 +137,7 @@ static void after_write(uv_write_t* req, int status) {
 #endif
 }
 
-void make_server(caStack* stack)
+void make_server(Stack* stack)
 {
     Value* ip = circa_input(stack, 0);
     Value* port = circa_input(stack, 1);
@@ -405,7 +405,7 @@ static int http_on_message_complete(http_parser* parser) {
     return 0;
 }
 
-void Server__connections(caStack* stack)
+void Server__connections(Stack* stack)
 {
     Server* server = (Server*) circa_native_ptr(circa_index(circa_input(stack, 0), 0));
     circa_copy(&server->connections, circa_output(stack, 0));
@@ -424,7 +424,7 @@ void client_on_connect(uv_connect_t *req, int status)
         internal_error("uv_read_start error\n");
 }
 
-void make_client(caStack* stack)
+void make_client(Stack* stack)
 {
     printf("make_client\n");
     Connection* connection = new Connection();
@@ -455,7 +455,7 @@ void make_client(caStack* stack)
     printf("make_client fin\n");
 }
 
-void Connection__send(caStack* stack)
+void Connection__send(Stack* stack)
 {
     Connection* connection = (Connection*) circa_native_ptr(circa_index(circa_input(stack, 0), 0));
 
@@ -464,7 +464,7 @@ void Connection__send(caStack* stack)
     circa_uv_write((uv_stream_t*) &connection->uv_tcp, asStr, true);
 }
 
-void Connection__receive(caStack* stack)
+void Connection__receive(Stack* stack)
 {
     Connection* connection = (Connection*) circa_native_ptr(circa_index(circa_input(stack, 0), 0));
     circa_move(&connection->incomingMsgs, circa_output(stack, 0));

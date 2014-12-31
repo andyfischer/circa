@@ -278,7 +278,7 @@ int run_command_line(caWorld* world, Value* args)
     if (string_equals(list_get(args, 0), "-call")) {
         Block* block = load_module_by_filename(world, list_get(args, 1));
 
-        caStack* stack = circa_create_stack(world);
+        Stack* stack = circa_create_stack(world);
 
         // Push function
         caBlock* func = circa_find_function_local(block, as_cstring(list_get(args, 2)));

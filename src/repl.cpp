@@ -147,12 +147,12 @@ void repl_run_line(Stack* stack, Value* line, Value* output)
     }
 }
 
-CIRCA_EXPORT void circa_repl_start(caStack* stack)
+CIRCA_EXPORT void circa_repl_start(Stack* stack)
 {
     return repl_start(stack);
 }
 
-CIRCA_EXPORT void circa_repl_run_line(caStack* stack, Value* input, Value* output)
+CIRCA_EXPORT void circa_repl_run_line(Stack* stack, Value* input, Value* output)
 {
     return repl_run_line(stack, input, output);
 }

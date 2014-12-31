@@ -73,43 +73,43 @@ void syntax_error(Stack* stack)
     circa_output_error(stack, as_cstring(&msg));
 }
 
-void from_string(caStack* stack)
+void from_string(Stack* stack)
 {
     parse_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void to_string_repr(caStack* stack)
+void to_string_repr(Stack* stack)
 {
     write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void refactor__rename(caStack* stack)
+void refactor__rename(Stack* stack)
 {
     rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
 }
 
-void refactor__change_function(caStack* stack)
+void refactor__change_function(Stack* stack)
 {
     change_function(as_term_ref(circa_input(stack, 0)),
         (Term*) circa_caller_input_term(stack, 1));
 }
 
-void reflect__this_block(caStack* stack)
+void reflect__this_block(Stack* stack)
 {
     set_block(circa_output(stack, 0), (Block*) circa_caller_block(stack));
 }
 
-void sys__module_search_paths(caStack* stack)
+void sys__module_search_paths(Stack* stack)
 {
     copy(module_search_paths(stack->world), circa_output(stack, 0));
 }
 
-void perf_stats_dump(caStack* stack)
+void perf_stats_dump(Stack* stack)
 {
     perf_stats_to_map(circa_output(stack, 0));
     circa_perf_stats_reset();
 }
-void global_script_version(caStack* stack)
+void global_script_version(Stack* stack)
 {
     World* world = stack->world;
     set_int(circa_output(stack, 0), world->globalScriptVersion);
@@ -368,7 +368,7 @@ void test_oracle_send(int i)
 {
     set_int(list_append(g_oracleValues), i);
 }
-void test_oracle(caStack* stack)
+void test_oracle(Stack* stack)
 {
     if (list_length(g_oracleValues) == 0)
         set_null(circa_output(stack, 0));
@@ -378,7 +378,7 @@ void test_oracle(caStack* stack)
     }
 }
 
-void test_spy(caStack* stack)
+void test_spy(Stack* stack)
 {
     if (g_spyValues == NULL) {
         g_spyValues = circa_alloc_value();
