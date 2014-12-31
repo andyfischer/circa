@@ -171,7 +171,7 @@ void test_oracle_send(int i);
 void install_standard_library(Block* kernel);
 void on_new_function_parsed(Term* func, Value* functionName);
 
-// find_builtin_module is defined in generated/stdlib_script_text.cpp
-const char* find_builtin_module(const char* name);
+// find_builtin_file is defined in generated/stdlib_script_text.cpp
+const char* find_builtin_file(const char* name);
 
 } // namespace circa

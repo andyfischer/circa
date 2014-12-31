@@ -7,6 +7,7 @@
 #include "file_source.h"
 #include "hashtable.h"
 #include "interpreter.h"
+#include "kernel.h"
 #include "list.h"
 #include "names.h"
 #include "string.h"
@@ -140,6 +141,12 @@ CIRCA_EXPORT void circa_read_file(caWorld* world, const char* filename, Value* c
     Value name;
     set_string(&name, filename);
 
+    const char* builtinFile = find_builtin_file(filename);
+    if (builtinFile != NULL) {
+        set_string(contentsOut, builtinFile);
+        return;
+    }
+
     Value* fileSources = &world->fileSources;
     for (int i=list_length(fileSources) - 1; i >= 0; i--) {
         Value* file_source = list_get(fileSources, i);
@@ -161,6 +168,10 @@ CIRCA_EXPORT bool circa_file_exists(caWorld* world, const char* filename)
     Value name;
     set_string(&name, filename);
 
+    const char* builtinFile = find_builtin_file(filename);
+    if (builtinFile != NULL)
+        return true;
+
     Value* fileSources = &world->fileSources;
     for (int i=list_length(fileSources) - 1; i >= 0; i--) {
         Value* file_source = list_get(fileSources, i);
@@ -176,6 +187,10 @@ CIRCA_EXPORT int circa_file_get_version(caWorld* world, const char* filename)
 {
     Value name;
     set_string(&name, filename);
+
+    const char* builtinFile = find_builtin_file(filename);
+    if (builtinFile != NULL)
+        return 0;
 
     Value* fileSources = &world->fileSources;
     for (int i=list_length(fileSources) - 1; i >= 0; i--) {

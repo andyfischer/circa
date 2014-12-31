@@ -94,17 +94,20 @@ void module_set_filename(World* world, Block* block, Value* filename)
 
 void resolve_possible_module_path(World* world, Value* path, Value* result)
 {
+    // try original path
     if (circa_file_exists(world, as_cstring(path))) {
         copy(path, result);
         return;
     }
 
+    // try <path>.ca
     copy(path, result);
 
     string_append(result, ".ca");
     if (circa_file_exists(world, as_cstring(result)))
         return;
         
+    // try <path>/package.ca
     copy(path, result);
 
     Value packageStr;
@@ -115,6 +118,7 @@ void resolve_possible_module_path(World* world, Value* path, Value* result)
     if (circa_file_exists(world, as_cstring(result)))
         return;
 
+    // not found
     set_null(result);
 }
 
@@ -215,16 +219,6 @@ Block* load_module(World* world, Block* relativeTo, Value* moduleName)
         Block* block = load_module_by_filename(world, &filename);
         module_set_name(world, block, moduleName);
         return block;
-    }
-
-    // Try as a builtin module
-    const char* builtinText = find_builtin_module(as_cstring(moduleName));
-
-    if (builtinText != NULL) {
-        Block* newBlock = create_module(world);
-        module_set_name(world, newBlock, moduleName);
-        load_script_from_text(newBlock, builtinText);
-        return newBlock;
     }
 
     return NULL;

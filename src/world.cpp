@@ -75,6 +75,8 @@ void world_initialize(World* world)
     set_list(&world->moduleSearchPaths);
     set_list(&world->fileSources);
 
+    world->moduleSearchPaths.append_str("$builtins");
+
     world->fileWatchWorld = alloc_file_watch_world();
     world->builtinPatch = circa_create_native_patch(world, "builtins");
 
