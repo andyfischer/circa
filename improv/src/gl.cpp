@@ -279,7 +279,7 @@ bool check_program_error(caStack* stack, GLuint program)
 
 void shader_from_text(caStack* stack)
 {
-    printf("Compiling shader..\n");
+    //printf("Compiling shader..\n");
     caValue* vertexText = circa_input(stack, 0);
     caValue* fragmentText = circa_input(stack, 1);
 

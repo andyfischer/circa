@@ -52,7 +52,6 @@ def submit_layer(List commands)
     command.func.call
 
 geom_shader = call(->
-  trace('compiling shader: geom')
   builder = shader_builder.new
   @builder.attribute('vec2', 'pos')
   @builder.attribute('vec4', 'color')
@@ -94,7 +93,6 @@ def submit_triangles_data(List data)
   vbo.draw
 
 geom_monocolor_shader = call(->
-  trace('compiling shader: geom monocolor')
   builder = shader_builder.new
   @builder.attribute('vec2', 'pos')
   @builder.vertexUniform('mat3', 'view')

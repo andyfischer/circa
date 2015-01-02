@@ -1,8 +1,8 @@
 
+package cairo
+
 require gl
 require draw
-
-package cairo
 
 struct Canvas {
   native_ptr native
@@ -131,15 +131,13 @@ def Canvas.round_rect(canvas, Rect rect, number cornerRadius)
   canvas.close_path
 
 def draw_gl_texture(Vec2 size, Func paint)
-  cached(->
-    surface = make_image_surface(size)
-    context = surface.start_drawing
-    paint.call(context)
-    data = surface.image_blob
-    texture = gl.new_texture(:2d)
-    texture.set_data(size, data)
-    texture
-  )
+  surface = make_image_surface(size)
+  context = surface.start_drawing
+  paint.call(context)
+  data = surface.image_blob
+  texture = gl.new_texture(:2d)
+  texture.set_data(size, data)
+  texture
 
 def draw_to_screen(Rect rect, Func paint)
   texture = draw_gl_texture(rect.size, paint)

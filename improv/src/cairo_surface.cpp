@@ -297,6 +297,7 @@ void Canvas_set_source_surface(caStack* stack)
 
     check_cairo_error(stack, context);
 }
+
 void make_image_surface(caStack* stack)
 {
     float width, height;

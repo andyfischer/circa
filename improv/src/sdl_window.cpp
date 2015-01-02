@@ -200,7 +200,7 @@ void ImprovWindow::setSize(float w, float h)
     
     glViewport(0, 0, _width, _height);
     
-    printf("glViewport %f %f", _width, _height);
+    //printf("glViewport %f %f", _width, _height);
     
     // Other GL setup
     glDisable(GL_CULL_FACE);
@@ -404,7 +404,9 @@ void setup_native_patches(caWorld* world)
     circa_patch_function(improvPatch, "play_audio", play_audio);
     circa_finish_native_patch(improvPatch);
 
-    caNativePatch* gl =circa_create_native_patch(world, "gl");
+    cairo_native_patch(circa_create_native_patch(world, "cairo"));
+
+    caNativePatch* gl = circa_create_native_patch(world, "gl");
     gl_native_patch(gl);
     circa_finish_native_patch(gl);
 }
@@ -441,8 +443,8 @@ extern "C" int main(int argc, char *argv[])
 
     circa_use_local_filesystem(world, "");
     circa_add_module_search_path(world, "ca");
-    improv::setup_native_patches(world);
 
+    improv::setup_native_patches(world);
     improv::setup_sdl_audio();
 
     improv::ImprovWindow window;

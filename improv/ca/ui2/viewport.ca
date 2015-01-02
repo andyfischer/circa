@@ -1,0 +1,5 @@
+
+struct Viewport {
+  Rect rect
+  Vec2 scroll
+}

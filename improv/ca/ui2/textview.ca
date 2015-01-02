@@ -1,0 +1,43 @@
+
+struct TextView {
+  List lines
+  any canvas
+
+  List positionedLines
+  Vec2 contentSize
+}
+
+struct PositionedLine {
+  Vec2 pos
+  any line
+}
+
+def TextView.positioned(self)
+  cursor = Vec2.make(0 0)
+  maxWidth = 0
+
+  fontExtents = canvas.font_extents
+
+  self.positionedLines = for line in lines
+    positionedLine = PositionedLine.make(cursor line)
+
+    @cursor.add([0 fontExtents.height])
+
+    min(@maxWidth self.canvas.text_extents(line).advance.x)
+
+    positionedLine
+
+  self.contentSize = [maxWidth cursor.y]
+  self
+
+def TextView.get_content_size(self) -> Vec2
+  self.positioned.contentSize
+
+def TextView.draw(self)
+  @self.positioned
+
+  canvas = self.canvas
+
+  for line in self.positionedLines
+    canvas.move_to(line.pos)
+    canvas.show_text(line.line)
