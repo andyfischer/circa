@@ -329,7 +329,7 @@ void copy(Value* source, Value* dest)
 void swap(Value* left, Value* right)
 {
     Type* temp_type = left->value_type;
-    ValueData temp_data = left->value_data;
+    caValueData temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;

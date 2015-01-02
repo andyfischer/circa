@@ -71,8 +71,8 @@ void check_term_for_static_error(Value* errors, Term* term)
     if (term->function == FUNCS.unknown_function)
         return append_static_error(errors, term, "unknown_function");
 
-    if (!is_function(term->function))
-        return append_static_error(errors, term, "not_a_function");
+    //if (!is_function(term->function))
+    //    return append_static_error(errors, term, "not_a_function");
 
     //bool varArgs = term_has_variable_args(term);
     //int expectedInputCount = term_count_input_placeholders(term);
@@ -84,8 +84,8 @@ void check_term_for_static_error(Value* errors, Term* term)
         check_input_for_static_error(errors, term, input);
 #endif
 
-    if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
-        return append_static_error(errors, term, "not_a_function");
+    //if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
+    //    return append_static_error(errors, term, "not_a_function");
 
     // Unknown identifier
     if (term->function == FUNCS.unknown_identifier)

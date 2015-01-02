@@ -666,7 +666,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
     if (global_world()->bootstrapStatus == sym_Done)
         return;
 
-    #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
+    #define find_func(name, sourceName) if (string_equals(functionName, sourceName) && FUNCS.name == NULL) FUNCS.name = func;
         find_func(add_i, "add_i"); find_func(add_f, "add_f");
         find_func(and_func, "and");
         find_func(break_func, "break");

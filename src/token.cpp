@@ -101,6 +101,44 @@ const char* get_token_text(int match)
     }
 }
 
+bool token_is_identifier_or_keyword(int match)
+{
+    switch (match) {
+    case tok_Identifier:
+    case tok_If:
+    case tok_Else:
+    case tok_Elif:
+    case tok_For:
+    case tok_State:
+    case tok_Def:
+    case tok_Struct:
+    case tok_Return:
+    case tok_In:
+    case tok_Let:
+    case tok_True:
+    case tok_False:
+    case tok_Namespace:
+    case tok_Include:
+    case tok_And:
+    case tok_Or:
+    case tok_Not:
+    case tok_Discard:
+    case tok_Null:
+    case tok_Break:
+    case tok_Continue:
+    case tok_Switch:
+    case tok_Case:
+    case tok_While:
+    case tok_Require:
+    case tok_Import:
+    case tok_Package:
+    case tok_Section:
+        return true;
+    default:
+        return false;
+    }
+}
+
 int Token::length()
 {
     ca_assert(end >= start);

@@ -150,12 +150,17 @@ void Block__source_filename(Stack* stack)
 void Block__has_static_error(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
+    if (block == NULL)
+        return circa_output_error(stack, "null block");
     set_bool(circa_output(stack, 0), has_static_errors_cached(block));
 }
 
 void Block__get_static_errors(Stack* stack)
 {
     Block* block = as_block(circa_input(stack, 0));
+
+    if (block == NULL)
+        return circa_output_error(stack, "null block");
 
     Value* errors = block_get_static_errors(block);
 

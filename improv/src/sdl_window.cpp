@@ -2,7 +2,7 @@
 
 #include "improv_common.h"
 
-#include "SDL2/SDL.h"
+#include "SDL.h"
 
 #include <unistd.h>
 #include <cmath>

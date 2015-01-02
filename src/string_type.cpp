@@ -303,7 +303,7 @@ void string_append_f(Value* left, float value)
         }
     }
 
-    for (int i = strlen(buf) - 1; i > dotPosition + 1; i--) {
+    for (size_t i = strlen(buf) - 1; i > dotPosition + 1; i--) {
         if (buf[i] == '0')
             buf[i] = 0;
         else

@@ -1,0 +1,6 @@
+
+iter = require ./package
+
+for example in [ [] [1] [1 2 3] [[1] [2] [3]] ]
+  print('testing: ' example)
+  assert(iter.to_list(iter.to_iterator(example)) == example)

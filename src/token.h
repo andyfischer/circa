@@ -28,6 +28,7 @@ struct Token
 typedef std::vector<Token> TokenList;
 
 const char* get_token_text(int match);
+bool token_is_identifier_or_keyword(int match);
 void tokenize(const char* input, int len, TokenList* results);
 void tokenize(std::string const &input, TokenList* results);
 

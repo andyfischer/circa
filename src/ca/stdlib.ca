@@ -13,6 +13,7 @@ def continue(any outs :multiple :optional)
 def extra_output(any _) -> any
 def func_call_implicit(any inputs :multiple)
 def get_field(any obj, String key) -> any
+--def has_method(any obj, Symbol field) -> bool
 def get_index(List list, int index) -> any
 def selector(any elements :multiple) -> Selector
 def get_with_selector(any object, Selector selector) -> any
@@ -993,6 +994,14 @@ def List.each(self, Func func) -> List
 
 def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
+  
+{-
+interface Iterator
+  def current() -> any
+  def done() -> bool
+  def advance() -> Iterator
+-}
+
 
 def Map.contains(self, any key) -> bool
   -- Returns true if the map contains the given key.

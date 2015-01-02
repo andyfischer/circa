@@ -773,7 +773,6 @@ void update_extra_output_count(Term* term, int count)
 
 void update_extra_outputs(Term* term)
 {
-    Block* block = term->owningBlock;
     Block* targetBlock = term_get_dispatch_block(term);
 
     if (targetBlock == NULL)

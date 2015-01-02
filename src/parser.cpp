@@ -861,7 +861,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             expectMultiple = true;
         }
 
-consume_next_output: {
+        consume_next_output: {
             if (!tokens.nextIs(tok_Identifier)) {
                 return syntax_error(block, tokens, startPosition,
                         "Expected type name after ->");
@@ -1388,20 +1388,20 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     possible_whitespace(tokens);
 
     Value path;
-    while (true) {
+
+    consume_path: {
         tokens.consumeStr(&path);
 
-        bool accept = false;
+        Symbol next = tokens.nextMatch();
 
-        switch (tokens.nextMatch()) {
-        case tok_Identifier:
+        if (token_is_identifier_or_keyword(next))
+            goto consume_path;
+
+        switch (next) {
         case tok_Slash:
         case tok_Dot:
-            accept = true;
+            goto consume_path;
         }
-
-        if (!accept)
-            break;
     }
 
     if (is_null(&path))

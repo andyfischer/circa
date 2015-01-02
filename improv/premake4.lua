@@ -6,7 +6,6 @@ solution "Improv"
     flags { "Symbols" }
     targetdir "build"
     objdir "build/obj"
-    defines { "NACL" }
 
     configuration "Release"
         flags { "OptimizeSpeed" }
@@ -21,11 +20,11 @@ solution "Improv"
         files {
             "src/*.cpp",
             }
-        includedirs {".", "../include", "deps"}
+        includedirs {".", "../include", "deps", "/usr/local/include"}
 
         -- SDL
-        buildoptions {"`sdl-config --cflags`"}
-        linkoptions {"`sdl-config --libs`"}
+        buildoptions {"`sdl2-config --cflags`"}
+        linkoptions {"`sdl2-config --libs`"}
         
         -- Freetype2
         buildoptions {"`freetype-config --cflags`"}
@@ -36,7 +35,12 @@ solution "Improv"
         }
 
         libdirs {
-            "../build"
+            "../build",
+            "/usr/local/lib"
+        }
+
+        links {
+            "cairo"
         }
 
         configuration "Debug"

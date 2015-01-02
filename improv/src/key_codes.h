@@ -4,10 +4,8 @@
 #include "circa/circa.h"
 
 #if IMPROV_USE_SDL
-  #include "SDL2/SDL_keycode.h"
-#endif
+  #include "SDL_keycode.h"
 
-#if IMPROV_USE_SDL
   SDL_Keycode nacl_keycode_to_sdl_key(uint32_t code);
   void sdl_key_to_symbol(SDL_Keycode sym, caValue* value);
 #endif

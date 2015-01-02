@@ -1,0 +1,46 @@
+
+struct ListIterator {
+  List val
+  int index
+}
+
+def ListIterator.done(self) -> bool
+  self.index >= self.val.length
+
+def ListIterator.current(self) -> any
+  self.val[self.index]
+
+def ListIterator.advance(self)
+  self.index += 1
+  self
+
+def List.to_iterator(self) -> ListIterator
+  ListIterator.make(self 0)
+
+def to_iterator(it) -> any
+  if is_list(it)
+    @it.to_iterator
+  it
+
+def visit(it, func)
+  to_iterator(@it)
+
+  while not it.done
+    func(it.current)
+    @it.advance
+
+def fold(it, func, val)
+  to_iterator(@it)
+
+  while not it.done
+    val = func.call(val it.current)
+    @it.advance
+
+  val
+
+def to_list(it) -> List
+  -- Language defect: Should be able to refer to List.append directly.
+  def append(List list, item) -> List
+    list.append(item)
+    
+  fold(it append [])

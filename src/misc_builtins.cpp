@@ -294,6 +294,22 @@ void get_field(Stack* stack)
     copy(value, circa_output(stack, 0));
 }
 
+void has_method(Stack* stack)
+{
+#if 0
+    Value* object = circa_input(stack, 0);
+    Value* field = circa_input(stack, 1);
+
+    Term* method = find_method(frame_block(top_frame_parent(stack)),
+        (Type*) circa_type_of(object), field);...
+
+    if (method != NULL)
+
+    if (is_hashtable(object) && hashtable_get(object, field) != NULL)
+        return true;
+#endif
+}
+
 void get_index(Stack* stack)
 {
     Value* list = circa_input(stack, 0);
@@ -1334,6 +1350,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "equals", equals_func);
     circa_patch_function(patch, "error", error);
     circa_patch_function(patch, "get_field", get_field);
+    circa_patch_function(patch, "has_method", has_method);
     circa_patch_function(patch, "get_index", get_index);
     circa_patch_function(patch, "get_with_symbol", get_with_symbol);
     circa_patch_function(patch, "is_compound", hosted_is_compound);
