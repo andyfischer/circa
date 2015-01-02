@@ -1,0 +1,15 @@
+
+import draw
+import ui2
+import cairo
+
+draw.background(#000)
+
+cairo.draw_to_screen([0 0 100 100], (canvas) ->
+  lines = ['a' 'b' 'c']
+
+  canvas.set_source_color(#fff)
+  
+  view = ui2.textview.TextView.make(lines canvas)
+)
+
