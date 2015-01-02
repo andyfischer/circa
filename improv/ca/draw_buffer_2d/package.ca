@@ -1,0 +1,23 @@
+
+require iter
+
+struct IntermediateState {
+  List popCommands
+}
+
+def to_iterator(command_list)
+  it = iter.to_iterator(command_list)
+
+def 
+
+def execute(canvas, list)
+
+  
+  
+  popCommands = []
+
+  for command in list
+    switch command.id
+      case :pop
+        
+

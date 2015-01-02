@@ -11,6 +11,7 @@
 #include <cairo/cairo-ft.h>
 
 #include "circa/circa.h"
+#include "FontFace.h"
 
 namespace improv {
     
@@ -155,12 +156,10 @@ void Canvas_set_font_size(caStack* stack)
 }
 void Canvas_set_font_face(caStack* stack)
 {
-#if 0 // FIXME
     cairo_t* context = as_cairo_context(circa_input(stack, 0));
     FontFace* font = as_font_face(circa_input(stack, 1));
     cairo_set_font_face(context, font->cairoFace);
     check_cairo_error(stack, context);
-#endif
 }
 void Canvas_show_text(caStack* stack)
 {
@@ -434,9 +433,7 @@ void cairo_native_patch(caNativePatch* module)
     circa_patch_function(module, "Surface.size", Surface__size);
     circa_patch_function(module, "Surface.image_blob", Surface__image_blob);
     circa_patch_function(module, "Surface.start_drawing", start_drawing);
-#if 0 // FIXME
     font_native_patch(module);
-#endif
     circa_finish_native_patch(module);
 }
 

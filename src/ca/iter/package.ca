@@ -39,8 +39,44 @@ def fold(it, func, val)
   val
 
 def to_list(it) -> List
-  -- Language defect: Should be able to refer to List.append directly.
+  -- Language defect: Should be able to refer to the function List.append directly.
   def append(List list, item) -> List
     list.append(item)
     
   fold(it append [])
+
+struct PrefixedIterator {
+  any item
+  Iterator remaining
+}
+
+def PrefixedIterator.done(self)
+  false
+
+def PrefixedIterator.current(self)
+  self.item
+
+def PrefixedIterator.advance(self)
+  self.remaining
+
+def prefix(item, it)
+  PrefixedIterator.make(item to_iterator(it))
+
+def ConcatenatedIterator {
+  any first
+  any last
+}
+
+def ConcatenatedIterator.done(self)
+  self.first.done
+
+def ConcatenatedIterator.current(self)
+  self.first.current
+
+def ConcatenatedIterator.advance(self)
+  @self.first.advance
+
+  if self.first.done
+    self.last
+  else
+    self

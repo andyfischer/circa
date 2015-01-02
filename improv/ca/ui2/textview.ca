@@ -39,5 +39,7 @@ def TextView.draw(self)
   canvas = self.canvas
 
   for line in self.positionedLines
+    c = canvas.
+    canvas.set_color
     canvas.move_to(line.pos)
     canvas.show_text(line.line)

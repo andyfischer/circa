@@ -1,6 +1,11 @@
 
 iter = require ./package
 
+-- to_list & to_iterator
 for example in [ [] [1] [1 2 3] [[1] [2] [3]] ]
-  print('testing: ' example)
   assert(iter.to_list(iter.to_iterator(example)) == example)
+
+-- prefix
+assert(iter.to_list(iter.prefix(1 [2 3 4])) == [1 2 3 4])
+assert(iter.to_list(iter.prefix(1 iter.prefix(2 [3 4]))) == [1 2 3 4])
+assert(iter.to_list(iter.prefix(1 [])) == [1])

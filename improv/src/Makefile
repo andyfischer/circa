@@ -65,6 +65,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/cairo_surface.o \
+	$(OBJDIR)/FontFace.o \
 	$(OBJDIR)/gl.o \
 	$(OBJDIR)/key_codes.o \
 	$(OBJDIR)/sdl_window.o \
@@ -129,6 +130,9 @@ $(GCH): $(PCH)
 endif
 
 $(OBJDIR)/cairo_surface.o: cairo_surface.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/FontFace.o: FontFace.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/gl.o: gl.cpp
