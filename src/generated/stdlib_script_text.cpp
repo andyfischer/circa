@@ -3318,7 +3318,7 @@ const char* find_builtin_file(const char* filename) {
         "def debug_break()\n"
         ;
 
-    if (strncmp(filename, "$builtins/error_trace/package.ca", 32) == 0) return
+    if (strncmp(filename, "$builtins/error_trace/main.ca", 29) == 0) return
         "\n"
         "require indent_writer\n"
         "\n"
@@ -3360,7 +3360,7 @@ const char* find_builtin_file(const char* filename) {
         "  writer.toString\n"
         ;
 
-    if (strncmp(filename, "$builtins/iter/package.ca", 25) == 0) return
+    if (strncmp(filename, "$builtins/iter/main.ca", 22) == 0) return
         "\n"
         "struct ListIterator {\n"
         "  List val\n"
@@ -3425,21 +3425,24 @@ const char* find_builtin_file(const char* filename) {
         "def prefix(item, it)\n"
         "  PrefixedIterator.make(item to_iterator(it))\n"
         "\n"
+        "struct ConcatenatedIterator {\n"
+        "  any first\n"
+        "  any last\n"
+        "}\n"
         "\n"
-        ;
-
-    if (strncmp(filename, "$builtins/iter/test.ca", 22) == 0) return
+        "def ConcatenatedIterator.done(self)\n"
+        "  self.first.done\n"
         "\n"
-        "iter = require ./package\n"
+        "def ConcatenatedIterator.current(self)\n"
+        "  self.first.current\n"
         "\n"
-        "-- to_list & to_iterator\n"
-        "for example in [ [] [1] [1 2 3] [[1] [2] [3]] ]\n"
-        "  assert(iter.to_list(iter.to_iterator(example)) == example)\n"
+        "def ConcatenatedIterator.advance(self)\n"
+        "  @self.first.advance\n"
         "\n"
-        "-- prefix\n"
-        "assert(iter.to_list(iter.prefix(1 [2 3 4])) == [1 2 3 4])\n"
-        "assert(iter.to_list(iter.prefix(1 iter.prefix(2 [3 4]))) == [1 2 3 4])\n"
-        "assert(iter.to_list(iter.prefix(1 [])) == [1])\n"
+        "  if self.first.done\n"
+        "    self.last\n"
+        "  else\n"
+        "    self\n"
         ;
 
 

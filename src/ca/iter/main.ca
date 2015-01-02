@@ -62,7 +62,7 @@ def PrefixedIterator.advance(self)
 def prefix(item, it)
   PrefixedIterator.make(item to_iterator(it))
 
-def ConcatenatedIterator {
+struct ConcatenatedIterator {
   any first
   any last
 }

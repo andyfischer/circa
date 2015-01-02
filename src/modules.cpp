@@ -107,13 +107,12 @@ void resolve_possible_module_path(World* world, Value* path, Value* result)
     if (circa_file_exists(world, as_cstring(result)))
         return;
         
-    // try <path>/package.ca
+    // try <path>/main.ca
     copy(path, result);
 
-    Value packageStr;
-    set_string(&packageStr, "package.ca");
-
-    join_path(result, &packageStr);
+    Value mainStr;
+    set_string(&mainStr, "main.ca");
+    join_path(result, &mainStr);
 
     if (circa_file_exists(world, as_cstring(result)))
         return;

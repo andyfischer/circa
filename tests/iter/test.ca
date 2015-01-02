@@ -1,5 +1,5 @@
 
-iter = require ./package
+require iter
 
 -- to_list & to_iterator
 for example in [ [] [1] [1 2 3] [[1] [2] [3]] ]
