@@ -7,17 +7,13 @@ struct StackIterator {
   List stack
 }
 
-def StackIterator.next(self)
-  self.it.next
-
-def StackIterator.advance(self)
+def StackIterator.resolve(self)
   it = self.it
-  @it.advance
-
-  if it == []
-    return []
 
   while true
+    if it == []
+      return []
+
     switch
       case it.next == :pop
         @it.advance
@@ -34,9 +30,20 @@ def StackIterator.advance(self)
         break
 
   self.it = it
-  print()
+  self
+
+def StackIterator.next(self)
+  self.it.next
+
+def StackIterator.advance(self)
+  @self.it.advance
+
+  if it == []
+    return []
+
+  @self.resolve
   self
 
 def new(it)
   iter.to_iterator(@it)
-  StackIterator.make(it [])
+  StackIterator.make(it []).resolve
