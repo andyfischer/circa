@@ -1,21 +1,27 @@
 
 struct ListIterator {
-  List val
+  List list
   int index
 }
 
 def ListIterator.done(self) -> bool
-  self.index >= self.val.length
+  self.index >= self.list.length
 
-def ListIterator.current(self) -> any
-  self.val[self.index]
+def ListIterator.next(self) -> any
+  self.list[self.index]
 
-def ListIterator.advance(self)
+def ListIterator.advance(self) -> any
   self.index += 1
+  if self.done
+    self = []
   self
 
-def List.to_iterator(self) -> ListIterator
-  ListIterator.make(self 0)
+def List.to_iterator(self)
+  it = ListIterator.make(self 0)
+  if it.done
+    []
+  else
+    it
 
 def to_iterator(it) -> any
   if is_list(it)
@@ -25,58 +31,51 @@ def to_iterator(it) -> any
 def visit(it, func)
   to_iterator(@it)
 
-  while not it.done
-    func(it.current)
+  while it != []
+    func(it.next)
     @it.advance
 
-def fold(it, func, val)
+def fold(it, func, accum)
   to_iterator(@it)
 
-  while not it.done
-    val = func.call(val it.current)
+  while it != []
+    accum = func.call(accum it.next)
     @it.advance
 
-  val
+  accum
 
-def to_list(it) -> List
+def flatten(it) -> List
+
   -- Language defect: Should be able to refer to the function List.append directly.
   def append(List list, item) -> List
     list.append(item)
     
   fold(it append [])
 
-struct PrefixedIterator {
-  any item
-  Iterator remaining
-}
-
-def PrefixedIterator.done(self)
-  false
-
-def PrefixedIterator.current(self)
-  self.item
-
-def PrefixedIterator.advance(self)
-  self.remaining
-
-def prefix(item, it)
-  PrefixedIterator.make(item to_iterator(it))
-
 struct ConcatenatedIterator {
-  any first
-  any last
+  any left
+  any right
 }
 
-def ConcatenatedIterator.done(self)
-  self.first.done
+def concat(left, right)
+  to_iterator(@left)
+  to_iterator(@right)
 
-def ConcatenatedIterator.current(self)
-  self.first.current
+  if left == []
+    right
+  else
+    ConcatenatedIterator.make(left right)
+
+def ConcatenatedIterator.next(self)
+  self.left.next
 
 def ConcatenatedIterator.advance(self)
-  @self.first.advance
 
-  if self.first.done
-    self.last
+  nextLeft = self.left.advance
+
+  if nextLeft == []
+    self = self.right
   else
-    self
+    self.left = nextLeft
+
+  self

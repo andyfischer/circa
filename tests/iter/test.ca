@@ -1,11 +1,18 @@
 
 require iter
 
--- to_list & to_iterator
+-- flatten & to_iterator
 for example in [ [] [1] [1 2 3] [[1] [2] [3]] ]
-  assert(iter.to_list(iter.to_iterator(example)) == example)
+  assert(iter.flatten(iter.to_iterator(example)) == example)
 
--- prefix
-assert(iter.to_list(iter.prefix(1 [2 3 4])) == [1 2 3 4])
-assert(iter.to_list(iter.prefix(1 iter.prefix(2 [3 4]))) == [1 2 3 4])
-assert(iter.to_list(iter.prefix(1 [])) == [1])
+-- concat
+assert(iter.flatten(iter.concat([1] [2 3 4])) == [1 2 3 4])
+assert(iter.flatten(iter.concat([1] iter.concat([2] [3 4]))) == [1 2 3 4])
+assert(iter.flatten(iter.concat([1] [])) == [1])
+assert(iter.flatten(iter.concat([] [])) == [])
+assert(iter.flatten(iter.concat([1] [])) == [1])
+
+-- visit
+iter.visit(iter.concat([1 2] [3 4]), (n) ->
+  print('visited: ' n)
+)
