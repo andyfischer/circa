@@ -72,9 +72,6 @@ Type* find_common_type(Type* type1, Type* type2)
     if (type1 == TYPES.any || type2 == TYPES.any)
         return TYPES.any;
 
-    if (is_list_based_type(type1) && is_list_based_type(type2))
-        return TYPES.list;
-
     return TYPES.any;
 }
 

@@ -1,0 +1,19 @@
+
+def match_list(list, pattern) -> bool
+  if not is_list(list)
+    return false
+
+  if list.length != pattern.length
+    return false
+
+  for index, item in list
+    patternItem = pattern[index]
+    switch
+      case is_type(patternItem)
+        if not patternItem.includes(item)
+          return false
+      else
+        if item != patternItem
+          return false
+
+  return true

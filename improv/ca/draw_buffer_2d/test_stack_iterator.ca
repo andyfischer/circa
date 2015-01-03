@@ -1,0 +1,9 @@
+
+require iter
+require ./stack_iterator
+
+def flatten(list)
+  iter.flatten(stack_iterator.new(list))
+
+assert(flatten([1 2 3]) == [1 2 3])
+assert(flatten([[:push 3] 1 2 :pop]) == [1 2 3])

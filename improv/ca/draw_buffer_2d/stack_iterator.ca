@@ -1,0 +1,42 @@
+
+require iter
+require match
+
+struct StackIterator {
+  any it
+  List stack
+}
+
+def StackIterator.next(self)
+  self.it.next
+
+def StackIterator.advance(self)
+  it = self.it
+  @it.advance
+
+  if it == []
+    return []
+
+  while true
+    switch
+      case it.next == :pop
+        @it.advance
+        fromStack = self.stack.last
+        @self.stack.pop
+        iter.concat([fromStack] @it)
+
+      case match.match_list(it.next [:push any])
+        el = it.next[1]
+        @it.advance
+        @self.stack.push(el)
+
+      else
+        break
+
+  self.it = it
+  print()
+  self
+
+def new(it)
+  iter.to_iterator(@it)
+  StackIterator.make(it [])

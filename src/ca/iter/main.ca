@@ -45,6 +45,9 @@ def fold(it, func, accum)
   accum
 
 def flatten(it) -> List
+  to_iterator(@it)
+  if it == []
+    return []
 
   -- Language defect: Should be able to refer to the function List.append directly.
   def append(List list, item) -> List
@@ -79,3 +82,5 @@ def ConcatenatedIterator.advance(self)
     self.left = nextLeft
 
   self
+
+def flatmap(it, transformer)

@@ -1,0 +1,13 @@
+
+struct T {
+  int a
+}
+
+def f()
+  if false
+    return []
+
+  T.make(1)
+
+print('f() = ' f())
+print('output type = ' f.block.output_placeholder(0).get_type)

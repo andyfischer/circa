@@ -971,7 +971,13 @@ def List.last(self) -> any
   -- Returns the last element
   self.get(self.length - 1)
 
-def List.pop(self) -> (List, any)
+def List.push(self, val) -> List
+  self.append(val)
+
+def List.pop(self) -> List
+  self.slice(0, -1)
+
+def List.pop2(self) -> (List, any)
   return self.slice(0, -1), self.last
 
 def List.filter(self, Func func) -> List
@@ -1116,14 +1122,17 @@ def String.characters(self) -> List
 -- Type
 def Type.declaringTerm(self) -> Term
 def Type.cast(self, any value) -> any
-    value, success = cast(value, self)
-    if not(success)
-        error(str("Couldn't cast value " value " to type " self.name))
-    value
+  value, success = cast(value, self)
+  if not success
+    error(str("Couldn't cast value " value " to type " self.name))
+  value
         
 def Type.make(self, any values :multiple) -> any
 def Type.name(self) -> String
 def Type.property(self, String name) -> any
+def Type.includes(self, value) -> bool
+  _, success = cast(value self)
+  success
 
 -- Term
 def term_ref(term :ref) -> Term

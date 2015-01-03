@@ -1,0 +1,6 @@
+plain style:
+a = {list: [1, 2]}
+b = 3
+rebind style:
+a = 3
+t = {list: [1, 2]}

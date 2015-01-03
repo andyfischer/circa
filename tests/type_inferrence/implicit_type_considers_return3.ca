@@ -7,4 +7,4 @@ def f(bool b)
 
 result = f(true)
 
-assert(static_type(result) == List)
+assert(static_type(result) == any)
