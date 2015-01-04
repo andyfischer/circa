@@ -277,6 +277,12 @@ void write_text_file_func(Stack* stack)
     write_text_file(circa_string_input(stack, 0), circa_string_input(stack, 1));
 }
 
+void method_lookup(Stack* stack)
+{
+    Value* obj = circa_input(stack, 0);
+    Value* method = circa_input(stack, 1);
+}
+
 void get_field(Stack* stack)
 {
     Value* head = circa_input(stack, 0);
@@ -1349,6 +1355,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "empty_list", empty_list);
     circa_patch_function(patch, "equals", equals_func);
     circa_patch_function(patch, "error", error);
+    circa_patch_function(patch, "method_lookup", method_lookup);
     circa_patch_function(patch, "get_field", get_field);
     circa_patch_function(patch, "has_method", has_method);
     circa_patch_function(patch, "get_index", get_index);

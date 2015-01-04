@@ -1,0 +1,46 @@
+
+require cairo
+
+struct DrawBuffer {
+  List commands
+  Vec2 pos
+}
+
+struct Command {
+  Symbol id
+  any args
+}
+
+def new()
+  DrawBuffer.make
+
+def DrawBuffer.save(self, items) -> DrawBuffer
+  deferred = for item in items
+    switch sym
+      case :pos
+        [:set_pos self.pos]
+      else
+        error('unrecognized: ' sym)
+
+  @self.commands.append([:push deferred])
+  self
+  
+def DrawBuffer.restore(self) -> DrawBuffer
+  @self.commands.append(:pop)
+
+def DrawBuffer.move(self, Vec2 pos) -> DrawBuffer
+  self.pos = pos
+  self
+
+def DrawBuffer.execute_one(self, canvas, Command command) -> DrawBuffer
+  switch command.id
+    case :set_pos
+      @self.pos = command.args
+    case :callback
+      command.args.call(self, canvas)
+    else
+      method_call(canvas command.id command.args)
+
+def DrawBuffer.execute(self, canvas, commands)
+  for command in stack_iterator.new(commands)
+    @self.execute_one(canvas, command)

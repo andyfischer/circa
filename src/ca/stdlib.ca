@@ -13,7 +13,7 @@ def continue(any outs :multiple :optional)
 def extra_output(any _) -> any
 def func_call_implicit(any inputs :multiple)
 def get_field(any obj, String key) -> any
---def has_method(any obj, Symbol field) -> bool
+def method_lookup(any obj, Symbol name) -> any -- Func or null
 def get_index(List list, int index) -> any
 def selector(any elements :multiple) -> Selector
 def get_with_selector(any object, Selector selector) -> any
@@ -379,6 +379,12 @@ def Func.apply(self, List inputs) -> any
 
 def call(Func func, inputs :multiple) -> any
   func.apply(inputs)
+
+def method_call(obj, Symbol name, List args)
+  func = method_lookup(obj name)
+  if func == null
+    error('Method not found: ' name)
+  func.call(args)
 
 def closure_block() -> Func
   -- Internally used function for declaring a closure.

@@ -7,13 +7,10 @@ struct StackIterator {
   List stack
 }
 
-def StackIterator.resolve(self)
+def StackIterator.settle(self)
   it = self.it
 
-  while true
-    if it == []
-      return []
-
+  while not it.done
     switch
       case it.next == :pop
         @it.advance
@@ -32,18 +29,17 @@ def StackIterator.resolve(self)
   self.it = it
   self
 
+def StackIterator.done(self)
+  self.it.done
+
 def StackIterator.next(self)
   self.it.next
 
 def StackIterator.advance(self)
   @self.it.advance
-
-  if it == []
-    return []
-
-  @self.resolve
+  @self.settle
   self
 
 def new(it)
   iter.to_iterator(@it)
-  StackIterator.make(it []).resolve
+  StackIterator.make(it []).settle

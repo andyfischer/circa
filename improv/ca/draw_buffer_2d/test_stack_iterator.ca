@@ -7,3 +7,6 @@ def flatten(list)
 
 assert(flatten([1 2 3]) == [1 2 3])
 assert(flatten([[:push 3] 1 2 :pop]) == [1 2 3])
+assert(flatten([[:push 3] :pop]) == [3])
+assert(flatten([[:push 3]]) == [])
+assert(flatten([[:push 3] [:push 2] [:push 1] :pop :pop :pop]) == [1 2 3])
