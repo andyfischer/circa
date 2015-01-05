@@ -860,11 +860,10 @@ void vm_run(Stack* stack)
             firstCacheLine->typeId = typeId;
             firstCacheLine->blockIndex = 0;
 
-            Term* method = find_method(frame_block(parent), (Type*) circa_type_of(object), elementName);
+            Block* method = find_method(frame_block(parent), (Type*) circa_type_of(object), elementName);
 
             if (method != NULL) {
-                Block* block = method->nestedContents;
-                int blockIndex = compiled_create_entry(stack->program, block);
+                int blockIndex = compiled_create_entry(stack->program, method);
                 vm_fix_bytecode_pointer();
 
                 // 'firstCacheLine' is invalidated by compiled_create_entry

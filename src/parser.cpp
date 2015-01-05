@@ -2274,8 +2274,11 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     // Find the function
     Term* function = NULL;
     
-    if (rootType != NULL)
-        function = find_method(block, rootType, &functionName);
+    if (rootType != NULL) {
+        Block* method = find_method(block, rootType, &functionName);
+        if (method != NULL)
+            function = method->owningTerm;
+    }
 
     Term* term = NULL;
 

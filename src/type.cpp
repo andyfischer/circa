@@ -335,31 +335,44 @@ void initialize_simple_pointer_type(Type* type)
     reset_type(type);
 }
 
-Term* find_method_with_search_name(Block* block, Type* type, Value* searchName)
+Block* find_method_inner(Type* type, Value* shortName, Value* fullName)
 {
-    // Local name search.
-    if (block != NULL) {
-        Term* term = find_name(block, searchName, sym_LookupFunction);
-        if (term != NULL)
-            return term;
+    // An 'inner' method is one declared in the same block as the original type.
+    // (or, a generated method that's contained inside the type). These methods
+    // are available regardless of call site.
+    
+    if (type->declaringTerm && type->declaringTerm->owningBlock) {
+        Term* term = find_name(type->declaringTerm->owningBlock, fullName);
+        if (term != NULL && is_function(term))
+            return term->nestedContents;
     }
 
-    // If not found, look in the block where the type was declared.
-    Block* typeDeclarationBlock = NULL;
-
-    if (type->declaringTerm != NULL)
-        typeDeclarationBlock = type->declaringTerm->owningBlock;
-
-    if (typeDeclarationBlock != NULL && typeDeclarationBlock != block) {
-        Term* term = find_name(typeDeclarationBlock, searchName);
-        if (term != NULL && is_function(term))
-            return term;
+    Block* declarationBlock = type_declaration_block(type);
+    if (declarationBlock != NULL) {
+        Term* func = find_local_name(declarationBlock, shortName);
+        if (func != NULL && is_function(func))
+            return func->nestedContents;
     }
 
     return NULL;
 }
 
-Term* find_method(Block* block, Type* type, Value* name)
+Block* find_method_outer(Block* location, Type* type, Value* fullName)
+{
+    // An 'outer' method is one declared outside the type's declaration block.
+    // Only used where visible (according to normal function visibility rules)
+
+    if (location == NULL)
+        return NULL;
+
+    Term* term = find_name(location, fullName, sym_LookupFunction);
+    if (term == NULL)
+        return NULL;
+
+    return term->nestedContents;
+}
+
+Block* find_method(Block* block, Type* type, Value* name)
 {
     if (string_equals(&type->name, ""))
         return NULL;
@@ -370,22 +383,11 @@ Term* find_method(Block* block, Type* type, Value* name)
     string_append(&searchName, ".");
     string_append(&searchName, name);
 
-    // Standard search.
-    Term* result = find_method_with_search_name(block, type, &searchName);
+    Block* method = find_method_outer(block, type, &searchName);
+    if (method != NULL)
+        return method;
 
-    if (result != NULL)
-        return result;
-
-    // Look inside the type definition, which contains simulated methods and
-    // possibly other stuff.
-    Block* typeDef = type_declaration_block(type);
-    if (typeDef != NULL) {
-        Term* func = find_local_name(typeDef, name);
-        if (func != NULL && is_function(func))
-            return func;
-    }
-
-    return NULL;
+    return find_method_inner(type, name, &searchName);
 }
 
 void install_type(Term* term, Type* type)
