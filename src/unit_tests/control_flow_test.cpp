@@ -20,10 +20,10 @@ void simple_get_exit_rank()
     Term* con = block.compile("continue");
     Term* dis = block.compile("discard");
 
-    test_assert(term_get_highest_exit_level(ret) == sym_ExitLevelFunction);
-    test_assert(term_get_highest_exit_level(br) == sym_ExitLevelLoop);
-    test_assert(term_get_highest_exit_level(con) == sym_ExitLevelLoop);
-    test_assert(term_get_highest_exit_level(dis) == sym_ExitLevelLoop);
+    test_assert(term_get_highest_exit_level(ret) == s_ExitLevelFunction);
+    test_assert(term_get_highest_exit_level(br) == s_ExitLevelLoop);
+    test_assert(term_get_highest_exit_level(con) == s_ExitLevelLoop);
+    test_assert(term_get_highest_exit_level(dis) == s_ExitLevelLoop);
 }
 
 void has_control_flow_prop()
@@ -33,19 +33,19 @@ void has_control_flow_prop()
     Term* f_def = block.compile("def f() { if true { return } }");
 
     // Top-level block has no control flow, it shouldn't escape f().
-    test_assert(block_get_bool_prop(&block, sym_HasControlFlow, false) == false);
+    test_assert(block_get_bool_prop(&block, s_HasControlFlow, false) == false);
 
     // Inside "f" does have control flow.
     test_assert(true == block_get_bool_prop(
-                find_block_from_path(&block, "f"), sym_HasControlFlow, false));
+                find_block_from_path(&block, "f"), s_HasControlFlow, false));
 
     // Inside if-block does too.
     test_assert(true == block_get_bool_prop(
                 find_block_from_path(&block, "f / function=if"),
-                sym_HasControlFlow, false));
+                s_HasControlFlow, false));
 
     Term* returnCall = find_term_from_path(&block, "**/function=return");
-    test_assert(block_get_bool_prop(returnCall->owningBlock, sym_HasControlFlow, true));
+    test_assert(block_get_bool_prop(returnCall->owningBlock, s_HasControlFlow, true));
 }
 
 void test_find_block_that_exit_point_will_reach()

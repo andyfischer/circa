@@ -14,8 +14,8 @@ def main()
 
 int = make_vm(main)
 int.call
-print(int.extract_state)
+print(int.get_state)
 int.call
-print(int.extract_state)
+print(int.get_state)
 int.call
-print(int.extract_state)
+print(int.get_state)

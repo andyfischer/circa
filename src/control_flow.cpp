@@ -54,13 +54,13 @@ bool is_exit_point_that_handles_rebinding(Term* term)
 Symbol term_get_highest_exit_level(Term* term)
 {
     if (term->function == FUNCS.return_func)
-        return sym_ExitLevelFunction;
+        return s_ExitLevelFunction;
     else if (term->function == FUNCS.break_func
             || term->function == FUNCS.continue_func
             || term->function == FUNCS.discard)
-        return sym_ExitLevelLoop;
+        return s_ExitLevelLoop;
     else
-        return sym_None;
+        return s_none;
 }
 
 Block* find_block_that_exit_point_will_reach(Term* term)
@@ -98,11 +98,11 @@ Block* find_block_that_exit_point_will_reach(Term* term)
 
 static Symbol max_exit_level(Symbol left, Symbol right)
 {
-    if (left == sym_ExitLevelFunction || right == sym_ExitLevelFunction)
-        return sym_ExitLevelFunction;
-    if (left == sym_ExitLevelLoop || right == sym_ExitLevelLoop)
-        return sym_ExitLevelLoop;
-    return sym_None;
+    if (left == s_ExitLevelFunction || right == s_ExitLevelFunction)
+        return s_ExitLevelFunction;
+    if (left == s_ExitLevelLoop || right == s_ExitLevelLoop)
+        return s_ExitLevelLoop;
+    return s_none;
 }
 
 void create_output_from_minor_block(Block* block, Value* description)
@@ -119,7 +119,7 @@ Symbol term_get_escaping_exit_level(Term* term)
 {
     // Check for a call that directly causes exit: return/continue/etc.
     Symbol directExitLevel = term_get_highest_exit_level(term);
-    if (directExitLevel != sym_None)
+    if (directExitLevel != s_none)
         return directExitLevel;
 
     // For-block
@@ -130,17 +130,17 @@ Symbol term_get_escaping_exit_level(Term* term)
             Symbol exit = term_get_highest_exit_level(contents->get(i));
 
             // Only ExitRankFunction escapes from for-block.
-            if (exit == sym_ExitLevelFunction)
+            if (exit == s_ExitLevelFunction)
                 return exit;
         }
 
-        return sym_None;
+        return s_none;
     }
 
     // If-block
     if (term->function == FUNCS.if_block) {
         Block* topContents = nested_contents(term);
-        Symbol highestExit = sym_None;
+        Symbol highestExit = s_none;
         for (int caseIndex=0; caseIndex < topContents->length(); caseIndex++) {
             Block* caseBlock = nested_contents(topContents->get(caseIndex));
             for (int i=0; i < caseBlock->length(); i++) {
@@ -154,12 +154,12 @@ Symbol term_get_escaping_exit_level(Term* term)
         return highestExit;
     }
 
-    return sym_None;
+    return s_none;
 }
 
 bool has_escaping_control_flow(Term* term)
 {
-    return term_get_escaping_exit_level(term) != sym_None;
+    return term_get_escaping_exit_level(term) != s_none;
 }
 
 void update_derived_inputs_for_exit_point(Term* term)
@@ -188,7 +188,7 @@ void update_derived_inputs_for_exit_point(Term* term)
 
 void update_for_control_flow(Block* block)
 {
-    if (!block_get_bool_prop(block, sym_HasControlFlow, false))
+    if (!block_get_bool_prop(block, s_HasControlFlow, false))
         return;
 
     for (int i=0; i < block->length(); i++) {
@@ -211,7 +211,7 @@ void controlFlow_postCompile(Term* term)
     Block* block = term->owningBlock;
 
     while (true) {
-        set_bool(block_insert_property(block, sym_HasControlFlow), true);
+        set_bool(block_insert_property(block, s_HasControlFlow), true);
 
         if (!is_minor_block(block))
             break;

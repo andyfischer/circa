@@ -8,7 +8,7 @@ def check1()
 
 int = make_vm(check1)
 int.call
-print(int.extract_state)
+print(int.get_state)
 
 -- Use state as a predicate to 'if'
 def sbool() -> bool
@@ -21,4 +21,4 @@ def check2()
 
 int = make_vm(check2)
 int.call
-print(int.extract_state)
+print(int.get_state)

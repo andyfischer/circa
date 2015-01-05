@@ -4,4 +4,4 @@ def f() -> Vec2
 
 p = f()
 print(p)
-assert(type(p) == Vec2)
+assert(typeof(p) == Vec2)

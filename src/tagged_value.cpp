@@ -14,6 +14,7 @@
 #include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
+#include "value_array.h"
 
 using namespace circa;
 
@@ -43,10 +44,13 @@ Value::operator=(Value const& rhs)
 }
 
 Term* Value::asTerm() { return as_term_ref(this); }
+Block* Value::asBlock() { return as_block(this); }
 bool Value::asBool() { return as_bool(this); }
 Symbol Value::asSymbol() { return as_symbol(this); }
 int Value::asInt() { return as_int(this); }
 float Value::asFloat() { return as_float(this); }
+const char* Value::as_str() { return as_cstring(this); }
+float Value::to_f() { return to_float(this); }
 ListData* Value::listData() { return (ListData*) this->value_data.ptr; }
 Value* Value::index(int i) { return list_get(this, i); }
 int Value::length() { return list_length(this); }
@@ -54,6 +58,12 @@ int Value::length() { return list_length(this); }
 Value* Value::set_value(Value* v)
 {
     ::set_value(this, v);
+    return this;
+}
+
+Value* Value::set_block(Block* b)
+{
+    ::set_block(this, b);
     return this;
 }
 
@@ -75,9 +85,21 @@ Value* Value::set_int(int i)
     return this;
 }
 
+Value* Value::set_float(float f)
+{
+    ::set_float(this, f);
+    return this;
+}
+
 Value* Value::set_symbol(caSymbol s)
 {
     ::set_symbol(this, s);
+    return this;
+}
+
+Value* Value::set_term(Term* t)
+{
+    ::set_term_ref(this, t);
     return this;
 }
 
@@ -142,6 +164,16 @@ Value* Value::extend(Value* rhsList)
     return this;
 }
 
+void Value::pop()
+{
+    list_pop(this);
+}
+
+Value* Value::last()
+{
+    return list_get(this, list_length(this) - 1);
+}
+
 Value* Value::set_hashtable()
 {
     ::set_hashtable(this);
@@ -153,30 +185,92 @@ Value* Value::field(caSymbol field)
     return hashtable_get_symbol_key(this, field);
 }
 
+Value* Value::int_key(int i)
+{
+    return hashtable_get_int_key(this, i);
+}
+
+Value* Value::val_key(Value* val)
+{
+    return hashtable_get(this, val);
+}
+
+Value* Value::term_key(Term* term)
+{
+    Value key;
+    ::set_term_ref(&key, term);
+    return hashtable_get(this, &key);
+}
+
+Value* Value::block_key(Block* block)
+{
+    Value key;
+    ::set_block(&key, block);
+    return hashtable_get(this, &key);
+}
+
 Value* Value::set_field_int(caSymbol field, int i)
 {
     Value* value = hashtable_insert_symbol_key(this, field);
     ::set_int(value, i);
-    return value;
+    return this;
 }
 
 Value* Value::set_field_str(caSymbol field, const char* str)
 {
     Value* value = hashtable_insert_symbol_key(this, field);
     ::set_string(value, str);
-    return value;
+    return this;
 }
 
 Value* Value::set_field_sym(caSymbol field, caSymbol s)
 {
     Value* value = hashtable_insert_symbol_key(this, field);
     ::set_symbol(value, s);
-    return value;
+    return this;
 }
 
-Value* Value::insert(caSymbol field)
+Value* Value::set_field_term(caSymbol field, Term* t)
 {
-    return hashtable_insert_symbol_key(this, field);
+    Value* value = hashtable_insert_symbol_key(this, field);
+    ::set_term_ref(value, t);
+    return this;
+}
+
+Value* Value::set_field_bool(caSymbol field, bool b)
+{
+    ::set_bool(hashtable_insert_symbol_key(this, field), b);
+    return this;
+}
+
+bool Value::field_bool(caSymbol field, bool defaultValue)
+{
+    Value* found = hashtable_get_symbol_key(this, field);
+    if (found != NULL)
+        return found->asBool();
+    return defaultValue;
+}
+
+Value* Value::insert(caSymbol key)
+{
+    return hashtable_insert_symbol_key(this, key);
+}
+
+Value* Value::insert_int(int key)
+{
+    return hashtable_insert_int_key(this, key);
+}
+
+Value* Value::insert_val(Value* key)
+{
+    return hashtable_insert(this, key);
+}
+
+Value* Value::insert_term(Term* termKey)
+{
+    Value key;
+    ::set_term_ref(&key, termKey);
+    return hashtable_insert(this, &key);
 }
 
 Value* Value::resize(int size)
@@ -195,6 +289,16 @@ void Value::dump()
     Value str;
     to_string(this, &str);
     printf("%s\n", as_cstring(&str));
+}
+
+char* Value::to_c_string()
+{
+    if (this == NULL)
+        return circa_strdup("NULL");
+
+    Value str;
+    to_string(this, &str);
+    return circa_strdup(as_cstring(&str));
 }
 
 void initialize_null(Value* value)
@@ -267,7 +371,7 @@ void cast(CastResult* result, Value* value, Type* type, bool checkOnly)
 
     // Casting to a interface always succeeds. Future: check if the value actually
     // fits the interface.
-    if (type->storageType == sym_InterfaceType)
+    if (type->storageType == s_InterfaceType)
         return;
 
     if (type->cast != NULL) {
@@ -797,7 +901,7 @@ Block* as_block(Value* value)
 
 void* as_opaque_pointer(Value* value)
 {
-    ca_assert(value->value_type->storageType == sym_StorageTypeOpaquePointer);
+    ca_assert(value->value_type->storageType == s_StorageTypeOpaquePointer);
     return value->value_data.ptr;
 }
 
@@ -856,23 +960,31 @@ void* get_pointer(Value* value, Type* expectedType)
 }
 
 bool is_blob(Value* value) { return value->value_type == TYPES.blob; }
-bool is_bool(Value* value) { return value->value_type->storageType == sym_StorageTypeBool; }
+bool is_bool(Value* value) { return value->value_type->storageType == s_StorageTypeBool; }
 bool is_block(Value* value) { return value->value_type == TYPES.block; }
 bool is_error(Value* value) { return value->value_type == TYPES.error; }
-bool is_float(Value* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
+bool is_float(Value* value) { return value->value_type->storageType == s_StorageTypeFloat; }
 bool is_func(Value* value) { return value->value_type == TYPES.func; }
 bool is_int(Value* value) { return value->value_type == TYPES.int_type; }
 bool is_stack(Value* value) { return value->value_type == TYPES.stack; }
-bool is_hashtable(Value* value) { return value->value_type->storageType == sym_StorageTypeHashtable; }
+bool is_hashtable(Value* value) { return value->value_type->storageType == s_StorageTypeHashtable; }
 bool is_list(Value* value) { return value->value_type == TYPES.list; }
-bool is_list_based(Value* value) { return value->value_type->storageType == sym_StorageTypeList; }
+bool is_list_based(Value* value) { return value->value_type->storageType == s_StorageTypeList; }
 bool is_null(Value* value) { return value->value_type == TYPES.null; }
-bool is_opaque_pointer(Value* value) { return value->value_type->storageType == sym_StorageTypeOpaquePointer; }
-bool is_ref(Value* value) { return value->value_type->storageType == sym_StorageTypeTerm; }
-bool is_string(Value* value) { return value->value_type->storageType == sym_StorageTypeString; }
+bool is_opaque_pointer(Value* value) { return value->value_type->storageType == s_StorageTypeOpaquePointer; }
+bool is_ref(Value* value) { return value->value_type->storageType == s_StorageTypeTerm; }
+bool is_string(Value* value) { return value->value_type->storageType == s_StorageTypeString; }
 bool is_symbol(Value* value) { return value->value_type == TYPES.symbol; }
 bool is_term_ref(Value* val) { return val->value_type == TYPES.term; }
-bool is_type(Value* value) { return value->value_type->storageType == sym_StorageTypeType; }
+bool is_type(Value* value) { return value->value_type->storageType == s_StorageTypeType; }
+
+bool is_list_with_length(Value* value, int length)
+{
+    if (!is_list(value))
+        return false;
+
+    return list_length(value) == length;
+}
 
 bool is_leaf_value(Value* value)
 {
@@ -923,7 +1035,36 @@ Symbol first_symbol(Value* value)
         return as_symbol(value);
     if (is_list(value))
         return first_symbol(list_get(value, 0));
-    return sym_None;
+    return s_none;
+}
+
+void ValueArray::init()
+{
+    size = 0;
+    items = NULL;
+}
+
+void ValueArray::reserve(int newSize)
+{
+    if (newSize < size)
+        return;
+
+    items = (Value*) realloc(items, newSize * sizeof(Value));
+    for (int i=size; i < newSize; i++)
+        initialize_null(&items[i]);
+
+    size = newSize;
+}
+void ValueArray::clear()
+{
+    free(items);
+    items = NULL;
+    size = 0;
+}
+
+Value* ValueArray::operator[](int index)
+{
+    return &items[index];
 }
 
 } // namespace circa
@@ -932,19 +1073,19 @@ using namespace circa;
 
 extern "C" {
 
-bool circa_is_bool(Value* value) { return value->value_type->storageType == sym_StorageTypeBool; }
+bool circa_is_bool(Value* value) { return value->value_type->storageType == s_StorageTypeBool; }
 bool circa_is_block(Value* value) { return value->value_type == TYPES.block; }
 bool circa_is_error(Value* value) { return value->value_type == TYPES.error; }
-bool circa_is_float(Value* value) { return value->value_type->storageType == sym_StorageTypeFloat; }
+bool circa_is_float(Value* value) { return value->value_type->storageType == s_StorageTypeFloat; }
 bool circa_is_func(Value* value) { return value->value_type == TYPES.func; }
-bool circa_is_int(Value* value) { return value->value_type->storageType == sym_StorageTypeInt; }
-bool circa_is_list(Value* value) { return value->value_type->storageType == sym_StorageTypeList; }
+bool circa_is_int(Value* value) { return value->value_type->storageType == s_StorageTypeInt; }
+bool circa_is_list(Value* value) { return value->value_type->storageType == s_StorageTypeList; }
 bool circa_is_null(Value* value)  { return value->value_type == TYPES.null; }
 bool circa_is_number(Value* value) { return circa_is_int(value) || circa_is_float(value); }
 bool circa_is_stack(Value* value) { return is_stack(value); }
-bool circa_is_string(Value* value) { return value->value_type->storageType == sym_StorageTypeString; }
+bool circa_is_string(Value* value) { return value->value_type->storageType == s_StorageTypeString; }
 bool circa_is_symbol(Value* value) { return value->value_type == TYPES.symbol; }
-bool circa_is_type(Value* value) { return value->value_type->storageType == sym_StorageTypeType; }
+bool circa_is_type(Value* value) { return value->value_type->storageType == s_StorageTypeType; }
 
 bool circa_bool(Value* value) {
     ca_assert(circa_is_bool(value));
@@ -1153,4 +1294,4 @@ void circa_move(Value* source, Value* dest)
     move(source, dest);
 }
 
-} // extern "C"
+}; // extern "C"

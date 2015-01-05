@@ -94,7 +94,7 @@ void string_resize(StringData** data, int newLength)
 
     StringData* oldData = *data;
     StringData* newData = string_create(newLength);
-    memcpy(newData->str, oldData->str, newLength);
+    memcpy(newData->str, oldData->str, std::min(newLength, oldData->length));
     newData->str[newLength] = 0;
     decref(oldData);
     *data = newData;
@@ -204,7 +204,7 @@ void string_setup_type(Type* type)
 {
     reset_type(type);
     set_string(&type->name, "String");
-    type->storageType = sym_StorageTypeString;
+    type->storageType = s_StorageTypeString;
     type->initialize = string_initialize;
     type->release = string_release;
     type->copy = string_copy;
@@ -215,7 +215,7 @@ void string_setup_type(Type* type)
 
 const char* as_cstring(Value* value)
 {
-    ca_assert(value->value_type->storageType == sym_StorageTypeString);
+    ca_assert(value->value_type->storageType == s_StorageTypeString);
     StringData* data = (StringData*) value->value_data.ptr;
     if (data == NULL)
         return "";
@@ -351,7 +351,7 @@ bool string_equals(Value* s, const char* str)
         if (str[0] != ':')
             return false;
 
-        return strcmp(symbol_as_string(s), str + 1) == 0;
+        return strcmp(symbol_val_as_string(s), str + 1) == 0;
     }
 
     return false;

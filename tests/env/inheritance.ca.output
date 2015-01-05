@@ -1,3 +1,2 @@
-[top level] 1
-[one layer] 1
-[second layer] 1
+in top_layer, env(:a) = 1
+in bottom_layer, env(:a) = 1

@@ -8,7 +8,7 @@ def T.add(@self, b)
   0
 
 t = T.make
-t.add(1)
+@t.add(1)
 assert(t.a == 1)
-t.add(3)
+@t.add(3)
 assert(t.a == 4)

@@ -1,10 +1,10 @@
 
 def get_caller_name() -> String
-    caller = reflect_caller()
+    caller = reflect_caller(1)
     return caller.name
 
 def get_caller() -> Term
-    return reflect_caller()
+    return reflect_caller(1)
 
 
 abc = get_caller_name()

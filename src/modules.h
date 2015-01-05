@@ -30,6 +30,7 @@ Block* module_ref_resolve(World* world, Value* module);
 
 Term* module_lookup(Block* module, Term* caller);
 Term* module_ref_lookup(Value* moduleRef, Term* caller);
+Term* module_lookup(World* world, Value* moduleRef, Value* name);
 
 bool is_module_ref(Value* value);
 void set_module_ref(Value* value, Value* path, Block* relativeTo);

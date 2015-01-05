@@ -1,0 +1,11 @@
+
+def main()
+  for i in [0 1 2]
+    state s = i
+    if i == 1
+      discard
+
+vm = make_vm(main)
+vm.call
+vm.get_state | print
+

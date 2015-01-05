@@ -12,4 +12,4 @@ def f(bool b)
 result = f(true)
 
 assert(static_type(result) != T)
-assert(type(result) == U)
+assert(typeof(result) == U)

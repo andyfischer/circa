@@ -5,17 +5,17 @@ struct T {
 }
 
 t = T.make(1, 'x')
-assert(to_string(t) == "{a: 1, b: 'x'}")
+assert(str(t) == "{a: 1, b: 'x'}")
 
 @t.set_a(4)
-assert(to_string(t) == "{a: 4, b: 'x'}")
+assert(str(t) == "{a: 4, b: 'x'}")
 
 @t.set_a(5).set_b('y')
-assert(to_string(t) == "{a: 5, b: 'y'}")
+assert(str(t) == "{a: 5, b: 'y'}")
 
 def error_test(t)
   t.set_a('hi')
 
-int = make_vm(error_test)
-int.call(t)
-assert(int.errored)
+vm = make_vm(error_test)
+vm.call(t)
+assert(vm.errored)

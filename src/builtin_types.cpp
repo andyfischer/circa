@@ -30,7 +30,7 @@ void any_setup_type(Type* type)
     type->initialize = any_initialize;
     type->toString = any_to_string;
     type->staticTypeQuery = any_staticTypeQuery;
-    type->storageType = sym_InterfaceType;
+    type->storageType = s_InterfaceType;
 }
 
 void bool_reset(Type*, Value* value)
@@ -51,7 +51,7 @@ void bool_to_string(Value* value, Value* out)
 void bool_setup_type(Type* type)
 {
     set_string(&type->name, "bool");
-    type->storageType = sym_StorageTypeBool;
+    type->storageType = s_StorageTypeBool;
     type->reset = bool_reset;
     type->hashFunc = bool_hashFunc;
     type->toString = bool_to_string;
@@ -95,13 +95,17 @@ void int_setup_type(Type* type)
 {
     if (string_equals(&type->name, ""))
         set_string(&type->name, "int");
-    type->storageType = sym_StorageTypeInt;
+    type->storageType = s_StorageTypeInt;
     type->reset = int_reset;
     type->equals = int_equals;
     type->hashFunc = int_hashFunc;
     type->toString = int_to_string;
 }
 
+int null_hashFunc(Value*)
+{
+    return 0;
+}
 void null_toString(Value* value, Value* out)
 {
     string_append(out, "null");
@@ -110,6 +114,7 @@ void null_setup_type(Type* type)
 {
     set_string(&type->name, "null");
     type->toString = null_toString;
+    type->hashFunc = null_hashFunc;
 }
 
 void number_reset(Type*, Value* value)
@@ -165,7 +170,7 @@ void number_setup_type(Type* type)
 {
     reset_type(type);
     set_string(&type->name, "number");
-    type->storageType = sym_StorageTypeFloat;
+    type->storageType = s_StorageTypeFloat;
     type->reset = number_reset;
     type->cast = number_cast;
     type->equals = number_equals;
@@ -185,7 +190,7 @@ void opaque_pointer_setup_type(Type* type)
 {
     if (string_equals(&type->name, ""))
         set_string(&type->name, "opaque_pointer");
-    type->storageType = sym_StorageTypeOpaquePointer;
+    type->storageType = s_StorageTypeOpaquePointer;
     type->toString = opaque_pointer_toString;
     type->hashFunc = shallow_hash_func;
 }

@@ -9,6 +9,7 @@
 #include "hashtable.h"
 #include "importing.h"
 #include "inspection.h"
+#include "modules.h"
 #include "parser.h"
 #include "static_checking.h"
 #include "string_type.h"
@@ -17,9 +18,14 @@
 #include "term.h"
 #include "token.h"
 #include "type.h"
+#include "vm.h"
 #include "world.h"
 
 namespace circa {
+
+// TODO: delete
+static Value* circa_input(Stack* stack, int index) { return NULL; }
+static Value* circa_output(Stack* stack, int index) { return NULL; }
 
 static void dealloc_type(Type* type);
 
@@ -53,7 +59,7 @@ namespace type_t {
     void setup_type(Type* type)
     {
         set_string(&type->name, "Type");
-        type->storageType = sym_StorageTypeType;
+        type->storageType = s_StorageTypeType;
         type->initialize = type_t::initialize;
         type->release = type_t::release;
         type->copy = type_t::copy;
@@ -156,7 +162,7 @@ Type* create_type_unconstructed()
 {
     Type* t = (Type*) malloc(sizeof(Type));
     memset(t, 0, sizeof(Type));
-    t->storageType = sym_StorageTypeNull;
+    t->storageType = s_StorageTypeNull;
     t->header.refcount = 1;
     t->inUse = false;
     t->id = global_world()->nextTypeID++;
@@ -167,6 +173,7 @@ void type_finish_construction(Type* t)
 {
     initialize_null(&t->properties);
     set_hashtable(&t->properties);
+    initialize_null(&t->attrs);
 
     initialize_null(&t->parameter);
     initialize_null(&t->name);
@@ -195,6 +202,7 @@ Type* create_type_refed()
 
 void predelete_type(Type* type)
 {
+    set_null(&type->attrs);
     set_null(&type->properties);
     set_null(&type->parameter);
     set_null(&type->name);
@@ -304,7 +312,7 @@ bool type_is_static_subset_of_type(Type* superType, Type* subType)
 
 void reset_type(Type* type)
 {
-    type->storageType = sym_StorageTypeNull;
+    type->storageType = s_StorageTypeNull;
     type->initialize = NULL;
     type->release = NULL;
     type->userRelease = NULL;
@@ -330,11 +338,6 @@ void clear_type_contents(Type* type)
     set_null(&type->parameter);
 }
 
-void initialize_simple_pointer_type(Type* type)
-{
-    reset_type(type);
-}
-
 Block* find_method_inner(Type* type, Value* shortName, Value* fullName)
 {
     // An 'inner' method is one declared in the same block as the original type.
@@ -357,7 +360,7 @@ Block* find_method_inner(Type* type, Value* shortName, Value* fullName)
     return NULL;
 }
 
-Block* find_method_outer(Block* location, Type* type, Value* fullName)
+Block* find_method_outer(Value* location, Type* type, Value* fullName)
 {
     // An 'outer' method is one declared outside the type's declaration block.
     // Only used where visible (according to normal function visibility rules)
@@ -365,17 +368,29 @@ Block* find_method_outer(Block* location, Type* type, Value* fullName)
     if (location == NULL)
         return NULL;
 
-    Term* term = find_name(location, fullName, sym_LookupFunction);
+    Term* term = find_name_at(location, fullName, s_LookupFunction);
     if (term == NULL)
         return NULL;
 
     return term->nestedContents;
 }
 
-Block* find_method(Block* block, Type* type, Value* name)
+Block* find_method_on_type(Type* type, Value* nameLocation)
 {
-    if (string_equals(&type->name, ""))
-        return NULL;
+    if (is_null(&type->attrs)) {
+        set_hashtable(&type->attrs);
+        type->attrs.insert(s_methodCache)->set_hashtable();
+    }
+
+    Value* cache = type->attrs.field(s_methodCache);
+    Value* cacheHit = cache->val_key(nameLocation);
+
+    if (cacheHit != NULL)
+        return cacheHit->asBlock();
+
+    // Not cached, now do O(n) search.
+    Value* name = nameLocation->index(0);
+    Value* location = nameLocation->index(1);
 
     // Construct the search name, which looks like TypeName.functionName.
     Value searchName;
@@ -383,17 +398,18 @@ Block* find_method(Block* block, Type* type, Value* name)
     string_append(&searchName, ".");
     string_append(&searchName, name);
 
-    Block* method = find_method_outer(block, type, &searchName);
-    if (method != NULL)
-        return method;
+    Block* method = NULL;
+    
+    if (!is_null(location))
+        method = find_method_outer(location, type, &searchName);
 
-    return find_method_inner(type, name, &searchName);
-}
+    if (method == NULL)
+        method = find_method_inner(type, name, &searchName);
 
-void install_type(Term* term, Type* type)
-{
-    // Type* oldType = as_type(term);
-    set_type(term_value(term), type);
+    // Cache save
+    cache->insert_val(nameLocation)->set_block(method);
+
+    return method;
 }
 
 void set_type_list(Value* value, Type* type1)
@@ -423,7 +439,7 @@ static int type_decl_get_field_count(Block* declaration)
     for (int i=0; i < declaration->length(); i++) {
         Term* term = declaration->get(i);
 
-        if (!is_function(term) || !term->boolProp(sym_FieldAccessor, false))
+        if (!is_function(term) || !term->boolProp(s_FieldAccessor, false))
             continue;
 
         count++;
@@ -446,7 +462,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
     // Add getter.
     {
         accessor = create_function(declaration, fieldName);
-        accessor->setBoolProp(sym_FieldAccessor, true);
+        accessor->setBoolProp(s_FieldAccessor, true);
         Block* accessorContents = nested_contents(accessor);
         Term* selfInput = append_input_placeholder(accessorContents);
         Term* accessorIndex = create_int(accessorContents, fieldIndex, "");
@@ -462,7 +478,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
         set_string(&setterName, "set_");
         string_append(&setterName, fieldName);
         Term* setter = create_function(declaration, as_cstring(&setterName));
-        setter->setBoolProp(sym_Setter, true);
+        setter->setBoolProp(s_Setter, true);
         Block* setterContents = nested_contents(setter);
         Term* selfInput = append_input_placeholder(setterContents);
         Term* valueInput = append_input_placeholder(setterContents);
@@ -472,7 +488,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
                 TermList(selfInput, indexValue, valueInput));
         Term* output = append_output_placeholder(setterContents, setIndex);
         set_declared_type(output, owningType);
-        output->setBoolProp(sym_ExplicitType, true);
+        output->setBoolProp(s_ExplicitType, true);
     }
 
     return accessor;
@@ -480,7 +496,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
 
 void setup_interface_type(Type* type)
 {
-    type->storageType = sym_InterfaceType;
+    type->storageType = s_InterfaceType;
     type->initialize = NULL;
     type->copy = NULL;
     type->release = NULL;
@@ -494,11 +510,11 @@ void Type__declaringTerm(Stack* stack)
     set_term_ref(circa_output(stack, 0), type->declaringTerm);
 }
 
-void Type__make(Stack* stack)
+void Type__make(VM* vm)
 {
-    Type* type = as_type(circa_input(stack, 0));
-    Value* args = circa_input(stack, 1);
-    Value* output = circa_output(stack, 0);
+    Type* type = as_type(circa_input(vm, 0));
+    Value* args = circa_input(vm, 1);
+    Value* output = circa_output(vm);
     
     if (!is_list_based_type(type)) {
         make(type, output);
@@ -510,7 +526,7 @@ void Type__make(Stack* stack)
             string_append(&msg, ", found ");
             string_append(&msg, list_length(args));
             string_append(&msg, ", expected 0");
-            return circa_output_error(stack, as_cstring(&msg));
+            return vm->throw_error(&msg);
         }
 
         return;
@@ -532,7 +548,7 @@ void Type__make(Stack* stack)
             string_append(&msg, list_length(args));
             string_append(&msg, ", expected ");
             string_append(&msg, expectedFieldCount);
-            return circa_output_error(stack, as_cstring(&msg));
+            return vm->throw_error(&msg);
         }
 
         CastResult castResult;
@@ -551,7 +567,7 @@ void Type__make(Stack* stack)
             string_append(&msg, "(index ");
             string_append(&msg, i);
             string_append(&msg, ")");
-            return circa_output_error(stack, as_cstring(&msg));
+            return vm->throw_error(&msg);
         }
     }
 
@@ -587,7 +603,7 @@ void Type__property(Stack* stack)
 void type_install_functions(NativePatch* patch)
 {
     circa_patch_function(patch, "Type.declaringTerm", Type__declaringTerm);
-    circa_patch_function(patch, "Type.make", Type__make);
+    circa_patch_function2(patch, "Type.make", Type__make);
     circa_patch_function(patch, "Type.name", Type__name);
     circa_patch_function(patch, "Type.property", Type__property);
 }

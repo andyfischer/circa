@@ -75,7 +75,7 @@ void native_ptr_setup_type(Type* type)
     type->initialize = native_ptr_initialize;
     type->copy = native_ptr_copy;
     type->release = native_ptr_release;
-    type->storageType = sym_StorageTypeOpaquePointer;
+    type->storageType = s_StorageTypeOpaquePointer;
     type->hashFunc = shallow_hash_func;
 }
 

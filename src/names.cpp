@@ -29,11 +29,11 @@ bool exposes_nested_names(Term* term);
 bool fits_lookup_type(Term* term, Symbol type)
 {
     switch (type) {
-        case sym_LookupAny:
+        case s_LookupAny:
             return true;
-        case sym_LookupType:
+        case s_LookupType:
             return is_type(term);
-        case sym_LookupFunction:
+        case s_LookupFunction:
             return is_function(term);
     }
     internal_error("unknown type in fits_lookup_type");
@@ -72,7 +72,7 @@ Term* run_name_search(NameSearch* params)
 
     int position = 0;
     
-    if (is_symbol(&params->position) && as_symbol(&params->position) == sym_Last)
+    if (is_symbol(&params->position) && as_symbol(&params->position) == s_last)
         position = block->length();
     else
         position = as_int(&params->position);
@@ -100,7 +100,7 @@ Term* run_name_search(NameSearch* params)
             NameSearch nestedSearch;
             nestedSearch.block = term->nestedContents;
             set_value(&nestedSearch.name, &params->name);
-            set_symbol(&nestedSearch.position, sym_Last);
+            set_symbol(&nestedSearch.position, s_last);
             nestedSearch.ordinal = -1;
             nestedSearch.lookupType = params->lookupType;
             nestedSearch.searchParent = false;
@@ -111,13 +111,13 @@ Term* run_name_search(NameSearch* params)
 
         #if 0
         // Check for an 'import' statement. If found, continue this search in the designated module.
-        if (term->function == FUNCS.require && term->boolProp(sym_Syntax_Import, false)) {
+        if (term->function == FUNCS.require && term->boolProp(s_Syntax_Import, false)) {
             Block* module = find_module_for_require_statement(term);
             if (module != NULL) {
                 NameSearch moduleSearch;
                 moduleSearch.block = module;
                 set_value(&moduleSearch.name, &params->name);
-                set_symbol(&moduleSearch.position, sym_Last);
+                set_symbol(&moduleSearch.position, s_last);
                 moduleSearch.ordinal = -1;
                 moduleSearch.lookupType = params->lookupType;
                 moduleSearch.searchParent = false;
@@ -139,7 +139,7 @@ Term* run_name_search(NameSearch* params)
         NameSearch builtinsSearch;
         builtinsSearch.block = find_builtins_block(block);
         set_value(&builtinsSearch.name, &params->name);
-        set_symbol(&builtinsSearch.position, sym_Last);
+        set_symbol(&builtinsSearch.position, s_last);
         builtinsSearch.lookupType = params->lookupType;
         builtinsSearch.ordinal = -1;
         builtinsSearch.searchParent = false;
@@ -162,8 +162,8 @@ Term* run_name_search(NameSearch* params)
         return NULL;
 
     parentSearch.block = parentTerm->owningBlock;
-    if (params->lookupType == sym_LookupFunction)
-        set_symbol(&parentSearch.position, sym_Last);
+    if (params->lookupType == s_LookupFunction)
+        set_symbol(&parentSearch.position, s_last);
     else
         set_int(&parentSearch.position, parentTerm->index + 1);
 
@@ -179,7 +179,7 @@ Term* find_name(Block* block, Value* name, Symbol lookupType)
     NameSearch nameSearch;
     nameSearch.block = block;
     copy(name, &nameSearch.name);
-    set_symbol(&nameSearch.position, sym_Last);
+    set_symbol(&nameSearch.position, s_last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
@@ -191,7 +191,7 @@ Term* find_local_name(Block* block, Value* name, Symbol lookupType)
     NameSearch nameSearch;
     nameSearch.block = block;
     copy(name, &nameSearch.name);
-    set_symbol(&nameSearch.position, sym_Last);
+    set_symbol(&nameSearch.position, s_last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = false;
@@ -203,7 +203,7 @@ Term* find_name(Block* block, const char* nameStr, Symbol lookupType)
     NameSearch nameSearch;
     nameSearch.block = block;
     set_string(&nameSearch.name, nameStr);
-    set_symbol(&nameSearch.position, sym_Last);
+    set_symbol(&nameSearch.position, s_last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
@@ -215,7 +215,7 @@ Term* find_local_name(Block* block, const char* nameStr, Symbol lookupType)
     NameSearch nameSearch;
     nameSearch.block = block;
     set_string(&nameSearch.name, nameStr);
-    set_symbol(&nameSearch.position, sym_Last);
+    set_symbol(&nameSearch.position, s_last);
     nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = false;
@@ -229,31 +229,42 @@ Term* find_local_name_at_position(Block* block, Value* name, Value* position)
     set_value(&nameSearch.name, name);
     set_value(&nameSearch.position, position);
     nameSearch.ordinal = -1;
-    nameSearch.lookupType = sym_LookupAny;
+    nameSearch.lookupType = s_LookupAny;
     nameSearch.searchParent = false;
     return run_name_search(&nameSearch);
 }
 
-Term* find_name_at(Term* term, const char* name)
+Term* find_name_at(Term* term, const char* name, Symbol lookupType)
 {
     NameSearch nameSearch;
     nameSearch.block = term->owningBlock;
     set_string(&nameSearch.name, name);
     set_int(&nameSearch.position, term->index);
     nameSearch.ordinal = -1;
-    nameSearch.lookupType = sym_LookupAny;
+    nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
 }
 
-Term* find_name_at(Term* term, Value* name)
+Term* find_name_at(Value* location, Value* name, Symbol lookupType)
 {
     NameSearch nameSearch;
-    nameSearch.block = term->owningBlock;
+
     copy(name, &nameSearch.name);
-    set_int(&nameSearch.position, term->index);
+
+    if (is_block(location)) {
+        Block* block = as_block(location);
+        nameSearch.block = block;
+        set_symbol(&nameSearch.position, s_last);
+    } else if (is_term_ref(location)) {
+        Term* term = as_term_ref(location);
+        nameSearch.block = term->owningBlock;
+        set_int(&nameSearch.position, term->index);
+    } else {
+        internal_error("find_name_at");
+    }
     nameSearch.ordinal = -1;
-    nameSearch.lookupType = sym_LookupAny;
+    nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
 }
@@ -390,7 +401,7 @@ bool get_relative_name_recursive(Block* block, Term* term, std::stringstream& ou
     }
     
     if (parentTerm->nestedContents != NULL &&
-        block_get_bool_prop(parentTerm->nestedContents, sym_Builtins, false))
+        block_get_bool_prop(parentTerm->nestedContents, s_Builtins, false))
     {
         output << term->name();
         return true;
@@ -562,14 +573,14 @@ Term* find_from_unique_name(Block* block, Value* name)
 
 Type* find_type(Block* block, const char* name)
 {
-    caTerm* term = find_name(block, name, sym_LookupType);
+    caTerm* term = find_name(block, name, s_LookupType);
     if (term == NULL)
         return NULL;
     return circa_type(circa_term_value(term));
 }
 Block* find_function_local(Block* block, const char* name)
 {
-    caTerm* term = find_name(block, name, sym_LookupFunction);
+    caTerm* term = find_name(block, name, s_LookupFunction);
     if (term == NULL)
         return NULL;
     return nested_contents(term);

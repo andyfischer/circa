@@ -88,14 +88,14 @@ Type* infer_type_of_get_index(Term* input)
         return TYPES.any;
 
     switch (list_get_parameter_type(&input->type->parameter)) {
-    case sym_Untyped:
+    case s_Untyped:
         return TYPES.any;
-    case sym_UniformListType:
+    case s_UniformListType:
         return list_get_repeated_type_from_type(input->type);
-    case sym_StructType:
-    case sym_AnonStructType:
+    case s_StructType:
+    case s_AnonStructType:
         return find_common_type(list_get_type_list_from_type(input->type));
-    case sym_Invalid:
+    case s_invalid:
     default:
         return TYPES.any;
     }
@@ -107,7 +107,7 @@ Term* statically_infer_length_func(Block* block, Term* term)
     if (input->function == FUNCS.copy)
         return statically_infer_length_func(block, input->input(0));
 
-    if (input->function == FUNCS.list)
+    if (input->function == FUNCS.make_list)
         return create_int(block, input->numInputs());
 
     if (input->function == FUNCS.list_append) {
@@ -120,7 +120,7 @@ Term* statically_infer_length_func(Block* block, Term* term)
     // Give up
     std::cout << "statically_infer_length_func didn't understand: "
         << input->function->name() << std::endl;
-    return create_symbol_value(block, sym_Unknown);
+    return create_symbol_value(block, s_unknown);
 }
 
 Type* create_typed_unsized_list_type(Type* elementType)

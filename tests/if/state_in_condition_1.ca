@@ -7,8 +7,7 @@ def f() -> bool
 
 def main()
   if f()
-    return
 
-int = make_vm(main)
-int.call
-int.call
+vm = make_vm(main)
+vm.call
+vm.call

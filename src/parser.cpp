@@ -224,19 +224,19 @@ void lhs_expression(ParserCxt* context, Value* result)
 {
     result->set_hashtable();
 
-    Value* format = result->insert(sym_format);
+    Value* format = result->insert(s_format);
 
     if (context->nextIs(tok_Identifier)) {
-        result->set_field_sym(sym_type, sym_ident);
-        format->append_sym(sym_ident);
-        context->consume(result->insert(sym_ident));
+        result->set_field_sym(s_type, s_ident);
+        format->append_sym(s_ident);
+        context->consume(result->insert(s_ident));
 
     } else if (context->nextIs(tok_LSquare)) {
 
-        Value* items = result->insert(sym_items);
+        Value* items = result->insert(s_items);
         items->set_list(0);
         context->consume(format->append());
-        result->set_field_sym(sym_type, sym_list);
+        result->set_field_sym(s_type, s_list);
 
         while (true) {
             possible_whitespace_or_newline(context, format);
@@ -254,23 +254,23 @@ void lhs_expression(ParserCxt* context, Value* result)
         }
 
     } else {
-        result->set_field_sym(sym_type, sym_error);
-        result->set_field_str(sym_message, "Unexpected token");
+        result->set_field_sym(s_type, s_error);
+        result->set_field_str(s_message, "Unexpected token");
     }
 }
 
 Term* apply_lhs(Block* block, Term* term, Value* lhs)
 {
-    switch (lhs->field(sym_type)->asSymbol()) {
-    case sym_ident:
-        rename(term, lhs->field(sym_ident));
+    switch (lhs->field(s_type)->asSymbol()) {
+    case s_ident:
+        rename(term, lhs->field(s_ident));
         return term;
 
-    case sym_list: {
+    case s_list: {
         term = apply(block, FUNCS.destructure_list, TermList(term));
 
-        Value* items = lhs->field(sym_items);
-        term->setIntProp(sym_Count, items->length());
+        Value* items = lhs->field(s_items);
+        term->setIntProp(s_count, items->length());
         update_extra_outputs(term);
 
         for (int i=0; i < items->length(); i++) {
@@ -293,7 +293,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
     ca_assert(parentTerm != NULL);
     ca_assert(parentTerm->sourceLoc.defined());
 
-    parentTerm->setStringProp(sym_Syntax_BlockStyle, "sigIndent");
+    parentTerm->setStringProp(s_Syntax_BlockStyle, "sigIndent");
 
     int parentTermIndent = tokens.indentOfLine(-1);
 
@@ -301,7 +301,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
     std::string postHeadingWs = possible_statement_ending(tokens);
     bool foundNewline = postHeadingWs.find_first_of("\n") != std::string::npos;
 
-    parentTerm->setStringProp(sym_Syntax_PostHeadingWs, postHeadingWs);
+    parentTerm->setStringProp(s_Syntax_PostHeadingWs, postHeadingWs);
 
     // If we're still on the same line, keep consuming statements. We might only
     // find a comment (in which case we should keep parsing subsequent lines),
@@ -320,7 +320,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
 
             Term* statement = inside_block_step(block, tokens, context).term;
 
-            std::string const& lineEnding = statement->stringProp(sym_Syntax_LineEnding, "");
+            std::string const& lineEnding = statement->stringProp(s_Syntax_LineEnding, "");
             bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
 
             if (statement->function != FUNCS.comment)
@@ -336,9 +336,9 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
                 // ending.
                 if (foundStatementOnSameLine) {
 
-                    parentTerm->setStringProp(sym_Syntax_LineEnding,
-                            statement->stringProp(sym_Syntax_LineEnding,""));
-                    statement->removeProperty(sym_Syntax_LineEnding);
+                    parentTerm->setStringProp(s_Syntax_LineEnding,
+                            statement->stringProp(s_Syntax_LineEnding,""));
+                    statement->removeProperty(s_Syntax_LineEnding);
                 }
                 return;
             }
@@ -363,9 +363,9 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
     if (find_indentation_of_next_statement(tokens) <= parentTermIndent) {
         // Take the line ending that we parsed as postHeadingWs, and move it over
         // to lineEnding instead (so that we don't parse another line ending).
-        parentTerm->setStringProp(sym_Syntax_LineEnding,
-                parentTerm->stringProp(sym_Syntax_PostHeadingWs, ""));
-        parentTerm->removeProperty(sym_Syntax_PostHeadingWs);
+        parentTerm->setStringProp(s_Syntax_LineEnding,
+                parentTerm->stringProp(s_Syntax_PostHeadingWs, ""));
+        parentTerm->removeProperty(s_Syntax_PostHeadingWs);
         return;
     }
 
@@ -378,7 +378,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
     //         a = 1
     //         return a + 2
 
-    parentTerm->setBoolProp(sym_Syntax_Multiline, true);
+    parentTerm->setBoolProp(s_Syntax_Multiline, true);
 
     int indentationLevel = 0;
     while (!tokens.finished()) {
@@ -397,7 +397,7 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
 
         if (statement->function != FUNCS.comment) {
             indentationLevel = int(statement->stringProp(
-                sym_Syntax_PreWs, "").length());
+                s_Syntax_PreWs, "").length());
             break;
         }
     }
@@ -425,10 +425,10 @@ void consume_block_with_significant_indentation(Block* block, TokenStream& token
 void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* context,
         Term* parentTerm, ParsingStep inside_block_step)
 {
-    parentTerm->setStringProp(sym_Syntax_BlockStyle, "braces");
+    parentTerm->setStringProp(s_Syntax_BlockStyle, "braces");
 
     if (tokens.nextIs(tok_Whitespace))
-        parentTerm->setStringProp(sym_Syntax_PostHeadingWs, possible_whitespace(tokens));
+        parentTerm->setStringProp(s_Syntax_PostHeadingWs, possible_whitespace(tokens));
 
     tokens.consume(tok_LBrace);
 
@@ -447,7 +447,7 @@ void consume_block_with_braces(Block* block, TokenStream& tokens, ParserCxt* con
 void apply_hints_from_parsed_input(Term* term, int index, ParseResult const& parseResult)
 {
     if (parseResult.identifierRebind) {
-        term_insert_input_property(term, index, sym_Syntax_IdentifierRebind)->set_bool(true);
+        term_insert_input_property(term, index, s_Syntax_IdentifierRebind)->set_bool(true);
     }
 }
 
@@ -541,13 +541,13 @@ ParseResult parse_statement(Block* block, TokenStream& tokens, ParserCxt* contex
 
     set_source_location(result.term, sourceStartPosition, tokens);
 
-    if (!is_multiline_block(result.term) && !result.term->hasProperty(sym_Syntax_LineEnding)) {
+    if (!is_multiline_block(result.term) && !result.term->hasProperty(s_Syntax_LineEnding)) {
 
         // Consume some trailing whitespace
         append_whitespace(result.term, possible_whitespace(tokens));
 
         // Consume a newline or ;
-        result.term->setStringProp(sym_Syntax_LineEnding, possible_statement_ending(tokens));
+        result.term->setStringProp(s_Syntax_LineEnding, possible_statement_ending(tokens));
     }
 
     // Mark this term as a statement
@@ -586,7 +586,7 @@ ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     Term* result = apply(block, FUNCS.comment, TermList());
-    result->setProp(sym_Comment, &commentText);
+    result->setProp(s_Comment, &commentText);
 
     return ParseResult(result);
 }
@@ -604,7 +604,7 @@ ParseResult type_expr(Block* block, TokenStream& tokens,
     Value typeName;
     tokens.consumeStr(&typeName);
 
-    Term* typeTerm = find_name(block, &typeName, sym_LookupType);
+    Term* typeTerm = find_name(block, &typeName, s_LookupType);
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
@@ -681,9 +681,9 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     set_starting_source_location(result, startPosition, tokens);
 
     if (methodType != NULL)
-        result->setBoolProp(sym_Syntax_MethodDecl, true);
+        result->setBoolProp(s_Syntax_MethodDecl, true);
 
-    result->setStringProp(sym_Syntax_PostNameWs, possible_whitespace(tokens));
+    result->setStringProp(s_Syntax_PostNameWs, possible_whitespace(tokens));
 
     // Optional list of qualifiers
     while (tokens.nextIs(tok_ColonString)) {
@@ -696,7 +696,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         symbolText += possible_whitespace(tokens);
 
-        result->setStringProp(sym_Syntax_Properties, result->stringProp(sym_Syntax_Properties,"")
+        result->setStringProp(s_Syntax_Properties, result->stringProp(s_Syntax_Properties,"")
                 + symbolText);
     }
 
@@ -778,14 +778,14 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // Save some information on the input as properties.
         if (!explicitType)
-            input->setBoolProp(sym_Syntax_ExplicitType, false);
+            input->setBoolProp(s_Syntax_ExplicitType, false);
 
         if (isStateArgument)
-            input->setBoolProp(sym_State, true);
+            input->setBoolProp(s_State, true);
 
         if (rebindSymbol) {
-            input->setBoolProp(sym_Output, true);
-            input->setBoolProp(sym_Syntax_RebindSymbol, true);
+            input->setBoolProp(s_Output, true);
+            input->setBoolProp(s_Syntax_RebindSymbol, true);
         }
 
         // Optional list of qualifiers
@@ -794,17 +794,21 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
             // Future: store syntax hint
             if (symbolText == ":ignore_error") {
-                input->setBoolProp(sym_IgnoreError, true);
+                input->setBoolProp(s_IgnoreError, true);
             } else if (symbolText == ":optional") {
-                input->setBoolProp(sym_Optional, true);
+                input->setBoolProp(s_Optional, true);
             } else if (symbolText == ":output" || symbolText == ":out") {
-                input->setBoolProp(sym_Output, true);
+                input->setBoolProp(s_Output, true);
             } else if (symbolText == ":multiple") {
-                input->setBoolProp(sym_Multiple, true);
+                input->setBoolProp(s_Multiple, true);
             } else if (symbolText == ":ref") {
-                input->setBoolProp(sym_Ref, true);
+                input->setBoolProp(s_Ref, true);
             } else if (symbolText == ":meta") {
-                input->setBoolProp(sym_Meta, true);
+                input->setBoolProp(s_Meta, true);
+            } else if (symbolText == ":local_state") {
+                input->setBoolProp(s_local_state, true);
+            } else if (symbolText == ":local_state_key") {
+                input->setBoolProp(s_local_state_key, true);
             } else {
                 return syntax_error(block, tokens, startPosition,
                     "Unrecognized qualifier: "+symbolText);
@@ -849,10 +853,10 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         // No output type specified.
         append_output_placeholder(contents, NULL);
     } else {
-        result->setStringProp(sym_Syntax_WhitespacePreColon, possible_whitespace(tokens));
+        result->setStringProp(s_Syntax_WhitespacePreColon, possible_whitespace(tokens));
         tokens.consume(tok_RightArrow);
-        result->setBoolProp(sym_Syntax_ExplicitType, true);
-        result->setStringProp(sym_Syntax_WhitespacePostColon, possible_whitespace(tokens));
+        result->setBoolProp(s_Syntax_ExplicitType, true);
+        result->setStringProp(s_Syntax_WhitespacePostColon, possible_whitespace(tokens));
 
         bool expectMultiple = false;
         
@@ -868,7 +872,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             }
 
             std::string typeName = tokens.consumeStr();
-            Term* typeTerm = find_name(block, typeName.c_str(), sym_LookupType);
+            Term* typeTerm = find_name(block, typeName.c_str(), s_LookupType);
 
             if (typeTerm == NULL) {
                 std::string msg;
@@ -885,7 +889,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
             Term* output = append_output_placeholder(contents, NULL);
             set_declared_type(output, unbox_type(typeTerm));
-            output->setBoolProp(sym_ExplicitType, true);
+            output->setBoolProp(s_ExplicitType, true);
 
             if (expectMultiple && lookahead_next_non_whitespace(tokens, false) == tok_Comma) {
                 tokens.consume(tok_Comma);
@@ -903,6 +907,8 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     ca_assert(is_function(result));
 
+    on_new_function_parsed(result, &functionName);
+
     // Consume contents, if there are still tokens left. It's okay to reach EOF here.
     if (!tokens.finished() && lookahead_next_non_whitespace(tokens, false) != tok_Semicolon) {
         context->push();
@@ -916,8 +922,6 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     ca_assert(is_function(result));
 
     set_source_location(result, startPosition, tokens);
-
-    on_new_function_parsed(result, &functionName);
 
     return ParseResult(result);
 }
@@ -963,7 +967,7 @@ ParseResult anon_function_decl(Block* block, TokenStream& tokens, ParserCxt* con
 
     finish_building_function(contents);
     set_source_location(result, startPosition, tokens);
-    term_set_bool_prop(result, sym_Syntax_AnonFunction, true);
+    term_set_bool_prop(result, s_Syntax_AnonFunction, true);
     return ParseResult(result);
 }
 
@@ -1030,7 +1034,7 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     Term* result = create_value(block, TYPES.type, as_cstring(&name));
 
     // Attributes
-    result->setStringProp(sym_Syntax_PreLBracketWs,
+    result->setStringProp(s_Syntax_PreLBracketWs,
             possible_whitespace_or_newline(tokens));
 
     while (tokens.nextIs(tok_ColonString)) {
@@ -1075,14 +1079,14 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             return syntax_error(block, tokens, startPosition, "Unrecognized magic symbol for type");
         }
 
-        result->setStringProp(sym_Syntax_TypeMagicSymbol, as_cstring(&str));
-        result->setBoolProp(sym_Syntax_NoBrackets, true);
+        result->setStringProp(s_Syntax_TypeMagicSymbol, as_cstring(&str));
+        result->setBoolProp(s_Syntax_NoBrackets, true);
         return ParseResult(result);
     }
 
     // if there's a semicolon, or we've run out of tokens, then finish here.
     if (tokens.nextIs(tok_Semicolon) || tokens.finished()) {
-        result->setBoolProp(sym_Syntax_NoBrackets, true);
+        result->setBoolProp(s_Syntax_NoBrackets, true);
         return ParseResult(result);
     }
 
@@ -1101,14 +1105,14 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     int closingToken = tokens.nextIs(tok_LBrace) ? tok_RBrace : tok_RSquare;
     tokens.consume();
 
-    result->setStringProp(sym_Syntax_PostLBracketWs,
+    result->setStringProp(s_Syntax_PostLBracketWs,
             possible_whitespace_or_newline(tokens));
 
     while (!tokens.nextIs(closingToken)) {
 
         if (lookahead_next_non_whitespace(tokens, false) == closingToken) {
             std::string preWs = possible_whitespace_or_newline(tokens);
-            result->setStringProp(sym_Syntax_PreRBracketWs, preWs);
+            result->setStringProp(s_Syntax_PreRBracketWs, preWs);
             break;
         }
 
@@ -1136,7 +1140,7 @@ ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* conte
         Term* commentTerm = comment(block, tokens, context).term;
         std::string lineEnding = possible_whitespace_or_newline(tokens);
         if (lineEnding != "")
-            commentTerm->setStringProp(sym_Syntax_LineEnding, lineEnding);
+            commentTerm->setStringProp(s_Syntax_LineEnding, lineEnding);
         return ParseResult(commentTerm);
     }
 
@@ -1154,8 +1158,8 @@ ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* conte
 
     // Create the accessor function.
     Term* accessor = type_decl_append_field(block, fieldName.c_str(), fieldType);
-    accessor->setStringProp(sym_Syntax_PreWs, preWs);
-    accessor->setStringProp(sym_Syntax_PostNameWs, postNameWs);
+    accessor->setStringProp(s_Syntax_PreWs, preWs);
+    accessor->setStringProp(s_Syntax_PostNameWs, postNameWs);
 
     Value postWhitespace;
     if (tokens.nextIs(tok_Whitespace))
@@ -1170,7 +1174,7 @@ ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* conte
         tokens.consumeStr(&postWhitespace);
 
     if (!is_null(&postWhitespace))
-        accessor->setProp(sym_Syntax_PostWs, &postWhitespace);
+        accessor->setProp(s_Syntax_PostWs, &postWhitespace);
     
     return ParseResult(accessor);
 }
@@ -1223,19 +1227,17 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
         if (expectCondition) {
             possible_whitespace(tokens);
-            caseTerm = if_block_append_case(contents);
-            Block* caseContents = nested_contents(caseTerm);
-            Term* condition = infix_expression(caseContents, tokens, context, 0).term;
-            case_add_condition_check(caseContents, condition);
+            Term* condition = infix_expression(block, tokens, context, 0).term;
+            caseTerm = if_block_append_case(contents, condition);
             ca_assert(condition != NULL);
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            caseTerm = if_block_append_case(contents);
+            caseTerm = if_block_append_case(contents, NULL);
             rename(caseTerm, "else");
         }
 
-        caseTerm->setStringProp(sym_Syntax_PreWs, preKeywordWhitespace);
+        caseTerm->setStringProp(s_Syntax_PreWs, preKeywordWhitespace);
         set_starting_source_location(caseTerm, leadingTokenPosition, tokens);
 
         context->push();
@@ -1254,7 +1256,7 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // If the previous block was multiline, then stop here if the upcoming
         // indentation is greater than the expected indent.
-        if (caseTerm->boolProp(sym_Syntax_Multiline, false)
+        if (caseTerm->boolProp(s_Syntax_Multiline, false)
                 && (blockIndent > find_indentation_of_next_statement(tokens)))
             break;
 
@@ -1264,16 +1266,19 @@ ParseResult if_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // If the last block was marked syntax:multiline, then add a lineEnding, so that
     // we don't parse another one.
-    if (caseTerm->boolProp(sym_Syntax_Multiline, false)
-            || caseTerm->hasProperty(sym_Syntax_LineEnding))
-        result->setStringProp(sym_Syntax_LineEnding, "");
+    if (caseTerm->boolProp(s_Syntax_Multiline, false)
+            || caseTerm->hasProperty(s_Syntax_LineEnding))
+        result->setStringProp(s_Syntax_LineEnding, "");
 
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
-        Term* elseTerm = if_block_append_case(contents);
+        Term* elseTerm = if_block_append_case(contents, NULL);
         rename(elseTerm, "else");
         hide_from_source(elseTerm);
     }
+
+    // Move the 'if' term, to place it after condition expressions.
+    move_before_final_terms(result);
 
     finish_if_block(result);
     set_source_location(result, startPosition, tokens);
@@ -1329,26 +1334,26 @@ ParseResult case_block(Block* block, TokenStream& tokens, ParserCxt* context)
             "'case' keyword must occur inside 'switch' block");
     }
 
-    Term* result = apply(block, FUNCS.case_func, TermList());
-    set_starting_source_location(result, startPosition, tokens);
-    Block* contents = nested_contents(result);
+    Block* outsideBlock = switchTerm->owningBlock;
 
-    Term* caseInput = infix_expression(contents, tokens, context, 0).term;
+    Term* condition = infix_expression(outsideBlock, tokens, context, 0).term;
 
     if (switchTerm->numInputs() > 0) {
-        caseInput = apply(contents, FUNCS.equals, TermList(caseInput, switchTerm->input(0)));
-        hide_from_source(caseInput);
+        condition = apply(outsideBlock, FUNCS.equals, TermList(condition, switchTerm->input(0)));
+        hide_from_source(condition);
     }
-    
-    case_add_condition_check(contents, caseInput);
+
+    Term* caseTerm = apply(block, FUNCS.case_func, TermList(condition));
+    set_starting_source_location(caseTerm, startPosition, tokens);
+    Block* contents = nested_contents(caseTerm);
 
     context->push();
     consume_block(contents, tokens, context);
     context->pop();
 
-    set_source_location(result, startPosition, tokens);
-    set_is_statement(result, true);
-    return ParseResult(result);
+    set_source_location(caseTerm, startPosition, tokens);
+    set_is_statement(caseTerm, true);
+    return ParseResult(caseTerm);
 }
 
 ParseResult else_block(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -1436,9 +1441,9 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     set_module_ref(term_value(term), &path, moduleRelativeTo);
 
     if (keyword == tok_Import) {
-        term->setBoolProp(sym_Syntax_Import, true);
+        term->setBoolProp(s_Syntax_Import, true);
     } else {
-        term->setBoolProp(sym_Syntax_Require, true);
+        term->setBoolProp(s_Syntax_Require, true);
     }
 
     // Possibly add a require_check()
@@ -1562,18 +1567,21 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
     if (typeTerm != NULL && is_type(typeTerm))
         explicitIteratorType = as_type(typeTerm);
 
-    Term* listExpr = infix_expression(block, tokens, context, 0).term;
+    Term* inputExpr = infix_expression(block, tokens, context, 0).term;
+    Term* iteratorExpr = apply(block, FUNCS.to_seq, TermList(inputExpr));
+    hide_from_source(iteratorExpr);
 
-    Term* forTerm = apply(block, FUNCS.for_func, TermList(listExpr));
+    Term* forTerm = apply(block, FUNCS.for_func, TermList());
+
     Block* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
-    term_insert_input_property(forTerm, 0, sym_Syntax_PostWs)->set_string("");
+    //FIXME term_insert_input_property(forTerm, 0, s_Syntax_PostWs)->set_string("");
     if (!is_null(&iteratorTypeName))
-        forTerm->setStringProp(sym_Syntax_ExplicitType, as_cstring(&iteratorTypeName));
+        forTerm->setStringProp(s_Syntax_ExplicitType, as_cstring(&iteratorTypeName));
 
-    forTerm->setBoolProp(sym_ModifyList, rebindListName);
+    forTerm->setBoolProp(s_ModifyList, rebindListName);
 
-    start_building_for_loop(forTerm, &indexName, &iteratorName, explicitIteratorType);
+    start_building_for_loop(contents, iteratorExpr, &indexName, &iteratorName, explicitIteratorType);
 
     context->push();
     consume_block(contents, tokens, context);
@@ -1584,7 +1592,7 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // Wrap up the rebound value, if it's a complex lexpr.
     if (rebindListName)
-        rebind_possible_accessor(block, listExpr, forTerm);
+        rebind_possible_accessor(block, inputExpr, forTerm);
 
     return ParseResult(forTerm);
 }
@@ -1643,7 +1651,7 @@ ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
     bool unknownType = false;
     if (!string_equals(&typeName, "")) {
-        Term* typeTerm = find_name(block, &typeName, sym_LookupType);
+        Term* typeTerm = find_name(block, &typeName, s_LookupType);
 
         if (typeTerm == NULL) {
             unknownType = true;
@@ -1666,12 +1674,13 @@ ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Term* initialValue = infix_expression(contents, tokens, context, 0).term;
 
         // Possibly add a cast()
+        /*
         if (type != declared_type(initialValue) && type != TYPES.any) {
             ca_assert(type->declaringTerm != NULL);
             initialValue = apply(nested_contents(initializer), FUNCS.cast, TermList(initialValue, type->declaringTerm));
-            initialValue->setBoolProp(sym_Hidden, true);
+            initialValue->setBoolProp(s_Hidden, true);
             set_declared_type(initialValue, type);
-        }
+        }*/
 
         append_output_placeholder(contents, initialValue);
         insert_nonlocal_terms(contents);
@@ -1685,17 +1694,17 @@ ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     // Create the declared_state() term.
-    Term* result = apply(block, FUNCS.declared_state, TermList(), as_cstring(&name));
+    Term* result = apply(block, FUNCS.declared_state,
+        TermList(NULL, type->declaringTerm, initializer),
+        as_cstring(&name));
 
     set_declared_type(result, type);
-    set_input(result, 0, type->declaringTerm);
-    set_input(result, 1, initializer);
     
-    result->setBoolProp(sym_Syntax_StateKeyword, true);
+    result->setBoolProp(s_Syntax_StateKeyword, true);
     if (unknownType && !is_null(&typeName))
-        result->setProp(sym_Error_UnknownType, &typeName);
+        result->setProp(s_Error_UnknownType, &typeName);
     if (!is_null(&typeName))
-        result->setProp(sym_Syntax_ExplicitType, &typeName);
+        result->setProp(s_Syntax_ExplicitType, &typeName);
 
     set_source_location(result, startPosition, tokens);
 
@@ -1722,8 +1731,8 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
         Term* output = find_or_create_next_unnamed_term_output(left);
         Term* set = rebind_possible_accessor(block, output, right);
 
-        set->setStringProp(sym_Syntax_PreEqualsSpace, preEqualsSpace);
-        set->setStringProp(sym_Syntax_PostEqualsSpace, postEqualsSpace);
+        set->setStringProp(s_Syntax_PreEqualsSpace, preEqualsSpace);
+        set->setStringProp(s_Syntax_PostEqualsSpace, postEqualsSpace);
 
         term = set;
     }
@@ -1789,8 +1798,8 @@ ParseResult return_statement(Block* block, TokenStream& tokens, ParserCxt* conte
     Term* result = apply(block, FUNCS.return_func, outputs);
 
     if (postKeywordWs != " ")
-        result->setStringProp(sym_Syntax_PostKeywordWs, postKeywordWs);
-    result->setBoolProp(sym_Syntax_ReturnStatement, true);
+        result->setStringProp(s_Syntax_PostKeywordWs, postKeywordWs);
+    result->setBoolProp(s_Syntax_ReturnStatement, true);
     
     return ParseResult(result);
 }
@@ -1889,7 +1898,7 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
         set_source_location(setWithSelectorTerm, startPosition, tokens);
 
     if (hasSimpleNameBinding) {
-        result->setProp(sym_Syntax_NameBinding, &nameBindingSyntax);
+        result->setProp(s_Syntax_NameBinding, &nameBindingSyntax);
 
         for (int i=0; i < list_length(&names); i++)
             rename(find_or_create_next_unnamed_term_output(result), list_get(&names, i));
@@ -2042,10 +2051,10 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 Term* term = result.term;
 
                 set_input(term, 1, left.term);
-                term->setStringProp(sym_Syntax_DeclarationStyle, "method-right-arrow");
+                term->setStringProp(s_Syntax_DeclarationStyle, "method-right-arrow");
 
-                term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string("");
-                term_insert_input_property(term, 1, sym_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
+                term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string("");
+                term_insert_input_property(term, 1, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
 
             } else {
 
@@ -2055,14 +2064,14 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
                 Term* term = result.term;
                 if (operatorMatch == tok_RightArrow)
-                    term->setStringProp(sym_Syntax_DeclarationStyle, "arrow-concat");
+                    term->setStringProp(s_Syntax_DeclarationStyle, "arrow-concat");
                 else
-                    term->setStringProp(sym_Syntax_DeclarationStyle, "bar-apply");
-                term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
+                    term->setStringProp(s_Syntax_DeclarationStyle, "bar-apply");
+                term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
 
             }
 
-            result.term->setStringProp(sym_Syntax_PostOperatorWs, postOperatorWhitespace);
+            result.term->setStringProp(s_Syntax_PostOperatorWs, postOperatorWhitespace);
 
         } else {
             ParseResult rightExpr = infix_expression(block, tokens, context,
@@ -2080,14 +2089,14 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
             Term* term = apply(block, opInfo.function, TermList(left.term, rightExpr.term));
 
-            term->setStringProp(sym_Syntax_DeclarationStyle, "infix");
-            term->setStringProp(sym_Syntax_FunctionName, operatorStr);
+            term->setStringProp(s_Syntax_DeclarationStyle, "infix");
+            term->setStringProp(s_Syntax_FunctionName, operatorStr);
             
             if (opInfo.isRebinding)
-                term->setBoolProp(sym_Syntax_RebindingInfix, true);
+                term->setBoolProp(s_Syntax_RebindingInfix, true);
 
-            term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
-            term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string(postOperatorWhitespace.c_str());
+            term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
+            term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string(postOperatorWhitespace.c_str());
 
             if (opInfo.isRebinding) {
                 // Just bind the name if left side is an identifier.
@@ -2101,16 +2110,16 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
                     Term* set = rebind_possible_accessor(block, left.term, newValue);
 
-                    set->setStringProp(sym_Syntax_RebindOperator, operatorStr);
+                    set->setStringProp(s_Syntax_RebindOperator, operatorStr);
                     set_is_statement(set, true);
 
                     // Move an input's post-whitespace to this term.
                     Value* existingPostWhitespace =
-                        term_get_input_property(newValue, 0, sym_Syntax_PostWs);
+                        term_get_input_property(newValue, 0, s_Syntax_PostWs);
 
                     if (existingPostWhitespace != NULL)
                         move(existingPostWhitespace,
-                            term_insert_property(set, sym_Syntax_PreEqualsSpace));
+                            term_insert_property(set, s_Syntax_PreEqualsSpace));
 
                     term = set;
                 }
@@ -2141,8 +2150,8 @@ ParseResult unary_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             }
             else if (is_float(term_value(expr.term))) {
                 set_float(term_value(expr.term), as_float(term_value(expr.term)) * -1.0f);
-                expr.term->setStringProp(sym_Syntax_OriginalFormat,
-                    "-" + expr.term->stringProp(sym_Syntax_OriginalFormat, ""));
+                expr.term->setStringProp(s_Syntax_OriginalFormat,
+                    "-" + expr.term->stringProp(s_Syntax_OriginalFormat, ""));
                 return expr;
             }
         }
@@ -2157,8 +2166,8 @@ ParseResult unary_expression(Block* block, TokenStream& tokens, ParserCxt* conte
         std::string postOperatorWs = possible_whitespace(tokens);
         ParseResult expr = atom_with_subscripts(block, tokens, context);
         Term* result = apply(block, FUNCS.not_func, TermList(expr.term));
-        result->setStringProp(sym_Syntax_DeclarationStyle, "prefix");
-        result->setStringProp(sym_Syntax_PostFunctionWs, postOperatorWs);
+        result->setStringProp(s_Syntax_DeclarationStyle, "prefix");
+        result->setStringProp(s_Syntax_PostFunctionWs, postOperatorWs);
 
         return ParseResult(result);
     }
@@ -2173,7 +2182,7 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
     int index = 0;
     while (!tokens.nextIs(tok_RParen) && !tokens.nextIs(tok_RSquare) && !tokens.finished()) {
 
-        inputHints.set(index, sym_Syntax_PreWs, possible_whitespace_or_newline(tokens));
+        inputHints.set(index, s_Syntax_PreWs, possible_whitespace_or_newline(tokens));
 
         if (tokens.nextIs(tok_State)) {
             tokens.consume(tok_State);
@@ -2188,14 +2197,14 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
             possible_whitespace(tokens);
             Value trueValue;
             set_bool(&trueValue, true);
-            inputHints.set(index, sym_State, &trueValue);
-            inputHints.set(index, sym_ExplicitState, &trueValue);
-            inputHints.set(index, sym_RebindsInput, "t");
+            inputHints.set(index, s_State, &trueValue);
+            inputHints.set(index, s_ExplicitState, &trueValue);
+            inputHints.set(index, s_RebindsInput, "t");
         }
 
         if (lookahead_match_rebind_argument(tokens)) {
             tokens.consume(tok_Ampersand);
-            inputHints.set(index, sym_RebindsInput, "t");
+            inputHints.set(index, s_RebindsInput, "t");
         }
 
         ParseResult parseResult = expression(block, tokens, context);
@@ -2203,18 +2212,18 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
         if (parseResult.identifierRebind) {
             Value trueValue;
             set_bool(&trueValue, true);
-            inputHints.set(index, sym_Syntax_IdentifierRebind, &trueValue);
+            inputHints.set(index, s_Syntax_IdentifierRebind, &trueValue);
         }
 
-        inputHints.set(index, sym_Syntax_PostWs, possible_whitespace_or_newline(tokens));
+        inputHints.set(index, s_Syntax_PostWs, possible_whitespace_or_newline(tokens));
 
         arguments.append(parseResult.term);
 
         if (tokens.nextIs(tok_Comma) || tokens.nextIs(tok_Semicolon))
-            inputHints.append(index, sym_Syntax_PostWs, tokens.consumeStr());
+            inputHints.append(index, s_Syntax_PostWs, tokens.consumeStr());
 
         // Might be whitespace after the comma as well
-        inputHints.append(index, sym_Syntax_PostWs, possible_whitespace_or_newline(tokens));
+        inputHints.append(index, s_Syntax_PostWs, possible_whitespace_or_newline(tokens));
 
         index++;
     }
@@ -2275,7 +2284,12 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     Term* function = NULL;
     
     if (rootType != NULL) {
-        Block* method = find_method(block, rootType, &functionName);
+        Value nameLocation;
+        nameLocation.set_list(2);
+        nameLocation.index(0)->set(&functionName);
+        nameLocation.index(1)->set_block(block);
+
+        Block* method = find_method_on_type(rootType, &nameLocation);
         if (method != NULL)
             function = method->owningTerm;
     }
@@ -2287,7 +2301,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         // Method could not be statically found. Create a dynamic_method call.
         function = FUNCS.dynamic_method;
         term = apply(block, function, inputs);
-        term->setStringProp(sym_MethodName, as_cstring(&functionName));
+        term->setStringProp(s_MethodName, as_cstring(&functionName));
 
     } else {
         term = apply(block, function, inputs);
@@ -2295,10 +2309,10 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     inputHints.apply(term);
     apply_hints_from_parsed_input(term, 0, lhs);
-    term->setStringProp(sym_Syntax_FunctionName, as_cstring(&functionName));
-    term->setStringProp(sym_Syntax_DeclarationStyle, "method-call");
+    term->setStringProp(s_Syntax_FunctionName, as_cstring(&functionName));
+    term->setStringProp(s_Syntax_DeclarationStyle, "method-call");
     if (!hasParens)
-        term->setBoolProp(sym_Syntax_NoParens, true);
+        term->setBoolProp(s_Syntax_NoParens, true);
 
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
@@ -2325,8 +2339,11 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // If function isn't found, bail out with unknown_function.
     if (function == NULL) {
-        Term* result = apply(block, FUNCS.unknown_function, inputs);
-        result->setStringProp(sym_Syntax_FunctionName, functionName);
+        Term* unknown_function = FUNCS.unknown_function;
+        if (unknown_function == NULL)
+            unknown_function = FUNCS.unknown_function_prelude;
+        Term* result = apply(block, unknown_function, inputs);
+        result->setStringProp(s_Syntax_FunctionName, functionName);
         return ParseResult(result);
     }
 
@@ -2335,7 +2352,7 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
     // Store the function name that they used, if it wasn't the function's
     // actual name (for example, the function might be inside a namespace).
     if (function == NULL || result->function->name() != functionName)
-        result->setStringProp(sym_Syntax_FunctionName, functionName);
+        result->setStringProp(s_Syntax_FunctionName, functionName);
 
     inputHints.apply(result);
 
@@ -2348,14 +2365,14 @@ ParseResult right_apply_to_function(Block* block, Term* lhs, Value* functionName
 
     if (function == NULL) {
         Term* term = apply(block, FUNCS.unknown_function, TermList(lhs));
-        term->setProp(sym_Syntax_FunctionName, functionName);
+        term->setProp(s_Syntax_FunctionName, functionName);
         return ParseResult(term);
     } else {
 
         Term* term = apply(block, function, TermList(lhs));
 
         if (!string_equals(&term->function->nameValue, functionName))
-            term->setProp(sym_Syntax_FunctionName, functionName);
+            term->setProp(s_Syntax_FunctionName, functionName);
 
         return ParseResult(term);
     }
@@ -2369,9 +2386,9 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
 
     Term* term = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
 
-    term->setStringProp(sym_Syntax_DeclarationStyle, "dot-access");
-    term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string("");
-    term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string("");
+    term->setStringProp(s_Syntax_DeclarationStyle, "dot-access");
+    term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string("");
+    term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string("");
 
     set_source_location(term, startPosition, tokens);
 
@@ -2409,9 +2426,9 @@ ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* c
             tokens.consume(tok_RSquare);
 
             Term* term = apply(block, FUNCS.get_index, TermList(head, subscript));
-            term_insert_input_property(term, 0, sym_Syntax_PostWs)->set_string("");
-            term_insert_input_property(term, 1, sym_Syntax_PreWs)->set_string(postLbracketWs.c_str());
-            term->setBoolProp(sym_Syntax_Brackets, true);
+            term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string("");
+            term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string(postLbracketWs.c_str());
+            term->setBoolProp(s_Syntax_Brackets, true);
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
             continue;
@@ -2433,7 +2450,7 @@ ParseResult atom_with_subscripts(Block* block, TokenStream& tokens, ParserCxt* c
             result = method_call(block, tokens, context, result);
 
             if (preDotWs != "" && result.term != NULL)
-                result.term->setStringProp(sym_Syntax_PreDotWs, preDotWs.c_str());
+                result.term->setStringProp(s_Syntax_PreDotWs, preDotWs.c_str());
             
             continue;
         }
@@ -2664,7 +2681,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
             return syntax_error(block, tokens, startPosition, as_cstring(&msg));
         }
         tokens.consume(tok_RParen);
-        result.term->setIntProp(sym_Syntax_Parens, result.term->intProp(sym_Syntax_Parens,0) + 1);
+        result.term->setIntProp(s_Syntax_Parens, result.term->intProp(s_Syntax_Parens,0) + 1);
     }
     else {
         std::string next;
@@ -2696,7 +2713,7 @@ ParseResult literal_hex(Block* block, TokenStream& tokens, ParserCxt* context)
     std::string text = tokens.consumeStr(tok_HexInteger);
     int value = (int) strtoul(text.c_str(), NULL, 0);
     Term* term = create_int(block, value);
-    term->setStringProp(sym_Syntax_IntegerFormat, "hex");
+    term->setStringProp(s_Syntax_IntegerFormat, "hex");
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
@@ -2713,10 +2730,10 @@ ParseResult literal_float(Block* block, TokenStream& tokens, ParserCxt* context)
     // Assign a default step value, using the # of decimal figures
     int decimalFigures = get_number_of_decimal_figures(text);
     float step = (float) std::pow(0.1, decimalFigures);
-    term->setFloatProp(sym_Step, step);
+    term->setFloatProp(s_Step, step);
 
     // Store the original string
-    term->setStringProp(sym_Syntax_OriginalFormat, text);
+    term->setStringProp(s_Syntax_OriginalFormat, text);
 
     float mutability = 0.0;
 
@@ -2726,7 +2743,7 @@ ParseResult literal_float(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     if (mutability != 0.0)
-        term->setFloatProp(sym_Mutability, mutability);
+        term->setFloatProp(s_Mutability, mutability);
 
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
@@ -2749,8 +2766,8 @@ ParseResult literal_string(Block* block, TokenStream& tokens, ParserCxt* context
     Term* term = create_string(block, as_cstring(&escaped));
     set_source_location(term, startPosition, tokens);
 
-    term->setProp(sym_Syntax_QuoteType, &quoteType);
-    term->setProp(sym_Syntax_OriginalFormat, &text);
+    term->setProp(s_Syntax_QuoteType, &quoteType);
+    term->setProp(s_Syntax_OriginalFormat, &text);
 
     return ParseResult(term);
 }
@@ -2840,7 +2857,7 @@ ParseResult literal_color(Block* block, TokenStream& tokens, ParserCxt* context)
     set_float(list_get(result, 2), b);
     set_float(list_get(result, 3), a);
 
-    resultTerm->setIntProp(sym_Syntax_ColorFormat, (int) text.length());
+    resultTerm->setIntProp(s_Syntax_ColorFormat, (int) text.length());
 
     set_source_location(resultTerm, startPosition, tokens);
     return ParseResult(resultTerm);
@@ -2878,11 +2895,11 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
         return syntax_error(block, tokens, startPosition, "Expected: ]");
     context->consume(tok_RSquare);
 
-    Term* term = apply(block, FUNCS.list, inputs);
+    Term* term = apply(block, FUNCS.make_list, inputs);
     listHints.apply(term);
 
-    term->setBoolProp(sym_Syntax_LiteralList, true);
-    term->setStringProp(sym_Syntax_DeclarationStyle, "bracket-list");
+    term->setBoolProp(s_Syntax_LiteralList, true);
+    term->setStringProp(s_Syntax_DeclarationStyle, "bracket-list");
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);
@@ -2925,9 +2942,9 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
         Value* formatElement = format.append();
         formatElement->set_list(2);
         if (keyExpr.isIdentifier()) {
-            formatElement->set_element_sym(0, sym_ident);
+            formatElement->set_element_sym(0, s_ident);
         } else {
-            formatElement->set_element_sym(0, sym_expr);
+            formatElement->set_element_sym(0, s_expr);
         }
         formatElement->set_element_int(1, inputIndex);
 
@@ -2948,9 +2965,9 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
         formatElement = format.append();
         formatElement->set_list(2);
         if (valueExpr.isIdentifier()) {
-            formatElement->set_element_sym(0, sym_ident);
+            formatElement->set_element_sym(0, s_ident);
         } else {
-            formatElement->set_element_sym(0, sym_expr);
+            formatElement->set_element_sym(0, s_expr);
         }
         formatElement->set_element_int(1, inputIndex);
 
@@ -2962,8 +2979,8 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
     context->consume(tok_RBrace);
 
     Term* term = apply(block, FUNCS.map, inputs);
-    term->setProp(sym_Syntax_InputFormat, &format);
-    term->setStringProp(sym_Syntax_DeclarationStyle, "braces-map");
+    term->setProp(s_Syntax_InputFormat, &format);
+    term->setStringProp(s_Syntax_DeclarationStyle, "braces-map");
     return ParseResult(term);
 }
 
@@ -2998,7 +3015,7 @@ ParseResult unknown_identifier(Block* block, std::string const& name)
 {
     Term* term = apply(block, FUNCS.unknown_identifier, TermList(), name.c_str());
     set_is_statement(term, false);
-    term->setStringProp(sym_Message, name);
+    term->setStringProp(s_Message, name);
     return ParseResult(term);
 }
 
@@ -3062,16 +3079,16 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL) {
-        std::string s = whitespace + term->stringProp(sym_Syntax_PreWs,"");
-        term->setStringProp(sym_Syntax_PreWs, s.c_str());
+        std::string s = whitespace + term->stringProp(s_Syntax_PreWs,"");
+        term->setStringProp(s_Syntax_PreWs, s.c_str());
     }
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL) {
-        std::string s = term->stringProp(sym_Syntax_PostWs,"") + whitespace;
-        term->setStringProp(sym_Syntax_PostWs, s.c_str());
+        std::string s = term->stringProp(s_Syntax_PostWs,"") + whitespace;
+        term->setStringProp(s_Syntax_PostWs, s.c_str());
     }
 }
 
@@ -3143,8 +3160,8 @@ ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
     }
 
     set_source_location(result, erroredPosition, tokens);
-    result->setStringProp(sym_OriginalText, as_cstring(&consumed));
-    result->setStringProp(sym_Message, message.c_str());
+    result->setStringProp(s_OriginalText, as_cstring(&consumed));
+    result->setStringProp(s_Message, message.c_str());
 
     ca_assert(has_static_error(result));
 
@@ -3224,7 +3241,7 @@ std::string possible_statement_ending(TokenStream& tokens)
 
 bool is_multiline_block(Term* term)
 {
-    return term->boolProp(sym_Syntax_Multiline, false);
+    return term->boolProp(s_Syntax_Multiline, false);
 }
 
 int get_number_of_decimal_figures(std::string const& str)

@@ -32,27 +32,27 @@ struct NameSearch
 // Finds a name in this block or a visible parent block.
 Term* find_name(Block* block,
                 Value* name,
-                Symbol lookupType = sym_LookupAny);
+                Symbol lookupType = s_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       Value* name,
-                      Symbol lookupType = sym_LookupAny);
+                      Symbol lookupType = s_LookupAny);
 
 // Convenient overloads for using a string as a name
 Term* find_name(Block* block,
                 const char* name,
-                Symbol lookupType = sym_LookupAny);
+                Symbol lookupType = s_LookupAny);
 
 // Finds a name in this block.
 Term* find_local_name(Block* block,
                       const char* name,
-                      Symbol lookupType = sym_LookupAny);
+                      Symbol lookupType = s_LookupAny);
 
 Term* find_local_name_at_position(Block* block, Value* name, Value* position);
 
-Term* find_name_at(Term* term, const char* name);
-Term* find_name_at(Term* term, Value* name);
+Term* find_name_at(Term* term, const char* name, Symbol lookupType = s_LookupAny);
+Term* find_name_at(Value* position, Value* name, Symbol lookupType = s_LookupAny);
 
 // If the name string has an ordinal (such as "a#1"), returns the ordinal value.
 // Otherwise returns -1.

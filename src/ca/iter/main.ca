@@ -1,51 +1,11 @@
 
-struct ListIterator {
-  List list
-  int index
-}
-
-def ListIterator.done(self) -> bool
-  self.index >= self.list.length
-
-def ListIterator.next(self) -> any
-  self.list[self.index]
-
-def ListIterator.advance(self) -> any
-  self.index += 1
-  self
-
-def List.to_iterator(self)
-  ListIterator.make(self 0)
-
-def to_iterator(it) -> any
-  if is_list(it)
-    @it.to_iterator
-  it
 
 def visit(it, func)
-  to_iterator(@it)
+  to_iter(@it)
 
   while not it.done
     func(it.next)
     @it.advance
-
-def fold(it, func, accum)
-  to_iterator(@it)
-
-  while not it.done
-    accum = func.call(accum it.next)
-    @it.advance
-
-  accum
-
-def flatten(it) -> List
-  to_iterator(@it)
-
-  -- Language defect: Should be able to refer to the function List.append directly.
-  def append(List list, item) -> List
-    list.append(item)
-    
-  fold(it append [])
 
 struct ConcatenatedIterator {
   any left
@@ -53,8 +13,8 @@ struct ConcatenatedIterator {
 }
 
 def concat(left, right)
-  to_iterator(@left)
-  to_iterator(@right)
+  to_iter(@left)
+  to_iter(@right)
 
   if left.done
     right

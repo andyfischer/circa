@@ -96,6 +96,13 @@ Term* apply(Block* block, Term* function, TermList const& inputs, const char* na
     return apply(block, function, inputs, &name);
 }
 
+Term* apply_dynamic_method(Block* block, Symbol methodName, TermList const& inputs, Value* name)
+{
+    Term* term = apply(block, FUNCS.dynamic_method, inputs, name);
+    term->setStringProp(s_MethodName, symbol_as_string(methodName));
+    return term;
+}
+
 Term* apply_spec(Block* block, Value* spec)
 {
     Term* function = as_term_ref(list_get(spec, 0));
@@ -110,7 +117,7 @@ Term* apply_spec(Block* block, Value* spec)
 
     for (int i=2; i < list_length(spec); i++) {
         Value* key = list_get(spec, i);
-        if (symbol_eq(key, sym_Name)) {
+        if (symbol_eq(key, s_Name)) {
             i++;
             rename(result, list_get(spec, i));
         } else {
@@ -347,7 +354,9 @@ void rename(Term* termToRename, Value* name)
 
                 if (!foundShadowedNameBinding) {
                     foundShadowedNameBinding = true;
-                    shadowedNameBinding = find_name_at(termToRename, name);
+                    Value termVal;
+                    termVal.set_term(termToRename);
+                    shadowedNameBinding = find_name_at(&termVal, name);
                     // shadowedNameBinding might still be NULL.
                 }
 
@@ -533,14 +542,14 @@ Term* append_output_placeholder_with_description(Block* block, Value* descriptio
 
     Value* descriptionTag = list_get(description, 0);
 
-    if (as_symbol(descriptionTag) == sym_Name) {
+    if (as_symbol(descriptionTag) == s_Name) {
         Value* name = list_get(description, 1);
         Term* result = append_output_placeholder(block, find_name(block, name));
         rename(result, name);
         return result;
-    } else if (as_symbol(descriptionTag) == sym_Control) {
+    } else if (as_symbol(descriptionTag) == s_Control) {
         Term* result = append_output_placeholder(block, NULL);
-        result->setBoolProp(sym_Control, true);
+        result->setBoolProp(s_Control, true);
         return result;
     } else {
         Term* result = append_output_placeholder(block, NULL);
@@ -566,12 +575,12 @@ void get_input_description(Term* input, Value* result)
     // Primary input.
     if (input_placeholder_index(input) == 0) {
         // return :Primary
-        set_symbol(result, sym_Primary);
+        set_symbol(result, s_Primary);
         return;
     }
 
     // return :Anonymous
-    set_symbol(result, sym_Anonymous);
+    set_symbol(result, s_Anonymous);
 }
 
 Term* find_output_placeholder_with_name(Block* block, Value* name)
@@ -591,25 +600,25 @@ Term* find_output_from_description(Block* block, Value* description)
         return find_output_placeholder_with_name(block, description);
 
     Value* tag = list_get(description, 0);
-    if (as_symbol(tag) == sym_Name) {
+    if (as_symbol(tag) == s_Name) {
         return find_output_placeholder_with_name(block, list_get(description, 1));
     }
 
-    else if (as_symbol(tag) == sym_Control) {
+    else if (as_symbol(tag) == s_Control) {
         for (int i=0;; i++) {
             Term* placeholder = get_output_placeholder(block, i);
             if (placeholder == NULL)
                 return NULL;
-            if (placeholder->hasProperty(sym_Control))
+            if (placeholder->hasProperty(s_Control))
                 return placeholder;
         }
     }
-    else if (as_symbol(tag) == sym_ExtraReturn) {
+    else if (as_symbol(tag) == s_ExtraReturn) {
         for (int i=0;; i++) {
             Term* placeholder = get_output_placeholder(block, i);
             if (placeholder == NULL)
                 return NULL;
-            if (placeholder->hasProperty(sym_ExtraReturn))
+            if (placeholder->hasProperty(s_ExtraReturn))
                 return placeholder;
         }
     }
@@ -620,19 +629,19 @@ Term* find_output_from_description(Block* block, Value* description)
 void get_output_description(Term* output, Value* result)
 {
     // control output
-    if (output->hasProperty(sym_Control)) {
+    if (output->hasProperty(s_Control)) {
         // return [:control]
         set_list(result, 1);
-        set_symbol(list_get(result, 0), sym_Control);
+        set_symbol(list_get(result, 0), s_Control);
         return;
     }
 
     // extraReturn output
-    else if (output->hasProperty(sym_ExtraReturn)) {
+    else if (output->hasProperty(s_ExtraReturn)) {
         // return [:extraReturn <index>]
         set_list(result, 2);
-        set_symbol(list_get(result, 0), sym_ExtraReturn);
-        set_int(list_get(result, 1), output->intProp(sym_ExtraReturn, 0));
+        set_symbol(list_get(result, 0), s_ExtraReturn);
+        set_int(list_get(result, 1), output->intProp(s_ExtraReturn, 0));
         return;
     }
 
@@ -640,7 +649,7 @@ void get_output_description(Term* output, Value* result)
     else if (!has_empty_name(output)) {
         // return [:name, <name>]
         set_list(result, 2);
-        set_symbol(list_get(result, 0), sym_Name);
+        set_symbol(list_get(result, 0), s_Name);
         copy(term_name(output), list_get(result, 1));
         return;
     }
@@ -649,12 +658,12 @@ void get_output_description(Term* output, Value* result)
     else if (input_placeholder_index(output) == 0) {
         // return [:primary]
         set_list(result, 1);
-        set_symbol(list_get(result, 0), sym_Primary);
+        set_symbol(list_get(result, 0), s_Primary);
         return;
     }
 
     set_list(result, 1);
-    set_symbol(list_get(result, 0), sym_Anonymous);
+    set_symbol(list_get(result, 0), s_Anonymous);
 }
 
 Term* get_output_term(Term* term, int index)
@@ -712,13 +721,13 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     Value* descriptionTag = list_get(&description, 0);
 
     // Control value
-    if (as_symbol(descriptionTag) == sym_Control) {
+    if (as_symbol(descriptionTag) == s_Control) {
         Block* block = location->owningBlock;
         for (int i = location->index; i >= 0; i--) {
             Term* term = block->get(i);
             if (term == NULL)
                 continue;
-            if (term->boolProp(sym_Control, false))
+            if (term->boolProp(s_Control, false))
                 return term;
         }
         return NULL;
@@ -782,7 +791,7 @@ void update_extra_outputs(Term* term)
 
     // Special case: number of outputs in destructure_list depends on its count.
     if (term->function == FUNCS.destructure_list) {
-        outputCount = term->intProp(sym_Count, 0);
+        outputCount = term->intProp(s_count, 0);
     }
 
     update_extra_output_count(term, outputCount - 1);
@@ -795,11 +804,11 @@ void update_extra_outputs(Term* term)
         Term* extraOutput = get_output_term(term, index);
 
         // Find the associated input placeholder (if any).
-        int rebindsInput = placeholder->intProp(sym_RebindsInput, -1);
+        int rebindsInput = placeholder->intProp(s_RebindsInput, -1);
 
         // Use the appropriate name
         if (rebindsInput >= 0) {
-            extraOutput->setIntProp(sym_RebindsInput, rebindsInput);
+            extraOutput->setIntProp(s_RebindsInput, rebindsInput);
             Term* input = term->input(rebindsInput);
 
             if (input != NULL)
@@ -815,39 +824,42 @@ void update_extra_outputs(Term* term)
 
 Symbol block_has_state(Block* block)
 {
-    if (block_has_property(block, sym_HasState))
-        return block_get_symbol_prop(block, sym_HasState, sym_No);
+    if (find_enclosing_major_block(block) == FUNCS.declared_state->nestedContents)
+        return s_no;
+
+    if (block_has_property(block, s_has_state))
+        return block_get_symbol_prop(block, s_has_state, s_no);
 
     // Temporarily set to :Maybe in case of recursion.
-    block_set_symbol_prop(block, sym_HasState, sym_Maybe);
+    block_set_symbol_prop(block, s_has_state, s_maybe);
 
-    Symbol result = sym_No;
+    Symbol result = s_no;
 
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
         if (is_declared_state(term)) {
-            result = sym_Yes;
+            result = s_yes;
             break;
         }
 
-        if (uses_dynamic_dispatch(term) && result == sym_No)
-            result = sym_Maybe;
+        if (uses_dynamic_dispatch(term) && result == s_no)
+            result = s_maybe;
 
         Block* contents = static_dispatch_block(term);
         if (contents == NULL)
             continue;
 
         Symbol hasState = block_has_state(contents);
-        if (hasState == sym_Yes) {
-            result = sym_Yes;
+        if (hasState == s_yes) {
+            result = s_yes;
             break;
         }
 
-        if (hasState == sym_Maybe)
-            result = sym_Maybe;
+        if (hasState == s_maybe)
+            result = s_maybe;
     }
 
-    block_set_symbol_prop(block, sym_HasState, result);
+    block_set_symbol_prop(block, s_has_state, result);
     return result;
 }
 
@@ -906,7 +918,7 @@ void block_finish_changes(Block* block)
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
         if (uses_dynamic_dispatch(term))
-            block_set_bool_prop(block, sym_HasDynamicDispatch, true);
+            block_set_bool_prop(block, s_HasDynamicDispatch, true);
     }
 
     block->inProgress = false;
@@ -920,7 +932,7 @@ void annotate_stateful_values(Block* block)
             continue;
 
         Term* result = find_name(block, term_name(term)); 
-        term_set_bool_prop(result, sym_LocalStateResult, true);
+        term_set_bool_prop(result, s_LocalStateResult, true);
 
         BlockIterator2 exitPointSearch;
         exitPointSearch.startAt(term);
@@ -929,8 +941,11 @@ void annotate_stateful_values(Block* block)
             if (!is_exit_point(*exitPointSearch))
                 continue;
 
-            Term* localResult = find_name_at(*exitPointSearch, term_name(term)); 
-            term_set_bool_prop(localResult, sym_LocalStateResult, true);
+            Value termVal;
+            termVal.set_term(*exitPointSearch);
+
+            Term* localResult = find_name_at(&termVal, term_name(term)); 
+            term_set_bool_prop(localResult, s_LocalStateResult, true);
         }
     }
 }
@@ -1009,7 +1024,7 @@ bool term_belongs_at_block_end(Term* term)
     if (term->function == FUNCS.output)
         return true;
 
-    if (term->boolProp(sym_Final, false))
+    if (term->boolProp(s_Final, false))
         return true;
 
     return false;

@@ -4,6 +4,6 @@
 def f()
   for i in [1 2 3] { state s = i }
 
-int = make_vm(f)
-int.call
-print(int.extract_state)
+vm = make_vm(f)
+vm.call
+print(vm.get_state)

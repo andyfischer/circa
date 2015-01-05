@@ -10,4 +10,4 @@ def main()
 
 int = make_vm(main)
 int.run
-print(int.extract_state)
+print(int.get_state)

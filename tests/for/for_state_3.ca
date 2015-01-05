@@ -4,6 +4,7 @@ def f()
         state t = 1
         state u = i + 2
 
-int = make_vm(f)
-int.call
-print(int.extract_state)
+vm = make_vm(f)
+vm.call
+s = vm.get_state
+assert(s == null or s == [])

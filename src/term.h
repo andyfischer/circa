@@ -34,7 +34,7 @@ struct Term
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
-    const char* name() { return as_cstring(&nameValue); }
+    const char* name();
 
     Value nameValue;
 
@@ -199,5 +199,8 @@ bool term_used_by_nonlocal(Term* term);
 bool term_is_observable_after(Term* term, Term* location);
 bool is_located_after(Term* location, Term* term);
 bool term_uses_input_multiple_times(Term* term, Term* input);
+bool term_needs_no_evaluation(Term* term);
+bool term_needs_no_evaluation2(Term* term);
+bool should_use_term_value(Term* term);
 
 } // namespace circa

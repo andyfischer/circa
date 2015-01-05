@@ -430,7 +430,7 @@ void set_mutable_hashtable(Value* value)
 
 Value* hashtable_get(Value* table, Value* key)
 {
-    ca_assert(table->value_type->storageType == sym_StorageTypeHashtable);
+    ca_assert(table->value_type->storageType == s_StorageTypeHashtable);
     return hashtable_get((Hashtable*) table->value_data.ptr, key);
 }
 
@@ -461,6 +461,13 @@ Value* hashtable_get_int_key(Value* table, int key)
     // Future: Optimize by not creating a Value.
     Value boxedKey;
     set_int(&boxedKey, key);
+    return hashtable_get(table, &boxedKey);
+}
+
+Value* hashtable_get_term_key(Value* table, Term* term)
+{
+    Value boxedKey;
+    set_term_ref(&boxedKey, term);
     return hashtable_get(table, &boxedKey);
 }
 
@@ -615,7 +622,7 @@ void hashtable_setup_type(Type* type)
     type->equals = hashtable_equals;
     type->hashFunc = hashtable_hash;
     type->toString = hashtable_to_string;
-    type->storageType = sym_StorageTypeHashtable;
+    type->storageType = s_StorageTypeHashtable;
 }
 
 HashtableIterator::HashtableIterator(Value* _table)

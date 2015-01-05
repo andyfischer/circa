@@ -1,0 +1,15 @@
+assert(typeof(1) == int)
+assert(typeof(1.0) == number)
+assert(typeof('s') == String)
+
+def runtime_typing(int i) -> any
+  if i == 0
+    return 1
+  elif i == 1
+    return 1.0
+  else
+    return "hi"
+
+assert(typeof(runtime_typing(0)) == int)
+assert(typeof(runtime_typing(1)) == number)
+assert(typeof(runtime_typing(2)) == String)

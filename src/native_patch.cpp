@@ -120,7 +120,7 @@ void remove_native_patch(World* world, const char* name)
     // TODO
 }
 
-CIRCA_EXPORT void circa_patch_function(caNativePatch* patch, const char* nameStr,
+CIRCA_EXPORT void circa_patch_function2(caNativePatch* patch, const char* nameStr,
         caEvaluateFunc func)
 {
     Value name;
@@ -167,7 +167,7 @@ NativeFuncIndex find_native_func_index(World* world, Block* block)
     if (module == NULL)
         return -1;
 
-    Value* moduleName = block_get_property(module, sym_Name);
+    Value* moduleName = block_get_property(module, s_Name);
     if (moduleName == NULL)
         return -1;
 

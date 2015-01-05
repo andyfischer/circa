@@ -2,11 +2,11 @@
 
 def my_func(arg1, arg2) -> any
     print('myfunc arg1 static_type: ' static_type(arg1))
-    print('myfunc arg1 type: ' type(arg1))
+    print('myfunc arg1 type: ' typeof(arg1))
     print('myfunc arg1: ' arg1)
 
     print('myfunc arg2 static_type: ' static_type(arg2))
-    print('myfunc arg2 type: ' type(arg2))
+    print('myfunc arg2 type: ' typeof(arg2))
     print('myfunc arg2: ' arg2)
 
     return arg1
@@ -24,8 +24,8 @@ struct T {}
 
 def T.func(self, b)
     print('T.func self static_type: ' static_type(self))
-    print('T.func type: ' type(self))
+    print('T.func type: ' typeof(self))
     print('T.func b static_type: ' static_type(b))
-    print('T.func b: ' type(b))
+    print('T.func b: ' typeof(b))
 
 make(T).func('b value')

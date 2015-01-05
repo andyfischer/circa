@@ -51,12 +51,12 @@ Term* declared_type_term(Term* term)
 
 void set_is_statement(Term* term, bool value)
 {
-    term->setBoolProp(sym_Statement, value);
+    term->setBoolProp(s_Statement, value);
 }
 
 bool is_statement(Term* term)
 {
-    return term->boolProp(sym_Statement, false);
+    return term->boolProp(s_Statement, false);
 }
 
 bool is_comment(Term* term)
@@ -66,7 +66,7 @@ bool is_comment(Term* term)
 
 bool is_empty_comment(Term* term)
 {
-    return is_comment(term) && term->stringProp(sym_Comment,"") == "";
+    return is_comment(term) && term->stringProp(s_Comment,"") == "";
 }
 
 bool is_value(Term* term)
@@ -76,7 +76,7 @@ bool is_value(Term* term)
 
 bool is_hidden(Term* term)
 {
-    if (term->boolProp(sym_Hidden, false))
+    if (term->boolProp(s_Hidden, false))
         return true;
 
     if (has_empty_name(term))
@@ -131,7 +131,7 @@ bool is_minor_block(Block* block)
 
 bool is_module(Block* block)
 {
-    return block_get_bool_prop(block, sym_IsModule, false);
+    return block_get_bool_prop(block, s_IsModule, false);
 }
 
 Block* find_nearest_major_block(Block* block)
@@ -239,7 +239,7 @@ bool is_input_meta(Block* block, int index)
     Term* placeholder = get_input_placeholder(block, index);
     if (placeholder == NULL)
         return false;
-    return placeholder->boolProp(sym_Meta, false);
+    return placeholder->boolProp(s_Meta, false);
 }
 
 Term* term_get_input_placeholder(Term* call, int index)
@@ -300,7 +300,7 @@ bool has_variable_args(Block* block)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return false;
-        if (placeholder->boolProp(sym_Multiple, false))
+        if (placeholder->boolProp(s_Multiple, false))
             return true;
     }
 }
@@ -311,7 +311,7 @@ int find_index_of_vararg(Block* block)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return -1;
-        if (placeholder->boolProp(sym_Multiple, false))
+        if (placeholder->boolProp(s_Multiple, false))
             return i;
     }
 }
@@ -414,7 +414,7 @@ void print_indent(RawOutputPrefs* prefs, Value* out)
         string_append(out, " ");
 }
 
-void print_block(Block* block, RawOutputPrefs* prefs, Value* out, Stack* stack)
+void print_block(Block* block, RawOutputPrefs* prefs, Value* out)
 {
     int prevIndent = prefs->indentLevel;
     u32 bytecodePc = 0;
@@ -441,7 +441,7 @@ void print_block(Block* block, RawOutputPrefs* prefs, Value* out, Stack* stack)
 
         prefs->indentLevel += 2;
         if (term->nestedContents != NULL) {
-            print_block(term->nestedContents, prefs, out, stack);
+            print_block(term->nestedContents, prefs, out);
         }
 
         if (prefs->showBytecode && bytecodeData) {
@@ -545,7 +545,7 @@ Value* get_parent_module_name(Block* block)
         return NULL;
 
     if (is_module(block)) {
-        return block_get_property(block, sym_ModuleName);
+        return block_get_property(block, s_ModuleName);
     } else {
         return get_parent_module_name(get_parent_block(block));
     }
@@ -643,8 +643,8 @@ void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
     }
 
     string_append(out, global_id(term).c_str());
-    string_append(out, " ");
-    string_append(out, unique_name(term));
+    // string_append(out, " ");
+    // string_append(out, unique_name(term));
 
     if (!has_empty_name(term)) {
         string_append(out, " '");
@@ -654,6 +654,9 @@ void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
 
     if (term->function == NULL) {
         string_append(out, " <NULL function>");
+    } else if (term->function == FUNCS.dynamic_method) {
+        string_append(out, " .");
+        string_append(out, term->stringProp(s_MethodName, ""));
     } else {
         string_append(out, " ");
         string_append(out, term_name(term->function));
@@ -675,15 +678,15 @@ void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
     string_append(out, ") ");
 
     // Print out certain properties
-    if (term->boolProp(sym_Multiple, false))
+    if (term->boolProp(s_Multiple, false))
         string_append(out, ":multiple ");
-    if (term->boolProp(sym_Output, false))
+    if (term->boolProp(s_Output, false))
         string_append(out, ":output ");
-    if (term->boolProp(sym_State, false))
+    if (term->boolProp(s_State, false))
         string_append(out, ":state ");
-    if (term->hasProperty(sym_Field)) {
+    if (term->hasProperty(s_Field)) {
         string_append(out, ":field(");
-        string_append(out, term->getProp(sym_Field));
+        string_append(out, term->getProp(s_Field));
         string_append(out, ")");
     }
 
@@ -778,12 +781,12 @@ void parse_path_expression(const char* expr, Value* valueOut)
         // Parse node contents.
         if (tokens.nextIs(tok_Star)) {
             tokens.consume();
-            set_symbol(list_append(valueOut), sym_Wildcard);
+            set_symbol(list_append(valueOut), s_Wildcard);
         }
 
         else if (tokens.nextIs(tok_DoubleStar)) {
             tokens.consume();
-            set_symbol(list_append(valueOut), sym_RecursiveWildcard);
+            set_symbol(list_append(valueOut), s_RecursiveWildcard);
         }
 
         else if (tokens.nextIs(tok_Identifier) && tokens.nextEqualsString("function")) {
@@ -798,7 +801,7 @@ void parse_path_expression(const char* expr, Value* valueOut)
 
             Value* node = list_append(valueOut);
             set_list(node, 2);
-            set_symbol(list_get(node, 0), sym_Function);
+            set_symbol(list_get(node, 0), s_Function);
             tokens.consumeStr(list_get(node, 1));
         }
 
@@ -837,9 +840,9 @@ static bool term_matches_path_expression_node(Term* term, Value* node)
         return equals(&term->nameValue, node);
 
     switch (first_symbol(node)) {
-    case sym_Wildcard:
+    case s_Wildcard:
         return true;
-    case sym_Function:
+    case s_Function:
         return equals(&term->function->nameValue, list_get(node, 1));
     }
 
@@ -854,7 +857,7 @@ Term* find_term_from_path(Block* root, Value* path, int offset)
     Value* node = list_get(path, offset);
 
     // Recursive wildcard.
-    if (is_symbol(node) && as_symbol(node) == sym_RecursiveWildcard) {
+    if (is_symbol(node) && as_symbol(node) == s_RecursiveWildcard) {
 
         // Check if recursive wildcard matches nothing.
         Term* match = find_term_from_path(root, path, offset + 1);

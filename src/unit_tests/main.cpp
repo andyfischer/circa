@@ -316,6 +316,7 @@ bool current_test_has_failed()
 
 namespace block_test { void register_tests(); }
 namespace building_test { void register_tests(); }
+namespace bytecode_test { void register_tests(); }
 namespace code_iterator_test { void register_tests(); }
 namespace compound_type_test { void register_tests(); }
 namespace control_flow_test { void register_tests(); }
@@ -345,6 +346,9 @@ int main(int argc, char** argv)
 {
     hashtable_test::register_tests();
 
+    bytecode_test::register_tests();
+
+#if 0
     block_test::register_tests();
     building_test::register_tests();
     code_iterator_test::register_tests();
@@ -370,6 +374,7 @@ int main(int argc, char** argv)
     string_test::register_tests();
     tokenizer_test::register_tests();
     type_test::register_tests();
+#endif
 
     caWorld* world = circa_initialize();
 

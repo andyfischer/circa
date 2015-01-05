@@ -18,6 +18,8 @@ Value* hashtable_get_int_key(Value* table, int key);
 Value* hashtable_insert_int_key(Value* table, int key);
 void hashtable_remove_int_key(Value* table, int key);
 
+Value* hashtable_get_term_key(Value* table, Term* term);
+
 Value* hashtable_get_symbol_key(Value* table, Symbol key);
 Value* hashtable_insert_symbol_key(Value* table, Symbol key);
 void hashtable_remove_symbol_key(Value* table, Symbol key);

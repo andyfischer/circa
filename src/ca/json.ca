@@ -168,4 +168,4 @@ def write(val) -> String
   elif is_string(val)
     val.quote
   else
-    to_string(val)
+    str(val)

@@ -1,5 +1,5 @@
 
-require error_trace
+require stack_trace
 
 def main()
   def func()
@@ -10,4 +10,4 @@ def main()
 vm = make_vm(main)
 vm.run
 
-error_trace.trace_to_string(vm) | print
+stack_trace.trace_to_string(vm) | print

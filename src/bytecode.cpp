@@ -90,26 +90,6 @@ static bool can_write_fixed_value(Value* value);
 static void write_fixed_value(Writer* writer, Value* value, int destReg);
 static void bc_copy_term_value(Writer* writer, Term* source, int destReg);
 
-bool term_needs_no_evaluation(Term* term)
-{
-    if (term == NULL
-            || is_value(term)
-            || term->function == FUNCS.require
-            || term->function == FUNCS.lambda
-            || term->function == FUNCS.case_func)
-
-        return true;
-
-    return false;
-}
-
-static bool should_use_term_value(Term* term)
-{
-    return is_value(term)
-        || term->owningBlock == global_builtins_block()
-        || term->function == FUNCS.require;
-}
-
 static Jump bc_jump(Writer* writer)
 {
     Jump jump;
@@ -180,13 +160,13 @@ static void bc_set_empty_list(Writer* writer, Block* top, Term* term)
 
 static void bc_load_frame_state(Writer* writer, Block* block)
 {
-    if (block_has_state(block) != sym_No)
+    if (block_has_state(block) != s_no)
         bc_native_call_to_builtin(writer, "#load_frame_state");
 }
 
 static void bc_store_frame_state(Writer* writer, Block* block)
 {
-    if (!writer->noSaveState && block_has_state(block) != sym_No)
+    if (!writer->noSaveState && block_has_state(block) != s_no)
         bc_native_call_to_builtin(writer, "#store_frame_state");
 }
 
@@ -592,7 +572,7 @@ bool block_contains_literal_symbol(Block* block, Symbol symbol)
 
 static bool should_skip_block(Writer* writer, Block* block)
 {
-    if (writer->skipEffects && block_contains_literal_symbol(block, sym_effect))
+    if (writer->skipEffects && block_contains_literal_symbol(block, s_effect))
         return true;
     if (block_is_evaluation_empty(block))
         return true;
@@ -732,7 +712,7 @@ void bc_start_for_loop(Writer* writer, Term* term)
         if (input == NULL)
             break;
             
-        bc_copy(writer, loopBlock, input->input(0), input, sym_Copy);
+        bc_copy(writer, loopBlock, input->input(0), input, s_Copy);
     }
     
     blob_append_char(writer->bytecode, bc_PrepareBlock);
@@ -768,7 +748,7 @@ void bc_start_for_loop(Writer* writer, Term* term)
         if (input == NULL)
             break;
             
-        bc_copy(writer, loopBlock, input, get_extra_output(term, i), sym_Move);
+        bc_copy(writer, loopBlock, input, get_extra_output(term, i), s_Move);
     }
 
     blob_append_char(writer->bytecode, bc_PopFrame);
@@ -789,7 +769,7 @@ void bc_start_while_loop(Writer* writer, Term* term)
         if (input == NULL)
             break;
             
-        bc_copy(writer, loopBlock, input->input(0), input, sym_Copy);
+        bc_copy(writer, loopBlock, input->input(0), input, s_Copy);
     }
 
     blob_append_char(writer->bytecode, bc_PrepareBlock);
@@ -809,15 +789,15 @@ void bc_loop_control_flow(Writer* writer, Term* term)
 
     if (term->function == FUNCS.continue_func) {
         bc_comment(writer, "continue");
-        exitType = sym_Continue;
+        exitType = s_Continue;
     } else if (term->function == FUNCS.break_func) {
         bc_comment(writer, "break");
-        exitType = sym_Break;
+        exitType = s_Break;
     } else if (term->function == FUNCS.discard) {
         bc_comment(writer, "discard");
-        exitType = sym_Discard;
+        exitType = s_Discard;
     } else if (term->function == FUNCS.loop_condition_bool) {
-        exitType = sym_Break;
+        exitType = s_Break;
     }
 
     write_pre_exit_pack_state(writer, term->owningBlock, term);
@@ -833,7 +813,7 @@ void bc_loop_control_flow(Writer* writer, Term* term)
                 break;
 
             Term* dest = get_output_placeholder(enclosingLoop, i + 1);
-            bc_copy(writer, term->owningBlock, input, dest, sym_Move);
+            bc_copy(writer, term->owningBlock, input, dest, s_Move);
         }
     } else {
 
@@ -841,7 +821,7 @@ void bc_loop_control_flow(Writer* writer, Term* term)
             Term* input = term->input(i);
 
             Term* dest = get_output_placeholder(enclosingLoop, i);
-            bc_copy(writer, term->owningBlock, input, dest, sym_Move);
+            bc_copy(writer, term->owningBlock, input, dest, s_Move);
         }
     }
 
@@ -849,14 +829,14 @@ void bc_loop_control_flow(Writer* writer, Term* term)
     Block* popBlock = term->owningBlock;
 
     while (popBlock != enclosingLoop) {
-        if (exitType != sym_Discard)
+        if (exitType != s_Discard)
             bc_store_frame_state(writer, popBlock);
 
         blob_append_char(writer->bytecode, bc_PopFrame);
         popBlock = get_parent_block_stackwise(popBlock);
     }
 
-    if (exitType != sym_Discard)
+    if (exitType != s_Discard)
         bc_store_frame_state(writer, enclosingLoop);
 
     bc_finish_loop_iteration(writer, enclosingLoop, exitType);
@@ -876,7 +856,7 @@ void bc_return(Writer* writer, Term* term)
 
         Term* dest = get_output_placeholder(majorBlock, i);
 
-        bc_copy(writer, term->owningBlock, input, dest, sym_Move);
+        bc_copy(writer, term->owningBlock, input, dest, s_Move);
         bc_convert_if_needed(writer, dest, input);
     }
 
@@ -979,7 +959,7 @@ void write_term(Writer* writer, Term* term)
         } else {
 
             bc_copy(writer, term->owningBlock, term->input(0), term);
-            if (!term->boolProp(sym_AccumulatingOutput, false))
+            if (!term->boolProp(s_AccumulatingOutput, false))
                 bc_convert_if_needed(writer, term, term->input(0));
             
             return;
@@ -1037,7 +1017,7 @@ void write_term(Writer* writer, Term* term)
 
     else if (term->function == FUNCS.destructure_list) {
         bc_comment(writer, "destructure list");
-        int count = term->intProp(sym_Count, 0);
+        int count = term->intProp(s_count, 0);
 
         for (int i=0; i < count; i++)
             bc_get_const_index(writer, term->input(0)->index, i, get_output_term(term, i)->index, false);
@@ -1209,7 +1189,7 @@ static Value* find_set_value_hack(Writer* writer, Term* term)
     if (termSpecificHacks == NULL)
         return NULL;
 
-    Value* desiredValueIndex = hashtable_get_symbol_key(termSpecificHacks, sym_set_value);
+    Value* desiredValueIndex = hashtable_get_symbol_key(termSpecificHacks, s_set_value);
     if (desiredValueIndex == NULL)
         return NULL;
 
@@ -1318,9 +1298,9 @@ static void bc_copy_term_value(Writer* writer, Term* source, int destReg)
 
 static void bc_move_or_copy(Writer* writer, int sourceReg, int destReg, Symbol moveOrCopy)
 {
-    if (moveOrCopy == sym_Move)
+    if (moveOrCopy == s_Move)
         blob_append_char(writer->bytecode, bc_MoveStackValue);
-    else if (moveOrCopy == sym_Copy)
+    else if (moveOrCopy == s_Copy)
         blob_append_char(writer->bytecode, bc_CopyStackValue);
     else
         internal_error("unrecognized value for moveOrCopy");
@@ -1347,9 +1327,9 @@ static bool term_can_consume_input(Term* term, Term* input)
 
 static void bc_copy(Writer* writer, Block* top, Term* source, Term* dest)
 {
-    Symbol moveOrCopy = sym_Copy;
+    Symbol moveOrCopy = s_Copy;
     if (term_can_consume_input(dest, source))
-        moveOrCopy = sym_Move;
+        moveOrCopy = s_Move;
     bc_copy(writer, top, source, dest, moveOrCopy);
 }
 
@@ -1383,7 +1363,7 @@ static void bc_loop_back_to_start(Writer* writer, Block* block)
             break;
         Term* output = input->input(1);
         if (output != NULL)
-            bc_copy(writer, block, output, input, sym_Move);
+            bc_copy(writer, block, output, input, s_Move);
     }
 
     // Return to start of the loop.
@@ -1399,7 +1379,7 @@ static void bc_loop_break_out(Writer* writer, Block* block)
         Term* output = get_output_placeholder(block, i+1);
         if (output == NULL)
             break;
-        bc_copy(writer, block, output, get_extra_output(block->owningTerm, i), sym_Move);
+        bc_copy(writer, block, output, get_extra_output(block->owningTerm, i), s_Move);
     }
 
     blob_append_char(writer->bytecode, bc_FinishFrame);
@@ -1423,13 +1403,13 @@ static void bc_finish_loop_iteration(Writer* writer, Block* block, Symbol exitTy
     }
 
     // Preserve list output
-    if (exitType != sym_Discard && is_for_loop(block) && term_is_observable(loopTerm)) {
+    if (exitType != s_Discard && is_for_loop(block) && term_is_observable(loopTerm)) {
         blob_append_char(writer->bytecode, bc_AppendMove);
         blob_append_u16(writer->bytecode, get_output_placeholder(block, 0)->index);
         blob_append_u16(writer->bytecode, find_register_distance(block, block->owningTerm));
     }
 
-    if (exitType == sym_Break) {
+    if (exitType == s_Break) {
 
         bc_comment(writer, "break out of loop");
         bc_loop_break_out(writer, block);
@@ -1467,7 +1447,7 @@ static void bytecode_write_input_instruction(Writer* writer, Term* caller, int i
     }
 
     // Handle :ref inputs. Only works on statically-known destination blocks.
-    if (placeholder != NULL && placeholder->boolProp(sym_Ref, false)) {
+    if (placeholder != NULL && placeholder->boolProp(s_Ref, false)) {
         bc_set_term_ref(writer, input, placeholderIndex);
         return;
     }
@@ -1485,11 +1465,11 @@ static void bytecode_write_input_instruction(Writer* writer, Term* caller, int i
         bc_copy_term_value(writer, input, placeholderIndex);
 
     } else {
-        Symbol moveOrCopy = sym_Copy;
+        Symbol moveOrCopy = s_Copy;
         if (!term_is_observable_after(input, caller) && !term_uses_input_multiple_times(caller, input))
-            moveOrCopy = sym_Move;
+            moveOrCopy = s_Move;
         else
-            moveOrCopy = sym_Copy;
+            moveOrCopy = s_Copy;
 
         bc_move_or_copy(writer,
             find_register_distance_to_new_frame(caller->owningBlock, input),
@@ -1547,7 +1527,7 @@ static void bytecode_write_output_instructions(Writer* writer, Term* caller, Blo
             blob_append_u32(writer->bytecode, outputIndex);
 
             blob_append_char(writer->bytecode,
-                placeholder->boolProp(sym_ExplicitType, false) ? 1 : 0);
+                placeholder->boolProp(s_ExplicitType, false) ? 1 : 0);
         }
 
         placeholderIndex++;
@@ -1579,6 +1559,7 @@ static void bytecode_write_local_reference(Writer* writer, Block* callingBlock, 
 
 static void write_pre_exit_pack_state(Writer* writer, Block* block, Term* exitPoint)
 {
+#if 0
     if (writer->noSaveState)
         return;
 
@@ -1631,6 +1612,7 @@ static void write_pre_exit_pack_state(Writer* writer, Block* block, Term* exitPo
             anyPackState = true;
         }
     }
+#endif
 }
 
 static void write_block_pre_exit(Writer* writer, Block* block, Term* exitPoint)
@@ -1856,7 +1838,7 @@ void write_block_bytecode(Writer* writer)
     write_block_pre_exit(writer, block, NULL);
 
     if (is_for_loop(block) || is_while_loop(block)) {
-        bc_finish_loop_iteration(writer, block, sym_Continue);
+        bc_finish_loop_iteration(writer, block, s_Continue);
     } else {
         blob_append_char(writer->bytecode, bc_FinishFrame);
     }
@@ -1866,6 +1848,7 @@ void write_block_bytecode(Writer* writer)
 
 void compile_block(Compiled* compiled, int blockIndex)
 {
+#if 0
     CompiledBlock* cblock = compiled_block(compiled, blockIndex);
 
     if (cblock->bytecodeOffset != -1)
@@ -1902,6 +1885,7 @@ void compile_block(Compiled* compiled, int blockIndex)
     string_append(&compiled->bytecode, &bytecode);
 
     cblock->compileInProgress = false;
+#endif
 }
 
 int compiled_create_empty_entry(Compiled* compiled, Block* block)
@@ -1976,11 +1960,11 @@ void program_set_hackset(Compiled* compiled, Value* hackset)
 {
     for (int i=0; i < list_length(hackset); i++) {
         Value* hacksetElement = hackset->index(i);
-        if (symbol_eq(hacksetElement, sym_no_effect))
+        if (symbol_eq(hacksetElement, s_no_effect))
             compiled->skipEffects = true;
-        else if (symbol_eq(hacksetElement, sym_no_save_state))
+        else if (symbol_eq(hacksetElement, s_no_save_state))
             compiled->noSaveState = true;
-        else if (first_symbol(hacksetElement) == sym_set_value) {
+        else if (first_symbol(hacksetElement) == s_set_value) {
             Value* setValueTarget = hacksetElement->index(1);
             Value* setValueNewValue = hacksetElement->index(2);
 
@@ -1990,11 +1974,11 @@ void program_set_hackset(Compiled* compiled, Value* hackset)
 
             int cachedValueIndex = 0;
             set_value(compiled_add_const(compiled, &cachedValueIndex), setValueNewValue);
-            set_int(hashtable_insert_symbol_key(termHacks, sym_set_value), cachedValueIndex);
-        } else if (first_symbol(hacksetElement) == sym_watch) {
+            set_int(hashtable_insert_symbol_key(termHacks, s_set_value), cachedValueIndex);
+        } else if (first_symbol(hacksetElement) == s_watch) {
             Value* watchPath = hacksetElement->index(1);
             program_add_watch(compiled, watchPath);
-        } else if (first_symbol(hacksetElement) == sym_TermCounter) {
+        } else if (first_symbol(hacksetElement) == s_TermCounter) {
             compiled->enableTermCounter = true;
         }
     }

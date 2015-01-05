@@ -120,18 +120,18 @@ void ca_debugger_break()
 CIRCA_EXPORT void circa_perf_stats_dump()
 {
     printf("perf_stats_dump:\n");
-    for (int i=c_firstStatIndex; i < sym_LastStatIndex-1; i++)
+    for (int i=c_firstStatIndex; i < s_LastStatIndex-1; i++)
         printf("  %s = %llu\n", builtin_symbol_to_string(i), PERF_STATS[i - c_firstStatIndex]);
 }
 CIRCA_EXPORT void circa_perf_stats_reset()
 {
-    for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++)
+    for (int i = c_firstStatIndex; i < s_LastStatIndex-1; i++)
         PERF_STATS[i - c_firstStatIndex] = 0;
 }
 void perf_stats_to_list(Value* list)
 {
     set_list(list, c_numPerfStats);
-    for (int i = c_firstStatIndex; i < sym_LastStatIndex-1; i++) {
+    for (int i = c_firstStatIndex; i < s_LastStatIndex-1; i++) {
         Symbol name = i;
         int64 value = PERF_STATS[i - c_firstStatIndex];
         Value* element = list_get(list, i - c_firstStatIndex);
@@ -147,14 +147,14 @@ void perf_stats_to_map(Value* map)
 {
     u64 frozenStats[c_numPerfStats];
 
-    for (int name = c_firstStatIndex; name < sym_LastStatIndex-1; name++) {
+    for (int name = c_firstStatIndex; name < s_LastStatIndex-1; name++) {
         int i = name - c_firstStatIndex;
         frozenStats[i] = PERF_STATS[i];
     }
 
     set_hashtable(map);
 
-    for (int name = c_firstStatIndex; name < sym_LastStatIndex-1; name++) {
+    for (int name = c_firstStatIndex; name < s_LastStatIndex-1; name++) {
         int i = name - c_firstStatIndex;
         u64 value = frozenStats[i];
         set_int(hashtable_insert_symbol_key(map, name), (int) value);

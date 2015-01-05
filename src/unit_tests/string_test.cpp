@@ -40,7 +40,7 @@ void test_prepend()
 void test_equality_with_symbol()
 {
     Value val;
-    set_symbol(&val, sym_Append);
+    set_symbol(&val, s_Append);
     test_assert(string_equals(&val, ":Append"));
     test_assert(!string_equals(&val, "Append"));
     test_assert(!string_equals(&val, "Appen"));

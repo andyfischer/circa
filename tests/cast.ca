@@ -1,9 +1,8 @@
 
-v, b = cast([1 1], Vec2)
+v = cast([1 1], Vec2)
 
 assert(v == [1 1])
 assert(v.x == 1)
-assert(b)
 
-v, b = cast('hello', number)
-assert(not b)
+v = cast('hello', number)
+assert(v == null)

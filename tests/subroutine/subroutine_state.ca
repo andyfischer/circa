@@ -7,12 +7,12 @@ def main() -> int
 int = make_vm(main)
 result = int.call
 print('should be 1: ' result)
-print('should be {s: 1}: ' int.extract_state)
+print('should be {s: 1}: ' int.get_state)
 
 result = int.call
 print('should be 2: ' result)
-print('should be {s: 2}: ' int.extract_state)
+print('should be {s: 2}: ' int.get_state)
 
 result = int.call
 print('should be 3: ' result)
-print('should be {s: 3}: ' int.extract_state)
+print('should be {s: 3}: ' int.get_state)

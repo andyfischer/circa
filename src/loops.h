@@ -6,13 +6,17 @@
 
 namespace circa {
 
+Term* loop_find_iterator(Block* contents);
+Term* loop_find_done_call(Block* block);
+Term* loop_find_key(Block* block);
+Term* loop_find_iterator_advance(Block* block);
 const char* for_loop_get_iterator_name(Term* forTerm);
 Term* for_loop_find_index(Block* contents);
 
 // Initialize the contents of a for-loop for a new term.
 //   'iteratorType' is the type to use  for the iterator. If it's NULL then we'll infer a
 //   type from the term's input.
-void start_building_for_loop(Term* forTerm, Value* indexName, Value* iteratorName, Type* iteratorType);
+void start_building_for_loop(Block* block, Term* listExpr, Value* indexName, Value* iteratorName, Type* iteratorType);
 void finish_for_loop(Term* forTerm);
 void finish_while_loop(Block* block);
 

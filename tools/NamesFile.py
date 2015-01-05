@@ -20,7 +20,7 @@ def get_c_name(name):
     if name.startswith('tok_') or name.startswith('stat_') or name.startswith('op_'):
         return name
     else:
-        return "sym_" + name
+        return "s_" + name
 
 def every_symbol():
     f = open(SymbolList, 'r')
@@ -42,7 +42,7 @@ def every_symbol():
         yield (line, get_c_name(line), index)
         index += 1
 
-    yield ('LastBuiltinName', 'sym_LastBuiltinName', index)
+    yield ('LastBuiltinName', 's_LastBuiltinName', index)
 
 def names_to_trie(names, i):
     by_prefix = {}
@@ -104,7 +104,7 @@ def write_impl(lines):
     lines.append('')
     lines.append('const char* builtin_symbol_to_string(int name)')
     lines.append('{')
-    lines.append('    if (name >= sym_LastBuiltinName)')
+    lines.append('    if (name >= s_LastBuiltinName)')
     lines.append('        return NULL;')
     lines.append('')
     lines.append('    switch (name) {')

@@ -2,9 +2,9 @@
 testBlock = ->
   print(a)
 
-int = make_vm(testBlock)
-int.run
+vm = make_vm(testBlock)
+vm.run
 
-assert(int.error_message == "Unknown identifier: a")
+assert(vm.error_message == "Unknown identifier: a")
 
 

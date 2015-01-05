@@ -1,4 +1,1 @@
-Error occurred:
-[tests/module/lib_with_static_error.ca 2,0 - 3,0] syntax_error()
-Expected: )
-
+Error occurred: 'Syntax error: Expected: )'

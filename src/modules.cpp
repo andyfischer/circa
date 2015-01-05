@@ -75,20 +75,20 @@ Block* find_module_by_filename(World* world, Value* filename)
 Block* create_module(World* world)
 {
     Block* block = alloc_block(world);
-    block_set_bool_prop(block, sym_IsModule, true);
+    block_set_bool_prop(block, s_IsModule, true);
     set_block(list_append(&world->everyModule), block);
     return block;
 }
 
 void module_set_name(World* world, Block* block, Value* name)
 {
-    copy(name, block_insert_property(block, sym_Name));
+    copy(name, block_insert_property(block, s_Name));
     set_block(hashtable_insert(&world->modulesByName, name), block);
 }
 
 void module_set_filename(World* world, Block* block, Value* filename)
 {
-    copy(filename, block_insert_property(block, sym_Filename));
+    copy(filename, block_insert_property(block, s_filename));
     set_block(hashtable_insert(&world->modulesByFilename, filename), block);
 }
 
@@ -123,7 +123,7 @@ void resolve_possible_module_path(World* world, Value* path, Value* result)
 
 void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut)
 {
-    Value* loadedByFilename = block_get_property(loadedBy, sym_Filename);
+    Value* loadedByFilename = block_get_property(loadedBy, s_filename);
     if (loadedByFilename != NULL) {
         Value path;
         get_directory_for_filename(loadedByFilename, &path);
@@ -156,7 +156,7 @@ void module_install_replacement(World* world, Value* filename, Block* replacemen
 {
     Block* existing = find_module_by_filename(world, filename);
     ca_assert(existing != NULL);
-    Value* existingName = block_get_property(existing, sym_Name);
+    Value* existingName = block_get_property(existing, s_Name);
 
     for (int i=0; i < world->everyModule.length(); i++) {
         if (as_block(world->everyModule.index(i)) == existing)
@@ -244,7 +244,7 @@ void set_module_ref(Value* value, Value* path, Block* relativeTo)
 
 Term* module_lookup(Block* module, Term* caller)
 {
-    Value* elementName = caller->getProp(sym_MethodName);
+    Value* elementName = caller->getProp(s_MethodName);
     Term* term = find_local_name(module, elementName);
     return term;
 }
@@ -252,6 +252,13 @@ Term* module_lookup(Block* module, Term* caller)
 Term* module_ref_lookup(Value* moduleRef, Term* caller)
 {
     return module_lookup(module_ref_resolve(get_world(caller), moduleRef), caller);
+}
+
+Term* module_lookup(World* world, Value* moduleRef, Value* name)
+{
+    Block* module = module_ref_resolve(world, moduleRef);
+    Term* term = find_local_name(module, name);
+    return term;
 }
  
 void load_script_eval(Stack* stack)

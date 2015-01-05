@@ -1,0 +1,6 @@
+
+for i in [1 2 3]
+  for j in ['a' 'b' 'c']
+    for k in [true false]
+      for l in [:left :right]
+        print([i j k l])

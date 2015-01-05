@@ -4,7 +4,7 @@ struct T {
 }
 
 -- T.f should implicitly have output type T.
-def T.f(self)
+def T.f(@self)
     self.i += 1
 
 t = make(T)

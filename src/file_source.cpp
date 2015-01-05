@@ -39,7 +39,7 @@ static bool file_source_is_filesystem_backed(Value* file_source)
     return is_list(file_source)
         && (list_length(file_source) >= 1)
         && (is_symbol(list_get(file_source, 0)))
-        && (as_symbol(list_get(file_source, 0)) == sym_Filesystem);
+        && (as_symbol(list_get(file_source, 0)) == s_Filesystem);
 }
 
 static bool file_source_is_tarball_backed(Value* file_source)
@@ -47,7 +47,7 @@ static bool file_source_is_tarball_backed(Value* file_source)
     return is_list(file_source)
         && (list_length(file_source) >= 1)
         && (is_symbol(list_get(file_source, 0)))
-        && (as_symbol(list_get(file_source, 0)) == sym_Tarball);
+        && (as_symbol(list_get(file_source, 0)) == s_Tarball);
 }
 
 void file_source_read_file(Value* file_source, Value* name, Value* contents)
@@ -125,14 +125,14 @@ int file_source_get_file_version(Value* file_source, Value* name)
 void file_source_create_using_filesystem(Value* file_source, const char* rootDir)
 {
     set_list(file_source, 2);
-    set_symbol(list_get(file_source, 0), sym_Filesystem);
+    set_symbol(list_get(file_source, 0), s_Filesystem);
     set_string(list_get(file_source, 1), rootDir);
 }
 
 void file_source_create_from_tarball(Value* file_source, Value* blob)
 {
     set_list(file_source, 2);
-    set_symbol(list_get(file_source, 0), sym_Tarball);
+    set_symbol(list_get(file_source, 0), s_Tarball);
     set_value(list_get(file_source, 1), blob);
 }
 

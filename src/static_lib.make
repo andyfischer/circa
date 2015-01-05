@@ -69,6 +69,7 @@ OBJECTS := \
 	$(OBJDIR)/building.o \
 	$(OBJDIR)/builtin_types.o \
 	$(OBJDIR)/bytecode.o \
+	$(OBJDIR)/bytecode2.o \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/change_events.o \
 	$(OBJDIR)/closures.o \
@@ -114,6 +115,7 @@ OBJECTS := \
 	$(OBJDIR)/type.o \
 	$(OBJDIR)/type_inference.o \
 	$(OBJDIR)/update_cascades.o \
+	$(OBJDIR)/vm.o \
 	$(OBJDIR)/world.o \
 	$(OBJDIR)/read_tar.o \
 	$(OBJDIR)/perlin.o \
@@ -193,6 +195,9 @@ $(OBJDIR)/builtin_types.o: builtin_types.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/bytecode.o: bytecode.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/bytecode2.o: bytecode2.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_api.o: c_api.cpp
@@ -328,6 +333,9 @@ $(OBJDIR)/type_inference.o: type_inference.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/update_cascades.o: update_cascades.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/vm.o: vm.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/world.o: world.cpp

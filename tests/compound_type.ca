@@ -15,12 +15,12 @@ m.b = m.a + 2
 assert(m.name == "Andy")
 assert(m.a == 1)
 assert(m.b == 3)
-assert(to_string(m) == "{a: 1, b: 3, name: 'Andy', distance: 0.0}")
+assert(str(m) == "{a: 1, b: 3, name: 'Andy', distance: 0.0}")
 
 -- test += on a field
 m.a += 5
 assert(m.a == 6)
-assert(to_string(m) == "{a: 6, b: 3, name: 'Andy', distance: 0.0}")
+assert(str(m) == "{a: 6, b: 3, name: 'Andy', distance: 0.0}")
 
 -- Cast from a plain list
 struct MyType2 {
@@ -42,7 +42,7 @@ struct Composite {
   String name,
 }
 c = make(Composite)
-assert(to_string(c) == "{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}")
+assert(str(c) == "{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}")
 
 struct Vector { number x, number y }
 v = make(Vector)
@@ -50,6 +50,6 @@ v = make(Vector)
 v.x = 5.0
 v.y = 6.0
 
-assert(to_string(v) == '{x: 5.0, y: 6.0}')
+assert(str(v) == '{x: 5.0, y: 6.0}')
 assert(v.x == 5.0)
 assert(v.y == 6.0)

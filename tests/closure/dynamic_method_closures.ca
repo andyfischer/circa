@@ -5,7 +5,7 @@ cl = (i) ->
 cl.call('call normal')
 cl.apply(['apply normal'])
 
-cld = cl -> any.cast
+cld = any.cast(cl)
 
 cld.call('call dynamic')
 cld.apply(['apply dynamic'])

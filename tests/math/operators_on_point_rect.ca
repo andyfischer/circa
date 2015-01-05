@@ -3,29 +3,29 @@ a = Vec2.make(1 2)
 b = Vec2.make(3 4)
 
 assert(a + b == [4 6])
-assert(type(a + b) == Vec2)
+assert(typeof(a + b) == Vec2)
 
 assert(a - b == [-2 -2])
-assert(type(a - b) == Vec2)
+assert(typeof(a - b) == Vec2)
 
 assert(a * 3 == [3 6])
-assert(type(a * 3) == Vec2)
+assert(typeof(a * 3) == Vec2)
 
 assert(Vec2.make(2 4) / 2 == [1.0, 2.0])
-assert(type(a / 3) == Vec2)
+assert(typeof(a / 3) == Vec2)
 
 r1 = Rect.make(1 2 3 4)
 r2 = Rect.make(0 3 6 9)
 
 assert(r1 + r2 == [1 5 9 13])
-assert(type(r1 + r2) == Rect)
+assert(typeof(r1 + r2) == Rect)
 
 assert(r1 - r2 == [1 -1 -3 -5])
-assert(type(r1 - r2) == Rect)
+assert(typeof(r1 - r2) == Rect)
 
 assert(r1 * 2 == [2 4 6 8])
-assert(type(r1 * 3) == Rect)
+assert(typeof(r1 * 3) == Rect)
 
 assert(r2 / 3 == [0.0 1.0 2.0 3.0])
-assert(type(r1 / 3) == Rect)
+assert(typeof(r1 / 3) == Rect)
 

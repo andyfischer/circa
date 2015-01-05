@@ -1,6 +1,6 @@
 
 set = [1 2 3].to_set
 
-assert(type(set) == Set)
+assert(typeof(set) == Set)
 assert(set.contains(1))
 assert(not set.contains(4))

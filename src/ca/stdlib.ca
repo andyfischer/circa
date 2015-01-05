@@ -1,7 +1,5 @@
 
--- Parse errors
-def unknown_function(any ins :multiple)
-def unknown_identifier()
+def unknown_function_prelude(any ins :multiple)
 
 -- Misc builtins
 def declare_field()
@@ -13,14 +11,12 @@ def continue(any outs :multiple :optional)
 def extra_output(any _) -> any
 def func_call_implicit(any inputs :multiple)
 def get_field(any obj, String key) -> any
-def method_lookup(any obj, Symbol name) -> any -- Func or null
+def method_lookup(location, any obj, Symbol name) -> any -- Func or null
 def get_index(List list, int index) -> any
 def selector(any elements :multiple) -> Selector
 def get_with_selector(any object, Selector selector) -> any
 def set_with_selector(any object, Selector selector, any newValue) -> any
-def syntax_error(msg :multiple)
 def section()
-def case_condition_bool(bool condition)
 def loop_condition_bool(bool condition)
 def minor_return_if_empty()
 
@@ -33,6 +29,7 @@ def while()
 -- For-block
 def for(List list) -> List
 def loop_index() -> int
+def loop_iterator()
 def loop_get_element(list, int index)
 def loop_output_index() -> any
 
@@ -47,7 +44,7 @@ def switch(any input :optional) -> any
 def output(any _)
 
 -- List values
-def list(any vals :multiple) -> List
+def make_list(any vals :multiple) -> List
 def blank_list(int count) -> List
 
 -- Logical
@@ -115,18 +112,19 @@ def arctan(number n) -> number
   -- Trigonometric arctan() function
 
 -- Secret functions used by interpreter
-def _get_local_state() -> any
   -- Special call, read this frame's state.
 def _get_local_stack_path() -> any
-def _find_active_value(term) -> (any, bool)
+-- def _find_active_value(term) -> (any, bool)
 def _save_state_result(Term declaredStateTerm, any result)
-def _get_demand_value(Term t) -> (bool, any)
+-- def _get_demand_value(Term t) -> (bool, any)
 def _store_demand_value(Term t, any val)
 def _extract_stack_path() -> List
 def dbg_get_incoming_state() -> any
 def dbg_get_outgoing_state() -> any
 def dbg_set_incoming_state(val)
 def dbg_set_outgoing_state(val)
+def reflect_caller(int height) -> Term
+def vm_incoming_state(int height) -> Map
 
 -- Type checking
 def is_compound(n) -> bool
@@ -241,8 +239,8 @@ def rand() -> number
 
 def copy(any val) -> any
 
-def cast_declared_type(any val) -> any
-def cast(any val, Type t) -> (any, bool)
+-- Returns null if cast fails.
+def cast(any val, Type t) -> any
 
 def cond(bool condition, any pos, any neg) -> any
   -- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.
@@ -274,7 +272,6 @@ def from_string(String s) -> any
 
 def error(any msg :multiple)
 
-
 -- Comparison
 def less_than_i(int a,int b) -> bool
 def less_than_f(number a,number b) -> bool
@@ -289,9 +286,6 @@ def length(List list) -> int
   -- Return the number of items in the given list
 
 def make(Type t) -> any
-
-def range(int start, int max) -> List
-  -- Return a list of integers from start to max-1
 
 def rpath(String path) -> String
 
@@ -311,25 +305,14 @@ def delete(Map val, List path) -> Map
 
 def trace(any items :multiple)
 
-def to_string(any val) -> String
-
 def to_string_repr(any val) -> String
   -- Encode a Circa value as a string representation.
 
-def type(any val) -> Type
+def typeof(any val) -> Type
   -- Returns the runtime type of a value.
 
-def static_type(any term :meta) -> Type
-  -- Returns the static type of a value.
-
 def env(any name) -> any
-  -- Fetch the env variable in the current scope with the given name.
-
-def env_opt(any name, any default) -> any
-  -- Like env(), but if the value doesn't exist then 'default' is used.
-
-def set_env(any name, any value)
-  -- Set an env var in the current scope.
+  -- Fetch an env variable
 
 def has_effects()
   -- Annotation, declare that a function has effects. Used in native-patched
@@ -339,13 +322,105 @@ def native_patch(String filename)
   -- Declare that this block should be patched by a native module.
 
 def memoize()
-  -- Instruct the VM to memoize the current frame.
+  -- Instruct the VM to memoize the current frame. Not currently working.
 
 def write_text_file(String filename, String contents)
-  -- Write contents to the given filename, overwriting any existing file. (future questionable)
+  -- Write contents to the given filename, overwriting any existing file.
+  -- TODO: delete, replace with library
 
+def syntax_error()
+  caller = reflect_caller(1)
+  error(str("Syntax error: " caller.property(:Message)))
 
-def inputs_fit_function(List inputs,Func func) -> bool
+def unknown_identifier()
+  caller = reflect_caller(1)
+  error(str("Unknown identifier: " caller.name))
+
+def unknown_function(i :multiple)
+  caller = reflect_caller(1)
+  error(str("Unknown function: " caller.property(:Syntax_FunctionName)))
+
+def static_type(i) -> Type
+  caller = reflect_caller(1)
+  input = caller.input(0)
+  input.get_type
+
+def term_ref(term :ref) -> Term
+  caller = reflect_caller(1)
+  caller.input(0)
+
+struct ListSeq {
+  List list
+  int index
+}
+
+def ListSeq.key(self)
+  self.index
+
+def ListSeq.done(self) -> bool
+  self.index >= self.list.length
+
+def ListSeq.next(self) -> any
+  self.list.get(self.index)
+
+def ListSeq.advance(self) -> ListSeq
+  self.index += 1
+  self
+
+def List.to_seq(self)
+  ListSeq.make(self 0)
+
+-- to_seq is used inside loops, no loops allowed before this function.
+def to_seq(val) -> any
+  if is_list(val)
+    val.to_seq
+  else
+    val
+
+struct Range {
+  int from
+  int to
+  int by
+}
+
+def Range.done(self) -> bool
+  self.from >= self.to
+
+def Range.next(self)
+  self.from
+
+def Range.key(self) -> int
+  self.from
+ 
+def Range.advance(self) -> Range
+  self.from += self.by
+  self
+
+def range(from, to)
+  Range.make(from to 1)
+
+def range_by(from, to, by)
+  Range.make(from to by)
+
+def fold(it, func, accum)
+  to_seq(@it)
+
+  while not it.done
+    accum = func.call(accum it.next)
+    @it.advance
+
+  accum
+
+def flatten(it) -> List
+  to_seq(@it)
+
+  -- Language defect: Should be able to refer to the function List.append directly.
+  def append(List list, item) -> List
+    list.append(item)
+    
+  fold(it append [])
+
+def inputs_fit_function(List inputs, Func func) -> bool
 def overload_error_no_match(List inputs)
 def unique_id() -> int
 def source_id() -> any
@@ -359,7 +434,7 @@ def global_script_version() -> int
 -- Func
 struct Func {
   Block block
-  Map bindings
+  List bindings
 }
 
 def Func.call(self, any inputs :multiple) -> any
@@ -380,8 +455,8 @@ def Func.apply(self, List inputs) -> any
 def call(Func func, inputs :multiple) -> any
   func.apply(inputs)
 
-def method_call(obj, Symbol name, List args)
-  func = method_lookup(obj name)
+def method_call(location, obj, Symbol name, List args)
+  func = method_lookup(location obj name)
   if func == null
     error('Method not found: ' name)
   func.call(args)
@@ -391,24 +466,23 @@ def closure_block() -> Func
 
 -- Secret internally-used funcs
 
-def _nonlocal(term :ref) -> any
+def _upvalue(term :ref) -> any
+{-
   value, found = _find_active_value(term)
   if found
     value
   else
     _eval_on_demand(term)
+-}
 
-def _declared_state(Type t, Func initializer :optional) -> any
-  -- Internally used function for fetching a stateful value. The parser
-  -- adds a call to this function whereever the 'state' keyword is used.
-
-  existing = _get_local_state()
-
+def _declared_state(existing, Type type, initializer) -> any
+  -- Fetch a declared state variable. The 'state' keyword uses this.
+  
   if existing != null
     -- Try to cast to the desired type
-    existing, cast_success = cast(existing, t)
+    existing = cast(existing, type)
 
-    if cast_success
+    if existing != null
       return existing
 
   -- Cast failed. Try to use the initializer.
@@ -416,11 +490,16 @@ def _declared_state(Type t, Func initializer :optional) -> any
     return initializer.call()
 
   -- No initializer. Use the type's default value.
-  return make(t)
+  return make(type)
+
+def vm_save_declared_state(result)
+def vm_close_stateful_minor_frame(result)
+def vm_capture_state_frames()
 
 def _dynamic_term_eval(Term t, List inputs) -> any
   t.function.to_func.apply(inputs)
 
+{-
 def _eval_on_demand(Term t) -> any
   -- Internal function, used when a nonlocal() term needs a value.
   if t.is_value or t.is_func_decl
@@ -436,11 +515,13 @@ def _eval_on_demand(Term t) -> any
   result = _dynamic_term_eval(t inputs)
   _store_demand_value(t result)
   result
+-}
 
 -- Misc builtin funcs --
 
 def abs(number n) -> number
   -- Absolute value
+
 def any_true(list) -> bool
   for i in list
     if not(i)
@@ -450,19 +531,17 @@ def any_true(list) -> bool
 def get_with_symbol(any lhs, Symbol symbol) -> any
 
 def first_symbol(any val) -> Symbol
-  if type(val) == Symbol
+  if typeof(val) == Symbol
     val
-  elif type(val) == List
+  elif typeof(val) == List
     if length(val) > 0
       first_symbol(val[0])
 
 def rand_range(number min, number max) -> number
   min + rand() * (max - min)
+
 def rand_i(int range) -> int
   floor(rand() * range)
-
-def swap(a, b) -> (any, any)
-  return b, a
 
 def increment(int i) -> int
   i + 1
@@ -475,7 +554,6 @@ struct FileSignature { String filename, int time_modified }
 struct Callable;
 struct Color { number r, number g, number b, number a }
 struct Module { String name, Block relativeTo }
-struct VM;
 struct Vec2 { number x, number y }
 struct Vec2i { int x, int y }
 struct Vec3 { number x, number y, number z }
@@ -491,6 +569,8 @@ def Module.to_func(self) -> Func
   self.block.to_func
 def Module.to_stack(self) -> VM
   self.block.to_stack
+def Module.to_vm(self) -> VM
+  self.block.to_vm
 
 def load_script(String filename) -> Block
   -- Load a script file with the given filename.
@@ -528,16 +608,10 @@ def file_changed(String filename) -> bool
   ver = file_version(filename)
   changed([filename ver])
 
--- Reflect module
-def reflect_this_block() -> Block
-def reflect_caller() -> Term
-def reflect_kernel() -> Block
-
 -- Sys module
 def sys_arg(int index) -> String
 def sys_module_search_paths() -> List
 def _perf_stats_dump() -> Map
-
 
 def make_blob(int size) -> Blob
 def Blob.size(self) -> int
@@ -555,7 +629,16 @@ def Blob.i8(self, int offset) -> int
 def Blob.i16(self, int offset) -> int
 def Blob.i32(self, int offset) -> int
 
-def Blob.to_hex_string(self, int offset, int len) -> String
+def Blob.to_hex_string(self, offset :optional, len :optional) -> String
+  if offset == null
+    offset = 0
+
+  if len == null
+    len = self.size
+
+  if len + offset > self.size
+    len = self.size - offset
+
   def to_hex_digit(int i)
     if i >= 0 and i < 10
       String.make.from_char_code('0'.char_code + i)
@@ -563,7 +646,7 @@ def Blob.to_hex_string(self, int offset, int len) -> String
       String.make.from_char_code('a'.char_code + i - 10)
 
   result = ""
-  for i in offset..(offset+len)
+  for i in range(offset, offset+len)
     byte = self.u8(i)
     @result.append(to_hex_digit(byte // 16))
     @result.append(to_hex_digit(byte % 16))
@@ -626,6 +709,9 @@ def Block.to_func(self) -> Func
 def Block.to_stack(self) -> VM
   self.to_func.to_stack
 
+def Block.to_vm(self) -> VM
+  self.to_func.to_vm
+
 def Block.name(self) -> String
     self.owner.name
 
@@ -670,9 +756,7 @@ def Block.if_block_cases(self) -> List
   self.terms.filter((term) -> term.function.name == 'case')
 
 def Block.case_find_condition(self) -> Term
-  for term in self.terms
-    if term.function == case_condition_bool.block
-      return term
+  -- FIXME
   return null
 
 def Block.find_while_condition(self) -> Term
@@ -713,8 +797,6 @@ def Frame.outputs(self) -> List
   -- Returns a list of output register values
 def Frame.output(self, int nth) -> any
   -- Returns the nth output register value
-def Frame.extract_state(self) -> Map
-  -- Returns the frame's state as a plain object (composite of maps and lists).
 
 def capture_stack() -> VM
   -- Returns a frozen copy of the currently executing stack.
@@ -723,6 +805,8 @@ def VM.apply(self, List inputs) -> any
 def VM.block(self) -> Block
   -- Returns the (topmost) block.
 def VM.call(self, any inputs :multiple) -> any
+def VM.run(self)
+  self.call
 def VM.copy(self) -> VM
 def VM.current_term(self) -> Term
   self.top.current_term
@@ -732,11 +816,18 @@ def VM.dump_with_bytecode(self)
 def VM.dump_compiled(self)
 def VM.eval_on_demand(self, Term term) -> any
 def VM.find_active_value(self, Term term) -> any
+
+def VM.get_raw_slots(self) -> List
+def VM.get_raw_ops(self) -> Blob
+def VM.get_raw_mops(self) -> Blob
+def VM.get_bytecode_const(self, index) -> any
+def VM.precompile(self, Block b)
+def bytecode_mop_size() -> int
+
 def VM.rethrow(self)
   -- If the stack has an error, raise it in this context.
   if self.has_error
     error(self.error_message)
-def VM.extract_state(self) -> Map
 def VM.find_active_frame_for_term(self, Term term) -> Frame
 def VM.id(self) -> int
 def VM.init(self, Func func)
@@ -751,10 +842,11 @@ def VM.init_env(self)
   self.set_env_map(Map.make)
 
 def VM.modify_env(self, Func func)
-  self.set_env_map(func.call(self.env_map))
+  new = func.call(self.env_map)
+  self.set_env_map(new)
 
 def VM.append_hack(self, any hack)
-  self.modify_env((env) -> env.list_append(:_hacks hack))
+  self.modify_env((env) -> env.list_append(:hacks hack))
 
 def VM.forward_env(self, names :multiple)
   for name in names
@@ -776,7 +868,10 @@ def VM.stack_push2(self, Func func)
 def VM.stack_pop(self)
   -- Pop the topmost frame.
 def VM.set_state_input(self, any)
+
 def VM.get_state(self) -> any
+def VM.set_state(self, any)
+
 def VM.migrate(self, Block from, Block to)
 def VM.migrate_to(self, Func func)
   -- Use 'func' as the new root, and migrate data and state.
@@ -785,14 +880,16 @@ def VM.reset_state(self)
 def VM.restart(self)
   -- Restart or "rewind" the stack, so the program counter is returned to the start
   -- of the topmost frame. State is preserved.
-def VM.run(self) -> VM
-  -- Run the interpreter until either the topmost frame is finished, or an error
-  -- is raised.
 def VM.frame(self, int depth) -> Frame
   -- Return the Frame with the given depth. The top of the stack has depth 0.
 def VM.frame_from_base(self, int height) -> Frame
   -- Return the Frame with the given height.
 def VM.frame_count(self) -> int
+
+-- don't delete:
+def VM.frame_list(self) -> List
+def VM.slot(self, index) -> any
+
 
 def VM.frames_from_top(self) -> List
   for i in 0..self.frame_count
@@ -801,6 +898,8 @@ def VM.frames_from_top(self) -> List
 def VM.frames_from_start(self) -> List
   for i in self.frame_count..0
     self.frame(i-1)
+
+
 
 def VM.top(self) -> Frame
   -- Return the topmost Frame.
@@ -830,6 +929,10 @@ def make_vm(Func func) -> VM
   -- Create a new VM
 
 def Func.to_stack(self) -> VM
+  -- TODO: delete
+  make_vm(self)
+
+def Func.to_vm(self) -> VM
   make_vm(self)
 
 def repeat(any val, int count) -> List
@@ -983,9 +1086,6 @@ def List.push(self, val) -> List
 def List.pop(self) -> List
   self.slice(0, -1)
 
-def List.pop2(self) -> (List, any)
-  return self.slice(0, -1), self.last
-
 def List.filter(self, Func func) -> List
   result = []
   for i in self
@@ -1036,19 +1136,19 @@ def Map.set(self, any key, any value) -> Map
 def Map.empty(self) -> bool
   -- Whether the map has no values
 
-def Map.apply(@self, any key, Func func)
-  @self.set(key, func.call(self.get(key)))
+def Map.apply(self, any key, Func func) -> Map
+  self.set(key, func.call(self.get(key)))
 
-def Map.modify(@self, any key, Func func)
-  @self.set(key, func.call(self.get(key)))
+def Map.modify(self, any key, Func func) -> Map
+  self.set(key, func.call(self.get(key)))
 
-def Map.list_append(@self, any key, any value) -> Map
+def Map.list_append(self, any key, any value) -> Map
   if self.contains(key)
-    @self.modify(key, (l) -> l.append(value))
+    self.modify(key, (l) -> l.append(value))
   else
-    @self.set(key, [value])
+    self.set(key, [value])
 
-def Map.bucketize(@self, List list, Func getKey) -> Map
+def Map.bucketize(self, List list, Func getKey) -> Map
   for el in list
     @self.list_append(getKey.call(el), el)
 
@@ -1061,13 +1161,13 @@ struct Set {
   Map m
 }
 
-def Set.add(@self, element) -> Set
+def Set.add(self, element) -> Set
   @self.m.set(element, true)
 
-def Set.contains(@self, element) -> bool
+def Set.contains(self, element) -> bool
   self.m.contains(element)
 
-def Set.remove(@self, element) -> Set
+def Set.remove(self, element) -> Set
   @self.m.remove(element)
 
 def Set.elements(self) -> List
@@ -1081,16 +1181,19 @@ def List.to_set(self) -> Set
 
 def String.append(self, String right) -> String
   -- Append a string to the right side.
-  str(self, right)
+  str(self right)
+
+def String.prepend(self, String left) -> String
+  str(left self)
     
 def String.char_at(self, int index) -> String
   -- Get character at a given index. UTF unsafe.
 
-def String.index_of(self, String substr) -> (bool, int)
+def String.index_of(self, String substr) -> any
   for i in 0..self.length
     if self.substr(i, substr.length) == substr
-      return true, i
-  return false, 0
+      return i
+  return null
 
 def String.ends_with(self, String suffix) -> bool
   -- Return true if this string ends with the given substring.
@@ -1127,24 +1230,20 @@ def String.characters(self) -> List
 
 -- Type
 def Type.declaringTerm(self) -> Term
-def Type.cast(self, any value) -> any
-  value, success = cast(value, self)
-  if not success
-    error(str("Couldn't cast value " value " to type " self.name))
-  value
         
 def Type.make(self, any values :multiple) -> any
 def Type.name(self) -> String
 def Type.property(self, String name) -> any
 def Type.includes(self, value) -> bool
-  _, success = cast(value self)
-  success
+  result = cast(value self)
+  result != null
 
--- Term
-def term_ref(term :ref) -> Term
-  if term.function == _nonlocal.block
-    term = term.input(0)
-  term
+def Type.cast(self, any value) -> any
+  result = cast(value, self)
+  if result == null
+    error(str("Couldn't cast value " value " to type " self.name))
+  result
+
 def Term.assign(self, any val)
 def Term.asint(self) -> int
 def Term.asfloat(self) -> number
@@ -1224,30 +1323,30 @@ def vec2(number x, number y)
   Vec2.make(x y)
 
 def Vec2.add(self, rhs) -> Vec2
-  rhs, isVec = cast(rhs, Vec2)
-  if isVec
-    [self.x + rhs.x, self.y + rhs.y]
+  rvec = cast(rhs, Vec2)
+  if rvec != null
+    [self.x + rvec.x, self.y + rvec.y]
   else
     [self.x + rhs, self.y + rhs]
 
 def Vec2.sub(self, rhs) -> Vec2
-  rhs, isVec = cast(rhs, Vec2)
-  if isVec
-    [self.x - rhs.x, self.y - rhs.y]
+  rvec = cast(rhs, Vec2)
+  if rvec != null
+    [self.x - rvec.x, self.y - rvec.y]
   else
     [self.x - rhs, self.y - rhs]
 
 def Vec2.mult(self, rhs) -> Vec2
-  rhs, isVec = cast(rhs, Vec2)
-  if isVec
-    [self.x * rhs.x, self.y * rhs.y]
+  rvec = cast(rhs, Vec2)
+  if rvec != null
+    [self.x * rvec.x, self.y * rvec.y]
   else
     [self.x * rhs, self.y * rhs]
 
 def Vec2.div(self, rhs) -> Vec2
-  rhs, isVec = cast(rhs, Vec2)
-  if isVec
-    [self.x / rhs.x, self.y / rhs.y]
+  rvec = cast(rhs, Vec2)
+  if rvec != null
+    [self.x / rvec.x, self.y / rvec.y]
   else
     [self.x / rhs, self.y / rhs]
     
@@ -1375,27 +1474,27 @@ def Rect.grow(self, Vec2 size) -> Rect
 def Rect.grow_s(self, number size) -> Rect
   [self.x1 - size, self.y1 - size, self.x2 + size, self.y2 + size]
 
-def Rect.subtractFrom(self, Symbol side, number dimension) -> (Rect, Rect)
+def Rect.subtractFrom(self, Symbol side, number dimension) -> List
   if side == :top
     min(@dimension, self.height)
     out = self.set_y2(dimension)
     self.y1 += dimension
-    return self, out
+    return [self, out]
   if side == :left
     min(@dimension, self.width)
     out = self.set_x2(self.x1 + dimension)
     self.x1 += dimension
-    return self, out
+    return [self, out]
   if side == :right
     min(@dimension, self.width)
     out = self.set_x1(self.x2 - dimension)
     self.x2 -= dimension
-    return self, out
+    return [self, out]
   if side == :bottom
     min(@dimension, self.height)
     out = self.set_y1(self.y2 - dimension)
     self.y2 -= dimension
-    return self, out
+    return [self, out]
   error(str('Unrecognized side: ' side))
 
 def sum(List numbers) -> number

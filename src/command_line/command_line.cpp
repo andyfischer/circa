@@ -7,6 +7,7 @@
 #include "block.h"
 #include "building.h"
 #include "bytecode.h"
+#include "bytecode2.h"
 #include "debug.h"
 #include "file.h"
 #include "file_watch.h"
@@ -25,6 +26,7 @@
 #include "term.h"
 #include "token.h"
 #include "update_cascades.h"
+#include "vm.h"
 #include "world.h"
 
 #include "circa/file.h"
@@ -39,6 +41,10 @@
 #endif
 
 namespace circa {
+
+// TODO: delete
+static Value* circa_input(Stack* stack, int index) { return NULL; }
+static Value* circa_output(Stack* stack, int index) { return NULL; }
 
 void run_repl_stdin(World* world);
 
@@ -399,18 +405,27 @@ int run_command_line(caWorld* world, Value* args)
 
     Block* block = load_module_by_filename(world, &filename);
 
-    Stack* stack = create_stack(world);
-    stack_init(stack, block);
+    VM* vm = new_vm(block);
 
     if (printRaw) {
         Value str;
-        print_block(block, &rawOutputPrefs, &str, stack);
+        print_block(block, &rawOutputPrefs, &str);
         printf("%s\n", as_cstring(&str));
     }
 
     if (dontRunScript)
         return 0;
 
+    vm_run(vm, NULL);
+
+    if (vm->has_error()) {
+        printf("Error occurred: %s\n", vm_get_error(vm)->to_c_string());
+        return 1;
+    }
+
+    return 0;
+
+    /*
     circa_run(stack);
 
     if (printState) {
@@ -435,6 +450,7 @@ int run_command_line(caWorld* world, Value* args)
 
         return 1;
     }
+    */
 
     return 0;
 }

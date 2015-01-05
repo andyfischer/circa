@@ -117,10 +117,10 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
         Value* action = list_get(&watch->onChangeActions, i);
 
         Symbol label = first_symbol(action);
-        ca_assert(label != sym_None);
+        ca_assert(label != s_none);
 
         switch (label) {
-        case sym_NativePatch: {
+        case s_NativePatch: {
             Value* moduleName = list_get(action, 1);
 
             NativePatch* nativeModule = insert_native_patch(world, moduleName);
@@ -128,7 +128,7 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             circa_finish_native_patch(nativeModule);
             break;
         }
-        case sym_RecompileModule: {
+        case s_RecompileModule: {
             printf("recompiling changed module: %s\n", as_cstring(&watch->filename));
 
             // Reload this code block.
@@ -193,7 +193,7 @@ FileWatch* add_file_watch_recompile_module(World* world, const char* filename)
 {
     circa::Value action;
     set_list(&action, 1);
-    set_symbol(list_get(&action, 0), sym_RecompileModule);
+    set_symbol(list_get(&action, 0), s_RecompileModule);
     return add_file_watch_action(world, filename, &action);
 }
 
@@ -201,7 +201,7 @@ FileWatch* add_file_watch_native_patch(World* world, const char* filename, const
 {
     circa::Value action;
     set_list(&action, 2);
-    set_symbol(list_get(&action, 0), sym_NativePatch);
+    set_symbol(list_get(&action, 0), s_NativePatch);
     set_string(list_get(&action, 1), moduleName);
     return add_file_watch_action(world, filename, &action);
 }

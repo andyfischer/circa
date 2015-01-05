@@ -8,5 +8,5 @@ def T.add(@t, int i)
 
 t = make(T)
 print(t)
-t.add(3)
+@t.add(3)
 print(t)

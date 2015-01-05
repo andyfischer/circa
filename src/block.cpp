@@ -310,6 +310,13 @@ Block::compile(const char* code)
     return parse(this, parse_statement_list, code);
 }
 
+const char* Block::name()
+{
+    if (this->owningTerm == NULL)
+        return "";
+    return this->owningTerm->name();
+}
+
 bool has_nested_contents(Term* term)
 {
     return term->nestedContents != NULL;
@@ -451,6 +458,11 @@ Block* find_enclosing_major_block(Block* block)
         block = get_parent_block(block);
     }
     return NULL;
+}
+
+Block* find_enclosing_major_block(Term* term)
+{
+    return find_enclosing_major_block(term->owningBlock);
 }
 
 Block* find_common_parent(Block* a, Block* b)
@@ -705,7 +717,7 @@ void load_script_from_text(Block* block, const char* text)
 void load_script(Block* block, const char* filename)
 {
     // Store the filename
-    set_string(block_insert_property(block, sym_Filename), filename);
+    set_string(block_insert_property(block, s_filename), filename);
 
     // Read the text file
     circa::Value contents;
@@ -783,12 +795,12 @@ void block_remove_property(Block* block, Symbol key)
 
 Value* block_get_source_filename(Block* block)
 {
-    return block_get_property(block, sym_Filename);
+    return block_get_property(block, s_filename);
 }
 
 Value* block_get_static_errors(Block* block)
 {
-    return block_get_property(block, sym_StaticErrors);
+    return block_get_property(block, s_StaticErrors);
 }
 
 bool block_get_bool_prop(Block* block, Symbol name, bool defaultValue)
@@ -819,7 +831,7 @@ void block_set_symbol_prop(Block* block, Symbol name, Symbol value)
 
 bool block_is_evaluation_empty(Block* block)
 {
-    Value* prop = block_get_property(block, sym_EvaluationEmpty);
+    Value* prop = block_get_property(block, s_EvaluationEmpty);
 
     if (prop == NULL)
         return false;
@@ -830,13 +842,13 @@ bool block_is_evaluation_empty(Block* block)
 void block_set_evaluation_empty(Block* block, bool empty)
 {
     if (empty)
-        set_bool(block_insert_property(block, sym_EvaluationEmpty), true);
+        set_bool(block_insert_property(block, s_EvaluationEmpty), true);
     else
-        block_remove_property(block, sym_EvaluationEmpty);
+        block_remove_property(block, s_EvaluationEmpty);
 }
 bool block_has_effects(Block* block)
 {
-    Value* prop = block_get_property(block, sym_HasEffects);
+    Value* prop = block_get_property(block, s_HasEffects);
 
     if (prop == NULL)
         return false;
@@ -846,9 +858,9 @@ bool block_has_effects(Block* block)
 void block_set_has_effects(Block* block, bool hasEffects)
 {
     if (hasEffects)
-        set_bool(block_insert_property(block, sym_HasEffects), true);
+        set_bool(block_insert_property(block, s_HasEffects), true);
     else
-        block_remove_property(block, sym_HasEffects);
+        block_remove_property(block, s_HasEffects);
 }
 
 int block_locals_count(Block* block)
@@ -966,14 +978,16 @@ void block_link_missing_functions(Block* block, Block* source)
 {
     for (BlockIterator it(block); it; ++it) {
         Term* term = *it;
-        if (term->function == NULL || term->function == FUNCS.unknown_function) {
-            std::string funcName = term->stringProp(sym_Syntax_FunctionName, "");
-
+        if (term->function == NULL
+                || term->function == FUNCS.unknown_function
+                || term->function == FUNCS.unknown_function_prelude) {
+            std::string funcName = term->stringProp(s_Syntax_FunctionName, "");
+            
             if (funcName == "")
                 continue;
 
             // try to find this function
-            Term* func = find_local_name(source, funcName.c_str(), sym_LookupFunction);
+            Term* func = find_local_name(source, funcName.c_str(), s_LookupFunction);
 
             if (func != NULL)
                 change_function(term, func);

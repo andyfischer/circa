@@ -1,14 +1,13 @@
 
-m = Map.make.set('one', 1).set('two' 2)
+m = Map.make.set(:one, 1).set(:two 2)
 
 assert(m.one == 1)
 assert(m.two == 2)
 
-
 def error_test()
-    m = Map.make.set('one', 1)
-    m.one(1)
+  m = Map.make
+  m.three
 
-int = error_test.to_stack
-int.run
-int.errored -> assert
+vm = error_test.to_vm
+vm.call
+vm.errored -> assert

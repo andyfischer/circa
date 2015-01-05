@@ -51,6 +51,14 @@ Term::nameStr()
     return as_cstring(&nameValue);
 }
 
+const char*
+Term::name()
+{
+    if (!is_string(&nameValue))
+        return "";
+    return as_cstring(&nameValue);
+}
+
 Term*
 Term::input(int index)
 {
@@ -350,31 +358,31 @@ void term_set_bool_prop(Term* term, Symbol prop, bool value)
 }
 bool is_input_implicit(Term* term, int index)
 {
-    Value* val = term_get_input_property(term, index, sym_Implicit);
+    Value* val = term_get_input_property(term, index, s_Implicit);
     if (val == NULL)
         return false;
     return as_bool(val);
 }
 void set_input_implicit(Term* term, int index, bool implicit)
 {
-    set_bool(term_insert_input_property(term, index, sym_Implicit), true);
+    set_bool(term_insert_input_property(term, index, s_Implicit), true);
 }
 bool is_input_hidden(Term* term, int index)
 {
-    Value* val = term_get_input_property(term, index, sym_Hidden);
+    Value* val = term_get_input_property(term, index, s_Hidden);
     if (val == NULL)
         return false;
     return as_bool(val);
 }
 void set_input_hidden(Term* term, int index, bool hidden)
 {
-    set_bool(term_insert_input_property(term, index, sym_Hidden), true);
+    set_bool(term_insert_input_property(term, index, s_Hidden), true);
 }
 
 void hide_from_source(Term* term)
 {
     ca_assert(term != NULL);
-    term->setBoolProp(sym_Hidden, true);
+    term->setBoolProp(s_Hidden, true);
 }
 
 Value* term_name(Term* term)
@@ -506,7 +514,7 @@ bool term_is_observable_for_special_reasons(Term* term)
         || (term->function == FUNCS.function_decl)
         || (is_for_loop(term->owningBlock) && is_input_placeholder(term) && term->index == 0)
         || (is_loop(term->owningBlock) && is_output_placeholder(term))
-        || (term_get_bool_prop(term, sym_LocalStateResult, false)));
+        || (term_get_bool_prop(term, s_LocalStateResult, false)));
 }
 
 bool term_is_observable(Term* term)
@@ -522,15 +530,6 @@ bool term_is_observable(Term* term)
     return true;
 }
 
-bool term_occurs_before_case_condition(Term* term)
-{
-    Term* condition = case_find_condition_check(term->owningBlock);
-    if (condition == NULL)
-        return false;
-
-    return is_located_after(condition, term);
-}
-
 bool terms_are_in_different_switch_conditions(Term* left, Term* right)
 {
     Block* commonBlock = find_common_parent_major(left->owningBlock, right->owningBlock);
@@ -540,11 +539,6 @@ bool terms_are_in_different_switch_conditions(Term* left, Term* right)
     if (!is_switch_block(commonBlock))
         return false;
 
-    if (term_occurs_before_case_condition(left))
-        return false;
-    if (term_occurs_before_case_condition(right))
-        return false;
-        
     left = find_parent_term_in_block(left, commonBlock);
     right = find_parent_term_in_block(right, commonBlock);
 
@@ -569,7 +563,7 @@ bool term_used_by_nonlocal(Term* term)
     for (int i=0; i < user_count(term); i++) {
         Term* user = term_user(term, i);
 
-        if (user->function == FUNCS.nonlocal)
+        if (user->function == FUNCS.upvalue)
             return true;
     }
     return false;
@@ -588,7 +582,7 @@ bool term_is_observable_after(Term* term, Term* location)
     for (int i=0; i < user_count(term); i++) {
         Term* user = term_user(term, i);
 
-        if (user->function == FUNCS.nonlocal)
+        if (user->function == FUNCS.upvalue)
             return true;
 
         if (terms_are_in_different_switch_conditions(location, user))
@@ -632,6 +626,44 @@ bool term_uses_input_multiple_times(Term* term, Term* input)
         if (term_dependency(term, i) == input)
             useCount++;
     return useCount > 1;
+}
+
+bool term_needs_no_evaluation(Term* term)
+{
+    if (term == NULL
+            || is_value(term)
+            || term->function == FUNCS.require
+            || term->function == FUNCS.lambda
+            || term->function == FUNCS.case_func
+            || term->function == FUNCS.comment)
+
+        return true;
+
+    return false;
+}
+
+bool term_needs_no_evaluation2(Term* term)
+{
+    if (term == NULL
+            || is_value(term)
+            || term->function == FUNCS.require
+            || term->function == FUNCS.lambda
+            || term->function == FUNCS.case_func
+            || term->function == FUNCS.input
+            || term->function == FUNCS.output
+            || term->function == FUNCS.extra_output
+            || term->function == FUNCS.comment)
+
+        return true;
+
+    return false;
+}
+
+bool should_use_term_value(Term* term)
+{
+    return is_value(term)
+        || term->owningBlock == global_builtins_block()
+        || term->function == FUNCS.require;
 }
 
 } // namespace circa

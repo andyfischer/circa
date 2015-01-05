@@ -12,11 +12,11 @@ struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
     Term* and_func;
+    Term* blank_list;
     Term* break_func;
     Term* case_func;
     Term* case_condition_bool;
     Term* cast;
-    Term* cast_declared_type;
     Term* closure_block;
     Term* comment;
     Term* cond;
@@ -39,7 +39,9 @@ struct BuiltinFuncs {
     Term* feedback;
     Term* for_func;
     Term* func_apply;
+    Term* func_apply_method;
     Term* func_call;
+    Term* func_call_method;
     Term* func_call_implicit;
     Term* function_decl;
     Term* get_field;
@@ -59,23 +61,24 @@ struct BuiltinFuncs {
     Term* length;
     Term* less_than;
     Term* less_than_eq;
-    Term* list;
     Term* list_append;
     Term* loop_condition_bool;
     Term* load_script;
+    Term* loop_iterator;
     Term* loop_index;
     Term* loop_get_element;
     Term* loop_output_index;
     Term* make;
+    Term* make_list;
     Term* map;
     Term* map_get;
     Term* memoize;
+    Term* method_lookup;
     Term* minor_return_if_empty;
     Term* module_get;
     Term* mult;
     Term* native_patch;
     Term* neg;
-    Term* nonlocal;
     Term* not_equals;
     Term* not_func;
     Term* or_func;
@@ -89,6 +92,7 @@ struct BuiltinFuncs {
     Term* save_state_result;
     Term* section_block;
     Term* selector;
+    Term* to_seq;
     Term* set_index;
     Term* set_field;
     Term* set_with_selector;
@@ -102,7 +106,11 @@ struct BuiltinFuncs {
     Term* type_make;
     Term* unbound_input;
     Term* unknown_function;
+    Term* unknown_function_prelude;
     Term* unknown_identifier;
+    Term* upvalue;
+    Term* vm_save_declared_state;
+    Term* vm_close_stateful_minor_frame;
     Term* value;
     Term* while_loop;
 };
@@ -133,6 +141,7 @@ struct BuiltinTypes {
     Type* symbol;
     Type* term;
     Type* type;
+    Type* vm;
     Type* void_type;
 };
 

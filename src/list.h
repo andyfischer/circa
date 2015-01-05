@@ -20,6 +20,7 @@ struct ListData {
     int count;
     int capacity;
     int checksum;
+    Value attrs;
 
     // items has size [capacity].
     Value items[0];

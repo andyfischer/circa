@@ -1,8 +1,7 @@
 
-found, index = "abcdef".index_of('bc')
+index = "abcdef".index_of('bc')
 
-assert(found)
 assert(index == 1)
 
-found, index = "abcdef".index_of('fg')
-assert(not found)
+index = "abcdef".index_of('fg')
+assert(index == null)

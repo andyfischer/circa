@@ -39,8 +39,8 @@ void perf_stats_to_map(Value* map);
 void perf_stat_inc(int name);
 void perf_stat_add(int name, int n);
 
-const int c_firstStatIndex = sym_FirstStatIndex + 1;
-const int c_numPerfStats = sym_LastStatIndex - c_firstStatIndex;
+const int c_firstStatIndex = s_FirstStatIndex + 1;
+const int c_numPerfStats = s_LastStatIndex - c_firstStatIndex;
 extern uint64 PERF_STATS[c_numPerfStats];
 
 #if CIRCA_ENABLE_PERF_STATS

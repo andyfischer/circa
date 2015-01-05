@@ -1,0 +1,20 @@
+
+def f()
+  trace('called f()')
+
+def g()
+  :effect
+  trace('called g()')
+
+def main()
+  f()
+  g()
+
+vm = make_vm(main)
+
+print('normal run:')
+vm.call
+
+vm.append_hack(:no_effect)
+print('no effect run:')
+vm.call

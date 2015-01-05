@@ -2,6 +2,6 @@
 f = ->
   add(a b c)
 
-int = make_vm(f)
-int.run
-assert(int.errored)
+vm = make_vm(f)
+vm.call
+assert(vm.has_error)

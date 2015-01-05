@@ -36,6 +36,7 @@
 #include "type_inference.h"
 #include "type.h"
 #include "world.h"
+#include "vm.h"
 
 namespace circa {
 
@@ -44,75 +45,22 @@ World* g_world = NULL;
 BuiltinFuncs FUNCS;
 BuiltinTypes TYPES;
 
-Value* g_oracleValues;
-Value* g_spyValues;
-
 Term* find_builtin_func(Block* builtins, const char* name);
 
 Type* output_placeholder_specializeType(Term* caller)
 {
     // Don't specialize if the type was explicitly declared
-    if (caller->boolProp(sym_ExplicitType, false))
+    if (caller->boolProp(s_ExplicitType, false))
         return declared_type(caller);
 
     // Special case: if we're an accumulatingOutput then the output type is List.
-    if (caller->boolProp(sym_AccumulatingOutput, false))
+    if (caller->boolProp(s_AccumulatingOutput, false))
         return TYPES.list;
 
     if (caller->input(0) == NULL)
         return NULL;
 
     return declared_type(caller->input(0));
-}
-
-void syntax_error(Stack* stack)
-{
-    Value msg;
-    set_string(&msg, "");
-    string_append(&msg, circa_caller_term(stack)->stringProp(sym_Message,"Syntax error").c_str());
-    circa_output_error(stack, as_cstring(&msg));
-}
-
-void from_string(Stack* stack)
-{
-    parse_string_repr(circa_input(stack, 0), circa_output(stack, 0));
-}
-
-void to_string_repr(Stack* stack)
-{
-    write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
-}
-
-void refactor__rename(Stack* stack)
-{
-    rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
-}
-
-void refactor__change_function(Stack* stack)
-{
-    change_function(as_term_ref(circa_input(stack, 0)),
-        (Term*) circa_caller_input_term(stack, 1));
-}
-
-void reflect__this_block(Stack* stack)
-{
-    set_block(circa_output(stack, 0), (Block*) circa_caller_block(stack));
-}
-
-void sys__module_search_paths(Stack* stack)
-{
-    copy(module_search_paths(stack->world), circa_output(stack, 0));
-}
-
-void perf_stats_dump(Stack* stack)
-{
-    perf_stats_to_map(circa_output(stack, 0));
-    circa_perf_stats_reset();
-}
-void global_script_version(Stack* stack)
-{
-    World* world = stack->world;
-    set_int(circa_output(stack, 0), world->globalScriptVersion);
 }
 
 std::string stackVariable_toString(Value* value)
@@ -251,9 +199,9 @@ Type* List__append_specializeType(Term* term)
 {
     Term* listInput = term->input(0);
     switch (list_get_parameter_type(&listInput->type->parameter)) {
-    case sym_Untyped:
+    case s_Untyped:
         return listInput->type;
-    case sym_UniformListType:
+    case s_UniformListType:
     {
         Type* listElementType = list_get_repeated_type_from_type(listInput->type);
         Type* commonType = find_common_type(listElementType, term->input(1)->type);
@@ -262,15 +210,15 @@ Type* List__append_specializeType(Term* term)
         else
             return create_typed_unsized_list_type(commonType);
     }
-    case sym_AnonStructType:
-    case sym_StructType:
+    case s_AnonStructType:
+    case s_StructType:
     {    
         Value elementTypes;
         copy(list_get_type_list_from_type(listInput->type), &elementTypes);
         set_type(elementTypes.append(), term->input(1)->type);
         return create_typed_unsized_list_type(find_common_type(&elementTypes));
     }
-    case sym_Invalid:
+    case s_invalid:
     default:
         return TYPES.any;
     }
@@ -334,59 +282,12 @@ int term_hashFunc(Value* val)
 void term_setup_type(Type* type)
 {
     set_string(&type->name, "Term");
-    type->storageType = sym_StorageTypeTerm;
+    type->storageType = s_StorageTypeTerm;
     type->toString = term_toString;
     type->hashFunc = term_hashFunc;
 }
 
 // Spy & oracle
-void test_spy_clear()
-{
-    if (g_spyValues == NULL)
-        g_spyValues = circa_alloc_value();
-    set_list(g_spyValues, 0);
-}
-Value* test_spy_get_results()
-{
-    return g_spyValues;
-}
-void test_oracle_clear()
-{
-    if (g_oracleValues == NULL)
-        g_oracleValues = circa_alloc_value();
-    set_list(g_oracleValues, 0);
-}
-void test_oracle_send(Value* value)
-{
-    copy(value, list_append(g_oracleValues));
-}
-Value* test_oracle_append()
-{
-    return list_append(g_oracleValues);
-}
-void test_oracle_send(int i)
-{
-    set_int(list_append(g_oracleValues), i);
-}
-void test_oracle(Stack* stack)
-{
-    if (list_length(g_oracleValues) == 0)
-        set_null(circa_output(stack, 0));
-    else {
-        copy(list_get(g_oracleValues, 0), circa_output(stack, 0));
-        list_remove_index(g_oracleValues, 0);
-    }
-}
-
-void test_spy(Stack* stack)
-{
-    if (g_spyValues == NULL) {
-        g_spyValues = circa_alloc_value();
-        set_list(g_spyValues);
-    }
-    copy(circa_input(stack, 0), list_append(g_spyValues));
-}
-
 void for_each_root_type(void (*callback)(Type* type))
 {
     (*callback)(TYPES.any);
@@ -405,6 +306,7 @@ void for_each_root_type(void (*callback)(Type* type))
     (*callback)(TYPES.symbol);
     (*callback)(TYPES.term);
     (*callback)(TYPES.type);
+    (*callback)(TYPES.vm);
     (*callback)(TYPES.void_type);
 }
 
@@ -415,7 +317,7 @@ void bootstrap_kernel()
 
     // Allocate a World object.
     g_world = alloc_world();
-    g_world->bootstrapStatus = sym_Bootstrapping;
+    g_world->bootstrapStatus = s_Bootstrapping;
     World* world = g_world;
 
     // Instanciate the types that are used by Type.
@@ -445,6 +347,7 @@ void bootstrap_kernel()
     TYPES.opaque_pointer = create_type();
     TYPES.symbol = create_type();
     TYPES.term = create_type();
+    TYPES.vm = create_type();
     TYPES.void_type = create_type();
 
     for_each_root_type(type_set_root);
@@ -465,6 +368,7 @@ void bootstrap_kernel()
     string_setup_type(TYPES.error); // errors are just stored as strings for now
     type_t::setup_type(TYPES.type);
     void_setup_type(TYPES.void_type);
+    vm_setup_type(TYPES.vm);
 
     // Finish initializing World (this requires List and Hashtable types)
     world_initialize(g_world);
@@ -525,8 +429,9 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.string, "String");
     create_type_value(builtins, TYPES.symbol, "Symbol");
     create_type_value(builtins, TYPES.term, "Term");
-    create_type_value(builtins, TYPES.void_type, "void");
     create_type_value(builtins, TYPES.map, "Map");
+    create_type_value(builtins, TYPES.void_type, "void");
+    create_type_value(builtins, TYPES.vm, "VM");
 
     // Create global symbol table (requires Hashtable type)
     symbol_initialize_global_table();
@@ -551,7 +456,7 @@ void bootstrap_kernel()
 
     // Now that we have input_placeholder(), declare one input on output_placeholder()
     apply(nested_contents(FUNCS.output),
-        FUNCS.input, TermList())->setBoolProp(sym_Optional, true);
+        FUNCS.input, TermList())->setBoolProp(s_Optional, true);
 
     // Initialize a few more types
     TYPES.selector = unbox_type(create_value(builtins, TYPES.type, "Selector"));
@@ -562,18 +467,7 @@ void bootstrap_kernel()
 
     // Parse stdlib.ca
     parse(builtins, parse_statement_list, find_builtin_file("$builtins/stdlib.ca"));
-    set_string(block_insert_property(builtins, sym_ModuleName), "stdlib");
-
-    // Install native functions.
-    circa_patch_function(world->builtinPatch, "from_string", from_string);
-    circa_patch_function(world->builtinPatch, "to_string_repr", to_string_repr);
-    circa_patch_function(world->builtinPatch, "test_spy", test_spy);
-    circa_patch_function(world->builtinPatch, "test_oracle", test_oracle);
-    circa_patch_function(world->builtinPatch, "reflect_this_block", reflect__this_block);
-    circa_patch_function(world->builtinPatch, "sys_module_search_paths", sys__module_search_paths);
-    circa_patch_function(world->builtinPatch, "_perf_stats_dump", perf_stats_dump);
-    circa_patch_function(world->builtinPatch, "syntax_error", syntax_error);
-    circa_patch_function(world->builtinPatch, "global_script_version", global_script_version);
+    set_string(block_insert_property(builtins, s_ModuleName), "stdlib");
 
     blob_install_functions(world->builtinPatch);
     selector_setup_funcs(world->builtinPatch);
@@ -584,8 +478,9 @@ void bootstrap_kernel()
     misc_builtins_setup_functions(world->builtinPatch);
     stack_install_functions(world->builtinPatch);
     type_install_functions(world->builtinPatch);
+    vm_install_functions(world->builtinPatch);
 
-    block_set_bool_prop(builtins, sym_Builtins, true);
+    block_set_bool_prop(builtins, s_Builtins, true);
 
     ca_assert(FUNCS.declared_state != NULL);
 
@@ -614,7 +509,7 @@ void bootstrap_kernel()
     TYPES.file_signature = as_type(builtins->get("FileSignature"));
     TYPES.func = as_type(builtins->get("Func"));
     TYPES.module_ref = as_type(builtins->get("Module"));
-    TYPES.stack = as_type(builtins->get("VM"));
+    //TYPES.stack = as_type(builtins->get("VM"));
     TYPES.frame = as_type(builtins->get("Frame"));
     TYPES.module_frame = as_type(builtins->get("ModuleFrame"));
     TYPES.vec2 = as_type(builtins->get("Vec2"));
@@ -634,7 +529,7 @@ void bootstrap_kernel()
             set_closure_for_declared_function(*it);
         }
 
-    stack_setup_type(TYPES.stack);
+    // stack_setup_type(TYPES.stack);
 
     nested_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 
@@ -645,10 +540,13 @@ void bootstrap_kernel()
         set_evaluation_empty(continue_func);
         set_evaluation_empty(comment);
         set_evaluation_empty(extra_output);
+        set_evaluation_empty(loop_iterator);
         set_evaluation_empty(loop_index);
         set_evaluation_empty(loop_output_index);
         set_evaluation_empty(static_error);
     #undef set_evaluation_empty
+
+    block_link_missing_functions(builtins, builtins);
 }
 
 Term* find_builtin_func(Block* builtins, const char* name)
@@ -663,17 +561,19 @@ Term* find_builtin_func(Block* builtins, const char* name)
 
 void on_new_function_parsed(Term* func, Value* functionName)
 {
-    if (global_world()->bootstrapStatus == sym_Done)
+    if (global_world()->bootstrapStatus == s_Done)
         return;
 
-    #define find_func(name, sourceName) if (string_equals(functionName, sourceName) && FUNCS.name == NULL) FUNCS.name = func;
+    #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
         find_func(add_i, "add_i"); find_func(add_f, "add_f");
         find_func(and_func, "and");
         find_func(break_func, "break");
+        find_func(blank_list, "blank_list");
         find_func(case_func, "case");
+#if 0
         find_func(case_condition_bool, "case_condition_bool");
+#endif
         find_func(cast, "cast");
-        find_func(cast_declared_type, "cast_declared_type");
         find_func(cond, "cond");
         find_func(continue_func, "continue");
         find_func(copy, "copy");
@@ -699,14 +599,16 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(length, "length");
         find_func(less_than, "less_than");
         find_func(less_than_eq, "less_than_eq");
-        find_func(list, "list");
         find_func(loop_condition_bool, "loop_condition_bool");
+        find_func(loop_iterator, "loop_iterator");
         find_func(loop_index, "loop_index");
         find_func(loop_get_element, "loop_get_element");
         find_func(loop_output_index, "loop_output_index");
         find_func(map, "map");
         find_func(make, "make");
+        find_func(make_list, "make_list");
         find_func(memoize, "memoize");
+        find_func(method_lookup, "method_lookup");
         find_func(minor_return_if_empty, "minor_return_if_empty");
         find_func(native_patch, "native_patch");
         find_func(neg, "neg");
@@ -728,8 +630,10 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(sub_i, "sub_i"); find_func(sub_f, "sub_f");
         find_func(switch_func, "switch");
         find_func(syntax_error, "syntax_error");
+        find_func(to_seq, "to_seq");
         find_func(type, "type");
         find_func(unknown_function, "unknown_function");
+        find_func(unknown_function_prelude, "unknown_function_prelude");
         find_func(unknown_identifier, "unknown_identifier");
         find_func(while_loop, "while");
         find_func(add, "add");
@@ -743,25 +647,28 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(equals, "equals");
         find_func(error, "error");
         find_func(eval_on_demand, "_eval_on_demand");
-        find_func(func_call, "Func.call");
-        find_func(func_apply, "Func.apply");
+        find_func(func_call, "call");
+        find_func(func_call_method, "Func.call");
+        find_func(func_apply, "func_apply");
+        find_func(func_apply_method, "Func.apply");
         find_func(get_with_selector, "get_with_selector");
         find_func(map_get, "Map.get");
         find_func(module_get, "Module._get");
         find_func(not_equals, "not_equals");
-        find_func(nonlocal, "_nonlocal");
         find_func(require, "require");
         find_func(selector, "selector");
         find_func(set_with_selector, "set_with_selector");
         find_func(save_state_result, "_save_state_result");
         find_func(type_make, "Type.make");
+        find_func(upvalue, "_upvalue");
+        find_func(vm_save_declared_state, "vm_save_declared_state");
+        find_func(vm_close_stateful_minor_frame, "vm_close_stateful_minor_frame");
     #undef find_func
 
     #define has_custom_type_infer(name) \
         if (FUNCS.name != NULL) \
             block_set_specialize_type_func(nested_contents(FUNCS.name), name##_specializeType)
 
-        has_custom_type_infer(cast);
         has_custom_type_infer(cond);
         has_custom_type_infer(copy);
         has_custom_type_infer(extra_output);
@@ -823,7 +730,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
 
     log_msg(0, "finished circa_initialize");
 
-    world->bootstrapStatus = sym_Done;
+    world->bootstrapStatus = s_Done;
 
     return world;
 }

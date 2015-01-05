@@ -1,0 +1,119 @@
+
+struct Op {
+  Symbol opcode
+  int a
+  int b
+  int c
+}
+
+struct Mop {
+  int maddr
+  Symbol opcode
+  int addr
+  int slot
+  int related_maddr
+}
+
+def read_op(Blob blob) -> Op
+  Op.make(opcode_from_int(blob.i16(6)) blob.i16(0), blob.i16(2), blob.i16(4))
+
+def read_mop(int maddr, Blob blob) -> Mop
+  Mop.make(maddr, mopcode_from_int(blob.i32(0)), blob.i32(4), blob.i32(8) blob.i32(12))
+
+def opcode_from_int(int opcode) -> Symbol
+  switch opcode
+    case 0x1 :nope
+    case 0x3 :uncompiled_call
+    case 0x8 :call
+    case 0x43 :func_call_s
+    case 0x2 :func_call_d
+    case 0x39 :func_apply_d
+    case 0x38 :dyn_method
+    case 0x4 :jump
+    case 0x30 :jif
+    case 0x31 :jnif
+    case 0x24 :jeq
+    case 0x25 :jneq
+    case 0x26 :jgt
+    case 0x27 :jgte
+    case 0x28 :jlt
+    case 0x29 :jlte
+    case 0x5 :ret
+    case 0x18 :ret_or_stop
+    case 0x16 :grow_frame
+    case 0x15 :load_const
+    case 0x45 :load_i
+    case 0x14 :varargs_to_list
+    case 0x42 :splat_upvalues
+    case 0x17 :native
+    case 0x12 :copy
+    case 0x7 :move
+    case 0x6 :set_null
+    case 0x40 :cast_fixed_type
+    case 0x13 :make_func
+    case 0x41 :make_list
+    case 0x20 :add_i
+    case 0x21 :sub_i
+    case 0x22 :mult_i
+    case 0x23 :div_i
+    case 0x35 :push_state_frame
+    case 0x36 :pop_state_frame
+    case 0x46 :pop_discard_state_frame
+    case 0x37 :get_state_value
+    case 0x44 :save_state_value
+    case 0x11 :comment
+    else
+      error('opcode not found: ' opcode)
+
+def mopcode_from_int(int mopcode) -> Symbol
+  switch mopcode
+    case 1 :term_eval_start
+    case 2 :term_eval_end
+    case 3 :term_live
+    case 4 :major_block_start
+    case 5 :major_block_end
+    case 6 :minor_block_start
+    case 7 :minor_block_end
+    case 8 :state_key
+    case 9 :state_header
+    else
+      error('mopcode not found: ' mopcode)
+
+def Blob.slices(self, int sliceSize)
+  for b in range_by(0, self.size, sliceSize)
+    self.slice(b, sliceSize)
+
+def dump_bytecode(VM vm)
+  mopByAddr = Map.make
+
+  for maddr, mop in vm.get_raw_mops.slices(bytecode_mop_size())
+    mop = read_mop(maddr, mop)
+    @mopByAddr.list_append(mop.addr, mop)
+
+  for addr, op in vm.get_raw_ops.slices(8).append(null)
+
+    mops = mopByAddr.get_opt(addr, [])
+    for mop in mops
+      print(' -- ' mop)
+
+    if op != null
+      op = read_op(op)
+
+      s = switch op.opcode
+        case :comment
+          msg = vm.get_bytecode_const(op.a)
+          str('# ' msg)
+        case :grow_frame
+          str('grow_frame ' op.a)
+        case :load_const
+          str('load_const slot: ' op.b ', value: ' vm.get_bytecode_const(op.a))
+        case :ret_or_stop
+          str('ret_or_stop')
+        else
+          str(op.opcode ' ' op.a ' ' op.b ' ' op.c)
+
+      @s.prepend(str('[' addr '] '))
+      print(s)
+  
+def dump(VM vm)
+  dump_bytecode(vm)

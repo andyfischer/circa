@@ -48,33 +48,59 @@ void set_closure_for_declared_function(Term* term)
         set_closure(term_value(term), term->nestedContents, NULL);
 }
 
+Value* function_find_output_name_from_inputs(Block* contents)
+{
+    for (int i = 0;; i++) {
+        Term* input = get_input_placeholder(contents, i);
+        if (input == NULL)
+            break;
+
+        if (input->boolProp(s_Output, false))
+            return term_name(input);
+    }
+    return NULL;
+}
+
 void finish_building_function(Block* contents)
 {
-    // Connect the primary output placeholder with the last expression.
+    // Connect the primary output placeholder. If an input has @ syntax then use the
+    // last term with that name. Otherwise, use the last expression.
     Term* primaryOutput = get_output_placeholder(contents, 0);
     ca_assert(primaryOutput->input(0) == NULL);
-    Term* lastExpression = find_expression_for_implicit_output(contents);
-    if (lastExpression != NULL) {
-        set_input(primaryOutput, 0, lastExpression);
-        if (!primaryOutput->boolProp(sym_ExplicitType, false))
+
+    Term* result = NULL;
+
+    Value* outputName = function_find_output_name_from_inputs(contents);
+    if (outputName != NULL) {
+        result = find_name(contents, outputName);
+    } else {
+        result = find_expression_for_implicit_output(contents);
+    }
+
+
+    if (result != NULL) {
+        set_input(primaryOutput, 0, result);
+        if (!primaryOutput->boolProp(s_ExplicitType, false))
             set_declared_type(primaryOutput, find_implicit_output_type(contents));
     }
 
     // Write a list of output_placeholder terms.
 
+#if 0
+TODO: DELETE
     // Look at every input declared as :output, these will be used to declare extra outputs.
     // TODO is a way to declare extra outputs that are not rebound inputs.
     for (int i = count_input_placeholders(contents) - 1; i >= 0; i--) {
         Term* input = get_input_placeholder(contents, i);
 
-        if (input->boolProp(sym_Output, false)) {
+        if (input->boolProp(s_Output, false)) {
 
             Term* result = find_name(contents, term_name(input));
             
             Term* output = append_output_placeholder(contents, result);
             rename(output, term_name(input));
             set_declared_type(output, input->type);
-            output->setIntProp(sym_RebindsInput, i);
+            output->setIntProp(s_RebindsInput, i);
         }
     }
 
@@ -89,6 +115,7 @@ void finish_building_function(Block* contents)
         // Update extra outputs
         update_extra_outputs(term);
     }
+#endif
 
     update_for_control_flow(contents);
     insert_nonlocal_terms(contents);

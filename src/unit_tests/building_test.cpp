@@ -77,7 +77,7 @@ void test_apply_spec()
     set_list(inputs, 2);
     set_term_ref(list_get(inputs, 0), a);
     set_term_ref(list_get(inputs, 1), a);
-    set_symbol(list_get(&spec, 2), sym_Name);
+    set_symbol(list_get(&spec, 2), s_Name);
     set_string(list_get(&spec, 3), "b");
     set_symbol(list_get(&spec, 4), symbol_from_string("foo"));
     set_string(list_get(&spec, 5), "bar");

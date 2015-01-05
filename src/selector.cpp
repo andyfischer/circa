@@ -12,6 +12,7 @@
 #include "selector.h"
 #include "string_type.h"
 #include "type.h"
+#include "vm.h"
 
 namespace circa {
 
@@ -193,9 +194,9 @@ void path_delete(Value* value, Value* path)
     }
 }
 
-void evaluate_selector(Stack* stack)
+void evaluate_selector(VM* vm)
 {
-    copy(circa_input(stack, 0), circa_output(stack, 0));
+    copy(circa_input(vm, 0), circa_output(vm));
 }
 
 bool is_accessor_function(Term* accessor)
@@ -209,7 +210,7 @@ bool is_accessor_function(Term* accessor)
 
     // Future: We should be able to detect if a method behaves as an accessor, without
     // an explicit property.
-    if (accessor->function->boolProp(sym_FieldAccessor, false))
+    if (accessor->function->boolProp(s_FieldAccessor, false))
         return true;
     
     return false;
@@ -228,8 +229,8 @@ bool term_is_accessor_traceable(Term* accessor)
             || accessor->function == FUNCS.get_field
             || is_copying_call(accessor)
             || accessor->function == FUNCS.dynamic_method
-            || accessor->function->boolProp(sym_FieldAccessor, false)
-            || accessor->function->boolProp(sym_Setter, false))
+            || accessor->function->boolProp(s_FieldAccessor, false)
+            || accessor->function->boolProp(s_Setter, false))
         return true;
 
     return false;
@@ -281,7 +282,7 @@ Term* write_selector_for_accessor_chain(Block* block, TermList* chain)
             selectorInputs.append(term->input(1));
 
         } else if (is_accessor_function(term)) {
-            Term* element = create_string(block, term->stringProp(sym_Syntax_FunctionName, "").c_str());
+            Term* element = create_string(block, term->stringProp(s_Syntax_FunctionName, "").c_str());
             selectorInputs.append(element);
         }
     }
@@ -354,7 +355,7 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
             inputIndexOfInterest = inputIndex;
 
         Value* identifierRebindHint = term_get_input_property(termBeforeHead,
-                inputIndexOfInterest, sym_Syntax_IdentifierRebind);
+                inputIndexOfInterest, s_Syntax_IdentifierRebind);
         if (head == NULL || has_empty_name(head)
                 || identifierRebindHint == NULL
                 || !as_bool(identifierRebindHint))
@@ -366,7 +367,7 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
         if (input == head) {
             // No accessor expression, then just do a name rebind.
             rename(output, &head->nameValue);
-            output->setBoolProp(sym_Syntax_ImplicitName, true);
+            output->setBoolProp(s_Syntax_ImplicitName, true);
         } else {
             // Create a set_with_selector expression.
             TermList accessorChain;
@@ -385,70 +386,65 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
     return NULL;
 }
 
-void get_with_selector_evaluate(Stack* stack)
+void get_with_selector_evaluate(VM* vm)
 {
-    Value* root = circa_input(stack, 0);
-    Value* selector = circa_input(stack, 1);
+    Value* root = circa_input(vm, 0);
+    Value* selector = circa_input(vm, 1);
 
-    circa::Value error;
+    Value error;
 
     Value* result = get_with_selector(root, selector, &error);
 
-    if (!is_null(&error)) {
-        copy(&error, circa_output(stack, 0));
-        raise_error(stack);
-        return;
-    }
+    if (!is_null(&error))
+        return vm->throw_error(&error);
 
-    copy(result, circa_output(stack, 0));
+    copy(result, circa_output(vm));
 }
 
-void set_with_selector_evaluate(Stack* stack)
+void set_with_selector_evaluate(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    move(circa_input(stack, 0), out);
+    Value* out = circa_output(vm);
+    move(circa_input(vm, 0), out);
     
-    Value* selector = circa_input(stack, 1);
-    Value* newValue = circa_input(stack, 2);
+    Value* selector = circa_input(vm, 1);
+    Value* newValue = circa_input(vm, 2);
 
-    circa::Value error;
+    Value error;
     set_with_selector(out, selector, newValue, &error);
 
-    if (!is_null(&error)) {
-        circa_output_error_val(stack, &error);
-        return;
-    }
+    if (!is_null(&error))
+        return vm->throw_error(&error);
 }
 
-void path_get_func(Stack* stack)
+void path_get_func(VM* vm)
 {
-    Value* result = path_get(circa_input(stack, 0), circa_input(stack, 1));
+    Value* result = path_get(circa_input(vm, 0), circa_input(vm, 1));
     if (result != NULL)
-        copy(result, circa_output(stack, 0));
+        copy(result, circa_output(vm));
     else
-        set_null(circa_output(stack, 0));
+        set_null(circa_output(vm));
 }
 
-void path_set_func(Stack* stack)
+void path_set_func(VM* vm)
 {
-    move(circa_input(stack, 0), circa_output(stack, 0));
-    move(circa_input(stack, 2), path_touch_and_init_map(circa_output(stack, 0), circa_input(stack, 1)));
+    move(circa_input(vm, 0), circa_output(vm));
+    move(circa_input(vm, 2), path_touch_and_init_map(circa_output(vm), circa_input(vm, 1)));
 }
 
-void path_delete_func(Stack* stack)
+void path_delete_func(VM* vm)
 {
-    move(circa_input(stack, 0), circa_output(stack, 0));
-    path_delete(circa_output(stack, 0), circa_input(stack, 1));
+    move(circa_input(vm, 0), circa_output(vm));
+    path_delete(circa_output(vm), circa_input(vm, 1));
 }
 
 void selector_setup_funcs(NativePatch* patch)
 {
-    circa_patch_function(patch, "selector", evaluate_selector);
-    circa_patch_function(patch, "get_with_selector", get_with_selector_evaluate);
-    circa_patch_function(patch, "set_with_selector", set_with_selector_evaluate);
-    circa_patch_function(patch, "get", path_get_func);
-    circa_patch_function(patch, "set", path_set_func);
-    circa_patch_function(patch, "delete", path_delete_func);
+    circa_patch_function2(patch, "selector", evaluate_selector);
+    circa_patch_function2(patch, "get_with_selector", get_with_selector_evaluate);
+    circa_patch_function2(patch, "set_with_selector", set_with_selector_evaluate);
+    circa_patch_function2(patch, "get", path_get_func);
+    circa_patch_function2(patch, "set", path_set_func);
+    circa_patch_function2(patch, "delete", path_delete_func);
 }
 
 } // namespace circa

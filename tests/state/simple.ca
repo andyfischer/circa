@@ -1,15 +1,20 @@
 
-
-def main()
+def main(i,j)
     state s = 0
     print('existing s = ' s)
     s += 1
     print('new s = ' s)
 
-stack = make_vm(main)
-stack.run
-stack.run
-stack.run
-if stack.errored
-    stack.dump
-    print('error: ' stack.error_message)
+vm = make_vm(main)
+
+require stack_trace
+if vm.has_error
+  stack_trace.dump(vm)
+
+--vm.precompile(main.block)
+vm.call
+vm.call
+vm.call
+
+--require bytecode_analysis
+--bytecode_analysis.dump(vm)

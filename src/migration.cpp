@@ -15,6 +15,7 @@
 #include "type.h"
 #include "world.h"
 #include "value_iterator.h"
+#include "vm.h"
 
 namespace circa {
 
@@ -199,6 +200,11 @@ void migrate_stack(Stack* stack, Migration* migration)
     }
 }
 
+void migrate_vm(VM* vm, Migration* migration)
+{
+    vm_on_code_change(vm);
+}
+
 bool list_value_may_need_migration(Value* value, Migration* migration)
 {
     for (int i=0; i < list_length(value); i++)
@@ -333,6 +339,14 @@ void migrate_stack(Stack* stack, Block* oldBlock, Block* newBlock)
     migration.oldBlock = oldBlock;
     migration.newBlock = newBlock;
     return migrate_stack(stack, &migration);
+}
+
+void migrate_vm(VM* vm, Block* oldBlock, Block* newBlock)
+{
+    Migration migration;
+    migration.oldBlock = oldBlock;
+    migration.newBlock = newBlock;
+    return migrate_vm(vm, &migration);
 }
 
 void migrate_value(Value* value, Block* oldBlock, Block* newBlock)

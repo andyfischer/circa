@@ -17,63 +17,76 @@
 #include "rand.h"
 #include "replication.h"
 #include "stack.h"
+#include "string_repr.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
+#include "vm.h"
+#include "world.h"
 
 #include "ext/perlin.h"
 
 namespace circa {
 
-void abs(Stack* stack)
+Value* g_oracleValues;
+Value* g_spyValues;
+
+// TODO: delete
+static Value* circa_input(Stack* stack, int index) { return NULL; }
+static Value* circa_output(Stack* stack, int index) { return NULL; }
+
+void abs(VM* vm)
 {
-    set_float(circa_output(stack, 0), std::abs(circa_float_input(stack, 0)));
+    set_float(circa_output(vm), std::abs(vm->input(0)->to_f()));
 }
 
-void add_i_evaluate(Stack* stack)
+void add_i(VM* vm)
 {
-    int sum = circa_int_input(stack, 0) + circa_int_input(stack, 1);
-    set_int(circa_output(stack, 0), sum);
+    int sum = vm->input(0)->as_i() + vm->input(1)->as_i();
+    vm->output()->set_int(sum);
 }
 
-void add_f_evaluate(Stack* stack)
+void add_f(VM* vm)
 {
-    float sum = circa_float_input(stack, 0) + circa_float_input(stack, 1);
-    set_float(circa_output(stack, 0), sum);
+    float sum = vm->input(0)->to_f() + vm->input(1)->to_f();
+    vm->output()->set_float(sum);
 }
 
-void assert_func(Stack* stack)
+void assert_func(VM* vm)
 {
-    if (!circa_bool_input(stack, 0))
-        circa_output_error(stack, "Assert failed");
+    if (!vm->input(0)->asBool())
+        circa_throw(vm, "Assert failed");
 }
 
-void cond(Stack* stack)
+void cond(VM* vm)
 {
-    int index = circa_bool_input(stack, 0) ? 1 : 2;
-    copy(circa_input(stack, index), circa_output(stack, 0));
+    int index = vm->input(0)->asBool() ? 1 : 2;
+    move(vm->input(index), vm->output());
 }
 
-void str(Stack* stack)
+void str(VM* vm)
 {
-    Value* args = circa_input(stack, 0);
-    Value* out = circa_output(stack, 0);
+    Value args;
+    move(circa_input(vm, 0), &args);
+
+    Value* out = circa_output(vm);
     set_string(out, "");
 
-    for (int index=0; index < list_length(args); index++) {
-        Value* v = circa_index(args, index);
+    for (int index=0; index < list_length(&args); index++) {
+        Value* v = circa_index(&args, index);
         string_append(out, v);
     }
 }
 
-void copy_eval(Stack* stack)
+void copy_eval(VM* vm)
 {
-    copy(circa_input(stack, 0), circa_output(stack, 0));
+    copy(vm->input(0), vm->output());
 }
 
+#if 0
 void cast_declared_type(Stack* stack)
 {
     Value* source = circa_input(stack, 0);
@@ -102,17 +115,19 @@ void cast_declared_type(Stack* stack)
     if (!success)
         return circa_output_error(stack, "cast failed");
 }
+#endif
 
-void cast_evaluate(Stack* stack)
+void cast_evaluate(VM* vm)
 {
-    // 'cast' is used by scripts. In this version, the type is passed via the 2nd param
-    Value* result = circa_output(stack, 0);
-    move(circa_input(stack, 0), result);
+    // Another version of cast(), this one returns a nullable output.
+    Value* result = circa_output(vm);
+    move(circa_input(vm, 0), result);
 
-    Type* type = unbox_type(circa_input(stack, 1));
+    Type* type = unbox_type(circa_input(vm, 1));
 
     bool success = cast(result, type);
-    set_bool(circa_output(stack, 1), success);
+    if (!success)
+        set_null(result);
 }
 
 void debug_break(Stack* stack)
@@ -120,77 +135,78 @@ void debug_break(Stack* stack)
     printf("debug_break..\n");
 }
 
-void div_f(Stack* stack)
+void div_f(VM* vm)
 {
-    set_float(circa_output(stack, 0), circa_float_input(stack, 0) / circa_float_input(stack, 1));
+    set_float(circa_output(vm), circa_input(vm, 0)->as_f() / circa_input(vm, 1)->as_f());
 }
 
-void div_i(Stack* stack)
+void div_i(VM* vm)
 {
-    int a = to_int(circa_input(stack, 0));
-    int b = to_int(circa_input(stack, 1));
-    set_int(circa_output(stack, 0), a / b);
+    int a = to_int(circa_input(vm, 0));
+    int b = to_int(circa_input(vm, 1));
+    set_int(circa_output(vm), a / b);
 }
 
-void empty_list(Stack* stack)
+void empty_list(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    int size = circa_int_input(stack, 1);
-    Value* initialValue = circa_input(stack, 0);
+    Value* out = circa_output(vm);
+    int size = circa_input(vm, 1)->as_i();
+    Value* initialValue = circa_input(vm, 0);
     set_list(out, size);
     for (int i=0; i < size; i++) {
         copy(initialValue, list_get(out, i));
     }
 }
 
-void equals_func(Stack* stack)
+void equals_func(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            equals(circa_input(stack, 0), circa_input(stack, 1)));
+    set_bool(circa_output(vm),
+            equals(circa_input(vm, 0), circa_input(vm, 1)));
 }
 
-void hosted_is_compound(Stack* stack)
+void hosted_is_compound(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_struct(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_struct(circa_input(vm, 0)));
 }
 
-void hosted_is_list(Stack* stack)
+void hosted_is_list(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_list(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_list(circa_input(vm, 0)));
 }
-void hosted_is_int(Stack* stack)
+void hosted_is_int(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_int(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_int(circa_input(vm, 0)));
 }
-void hosted_is_map(Stack* stack)
+void hosted_is_map(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_hashtable(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_hashtable(circa_input(vm, 0)));
 }
-void hosted_is_number(Stack* stack)
+void hosted_is_number(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_float(circa_input(vm, 0)));
 }
-void hosted_is_bool(Stack* stack)
+void hosted_is_bool(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_bool(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_bool(circa_input(vm, 0)));
 }
-void hosted_is_string(Stack* stack)
+void hosted_is_string(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_string(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_string(circa_input(vm, 0)));
 }
-void hosted_is_null(Stack* stack)
+void hosted_is_null(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_null(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_null(circa_input(vm, 0)));
 }
-void hosted_is_function(Stack* stack)
+void hosted_is_function(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_func(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_func(circa_input(vm, 0)));
 }
-void hosted_is_type(Stack* stack)
+void hosted_is_type(VM* vm)
 {
-    set_bool(circa_output(stack, 0), is_type(circa_input(stack, 0)));
+    set_bool(circa_output(vm), is_type(circa_input(vm, 0)));
 }
 
+#if 0
 void inputs_fit_function(Stack* stack)
 {
     Value* inputs = circa_input(stack, 0);
@@ -255,49 +271,135 @@ void source_id(Stack* stack)
 #endif
 }
 
-void unknown_function(Stack* stack)
-{
-    std::string out;
-    out += "Unknown function: ";
-    Term* caller = (Term*) circa_caller_term(stack);
-    out += caller->stringProp(sym_Syntax_FunctionName, "");
-    circa_output_error(stack, out.c_str());
-}
-
-void unknown_identifier(Stack* stack)
-{
-    Value msg;
-    set_string(&msg, "Unknown identifier: ");
-    string_append(&msg, term_name(circa_caller_term(stack)));
-    circa_output_error(stack, as_cstring(&msg));
-}
-
 void write_text_file_func(Stack* stack)
 {
     write_text_file(circa_string_input(stack, 0), circa_string_input(stack, 1));
 }
+#endif
 
-void method_lookup(Stack* stack)
+void from_string(Stack* stack)
 {
-    Value* obj = circa_input(stack, 0);
-    Value* method = circa_input(stack, 1);
+    parse_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void get_field(Stack* stack)
+void to_string_repr(Stack* stack)
 {
-    Value* head = circa_input(stack, 0);
+    write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
+}
+
+void test_oracle(VM* vm)
+{
+    if (list_length(g_oracleValues) == 0)
+        set_null(vm->output());
+    else {
+        copy(list_get(g_oracleValues, 0), vm->output());
+        list_remove_index(g_oracleValues, 0);
+    }
+}
+
+void test_spy(VM* vm)
+{
+    if (g_spyValues == NULL) {
+        g_spyValues = circa_alloc_value();
+        set_list(g_spyValues);
+    }
+    copy(circa_input(vm, 0), list_append(g_spyValues));
+}
+
+void test_spy_clear()
+{
+    if (g_spyValues == NULL)
+        g_spyValues = circa_alloc_value();
+    set_list(g_spyValues, 0);
+}
+Value* test_spy_get_results()
+{
+    return g_spyValues;
+}
+void test_oracle_clear()
+{
+    if (g_oracleValues == NULL)
+        g_oracleValues = circa_alloc_value();
+    set_list(g_oracleValues, 0);
+}
+void test_oracle_send(Value* value)
+{
+    copy(value, list_append(g_oracleValues));
+}
+Value* test_oracle_append()
+{
+    return list_append(g_oracleValues);
+}
+void test_oracle_send(int i)
+{
+    set_int(list_append(g_oracleValues), i);
+}
+
+#if 0
+void refactor__rename(Stack* stack)
+{
+    rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
+}
+
+void refactor__change_function(Stack* stack)
+{
+    change_function(as_term_ref(circa_input(stack, 0)),
+        (Term*) circa_caller_input_term(stack, 1));
+}
+#endif
+
+void reflect__this_block(Stack* stack)
+{
+    set_block(circa_output(stack, 0), (Block*) circa_caller_block(stack));
+}
+
+void sys__module_search_paths(Stack* stack)
+{
+    copy(module_search_paths(stack->world), circa_output(stack, 0));
+}
+
+void perf_stats_dump(Stack* stack)
+{
+    perf_stats_to_map(circa_output(stack, 0));
+    circa_perf_stats_reset();
+}
+void global_script_version(Stack* stack)
+{
+    World* world = stack->world;
+    set_int(circa_output(stack, 0), world->globalScriptVersion);
+}
+
+void method_lookup(VM* vm)
+{
+    Value* location = circa_input(vm, 0);
+    Value* obj = circa_input(vm, 1);
+    Value* methodName = circa_input(vm, 2);
+
+    Value nameLocation;
+    nameLocation.set_list(2);
+    nameLocation.index(0)->set(methodName);
+    nameLocation.index(1)->set(location);
+
+    Block* block = find_method_on_type(get_value_type(obj), &nameLocation);
+
+    set_closure(vm->output(), block, NULL);
+}
+
+void get_field(VM* vm)
+{
+    Value* head = vm->input(0);
 
     Value error;
-    Value* value = get_field(head, circa_input(stack, 1), &error);
+    Value* value = get_field(head, vm->input(1), &error);
 
     if (!is_null(&error)) {
-        circa_output_error(stack, as_cstring(&error));
+        vm->throw_error(&error);
         return;
     }
 
     ca_assert(value != NULL);
 
-    copy(value, circa_output(stack, 0));
+    copy(value, vm->output());
 }
 
 void has_method(Stack* stack)
@@ -316,43 +418,39 @@ void has_method(Stack* stack)
 #endif
 }
 
-void get_index(Stack* stack)
+void get_index(VM* vm)
 {
-    Value* list = circa_input(stack, 0);
-    int index = circa_int_input(stack, 1);
+    Value* list = vm->input(0);
+    int index = vm->input(1)->as_i();
 
     if (index < 0) {
         char indexStr[40];
         sprintf(indexStr, "Negative index: %d", index);
-        return circa_output_error(stack, indexStr);
+        return circa_throw(vm, indexStr);
     } else if (index >= list_length(list)) {
         char indexStr[40];
         sprintf(indexStr, "Index out of range: %d", index);
-        return circa_output_error(stack, indexStr);
+        return circa_throw(vm, indexStr);
     }
 
     Value* result = get_index(list, index);
 
-    copy(result, circa_output(stack, 0));
-    cast(circa_output(stack, 0), declared_type((Term*) circa_caller_term(stack)));
+    copy(result, vm->output());
 }
 
-void make_list(Stack* stack)
+void make_list(VM* vm)
 {
-    // Variadic arg handling will already have turned this into a list
-    Value* out = circa_output(stack, 0);
-    move(circa_input(stack, 0), out);
-    if (!circa_is_list(out))
-        circa_set_list(out, 0);
+    // Variadic arg handling will already have turned this into a list.
+    move(vm->input(0), vm->output());
 }
 
-void make_map(Stack* stack)
+void make_map(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    Value* args = circa_input(stack, 0);
+    Value* out = vm->output();
+    Value* args = vm->input(0);
     int len = list_length(args);
     if ((len % 2) != 0)
-        return circa_output_error(stack, "Number of arguments must be an even number");
+        return vm->throw_str("Number of arguments must be an even number");
 
     set_hashtable(out);
     for (int i=0; i < len; i += 2) {
@@ -362,67 +460,65 @@ void make_map(Stack* stack)
     }
 }
 
-void blank_list(Stack* stack)
+void blank_list(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    int count = circa_int_input(stack, 0);
-    circa_set_list(out, count);
+    circa_set_list(vm->output(), vm->input(0)->as_i());
 }
 
-void and_func(Stack* stack)
+void and_func(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-        circa_bool_input(stack, 0) && circa_bool_input(stack, 1));
+    set_bool(circa_output(vm),
+        circa_input(vm, 0)->asBool() && circa_input(vm, 1)->asBool());
 }
 
-void or_func(Stack* stack)
+void or_func(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-        circa_bool_input(stack, 0) || circa_bool_input(stack, 1));
+    set_bool(circa_output(vm),
+        circa_input(vm, 0)->asBool() || circa_input(vm, 1)->asBool());
 }
 
-void not_func(Stack* stack)
+void not_func(VM* vm)
 {
-    set_bool(circa_output(stack, 0), !circa_bool_input(stack, 0));
+    set_bool(circa_output(vm), !circa_input(vm, 0)->asBool());
 }
 
-void make_func(Stack* stack)
+void make_func(VM* vm)
 {
-    make(as_type(circa_input(stack, 0)), circa_output(stack, 0));
+    make(as_type(circa_input(vm, 0)), circa_output(vm));
 }
 
-void max_f(Stack* stack)
+void max_f(VM* vm)
 {
-    set_float(circa_output(stack, 0),
-            std::max(circa_float_input(stack, 0), circa_float_input(stack, 1)));
+    set_float(circa_output(vm),
+            std::max(vm->input(0)->to_f(), vm->input(1)->to_f()));
 }
 
-void max_i(Stack* stack)
+void max_i(VM* vm)
 {
-    set_int(circa_output(stack, 0),
-            std::max(circa_int_input(stack, 0), circa_int_input(stack, 1)));
+    set_int(circa_output(vm),
+            std::max(vm->input(0)->as_i(), vm->input(1)->as_i()));
 }
 
-void min_f(Stack* stack)
+void min_f(VM* vm)
 {
-    set_float(circa_output(stack, 0),
-            std::min(circa_float_input(stack, 0), circa_float_input(stack, 1)));
+    set_float(circa_output(vm),
+            std::min(vm->input(0)->to_f(), vm->input(1)->to_f()));
 }
 
-void min_i(Stack* stack)
+void min_i(VM* vm)
 {
-    set_int(circa_output(stack, 0),
-            std::min(circa_int_input(stack, 0), circa_int_input(stack, 1)));
+    set_int(circa_output(vm),
+            std::min(vm->input(0)->as_i(), vm->input(1)->as_i()));
 }
 
-void remainder_i(Stack* stack)
+void remainder_i(VM* vm)
 {
-    set_int(circa_output(stack, 0), circa_int_input(stack, 0) % circa_int_input(stack, 1));
+    set_int(circa_output(vm), vm->input(0)->as_i() % vm->input(1)->as_i());
 }
 
-void remainder_f(Stack* stack)
+void remainder_f(VM* vm)
 {
-    set_float(circa_output(stack, 0), fmodf(circa_float_input(stack, 0), circa_float_input(stack, 1)));
+    set_float(circa_output(vm), fmodf(vm->input(0)->to_f(), vm->input(1)->to_f()));
 }
 
 // We compute mod() using floored division. This is different than C and many
@@ -433,55 +529,55 @@ void remainder_f(Stack* stack)
 // For a function that works the same as C's modulo, use remainder() . The % operator
 // also uses remainder(), so that it works the same as C's % operator.
 
-void mod_i(Stack* stack)
+void mod_i(VM* vm)
 {
-    int a = circa_int_input(stack, 0);
-    int n = circa_int_input(stack, 1);
+    int a = vm->input(0)->as_i();
+    int n = vm->input(1)->as_i();
 
     int out = a % n;
     if (out < 0)
         out += n;
 
-    set_int(circa_output(stack, 0), out);
+    set_int(circa_output(vm), out);
 }
 
-void mod_f(Stack* stack)
+void mod_f(VM* vm)
 {
-    float a = circa_float_input(stack, 0);
-    float n = circa_float_input(stack, 1);
+    float a = vm->input(0)->to_f();
+    float n = vm->input(1)->to_f();
 
     float out = fmodf(a, n);
 
     if (out < 0)
         out += n;
 
-    set_float(circa_output(stack, 0), out);
+    set_float(circa_output(vm), out);
 }
 
-void round(Stack* stack)
+void round(VM* vm)
 {
-    float input = circa_float_input(stack, 0);
+    float input = vm->input(0)->to_f();
     if (input > 0.0)
-        set_int(circa_output(stack, 0), int(input + 0.5));
+        set_int(circa_output(vm), int(input + 0.5));
     else
-        set_int(circa_output(stack, 0), int(input - 0.5));
+        set_int(circa_output(vm), int(input - 0.5));
 }
 
-void floor(Stack* stack)
+void floor(VM* vm)
 {
-    set_int(circa_output(stack, 0), (int) std::floor(circa_float_input(stack, 0)));
+    set_int(circa_output(vm), (int) std::floor(vm->input(0)->to_f()));
 }
 
-void ceil(Stack* stack)
+void ceil(VM* vm)
 {
-    set_int(circa_output(stack, 0), (int) std::ceil(circa_float_input(stack, 0)));
+    set_int(circa_output(vm), (int) std::ceil(vm->input(0)->to_f()));
 }
 
-void average(Stack* stack)
+void average(VM* vm)
 {
-    Value* args = circa_input(stack, 0);
+    Value* args = circa_input(vm, 0);
     int count = circa_count(args);
-    Value* out = circa_output(stack, 0);
+    Value* out = circa_output(vm);
 
     if (count == 0) {
         set_float(out, 0);
@@ -495,101 +591,97 @@ void average(Stack* stack)
     set_float(out, sum / count);
 }
 
-void pow(Stack* stack)
+void pow(VM* vm)
 {
-    set_float(circa_output(stack, 0),
-            std::pow((float) to_float(circa_input(stack, 0)), to_float(circa_input(stack, 1))));
+    set_float(circa_output(vm),
+            std::pow((float) to_float(circa_input(vm, 0)), to_float(circa_input(vm, 1))));
 }
 
-void sqr(Stack* stack)
+void sqr(VM* vm)
 {
-    float in = circa_float_input(stack, 0);
-    set_float(circa_output(stack, 0), in * in);
+    float in = vm->input(0)->to_f();
+    set_float(circa_output(vm), in * in);
 }
-void cube(Stack* stack)
+void cube(VM* vm)
 {
-    float in = circa_float_input(stack, 0);
-    set_float(circa_output(stack, 0), in * in * in);
-}
-
-void sqrt(Stack* stack)
-{
-    set_float(circa_output(stack, 0), std::sqrt(circa_float_input(stack, 0)));
+    float in = vm->input(0)->to_f();
+    set_float(circa_output(vm), in * in * in);
 }
 
-void log(Stack* stack)
+void sqrt(VM* vm)
 {
-    set_float(circa_output(stack, 0), std::log(circa_float_input(stack, 0)));
+    set_float(circa_output(vm), std::sqrt(vm->input(0)->to_f()));
 }
 
-
-void mult_f(Stack* stack)
+void log(VM* vm)
 {
-    float product = circa_float_input(stack, 0) * circa_float_input(stack, 1);
-    set_float(circa_output(stack, 0), product);
+    set_float(circa_output(vm), std::log(vm->input(0)->to_f()));
 }
 
-void mult_i(Stack* stack)
+void mult_f(VM* vm)
 {
-    int product = circa_int_input(stack, 0) * circa_int_input(stack, 1);
-    set_int(circa_output(stack, 0), product);
+    float product = vm->input(0)->to_f() * vm->input(1)->to_f();
+    set_float(circa_output(vm), product);
 }
 
-void neg_f(Stack* stack)
+void mult_i(VM* vm)
 {
-    set_float(circa_output(stack, 0), -circa_float_input(stack, 0));
+    int product = vm->input(0)->as_i() * vm->input(1)->as_i();
+    set_int(circa_output(vm), product);
 }
 
-void neg_i(Stack* stack)
+void neg_f(VM* vm)
 {
-    set_int(circa_output(stack, 0), -circa_int_input(stack, 0));
+    set_float(circa_output(vm), -vm->input(0)->to_f());
 }
 
-void sub_i(Stack* stack)
+void neg_i(VM* vm)
 {
-    set_int(circa_output(stack, 0), circa_int_input(stack, 0) - circa_int_input(stack, 1));
+    set_int(circa_output(vm), -vm->input(0)->as_i());
 }
 
-void sub_f(Stack* stack)
+void sub_i(VM* vm)
 {
-    set_float(circa_output(stack, 0), circa_float_input(stack, 0) - circa_float_input(stack, 1));
+    set_int(circa_output(vm), vm->input(0)->as_i() - vm->input(1)->as_i());
+}
+
+void sub_f(VM* vm)
+{
+    set_float(circa_output(vm), vm->input(0)->to_f() - vm->input(1)->to_f());
 }
 
 float radians_to_degrees(float radians) { return radians * 180.0f / M_PI; }
 float degrees_to_radians(float unit) { return unit * M_PI / 180.0f; }
 
-void sin_func(Stack* stack)
+void sin_func(VM* vm)
 {
-    float input = circa_float_input(stack, 0);
-
-    set_float(circa_output(stack, 0), sin(degrees_to_radians(input)));
+    float input = vm->input(0)->to_f();
+    set_float(circa_output(vm), sin(degrees_to_radians(input)));
 }
-void cos_func(Stack* stack)
+void cos_func(VM* vm)
 {
-    float input = circa_float_input(stack, 0);
-
-    set_float(circa_output(stack, 0), cos(degrees_to_radians(input)));
+    float input = vm->input(0)->to_f();
+    set_float(circa_output(vm), cos(degrees_to_radians(input)));
 }
-void tan_func(Stack* stack)
+void tan_func(VM* vm)
 {
-    float input = circa_float_input(stack, 0);
-
-    set_float(circa_output(stack, 0), tan(degrees_to_radians(input)));
+    float input = vm->input(0)->to_f();
+    set_float(circa_output(vm), tan(degrees_to_radians(input)));
 }
-void arcsin_func(Stack* stack)
+void arcsin_func(VM* vm)
 {
-    float result = asin(circa_float_input(stack, 0));
-    set_float(circa_output(stack, 0), radians_to_degrees(result));
+    float result = asin(vm->input(0)->to_f());
+    set_float(circa_output(vm), radians_to_degrees(result));
 }
-void arccos_func(Stack* stack)
+void arccos_func(VM* vm)
 {
-    float result = acos(circa_float_input(stack, 0));
-    set_float(circa_output(stack, 0), radians_to_degrees(result));
+    float result = acos(vm->input(0)->to_f());
+    set_float(circa_output(vm), radians_to_degrees(result));
 }
-void arctan_func(Stack* stack)
+void arctan_func(VM* vm)
 {
-    float result = atan(circa_float_input(stack, 0));
-    set_float(circa_output(stack, 0), radians_to_degrees(result));
+    float result = atan(vm->input(0)->to_f());
+    set_float(circa_output(vm), radians_to_degrees(result));
 }
 
 void range(Stack* stack)
@@ -619,48 +711,49 @@ void rpath(Stack* stack)
     get_path_relative_to_source(block, circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void set_field(Stack* stack)
+void set_field(VM* vm)
 {
     stat_increment(SetField);
 
-    Value* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
+    Value* out = vm->output();
+    copy(vm->input(0), out);
     touch(out);
 
-    Value* name = circa_input(stack, 1);
+    Value* name = vm->input(1);
 
     Value* slot = get_field(out, name, NULL);
     if (slot == NULL) {
-        circa::Value msg;
+        Value msg;
         set_string(&msg, "field not found: ");
         string_append(&msg, name);
-        return raise_error_msg(stack, as_cstring(&msg));
+        return vm->throw_error(&msg);
     }
 
-    copy(circa_input(stack, 2), slot);
+    copy(vm->input(2), slot);
 }
 
-void set_index(Stack* stack)
+void set_index(VM* vm)
 {
     stat_increment(SetIndex);
 
-    Value* output = circa_output(stack, 0);
-    copy(circa_input(stack, 0), output);
+    Value* output = vm->output();
+    copy(vm->input(0), output);
     touch(output);
-    int index = circa_int_input(stack, 1);
-    copy(circa_input(stack, 2), list_get(output, index));
-}
-void rand(Stack* stack)
-{
-    set_float(circa_output(stack, 0), rand_next_double(&stack->randState));
+    int index = vm->input(1)->as_i();
+    move(vm->input(2), list_get(output, index));
 }
 
-void repeat(Stack* stack)
+void rand(VM* vm)
 {
-    Value* source = circa_input(stack, 0);
-    int repeatCount = circa_int_input(stack, 1);
+    set_float(vm->output(), rand_next_double(&vm->randState));
+}
 
-    Value* out = circa_output(stack, 0);
+void repeat(VM* vm)
+{
+    Value* source = vm->input(0);
+    int repeatCount = vm->input(1)->as_i();
+
+    Value* out = vm->output();
     circa_set_list(out, repeatCount);
 
     for (int i=0; i < repeatCount; i++)
@@ -674,67 +767,59 @@ void int__to_hex_string(Stack* stack)
     set_string(circa_output(stack, 0), strm.str().c_str());
 }
 
-void less_than_i(Stack* stack)
+void less_than_i(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_int_input(stack, 0) < circa_int_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_i() < vm->input(1)->as_i() );
 }
 
-void less_than_f(Stack* stack)
+void less_than_f(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_float_input(stack, 0) < circa_float_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_f() < vm->input(1)->as_f() );
 }
 
-void less_than_eq_i(Stack* stack)
+void less_than_eq_i(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_int_input(stack, 0) <= circa_int_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_i() <= vm->input(1)->as_i() );
 }
 
-void less_than_eq_f(Stack* stack)
+void less_than_eq_f(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_float_input(stack, 0) <= circa_float_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_f() <= vm->input(1)->as_f() );
 }
 
-void greater_than_i(Stack* stack)
+void greater_than_i(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_int_input(stack, 0) > circa_int_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_i() > vm->input(1)->as_i() );
 }
 
-void greater_than_f(Stack* stack)
+void greater_than_f(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_float_input(stack, 0) > circa_float_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_f() > vm->input(1)->as_f() );
 }
 
-void greater_than_eq_i(Stack* stack)
+void greater_than_eq_i(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_int_input(stack, 0) >= circa_int_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_i() >= vm->input(1)->as_i() );
 }
 
-void greater_than_eq_f(Stack* stack)
+void greater_than_eq_f(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            circa_float_input(stack, 0) >= circa_float_input(stack, 1));
+    vm->output()->set_bool( vm->input(0)->as_f() >= vm->input(1)->as_f() );
 }
 
-void List__append(Stack* stack)
+void List__append(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    move(circa_input(stack, 0), out);
-    move(circa_input(stack, 1), list_append(out));
+    Value* out = circa_output(vm);
+    move(circa_input(vm, 0), out);
+    move(circa_input(vm, 1), list_append(out));
 }
 
-void List__concat(Stack* stack)
+void List__concat(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    move(circa_input(stack, 0), out);
+    Value* out = circa_output(vm);
+    move(circa_input(vm, 0), out);
 
-    Value* additions = circa_input(stack, 1);
+    Value* additions = circa_input(vm, 1);
     touch(additions);
 
     int oldLength = list_length(out);
@@ -745,20 +830,22 @@ void List__concat(Stack* stack)
         move(list_get(additions, i), list_get(out, oldLength + i));
 }
 
-void List__resize(Stack* stack)
+void List__resize(VM* vm)
 {
-    Value* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-    int count = circa_int_input(stack, 1);
+    Value* out = circa_output(vm);
+    copy(circa_input(vm, 0), out);
+    int count = circa_input(vm, 1)->as_i();
     circa_resize(out, count);
 }
 
-void List__extend(Stack* stack)
+void List__extend(VM* vm)
 {
-    Value* out = circa_output(stack, 1);
-    copy(circa_input(stack, 0), out);
+#if 0
+    FIXME
+    Value* out = circa_output(vm, 1);
+    copy(circa_input(vm, 0), out);
 
-    Value* additions = circa_input(stack, 1);
+    Value* additions = circa_input(vm, 1);
 
     int oldLength = list_length(out);
     int additionsLength = list_length(additions);
@@ -766,31 +853,32 @@ void List__extend(Stack* stack)
     list_resize(out, oldLength + additionsLength);
     for (int i = 0; i < additionsLength; i++)
         copy(list_get(additions, i), list_get(out, oldLength + i));
+#endif
 }
 
-void List__count(Stack* stack)
+void List__count(VM* vm)
 {
-    set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
+    set_int(circa_output(vm), list_length(circa_input(vm, 0)));
 }
-void List__length(Stack* stack)
+void List__length(VM* vm)
 {
-    set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
-}
-
-void List__insert(Stack* stack)
-{
-    Value* out = circa_output(stack, 0);
-    copy(circa_input(stack, 0), out);
-
-    copy(circa_input(stack, 2), list_insert(out, circa_int_input(stack, 1)));
+    set_int(circa_output(vm), list_length(circa_input(vm, 0)));
 }
 
-void List__slice(Stack* stack)
+void List__insert(VM* vm)
 {
-    Value* input = circa_input(stack, 0);
-    int start = circa_int_input(stack, 1);
-    int end = circa_int_input(stack, 2);
-    Value* output = circa_output(stack, 0);
+    Value* out = circa_output(vm);
+    copy(circa_input(vm, 0), out);
+
+    copy(circa_input(vm, 2), list_insert(out, circa_input(vm, 1)->as_i()));
+}
+
+void List__slice(VM* vm)
+{
+    Value* input = circa_input(vm, 0);
+    int start = circa_input(vm, 1)->as_i();
+    int end = circa_input(vm, 2)->as_i();
+    Value* output = circa_output(vm);
 
     if (start < 0)
         start = 0;
@@ -814,12 +902,12 @@ void List__slice(Stack* stack)
         copy(list_get(input, start + i), list_get(output, i));
 }
 
-void List__join(Stack* stack)
+void List__join(VM* vm)
 {
-    Value* input = circa_input(stack, 0);
-    Value* joiner = circa_input(stack, 1);
+    Value* input = circa_input(vm, 0);
+    Value* joiner = circa_input(vm, 1);
 
-    Value* out = circa_output(stack, 0);
+    Value* out = circa_output(vm);
     set_string(out, "");
 
     for (int i=0; i < list_length(input); i++) {
@@ -830,165 +918,165 @@ void List__join(Stack* stack)
     }
 }
 
-void List__get(Stack* stack)
+void List__get(VM* vm)
 {
-    Value* self = circa_input(stack, 0);
-    int index = circa_int_input(stack, 1);
+    Value* self = circa_input(vm, 0);
+    int index = circa_input(vm, 1)->as_i();
     if (index < 0 || index >= list_length(self))
-        return raise_error_msg(stack, "Index out of bounds");
+        return circa_throw(vm, "Index out of bounds");
 
-    copy(list_get(self, index), circa_output(stack, 0));
+    copy(list_get(self, index), circa_output(vm));
 }
 
-void List__set(Stack* stack)
+void List__set(VM* vm)
 {
-    Value* self = circa_output(stack, 0);
-    move(circa_input(stack, 0), self);
+    Value* self = circa_output(vm);
+    move(circa_input(vm, 0), self);
     touch(self);
 
-    int index = circa_int_input(stack, 1);
-    Value* value = circa_input(stack, 2);
+    int index = circa_input(vm, 1)->as_i();
+    Value* value = circa_input(vm, 2);
 
     move(value, list_get(self, index));
 }
 
-void List__remove(Stack* stack)
+void List__remove(VM* vm)
 {
-    Value* self = circa_output(stack, 0);
-    move(circa_input(stack, 0), self);
-    int index = circa_int_input(stack, 1);
+    Value* self = circa_output(vm);
+    move(circa_input(vm, 0), self);
+    int index = circa_input(vm, 1)->as_i();
 
     if (index < 0 || index >= list_length(self))
-        return circa_output_error(stack, "Invalid index");
+        return circa_throw(vm, "Index out of bounds");
 
     list_remove_index(self, index);
 }
 
-void Map__contains(Stack* stack)
+void Map__contains(VM* vm)
 {
-    Value* key = circa_input(stack, 1);
+    Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
-        return circa_output_error(stack, "Key is not hashable");
+        return circa_throw(vm, "Key is not hashable");
 
-    Value* value = hashtable_get(circa_input(stack, 0), key);
-    set_bool(circa_output(stack, 0), value != NULL);
+    Value* value = hashtable_get(circa_input(vm, 0), key);
+    set_bool(circa_output(vm), value != NULL);
 }
 
-void Map__keys(Stack* stack)
+void Map__keys(VM* vm)
 {
-    Value* table = circa_input(stack, 0);
-    hashtable_get_keys(table, circa_output(stack, 0));
+    Value* table = circa_input(vm, 0);
+    hashtable_get_keys(table, circa_output(vm));
 }
 
-void Map__remove(Stack* stack)
+void Map__remove(VM* vm)
 {
-    Value* key = circa_input(stack, 1);
+    Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
-        return circa_output_error(stack, "Key is not hashable");
+        return circa_throw(vm, "Key is not hashable");
 
-    Value* self = circa_output(stack, 0);
-    move(circa_input(stack, 0), self);
+    Value* self = circa_output(vm);
+    move(circa_input(vm, 0), self);
     hashtable_remove(self, key);
 }
 
-void Map__get(Stack* stack)
+void Map__get(VM* vm)
 {
-    Value* table = circa_input(stack, 0);
-    Value* key = circa_input(stack, 1);
+    Value* table = circa_input(vm, 0);
+    Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
-        return circa_output_error(stack, "Key is not hashable");
+        return circa_throw(vm, "Key is not hashable");
 
     Value* value = hashtable_get(table, key);
     if (value == NULL) {
         Value msg;
         set_string(&msg, "Key not found: ");
         string_append_quoted(&msg, key);
-        return circa_output_error(stack, as_cstring(&msg));
+        return vm->throw_error(&msg);
     }
-    copy(value, circa_output(stack, 0));
+    copy(value, circa_output(vm));
 }
 
-void Map__set(Stack* stack)
+void Map__set(VM* vm)
 {
-    Value* key = circa_input(stack, 1);
+    Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
-        return circa_output_error(stack, "Key is not hashable");
+        return circa_throw(vm, "Key is not hashable");
 
-    Value* self = circa_output(stack, 0);
-    move(circa_input(stack, 0), self);
+    Value* self = circa_output(vm);
+    move(circa_input(vm, 0), self);
 
-    Value* value = circa_input(stack, 2);
+    Value* value = circa_input(vm, 2);
     move(value, hashtable_insert(self, key, false));
 }
 
-void Map__empty(Stack* stack)
+void Map__empty(VM* vm)
 {
-    set_bool(circa_output(stack, 0), hashtable_is_empty(circa_input(stack, 0)));
+    set_bool(circa_output(vm), hashtable_is_empty(circa_input(vm, 0)));
 }
 
-void Module__block(Stack* stack)
+void Module__block(VM* vm)
 {
-    Value* moduleRef = circa_input(stack, 0);
-    Block* moduleBlock = module_ref_resolve(stack->world, moduleRef);
-    set_block(circa_output(stack, 0), moduleBlock);
+    Value* moduleRef = circa_input(vm, 0);
+    Block* moduleBlock = module_ref_resolve(vm->world, moduleRef);
+    set_block(circa_output(vm), moduleBlock);
 }
 
-void Module__get(Stack* stack)
+void Module__get(VM* vm)
 {
-    Value* moduleRef = circa_input(stack, 0);
-    Block* moduleBlock = module_ref_resolve(stack->world, moduleRef);
-    Term* term = find_local_name(moduleBlock, circa_input(stack, 1));
-    copy(term_value(term), circa_output(stack, 0));
+    Value* moduleRef = circa_input(vm, 0);
+    Block* moduleBlock = module_ref_resolve(vm->world, moduleRef);
+    Term* term = find_local_name(moduleBlock, circa_input(vm, 1));
+    copy(term_value(term), circa_output(vm));
 }
 
-void String__char_at(Stack* stack)
+void String__char_at(VM* vm)
 {
-    const char* str = circa_string_input(stack, 0);
-    int index = circa_int_input(stack, 1);
+    const char* str = circa_input(vm, 0)->as_str();
+    int index = circa_input(vm, 1)->as_i();
 
     if (index < 0) {
-        circa_output_error(stack, "negative index");
+        circa_throw(vm, "negative index");
         return;
     }
 
     if ((unsigned) index >= strlen(str)) {
-        set_string(circa_output(stack, 0), "");
+        set_string(circa_output(vm), "");
         return;
     }
 
     char output[1];
     output[0] = str[index];
-    set_string(circa_output(stack, 0), output, 1);
+    set_string(circa_output(vm), output, 1);
 }
 
-void String__length(Stack* stack)
+void String__length(VM* vm)
 {
-    const char* str = circa_string_input(stack, 0);
-    set_int(circa_output(stack, 0), (int) strlen(str));
+    const char* str = circa_input(vm, 0)->as_str();
+    set_int(circa_output(vm), (int) strlen(str));
 }
 
-void String__char_code(Stack* stack)
+void String__char_code(VM* vm)
 {
-    const char* str = circa_string_input(stack, 0);
+    const char* str = circa_input(vm, 0)->as_str();
     if (strlen(str) != 1)
-        return circa_output_error(stack, "Expected a string of length 1");
+        return circa_throw(vm, "Expected a string of length 1");
     
-    set_int(circa_output(stack, 0), (int) str[0]);
+    set_int(circa_output(vm), (int) str[0]);
 }
 
-void String__from_char_code(Stack* stack)
+void String__from_char_code(VM* vm)
 {
     char str[2];
-    str[0] = circa_int_input(stack, 1);
+    str[0] = circa_input(vm, 1)->as_i();
     str[1] = 0;
-    set_string(circa_output(stack, 0), str);
+    set_string(circa_output(vm), str);
 }
 
-void String__substr(Stack* stack)
+void String__substr(VM* vm)
 {
-    Value* self = circa_input(stack, 0);
-    int start = circa_int_input(stack, 1);
-    int length = circa_int_input(stack, 2);
+    Value* self = circa_input(vm, 0);
+    int start = circa_input(vm, 1)->as_i();
+    int length = circa_input(vm, 2)->as_i();
 
     if (start < 0)
         start = 0;
@@ -1007,7 +1095,7 @@ void String__substr(Stack* stack)
     if (start > existingLength)
         start = existingLength;
 
-    set_string(circa_output(stack, 0), as_cstring(self) + start, length);
+    set_string(circa_output(vm), as_cstring(self) + start, length);
 }
 
 char character_to_lower(char c)
@@ -1017,25 +1105,25 @@ char character_to_lower(char c)
     return c;
 }
 
-void String__to_camel_case(Stack* stack)
+void String__to_camel_case(VM* vm)
 {
-    const char* in = circa_string_input(stack, 0);
-    set_string(circa_output(stack, 0), in);
+    const char* in = circa_input(vm, 0)->as_str();
+    set_string(circa_output(vm), in);
 
-    char* out = (char*) as_cstring(circa_output(stack, 0));
+    char* out = (char*) as_cstring(circa_output(vm));
     if (out[0] == 0)
         return;
 
     out[0] = character_to_lower(out[0]);
 }
 
-void String__to_lower(Stack* stack)
+void String__to_lower(VM* vm)
 {
-    const char* in = circa_string_input(stack, 0);
+    const char* in = circa_input(vm, 0)->as_str();
     int len = (int) strlen(in);
 
-    set_string(circa_output(stack, 0), in);
-    char* out = (char*) as_cstring(circa_output(stack, 0));
+    set_string(circa_output(vm), in);
+    char* out = (char*) as_cstring(circa_output(vm));
 
     for (int i=0; i < len; i++) {
         char c = in[i];
@@ -1046,25 +1134,25 @@ void String__to_lower(Stack* stack)
     }
 }
 
-void String__to_number(Stack* stack)
+void String__to_number(VM* vm)
 {
-    float n = atof(circa_string_input(stack, 0));
-    set_float(circa_output(stack, 0), n);
+    float n = atof(circa_input(vm, 0)->as_str());
+    set_float(circa_output(vm), n);
 }
 
-void String__to_int(Stack* stack)
+void String__to_int(VM* vm)
 {
-    int n = atoi(circa_string_input(stack, 0));
-    set_int(circa_output(stack, 0), n);
+    int n = atoi(circa_input(vm, 0)->as_str());
+    set_int(circa_output(vm), n);
 }
 
-void String__to_upper(Stack* stack)
+void String__to_upper(VM* vm)
 {
-    const char* in = circa_string_input(stack, 0);
+    const char* in = circa_input(vm, 0)->as_str();
     int len = (int) strlen(in);
 
-    set_string(circa_output(stack, 0), in);
-    char* out = (char*) as_cstring(circa_output(stack, 0));
+    set_string(circa_output(vm), in);
+    char* out = (char*) as_cstring(circa_output(vm));
 
     for (int i=0; i < len; i++) {
         char c = in[i];
@@ -1075,18 +1163,18 @@ void String__to_upper(Stack* stack)
     }
 }
 
-void String__slice(Stack* stack)
+void String__slice(VM* vm)
 {
-    int start = circa_int_input(stack, 1);
-    int end = circa_int_input(stack, 2);
-    std::string const& s = as_string(circa_input(stack, 0));
+    int start = circa_input(vm, 1)->as_i();
+    int end = circa_input(vm, 2)->as_i();
+    std::string const& s = as_string(circa_input(vm, 0));
 
     // Negative indexes are relatve to end of string
     if (start < 0) start = (int) s.length() + start;
     if (end < 0) end = (int) s.length() + end;
 
-    if (start < 0) return set_string(circa_output(stack, 0), "");
-    if (end < 0) return set_string(circa_output(stack, 0), "");
+    if (start < 0) return set_string(circa_output(vm), "");
+    if (end < 0) return set_string(circa_output(vm), "");
 
     if ((unsigned) start > s.length())
         start = (int) s.length();
@@ -1095,74 +1183,23 @@ void String__slice(Stack* stack)
         end = (int) s.length();
 
     if (end < start)
-        return set_string(circa_output(stack, 0), "");
+        return set_string(circa_output(vm), "");
 
-    set_string(circa_output(stack, 0), s.substr(start, end - start));
+    set_string(circa_output(vm), s.substr(start, end - start));
 }
 
-void String__ends_with(Stack* stack)
+void String__ends_with(VM* vm)
 {
-    set_bool(circa_output(stack, 0), string_ends_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
+    set_bool(circa_output(vm), string_ends_with(circa_input(vm, 0), as_cstring(circa_input(vm, 1))));
 }
-void String__starts_with(Stack* stack)
+void String__starts_with(VM* vm)
 {
-    set_bool(circa_output(stack, 0), string_starts_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
-}
-
-void String__split(Stack* stack)
-{
-    string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
+    set_bool(circa_output(vm), string_starts_with(circa_input(vm, 0), as_cstring(circa_input(vm, 1))));
 }
 
-Value* find_env_value(Stack* stack, Value* key)
+void String__split(VM* vm)
 {
-    stat_increment(FindEnvValue);
-
-    for (Frame* frame = top_frame(stack); frame != NULL; frame = prev_frame(frame)) {
-        if (!is_null(&frame->env)) {
-            Value* value = hashtable_get(&frame->env, key);
-            if (value != NULL)
-                return value;
-        }
-    }
-
-    if (!is_null(&stack->env)) {
-        Value* value = hashtable_get(&stack->env, key);
-        if (value != NULL)
-            return value;
-    }
-
-    if (stack->caller != NULL)
-        // Keep searching up to the calling stack
-        return find_env_value(stack->caller, key);
-
-    return NULL;
-}
-
-void get_env(Stack* stack)
-{
-    Value* value = find_env_value(stack, circa_input(stack, 0));
-    if (value != NULL)
-        copy(value, circa_output(stack, 0));
-    else
-        set_null(circa_output(stack, 0));
-}
-
-void get_env_opt(Stack* stack)
-{
-    Value* value = find_env_value(stack, circa_input(stack, 0));
-    if (value != NULL)
-        copy(value, circa_output(stack, 0));
-    else
-        copy(circa_input(stack, 1), circa_output(stack, 0));
-}
-
-void set_env(Stack* stack)
-{
-    Value* key = circa_input(stack, 0);
-    Value* value = circa_input(stack, 1);
-
-    copy(value, stack_env_insert(stack, key));
+    string_split(circa_input(vm, 0), string_get(circa_input(vm, 1), 0), circa_output(vm));
 }
 
 void file__exists(Stack* stack)
@@ -1181,6 +1218,7 @@ void file__read_text(Stack* stack)
     circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
 }
 
+#if 0
 void channel_send(Stack* stack)
 {
     Value* name = circa_input(stack, 0);
@@ -1217,41 +1255,43 @@ void find_active_value(Stack* stack)
         set_bool(circa_output(stack, 1), true);
     }
 }
+#endif
 
-void typeof_func(Stack* stack)
+void typeof_func(VM* vm)
 {
-    Value* in = circa_input(stack, 0);
-    set_type(circa_output(stack, 0), in->value_type);
+    set_type(vm->output(), get_value_type(vm->input(0)));
 }
 
+#if 0
 void static_type_func(Stack* stack)
 {
     Term* caller = (Term*) circa_caller_term(stack);
     Term* input = caller->input(0);
     set_type(circa_output(stack, 0), input->type);
 }
+#endif
 
-void length(Stack* stack)
+void length(VM* vm)
 {
-    set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
+    set_int(circa_output(vm), num_elements(circa_input(vm, 0)));
 }
 
-void noise(Stack* stack)
+void noise(VM* vm)
 {
     const int octaves = 4;
-    float out = perlin_fbm(octaves, circa_float_input(stack, 0));
-    set_float(circa_output(stack, 0), out);
+    float out = perlin_fbm(octaves, vm->input(0)->to_f());
+    set_float(vm->output(), out);
 }
 
-void not_equals(Stack* stack)
+void not_equals(VM* vm)
 {
-    set_bool(circa_output(stack, 0),
-            !equals(circa_input(stack, 0), circa_input(stack, 1)));
+    set_bool(circa_output(vm),
+            !equals(circa_input(vm, 0), circa_input(vm, 1)));
 }
 
-void error(Stack* stack)
+void error(VM* vm)
 {
-    Value* args = circa_input(stack, 0);
+    Value* args = circa_input(vm, 0);
 
     Value out;
 
@@ -1260,34 +1300,34 @@ void error(Stack* stack)
         string_append(&out, val);
     }
 
-    circa_output_error_val(stack, &out);
+    vm->throw_error(&out);
 }
 
-void get_with_symbol(Stack* stack)
+void get_with_symbol(VM* vm)
 {
-    Value* left = circa_input(stack, 0);
+    Value* left = vm->input(0);
     Value str;
-    symbol_as_string(circa_input(stack, 1), &str);
+    symbol_as_string(vm->input(1), &str);
 
     if (is_module_ref(left)) {
-        Block* block = module_ref_resolve(stack->world, left);
+        Block* block = module_ref_resolve(vm->world, left);
         Term* term = find_local_name(block, &str);
 
         if (term != NULL) {
-            set_closure(circa_output(stack, 0), term->nestedContents, NULL);
+            set_closure(vm->output(), term->nestedContents, NULL);
             return;
         }
     }
 
-    circa_output_error(stack, "Symbol not found");
+    vm->throw_str("Symbol not found");
 }
 
-void print(Stack* stack)
+void print(VM* vm)
 {
-    Value* args = circa_input(stack, 0);
-
     Value out;
     set_string(&out, "");
+
+    Value* args = vm->input(0);
 
     for (int i = 0; i < circa_count(args); i++) {
         Value* val = circa_index(args, i);
@@ -1295,16 +1335,16 @@ void print(Stack* stack)
     }
 
     write_log(as_cstring(&out));
-
-    set_null(circa_output(stack, 0));
 }
 
+#if 0
 void to_string(Stack* stack)
 {
     Value* in = circa_input(stack, 0);
     Value* out = circa_output(stack, 0);
     to_string(in, out);
 }
+#endif
 
 void compute_patch_hosted(Stack* stack)
 {
@@ -1339,128 +1379,125 @@ void destructure_list(Stack* stack)
 
 void misc_builtins_setup_functions(NativePatch* patch)
 {
-    circa_patch_function(patch, "add_i", add_i_evaluate);
-    circa_patch_function(patch, "add_f", add_f_evaluate);
-    circa_patch_function(patch, "abs", abs);
-    circa_patch_function(patch, "assert", assert_func);
+    circa_patch_function2(patch, "add_i", add_i);
+    circa_patch_function2(patch, "add_f", add_f);
+    circa_patch_function2(patch, "abs", abs);
+    circa_patch_function2(patch, "assert", assert_func);
     circa_patch_function(patch, "cast_declared_type", cast_declared_type);
-    circa_patch_function(patch, "cast", cast_evaluate);
+    circa_patch_function2(patch, "cast", cast_evaluate);
     circa_patch_function(patch, "debug_break", debug_break);
-    circa_patch_function(patch, "str", str);
-    circa_patch_function(patch, "cond", cond);
-    circa_patch_function(patch, "copy", copy_eval);
+    circa_patch_function2(patch, "str", str);
+    circa_patch_function2(patch, "cond", cond);
+    circa_patch_function2(patch, "copy", copy_eval);
     circa_patch_function(patch, "destructure_list", destructure_list);
-    circa_patch_function(patch, "div_f", div_f);
-    circa_patch_function(patch, "div_i", div_i);
-    circa_patch_function(patch, "empty_list", empty_list);
-    circa_patch_function(patch, "equals", equals_func);
-    circa_patch_function(patch, "error", error);
-    circa_patch_function(patch, "method_lookup", method_lookup);
-    circa_patch_function(patch, "get_field", get_field);
+    circa_patch_function2(patch, "div_f", div_f);
+    circa_patch_function2(patch, "div_i", div_i);
+    circa_patch_function2(patch, "empty_list", empty_list);
+    circa_patch_function2(patch, "equals", equals_func);
+    circa_patch_function2(patch, "error", error);
+    circa_patch_function2(patch, "method_lookup", method_lookup);
+    circa_patch_function2(patch, "get_field", get_field);
     circa_patch_function(patch, "has_method", has_method);
-    circa_patch_function(patch, "get_index", get_index);
-    circa_patch_function(patch, "get_with_symbol", get_with_symbol);
-    circa_patch_function(patch, "is_compound", hosted_is_compound);
-    circa_patch_function(patch, "is_list", hosted_is_list);
-    circa_patch_function(patch, "is_int", hosted_is_int);
-    circa_patch_function(patch, "is_map", hosted_is_map);
-    circa_patch_function(patch, "is_number", hosted_is_number);
-    circa_patch_function(patch, "is_bool", hosted_is_bool);
-    circa_patch_function(patch, "is_string", hosted_is_string);
-    circa_patch_function(patch, "is_null", hosted_is_null);
-    circa_patch_function(patch, "is_function", hosted_is_function);
-    circa_patch_function(patch, "is_type", hosted_is_type);
-    circa_patch_function(patch, "length", length);
+    circa_patch_function2(patch, "get_index", get_index);
+    circa_patch_function2(patch, "get_with_symbol", get_with_symbol);
+    circa_patch_function2(patch, "is_compound", hosted_is_compound);
+    circa_patch_function2(patch, "is_list", hosted_is_list);
+    circa_patch_function2(patch, "is_int", hosted_is_int);
+    circa_patch_function2(patch, "is_map", hosted_is_map);
+    circa_patch_function2(patch, "is_number", hosted_is_number);
+    circa_patch_function2(patch, "is_bool", hosted_is_bool);
+    circa_patch_function2(patch, "is_string", hosted_is_string);
+    circa_patch_function2(patch, "is_null", hosted_is_null);
+    circa_patch_function2(patch, "is_function", hosted_is_function);
+    circa_patch_function2(patch, "is_type", hosted_is_type);
+    circa_patch_function2(patch, "length", length);
     circa_patch_function(patch, "int.to_hex_string", int__to_hex_string);
-    circa_patch_function(patch, "less_than_i", less_than_i);
-    circa_patch_function(patch, "less_than_f", less_than_f);
-    circa_patch_function(patch, "less_than_eq_i", less_than_eq_i);
-    circa_patch_function(patch, "less_than_eq_f", less_than_eq_f);
-    circa_patch_function(patch, "greater_than_i", greater_than_i);
-    circa_patch_function(patch, "greater_than_f", greater_than_f);
-    circa_patch_function(patch, "greater_than_eq_i", greater_than_eq_i);
-    circa_patch_function(patch, "greater_than_eq_f", greater_than_eq_f);
-    circa_patch_function(patch, "list", make_list);
-    circa_patch_function(patch, "blank_list", blank_list);
-    circa_patch_function(patch, "map", make_map);
-    circa_patch_function(patch, "and", and_func);
-    circa_patch_function(patch, "or", or_func);
-    circa_patch_function(patch, "not", not_func);
-    circa_patch_function(patch, "make", make_func);
-    circa_patch_function(patch, "max_f", max_f);
-    circa_patch_function(patch, "max_i", max_i);
-    circa_patch_function(patch, "min_f", min_f);
-    circa_patch_function(patch, "min_i", min_i);
-    circa_patch_function(patch, "mod_i", mod_i);
-    circa_patch_function(patch, "mod_f", mod_f);
-    circa_patch_function(patch, "mult_i", mult_i);
-    circa_patch_function(patch, "mult_f", mult_f);
-    circa_patch_function(patch, "neg_i", neg_i);
-    circa_patch_function(patch, "neg_f", neg_f);
-    circa_patch_function(patch, "remainder_i", remainder_i);
-    circa_patch_function(patch, "remainder_f", remainder_f);
-    circa_patch_function(patch, "round", round);
-    circa_patch_function(patch, "sub_i", sub_i);
-    circa_patch_function(patch, "sub_f", sub_f);
-    circa_patch_function(patch, "floor", floor);
-    circa_patch_function(patch, "ceil", ceil);
-    circa_patch_function(patch, "average", average);
-    circa_patch_function(patch, "pow", pow);
-    circa_patch_function(patch, "sqr", sqr);
-    circa_patch_function(patch, "cube", cube);
-    circa_patch_function(patch, "sqrt", sqrt);
-    circa_patch_function(patch, "log", log);
+    circa_patch_function2(patch, "less_than_i", less_than_i);
+    circa_patch_function2(patch, "less_than_f", less_than_f);
+    circa_patch_function2(patch, "less_than_eq_i", less_than_eq_i);
+    circa_patch_function2(patch, "less_than_eq_f", less_than_eq_f);
+    circa_patch_function2(patch, "greater_than_i", greater_than_i);
+    circa_patch_function2(patch, "greater_than_f", greater_than_f);
+    circa_patch_function2(patch, "greater_than_eq_i", greater_than_eq_i);
+    circa_patch_function2(patch, "greater_than_eq_f", greater_than_eq_f);
+    circa_patch_function2(patch, "make_list", make_list);
+    circa_patch_function2(patch, "blank_list", blank_list);
+    circa_patch_function2(patch, "map", make_map);
+    circa_patch_function2(patch, "and", and_func);
+    circa_patch_function2(patch, "or", or_func);
+    circa_patch_function2(patch, "not", not_func);
+    circa_patch_function2(patch, "make", make_func);
+    circa_patch_function2(patch, "max_f", max_f);
+    circa_patch_function2(patch, "max_i", max_i);
+    circa_patch_function2(patch, "min_f", min_f);
+    circa_patch_function2(patch, "min_i", min_i);
+    circa_patch_function2(patch, "mod_i", mod_i);
+    circa_patch_function2(patch, "mod_f", mod_f);
+    circa_patch_function2(patch, "mult_i", mult_i);
+    circa_patch_function2(patch, "mult_f", mult_f);
+    circa_patch_function2(patch, "neg_i", neg_i);
+    circa_patch_function2(patch, "neg_f", neg_f);
+    circa_patch_function2(patch, "remainder_i", remainder_i);
+    circa_patch_function2(patch, "remainder_f", remainder_f);
+    circa_patch_function2(patch, "round", round);
+    circa_patch_function2(patch, "sub_i", sub_i);
+    circa_patch_function2(patch, "sub_f", sub_f);
+    circa_patch_function2(patch, "floor", floor);
+    circa_patch_function2(patch, "ceil", ceil);
+    circa_patch_function2(patch, "average", average);
+    circa_patch_function2(patch, "pow", pow);
+    circa_patch_function2(patch, "sqr", sqr);
+    circa_patch_function2(patch, "cube", cube);
+    circa_patch_function2(patch, "sqrt", sqrt);
+    circa_patch_function2(patch, "log", log);
 
-    circa_patch_function(patch, "sin", sin_func);
-    circa_patch_function(patch, "cos", cos_func);
-    circa_patch_function(patch, "tan", tan_func);
-    circa_patch_function(patch, "arcsin", arcsin_func);
-    circa_patch_function(patch, "arccos", arccos_func);
-    circa_patch_function(patch, "arctan", arctan_func);
+    circa_patch_function2(patch, "sin", sin_func);
+    circa_patch_function2(patch, "cos", cos_func);
+    circa_patch_function2(patch, "tan", tan_func);
+    circa_patch_function2(patch, "arcsin", arcsin_func);
+    circa_patch_function2(patch, "arccos", arccos_func);
+    circa_patch_function2(patch, "arctan", arctan_func);
 
-    circa_patch_function(patch, "range", range);
     circa_patch_function(patch, "rpath", rpath);
-    circa_patch_function(patch, "set_field", set_field);
-    circa_patch_function(patch, "set_index", set_index);
+    circa_patch_function2(patch, "set_field", set_field);
+    circa_patch_function2(patch, "set_index", set_index);
     
-    circa_patch_function(patch, "List.append", List__append);
-    circa_patch_function(patch, "List.concat", List__concat);
-    circa_patch_function(patch, "List.resize", List__resize);
-    circa_patch_function(patch, "List.count", List__count);
-    circa_patch_function(patch, "List.insert", List__insert);
-    circa_patch_function(patch, "List.length", List__length);
-    circa_patch_function(patch, "List.join", List__join);
-    circa_patch_function(patch, "List.slice", List__slice);
-    circa_patch_function(patch, "List.get", List__get);
-    circa_patch_function(patch, "List.set", List__set);
-    circa_patch_function(patch, "List.remove", List__remove);
-    circa_patch_function(patch, "Map.contains", Map__contains);
-    circa_patch_function(patch, "Map.keys", Map__keys);
-    circa_patch_function(patch, "Map.remove", Map__remove);
-    circa_patch_function(patch, "Map.get", Map__get);
-    circa_patch_function(patch, "Map.set", Map__set);
-    circa_patch_function(patch, "Map.empty", Map__empty);
-    circa_patch_function(patch, "Module.block", Module__block);
-    circa_patch_function(patch, "Module._get", Module__get);
+    circa_patch_function2(patch, "List.append", List__append);
+    circa_patch_function2(patch, "List.concat", List__concat);
+    circa_patch_function2(patch, "List.resize", List__resize);
+    circa_patch_function2(patch, "List.count", List__count);
+    circa_patch_function2(patch, "List.insert", List__insert);
+    circa_patch_function2(patch, "List.length", List__length);
+    circa_patch_function2(patch, "List.join", List__join);
+    circa_patch_function2(patch, "List.slice", List__slice);
+    circa_patch_function2(patch, "List.get", List__get);
+    circa_patch_function2(patch, "List.set", List__set);
+    circa_patch_function2(patch, "List.remove", List__remove);
 
-    circa_patch_function(patch, "String.char_at", String__char_at);
-    circa_patch_function(patch, "String.ends_with", String__ends_with);
-    circa_patch_function(patch, "String.length", String__length);
-    circa_patch_function(patch, "String.char_code", String__char_code);
-    circa_patch_function(patch, "String.from_char_code", String__from_char_code);
-    circa_patch_function(patch, "String.substr", String__substr);
-    circa_patch_function(patch, "String.slice", String__slice);
-    circa_patch_function(patch, "String.starts_with", String__starts_with);
-    circa_patch_function(patch, "String.split", String__split);
-    circa_patch_function(patch, "String.to_camel_case", String__to_camel_case);
-    circa_patch_function(patch, "String.to_upper", String__to_upper);
-    circa_patch_function(patch, "String.to_lower", String__to_lower);
-    circa_patch_function(patch, "String.to_number", String__to_number);
-    circa_patch_function(patch, "String.to_int", String__to_int);
+    circa_patch_function2(patch, "Map.contains", Map__contains);
+    circa_patch_function2(patch, "Map.keys", Map__keys);
+    circa_patch_function2(patch, "Map.remove", Map__remove);
+    circa_patch_function2(patch, "Map.get", Map__get);
+    circa_patch_function2(patch, "Map.set", Map__set);
+    circa_patch_function2(patch, "Map.empty", Map__empty);
 
-    circa_patch_function(patch, "env", get_env);
-    circa_patch_function(patch, "env_opt", get_env_opt);
-    circa_patch_function(patch, "set_env", set_env);
+    circa_patch_function2(patch, "Module.block", Module__block);
+    circa_patch_function2(patch, "Module._get", Module__get);
+
+    circa_patch_function2(patch, "String.char_at", String__char_at);
+    circa_patch_function2(patch, "String.ends_with", String__ends_with);
+    circa_patch_function2(patch, "String.length", String__length);
+    circa_patch_function2(patch, "String.char_code", String__char_code);
+    circa_patch_function2(patch, "String.from_char_code", String__from_char_code);
+    circa_patch_function2(patch, "String.substr", String__substr);
+    circa_patch_function2(patch, "String.slice", String__slice);
+    circa_patch_function2(patch, "String.starts_with", String__starts_with);
+    circa_patch_function2(patch, "String.split", String__split);
+    circa_patch_function2(patch, "String.to_camel_case", String__to_camel_case);
+    circa_patch_function2(patch, "String.to_upper", String__to_upper);
+    circa_patch_function2(patch, "String.to_lower", String__to_lower);
+    circa_patch_function2(patch, "String.to_number", String__to_number);
+    circa_patch_function2(patch, "String.to_int", String__to_int);
 
     circa_patch_function(patch, "file_version", file__version);
     circa_patch_function(patch, "file_exists", file__exists);
@@ -1470,23 +1507,26 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "_find_active_value", find_active_value);
 
     circa_patch_function(patch, "noise", noise);
-    circa_patch_function(patch, "not_equals", not_equals);
-    circa_patch_function(patch, "print", print);
-    circa_patch_function(patch, "rand", rand);
-    circa_patch_function(patch, "repeat", repeat);
-    circa_patch_function(patch, "to_string", to_string);
-    circa_patch_function(patch, "trace", print);
-    circa_patch_function(patch, "type", typeof_func);
-    circa_patch_function(patch, "static_type", static_type_func);
+    circa_patch_function2(patch, "not_equals", not_equals);
+    circa_patch_function2(patch, "print", print);
+    circa_patch_function2(patch, "rand", rand);
+    circa_patch_function2(patch, "repeat", repeat);
+    circa_patch_function2(patch, "trace", print);
+    circa_patch_function2(patch, "typeof", typeof_func);
     circa_patch_function(patch, "compute_patch", compute_patch_hosted);
     circa_patch_function(patch, "apply_patch", apply_patch_hosted);
     circa_patch_function(patch, "inputs_fit_function", inputs_fit_function);
     circa_patch_function(patch, "overload_error_no_match", overload_error_no_match);
     circa_patch_function(patch, "unique_id", unique_id);
     circa_patch_function(patch, "source_id", source_id);
-    circa_patch_function(patch, "unknown_identifier", unknown_identifier);
-    circa_patch_function(patch, "unknown_function", unknown_function);
     circa_patch_function(patch, "write_text_file", write_text_file_func);
+    circa_patch_function(patch, "from_string", from_string);
+    circa_patch_function(patch, "to_string_repr", to_string_repr);
+    circa_patch_function2(patch, "test_spy", test_spy);
+    circa_patch_function2(patch, "test_oracle", test_oracle);
+    circa_patch_function(patch, "sys_module_search_paths", sys__module_search_paths);
+    circa_patch_function(patch, "_perf_stats_dump", perf_stats_dump);
+    circa_patch_function(patch, "global_script_version", global_script_version);
 }
 
 } // namespace circa

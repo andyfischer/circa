@@ -27,13 +27,17 @@ namespace circa {
     struct Type;
     struct World;
     struct Value;
+    struct VM;
 }
 
 typedef circa::Block caBlock;
 
 // a Stack holds the interpreter's current state, including a list of frames (activation
 // records).
+// TODO: replace with VM
 typedef circa::Stack caStack;
+
+typedef circa::VM caVM;
 
 typedef circa::Term caTerm;
 
@@ -51,6 +55,7 @@ typedef circa::Value caValue;
 #else
 
 typedef struct caBlock caBlock;
+typedef struct caVM caVM;
 typedef struct caStack caStack;
 typedef struct caTerm caTerm;
 typedef struct caType caType;
@@ -79,7 +84,6 @@ union caValueData {
 
 #ifdef __cplusplus
 
-// C++ wrapper on caValue. Provides C++-style initialization and destruction.
 namespace circa {
 
 struct Value
@@ -93,21 +97,32 @@ struct Value
     Value& operator=(Value const&);
 
     caTerm* asTerm();
+    caBlock* asBlock();
     bool asBool();
     caSymbol asSymbol();
     int asInt();
     float asFloat();
     ListData* listData();
+    int as_i() { return asInt(); }
+    float as_f() { return asFloat(); }
+    float to_f();
+    caSymbol as_s() { return asSymbol(); }
+    const char* as_str();
+    caSymbol as_b() { return asBool(); }
 
     Value* index(int i);
     int length();
 
     // Assignment
+    Value* set(caValue* v) { return set_value(v); }
     Value* set_value(caValue* v);
+    Value* set_block(Block* b);
     Value* set_bool(bool b);
     Value* set_string(const char* s);
     Value* set_int(int i);
+    Value* set_float(float f);
     Value* set_symbol(caSymbol s);
+    Value* set_term(Term* t);
 
     // List utils
     Value* set_list(int size);
@@ -122,17 +137,30 @@ struct Value
     Value* append_sym(caSymbol s);
     Value* append_str(const char* s);
     Value* extend(Value* rhsList);
+    void pop();
+    Value* last();
 
     // Hashtable utils
     Value* set_hashtable();
     Value* field(caSymbol field);
+    Value* int_key(int key);
+    Value* val_key(Value* key);
+    Value* term_key(Term* key);
+    Value* block_key(Block* key);
     Value* set_field_int(caSymbol field, int i);
     Value* set_field_str(caSymbol field, const char*);
     Value* set_field_sym(caSymbol field, caSymbol sym);
-    Value* insert(caSymbol field);
+    Value* set_field_term(caSymbol field, Term* term);
+    Value* set_field_bool(caSymbol field, bool b);
+    bool field_bool(caSymbol field, bool defaultValue);
+    Value* insert(caSymbol key);
+    Value* insert_int(int key);
+    Value* insert_val(Value* valueKey);
+    Value* insert_term(Term* key);
 
     // For debugging:
     void dump();
+    char* to_c_string(); // caller must free() this char*.
 };
 
 } // namespace circa
@@ -142,7 +170,7 @@ struct Value
 // EvaluateFunc is the signature for a C evaluation function. The function will access the
 // stack to read inputs (if any), possibly perform some action, and write output values
 // (if any) back to the stack.
-typedef void (*caEvaluateFunc)(caStack* stack);
+typedef void (*caEvaluateFunc)(caVM* stack);
 
 typedef void (*caNativePtrRelease)(void* ptr);
 
@@ -534,7 +562,10 @@ caValue* circa_declare_value(caBlock* block, const char* name);
 
 // -- Native module support --
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
-void circa_patch_function(caNativePatch* module, const char* name, caEvaluateFunc func);
+
+#define circa_patch_function(x,y,z) ;
+
+void circa_patch_function2(caNativePatch* patch, const char* nameStr, caEvaluateFunc func);
 // void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func);
 void circa_finish_native_patch(caNativePatch* module);
 

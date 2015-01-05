@@ -8,4 +8,4 @@ def main() -> int
 
 int = make_vm(main)
 int.call -> print
-int.extract_state -> print
+int.get_state -> print

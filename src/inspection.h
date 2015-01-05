@@ -108,7 +108,7 @@ struct RawOutputPrefs
 };
 
 
-void print_block(Block* block, RawOutputPrefs* prefs, Value* out, Stack* stack=NULL);
+void print_block(Block* block, RawOutputPrefs* prefs, Value* out);
 void print_term(Term* term, RawOutputPrefs* prefs, Value* out);
 void print_term(Term* term, Value* out);
 

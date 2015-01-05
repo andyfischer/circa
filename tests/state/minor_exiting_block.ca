@@ -7,4 +7,4 @@ def main()
 
 vm = make_vm(main)
 vm.call
-print(vm.extract_state)
+print(vm.get_state)

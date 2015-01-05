@@ -24,13 +24,13 @@ namespace circa {
 
 void repl_start(Stack* stack)
 {
-    Value sym_displayRaw;
-    set_symbol_from_string(&sym_displayRaw, "displayRaw");
+    Value s_displayRaw;
+    set_symbol_from_string(&s_displayRaw, "displayRaw");
 
     Value mainStr;
     set_string(&mainStr, "main");
     Block* block = find_module(stack->world, NULL, &mainStr);
-    set_bool(hashtable_insert(&stack->attrs, &sym_displayRaw), false);
+    set_bool(hashtable_insert(&stack->attrs, &s_displayRaw), false);
     stack_init(stack, block);
 }
 
@@ -39,9 +39,9 @@ void repl_run_line(Stack* stack, Value* line, Value* output)
     Block* block = stack_top_block(stack);
     set_list(output, 0);
 
-    Value sym_displayRaw;
-    set_symbol_from_string(&sym_displayRaw, "displayRaw");
-    Value* displayRaw = hashtable_get(&stack->attrs, &sym_displayRaw);
+    Value s_displayRaw;
+    set_symbol_from_string(&s_displayRaw, "displayRaw");
+    Value* displayRaw = hashtable_get(&stack->attrs, &s_displayRaw);
 
     if (string_equals(line, "exit") || string_equals(line, "/exit")) {
         pop_frame(stack);

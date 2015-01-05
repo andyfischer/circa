@@ -9,4 +9,4 @@ def main()
 
 vm = make_vm(main)
 vm.run
-vm.extract_state | print
+vm.get_state | print

@@ -1,9 +1,3 @@
 
 
-def main()
-  def 1
-
-int = make_vm(main)
-int.run
-
-assert(int.error_message == "Expected identifier after def, found: 1")
+def 1

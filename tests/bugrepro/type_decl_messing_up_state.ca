@@ -13,4 +13,4 @@ def f()
 
 int = make_vm(f)
 int.call
-print(int.extract_state)
+print(int.get_state)

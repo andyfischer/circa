@@ -1,6 +1,6 @@
 
-assert(to_string(true) == 'true')
-assert(to_string(false) == 'false')
+assert(str(true) == 'true')
+assert(str(false) == 'false')
 
 -- and
 assert(and(true,true) == true)

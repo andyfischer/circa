@@ -9,213 +9,250 @@ namespace circa {
 
 const char* builtin_symbol_to_string(int name)
 {
-    if (name >= sym_LastBuiltinName)
+    if (name >= s_LastBuiltinName)
         return NULL;
 
     switch (name) {
-    case sym_None: return "None";
-    case sym_Invalid: return "Invalid";
-    case sym_File: return "File";
-    case sym_Newline: return "Newline";
-    case sym_Out: return "Out";
-    case sym_Unknown: return "Unknown";
-    case sym_Repeat: return "Repeat";
-    case sym_Success: return "Success";
-    case sym_Failure: return "Failure";
-    case sym_Yes: return "Yes";
-    case sym_No: return "No";
-    case sym_Maybe: return "Maybe";
-    case sym_Index: return "Index";
-    case sym_Last: return "Last";
-    case sym_Count: return "Count";
-    case sym_EvaluationEmpty: return "EvaluationEmpty";
-    case sym_HasEffects: return "HasEffects";
-    case sym_HasControlFlow: return "HasControlFlow";
-    case sym_HasState: return "HasState";
-    case sym_HasDynamicDispatch: return "HasDynamicDispatch";
-    case sym_DirtyStateType: return "DirtyStateType";
-    case sym_Filename: return "Filename";
-    case sym_Builtins: return "Builtins";
-    case sym_ModuleName: return "ModuleName";
-    case sym_StaticErrors: return "StaticErrors";
-    case sym_IsModule: return "IsModule";
-    case sym_AccumulatingOutput: return "AccumulatingOutput";
-    case sym_Comment: return "Comment";
-    case sym_Constructor: return "Constructor";
-    case sym_Error: return "Error";
-    case sym_ExplicitState: return "ExplicitState";
-    case sym_ExplicitType: return "ExplicitType";
-    case sym_Field: return "Field";
-    case sym_FieldAccessor: return "FieldAccessor";
-    case sym_Final: return "Final";
-    case sym_Hidden: return "Hidden";
-    case sym_HiddenInput: return "HiddenInput";
-    case sym_Implicit: return "Implicit";
-    case sym_IgnoreError: return "IgnoreError";
-    case sym_LocalStateResult: return "LocalStateResult";
-    case sym_Meta: return "Meta";
-    case sym_Message: return "Message";
-    case sym_MethodName: return "MethodName";
-    case sym_ModifyList: return "ModifyList";
-    case sym_Multiple: return "Multiple";
-    case sym_Mutability: return "Mutability";
-    case sym_Optional: return "Optional";
-    case sym_OriginalText: return "OriginalText";
-    case sym_OverloadedFunc: return "OverloadedFunc";
-    case sym_Ref: return "Ref";
-    case sym_Rebind: return "Rebind";
-    case sym_RebindsInput: return "RebindsInput";
-    case sym_Setter: return "Setter";
-    case sym_State: return "State";
-    case sym_Step: return "Step";
-    case sym_Statement: return "Statement";
-    case sym_Output: return "Output";
-    case sym_PreferSpecialize: return "PreferSpecialize";
-    case sym_Error_UnknownType: return "Error_UnknownType";
-    case sym_error: return "error";
-    case sym_expr: return "expr";
-    case sym_format: return "format";
-    case sym_ident: return "ident";
-    case sym_items: return "items";
-    case sym_message: return "message";
-    case sym_list: return "list";
-    case sym_type: return "type";
-    case sym_Syntax_AnonFunction: return "Syntax_AnonFunction";
-    case sym_Syntax_BlockStyle: return "Syntax_BlockStyle";
-    case sym_Syntax_Brackets: return "Syntax_Brackets";
-    case sym_Syntax_ColorFormat: return "Syntax_ColorFormat";
-    case sym_Syntax_DeclarationStyle: return "Syntax_DeclarationStyle";
-    case sym_Syntax_ExplicitType: return "Syntax_ExplicitType";
-    case sym_Syntax_FunctionName: return "Syntax_FunctionName";
-    case sym_Syntax_IdentifierRebind: return "Syntax_IdentifierRebind";
-    case sym_Syntax_ImplicitName: return "Syntax_ImplicitName";
-    case sym_Syntax_Import: return "Syntax_Import";
-    case sym_Syntax_InputFormat: return "Syntax_InputFormat";
-    case sym_Syntax_IntegerFormat: return "Syntax_IntegerFormat";
-    case sym_Syntax_LineEnding: return "Syntax_LineEnding";
-    case sym_Syntax_LiteralList: return "Syntax_LiteralList";
-    case sym_Syntax_MethodDecl: return "Syntax_MethodDecl";
-    case sym_Syntax_Multiline: return "Syntax_Multiline";
-    case sym_Syntax_NameBinding: return "Syntax_NameBinding";
-    case sym_Syntax_NoBrackets: return "Syntax_NoBrackets";
-    case sym_Syntax_NoParens: return "Syntax_NoParens";
-    case sym_Syntax_Operator: return "Syntax_Operator";
-    case sym_Syntax_OriginalFormat: return "Syntax_OriginalFormat";
-    case sym_Syntax_Parens: return "Syntax_Parens";
-    case sym_Syntax_PreWs: return "Syntax_PreWs";
-    case sym_Syntax_PreDotWs: return "Syntax_PreDotWs";
-    case sym_Syntax_PreOperatorWs: return "Syntax_PreOperatorWs";
-    case sym_Syntax_PreEndWs: return "Syntax_PreEndWs";
-    case sym_Syntax_PreEqualsSpace: return "Syntax_PreEqualsSpace";
-    case sym_Syntax_PreLBracketWs: return "Syntax_PreLBracketWs";
-    case sym_Syntax_PreRBracketWs: return "Syntax_PreRBracketWs";
-    case sym_Syntax_PostEqualsSpace: return "Syntax_PostEqualsSpace";
-    case sym_Syntax_PostFunctionWs: return "Syntax_PostFunctionWs";
-    case sym_Syntax_PostKeywordWs: return "Syntax_PostKeywordWs";
-    case sym_Syntax_PostLBracketWs: return "Syntax_PostLBracketWs";
-    case sym_Syntax_PostHeadingWs: return "Syntax_PostHeadingWs";
-    case sym_Syntax_PostNameWs: return "Syntax_PostNameWs";
-    case sym_Syntax_PostWs: return "Syntax_PostWs";
-    case sym_Syntax_PostOperatorWs: return "Syntax_PostOperatorWs";
-    case sym_Syntax_Properties: return "Syntax_Properties";
-    case sym_Syntax_QuoteType: return "Syntax_QuoteType";
-    case sym_Syntax_RebindSymbol: return "Syntax_RebindSymbol";
-    case sym_Syntax_RebindOperator: return "Syntax_RebindOperator";
-    case sym_Syntax_RebindingInfix: return "Syntax_RebindingInfix";
-    case sym_Syntax_ReturnStatement: return "Syntax_ReturnStatement";
-    case sym_Syntax_Require: return "Syntax_Require";
-    case sym_Syntax_StateKeyword: return "Syntax_StateKeyword";
-    case sym_Syntax_TypeMagicSymbol: return "Syntax_TypeMagicSymbol";
-    case sym_Syntax_WhitespaceBeforeEnd: return "Syntax_WhitespaceBeforeEnd";
-    case sym_Syntax_WhitespacePreColon: return "Syntax_WhitespacePreColon";
-    case sym_Syntax_WhitespacePostColon: return "Syntax_WhitespacePostColon";
-    case sym_Wildcard: return "Wildcard";
-    case sym_RecursiveWildcard: return "RecursiveWildcard";
-    case sym_Function: return "Function";
-    case sym_TypeRelease: return "TypeRelease";
-    case sym_FileNotFound: return "FileNotFound";
-    case sym_NotEnoughInputs: return "NotEnoughInputs";
-    case sym_TooManyInputs: return "TooManyInputs";
-    case sym_ExtraOutputNotFound: return "ExtraOutputNotFound";
-    case sym_Default: return "Default";
-    case sym_ByDemand: return "ByDemand";
-    case sym_Unevaluated: return "Unevaluated";
-    case sym_InProgress: return "InProgress";
-    case sym_Lazy: return "Lazy";
-    case sym_Consumed: return "Consumed";
-    case sym_Uncaptured: return "Uncaptured";
-    case sym_Return: return "Return";
-    case sym_Continue: return "Continue";
-    case sym_Break: return "Break";
-    case sym_Discard: return "Discard";
-    case sym_Control: return "Control";
-    case sym_ExitLevelFunction: return "ExitLevelFunction";
-    case sym_ExitLevelLoop: return "ExitLevelLoop";
-    case sym_HighestExitLevel: return "HighestExitLevel";
-    case sym_ExtraReturn: return "ExtraReturn";
-    case sym_Name: return "Name";
-    case sym_Primary: return "Primary";
-    case sym_Anonymous: return "Anonymous";
-    case sym_Entropy: return "Entropy";
-    case sym_OnDemand: return "OnDemand";
-    case sym__hacks: return "_hacks";
-    case sym_no_effect: return "no_effect";
-    case sym_no_save_state: return "no_save_state";
-    case sym_effect: return "effect";
-    case sym_set_value: return "set_value";
-    case sym_watch: return "watch";
-    case sym_Copy: return "Copy";
-    case sym_Move: return "Move";
-    case sym_Unobservable: return "Unobservable";
-    case sym_TermCounter: return "TermCounter";
-    case sym_Watch: return "Watch";
-    case sym_StackReady: return "StackReady";
-    case sym_StackRunning: return "StackRunning";
-    case sym_StackFinished: return "StackFinished";
-    case sym_InfixOperator: return "InfixOperator";
-    case sym_FunctionName: return "FunctionName";
-    case sym_TypeName: return "TypeName";
-    case sym_TermName: return "TermName";
-    case sym_Keyword: return "Keyword";
-    case sym_Whitespace: return "Whitespace";
-    case sym_UnknownIdentifier: return "UnknownIdentifier";
-    case sym_LookupAny: return "LookupAny";
-    case sym_LookupType: return "LookupType";
-    case sym_LookupFunction: return "LookupFunction";
-    case sym_Untyped: return "Untyped";
-    case sym_UniformListType: return "UniformListType";
-    case sym_AnonStructType: return "AnonStructType";
-    case sym_StructType: return "StructType";
-    case sym_NativePatch: return "NativePatch";
-    case sym_RecompileModule: return "RecompileModule";
-    case sym_Filesystem: return "Filesystem";
-    case sym_Tarball: return "Tarball";
-    case sym_Bootstrapping: return "Bootstrapping";
-    case sym_Done: return "Done";
-    case sym_StorageTypeNull: return "StorageTypeNull";
-    case sym_StorageTypeInt: return "StorageTypeInt";
-    case sym_StorageTypeFloat: return "StorageTypeFloat";
-    case sym_StorageTypeBlob: return "StorageTypeBlob";
-    case sym_StorageTypeBool: return "StorageTypeBool";
-    case sym_StorageTypeStack: return "StorageTypeStack";
-    case sym_StorageTypeString: return "StorageTypeString";
-    case sym_StorageTypeList: return "StorageTypeList";
-    case sym_StorageTypeOpaquePointer: return "StorageTypeOpaquePointer";
-    case sym_StorageTypeTerm: return "StorageTypeTerm";
-    case sym_StorageTypeType: return "StorageTypeType";
-    case sym_StorageTypeHandle: return "StorageTypeHandle";
-    case sym_StorageTypeHashtable: return "StorageTypeHashtable";
-    case sym_StorageTypeObject: return "StorageTypeObject";
-    case sym_InterfaceType: return "InterfaceType";
-    case sym_Delete: return "Delete";
-    case sym_Insert: return "Insert";
-    case sym_Element: return "Element";
-    case sym_Key: return "Key";
-    case sym_Replace: return "Replace";
-    case sym_Append: return "Append";
-    case sym_Truncate: return "Truncate";
-    case sym_ChangeAppend: return "ChangeAppend";
-    case sym_ChangeRename: return "ChangeRename";
+    case s_addr: return "addr";
+    case s_advance: return "advance";
+    case s_block: return "block";
+    case s_break: return "break";
+    case s_case: return "case";
+    case s_continue: return "continue";
+    case s_conditional_done: return "conditional_done";
+    case s_count: return "count";
+    case s_current_term: return "current_term";
+    case s_declared_state: return "declared_state";
+    case s_discard: return "discard";
+    case s_done: return "done";
+    case s_error: return "error";
+    case s_expr: return "expr";
+    case s_failure: return "failure";
+    case s_file: return "file";
+    case s_filename: return "filename";
+    case s_format: return "format";
+    case s_frames: return "frames";
+    case s_has_state: return "has_state";
+    case s_ident: return "ident";
+    case s_incoming: return "incoming";
+    case s_index: return "index";
+    case s_inputs: return "inputs";
+    case s_invalid: return "invalid";
+    case s_iterator: return "iterator";
+    case s_iterator_value: return "iterator_value";
+    case s_items: return "items";
+    case s_key: return "key";
+    case s_last: return "last";
+    case s_list: return "list";
+    case s_liveness_list: return "liveness_list";
+    case s_local_state: return "local_state";
+    case s_local_state_key: return "local_state_key";
+    case s_loop: return "loop";
+    case s_maddr: return "maddr";
+    case s_major_block: return "major_block";
+    case s_maybe: return "maybe";
+    case s_message: return "message";
+    case s_methodCache: return "methodCache";
+    case s_next: return "next";
+    case s_next_case: return "next_case";
+    case s_no: return "no";
+    case s_none: return "none";
+    case s_newline: return "newline";
+    case s_out: return "out";
+    case s_outputSlot: return "outputSlot";
+    case s_outgoing: return "outgoing";
+    case s_pc: return "pc";
+    case s_produceOutput: return "produceOutput";
+    case s_repeat: return "repeat";
+    case s_return: return "return";
+    case s_slot: return "slot";
+    case s_slots: return "slots";
+    case s_slotCount: return "slotCount";
+    case s_switch: return "switch";
+    case s_success: return "success";
+    case s_type: return "type";
+    case s_term: return "term";
+    case s_top: return "top";
+    case s_unknown: return "unknown";
+    case s_yes: return "yes";
+    case s_EvaluationEmpty: return "EvaluationEmpty";
+    case s_HasEffects: return "HasEffects";
+    case s_HasControlFlow: return "HasControlFlow";
+    case s_HasDynamicDispatch: return "HasDynamicDispatch";
+    case s_DirtyStateType: return "DirtyStateType";
+    case s_Builtins: return "Builtins";
+    case s_ModuleName: return "ModuleName";
+    case s_StaticErrors: return "StaticErrors";
+    case s_IsModule: return "IsModule";
+    case s_AccumulatingOutput: return "AccumulatingOutput";
+    case s_Comment: return "Comment";
+    case s_Constructor: return "Constructor";
+    case s_Error: return "Error";
+    case s_ExplicitState: return "ExplicitState";
+    case s_ExplicitType: return "ExplicitType";
+    case s_Field: return "Field";
+    case s_FieldAccessor: return "FieldAccessor";
+    case s_Final: return "Final";
+    case s_Hidden: return "Hidden";
+    case s_HiddenInput: return "HiddenInput";
+    case s_Implicit: return "Implicit";
+    case s_IgnoreError: return "IgnoreError";
+    case s_LocalStateResult: return "LocalStateResult";
+    case s_Meta: return "Meta";
+    case s_Message: return "Message";
+    case s_MethodName: return "MethodName";
+    case s_ModifyList: return "ModifyList";
+    case s_Multiple: return "Multiple";
+    case s_Mutability: return "Mutability";
+    case s_Optional: return "Optional";
+    case s_OriginalText: return "OriginalText";
+    case s_OverloadedFunc: return "OverloadedFunc";
+    case s_Ref: return "Ref";
+    case s_Rebind: return "Rebind";
+    case s_RebindsInput: return "RebindsInput";
+    case s_Setter: return "Setter";
+    case s_State: return "State";
+    case s_Step: return "Step";
+    case s_Statement: return "Statement";
+    case s_Output: return "Output";
+    case s_PreferSpecialize: return "PreferSpecialize";
+    case s_Error_UnknownType: return "Error_UnknownType";
+    case s_Syntax_AnonFunction: return "Syntax_AnonFunction";
+    case s_Syntax_BlockStyle: return "Syntax_BlockStyle";
+    case s_Syntax_Brackets: return "Syntax_Brackets";
+    case s_Syntax_ColorFormat: return "Syntax_ColorFormat";
+    case s_Syntax_DeclarationStyle: return "Syntax_DeclarationStyle";
+    case s_Syntax_ExplicitType: return "Syntax_ExplicitType";
+    case s_Syntax_FunctionName: return "Syntax_FunctionName";
+    case s_Syntax_IdentifierRebind: return "Syntax_IdentifierRebind";
+    case s_Syntax_ImplicitName: return "Syntax_ImplicitName";
+    case s_Syntax_Import: return "Syntax_Import";
+    case s_Syntax_InputFormat: return "Syntax_InputFormat";
+    case s_Syntax_IntegerFormat: return "Syntax_IntegerFormat";
+    case s_Syntax_LineEnding: return "Syntax_LineEnding";
+    case s_Syntax_LiteralList: return "Syntax_LiteralList";
+    case s_Syntax_MethodDecl: return "Syntax_MethodDecl";
+    case s_Syntax_Multiline: return "Syntax_Multiline";
+    case s_Syntax_NameBinding: return "Syntax_NameBinding";
+    case s_Syntax_NoBrackets: return "Syntax_NoBrackets";
+    case s_Syntax_NoParens: return "Syntax_NoParens";
+    case s_Syntax_Operator: return "Syntax_Operator";
+    case s_Syntax_OriginalFormat: return "Syntax_OriginalFormat";
+    case s_Syntax_Parens: return "Syntax_Parens";
+    case s_Syntax_PreWs: return "Syntax_PreWs";
+    case s_Syntax_PreDotWs: return "Syntax_PreDotWs";
+    case s_Syntax_PreOperatorWs: return "Syntax_PreOperatorWs";
+    case s_Syntax_PreEndWs: return "Syntax_PreEndWs";
+    case s_Syntax_PreEqualsSpace: return "Syntax_PreEqualsSpace";
+    case s_Syntax_PreLBracketWs: return "Syntax_PreLBracketWs";
+    case s_Syntax_PreRBracketWs: return "Syntax_PreRBracketWs";
+    case s_Syntax_PostEqualsSpace: return "Syntax_PostEqualsSpace";
+    case s_Syntax_PostFunctionWs: return "Syntax_PostFunctionWs";
+    case s_Syntax_PostKeywordWs: return "Syntax_PostKeywordWs";
+    case s_Syntax_PostLBracketWs: return "Syntax_PostLBracketWs";
+    case s_Syntax_PostHeadingWs: return "Syntax_PostHeadingWs";
+    case s_Syntax_PostNameWs: return "Syntax_PostNameWs";
+    case s_Syntax_PostWs: return "Syntax_PostWs";
+    case s_Syntax_PostOperatorWs: return "Syntax_PostOperatorWs";
+    case s_Syntax_Properties: return "Syntax_Properties";
+    case s_Syntax_QuoteType: return "Syntax_QuoteType";
+    case s_Syntax_RebindSymbol: return "Syntax_RebindSymbol";
+    case s_Syntax_RebindOperator: return "Syntax_RebindOperator";
+    case s_Syntax_RebindingInfix: return "Syntax_RebindingInfix";
+    case s_Syntax_ReturnStatement: return "Syntax_ReturnStatement";
+    case s_Syntax_Require: return "Syntax_Require";
+    case s_Syntax_StateKeyword: return "Syntax_StateKeyword";
+    case s_Syntax_TypeMagicSymbol: return "Syntax_TypeMagicSymbol";
+    case s_Syntax_WhitespaceBeforeEnd: return "Syntax_WhitespaceBeforeEnd";
+    case s_Syntax_WhitespacePreColon: return "Syntax_WhitespacePreColon";
+    case s_Syntax_WhitespacePostColon: return "Syntax_WhitespacePostColon";
+    case s_Wildcard: return "Wildcard";
+    case s_RecursiveWildcard: return "RecursiveWildcard";
+    case s_Function: return "Function";
+    case s_TypeRelease: return "TypeRelease";
+    case s_FileNotFound: return "FileNotFound";
+    case s_NotEnoughInputs: return "NotEnoughInputs";
+    case s_TooManyInputs: return "TooManyInputs";
+    case s_ExtraOutputNotFound: return "ExtraOutputNotFound";
+    case s_Default: return "Default";
+    case s_ByDemand: return "ByDemand";
+    case s_Unevaluated: return "Unevaluated";
+    case s_InProgress: return "InProgress";
+    case s_Lazy: return "Lazy";
+    case s_Consumed: return "Consumed";
+    case s_Uncaptured: return "Uncaptured";
+    case s_Return: return "Return";
+    case s_Continue: return "Continue";
+    case s_Break: return "Break";
+    case s_Discard: return "Discard";
+    case s_Control: return "Control";
+    case s_ExitLevelFunction: return "ExitLevelFunction";
+    case s_ExitLevelLoop: return "ExitLevelLoop";
+    case s_HighestExitLevel: return "HighestExitLevel";
+    case s_ExtraReturn: return "ExtraReturn";
+    case s_Name: return "Name";
+    case s_Primary: return "Primary";
+    case s_Anonymous: return "Anonymous";
+    case s_Entropy: return "Entropy";
+    case s_OnDemand: return "OnDemand";
+    case s_hacks: return "hacks";
+    case s_no_effect: return "no_effect";
+    case s_no_save_state: return "no_save_state";
+    case s_effect: return "effect";
+    case s_set_value: return "set_value";
+    case s_watch: return "watch";
+    case s_Copy: return "Copy";
+    case s_Move: return "Move";
+    case s_Unobservable: return "Unobservable";
+    case s_TermCounter: return "TermCounter";
+    case s_Watch: return "Watch";
+    case s_StackReady: return "StackReady";
+    case s_StackRunning: return "StackRunning";
+    case s_StackFinished: return "StackFinished";
+    case s_InfixOperator: return "InfixOperator";
+    case s_FunctionName: return "FunctionName";
+    case s_TypeName: return "TypeName";
+    case s_TermName: return "TermName";
+    case s_Keyword: return "Keyword";
+    case s_Whitespace: return "Whitespace";
+    case s_UnknownIdentifier: return "UnknownIdentifier";
+    case s_LookupAny: return "LookupAny";
+    case s_LookupType: return "LookupType";
+    case s_LookupFunction: return "LookupFunction";
+    case s_Untyped: return "Untyped";
+    case s_UniformListType: return "UniformListType";
+    case s_AnonStructType: return "AnonStructType";
+    case s_StructType: return "StructType";
+    case s_NativePatch: return "NativePatch";
+    case s_RecompileModule: return "RecompileModule";
+    case s_Filesystem: return "Filesystem";
+    case s_Tarball: return "Tarball";
+    case s_Bootstrapping: return "Bootstrapping";
+    case s_Done: return "Done";
+    case s_StorageTypeNull: return "StorageTypeNull";
+    case s_StorageTypeInt: return "StorageTypeInt";
+    case s_StorageTypeFloat: return "StorageTypeFloat";
+    case s_StorageTypeBlob: return "StorageTypeBlob";
+    case s_StorageTypeBool: return "StorageTypeBool";
+    case s_StorageTypeStack: return "StorageTypeStack";
+    case s_StorageTypeString: return "StorageTypeString";
+    case s_StorageTypeList: return "StorageTypeList";
+    case s_StorageTypeOpaquePointer: return "StorageTypeOpaquePointer";
+    case s_StorageTypeTerm: return "StorageTypeTerm";
+    case s_StorageTypeType: return "StorageTypeType";
+    case s_StorageTypeHandle: return "StorageTypeHandle";
+    case s_StorageTypeHashtable: return "StorageTypeHashtable";
+    case s_StorageTypeObject: return "StorageTypeObject";
+    case s_InterfaceType: return "InterfaceType";
+    case s_Delete: return "Delete";
+    case s_Insert: return "Insert";
+    case s_Element: return "Element";
+    case s_Key: return "Key";
+    case s_Replace: return "Replace";
+    case s_Append: return "Append";
+    case s_Truncate: return "Truncate";
+    case s_ChangeAppend: return "ChangeAppend";
+    case s_ChangeRename: return "ChangeRename";
     case tok_Identifier: return "tok_Identifier";
     case tok_ColonString: return "tok_ColonString";
     case tok_Integer: return "tok_Integer";
@@ -305,10 +342,10 @@ const char* builtin_symbol_to_string(int name)
     case tok_Comment: return "tok_Comment";
     case tok_Eof: return "tok_Eof";
     case tok_Unrecognized: return "tok_Unrecognized";
-    case sym_NormalCall: return "NormalCall";
-    case sym_FuncApply: return "FuncApply";
-    case sym_FuncCall: return "FuncCall";
-    case sym_FirstStatIndex: return "FirstStatIndex";
+    case s_NormalCall: return "NormalCall";
+    case s_FuncApply: return "FuncApply";
+    case s_FuncCall: return "FuncCall";
+    case s_FirstStatIndex: return "FirstStatIndex";
     case stat_TermCreated: return "stat_TermCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";
     case stat_TermPropAccess: return "stat_TermPropAccess";
@@ -363,8 +400,8 @@ const char* builtin_symbol_to_string(int name)
     case stat_SetWithSelector_Touch_List: return "stat_SetWithSelector_Touch_List";
     case stat_SetWithSelector_Touch_Hashtable: return "stat_SetWithSelector_Touch_Hashtable";
     case stat_StackPushFrame: return "stat_StackPushFrame";
-    case sym_LastStatIndex: return "LastStatIndex";
-    case sym_LastBuiltinName: return "LastBuiltinName";
+    case s_LastStatIndex: return "LastStatIndex";
+    case s_LastBuiltinName: return "LastBuiltinName";
     default: return NULL;
     }
 }
@@ -376,7 +413,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'c':
         if (strcmp(str + 2, "cumulatingOutput") == 0)
-            return sym_AccumulatingOutput;
+            return s_AccumulatingOutput;
         break;
     case 'n':
     switch (str[2]) {
@@ -386,11 +423,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'S':
         if (strcmp(str + 5, "tructType") == 0)
-            return sym_AnonStructType;
+            return s_AnonStructType;
         break;
     case 'y':
         if (strcmp(str + 5, "mous") == 0)
-            return sym_Anonymous;
+            return s_Anonymous;
         break;
     default: return -1;
     }
@@ -400,7 +437,7 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'p':
         if (strcmp(str + 2, "pend") == 0)
-            return sym_Append;
+            return s_Append;
         break;
     default: return -1;
     }
@@ -408,19 +445,19 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'o':
         if (strcmp(str + 2, "otstrapping") == 0)
-            return sym_Bootstrapping;
+            return s_Bootstrapping;
         break;
     case 'r':
         if (strcmp(str + 2, "eak") == 0)
-            return sym_Break;
+            return s_Break;
         break;
     case 'u':
         if (strcmp(str + 2, "iltins") == 0)
-            return sym_Builtins;
+            return s_Builtins;
         break;
     case 'y':
         if (strcmp(str + 2, "Demand") == 0)
-            return sym_ByDemand;
+            return s_ByDemand;
         break;
     default: return -1;
     }
@@ -438,11 +475,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[6]) {
     case 'A':
         if (strcmp(str + 7, "ppend") == 0)
-            return sym_ChangeAppend;
+            return s_ChangeAppend;
         break;
     case 'R':
         if (strcmp(str + 7, "ename") == 0)
-            return sym_ChangeRename;
+            return s_ChangeRename;
         break;
     default: return -1;
     }
@@ -458,7 +495,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'm':
         if (strcmp(str + 3, "ment") == 0)
-            return sym_Comment;
+            return s_Comment;
         break;
     case 'n':
     switch (str[3]) {
@@ -466,11 +503,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 't':
         if (strcmp(str + 5, "ructor") == 0)
-            return sym_Constructor;
+            return s_Constructor;
         break;
     case 'u':
         if (strcmp(str + 5, "med") == 0)
-            return sym_Consumed;
+            return s_Consumed;
         break;
     default: return -1;
     }
@@ -478,11 +515,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'i':
         if (strcmp(str + 5, "nue") == 0)
-            return sym_Continue;
+            return s_Continue;
         break;
     case 'r':
         if (strcmp(str + 5, "ol") == 0)
-            return sym_Control;
+            return s_Control;
         break;
     default: return -1;
     }
@@ -490,11 +527,7 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'p':
         if (strcmp(str + 3, "y") == 0)
-            return sym_Copy;
-        break;
-    case 'u':
-        if (strcmp(str + 3, "nt") == 0)
-            return sym_Count;
+            return s_Copy;
         break;
     default: return -1;
     }
@@ -506,11 +539,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'f':
         if (strcmp(str + 3, "ault") == 0)
-            return sym_Default;
+            return s_Default;
         break;
     case 'l':
         if (strcmp(str + 3, "ete") == 0)
-            return sym_Delete;
+            return s_Delete;
         break;
     default: return -1;
     }
@@ -518,17 +551,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'r':
         if (strcmp(str + 3, "tyStateType") == 0)
-            return sym_DirtyStateType;
+            return s_DirtyStateType;
         break;
     case 's':
         if (strcmp(str + 3, "card") == 0)
-            return sym_Discard;
+            return s_Discard;
         break;
     default: return -1;
     }
     case 'o':
         if (strcmp(str + 2, "ne") == 0)
-            return sym_Done;
+            return s_Done;
         break;
     default: return -1;
     }
@@ -536,11 +569,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'l':
         if (strcmp(str + 2, "ement") == 0)
-            return sym_Element;
+            return s_Element;
         break;
     case 'n':
         if (strcmp(str + 2, "tropy") == 0)
-            return sym_Entropy;
+            return s_Entropy;
         break;
     case 'r':
     switch (str[2]) {
@@ -552,10 +585,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[5]) {
     case '_':
         if (strcmp(str + 6, "UnknownType") == 0)
-            return sym_Error_UnknownType;
+            return s_Error_UnknownType;
         break;
     case 0:
-            return sym_Error;
+            return s_Error;
     default: return -1;
     }
     default: return -1;
@@ -566,7 +599,7 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'v':
         if (strcmp(str + 2, "aluationEmpty") == 0)
-            return sym_EvaluationEmpty;
+            return s_EvaluationEmpty;
         break;
     case 'x':
     switch (str[2]) {
@@ -586,11 +619,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     case 'F':
         if (strcmp(str + 10, "unction") == 0)
-            return sym_ExitLevelFunction;
+            return s_ExitLevelFunction;
         break;
     case 'L':
         if (strcmp(str + 10, "oop") == 0)
-            return sym_ExitLevelLoop;
+            return s_ExitLevelLoop;
         break;
     default: return -1;
     }
@@ -620,11 +653,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 'S':
         if (strcmp(str + 9, "tate") == 0)
-            return sym_ExplicitState;
+            return s_ExplicitState;
         break;
     case 'T':
         if (strcmp(str + 9, "ype") == 0)
-            return sym_ExplicitType;
+            return s_ExplicitType;
         break;
     default: return -1;
     }
@@ -646,11 +679,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[5]) {
     case 'O':
         if (strcmp(str + 6, "utputNotFound") == 0)
-            return sym_ExtraOutputNotFound;
+            return s_ExtraOutputNotFound;
         break;
     case 'R':
         if (strcmp(str + 6, "eturn") == 0)
-            return sym_ExtraReturn;
+            return s_ExtraReturn;
         break;
     default: return -1;
     }
@@ -664,10 +697,6 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'F':
     switch (str[1]) {
-    case 'a':
-        if (strcmp(str + 2, "ilure") == 0)
-            return sym_Failure;
-        break;
     case 'i':
     switch (str[2]) {
     case 'e':
@@ -678,10 +707,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[5]) {
     case 'A':
         if (strcmp(str + 6, "ccessor") == 0)
-            return sym_FieldAccessor;
+            return s_FieldAccessor;
         break;
     case 0:
-            return sym_Field;
+            return s_Field;
     default: return -1;
     }
     default: return -1;
@@ -694,29 +723,23 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'N':
         if (strcmp(str + 5, "otFound") == 0)
-            return sym_FileNotFound;
-        break;
-    case 'n':
-        if (strcmp(str + 5, "ame") == 0)
-            return sym_Filename;
+            return s_FileNotFound;
         break;
     case 's':
         if (strcmp(str + 5, "ystem") == 0)
-            return sym_Filesystem;
+            return s_Filesystem;
         break;
-    case 0:
-            return sym_File;
     default: return -1;
     }
     default: return -1;
     }
     case 'n':
         if (strcmp(str + 3, "al") == 0)
-            return sym_Final;
+            return s_Final;
         break;
     case 'r':
         if (strcmp(str + 3, "stStatIndex") == 0)
-            return sym_FirstStatIndex;
+            return s_FirstStatIndex;
         break;
     default: return -1;
     }
@@ -728,11 +751,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'A':
         if (strcmp(str + 5, "pply") == 0)
-            return sym_FuncApply;
+            return s_FuncApply;
         break;
     case 'C':
         if (strcmp(str + 5, "all") == 0)
-            return sym_FuncCall;
+            return s_FuncCall;
         break;
     case 't':
     switch (str[5]) {
@@ -744,10 +767,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 'N':
         if (strcmp(str + 9, "ame") == 0)
-            return sym_FunctionName;
+            return s_FunctionName;
         break;
     case 0:
-            return sym_Function;
+            return s_Function;
     default: return -1;
     }
     default: return -1;
@@ -772,19 +795,15 @@ int builtin_symbol_from_string(const char* str)
     switch (str[3]) {
     case 'C':
         if (strcmp(str + 4, "ontrolFlow") == 0)
-            return sym_HasControlFlow;
+            return s_HasControlFlow;
         break;
     case 'D':
         if (strcmp(str + 4, "ynamicDispatch") == 0)
-            return sym_HasDynamicDispatch;
+            return s_HasDynamicDispatch;
         break;
     case 'E':
         if (strcmp(str + 4, "ffects") == 0)
-            return sym_HasEffects;
-        break;
-    case 'S':
-        if (strcmp(str + 4, "tate") == 0)
-            return sym_HasState;
+            return s_HasEffects;
         break;
     default: return -1;
     }
@@ -802,10 +821,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[6]) {
     case 'I':
         if (strcmp(str + 7, "nput") == 0)
-            return sym_HiddenInput;
+            return s_HiddenInput;
         break;
     case 0:
-            return sym_Hidden;
+            return s_Hidden;
     default: return -1;
     }
     default: return -1;
@@ -816,7 +835,7 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'g':
         if (strcmp(str + 3, "hestExitLevel") == 0)
-            return sym_HighestExitLevel;
+            return s_HighestExitLevel;
         break;
     default: return -1;
     }
@@ -826,43 +845,35 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'g':
         if (strcmp(str + 2, "noreError") == 0)
-            return sym_IgnoreError;
+            return s_IgnoreError;
         break;
     case 'm':
         if (strcmp(str + 2, "plicit") == 0)
-            return sym_Implicit;
+            return s_Implicit;
         break;
     case 'n':
     switch (str[2]) {
     case 'P':
         if (strcmp(str + 3, "rogress") == 0)
-            return sym_InProgress;
-        break;
-    case 'd':
-        if (strcmp(str + 3, "ex") == 0)
-            return sym_Index;
+            return s_InProgress;
         break;
     case 'f':
         if (strcmp(str + 3, "ixOperator") == 0)
-            return sym_InfixOperator;
+            return s_InfixOperator;
         break;
     case 's':
         if (strcmp(str + 3, "ert") == 0)
-            return sym_Insert;
+            return s_Insert;
         break;
     case 't':
         if (strcmp(str + 3, "erfaceType") == 0)
-            return sym_InterfaceType;
-        break;
-    case 'v':
-        if (strcmp(str + 3, "alid") == 0)
-            return sym_Invalid;
+            return s_InterfaceType;
         break;
     default: return -1;
     }
     case 's':
         if (strcmp(str + 2, "Module") == 0)
-            return sym_IsModule;
+            return s_IsModule;
         break;
     default: return -1;
     }
@@ -874,10 +885,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[3]) {
     case 'w':
         if (strcmp(str + 4, "ord") == 0)
-            return sym_Keyword;
+            return s_Keyword;
         break;
     case 0:
-            return sym_Key;
+            return s_Key;
     default: return -1;
     }
     default: return -1;
@@ -894,21 +905,19 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'B':
         if (strcmp(str + 5, "uiltinName") == 0)
-            return sym_LastBuiltinName;
+            return s_LastBuiltinName;
         break;
     case 'S':
         if (strcmp(str + 5, "tatIndex") == 0)
-            return sym_LastStatIndex;
+            return s_LastStatIndex;
         break;
-    case 0:
-            return sym_Last;
     default: return -1;
     }
     default: return -1;
     }
     case 'z':
         if (strcmp(str + 3, "y") == 0)
-            return sym_Lazy;
+            return s_Lazy;
         break;
     default: return -1;
     }
@@ -916,7 +925,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'c':
         if (strcmp(str + 3, "alStateResult") == 0)
-            return sym_LocalStateResult;
+            return s_LocalStateResult;
         break;
     case 'o':
     switch (str[3]) {
@@ -928,15 +937,15 @@ int builtin_symbol_from_string(const char* str)
     switch (str[6]) {
     case 'A':
         if (strcmp(str + 7, "ny") == 0)
-            return sym_LookupAny;
+            return s_LookupAny;
         break;
     case 'F':
         if (strcmp(str + 7, "unction") == 0)
-            return sym_LookupFunction;
+            return s_LookupFunction;
         break;
     case 'T':
         if (strcmp(str + 7, "ype") == 0)
-            return sym_LookupType;
+            return s_LookupType;
         break;
     default: return -1;
     }
@@ -952,23 +961,19 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'M':
     switch (str[1]) {
-    case 'a':
-        if (strcmp(str + 2, "ybe") == 0)
-            return sym_Maybe;
-        break;
     case 'e':
     switch (str[2]) {
     case 's':
         if (strcmp(str + 3, "sage") == 0)
-            return sym_Message;
+            return s_Message;
         break;
     case 't':
     switch (str[3]) {
     case 'a':
-            return sym_Meta;
+            return s_Meta;
     case 'h':
         if (strcmp(str + 4, "odName") == 0)
-            return sym_MethodName;
+            return s_MethodName;
         break;
     default: return -1;
     }
@@ -980,17 +985,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[3]) {
     case 'i':
         if (strcmp(str + 4, "fyList") == 0)
-            return sym_ModifyList;
+            return s_ModifyList;
         break;
     case 'u':
         if (strcmp(str + 4, "leName") == 0)
-            return sym_ModuleName;
+            return s_ModuleName;
         break;
     default: return -1;
     }
     case 'v':
         if (strcmp(str + 3, "e") == 0)
-            return sym_Move;
+            return s_Move;
         break;
     default: return -1;
     }
@@ -998,11 +1003,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'l':
         if (strcmp(str + 3, "tiple") == 0)
-            return sym_Multiple;
+            return s_Multiple;
         break;
     case 't':
         if (strcmp(str + 3, "ability") == 0)
-            return sym_Mutability;
+            return s_Mutability;
         break;
     default: return -1;
     }
@@ -1014,34 +1019,24 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'm':
         if (strcmp(str + 3, "e") == 0)
-            return sym_Name;
+            return s_Name;
         break;
     case 't':
         if (strcmp(str + 3, "ivePatch") == 0)
-            return sym_NativePatch;
+            return s_NativePatch;
         break;
     default: return -1;
     }
-    case 'e':
-        if (strcmp(str + 2, "wline") == 0)
-            return sym_Newline;
-        break;
     case 'o':
     switch (str[2]) {
-    case 'n':
-        if (strcmp(str + 3, "e") == 0)
-            return sym_None;
-        break;
     case 'r':
         if (strcmp(str + 3, "malCall") == 0)
-            return sym_NormalCall;
+            return s_NormalCall;
         break;
     case 't':
         if (strcmp(str + 3, "EnoughInputs") == 0)
-            return sym_NotEnoughInputs;
+            return s_NotEnoughInputs;
         break;
-    case 0:
-            return sym_No;
     default: return -1;
     }
     default: return -1;
@@ -1050,33 +1045,23 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'n':
         if (strcmp(str + 2, "Demand") == 0)
-            return sym_OnDemand;
+            return s_OnDemand;
         break;
     case 'p':
         if (strcmp(str + 2, "tional") == 0)
-            return sym_Optional;
+            return s_Optional;
         break;
     case 'r':
         if (strcmp(str + 2, "iginalText") == 0)
-            return sym_OriginalText;
+            return s_OriginalText;
         break;
     case 'u':
-    switch (str[2]) {
-    case 't':
-    switch (str[3]) {
-    case 'p':
-        if (strcmp(str + 4, "ut") == 0)
-            return sym_Output;
+        if (strcmp(str + 2, "tput") == 0)
+            return s_Output;
         break;
-    case 0:
-            return sym_Out;
-    default: return -1;
-    }
-    default: return -1;
-    }
     case 'v':
         if (strcmp(str + 2, "erloadedFunc") == 0)
-            return sym_OverloadedFunc;
+            return s_OverloadedFunc;
         break;
     default: return -1;
     }
@@ -1086,11 +1071,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'e':
         if (strcmp(str + 3, "ferSpecialize") == 0)
-            return sym_PreferSpecialize;
+            return s_PreferSpecialize;
         break;
     case 'i':
         if (strcmp(str + 3, "mary") == 0)
-            return sym_Primary;
+            return s_Primary;
         break;
     default: return -1;
     }
@@ -1110,10 +1095,10 @@ int builtin_symbol_from_string(const char* str)
     switch (str[6]) {
     case 's':
         if (strcmp(str + 7, "Input") == 0)
-            return sym_RebindsInput;
+            return s_RebindsInput;
         break;
     case 0:
-            return sym_Rebind;
+            return s_Rebind;
     default: return -1;
     }
     default: return -1;
@@ -1126,31 +1111,23 @@ int builtin_symbol_from_string(const char* str)
     switch (str[3]) {
     case 'o':
         if (strcmp(str + 4, "mpileModule") == 0)
-            return sym_RecompileModule;
+            return s_RecompileModule;
         break;
     case 'u':
         if (strcmp(str + 4, "rsiveWildcard") == 0)
-            return sym_RecursiveWildcard;
+            return s_RecursiveWildcard;
         break;
     default: return -1;
     }
     case 'f':
-            return sym_Ref;
+            return s_Ref;
     case 'p':
-    switch (str[3]) {
-    case 'e':
-        if (strcmp(str + 4, "at") == 0)
-            return sym_Repeat;
+        if (strcmp(str + 3, "lace") == 0)
+            return s_Replace;
         break;
-    case 'l':
-        if (strcmp(str + 4, "ace") == 0)
-            return sym_Replace;
-        break;
-    default: return -1;
-    }
     case 't':
         if (strcmp(str + 3, "urn") == 0)
-            return sym_Return;
+            return s_Return;
         break;
     default: return -1;
     }
@@ -1160,7 +1137,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'e':
         if (strcmp(str + 2, "tter") == 0)
-            return sym_Setter;
+            return s_Setter;
         break;
     case 't':
     switch (str[2]) {
@@ -1172,17 +1149,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[5]) {
     case 'F':
         if (strcmp(str + 6, "inished") == 0)
-            return sym_StackFinished;
+            return s_StackFinished;
         break;
     case 'R':
     switch (str[6]) {
     case 'e':
         if (strcmp(str + 7, "ady") == 0)
-            return sym_StackReady;
+            return s_StackReady;
         break;
     case 'u':
         if (strcmp(str + 7, "nning") == 0)
-            return sym_StackRunning;
+            return s_StackRunning;
         break;
     default: return -1;
     }
@@ -1196,15 +1173,15 @@ int builtin_symbol_from_string(const char* str)
     switch (str[5]) {
     case 'm':
         if (strcmp(str + 6, "ent") == 0)
-            return sym_Statement;
+            return s_Statement;
         break;
     case 0:
-            return sym_State;
+            return s_State;
     default: return -1;
     }
     case 'i':
         if (strcmp(str + 5, "cErrors") == 0)
-            return sym_StaticErrors;
+            return s_StaticErrors;
         break;
     default: return -1;
     }
@@ -1212,7 +1189,7 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'e':
         if (strcmp(str + 3, "p") == 0)
-            return sym_Step;
+            return s_Step;
         break;
     case 'o':
     switch (str[3]) {
@@ -1236,17 +1213,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[12]) {
     case 'l':
         if (strcmp(str + 13, "ob") == 0)
-            return sym_StorageTypeBlob;
+            return s_StorageTypeBlob;
         break;
     case 'o':
         if (strcmp(str + 13, "ol") == 0)
-            return sym_StorageTypeBool;
+            return s_StorageTypeBool;
         break;
     default: return -1;
     }
     case 'F':
         if (strcmp(str + 12, "loat") == 0)
-            return sym_StorageTypeFloat;
+            return s_StorageTypeFloat;
         break;
     case 'H':
     switch (str[12]) {
@@ -1254,11 +1231,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[13]) {
     case 'n':
         if (strcmp(str + 14, "dle") == 0)
-            return sym_StorageTypeHandle;
+            return s_StorageTypeHandle;
         break;
     case 's':
         if (strcmp(str + 14, "htable") == 0)
-            return sym_StorageTypeHashtable;
+            return s_StorageTypeHashtable;
         break;
     default: return -1;
     }
@@ -1266,25 +1243,25 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'I':
         if (strcmp(str + 12, "nt") == 0)
-            return sym_StorageTypeInt;
+            return s_StorageTypeInt;
         break;
     case 'L':
         if (strcmp(str + 12, "ist") == 0)
-            return sym_StorageTypeList;
+            return s_StorageTypeList;
         break;
     case 'N':
         if (strcmp(str + 12, "ull") == 0)
-            return sym_StorageTypeNull;
+            return s_StorageTypeNull;
         break;
     case 'O':
     switch (str[12]) {
     case 'b':
         if (strcmp(str + 13, "ject") == 0)
-            return sym_StorageTypeObject;
+            return s_StorageTypeObject;
         break;
     case 'p':
         if (strcmp(str + 13, "aquePointer") == 0)
-            return sym_StorageTypeOpaquePointer;
+            return s_StorageTypeOpaquePointer;
         break;
     default: return -1;
     }
@@ -1294,11 +1271,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[13]) {
     case 'a':
         if (strcmp(str + 14, "ck") == 0)
-            return sym_StorageTypeStack;
+            return s_StorageTypeStack;
         break;
     case 'r':
         if (strcmp(str + 14, "ing") == 0)
-            return sym_StorageTypeString;
+            return s_StorageTypeString;
         break;
     default: return -1;
     }
@@ -1308,11 +1285,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[12]) {
     case 'e':
         if (strcmp(str + 13, "rm") == 0)
-            return sym_StorageTypeTerm;
+            return s_StorageTypeTerm;
         break;
     case 'y':
         if (strcmp(str + 13, "pe") == 0)
-            return sym_StorageTypeType;
+            return s_StorageTypeType;
         break;
     default: return -1;
     }
@@ -1336,14 +1313,10 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'r':
         if (strcmp(str + 3, "uctType") == 0)
-            return sym_StructType;
+            return s_StructType;
         break;
     default: return -1;
     }
-    case 'u':
-        if (strcmp(str + 2, "ccess") == 0)
-            return sym_Success;
-        break;
     case 'y':
     switch (str[2]) {
     case 'n':
@@ -1358,41 +1331,41 @@ int builtin_symbol_from_string(const char* str)
     switch (str[7]) {
     case 'A':
         if (strcmp(str + 8, "nonFunction") == 0)
-            return sym_Syntax_AnonFunction;
+            return s_Syntax_AnonFunction;
         break;
     case 'B':
     switch (str[8]) {
     case 'l':
         if (strcmp(str + 9, "ockStyle") == 0)
-            return sym_Syntax_BlockStyle;
+            return s_Syntax_BlockStyle;
         break;
     case 'r':
         if (strcmp(str + 9, "ackets") == 0)
-            return sym_Syntax_Brackets;
+            return s_Syntax_Brackets;
         break;
     default: return -1;
     }
     case 'C':
         if (strcmp(str + 8, "olorFormat") == 0)
-            return sym_Syntax_ColorFormat;
+            return s_Syntax_ColorFormat;
         break;
     case 'D':
         if (strcmp(str + 8, "eclarationStyle") == 0)
-            return sym_Syntax_DeclarationStyle;
+            return s_Syntax_DeclarationStyle;
         break;
     case 'E':
         if (strcmp(str + 8, "xplicitType") == 0)
-            return sym_Syntax_ExplicitType;
+            return s_Syntax_ExplicitType;
         break;
     case 'F':
         if (strcmp(str + 8, "unctionName") == 0)
-            return sym_Syntax_FunctionName;
+            return s_Syntax_FunctionName;
         break;
     case 'I':
     switch (str[8]) {
     case 'd':
         if (strcmp(str + 9, "entifierRebind") == 0)
-            return sym_Syntax_IdentifierRebind;
+            return s_Syntax_IdentifierRebind;
         break;
     case 'm':
     switch (str[9]) {
@@ -1400,11 +1373,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[10]) {
     case 'l':
         if (strcmp(str + 11, "icitName") == 0)
-            return sym_Syntax_ImplicitName;
+            return s_Syntax_ImplicitName;
         break;
     case 'o':
         if (strcmp(str + 11, "rt") == 0)
-            return sym_Syntax_Import;
+            return s_Syntax_Import;
         break;
     default: return -1;
     }
@@ -1414,11 +1387,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     case 'p':
         if (strcmp(str + 10, "utFormat") == 0)
-            return sym_Syntax_InputFormat;
+            return s_Syntax_InputFormat;
         break;
     case 't':
         if (strcmp(str + 10, "egerFormat") == 0)
-            return sym_Syntax_IntegerFormat;
+            return s_Syntax_IntegerFormat;
         break;
     default: return -1;
     }
@@ -1430,11 +1403,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[9]) {
     case 'n':
         if (strcmp(str + 10, "eEnding") == 0)
-            return sym_Syntax_LineEnding;
+            return s_Syntax_LineEnding;
         break;
     case 't':
         if (strcmp(str + 10, "eralList") == 0)
-            return sym_Syntax_LiteralList;
+            return s_Syntax_LiteralList;
         break;
     default: return -1;
     }
@@ -1444,11 +1417,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 'e':
         if (strcmp(str + 9, "thodDecl") == 0)
-            return sym_Syntax_MethodDecl;
+            return s_Syntax_MethodDecl;
         break;
     case 'u':
         if (strcmp(str + 9, "ltiline") == 0)
-            return sym_Syntax_Multiline;
+            return s_Syntax_Multiline;
         break;
     default: return -1;
     }
@@ -1456,17 +1429,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 'a':
         if (strcmp(str + 9, "meBinding") == 0)
-            return sym_Syntax_NameBinding;
+            return s_Syntax_NameBinding;
         break;
     case 'o':
     switch (str[9]) {
     case 'B':
         if (strcmp(str + 10, "rackets") == 0)
-            return sym_Syntax_NoBrackets;
+            return s_Syntax_NoBrackets;
         break;
     case 'P':
         if (strcmp(str + 10, "arens") == 0)
-            return sym_Syntax_NoParens;
+            return s_Syntax_NoParens;
         break;
     default: return -1;
     }
@@ -1476,11 +1449,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 'p':
         if (strcmp(str + 9, "erator") == 0)
-            return sym_Syntax_Operator;
+            return s_Syntax_Operator;
         break;
     case 'r':
         if (strcmp(str + 9, "iginalFormat") == 0)
-            return sym_Syntax_OriginalFormat;
+            return s_Syntax_OriginalFormat;
         break;
     default: return -1;
     }
@@ -1488,7 +1461,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[8]) {
     case 'a':
         if (strcmp(str + 9, "rens") == 0)
-            return sym_Syntax_Parens;
+            return s_Syntax_Parens;
         break;
     case 'o':
     switch (str[9]) {
@@ -1498,35 +1471,35 @@ int builtin_symbol_from_string(const char* str)
     switch (str[11]) {
     case 'E':
         if (strcmp(str + 12, "qualsSpace") == 0)
-            return sym_Syntax_PostEqualsSpace;
+            return s_Syntax_PostEqualsSpace;
         break;
     case 'F':
         if (strcmp(str + 12, "unctionWs") == 0)
-            return sym_Syntax_PostFunctionWs;
+            return s_Syntax_PostFunctionWs;
         break;
     case 'H':
         if (strcmp(str + 12, "eadingWs") == 0)
-            return sym_Syntax_PostHeadingWs;
+            return s_Syntax_PostHeadingWs;
         break;
     case 'K':
         if (strcmp(str + 12, "eywordWs") == 0)
-            return sym_Syntax_PostKeywordWs;
+            return s_Syntax_PostKeywordWs;
         break;
     case 'L':
         if (strcmp(str + 12, "BracketWs") == 0)
-            return sym_Syntax_PostLBracketWs;
+            return s_Syntax_PostLBracketWs;
         break;
     case 'N':
         if (strcmp(str + 12, "ameWs") == 0)
-            return sym_Syntax_PostNameWs;
+            return s_Syntax_PostNameWs;
         break;
     case 'O':
         if (strcmp(str + 12, "peratorWs") == 0)
-            return sym_Syntax_PostOperatorWs;
+            return s_Syntax_PostOperatorWs;
         break;
     case 'W':
         if (strcmp(str + 12, "s") == 0)
-            return sym_Syntax_PostWs;
+            return s_Syntax_PostWs;
         break;
     default: return -1;
     }
@@ -1540,41 +1513,41 @@ int builtin_symbol_from_string(const char* str)
     switch (str[10]) {
     case 'D':
         if (strcmp(str + 11, "otWs") == 0)
-            return sym_Syntax_PreDotWs;
+            return s_Syntax_PreDotWs;
         break;
     case 'E':
     switch (str[11]) {
     case 'n':
         if (strcmp(str + 12, "dWs") == 0)
-            return sym_Syntax_PreEndWs;
+            return s_Syntax_PreEndWs;
         break;
     case 'q':
         if (strcmp(str + 12, "ualsSpace") == 0)
-            return sym_Syntax_PreEqualsSpace;
+            return s_Syntax_PreEqualsSpace;
         break;
     default: return -1;
     }
     case 'L':
         if (strcmp(str + 11, "BracketWs") == 0)
-            return sym_Syntax_PreLBracketWs;
+            return s_Syntax_PreLBracketWs;
         break;
     case 'O':
         if (strcmp(str + 11, "peratorWs") == 0)
-            return sym_Syntax_PreOperatorWs;
+            return s_Syntax_PreOperatorWs;
         break;
     case 'R':
         if (strcmp(str + 11, "BracketWs") == 0)
-            return sym_Syntax_PreRBracketWs;
+            return s_Syntax_PreRBracketWs;
         break;
     case 'W':
         if (strcmp(str + 11, "s") == 0)
-            return sym_Syntax_PreWs;
+            return s_Syntax_PreWs;
         break;
     default: return -1;
     }
     case 'o':
         if (strcmp(str + 10, "perties") == 0)
-            return sym_Syntax_Properties;
+            return s_Syntax_Properties;
         break;
     default: return -1;
     }
@@ -1582,7 +1555,7 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'Q':
         if (strcmp(str + 8, "uoteType") == 0)
-            return sym_Syntax_QuoteType;
+            return s_Syntax_QuoteType;
         break;
     case 'R':
     switch (str[8]) {
@@ -1598,15 +1571,15 @@ int builtin_symbol_from_string(const char* str)
     switch (str[13]) {
     case 'O':
         if (strcmp(str + 14, "perator") == 0)
-            return sym_Syntax_RebindOperator;
+            return s_Syntax_RebindOperator;
         break;
     case 'S':
         if (strcmp(str + 14, "ymbol") == 0)
-            return sym_Syntax_RebindSymbol;
+            return s_Syntax_RebindSymbol;
         break;
     case 'i':
         if (strcmp(str + 14, "ngInfix") == 0)
-            return sym_Syntax_RebindingInfix;
+            return s_Syntax_RebindingInfix;
         break;
     default: return -1;
     }
@@ -1618,11 +1591,11 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'q':
         if (strcmp(str + 10, "uire") == 0)
-            return sym_Syntax_Require;
+            return s_Syntax_Require;
         break;
     case 't':
         if (strcmp(str + 10, "urnStatement") == 0)
-            return sym_Syntax_ReturnStatement;
+            return s_Syntax_ReturnStatement;
         break;
     default: return -1;
     }
@@ -1630,11 +1603,11 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'S':
         if (strcmp(str + 8, "tateKeyword") == 0)
-            return sym_Syntax_StateKeyword;
+            return s_Syntax_StateKeyword;
         break;
     case 'T':
         if (strcmp(str + 8, "ypeMagicSymbol") == 0)
-            return sym_Syntax_TypeMagicSymbol;
+            return s_Syntax_TypeMagicSymbol;
         break;
     case 'W':
     switch (str[8]) {
@@ -1658,17 +1631,17 @@ int builtin_symbol_from_string(const char* str)
     switch (str[17]) {
     case 'B':
         if (strcmp(str + 18, "eforeEnd") == 0)
-            return sym_Syntax_WhitespaceBeforeEnd;
+            return s_Syntax_WhitespaceBeforeEnd;
         break;
     case 'P':
     switch (str[18]) {
     case 'o':
         if (strcmp(str + 19, "stColon") == 0)
-            return sym_Syntax_WhitespacePostColon;
+            return s_Syntax_WhitespacePostColon;
         break;
     case 'r':
         if (strcmp(str + 19, "eColon") == 0)
-            return sym_Syntax_WhitespacePreColon;
+            return s_Syntax_WhitespacePreColon;
         break;
     default: return -1;
     }
@@ -1710,7 +1683,7 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'a':
         if (strcmp(str + 2, "rball") == 0)
-            return sym_Tarball;
+            return s_Tarball;
         break;
     case 'e':
     switch (str[2]) {
@@ -1720,11 +1693,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'C':
         if (strcmp(str + 5, "ounter") == 0)
-            return sym_TermCounter;
+            return s_TermCounter;
         break;
     case 'N':
         if (strcmp(str + 5, "ame") == 0)
-            return sym_TermName;
+            return s_TermName;
         break;
     default: return -1;
     }
@@ -1734,11 +1707,11 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'o':
         if (strcmp(str + 2, "oManyInputs") == 0)
-            return sym_TooManyInputs;
+            return s_TooManyInputs;
         break;
     case 'r':
         if (strcmp(str + 2, "uncate") == 0)
-            return sym_Truncate;
+            return s_Truncate;
         break;
     case 'y':
     switch (str[2]) {
@@ -1748,11 +1721,11 @@ int builtin_symbol_from_string(const char* str)
     switch (str[4]) {
     case 'N':
         if (strcmp(str + 5, "ame") == 0)
-            return sym_TypeName;
+            return s_TypeName;
         break;
     case 'R':
         if (strcmp(str + 5, "elease") == 0)
-            return sym_TypeRelease;
+            return s_TypeRelease;
         break;
     default: return -1;
     }
@@ -1768,49 +1741,27 @@ int builtin_symbol_from_string(const char* str)
     switch (str[2]) {
     case 'c':
         if (strcmp(str + 3, "aptured") == 0)
-            return sym_Uncaptured;
+            return s_Uncaptured;
         break;
     case 'e':
         if (strcmp(str + 3, "valuated") == 0)
-            return sym_Unevaluated;
+            return s_Unevaluated;
         break;
     case 'i':
         if (strcmp(str + 3, "formListType") == 0)
-            return sym_UniformListType;
+            return s_UniformListType;
         break;
     case 'k':
-    switch (str[3]) {
-    case 'n':
-    switch (str[4]) {
-    case 'o':
-    switch (str[5]) {
-    case 'w':
-    switch (str[6]) {
-    case 'n':
-    switch (str[7]) {
-    case 'I':
-        if (strcmp(str + 8, "dentifier") == 0)
-            return sym_UnknownIdentifier;
+        if (strcmp(str + 3, "nownIdentifier") == 0)
+            return s_UnknownIdentifier;
         break;
-    case 0:
-            return sym_Unknown;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
     case 'o':
         if (strcmp(str + 3, "bservable") == 0)
-            return sym_Unobservable;
+            return s_Unobservable;
         break;
     case 't':
         if (strcmp(str + 3, "yped") == 0)
-            return sym_Untyped;
+            return s_Untyped;
         break;
     default: return -1;
     }
@@ -1820,82 +1771,424 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'a':
         if (strcmp(str + 2, "tch") == 0)
-            return sym_Watch;
+            return s_Watch;
         break;
     case 'h':
         if (strcmp(str + 2, "itespace") == 0)
-            return sym_Whitespace;
+            return s_Whitespace;
         break;
     case 'i':
         if (strcmp(str + 2, "ldcard") == 0)
-            return sym_Wildcard;
+            return s_Wildcard;
         break;
     default: return -1;
     }
-    case 'Y':
-        if (strcmp(str + 1, "es") == 0)
-            return sym_Yes;
+    case 'a':
+    switch (str[1]) {
+    case 'd':
+    switch (str[2]) {
+    case 'd':
+        if (strcmp(str + 3, "r") == 0)
+            return s_addr;
         break;
-    case '_':
-        if (strcmp(str + 1, "hacks") == 0)
-            return sym__hacks;
+    case 'v':
+        if (strcmp(str + 3, "ance") == 0)
+            return s_advance;
         break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'b':
+    switch (str[1]) {
+    case 'l':
+        if (strcmp(str + 2, "ock") == 0)
+            return s_block;
+        break;
+    case 'r':
+        if (strcmp(str + 2, "eak") == 0)
+            return s_break;
+        break;
+    default: return -1;
+    }
+    case 'c':
+    switch (str[1]) {
+    case 'a':
+        if (strcmp(str + 2, "se") == 0)
+            return s_case;
+        break;
+    case 'o':
+    switch (str[2]) {
+    case 'n':
+    switch (str[3]) {
+    case 'd':
+        if (strcmp(str + 4, "itional_done") == 0)
+            return s_conditional_done;
+        break;
+    case 't':
+        if (strcmp(str + 4, "inue") == 0)
+            return s_continue;
+        break;
+    default: return -1;
+    }
+    case 'u':
+        if (strcmp(str + 3, "nt") == 0)
+            return s_count;
+        break;
+    default: return -1;
+    }
+    case 'u':
+        if (strcmp(str + 2, "rrent_term") == 0)
+            return s_current_term;
+        break;
+    default: return -1;
+    }
+    case 'd':
+    switch (str[1]) {
+    case 'e':
+        if (strcmp(str + 2, "clared_state") == 0)
+            return s_declared_state;
+        break;
+    case 'i':
+        if (strcmp(str + 2, "scard") == 0)
+            return s_discard;
+        break;
+    case 'o':
+        if (strcmp(str + 2, "ne") == 0)
+            return s_done;
+        break;
+    default: return -1;
+    }
     case 'e':
     switch (str[1]) {
     case 'f':
         if (strcmp(str + 2, "fect") == 0)
-            return sym_effect;
+            return s_effect;
         break;
     case 'r':
         if (strcmp(str + 2, "ror") == 0)
-            return sym_error;
+            return s_error;
         break;
     case 'x':
         if (strcmp(str + 2, "pr") == 0)
-            return sym_expr;
+            return s_expr;
         break;
     default: return -1;
     }
     case 'f':
-        if (strcmp(str + 1, "ormat") == 0)
-            return sym_format;
+    switch (str[1]) {
+    case 'a':
+        if (strcmp(str + 2, "ilure") == 0)
+            return s_failure;
         break;
+    case 'i':
+    switch (str[2]) {
+    case 'l':
+    switch (str[3]) {
+    case 'e':
+    switch (str[4]) {
+    case 'n':
+        if (strcmp(str + 5, "ame") == 0)
+            return s_filename;
+        break;
+    case 0:
+            return s_file;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'o':
+        if (strcmp(str + 2, "rmat") == 0)
+            return s_format;
+        break;
+    case 'r':
+        if (strcmp(str + 2, "ames") == 0)
+            return s_frames;
+        break;
+    default: return -1;
+    }
+    case 'h':
+    switch (str[1]) {
+    case 'a':
+    switch (str[2]) {
+    case 'c':
+        if (strcmp(str + 3, "ks") == 0)
+            return s_hacks;
+        break;
+    case 's':
+        if (strcmp(str + 3, "_state") == 0)
+            return s_has_state;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'i':
     switch (str[1]) {
     case 'd':
         if (strcmp(str + 2, "ent") == 0)
-            return sym_ident;
+            return s_ident;
         break;
-    case 't':
-        if (strcmp(str + 2, "ems") == 0)
-            return sym_items;
+    case 'n':
+    switch (str[2]) {
+    case 'c':
+        if (strcmp(str + 3, "oming") == 0)
+            return s_incoming;
+        break;
+    case 'd':
+        if (strcmp(str + 3, "ex") == 0)
+            return s_index;
+        break;
+    case 'p':
+        if (strcmp(str + 3, "uts") == 0)
+            return s_inputs;
+        break;
+    case 'v':
+        if (strcmp(str + 3, "alid") == 0)
+            return s_invalid;
         break;
     default: return -1;
     }
-    case 'l':
-        if (strcmp(str + 1, "ist") == 0)
-            return sym_list;
-        break;
+    case 't':
+    switch (str[2]) {
+    case 'e':
+    switch (str[3]) {
     case 'm':
-        if (strcmp(str + 1, "essage") == 0)
-            return sym_message;
+        if (strcmp(str + 4, "s") == 0)
+            return s_items;
         break;
+    case 'r':
+    switch (str[4]) {
+    case 'a':
+    switch (str[5]) {
+    case 't':
+    switch (str[6]) {
+    case 'o':
+    switch (str[7]) {
+    case 'r':
+    switch (str[8]) {
+    case '_':
+        if (strcmp(str + 9, "value") == 0)
+            return s_iterator_value;
+        break;
+    case 0:
+            return s_iterator;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'k':
+        if (strcmp(str + 1, "ey") == 0)
+            return s_key;
+        break;
+    case 'l':
+    switch (str[1]) {
+    case 'a':
+        if (strcmp(str + 2, "st") == 0)
+            return s_last;
+        break;
+    case 'i':
+    switch (str[2]) {
+    case 's':
+        if (strcmp(str + 3, "t") == 0)
+            return s_list;
+        break;
+    case 'v':
+        if (strcmp(str + 3, "eness_list") == 0)
+            return s_liveness_list;
+        break;
+    default: return -1;
+    }
+    case 'o':
+    switch (str[2]) {
+    case 'c':
+    switch (str[3]) {
+    case 'a':
+    switch (str[4]) {
+    case 'l':
+    switch (str[5]) {
+    case '_':
+    switch (str[6]) {
+    case 's':
+    switch (str[7]) {
+    case 't':
+    switch (str[8]) {
+    case 'a':
+    switch (str[9]) {
+    case 't':
+    switch (str[10]) {
+    case 'e':
+    switch (str[11]) {
+    case '_':
+        if (strcmp(str + 12, "key") == 0)
+            return s_local_state_key;
+        break;
+    case 0:
+            return s_local_state;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'o':
+        if (strcmp(str + 3, "p") == 0)
+            return s_loop;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'm':
+    switch (str[1]) {
+    case 'a':
+    switch (str[2]) {
+    case 'd':
+        if (strcmp(str + 3, "dr") == 0)
+            return s_maddr;
+        break;
+    case 'j':
+        if (strcmp(str + 3, "or_block") == 0)
+            return s_major_block;
+        break;
+    case 'y':
+        if (strcmp(str + 3, "be") == 0)
+            return s_maybe;
+        break;
+    default: return -1;
+    }
+    case 'e':
+    switch (str[2]) {
+    case 's':
+        if (strcmp(str + 3, "sage") == 0)
+            return s_message;
+        break;
+    case 't':
+        if (strcmp(str + 3, "hodCache") == 0)
+            return s_methodCache;
+        break;
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'n':
     switch (str[1]) {
+    case 'e':
+    switch (str[2]) {
+    case 'w':
+        if (strcmp(str + 3, "line") == 0)
+            return s_newline;
+        break;
+    case 'x':
+    switch (str[3]) {
+    case 't':
+    switch (str[4]) {
+    case '_':
+        if (strcmp(str + 5, "case") == 0)
+            return s_next_case;
+        break;
+    case 0:
+            return s_next;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 'o':
     switch (str[2]) {
     case '_':
     switch (str[3]) {
     case 'e':
         if (strcmp(str + 4, "ffect") == 0)
-            return sym_no_effect;
+            return s_no_effect;
         break;
     case 's':
         if (strcmp(str + 4, "ave_state") == 0)
-            return sym_no_save_state;
+            return s_no_save_state;
         break;
     default: return -1;
     }
+    case 'n':
+        if (strcmp(str + 3, "e") == 0)
+            return s_none;
+        break;
+    case 0:
+            return s_no;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'o':
+    switch (str[1]) {
+    case 'u':
+    switch (str[2]) {
+    case 't':
+    switch (str[3]) {
+    case 'g':
+        if (strcmp(str + 4, "oing") == 0)
+            return s_outgoing;
+        break;
+    case 'p':
+        if (strcmp(str + 4, "utSlot") == 0)
+            return s_outputSlot;
+        break;
+    case 0:
+            return s_out;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'p':
+    switch (str[1]) {
+    case 'c':
+            return s_pc;
+    case 'r':
+        if (strcmp(str + 2, "oduceOutput") == 0)
+            return s_produceOutput;
+        break;
+    default: return -1;
+    }
+    case 'r':
+    switch (str[1]) {
+    case 'e':
+    switch (str[2]) {
+    case 'p':
+        if (strcmp(str + 3, "eat") == 0)
+            return s_repeat;
+        break;
+    case 't':
+        if (strcmp(str + 3, "urn") == 0)
+            return s_return;
+        break;
     default: return -1;
     }
     default: return -1;
@@ -1904,8 +2197,28 @@ int builtin_symbol_from_string(const char* str)
     switch (str[1]) {
     case 'e':
         if (strcmp(str + 2, "t_value") == 0)
-            return sym_set_value;
+            return s_set_value;
         break;
+    case 'l':
+    switch (str[2]) {
+    case 'o':
+    switch (str[3]) {
+    case 't':
+    switch (str[4]) {
+    case 'C':
+        if (strcmp(str + 5, "ount") == 0)
+            return s_slotCount;
+        break;
+    case 's':
+            return s_slots;
+    case 0:
+            return s_slot;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 't':
     switch (str[2]) {
     case 'a':
@@ -2770,10 +3083,22 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'u':
+        if (strcmp(str + 2, "ccess") == 0)
+            return s_success;
+        break;
+    case 'w':
+        if (strcmp(str + 2, "itch") == 0)
+            return s_switch;
+        break;
     default: return -1;
     }
     case 't':
     switch (str[1]) {
+    case 'e':
+        if (strcmp(str + 2, "rm") == 0)
+            return s_term;
+        break;
     case 'o':
     switch (str[2]) {
     case 'k':
@@ -3412,17 +3737,27 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
+    case 'p':
+            return s_top;
     default: return -1;
     }
     case 'y':
         if (strcmp(str + 2, "pe") == 0)
-            return sym_type;
+            return s_type;
         break;
     default: return -1;
     }
+    case 'u':
+        if (strcmp(str + 1, "nknown") == 0)
+            return s_unknown;
+        break;
     case 'w':
         if (strcmp(str + 1, "atch") == 0)
-            return sym_watch;
+            return s_watch;
+        break;
+    case 'y':
+        if (strcmp(str + 1, "es") == 0)
+            return s_yes;
         break;
     default: return -1;
     }

@@ -45,8 +45,8 @@ void check_input_for_static_error(Value* errors, Term* term, int index)
 
     Term* input = term->input(index);
     Term* placeholder = term_get_input_placeholder(term, effectiveIndex);
-    bool meta = placeholder->boolProp(sym_Meta, false);
-    bool optional = placeholder->boolProp(sym_Optional, false);
+    bool meta = placeholder->boolProp(s_Meta, false);
+    bool optional = placeholder->boolProp(s_Optional, false);
 
     if (input == NULL) {
         if (!meta && !optional)
@@ -114,7 +114,7 @@ void update_static_error_list(Block* block)
 {
     Value errors;
     check_for_static_errors(&errors, block);
-    move(&errors, block_insert_property(block, sym_StaticErrors));
+    move(&errors, block_insert_property(block, s_StaticErrors));
 }
 
 bool has_static_error(Term* term)
@@ -133,7 +133,7 @@ bool has_static_errors(Block* block)
 
 bool has_static_errors_cached(Block* block)
 {
-    return block_has_property(block, sym_StaticErrors) && !block_get_static_errors(block)->isEmpty();
+    return block_has_property(block, s_StaticErrors) && !block_get_static_errors(block)->isEmpty();
 }
 
 int count_static_errors(Block* block)
@@ -162,7 +162,7 @@ void format_static_error(Value* error, Value* stringOutput)
     else if (strcmp(type, "unknown_identifier") == 0)
         out << "Unknown identifier: " << term->name();
     else if (strcmp(type, "syntax_error") == 0)
-        out << "Syntax error: " << term->stringProp(sym_Message, "");
+        out << "Syntax error: " << term->stringProp(s_Message, "");
     else if (strcmp(type, "wrong_input_count") == 0) {
         int funcNumInputs = term_count_input_placeholders(term);
         int actualCount = term->numInputs();
@@ -175,7 +175,7 @@ void format_static_error(Value* error, Value* stringOutput)
     } else if (strcmp(type, "null_function") == 0)
         out << "NULL function reference";
     else if (strcmp(type, "unknown_function") == 0)
-        out << "Unknown function: " << term->stringProp(sym_Syntax_FunctionName, "");
+        out << "Unknown function: " << term->stringProp(s_Syntax_FunctionName, "");
     else if (strcmp(type, "null_input") == 0)
         out << "NULL input reference for input " << inputIndex;
     else if (strcmp(type, "type_mismatch") == 0) {
@@ -279,12 +279,12 @@ std::string get_static_error_message(Term* term)
 
 void mark_static_error(Term* term, const char* msg)
 {
-    term->setStringProp(sym_Error, msg);
+    term->setStringProp(s_Error, msg);
 }
 
 void mark_static_error(Term* term, Value* error)
 {
-    term->setProp(sym_Error, error);
+    term->setProp(s_Error, error);
 }
 
 } // namespace circa

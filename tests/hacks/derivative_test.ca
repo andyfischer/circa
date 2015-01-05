@@ -16,7 +16,7 @@ y = main.block.find_term('y')
 vm.append_hack([:watch, [y]])
 
 -- Run, and fetch the watched result of Y
-vm.run
+vm.call
 original_y = vm.get_watch_result([y])
 print('Original y = ' original_y)
 
@@ -31,7 +31,7 @@ dvm.append_hack([:watch, [y]])
 -- Turn off side effects even though this particular program doesn't have any
 dvm.append_hack(:no_effect)
 
-dvm.run
+dvm.call
 
 modified_y = dvm.get_watch_result([y])
 print('Modified y = ' modified_y)

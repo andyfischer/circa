@@ -5,7 +5,7 @@ m = make(Map)
 
 @m.set(3,3)
 @m.set(4,4)
-assert(to_string(m) == '{3: 3, 4: 4}')
+assert(str(m) == '{3 => 3, 4 => 4}')
 
 -- references as keys
 a = 1; b = 2

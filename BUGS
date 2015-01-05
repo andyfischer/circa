@@ -1,6 +1,8 @@
 
 Miscellanous (most-recent first)
 
+  using @ on a function input is broken again (it creates an extra output)
+
   make 'make' optional on a type. As in, "Type.something" is equivalent to "Type.make.something"
  
   to_string should escape the stuff inside the string.. quotes and newlines and etc.

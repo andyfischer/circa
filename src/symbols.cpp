@@ -15,7 +15,7 @@ namespace circa {
 
 Value* g_runtimeSymbolMap;    // Maps strings to Symbol values.
 Value* g_runtimeSymbolTable;   // List, associating Symbol values with strings.
-int g_nextRuntimeSymbol = sym_LastBuiltinName + 1;
+int g_nextRuntimeSymbol = s_LastBuiltinName + 1;
 
 Symbol symbol_from_string(const char* str)
 {
@@ -51,17 +51,22 @@ void set_symbol_from_string(Value* val, const char* str)
     set_symbol(val, symbol_from_string(str));
 }
 
-const char* symbol_as_string(Value* symbol)
+const char* symbol_as_string(Symbol symbol)
 {
-    const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));
+    const char* builtinName = builtin_symbol_to_string(symbol);
     if (builtinName != NULL)
         return builtinName;
 
-    Value* tableVal = list_get(g_runtimeSymbolTable, as_symbol(symbol));
+    Value* tableVal = list_get(g_runtimeSymbolTable, symbol);
     if (tableVal != NULL)
         return as_cstring(tableVal);
 
     return NULL;
+}
+
+const char* symbol_val_as_string(Value* symbol)
+{
+    return symbol_as_string(as_symbol(symbol));
 }
 
 void symbol_as_string(Value* symbol, Value* str)
@@ -85,7 +90,7 @@ void symbol_as_string(Value* symbol, Value* str)
 static void symbol_to_source_string(Value* value, Value* out)
 {
     string_append(out, ":");
-    string_append(out, symbol_as_string(value));
+    string_append(out, symbol_val_as_string(value));
 }
 
 static int hash_func(Value* value)
@@ -120,19 +125,19 @@ void symbol_setup_type(Type* type)
 {
     reset_type(type);
     set_string(&type->name, "Symbol");
-    type->storageType = sym_StorageTypeInt;
+    type->storageType = s_StorageTypeInt;
     type->toString = symbol_to_source_string;
     type->hashFunc = hash_func;
 }
 
 CIRCA_EXPORT const char* circa_symbol_text(Value* symbol)
 {
-    return symbol_as_string(symbol);
+    return symbol_val_as_string(symbol);
 }
 
 CIRCA_EXPORT bool circa_symbol_equals(Value* symbol, const char* text)
 {
-    return strcmp(symbol_as_string(symbol), text) == 0;
+    return strcmp(symbol_val_as_string(symbol), text) == 0;
 }
 
 }

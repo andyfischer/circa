@@ -1,16 +1,4 @@
 
--- Subroutines
-def f(any v) -> any
-  return v
-
-a = f('test')
-assert(a == 'test')
-
-def g(bool b, any v) -> any
-    return cond(b, v, 5)
-
-assert(g(true, 'test') == 'test')
-assert(g(false, 'test') == 5)
 
 -- Field access
 def h() -> any

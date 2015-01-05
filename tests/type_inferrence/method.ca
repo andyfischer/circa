@@ -9,6 +9,6 @@ def T.f(self) {
 }
 
 t = make(T)
-assert(type(t) == T)
+assert(typeof(t) == T)
 t.f()
-assert(type(t) == T)
+assert(typeof(t) == T)

@@ -12,4 +12,4 @@ def g()
 
 int = make_vm(g)
 int.call
-print(int.extract_state)
+print(int.get_state)

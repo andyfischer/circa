@@ -112,6 +112,7 @@ struct Block
     void dump_with_props();
     Term* owner();
     Block* parent();
+    const char* name();
 
 private:
     // Disallow copy constructor
@@ -129,6 +130,7 @@ Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);
 Term* block_get_function_term(Block* block);
 Value* block_name(Block* block);
+const char* block_name2(Block* block);
 
 void remove_nested_contents(Term* term);
 
@@ -140,6 +142,7 @@ Block* get_parent_block(Block* block);
 Block* get_parent_block_stackwise(Block* block);
 Block* find_enclosing_loop(Block* block);
 Block* find_enclosing_major_block(Block* block);
+Block* find_enclosing_major_block(Term* term);
 
 Block* find_common_parent(Block* a, Block* b);
 Block* find_common_parent(Term* a, Term* b);

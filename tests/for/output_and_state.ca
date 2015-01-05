@@ -11,7 +11,7 @@ def f() -> List
 
 vm = make_vm(f)
 result = vm.call
-print('step1, result = ' result ', s = ' vm.extract_state)
+print('step1, result = ' result ', s = ' vm.get_state)
 
 result = vm.call
-print('step2, result = ' result ', s = ' vm.extract_state)
+print('step2, result = ' result ', s = ' vm.get_state)

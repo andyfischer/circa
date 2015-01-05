@@ -10,4 +10,8 @@ def main()
     print('fib(' i ') = ' fib(i))
 
 vm = make_vm(main)
-main()
+vm.precompile(main.block)
+vm.precompile(fib.block)
+
+require bytecode_analysis
+bytecode_analysis.dump(vm)

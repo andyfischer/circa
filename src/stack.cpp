@@ -32,7 +32,7 @@ Stack::Stack()
     refCount = 1;
     isRefcounted = false;
 
-    step = sym_StackReady;
+    step = s_StackReady;
 
     frames = NULL;
     frameCount = 0;
@@ -545,7 +545,7 @@ void stack_derive_hackset(Stack* stack, Value* hackset)
 {
     set_list(hackset);
 
-    Value* hacks = hashtable_get_symbol_key(&stack->env, sym__hacks);
+    Value* hacks = hashtable_get_symbol_key(&stack->env, s_hacks);
 
     if (hacks == NULL)
         return;
@@ -570,7 +570,7 @@ Value* stack_demand_value_get(Stack* stack, Term* term)
 
 void stack_save_watch_observation(Stack* stack, Value* path, Value* value)
 {
-    Value* watches = hashtable_insert_symbol_key(&stack->observations, sym_Watch);
+    Value* watches = hashtable_insert_symbol_key(&stack->observations, s_Watch);
     if (!is_hashtable(watches))
         set_hashtable(watches);
     copy(value, hashtable_insert(watches, path));
@@ -578,7 +578,7 @@ void stack_save_watch_observation(Stack* stack, Value* path, Value* value)
 
 Value* stack_get_watch_observation(Stack* stack, Value* path)
 {
-    Value* watches = hashtable_get_symbol_key(&stack->observations, sym_Watch);
+    Value* watches = hashtable_get_symbol_key(&stack->observations, s_Watch);
     if (watches == NULL)
         return NULL;
     return hashtable_get(watches, path);
@@ -846,7 +846,7 @@ void Stack__dump_with_bytecode(Stack* stack)
     write_log(as_cstring(&str));
 }
 
-void Stack__extract_state(Stack* stack)
+void Stack__get_state(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     copy(&self->state, circa_output(stack, 0));
@@ -936,7 +936,7 @@ void Stack__set_env_map(Stack* stack)
     copy(map, &self->env);
 }
 
-void Stack__get_state(Stack* stack)
+void Stack__get_state2(Stack* stack)
 {
     Stack* self = as_stack(circa_input(stack, 0));
     copy(&self->state, circa_output(stack, 0));
@@ -1278,21 +1278,34 @@ void Frame__current_term(Stack* stack)
     set_term_ref(circa_output(stack, 0), frame_current_term(frame));
 }
 
+void make_vm(Stack* stack)
+{
+    Stack* newStack = create_stack(stack->world);
+    Value* closure = circa_input(stack, 0);
+
+    Block* block = as_block(list_get(closure, 0));
+
+    if (block == NULL)
+        return circa_output_error(stack, "NULL block");
+
+    stack_init_with_closure(newStack, closure);
+
+    set_pointer(circa_set_default_output(stack, 0), newStack);
+}
+
 void stack_install_functions(NativePatch* patch)
 {
+    circa_patch_function(patch, "make_vm", make_vm);
     circa_patch_function(patch, "VM.block", Stack__block);
     circa_patch_function(patch, "VM.dump", Stack__dump);
     circa_patch_function(patch, "VM.dump_compiled", Stack__dump_compiled);
     circa_patch_function(patch, "VM.dump_with_bytecode", Stack__dump_with_bytecode);
-    circa_patch_function(patch, "VM.extract_state", Stack__extract_state);
+    circa_patch_function(patch, "VM.get_state", Stack__get_state);
     circa_patch_function(patch, "VM.eval_on_demand", Stack__eval_on_demand);
     circa_patch_function(patch, "VM.find_active_value", Stack__find_active_value);
     circa_patch_function(patch, "VM.find_active_frame_for_term", Stack__find_active_frame_for_term);
     circa_patch_function(patch, "VM.id", Stack__id);
     circa_patch_function(patch, "VM.init", Stack__init);
-#if 0
-    circa_patch_function(patch, "VM.has_incoming_state", Stack__has_incoming_state);
-#endif
     circa_patch_function(patch, "VM.env", Stack__env);
     circa_patch_function(patch, "VM.env_map", Stack__env_map);
     circa_patch_function(patch, "VM.set_env", Stack__set_env);

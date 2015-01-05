@@ -1,8 +1,0 @@
-
-def f() -> int
-  1
-
-
-a,b,c = f()
-
-assert(equals(str([a b c]), "[1, null, null]"))

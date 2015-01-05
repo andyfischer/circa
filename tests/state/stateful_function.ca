@@ -8,7 +8,7 @@ def check1()
 
 int = make_vm(check1)
 int.call
-print(int.extract_state)
+print(int.get_state)
 
 -- Test a function that uses a return value
 def g(int i) -> int
@@ -20,7 +20,7 @@ def check2()
 
 int = make_vm(check2)
 int.call
-print(int.extract_state)
+print(int.get_state)
 
 -- Test a function with a returned value and a stateful call
 def h(int i) -> int
@@ -32,4 +32,4 @@ def check3()
 
 int = make_vm(check3)
 int.call
-print(int.extract_state)
+print(int.get_state)

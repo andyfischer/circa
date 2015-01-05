@@ -20,7 +20,7 @@ Term* find_nonlocal_term_for_input(Block* block, Term* input)
 {
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        if (term->function == FUNCS.nonlocal && term->input(0) == input)
+        if (term->function == FUNCS.upvalue && term->input(0) == input)
             return term;
     }
     return NULL;
@@ -36,7 +36,7 @@ void insert_nonlocal_terms(Block* block)
 
         // Skip nonlocal() terms in this block. But, don't skip nonlocal terms that are
         // in nested major blocks.
-        if (innerTerm->function == FUNCS.nonlocal
+        if (innerTerm->function == FUNCS.upvalue
                 && innerTerm->owningBlock == block)
             continue;
 
@@ -45,8 +45,8 @@ void insert_nonlocal_terms(Block* block)
             if (input == NULL)
                 continue;
 
-            // No nonlocal needed for a pure value.
-            if (is_value(input))
+            // No nonlocal needed for a fixed value.
+            if (is_value(input) || input->function == FUNCS.require)
                 continue;
 
             // No nonlocal needed if input is inside this major block.
@@ -68,7 +68,7 @@ void insert_nonlocal_terms(Block* block)
 
             } else {
                 // Create a new nonlocal term.
-                Term* unbound = apply(block, FUNCS.nonlocal, TermList(input), &input->nameValue);
+                Term* unbound = apply(block, FUNCS.upvalue, TermList(input), &input->nameValue);
                 set_declared_type(unbound, input->type);
                 block->move(unbound, nextInsertPosition++);
                 remap_pointers_quick(innerTerm, input, unbound);
@@ -92,6 +92,7 @@ bool is_closure(Value* value)
     return value->value_type == TYPES.func;
 }
 
+// TODO: Delete in favor of func_block
 Value* closure_get_block(Value* value)
 {
     ca_assert(is_closure(value));
@@ -134,7 +135,7 @@ void closure_save_bindings_for_frame(Value* closure, Frame* frame)
 
     for (int i=0; i < closureBlock->length(); i++) {
         Term* term = closureBlock->get(i);
-        if (term->function != FUNCS.nonlocal)
+        if (term->function != FUNCS.upvalue)
             continue;
 
         Term* input = term->input(0);
@@ -157,6 +158,33 @@ void closure_save_bindings_for_frame(Value* closure, Frame* frame)
     }
 }
 
+int find_first_closure_upvalue(Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.input)
+            continue;
+        else if (term->function == FUNCS.upvalue)
+            return i;
+        else
+            return 0;
+    }
+    return 0;
+}
+
+int count_closure_upvalues(Block* block)
+{
+    int count = 0;
+    for (int i=find_first_closure_upvalue(block); i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.upvalue)
+            count++;
+        else
+            break;
+    }
+    return count;
+}
+
 void closure_save_all_bindings(Value* closure, Stack* stack)
 {
     Block* closureBlock = func_block(closure);
@@ -166,7 +194,7 @@ void closure_save_all_bindings(Value* closure, Stack* stack)
 
     for (int i=0; i < closureBlock->length(); i++) {
         Term* term = closureBlock->get(i);
-        if (term->function != FUNCS.nonlocal)
+        if (term->function != FUNCS.upvalue)
             continue;
 
         Term* input = term->input(0);
@@ -186,8 +214,10 @@ void closure_save_all_bindings(Value* closure, Stack* stack)
 
 void closures_install_functions(NativePatch* patch)
 {
-    circa_patch_function(patch, "closure_block", closure_block_evaluate);
-    circa_patch_function(patch, "function_decl", closure_block_evaluate);
+#if 0
+    circa_patch_function2(patch, "closure_block", closure_block_evaluate);
+    circa_patch_function2(patch, "function_decl", closure_block_evaluate);
+#endif
 }
 
 } // namespace circa

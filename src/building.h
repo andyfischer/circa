@@ -16,6 +16,8 @@ Term* apply(Block* block, const char* functionName, TermList const& inputs,
 
 Term* apply(Block* block, Term* function, TermList const& inputs, const char* name);
 
+Term* apply_dynamic_method(Block* block, Symbol methodName, TermList const& inputs, Value* name=NULL);
+
 // Call apply using a spec value.
 // Example:  [Term#add [Term#a Term#b] :name 'c']
 Term* apply_spec(Block* block, Value* spec);

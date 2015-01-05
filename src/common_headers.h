@@ -45,12 +45,12 @@ typedef int32_t i32;
 typedef int64_t i64;
 
 struct Block;
+struct Bytecode;
 struct CastResult;
 struct CircaObject;
 struct Compiled;
 struct CompiledBlock;
 struct Frame;
-struct Stack;
 struct FeedbackOperation;
 struct FileWatch;
 struct FileWatchWorld;
@@ -60,18 +60,20 @@ struct LibuvWorld;
 struct NativeFunc;
 struct NativePatch;
 struct RawOutputPrefs;
+struct Stack;
 struct StaticTypeQuery;
 struct Term;
 struct TermList;
 struct TermMap;
 struct Type;
+struct VM;
 
 typedef bool (*TermVisitor)(Term* term, Value* context);
 typedef int Symbol;
 
 // Function-related typedefs:
 
-typedef void (*EvaluateFunc)(Stack* stack);
+typedef void (*EvaluateFunc)(VM* vm);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*ReleaseFunc)(Value* value);
 typedef void (*PostCompileFunc)(Term*);

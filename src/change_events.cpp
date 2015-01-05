@@ -121,7 +121,7 @@ Value* change_event_field(Value* event, int index)
 void change_event_set_blank(Value* value, int eventSpecificFields)
 {
     set_list(value, 3 + eventSpecificFields);
-    set_symbol(change_event_type(value), sym_None);
+    set_symbol(change_event_type(value), s_none);
     set_hashtable(change_event_attrs(value));
 }
 
@@ -132,7 +132,7 @@ void change_event_make_rename(Value* event, Term* target, const char* newName)
 void change_event_make_append(Value* event, Block* target, Value* expression)
 {
     change_event_set_blank(event, 1);
-    set_symbol(change_event_type(event), sym_ChangeAppend);
+    set_symbol(change_event_type(event), s_ChangeAppend);
     set_block(change_event_target(event), target);
     set_value(change_event_field(event, 0), expression);
 }
@@ -154,7 +154,7 @@ void change_event_commit(caWorld* world, Value* event, bool dryRun, Value* resul
     Symbol type = as_symbol(change_event_type(event));
 
     switch (type) {
-    case sym_ChangeAppend:
+    case s_ChangeAppend:
         commit_append(world, event, dryRun, result);
         break;
     default:

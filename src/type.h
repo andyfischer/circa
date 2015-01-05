@@ -87,6 +87,7 @@ struct Type
     Type* parent;
 
     Value properties;
+    Value attrs;
     
     // Type parameters
     Value parameter;
@@ -182,13 +183,8 @@ bool term_output_never_satisfies_type(Term* term, Type* type);
 void reset_type(Type* type);
 void clear_type_contents(Type* type);
 
-void initialize_simple_pointer_type(Type* type);
-
-Block* find_method(Block* block, Type* type, Value* name);
-
-// Change the type value for an existing type. 'term' should be a value of
-// type Type.
-void install_type(Term* term, Type* type);
+// 'location' is either a Block or Term value.
+Block* find_method_on_type(Type* type, Value* nameLocation);
 
 void set_type_list(Value* value, Type* type1);
 void set_type_list(Value* value, Type* type1, Type* type2);

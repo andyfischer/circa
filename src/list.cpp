@@ -26,15 +26,16 @@ ListData* allocate_list(int count, int capacity)
 {
     ca_assert(count <= capacity);
 
-    ListData* result = (ListData*) malloc(list_size(capacity));
+    ListData* data = (ListData*) malloc(list_size(capacity));
 
-    result->refCount = 1;
-    result->count = count;
-    result->capacity = capacity;
+    data->refCount = 1;
+    data->count = count;
+    data->capacity = capacity;
+    initialize_null(&data->attrs);
     for (int i=0; i < capacity; i++)
-        initialize_null(&result->items[i]);
+        initialize_null(&data->items[i]);
 
-    return result;
+    return data;
 }
 
 void list_incref(ListData* data)
@@ -59,6 +60,7 @@ void free_list(ListData* data)
     // Release all elements
     for (int i=0; i < data->count; i++)
         set_null(&data->items[i]);
+    set_null(&data->attrs);
     free(data);
 }
 
@@ -280,7 +282,7 @@ void list_copy(Value* source, Value* dest)
 {
     stat_increment(ListSoftCopy);
 
-    ca_assert(source->value_type->storageType == sym_StorageTypeList);
+    ca_assert(source->value_type->storageType == s_StorageTypeList);
 
     make_no_initialize(source->value_type, dest);
     ListData* sourceData = (ListData*) source->value_data.ptr;
@@ -537,7 +539,7 @@ void list_extend(Value* list, Value* rhsList)
 
 Value* list_insert(Value* list, int index)
 {
-    ca_assert(list->value_type->storageType == sym_StorageTypeList);
+    ca_assert(list->value_type->storageType == s_StorageTypeList);
     ListData* data = (ListData*) list->value_data.ptr;
     Value* result = list_insert(&data, index);
     list->value_data.ptr = data;
@@ -585,17 +587,17 @@ void list_remove_nulls(Value* value)
 Symbol list_get_parameter_type(Value* parameter)
 {
     if (is_null(parameter))
-        return sym_Untyped;
+        return s_Untyped;
     if (is_type(parameter))
-        return sym_UniformListType;
+        return s_UniformListType;
 
     if (is_list(parameter)) {
         if ((list_length(parameter) == 2) && is_list(list_get(parameter, 0)))
-            return sym_StructType;
+            return s_StructType;
         else
-            return sym_AnonStructType;
+            return s_AnonStructType;
     }
-    return sym_Invalid;
+    return s_invalid;
 }
 
 bool list_type_has_specific_size(Value* parameter)
@@ -621,7 +623,7 @@ void setup_compound_type(Type* type)
 
 void compound_type_append_field(Type* type, Type* fieldType, Value* fieldName)
 {
-    ca_assert(list_get_parameter_type(&type->parameter) == sym_StructType);
+    ca_assert(list_get_parameter_type(&type->parameter) == s_StructType);
 
     list_touch(&type->parameter);
     Value* types = list_get(&type->parameter, 0);
@@ -649,7 +651,7 @@ Type* compound_type_get_field_type(Type* type, int index)
 
 bool is_struct_type(Type* type)
 {
-    return list_get_parameter_type(&type->parameter) == sym_StructType;
+    return list_get_parameter_type(&type->parameter) == s_StructType;
 }
 
 void compound_type_to_string(Value* value, Value* out)
@@ -680,7 +682,7 @@ void list_type_initialize_from_decl(Type* type, Block* decl)
     for (int i=0; i < decl->length(); i++) {
         Term* term = decl->get(i);
 
-        if (!is_function(term) || !term->boolProp(sym_FieldAccessor, false))
+        if (!is_function(term) || !term->boolProp(s_FieldAccessor, false))
             continue;
 
         Type* fieldType = get_output_type(nested_contents(term), 0);
@@ -695,13 +697,13 @@ Value* list_get_type_list_from_type(Type* type)
     Value* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
-    case sym_AnonStructType:
+    case s_AnonStructType:
         return parameter;
-    case sym_StructType:
+    case s_StructType:
         return list_get(parameter, 0);
-    case sym_Untyped:
-    case sym_UniformListType:
-    case sym_Invalid:
+    case s_Untyped:
+    case s_UniformListType:
+    case s_invalid:
         return NULL;
     }
     ca_assert(false);
@@ -714,12 +716,12 @@ Value* list_get_name_list_from_type(Type* type)
     Value* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
-    case sym_StructType:
+    case s_StructType:
         return list_get(parameter, 1);
-    case sym_AnonStructType:
-    case sym_Untyped:
-    case sym_UniformListType:
-    case sym_Invalid:
+    case s_AnonStructType:
+    case s_Untyped:
+    case s_UniformListType:
+    case s_invalid:
         return NULL;
     }
     ca_assert(false);
@@ -749,7 +751,7 @@ int list_find_field_index_by_name(Type* listType, const char* name)
 
 bool is_list_based_type(Type* type)
 {
-    return type->storageType == sym_StorageTypeList;
+    return type->storageType == s_StorageTypeList;
 }
 
 namespace list_t {
@@ -894,7 +896,7 @@ namespace list_t {
 
         // Special case when looking at a call to list(); look at inputs instead of
         // looking at the result.
-        if (subject && subject->function == FUNCS.list)
+        if (subject && subject->function == FUNCS.make_list)
         {
             if (subject->numInputs() != circa_count(expectedElementTypes))
                 return query->fail();
@@ -953,7 +955,7 @@ namespace list_t {
     {
         if (string_equals(&type->name, ""))
             set_string(&type->name, "List");
-        type->storageType = sym_StorageTypeList;
+        type->storageType = s_StorageTypeList;
         type->initialize = tv_initialize;
         type->release = tv_release;
         type->copy = tv_copy;

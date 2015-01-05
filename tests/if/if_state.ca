@@ -5,4 +5,4 @@ def f()
 
 int = make_vm(f)
 int.call
-print('f state: ' int.extract_state)
+print('f state: ' int.get_state)

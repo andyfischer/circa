@@ -1,10 +1,9 @@
 
-def main() -> String
-  return env(:key)
+def main()
+  env(:key)
 
-int = make_vm(main)
-assert(int.call == null)
+vm = make_vm(main)
+assert(vm.call == null)
 
-int.set_env(:key 'value')
-assert(int.call == 'value')
-assert(int.call == 'value')
+vm.set_env(:key 'value')
+assert(vm.call == 'value')

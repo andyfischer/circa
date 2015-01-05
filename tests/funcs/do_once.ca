@@ -2,7 +2,7 @@ def once() -> bool
     state bool s = true
     result = s
     s = false
-    return result
+    result
 
 def f()
   if once()
@@ -15,4 +15,4 @@ vm.call
 vm.call
 vm.call
 vm.call
-print('final state: ' vm.extract_state)
+print('final state: ' vm.get_state)

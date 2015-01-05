@@ -180,7 +180,7 @@ void stack_reset(Stack* stack)
 
 void stack_restart(Stack* stack)
 {
-    if (stack->step == sym_StackReady)
+    if (stack->step == s_StackReady)
         return;
 
     if (vm_top_frame(stack) == NULL)
@@ -194,7 +194,7 @@ void stack_restart(Stack* stack)
     top->pc = 0;
 
     stack->errorOccurred = false;
-    stack->step = sym_StackReady;
+    stack->step = s_StackReady;
 }
 
 Value* stack_get_state(Stack* stack)
@@ -345,7 +345,7 @@ void create_output(Stack* stack)
 
 void raise_error(Stack* stack)
 {
-    stack->step = sym_StackFinished;
+    stack->step = s_StackFinished;
     stack->errorOccurred = true;
 }
 
@@ -381,7 +381,7 @@ static void start_interpreter_session(Stack* stack)
     }
 
     // Re-seed random generator.
-    Value* seed = hashtable_get_int_key(&stack->env, sym_Entropy);
+    Value* seed = hashtable_get_int_key(&stack->env, s_Entropy);
     if (seed != NULL)
         rand_init(&stack->randState, get_hash_value(seed));
 
@@ -632,7 +632,7 @@ void vm_resolve_dynamic_method_to_module_access(Stack* stack, Value* object)
     Frame* parent = top_frame_parent(stack);
     Term* caller = frame_current_term(parent);
     Term* term = module_ref_lookup(object, caller);
-    Value* elementName = caller->getProp(sym_MethodName);
+    Value* elementName = caller->getProp(s_MethodName);
 
     stat_increment(Interpreter_DynamicMethod_ModuleLookup);
 
@@ -672,7 +672,7 @@ void vm_resolve_dynamic_method_to_hashtable_get(Stack* stack)
     Frame* parent = top_frame_parent(stack);
     stack_resize_top_frame(stack, vm_frame_register_count(top) + 1);
     Term* caller = frame_current_term(parent);
-    Value* elementName = caller->getProp(sym_MethodName);
+    Value* elementName = caller->getProp(s_MethodName);
     copy(elementName, vm_frame_register(top, 1));
     int blockIndex = compiled_create_entry(stack->program, FUNCS.map_get->nestedContents);
     vm_prepare_top_frame(stack, blockIndex);
@@ -693,7 +693,7 @@ void vm_dynamic_method_dispatch_from_cache(Stack* stack, MethodCacheLine* cacheL
     case MethodCache_NotFound: {
         Frame* parent = top_frame_parent(stack);
         Term* caller = frame_current_term(parent);
-        Value* elementName = caller->getProp(sym_MethodName);
+        Value* elementName = caller->getProp(s_MethodName);
         Value msg;
         set_string(&msg, "Method '");
         string_append(&msg, elementName);
@@ -726,13 +726,13 @@ void vm_prepare_top_frame(Stack* stack, int blockIndex)
 
 void vm_run(Stack* stack)
 {
-    if (stack->step == sym_StackFinished)
+    if (stack->step == s_StackFinished)
         stack_restart(stack);
 
     start_interpreter_session(stack);
 
     stack->errorOccurred = false;
-    stack->step = sym_StackRunning;
+    stack->step = s_StackRunning;
     u32 pc = frame_compiled_block(vm_top_frame(stack))->bytecodeOffset;
     char* bytecode = NULL;
     vm_fix_bytecode_pointer();
@@ -827,6 +827,7 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_ResolveDynamicMethod: {
+#if 0
             vm_unpack_u32(termIndex);
 
             MethodCacheLine* firstCacheLine = (MethodCacheLine*) (bytecode + pc);
@@ -854,7 +855,7 @@ void vm_run(Stack* stack)
             // Slow lookup
             stat_increment(Interpreter_DynamicMethod_SlowLookup);
             Term* caller = frame_term(parent, termIndex);
-            Value* elementName = caller->getProp(sym_MethodName);
+            Value* elementName = caller->getProp(s_MethodName);
 
             vm_method_cache_make_empty_slot(firstCacheLine);
             firstCacheLine->typeId = typeId;
@@ -890,6 +891,7 @@ void vm_run(Stack* stack)
             pc += c_methodCacheSize;
 
             vm_fix_bytecode_pointer();
+#endif
             continue;
         }
         case bc_ResolveDynamicFuncToClosureCall: {
@@ -931,7 +933,7 @@ void vm_run(Stack* stack)
                     return raise_error_not_enough_inputs(stack);
 
                 if (!cast(vm_frame_register(top, i), declared_type(placeholder))) {
-                    bool allowedNull = is_null(vm_frame_register(top, i)) && placeholder->boolProp(sym_Optional, false);
+                    bool allowedNull = is_null(vm_frame_register(top, i)) && placeholder->boolProp(s_Optional, false);
                     if (!allowedNull)
                         return raise_error_input_type_mismatch(stack, i);
                 }
@@ -974,7 +976,7 @@ void vm_run(Stack* stack)
 
             vm_unpack_reg_reg(source, dest);
 
-            ca_assert(!symbol_eq(source, sym_Unobservable));
+            ca_assert(!symbol_eq(source, s_Unobservable));
 
             copy(source, dest);
 
@@ -985,12 +987,12 @@ void vm_run(Stack* stack)
 
             vm_unpack_reg_reg(source, dest);
 
-            ca_assert(!symbol_eq(source, sym_Unobservable));
+            ca_assert(!symbol_eq(source, s_Unobservable));
 
             move(source, dest);
 
             #if DEBUG
-                set_symbol(source, sym_Unobservable);
+                set_symbol(source, s_Unobservable);
             #endif
 
             continue;
@@ -1033,7 +1035,7 @@ void vm_run(Stack* stack)
                 set_list(to, 0);
             move(from, list_append(to));
             #if DEBUG
-                set_symbol(from, sym_Unobservable);
+                set_symbol(from, s_Unobservable);
             #endif
             continue;
         }
@@ -1054,7 +1056,7 @@ void vm_run(Stack* stack)
             Value* element = get_index(list, as_int(index));
             move(element, to);
             #if DEBUG
-                set_symbol(element, sym_Unobservable);
+                set_symbol(element, s_Unobservable);
             #endif
             continue;
         }
@@ -1081,7 +1083,7 @@ void vm_run(Stack* stack)
                 move(element, to);
 
             #if DEBUG
-                set_symbol(element, sym_Unobservable);
+                set_symbol(element, s_Unobservable);
             #endif
             continue;
         }
@@ -1122,7 +1124,7 @@ void vm_run(Stack* stack)
             // Stop if we have finished the topmost block
             if (prev_frame(top) == NULL) {
                 top->pc = pc;
-                stack->step = sym_StackFinished;
+                stack->step = s_StackFinished;
                 return;
             }
 
@@ -1145,7 +1147,7 @@ void vm_run(Stack* stack)
             move(value, receiverSlot);
             
             #if DEBUG
-                set_symbol(value, sym_Unobservable);
+                set_symbol(value, s_Unobservable);
             #endif
 
             // Type check
@@ -1193,7 +1195,7 @@ void vm_run(Stack* stack)
                     move(placeholderRegister, receiverSlot);
                     
                     #if DEBUG
-                        set_symbol(placeholderRegister, sym_Unobservable);
+                        set_symbol(placeholderRegister, s_Unobservable);
                     #endif
 
                     // Type check
@@ -1264,6 +1266,7 @@ void vm_run(Stack* stack)
             continue;
         }
         case bc_NativeCall: {
+#if 0
             vm_unpack_u32(funcIndex);
 
             EvaluateFunc func = get_native_func(stack->world, funcIndex);
@@ -1274,6 +1277,7 @@ void vm_run(Stack* stack)
 
             // Certain functions (like require/load_script) can invalidate bytecode.
             vm_fix_bytecode_pointer();
+#endif
             continue;
         }
 
@@ -1423,21 +1427,6 @@ static bool vm_matches_watch_path(Stack* stack, Value* path)
     return true;
 }
 
-void make_vm(Stack* stack)
-{
-    Stack* newStack = create_stack(stack->world);
-    Value* closure = circa_input(stack, 0);
-
-    Block* block = as_block(list_get(closure, 0));
-
-    if (block == NULL)
-        return circa_output_error(stack, "NULL block");
-
-    stack_init_with_closure(newStack, closure);
-
-    set_pointer(circa_set_default_output(stack, 0), newStack);
-}
-
 void capture_stack(Stack* stack)
 {
     Stack* newStack = stack_duplicate(stack);
@@ -1451,6 +1440,7 @@ void hosted_extract_path(Stack* stack)
     stack_extract_current_path(stack, circa_output(stack, 0), untilFrame);
 }
 
+#if 0
 void reflect__caller(Stack* stack)
 {
     Frame* frame = top_frame_parent(stack);
@@ -1458,6 +1448,7 @@ void reflect__caller(Stack* stack)
     Term* theirCaller = frame_current_term(callerFrame);
     set_term_ref(circa_output(stack, 0), theirCaller);
 }
+#endif
 
 int case_frame_get_index(Frame* frame)
 {
@@ -1681,8 +1672,6 @@ void dbg_set_outgoing_state(Stack* stack)
 
 void interpreter_install_functions(NativePatch* patch)
 {
-    circa_patch_function(patch, "make_vm", make_vm);
-    circa_patch_function(patch, "make_vm", make_vm);
     circa_patch_function(patch, "capture_stack", capture_stack);
     circa_patch_function(patch, "_extract_stack_path", hosted_extract_path);
     circa_patch_function(patch, "reflect_caller", reflect__caller);

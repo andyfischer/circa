@@ -7,8 +7,8 @@ t = T.make
 def T.f(self) -> Vec2
     [1, 2]
 
-assert(type(t.f) == Vec2)
+assert(typeof(t.f) == Vec2)
 
 any.cast(@t)
 
-assert(type(t.f) == Vec2)
+assert(typeof(t.f) == Vec2)

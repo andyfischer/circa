@@ -11,6 +11,6 @@ def g()
 print('calling g')
 int = make_vm(g)
 int.call
-print('state: ' int.extract_state)
+print('state: ' int.get_state)
 int.call
-print('state: ' int.extract_state)
+print('state: ' int.get_state)

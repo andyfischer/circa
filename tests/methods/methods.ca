@@ -38,8 +38,8 @@ struct T3 { T2 t }
 struct T4 { T3 t }
 
 t = make(T4)
-assert(to_string(t) == "{t: {t: {t: {list: []}}}}")
+assert(str(t) == "{t: {t: {t: {list: []}}}}")
 assert(t.t.t.t.list == [])
 @t.t.t.t.list.append(10)
 assert(t.t.t.t.list == [10])
-assert(to_string(t) == "{t: {t: {t: {list: [10]}}}}")
+assert(str(t) == "{t: {t: {t: {list: [10]}}}}")

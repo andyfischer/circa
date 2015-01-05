@@ -5,11 +5,11 @@ def main()
 
 int = make_vm(main)
 int.call
-assert(to_string(int.extract_state) == "{s: 1}")
+assert(str(int.get_state) == "{s: 1}")
 int.call
-assert(to_string(int.extract_state) == "{s: 2}")
+assert(str(int.get_state) == "{s: 2}")
 int.call
-assert(to_string(int.extract_state) == "{s: 3}")
+assert(str(int.get_state) == "{s: 3}")
 
 def main()
     state s = 0
@@ -17,8 +17,8 @@ def main()
 
 int = make_vm(main)
 int.call
-assert(to_string(int.extract_state) == "{s: 1}")
+assert(str(int.get_state) == "{s: 1}")
 int.call
-assert(to_string(int.extract_state) == "{s: 2}")
+assert(str(int.get_state) == "{s: 2}")
 int.call
-assert(to_string(int.extract_state) == "{s: 3}")
+assert(str(int.get_state) == "{s: 3}")

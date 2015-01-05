@@ -4,6 +4,6 @@ struct CompoundType {
 }
 
 t = make(CompoundType)
-assert(type(t) == CompoundType)
+assert(typeof(t) == CompoundType)
 t.i = 1
-assert(type(t) == CompoundType)
+assert(typeof(t) == CompoundType)

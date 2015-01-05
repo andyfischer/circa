@@ -5,10 +5,10 @@ struct A {
 
 a = A.make
 
-assert(type(a.p) == Vec2)
+assert(typeof(a.p) == Vec2)
 
 a.p = [1 2]
 
-assert(type(a.p) == Vec2)
+assert(typeof(a.p) == Vec2)
 
 print(a)

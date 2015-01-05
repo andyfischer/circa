@@ -91,22 +91,11 @@ int case_block_get_index(Block* caseBlock)
     return -1;
 }
 
-Term* case_find_condition_check(Block* block)
-{
-    for (int i=0; i < block->length(); i++) {
-        Term* term = block->get(i);
-        if (term->function == FUNCS.case_condition_bool)
-            return term;
-    }
-    return NULL;
-}
-
 Term* case_find_condition(Block* block)
 {
-    Term* conditionCheck = case_find_condition_check(block);
-    if (conditionCheck != NULL)
-        return conditionCheck->input(0);
-    return NULL;
+    Term* owner = block->owningTerm;
+    ca_assert(owner->function == FUNCS.case_func);
+    return owner->input(0);
 }
 
 Term* if_block_prepend_primary_output(Term* ifBlock)
@@ -200,7 +189,7 @@ static void if_block_setup_new_case(Block* block, Term* newCase)
     }
 }
 
-Term* if_block_append_case(Block* block)
+Term* if_block_append_case(Block* block, Term* condition)
 {
     int insertPos = 0;
     for (int i=0; i < block->length(); i++) {
@@ -214,16 +203,11 @@ Term* if_block_append_case(Block* block)
             insertPos = term->index + 1;
     }
 
-    Term* newCase = apply(block, FUNCS.case_func, TermList());
+    Term* newCase = apply(block, FUNCS.case_func, TermList(condition));
     block->move(newCase, insertPos);
 
     if_block_setup_new_case(block, newCase);
     return newCase;
-}
-
-void case_add_condition_check(Block* caseBlock, Term* condition)
-{
-    apply(caseBlock, FUNCS.case_condition_bool, TermList(condition));
 }
 
 Term* if_block_get_output_by_name(Block* block, const char* name)
@@ -402,7 +386,7 @@ bool switch_has_default_case(Block* block)
         Term* term = block->get(i);
         if (term->function != FUNCS.case_func)
             continue;
-        if (case_find_condition_check(nested_contents(term)) == NULL)
+        if (term->input(0) == NULL)
             return true;
     }
     return false;

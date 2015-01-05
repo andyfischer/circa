@@ -122,6 +122,8 @@ bool is_symbol(Value* value);
 bool is_term_ref(Value* val);
 bool is_type(Value* value);
 
+bool is_list_with_length(Value* value, int length);
+
 // A 'leaf' value does not contain or reference any other values. Examples: int,float,bool,string.
 bool is_leaf_value(Value* value);
 
@@ -165,7 +167,7 @@ int to_int(Value* value);
 
 // If the value is a symbol, return it. If it's a value and the first element is a symbol,
 // then return that. Will recursively search if the first element is itself a list.
-// Returns sym_None if a symbol value was not found.
+// Returns s_none if a symbol value was not found.
 Symbol first_symbol(Value* value);
 
 } // namespace circa

@@ -14,18 +14,90 @@
 #include "interpreter.h"
 #include "list.h"
 #include "loops.h"
+#include "symbols.h"
+#include "string_type.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
 #include "update_cascades.h"
 
+/*
+ 
+When a for-loop is compiled to bytecode, here's what happens:
+
+  for k,i in list
+   <stuff>
+
+compiles to:
+
+  a = to_iter(list)
+  for(a) {
+    if a.done
+      break
+    k = a.key
+    i = a.next
+
+    a = a.advance
+  }
+*/
+
+
 namespace circa {
 
-Term* for_loop_get_iterator(Block* contents)
+Term* loop_find_iterator(Block* contents)
 {
     for (int i=0; i < contents->length(); i++)
-        if (contents->get(i)->function == FUNCS.loop_get_element)
+        if (contents->get(i)->function == FUNCS.loop_iterator)
             return contents->get(i);
+    return NULL;
+}
+
+Term* loop_find_iterator_value(Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->boolProp(s_iterator_value, false))
+            return term;
+    }
+    return NULL;
+}
+
+Term* loop_find_done_call(Block* block)
+{
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        Value* methodName = term->getProp(s_MethodName);
+        if (methodName && string_equals(methodName, "done"))
+            return term;
+    }
+    return NULL;
+}
+
+Term* loop_find_key(Block* block)
+{
+    Term* iterator = loop_find_iterator(block);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->input(0) != iterator)
+            continue;
+        Value* methodName = term->getProp(s_MethodName);
+        if (methodName && string_equals(methodName, "key"))
+            return term;
+    }
+    return NULL;
+}
+
+Term* loop_find_iterator_advance(Block* block)
+{
+    Term* iterator = loop_find_iterator(block);
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->input(0) != iterator)
+            continue;
+        Value* methodName = term->getProp(s_MethodName);
+        if (methodName && string_equals(methodName, "advance"))
+            return term;
+    }
     return NULL;
 }
 
@@ -36,7 +108,7 @@ Term* for_loop_find_index(Block* contents)
 
 const char* for_loop_get_iterator_name(Term* forTerm)
 {
-    Term* iterator = for_loop_get_iterator(nested_contents(forTerm));
+    Term* iterator = loop_find_iterator_value(nested_contents(forTerm));
     if (iterator == NULL)
         return "";
 
@@ -49,11 +121,28 @@ Block* get_for_loop_outer_rebinds(Term* forTerm)
     return contents->getFromEnd(0)->contents();
 }
 
-void start_building_for_loop(Term* forTerm, Value* indexName, Value* iteratorName, Type* iteratorType)
+void start_building_for_loop(Block* contents, Term* listExpr, Value* indexName,
+    Value* elementName, Type* iteratorType)
 {
-    Block* contents = nested_contents(forTerm);
+    Term* iterator = apply(contents, FUNCS.loop_iterator, TermList(listExpr));
+
+    Term* done = apply_dynamic_method(contents, s_done, TermList(iterator));
+    hide_from_source(done);
+
+    Term* getKey = apply_dynamic_method(contents, s_key, TermList(iterator));
+    hide_from_source(getKey);
+
+    if (!is_null(indexName)) {
+        Term* getIndex = apply_dynamic_method(contents, s_key, TermList(iterator), indexName);
+        hide_from_source(getIndex);
+    }
+
+    Term* getNext = apply_dynamic_method(contents, s_next, TermList(iterator), elementName);
+    getNext->setBoolProp(s_iterator_value, true);
+    hide_from_source(getNext);
 
     // Add input placeholder for the list input
+#if 0
     Term* listInput = apply(contents, FUNCS.input, TermList());
 
     // loop_index()
@@ -63,12 +152,11 @@ void start_building_for_loop(Term* forTerm, Value* indexName, Value* iteratorNam
     // loop_get_element()
     Term* iterator = apply(contents, FUNCS.loop_get_element, TermList(listInput, index), iteratorName);
     hide_from_source(iterator);
+#endif
 
     if (iteratorType != NULL) {
-        Term* castedIterator = apply(contents, FUNCS.cast_declared_type, TermList(iterator), iteratorName);
-        set_declared_type(castedIterator, iteratorType);
-    } else {
-        iteratorType = infer_type_of_get_index(forTerm->input(0));
+        Term* castedValue = apply(contents, FUNCS.cast,
+            TermList(getNext, iteratorType->declaringTerm), elementName);
     }
 }
 
@@ -86,7 +174,9 @@ void list_names_that_must_be_looped(Block* contents, Value* names)
         if (has_empty_name(term))
             continue;
 
-        Term* outsideName = find_name_at(contents->owningTerm, term_name(term));
+        Value termVal;
+        termVal.set_term(contents->owningTerm);
+        Term* outsideName = find_name_at(&termVal, term_name(term));
 
         // Don't look at names outside the major block.
         if (outsideName != NULL && !is_under_same_major_block(term, outsideName))
@@ -105,14 +195,13 @@ void insert_looped_placeholders(Block* contents)
     Value names;
     list_names_that_must_be_looped(contents, &names);
 
-    //set_input_placeholder_count(contents, hashtable_count(&names));
-    //set_output_placeholder_count(contents, hashtable_count(&names));
-
     for (ListIterator it(&names); it; ++it) {
         Term* inputPlaceholder = append_input_placeholder(contents);
         Value* name = it.value();
         rename(inputPlaceholder, name);
-        Term* outsideTerm = find_name_at(contents->owningTerm, name);
+        Value owningTermVal;
+        owningTermVal.set_term(contents->owningTerm);
+        Term* outsideTerm = find_name_at(&owningTermVal, name);
         Term* innerResult = find_local_name(contents, name);
         Term* outputPlaceholder = append_output_placeholder(contents, innerResult);
         rename(outputPlaceholder, name);
@@ -136,11 +225,11 @@ void list_names_that_should_be_used_as_minor_block_output(Block* block, Value* n
 // Find the term that should be the 'primary' result for this loop.
 Term* loop_get_primary_result(Block* block)
 {
-    Term* iterator = for_loop_get_iterator(block);
+    Term* iterator = loop_find_iterator_value(block);
 
     // For a rebound list, use the last term that has the iterator's
     // name.
-    if (block->owningTerm->boolProp(sym_ModifyList, false)) {
+    if (block->owningTerm->boolProp(s_ModifyList, false)) {
         Term* term = block->get(iterator->name());
         if (term != NULL)
             return term;
@@ -173,10 +262,15 @@ void finish_for_loop(Term* forTerm)
     // Need to finish here to prevent error
     block_finish_changes(block);
 
+    Term* primaryResult = loop_get_primary_result(block);
+
+    Term* iterator = loop_find_iterator(block);
+    Term* nextCall = apply_dynamic_method(block, s_advance, TermList(iterator));
+    hide_from_source(nextCall);
+
     // Add a a primary output
-    Term* primaryOutput = apply(block, FUNCS.output,
-            TermList(loop_get_primary_result(block)));
-    primaryOutput->setBoolProp(sym_AccumulatingOutput, true);
+    Term* primaryOutput = apply(block, FUNCS.output, TermList(primaryResult));
+    primaryOutput->setBoolProp(s_AccumulatingOutput, true); // TODO: can delete?
     respecialize_type(primaryOutput);
 
     insert_looped_placeholders(block);

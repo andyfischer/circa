@@ -6,6 +6,7 @@
 #include "kernel.h"
 #include "tagged_value.h"
 #include "type.h"
+#include "vm.h"
 
 namespace circa {
 
@@ -44,7 +45,7 @@ BlobSlice* blob_alloc_slice()
     return slice;
 }
 
-BlobRaw* blob_alloc_raw(char* data, u32 numBytes)
+BlobRaw* blob_alloc_raw(const char* data, u32 numBytes)
 {
     BlobRaw* blob = (BlobRaw*) malloc(sizeof(*blob) + numBytes);
     blob->concreteType = BLOB_RAW;
@@ -57,7 +58,7 @@ BlobRaw* blob_alloc_raw(char* data, u32 numBytes)
     return blob;
 }
 
-char* set_blob_alloc_raw(Value* value, char* data, u32 numBytes)
+char* set_blob_alloc_raw(Value* value, const char* data, u32 numBytes)
 {
     BlobRaw* raw = blob_alloc_raw(data, numBytes);
     make_no_initialize(TYPES.blob, value);
@@ -188,135 +189,135 @@ void blob_setup_type(Type* type)
     type->hashFunc = blob_hash;
 }
 
-void make_blob(Stack* stack)
+void make_blob(VM* vm)
 {
-    u32 size = circa_int_input(stack, 0);
-    set_blob_alloc_raw(circa_output(stack, 0), NULL, size);
+    u32 size = vm->input(0)->as_i();
+    set_blob_alloc_raw(vm->output(), NULL, size);
 }
 
-void Blob__size(Stack* stack)
+void Blob__size(VM* vm)
 {
-    set_int(circa_output(stack, 0), blob_size(circa_input(stack, 0)));
+    set_int(vm->output(), blob_size(vm->input(0)));
 }
 
-void Blob__slice(Stack* stack)
+void Blob__slice(VM* vm)
 {
-    Value* existingBlob = circa_input(stack, 0);
-    int offset = circa_int_input(stack, 1);
-    int size = circa_int_input(stack, 2);
+    Value* existingBlob = vm->input(0);
+    int offset = vm->input(1)->as_i();
+    int size = vm->input(2)->as_i();
 
     char* existingData;
     u32 existingNumBytes;
     blob_data(existingBlob, &existingData, &existingNumBytes);
     
-    if ((offset + size) >= existingNumBytes)
-        return circa_output_error(stack, "Offset+size is out of bounds");
+    if ((offset + size) > existingNumBytes)
+        return vm->throw_str("Offset+size is out of bounds");
 
-    circa_set_blob_from_backing_value(circa_output(stack, 0), existingBlob, existingData+offset, size);
+    circa_set_blob_from_backing_value(vm->output(), existingBlob, existingData+offset, size);
 }
 
 #define BLOB_SET(type) \
-    Value* blob = circa_input(stack, 0); \
-    int offset = circa_int_input(stack, 1); \
+    Value* blob = vm->input(0); \
+    int offset = vm->input(1)->as_i(); \
     \
     if ((offset + sizeof(type)) > blob_size(blob)) \
-        return circa_output_error(stack, "Offset is out of bounds"); \
+        return vm->throw_str("Offset is out of bounds"); \
     \
     char* data = blob_touch(blob); \
-    *(type*)(data + offset) = circa_int_input(stack, 2); \
-    move(blob, circa_output(stack, 0));
+    *(type*)(data + offset) = vm->input(2)->as_i(); \
+    move(blob, vm->output());
 
-void Blob__set_u8(Stack* stack)
+void Blob__set_u8(VM* vm)
 {
     BLOB_SET(u8);
 }
 
-void Blob__set_u16(Stack* stack)
+void Blob__set_u16(VM* vm)
 {
     BLOB_SET(u16);
 }
 
-void Blob__set_u32(Stack* stack)
+void Blob__set_u32(VM* vm)
 {
     BLOB_SET(u32);
 }
 
-void Blob__set_i8(Stack* stack)
+void Blob__set_i8(VM* vm)
 {
     BLOB_SET(i8);
 }
 
-void Blob__set_i16(Stack* stack)
+void Blob__set_i16(VM* vm)
 {
     BLOB_SET(i16);
 }
 
-void Blob__set_i32(Stack* stack)
+void Blob__set_i32(VM* vm)
 {
     BLOB_SET(i32);
 }
 
 #define BLOB_GET(type) \
-    Value* blob = circa_input(stack, 0); \
-    int offset = circa_int_input(stack, 1); \
+    Value* blob = vm->input(0); \
+    int offset = vm->input(1)->as_i(); \
     \
     char* data; \
     u32 numBytes; \
     blob_data(blob, &data, &numBytes); \
     \
     if ((offset + sizeof(type)) > numBytes) \
-        return circa_output_error(stack, "Offset is out of bounds"); \
+        return vm->throw_str("Offset is out of bounds"); \
     \
     type result = *(type*) (data + offset); \
-    set_int(circa_output(stack, 0), result);
+    set_int(vm->output(), result);
 
-void Blob__u8(Stack* stack)
+void Blob__u8(VM* vm)
 {
     BLOB_GET(u8);
 }
 
-void Blob__u16(Stack* stack)
+void Blob__u16(VM* vm)
 {
     BLOB_GET(u16);
 }
 
-void Blob__u32(Stack* stack)
+void Blob__u32(VM* vm)
 {
     BLOB_GET(u32);
 }
 
-void Blob__i8(Stack* stack)
+void Blob__i8(VM* vm)
 {
     BLOB_GET(i8);
 }
 
-void Blob__i16(Stack* stack)
+void Blob__i16(VM* vm)
 {
     BLOB_GET(i16);
 }
 
-void Blob__i32(Stack* stack)
+void Blob__i32(VM* vm)
 {
     BLOB_GET(i32);
 }
 
 void blob_install_functions(NativePatch* patch)
 {
-    circa_patch_function(patch, "make_blob", make_blob);
-    circa_patch_function(patch, "Blob.size", Blob__size);
-    circa_patch_function(patch, "Blob.slice", Blob__slice);
-    circa_patch_function(patch, "Blob.set_u8", Blob__set_u8);
-    circa_patch_function(patch, "Blob.set_u16", Blob__set_u16);
-    circa_patch_function(patch, "Blob.set_u32", Blob__set_u32);
-    circa_patch_function(patch, "Blob.set_i8", Blob__set_i8);
-    circa_patch_function(patch, "Blob.set_i16", Blob__set_i16);
-    circa_patch_function(patch, "Blob.set_i32", Blob__set_i32);
-    circa_patch_function(patch, "Blob.i8", Blob__i8);
-    circa_patch_function(patch, "Blob.i16", Blob__i16);
-    circa_patch_function(patch, "Blob.i32", Blob__i32);
-    circa_patch_function(patch, "Blob.u8", Blob__u8);
-    circa_patch_function(patch, "Blob.u16", Blob__u16);
-    circa_patch_function(patch, "Blob.u32", Blob__u32);
+    circa_patch_function2(patch, "make_blob", make_blob);
+    circa_patch_function2(patch, "Blob.size", Blob__size);
+    circa_patch_function2(patch, "Blob.slice", Blob__slice);
+    circa_patch_function2(patch, "Blob.set_u8", Blob__set_u8);
+    circa_patch_function2(patch, "Blob.set_u16", Blob__set_u16);
+    circa_patch_function2(patch, "Blob.set_u32", Blob__set_u32);
+    circa_patch_function2(patch, "Blob.set_i8", Blob__set_i8);
+    circa_patch_function2(patch, "Blob.set_i16", Blob__set_i16);
+    circa_patch_function2(patch, "Blob.set_i32", Blob__set_i32);
+    circa_patch_function2(patch, "Blob.i8", Blob__i8);
+    circa_patch_function2(patch, "Blob.i16", Blob__i16);
+    circa_patch_function2(patch, "Blob.i32", Blob__i32);
+    circa_patch_function2(patch, "Blob.u8", Blob__u8);
+    circa_patch_function2(patch, "Blob.u16", Blob__u16);
+    circa_patch_function2(patch, "Blob.u32", Blob__u32);
 }
 
 } // namespace circa

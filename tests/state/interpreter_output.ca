@@ -9,4 +9,4 @@ def b(a)
 
 int = make_vm(b)
 int.call(1)
-print(int.extract_state)
+print(int.get_state)
