@@ -9,5 +9,7 @@ def main()
       s += 1
       print(' step 2, state = ' s)
 
-make_vm(main).run.run
+vm = make_vm(main)
+vm.call
+vm.call
 

@@ -464,6 +464,13 @@ Value* hashtable_get_int_key(Value* table, int key)
     return hashtable_get(table, &boxedKey);
 }
 
+Value* hashtable_insert_term_key(Value* table, Term* term)
+{
+    Value boxedKey;
+    set_term_ref(&boxedKey, term);
+    return hashtable_insert(table, &boxedKey);
+}
+
 Value* hashtable_get_term_key(Value* table, Term* term)
 {
     Value boxedKey;

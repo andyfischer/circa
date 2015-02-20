@@ -817,6 +817,13 @@ Value* set_list(Value* value)
     return value;
 }
 
+Value* set_list_1(Value* value, Value* item1)
+{
+    set_list(value, 1);
+    copy(item1, value->index(0));
+    return value;
+}
+
 void set_string(Value* value, std::string const& s)
 {
     set_string(value, s.c_str());

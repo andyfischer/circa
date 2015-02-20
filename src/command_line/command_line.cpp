@@ -42,10 +42,6 @@
 
 namespace circa {
 
-// TODO: delete
-static Value* circa_input(Stack* stack, int index) { return NULL; }
-static Value* circa_output(Stack* stack, int index) { return NULL; }
-
 void run_repl_stdin(World* world);
 
 bool circa_get_line(Value* lineOut)
@@ -281,6 +277,7 @@ int run_command_line(caWorld* world, Value* args)
         return 0;
     }
 
+#if 0
     if (string_equals(list_get(args, 0), "-call")) {
         Block* block = load_module_by_filename(world, list_get(args, 1));
 
@@ -344,25 +341,7 @@ int run_command_line(caWorld* world, Value* args)
         }
         return 0;
     }
-
-    // Run file checker
-    if (string_equals(list_get(args, 0), "-check")) {
-        Block* inputBlock = load_module_by_filename(world, list_get(args, 1));
-
-        Value str_static_checking;
-        set_string(&str_static_checking, "static_checking");
-        Block* staticChecking = load_module(world, NULL, &str_static_checking);
-        Block* func = find_function_local(staticChecking, "check_block_and_report");
-
-        Stack stack;
-        stack_init(&stack, func);
-        set_block(circa_input(&stack, 0), inputBlock);
-
-        circa_run(&stack);
-        if (stack_errored(&stack))
-            dump(&stack);
-        return 0;
-    }
+#endif
 
     // Command reader (from stdin)
     if (string_equals(list_get(args, 0), "-run-stdin")) {
@@ -379,16 +358,18 @@ int run_command_line(caWorld* world, Value* args)
         Block* sourceRepro = load_module(world, NULL, &sourceReproStr);
         Block* to_source_string = find_function_local(sourceRepro, "block_to_string");
 
-        Stack stack;
-        stack_init(&stack, to_source_string);
-        set_block(circa_input(&stack, 0), block);
+        VM* vm = new_vm(to_source_string);
+        set_block(vm->input(0), block);
 
-        circa_run(&stack);
+        vm_run(vm, NULL);
 
-        if (stack_errored(&stack))
-            dump(&stack);
+        if (vm_has_error(vm))
+            vm->dump();
         else
-            printf("%s\n", as_cstring(circa_output(&stack, 0)));
+            printf("%s\n", as_cstring(vm->output()));
+
+        free_vm(vm);
+        
         return 0;
     }
 

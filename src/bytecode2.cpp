@@ -317,6 +317,9 @@ void cast_fixed_type(Bytecode* bc, int slot, Type* type)
 
 bool should_write_state_header(Bytecode* bc, Block* block)
 {
+    // No state in while-loop. Maybe temp, maybe permanant.
+    if (is_while_loop(block))
+        return false;
     return block_has_state(block) != s_no;
 }
 

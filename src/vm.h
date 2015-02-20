@@ -32,6 +32,8 @@ struct VM {
     Value state;
     int stateTop;
 
+    Value demandEvalMap; // Map of Term -> value
+
     Value incomingEnv; // env from calling context
     Value env; // actual env (including inheritance)
     RandState randState;
@@ -61,6 +63,7 @@ struct VMStateFrame {
 #endif
     
 VM* new_vm(Block* main);
+void free_vm(VM* vm);
 void vm_grow_stack(VM* vm, int newSize);
 void vm_on_code_change(VM* vm);
 bool vm_check_if_hacks_changed(VM* vm);
@@ -78,12 +81,6 @@ void save_state_value(VM* vm, Value* key, Value* value);
 
 void vm_prepare_env(VM* vm, VM* callingVM);
 void vm_cleanup_on_stop(VM* vm);
-
-#if 0
-Value* vm_state_push_key(VM* vm);
-void vm_state_load_frame(VM* vm, int framePos);
-void vm_state_store_frame(VM* vm);
-#endif
 
 Term* vm_calling_term(VM* vm);
 void vm_to_frame_list(VM* vm, Value* frameList);

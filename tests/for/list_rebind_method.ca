@@ -11,6 +11,6 @@ items = [T.make(1), T.make(2), T.make(3)]
 print('items start: ' items)
 
 for T t in @items
-    t.increment
+  @t.increment
 
 print('items end: ' items)

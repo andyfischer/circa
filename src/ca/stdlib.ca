@@ -112,7 +112,6 @@ def arctan(number n) -> number
   -- Trigonometric arctan() function
 
 -- Secret functions used by interpreter
-  -- Special call, read this frame's state.
 def _get_local_stack_path() -> any
 -- def _find_active_value(term) -> (any, bool)
 def _save_state_result(Term declaredStateTerm, any result)
@@ -124,7 +123,6 @@ def dbg_get_outgoing_state() -> any
 def dbg_set_incoming_state(val)
 def dbg_set_outgoing_state(val)
 def reflect_caller(int height) -> Term
-def vm_incoming_state(int height) -> Map
 
 -- Type checking
 def is_compound(n) -> bool
@@ -370,7 +368,31 @@ def ListSeq.advance(self) -> ListSeq
 def List.to_seq(self)
   ListSeq.make(self 0)
 
--- to_seq is used inside loops, no loops allowed before this function.
+struct ConcatSeq {
+  any left
+  any right
+}
+
+def ConcatSeq.done(self)
+  self.left.done and self.right.done
+
+def ConcatSeq.settle(self)
+  cond(self.left.done, self.right, self)
+
+def ConcatSeq.next(self)
+  self.left.next
+
+def ConcatSeq.advance(@self)
+  @self.left.advance
+  @self.settle
+
+def ConcatSeq.key(self)
+  self.left.key
+
+def concat_seq(left, right)
+  ConcatSeq.make(to_seq(left) to_seq(right)).settle
+
+-- to_seq is used inside loops, so don't write any loops before this declaration.
 def to_seq(val) -> any
   if is_list(val)
     val.to_seq
@@ -392,9 +414,8 @@ def Range.next(self)
 def Range.key(self) -> int
   self.from
  
-def Range.advance(self) -> Range
+def Range.advance(@self) -> Range
   self.from += self.by
-  self
 
 def range(from, to)
   Range.make(from to 1)
@@ -403,22 +424,20 @@ def range_by(from, to, by)
   Range.make(from to by)
 
 def fold(it, func, accum)
-  to_seq(@it)
-
-  while not it.done
-    accum = func.call(accum it.next)
-    @it.advance
-
+  for i in it
+    accum = func.call(accum i)
   accum
 
 def flatten(it) -> List
-  to_seq(@it)
-
   -- Language defect: Should be able to refer to the function List.append directly.
   def append(List list, item) -> List
     list.append(item)
     
   fold(it append [])
+
+def visit(it, func)
+  for i in it
+    func(i)
 
 def inputs_fit_function(List inputs, Func func) -> bool
 def overload_error_no_match(List inputs)
@@ -492,12 +511,23 @@ def _declared_state(existing, Type type, initializer) -> any
   -- No initializer. Use the type's default value.
   return make(type)
 
-def vm_save_declared_state(result)
-def vm_close_stateful_minor_frame(result)
-def vm_capture_state_frames()
+def vm_demand_eval_find_existing(Term t) -> List
+def vm_demand_eval_store(Term t, any val)
 
-def _dynamic_term_eval(Term t, List inputs) -> any
-  t.function.to_func.apply(inputs)
+def vm_demand_eval(Term t) -> any
+  if t.is_value or t.is_func_decl
+    return t.value
+
+  existing = vm_demand_eval_find_existing(t)
+  if existing != []
+    return existing.first
+
+  inputs = for Term input in t.inputs
+    vm_demand_eval(input)
+
+  result = t.function.to_func.apply(inputs)
+  vm_demand_eval_store(t result)
+  result
 
 {-
 def _eval_on_demand(Term t) -> any

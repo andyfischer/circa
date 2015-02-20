@@ -1,0 +1,11 @@
+
+def fold(it, func, accum)
+  for i in it
+    accum = func.call(accum i)
+  accum
+
+def append(l, i)
+  l.append(i)
+
+result = fold([1 2 3] append [:x])
+assert(result == [:x 1 2 3])

@@ -43,6 +43,8 @@ VM* new_vm(Block* main)
     vm->stateTop = -1;
     set_hashtable(&vm->state);
     vm->inputCount = 0;
+    initialize_null(&vm->demandEvalMap);
+    set_hashtable(&vm->demandEvalMap);
     initialize_null(&vm->incomingUpvalues);
     initialize_null(&vm->incomingEnv);
     set_hashtable(&vm->incomingEnv);
@@ -50,6 +52,18 @@ VM* new_vm(Block* main)
     set_hashtable(&vm->env);
     rand_init(&vm->randState, 0);
     return vm;
+}
+
+void free_vm(VM* vm)
+{
+    set_null(&vm->topLevelUpvalues);
+    set_null(&vm->bcHacks);
+    vm->stack.clear();
+    set_null(&vm->incomingUpvalues);
+    set_null(&vm->state);
+    set_null(&vm->demandEvalMap);
+    set_null(&vm->incomingEnv);
+    set_null(&vm->env);
 }
 
 VM* vm_duplicate(VM* source)
@@ -276,6 +290,22 @@ void reflect_caller(VM* vm)
 
     Term* term = find_active_term(vm->bc, frame.pc);
     set_term_ref(vm->output(), term);
+}
+
+void vm_demand_eval_find_existing(VM* vm)
+{
+    Term* term = vm->input(0)->asTerm();
+    Value* found = hashtable_get_term_key(&vm->demandEvalMap, term);
+    if (found == NULL)
+        set_list(vm->output());
+    else
+        set_list_1(vm->output(), found);
+}
+
+void vm_demand_eval_store(VM* vm)
+{
+    Term* term = vm->input(0)->asTerm();
+    copy(vm->input(1), hashtable_insert_term_key(&vm->demandEvalMap, term));
 }
 
 #if 0
@@ -976,6 +1006,8 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function2(patch, "VM.precompile", VM__precompile);
     circa_patch_function2(patch, "bytecode_mop_size", bytecode_get_mop_size);
     circa_patch_function2(patch, "reflect_caller", reflect_caller);
+    circa_patch_function2(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
+    circa_patch_function2(patch, "vm_demand_eval_store", vm_demand_eval_store);
 #if 0
     circa_patch_function2(patch, "vm_incoming_state", vm_incoming_state);
     circa_patch_function2(patch, "vm_save_declared_state", vm_save_declared_state);

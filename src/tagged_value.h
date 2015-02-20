@@ -154,6 +154,7 @@ void set_hashtable(Value* value);
 void set_int(Value* value, int i);
 Value* set_list(Value* value);
 Value* set_list(Value* value, int size);
+Value* set_list_1(Value* value, Value* item1);
 void set_opaque_pointer(Value* value, void* addr);
 void set_string(Value* value, const char* s);
 void set_string(Value* value, std::string const& s);
