@@ -9,9 +9,7 @@
 #include "function.h"
 #include "hashtable.h"
 #include "kernel.h"
-#include "importing.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "list.h"
 #include "loops.h"
 #include "symbols.h"
@@ -140,19 +138,6 @@ void start_building_for_loop(Block* contents, Term* listExpr, Value* indexName,
     Term* getNext = apply_dynamic_method(contents, s_next, TermList(iterator), elementName);
     getNext->setBoolProp(s_iterator_value, true);
     hide_from_source(getNext);
-
-    // Add input placeholder for the list input
-#if 0
-    Term* listInput = apply(contents, FUNCS.input, TermList());
-
-    // loop_index()
-    Term* index = apply(contents, FUNCS.loop_index, TermList(), indexName);
-    hide_from_source(index);
-
-    // loop_get_element()
-    Term* iterator = apply(contents, FUNCS.loop_get_element, TermList(listInput, index), iteratorName);
-    hide_from_source(iterator);
-#endif
 
     if (iteratorType != NULL) {
         Term* castedValue = apply(contents, FUNCS.cast,

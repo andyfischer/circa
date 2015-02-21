@@ -8,7 +8,6 @@
 #include "building.h"
 #include "kernel.h"
 #include "code_iterators.h"
-#include "interpreter.h"
 #include "file.h"
 #include "function.h"
 #include "hashtable.h"

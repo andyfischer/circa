@@ -8,7 +8,6 @@
 #include "file.h"
 #include "hashtable.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"
@@ -16,7 +15,6 @@
 #include "native_patch.h"
 #include "rand.h"
 #include "replication.h"
-#include "stack.h"
 #include "string_repr.h"
 #include "string_type.h"
 #include "symbols.h"
@@ -33,10 +31,6 @@ namespace circa {
 
 Value* g_oracleValues;
 Value* g_spyValues;
-
-// TODO: delete
-static Value* circa_input(Stack* stack, int index) { return NULL; }
-static Value* circa_output(Stack* stack, int index) { return NULL; }
 
 void abs(VM* vm)
 {
@@ -86,37 +80,6 @@ void copy_eval(VM* vm)
     copy(vm->input(0), vm->output());
 }
 
-#if 0
-void cast_declared_type(Stack* stack)
-{
-    Value* source = circa_input(stack, 0);
-
-    Type* type = circa_caller_term(stack)->type;
-
-    if (type == TYPES.any)
-        return move(source, circa_output(stack, 0));
-
-    if (!cast_possible(source, type)) {
-        std::stringstream message;
-        Value msg;
-        string_append(&msg, "Can't cast value ");
-        string_append_quoted(&msg, source);
-        string_append(&msg, " to type ");
-        string_append(&msg, &type->name);
-
-        return circa_output_error(stack, as_cstring(&msg));
-    }
-
-    Value* output = circa_output(stack, 0);
-    move(source, output);
-    touch(output);
-    bool success = cast(output, type);
-
-    if (!success)
-        return circa_output_error(stack, "cast failed");
-}
-#endif
-
 void cast_evaluate(VM* vm)
 {
     // Another version of cast(), this one returns a nullable output.
@@ -128,11 +91,6 @@ void cast_evaluate(VM* vm)
     bool success = cast(result, type);
     if (!success)
         set_null(result);
-}
-
-void debug_break(Stack* stack)
-{
-    printf("debug_break..\n");
 }
 
 void div_f(VM* vm)
@@ -207,76 +165,6 @@ void hosted_is_type(VM* vm)
 }
 
 #if 0
-void inputs_fit_function(Stack* stack)
-{
-    Value* inputs = circa_input(stack, 0);
-    Term* function = circa_caller_input_term(stack, 1);
-    Block* functionContents = nested_contents(function);
-    Value* result = circa_output(stack, 0);
-
-    bool varArgs = has_variable_args(functionContents);
-
-    // Fail if wrong # of inputs
-    if (!varArgs && (count_input_placeholders(functionContents) != circa_count(inputs))) {
-        set_bool(result, false);
-        return;
-    }
-
-    // Check each input
-    for (int i=0; i < circa_count(inputs); i++) {
-        Term* placeholder = get_effective_input_placeholder(functionContents, i);
-        Value* value = circa_index(inputs, i);
-        if (value == NULL)
-            continue;
-        if (!cast_possible(value, declared_type(placeholder))) {
-            set_bool(result, false);
-            return;
-        }
-    }
-
-    set_bool(result, true);
-}
-void overload_error_no_match(Stack* stack)
-{
-    Value* inputs = circa_input(stack, 00);
-
-    Term* caller = (Term*) circa_caller_term(stack);
-    Term* func = parent_term(caller, 3);
-
-    std::stringstream out;
-    Value msg;
-    string_append(&msg, "In overloaded function ");
-
-    if (func == NULL)
-        string_append(&msg, "<name not found>");
-    else
-        string_append(&msg, term_name(func));
-    string_append(&msg, ", no func could handle inputs: ");
-    string_append(&msg, inputs);
-    circa_output_error(stack, as_cstring(&msg));
-}
-
-void unique_id(Stack* stack)
-{
-    static int nextId = 1; // TODO: this should probably be stored on World?
-    set_int(circa_output(stack, 0), nextId++);
-}
-
-void source_id(Stack* stack)
-{
-#if 0
-    // TODO
-    Term* caller = frame_current_term(top_frame_parent(stack));
-    get_global_name(caller, circa_output(stack, 0));
-#endif
-}
-
-void write_text_file_func(Stack* stack)
-{
-    write_text_file(circa_string_input(stack, 0), circa_string_input(stack, 1));
-}
-#endif
-
 void from_string(Stack* stack)
 {
     parse_string_repr(circa_input(stack, 0), circa_output(stack, 0));
@@ -286,6 +174,7 @@ void to_string_repr(Stack* stack)
 {
     write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
+#endif
 
 void test_oracle(VM* vm)
 {
@@ -336,28 +225,6 @@ void test_oracle_send(int i)
 }
 
 #if 0
-void refactor__rename(Stack* stack)
-{
-    rename(as_term_ref(circa_input(stack, 0)), circa_input(stack, 1));
-}
-
-void refactor__change_function(Stack* stack)
-{
-    change_function(as_term_ref(circa_input(stack, 0)),
-        (Term*) circa_caller_input_term(stack, 1));
-}
-#endif
-
-void reflect__this_block(Stack* stack)
-{
-    set_block(circa_output(stack, 0), (Block*) circa_caller_block(stack));
-}
-
-void sys__module_search_paths(Stack* stack)
-{
-    copy(module_search_paths(stack->world), circa_output(stack, 0));
-}
-
 void perf_stats_dump(Stack* stack)
 {
     perf_stats_to_map(circa_output(stack, 0));
@@ -368,6 +235,7 @@ void global_script_version(Stack* stack)
     World* world = stack->world;
     set_int(circa_output(stack, 0), world->globalScriptVersion);
 }
+#endif
 
 void method_lookup(VM* vm)
 {
@@ -402,9 +270,9 @@ void get_field(VM* vm)
     copy(value, vm->output());
 }
 
+#if 0
 void has_method(Stack* stack)
 {
-#if 0
     Value* object = circa_input(stack, 0);
     Value* field = circa_input(stack, 1);
 
@@ -415,8 +283,8 @@ void has_method(Stack* stack)
 
     if (is_hashtable(object) && hashtable_get(object, field) != NULL)
         return true;
-#endif
 }
+#endif
 
 void get_index(VM* vm)
 {
@@ -684,32 +552,13 @@ void arctan_func(VM* vm)
     set_float(circa_output(vm), radians_to_degrees(result));
 }
 
-void range(Stack* stack)
-{
-    int start = circa_int_input(stack, 0);
-    int max = circa_int_input(stack, 1);
-
-    unsigned count = std::abs(max - start);
-    
-    if (count > 1000000)
-        return circa_output_error(stack, "Range is too large");
-    
-    Value* output = circa_output(stack, 0);
-    set_list(output, count);
-
-    int val = start;
-    int increment = start < max ? 1 : -1;
-    for (int i=0; i < count; i++) {
-        set_int(list_get(output, i), val);
-        val += increment;
-    }
-}
-
+#if 0
 void rpath(Stack* stack)
 {
     caBlock* block = circa_caller_block(stack);
     get_path_relative_to_source(block, circa_input(stack, 0), circa_output(stack, 0));
 }
+#endif
 
 void set_field(VM* vm)
 {
@@ -758,13 +607,6 @@ void repeat(VM* vm)
 
     for (int i=0; i < repeatCount; i++)
         copy(source, circa_index(out, i));
-}
-
-void int__to_hex_string(Stack* stack)
-{
-    std::stringstream strm;
-    strm << std::hex << as_int(circa_input(stack, 0));
-    set_string(circa_output(stack, 0), strm.str().c_str());
 }
 
 void less_than_i(VM* vm)
@@ -836,24 +678,6 @@ void List__resize(VM* vm)
     copy(circa_input(vm, 0), out);
     int count = circa_input(vm, 1)->as_i();
     circa_resize(out, count);
-}
-
-void List__extend(VM* vm)
-{
-#if 0
-    FIXME
-    Value* out = circa_output(vm, 1);
-    copy(circa_input(vm, 0), out);
-
-    Value* additions = circa_input(vm, 1);
-
-    int oldLength = list_length(out);
-    int additionsLength = list_length(additions);
-
-    list_resize(out, oldLength + additionsLength);
-    for (int i = 0; i < additionsLength; i++)
-        copy(list_get(additions, i), list_get(out, oldLength + i));
-#endif
 }
 
 void List__count(VM* vm)
@@ -1202,6 +1026,7 @@ void String__split(VM* vm)
     string_split(circa_input(vm, 0), string_get(circa_input(vm, 1), 0), circa_output(vm));
 }
 
+#if 0
 void file__exists(Stack* stack)
 {
     set_bool(circa_output(stack, 0),
@@ -1217,59 +1042,12 @@ void file__read_text(Stack* stack)
 {
     circa_read_file(stack->world, circa_string_input(stack, 0), circa_output(stack, 0));
 }
-
-#if 0
-void channel_send(Stack* stack)
-{
-    Value* name = circa_input(stack, 0);
-    Value* channel = find_env_value(stack, name);
-    if (channel == NULL) {
-        channel = stack_env_insert(stack, name);
-        set_list(channel, 0);
-    }
-
-    move(circa_input(stack, 1), list_append(channel));
-}
-
-void channel_read(Stack* stack)
-{
-    Value* name = circa_input(stack, 0);
-    Value* channel = find_env_value(stack, name);
-    if (channel == NULL)
-        set_list(circa_output(stack, 0), 0);
-    else {
-        move(channel, circa_output(stack, 0));
-        set_list(channel, 0);
-    }
-}
-
-void find_active_value(Stack* stack)
-{
-    Term* term = as_term_ref(circa_input(stack, 0));
-    Value* value = stack_find_nonlocal(top_frame(stack), term);
-
-    if (value == NULL) {
-        set_bool(circa_output(stack, 1), false);
-    } else {
-        set_value(circa_output(stack, 0), value);
-        set_bool(circa_output(stack, 1), true);
-    }
-}
 #endif
 
 void typeof_func(VM* vm)
 {
     set_type(vm->output(), get_value_type(vm->input(0)));
 }
-
-#if 0
-void static_type_func(Stack* stack)
-{
-    Term* caller = (Term*) circa_caller_term(stack);
-    Term* input = caller->input(0);
-    set_type(circa_output(stack, 0), input->type);
-}
-#endif
 
 void length(VM* vm)
 {
@@ -1338,14 +1116,6 @@ void print(VM* vm)
 }
 
 #if 0
-void to_string(Stack* stack)
-{
-    Value* in = circa_input(stack, 0);
-    Value* out = circa_output(stack, 0);
-    to_string(in, out);
-}
-#endif
-
 void compute_patch_hosted(Stack* stack)
 {
     Value error;
@@ -1376,6 +1146,7 @@ void destructure_list(Stack* stack)
             copy(list->index(i), circa_output(stack, i));
     }
 }
+#endif
 
 void misc_builtins_setup_functions(NativePatch* patch)
 {
@@ -1383,13 +1154,10 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function2(patch, "add_f", add_f);
     circa_patch_function2(patch, "abs", abs);
     circa_patch_function2(patch, "assert", assert_func);
-    circa_patch_function(patch, "cast_declared_type", cast_declared_type);
     circa_patch_function2(patch, "cast", cast_evaluate);
-    circa_patch_function(patch, "debug_break", debug_break);
     circa_patch_function2(patch, "str", str);
     circa_patch_function2(patch, "cond", cond);
     circa_patch_function2(patch, "copy", copy_eval);
-    circa_patch_function(patch, "destructure_list", destructure_list);
     circa_patch_function2(patch, "div_f", div_f);
     circa_patch_function2(patch, "div_i", div_i);
     circa_patch_function2(patch, "empty_list", empty_list);
@@ -1397,7 +1165,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function2(patch, "error", error);
     circa_patch_function2(patch, "method_lookup", method_lookup);
     circa_patch_function2(patch, "get_field", get_field);
-    circa_patch_function(patch, "has_method", has_method);
     circa_patch_function2(patch, "get_index", get_index);
     circa_patch_function2(patch, "get_with_symbol", get_with_symbol);
     circa_patch_function2(patch, "is_compound", hosted_is_compound);
@@ -1411,7 +1178,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function2(patch, "is_function", hosted_is_function);
     circa_patch_function2(patch, "is_type", hosted_is_type);
     circa_patch_function2(patch, "length", length);
-    circa_patch_function(patch, "int.to_hex_string", int__to_hex_string);
     circa_patch_function2(patch, "less_than_i", less_than_i);
     circa_patch_function2(patch, "less_than_f", less_than_f);
     circa_patch_function2(patch, "less_than_eq_i", less_than_eq_i);
@@ -1504,7 +1270,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "file_read_text", file__read_text);
     circa_patch_function(patch, "channel_send", channel_send);
     circa_patch_function(patch, "channel_read", channel_read);
-    circa_patch_function(patch, "_find_active_value", find_active_value);
 
     circa_patch_function(patch, "noise", noise);
     circa_patch_function2(patch, "not_equals", not_equals);

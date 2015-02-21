@@ -53,14 +53,6 @@ void check_input_for_static_error(Value* errors, Term* term, int index)
             append_static_error_for_input(errors, term, "null_input", index);
         return;
     }
-
-    // Check type
-    // Currently disabled
-#if 0
-    Type* type = placeholder->type;
-    if (term_output_never_satisfies_type(input, type))
-        append_static_error_for_input(errors, term, "type_mismatch", index);
-#endif
 }
 
 void check_term_for_static_error(Value* errors, Term* term)
@@ -70,22 +62,6 @@ void check_term_for_static_error(Value* errors, Term* term)
 
     if (term->function == FUNCS.unknown_function)
         return append_static_error(errors, term, "unknown_function");
-
-    //if (!is_function(term->function))
-    //    return append_static_error(errors, term, "not_a_function");
-
-    //bool varArgs = term_has_variable_args(term);
-    //int expectedInputCount = term_count_input_placeholders(term);
-
-    // Checking input count here is disabled. TODO: Look at bytecode instead.
-
-#if 0
-    for (int input=0; input < term->numInputs(); input++)
-        check_input_for_static_error(errors, term, input);
-#endif
-
-    //if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
-    //    return append_static_error(errors, term, "not_a_function");
 
     // Unknown identifier
     if (term->function == FUNCS.unknown_identifier)
@@ -260,22 +236,6 @@ bool print_static_errors_formatted(Block* block)
     dump(&out);
     return result;
 }
-
-#if 0
-std::string get_static_errors_formatted(Block* block)
-{
-    std::stringstream out;
-    print_static_errors_formatted(block, out);
-    return out.str();
-}
-
-std::string get_static_error_message(Term* term)
-{
-    std::stringstream out;
-    format_static_error(term, out);
-    return out.str();
-}
-#endif
 
 void mark_static_error(Term* term, const char* msg)
 {

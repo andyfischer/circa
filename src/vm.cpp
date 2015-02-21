@@ -74,6 +74,26 @@ VM* vm_duplicate(VM* source)
     return vm;
 }
 
+void vm_reset(VM* vm, Block* newBlock)
+{
+    vm->pc = 0;
+    vm->stack.clear();
+    vm->mainBlock = newBlock;
+    vm->error = false;
+    vm->stackTop = 0;
+    vm->stack.clear();
+    set_hashtable(&vm->state);
+    vm->stateTop = -1;
+    set_hashtable(&vm->demandEvalMap);
+    set_hashtable(&vm->incomingEnv);
+    set_hashtable(&vm->env);
+    vm_on_code_change(vm);
+}
+
+void vm_reset_with_closure(VM* vm, Value* closure)
+{
+}
+
 static inline Value* get_slot(VM* vm, int slot)
 {
     int index = vm->stackTop + slot;
@@ -308,79 +328,6 @@ void vm_demand_eval_store(VM* vm)
     copy(vm->input(1), hashtable_insert_term_key(&vm->demandEvalMap, term));
 }
 
-#if 0
-VMStateFrame find_state_frame_at_maddr(VM* vm, int top, int maddr)
-{
-    VMStateFrame stateFrame;
-    stateFrame.top = top;
-    stateFrame.maddr = 0;
-    stateFrame.key = NULL;
-    stateFrame.incoming = NULL;
-    stateFrame.outgoing = NULL;
-    stateFrame.isMajorBlock = false;
-
-    bool done = false;
-    for (; !done && maddr >= 0; maddr--) {
-        maddr = mop_search_skip_minor_blocks(vm->bc, maddr);
-
-        BytecodeMetadata md = vm->bc->metadata[maddr];
-        switch (md.mopcode) {
-        case mop_state_key:
-            stateFrame.key = vm->stack[top + md.slot];
-            break;
-        case mop_state_header:
-            stateFrame.incoming = vm->stack[top + md.slot];
-            stateFrame.outgoing = vm->stack[top + md.slot + 1];
-            break;
-        case mop_minor_block_start:
-            stateFrame.maddr = maddr;
-            done = true;
-            break;
-        case mop_major_block_start:
-            stateFrame.isMajorBlock = true;
-            done = true;
-            break;
-        }
-    }
-
-    if (stateFrame.key == NULL && top > 0) {
-        // No mop_state_key header found, use the calling term as state key.
-        VMStackFrame stackFrame;
-        stackFrame.top = top;
-        stackFrame = vm_walk_up_stack_frames(vm, stackFrame, 1);
-        Term* term = find_active_term(vm->bc, stackFrame.pc);
-        stateFrame.key = unique_name(term);
-    }
-
-    return stateFrame;
-}
-
-VMStateFrame find_state_frame_at_stack_frame(VM* vm, VMStackFrame stackFrame)
-{
-    int maddr = find_metadata_addr_for_addr(vm->bc, stackFrame.pc);
-    return find_state_frame_at_maddr(vm, stackFrame.top, maddr);
-}
-
-VMStateFrame find_parent_state_frame(VM* vm, VMStateFrame frame)
-{
-    if (frame.isMajorBlock) {
-        if (frame.top == 0) {
-            VMStateFrame result;
-            result.top = -1;
-            return result;
-        }
-
-        VMStackFrame stackFrame;
-        stackFrame.top = frame.top;
-
-        stackFrame = vm_walk_up_stack_frames(vm, stackFrame, 1);
-        return find_state_frame_at_stack_frame(vm, stackFrame);
-    } else {
-        return find_state_frame_at_maddr(vm, frame.top, frame.maddr - 1);
-    }
-}
-#endif
-
 void push_state_frame(VM* vm, int newTop, Value* key)
 {
     #if TRACE_STATE_EXECUTION
@@ -514,177 +461,6 @@ void save_state_value(VM* vm, Value* key, Value* value)
         copy(value, hashtable_insert(frameOutgoing, key));
     }
 }
-
-#if 0
-Value* open_incoming_state(VM* vm, VMStateFrame frame)
-{
-    #if TRACE_STATE_EXECUTION
-        printf("open_incoming_state: state frame {top:%d, maddr:%d}\n", frame.top, frame.maddr);
-    #endif
-
-    if (frame.incoming != NULL && is_hashtable(frame.incoming)) {
-        // Header found and value already loaded.
-        #if TRACE_STATE_EXECUTION
-            printf("open_incoming_state: found loaded incoming %s\n",
-                frame.incoming->to_c_string());
-        #endif
-        return frame.incoming;
-    }
-
-    VMStateFrame parentFrame = find_parent_state_frame(vm, frame);
-    
-    #if TRACE_STATE_EXECUTION
-        printf("open_incoming_state: found parent frame {top:%d, maddr:%d}\n",
-            parentFrame.top, parentFrame.maddr);
-    #endif
-
-    if (parentFrame.top == -1) {
-        #if TRACE_STATE_EXECUTION
-            printf("open_incoming_state: using topmost frame\n");
-        #endif
-        // Reached the top frame.
-        return &vm->state;
-    }
-
-    // Pull value out from parent frame
-    Value* parentIncoming = open_incoming_state(vm, parentFrame);
-
-    #if TRACE_STATE_EXECUTION
-        printf("open_incoming_state: parent incoming is: %s\n", parentIncoming->to_c_string());
-    #endif
-
-    Value* found = NULL;
-    
-    if (parentIncoming != NULL)
-        found = hashtable_get(parentIncoming, frame.key);
-
-    #if TRACE_STATE_EXECUTION
-        printf("open_incoming_state: found is: %s\n", found->to_c_string());
-    #endif
-
-    if (found == NULL) {
-        if (frame.incoming != NULL) {
-            // Save an empty hashtable in our header, so that we don't need to do this search again.
-            set_hashtable(frame.incoming);
-            return frame.incoming;
-        }
-        return NULL;
-    }
-    
-    // Found the result, save to our header and return.
-    if (frame.incoming != NULL)
-        copy(found, frame.incoming); // Future: might be able to optimize this to move()
-
-    return found;
-}
-
-Value* prepare_outgoing_state(VM* vm, VMStateFrame frame)
-{
-    if (frame.outgoing != NULL && is_hashtable(frame.outgoing))
-        // Header found and outgoing value already prepared
-        return frame.outgoing;
-
-    if (frame.outgoing != NULL) {
-        set_hashtable(frame.outgoing);
-        return frame.outgoing;
-    }
-
-    // No state header, add a field to parent state.
-    VMStateFrame parentFrame = find_parent_state_frame(vm, frame);
-
-    if (parentFrame.top == -1)
-        // Reached the top frame.
-        return &vm->state;
-
-    Value* parentOutgoing = prepare_outgoing_state(vm, parentFrame);
-
-    Value* outgoing = hashtable_insert(parentOutgoing, frame.key);
-    set_hashtable(outgoing);
-    return outgoing;
-}
-
-void vm_incoming_state(VM* vm)
-{
-
-    int height = vm->input(0)->as_i();
-    VMStackFrame stackFrame = vm_walk_up_stack_frames(vm, vm_top_stack_frame(vm), height + 1);
-
-    #if TRACE_STATE_EXECUTION
-        printf("vm_incoming_state: stack frame {top:%d, pc:%d}\n", stackFrame.top, stackFrame.pc);
-    #endif
-
-    Value* value = open_incoming_state(vm, find_state_frame_at_stack_frame(vm, stackFrame));
-    if (value == NULL)
-        set_hashtable(vm->output());
-    else
-        copy(value, vm->output());
-}
-
-void vm_save_declared_state(VM* vm)
-{
-    Value* result = vm->input(0);
-    VMStackFrame frame = vm_walk_up_stack_frames(vm, vm_top_stack_frame(vm), 1);
-    Term* caller = find_active_term(vm->bc, frame.pc);
-    ca_assert(caller != NULL);
-    Value* stateKey = unique_name(caller);
-    Value* outgoing = prepare_outgoing_state(vm, find_state_frame_at_stack_frame(vm, frame));
-
-    #if TRACE_STATE_EXECUTION
-        printf("vm_save_declared_state: saving %s with key %s to outgoing %s\n",
-            result->to_c_string(), stateKey->to_c_string(),
-            outgoing->to_c_string());
-    #endif
-
-    copy(result, hashtable_insert(outgoing, stateKey));
-}
-
-void vm_close_stateful_minor_frame(VM* vm)
-{
-    VMStackFrame stackFrame = vm_walk_up_stack_frames(vm, vm_top_stack_frame(vm), 1);
-    VMStateFrame stateFrame = find_state_frame_at_stack_frame(vm, stackFrame);
-
-    // should always be a state header where there is a vm_close_stateful_minor_frame()
-    ca_assert(stateFrame.incoming != NULL);
-
-    VMStateFrame parentStateFrame = find_parent_state_frame(vm, stateFrame);
-
-    #if TRACE_STATE_EXECUTION
-        printf("vm_close_stateful_minor_frame: saving outgoing %s with key %s\n",
-            stateFrame.outgoing->to_c_string(), stateFrame.key->to_c_string());
-    #endif
-
-    if (parentStateFrame.top == -1) {
-        move(stateFrame.outgoing, &vm->state);
-    } else {
-        Value* parentOutgoing = prepare_outgoing_state(vm, parentStateFrame);
-        move(stateFrame.outgoing, hashtable_insert(parentOutgoing, stateFrame.key));
-    }
-}
-
-void vm_capture_state_frames(VM* vm)
-{
-    Value* out = vm->output()->set_list(0);
-
-    VMStateFrame frame = find_state_frame_at_stack_frame(vm, vm_top_stack_frame(vm));
-    while (frame.top >= 0) {
-
-        Value* item = out->append();
-        set_hashtable(item);
-        item->insert(s_top)->set_int(frame.top);
-        item->insert(s_maddr)->set_int(frame.maddr);
-        if (frame.key != NULL)
-            item->insert(s_key)->set(frame.key);
-            /*
-        if (frame.incoming != NULL)
-            item->insert(s_incoming)->set(frame.incoming);
-        if (frame.outgoing != NULL)
-            item->insert(s_outgoing)->set(frame.outgoing);
-            */
-
-        frame = find_parent_state_frame(vm, frame);
-    }
-}
-#endif
 
 Value* VM::input(int index)
 {
@@ -864,6 +640,11 @@ void vm_update_derived_hack_info(VM* vm)
     }
 }
 
+int vm_num_inputs(VM* vm)
+{
+    return vm->inputCount;
+}
+
 void vm_prepare_env(VM* vm, VM* callingVM)
 {
     copy(&vm->incomingEnv, &vm->env);
@@ -890,73 +671,6 @@ void vm_cleanup_on_stop(VM* vm)
     set_null(&vm->incomingUpvalues);
 }
 
-#if 0
-Value* vm_state_push_key(VM* vm)
-{
-    vm->stateStackTop += 2;
-    int top = vm->stateStackTop;
-    vm->stateStack.reserve(top + 1);
-    Value* topKey = vm->stateStack[top - 1];
-    Value* topVal = vm->stateStack[top];
-    return topKey;
-}
-
-void vm_state_load_frame(VM* vm, int top)
-{
-    vm->stateStack.reserve(top + 1);
-    Value* val = vm->stateStack[top];
-
-    if (top == 0)
-        return;
-    if (!is_null(val))
-        return;
-
-    vm_state_load_frame(vm, top - 2);
-
-    Value* key = vm->stateStack[top - 1];
-    Value* parentVal = vm->stateStack[top - 2];
-
-    if (!is_null(parentVal)) {
-        Value* found = hashtable_get(parentVal, key);
-
-        // TODO: Can probably make this a move()
-        if (found != NULL)
-            copy(found, val);
-    }
-}
-
-void vm_state_store_frame(VM* vm)
-{
-    int top = vm->stateStackTop;
-    if (top == 0)
-        return;
-
-    vm->stateStackTop -= 2;
-
-    Value* val = vm->stateStack[top];
-    Value* key = vm->stateStack[top-1];
-    Value* parentVal = vm->stateStack[top-2];
-
-    if (vm->noSaveState) {
-        set_null(val);
-        set_null(key);
-        return;
-    }
-
-    if (is_null(val)) {
-        if (!is_null(parentVal))
-            hashtable_remove(parentVal, key);
-        return;
-    }
-
-    if (is_null(parentVal))
-        set_hashtable(parentVal);
-
-    move(val, hashtable_insert(parentVal, key));
-    set_null(key);
-}
-#endif
-
 int find_state_slot(VM* vm, int addr)
 {
     return -1;
@@ -967,17 +681,17 @@ Value* prepare_outgoing_state_frame_for_save(VM* vm)
     return NULL;
 }
 
-Value* circa_input(VM* vm, int index)
+CIRCA_EXPORT Value* circa_input(VM* vm, int index)
 {
     return vm->input(index);
 }
 
-Value* circa_output(VM* vm)
+CIRCA_EXPORT Value* circa_output(VM* vm)
 {
     return vm->output();
 }
 
-void circa_throw(VM* vm, const char* msg)
+CIRCA_EXPORT void circa_throw(VM* vm, const char* msg)
 {
     Value str;
     set_string(&str, msg);
@@ -1008,12 +722,6 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function2(patch, "reflect_caller", reflect_caller);
     circa_patch_function2(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
     circa_patch_function2(patch, "vm_demand_eval_store", vm_demand_eval_store);
-#if 0
-    circa_patch_function2(patch, "vm_incoming_state", vm_incoming_state);
-    circa_patch_function2(patch, "vm_save_declared_state", vm_save_declared_state);
-    circa_patch_function2(patch, "vm_close_stateful_minor_frame", vm_close_stateful_minor_frame);
-    circa_patch_function2(patch, "vm_capture_state_frames", vm_capture_state_frames);
-#endif
     circa_patch_function2(patch, "env", get_env);
 }
 

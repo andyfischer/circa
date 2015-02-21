@@ -336,52 +336,11 @@ void write_state_header_with_term_name(Bytecode* bc, Term* term)
     write_state_header(bc, slot);
 }
 
-void start_minor_frame(Bytecode* bc, Block* block)
-{
-    //append_metadata(bc, mop_minor_block_start, 0)->block = block;
-}
-
-#if 0
-void maybe_write_state_key_with_term_name(Bytecode* bc, Block* block, Term* term)
-{
-    Symbol hasState = block_has_state(block);
-    if (hasState == s_yes || hasState == s_maybe) {
-        int slot = reserve_slots(bc, 1);
-        copy(unique_name(term), load_const(bc, slot));
-        append_metadata(bc, mop_state_key, slot);
-    }
-}
-
-void maybe_close_stateful_minor_frame(Bytecode* bc)
-{
-    if (bc->vm->noSaveState)
-        return;
-
-    int stateHeader = mop_find_active_mopcode(bc, mop_state_header, -1);
-
-    if (stateHeader != -1) {
-        comment(bc, "close stateful minor frame");
-        // If there's a stateful header, need to close it.
-        int top = reserve_new_frame_slots(bc, 0);
-        call(bc, top, 0, FUNCS.vm_close_stateful_minor_frame->nestedContents);
-    }
-}
-#endif
-
 void end_major_frame(Bytecode* bc)
 {
     int blockStartMaddr = mop_find_active_mopcode(bc, mop_major_block_start, -1);
     //ca_assert(blockStartMaddr != -1);
     append_metadata(bc, mop_major_block_end, 0)->related_maddr = blockStartMaddr;
-}
-
-void end_minor_frame(Bytecode* bc)
-{
-#if 0
-    int blockStartMaddr = mop_find_active_mopcode(bc, mop_minor_block_start, -1);
-    ca_assert(blockStartMaddr != -1);
-    append_metadata(bc, mop_minor_block_end, 0)->related_maddr = blockStartMaddr;
-#endif
 }
 
 bool both_inputs_are_int(Term* term)
@@ -468,7 +427,6 @@ void dynamic_method(Bytecode* bc, Term* term)
 void write_loop(Bytecode* bc, Block* loop)
 {
     comment(bc, "loop start");
-    start_minor_frame(bc, loop);
 
     Term* callingTerm = loop->owningTerm;
     if (should_write_state_header(bc, loop))
@@ -594,8 +552,6 @@ void write_loop(Bytecode* bc, Block* loop)
 
     if (should_write_state_header(bc, loop))
         append_op(bc, op_pop_state_frame);
-
-    end_minor_frame(bc);
 }
 
 
@@ -728,7 +684,6 @@ void write_conditional_case(Bytecode* bc, Block* block, int conditionIndex)
             ->insert(s_block)->set_block(get_parent_block(block));
     }
 
-    start_minor_frame(bc, block);
     comment(bc, "case");
 
     if (should_write_state_header(bc, block)) {
@@ -783,13 +738,10 @@ void close_conditional_case(Bytecode* bc, Block* block)
     }
 
     comment(bc, "case fin");
-    end_minor_frame(bc);
 }
 
 void write_conditional_chain(Bytecode* bc, Block* block)
 {
-    start_minor_frame(bc, block);
-
     comment(bc, "conditional start");
     int startAddr = bc->opCount;
 
@@ -1025,18 +977,6 @@ void save_declared_state(Bytecode* bc, Block* block, Term* atTerm)
         load_term(bc, result, slot+1);
 
         append_op(bc, op_save_state_value, slot, slot+1);
-
-        #if 0
-        append_metadata(bc, mop_term_eval_start, 0)->term = term;
-
-        int top = reserve_new_frame_slots(bc, 1);
-        load_term(bc, result, top + 1);
-        comment(bc, "save declared state");
-        call(bc, top, 1, FUNCS.vm_save_declared_state->nestedContents);
-
-        append_metadata(bc, mop_term_eval_end, 0)->related_maddr =
-            mop_find_active_mopcode(bc, mop_term_eval_start, -1);
-        #endif
     }
 }
 
@@ -1395,12 +1335,6 @@ void dump_mop(Bytecode*, BytecodeMetadata mop)
     case mop_term_live: printf("term_live"); break;
     case mop_major_block_start: printf("major_block_start"); break;
     case mop_major_block_end: printf("major_block_end"); break;
-    //case mop_minor_block_start: printf("minor_block_start"); break;
-    //case mop_minor_block_end: printf("minor_block_end"); break;
-#if 0
-    case mop_state_key: printf("state_key"); break;
-    case mop_state_header: printf("state_header"); break;
-#endif
     }
 
     printf(" slot:%d", mop.slot);
@@ -2002,15 +1936,6 @@ int find_metadata_addr_for_addr(Bytecode* bc, int addr)
     return maddr;
 }
 
-#if 0
-int mop_search_skip_minor_blocks(Bytecode* bc, int maddr)
-{
-    while (bc->metadata[maddr].mopcode == mop_minor_block_end)
-        maddr = bc->metadata[maddr].related_maddr - 1;
-    return maddr;
-}
-#endif
-
 int mop_find_active_mopcode(Bytecode* bc, int mopcode, int maddr)
 {
     bool stayWithinMinorFrame = false; //mopcode == mop_state_header;
@@ -2019,18 +1944,11 @@ int mop_find_active_mopcode(Bytecode* bc, int mopcode, int maddr)
         maddr = bc->metadataSize - 1;
 
     for (; maddr >= 0; maddr--) {
-#if 0
-        maddr = mop_search_skip_minor_blocks(bc, maddr);
-#endif
 
         if (bc->metadata[maddr].mopcode == mopcode)
             return maddr;
         if (bc->metadata[maddr].mopcode == mop_major_block_start)
             return -1;
-#if 0
-        if (stayWithinMinorFrame && bc->metadata[maddr].mopcode == mop_minor_block_start)
-            return -1;
-#endif
     }
     return -1;
 }
@@ -2061,30 +1979,6 @@ Term* find_active_term(Bytecode* bc, int addr)
     }
     return NULL;
 }
-#if 0
-Block* find_active_minor_block_for_maddr(Bytecode* bc, int maddr)
-{
-    if (bc == NULL || bc->metadataSize == 0)
-        return NULL;
-    int foundMaddr = mop_find_active_mopcode(bc, mop_minor_block_start, maddr);
-    if (foundMaddr == -1)
-        foundMaddr = mop_find_active_mopcode(bc, mop_major_block_start, maddr);
-    ca_assert(foundMaddr != -1);
-    return bc->metadata[foundMaddr].block;
-}
-
-Block* find_active_minor_block(Bytecode* bc, int addr)
-{
-    if (bc == NULL || bc->metadataSize == 0)
-        return NULL;
-
-    if (addr == -1)
-        addr = bc->opCount - 1;
-
-    int maddr = find_metadata_addr_for_addr(bc, addr);
-    return find_active_minor_block_for_maddr(bc, addr);
-}
-#endif
 
 Block* find_active_major_block(Bytecode* bc, int addr)
 {

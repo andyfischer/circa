@@ -6,13 +6,13 @@
 #include "file.h"
 #include "file_source.h"
 #include "hashtable.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "names.h"
 #include "string.h"
 #include "tagged_value.h"
 #include "world.h"
+#include "vm.h"
 #include "ext/read_tar.h"
 
 namespace circa {
@@ -158,9 +158,9 @@ CIRCA_EXPORT void circa_read_file(caWorld* world, const char* filename, Value* c
     set_null(contentsOut);
 }
 
-CIRCA_EXPORT void circa_read_file_with_stack(Stack* stack, const char* filename, Value* contentsOut)
+CIRCA_EXPORT void circa_read_file_with_vm(VM* vm, const char* filename, Value* contentsOut)
 {
-    return ::circa_read_file(stack->world, filename, contentsOut);
+    return ::circa_read_file(vm->world, filename, contentsOut);
 }
 
 CIRCA_EXPORT bool circa_file_exists(caWorld* world, const char* filename)

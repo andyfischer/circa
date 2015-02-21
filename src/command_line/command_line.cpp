@@ -6,13 +6,11 @@
 
 #include "block.h"
 #include "building.h"
-#include "bytecode.h"
 #include "bytecode2.h"
 #include "debug.h"
 #include "file.h"
 #include "file_watch.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"
@@ -154,20 +152,14 @@ void print_usage()
         "  -path <path>     : Add a module search path\n"
         "  -p                  : Print out raw source\n"
         "  -pp                 : Print out raw source with properties\n"
-        "  -b                  : Print out raw source with bytecode\n"
-        "  -n                  : Don't actually run the script (for use with -p, -b, etc)\n"
+        "  -n                  : Don't actually run the script (for use with -p, etc)\n"
         "  -print-state        : Print state as text after running the script\n"
         "  -break-on <id>      : Debugger break when term <id> is created\n"
         "\n"
         "Available commands:\n"
-        "  -call <filename> <func name> <args>\n"
-        "                    : Call a function in a script file, print results\n"
-        "  -loop <filename>  : Run the script in an endless loop\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
         "  -check <filename> : Statically check the script for errors\n"
-        "  -build <dir>      : Rebuild a module using a build.ca file\n"
         "  -run-stdin        : Read and execute commands from stdin\n"
-        "  -source-repro     : Compile and reproduce a script's source (for testing)\n"
         << std::endl;
 }
 
@@ -218,7 +210,6 @@ int run_command_line(caWorld* world, Value* args)
 
         if (string_equals(list_get(args, 0), "-b") || string_equals(list_get(args, 0), "-pb")) {
             printRaw = true;
-            rawOutputPrefs.showBytecode = true;
             list_remove_index(args, 0);
             continue;
         }
@@ -276,72 +267,6 @@ int run_command_line(caWorld* world, Value* args)
         run_repl_stdin(world);
         return 0;
     }
-
-#if 0
-    if (string_equals(list_get(args, 0), "-call")) {
-        Block* block = load_module_by_filename(world, list_get(args, 1));
-
-        Stack* stack = circa_create_stack(world);
-
-        // Push function
-        caBlock* func = circa_find_function_local(block, as_cstring(list_get(args, 2)));
-        circa_push_function(stack, func);
-
-        // Push inputs
-        for (int i=3, inputIndex = 0; i < circa_count(args); i++) {
-            Value* val = circa_input(stack, inputIndex++);
-            parse_string_repr(list_get(args, i), val);
-        }
-
-        circa_run(stack);
-
-        if (circa_has_error(stack))
-            circa_dump_stack_trace(stack);
-
-        // Print outputs
-        for (int i=0;; i++) {
-            Value* out = circa_output(stack, i);
-            if (out == NULL)
-                break;
-
-            dump(circa_output(stack, i));
-        }
-        
-        circa_free_stack(stack);
-        return 0;
-    }
-
-    if (string_equals(list_get(args, 0), "-loop")) {
-        if (list_length(args) < 2) {
-            std::cout << "Expected a filename after -loop" << std::endl;
-            return 1;
-        }
-
-        Value* filename = list_get(args, 1);
-        Block* block = load_module_by_filename(world, filename);
-        Stack* stack = create_stack(world);
-        stack_init(stack, block);
-        while (true) {
-
-            circa_run(stack);
-
-            world_tick(world);
-
-            // 16ms delay. TODO: Replace with libuv timer.
-            usleep(16 * 1000);
-
-            if (stack_errored(stack)) {
-                std::cout << "Error occurred:\n";
-                circa_dump_stack_trace(stack);
-                std::cout << std::endl;
-                std::cout << "Stack:\n";
-                dump(stack);
-                return 1;
-            }
-        }
-        return 0;
-    }
-#endif
 
     // Command reader (from stdin)
     if (string_equals(list_get(args, 0), "-run-stdin")) {
@@ -405,39 +330,12 @@ int run_command_line(caWorld* world, Value* args)
     }
 
     return 0;
-
-    /*
-    circa_run(stack);
-
-    if (printState) {
-        Value* state = stack_get_state(stack);
-        if (state == NULL)
-            std::cout << "state = null";
-        else
-            dump(state);
-    }
-
-    if (stack_errored(stack)) {
-        std::cout << "Error occurred:\n";
-        Value str;
-        stack_trace_to_string(stack, &str);
-        std::cout << as_cstring(&str);
-        std::cout << std::endl;
-
-        if (dumpOption) {
-            std::cout << "Stack:\n";
-            dump(stack);
-        }
-
-        return 1;
-    }
-    */
-
-    return 0;
 }
 
 void run_repl_stdin(World* world)
 {
+    printf("REPL no worky\n");
+#if 0
     Stack* stack = create_stack(world);
     repl_start(stack);
 
@@ -463,6 +361,7 @@ void run_repl_stdin(World* world)
         if (top_frame(stack) == NULL)
             return;
     }
+#endif
 }
 
 int run_command_line(caWorld* world, int argc, const char* args[])

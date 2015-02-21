@@ -6,7 +6,6 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "function.h"
 #include "kernel.h"
 #include "tagged_value.h"

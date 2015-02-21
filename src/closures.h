@@ -5,18 +5,11 @@
 namespace circa {
 
 void insert_nonlocal_terms(Block* block);
-
-void closure_block_evaluate(Stack* stack);
-
-void closure_save_bindings_for_frame(Value* closure, Frame* frame);
-
 int count_closure_upvalues(Block* block);
 
 // Returns 0 if no closure bindings are found. Caller should use count_closure_upvalues
 // to determine if there really are any bindings.
 int find_first_closure_upvalue(Block* block);
-
-void closure_save_all_bindings(Value* closure, Stack* stack);
 
 bool is_closure(Value* value);
 

@@ -135,7 +135,6 @@ float       as_float(Value* value);
 int         as_int(Value* value);
 Symbol      as_symbol(Value* value);
 void*       as_opaque_pointer(Value* value);
-Stack*      as_stack(Value* value);
 Term*       as_term_ref(Value* val);
 Type*       as_type(Value* value);
 

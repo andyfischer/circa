@@ -5,8 +5,7 @@
 #include "common_headers.h"
 #include "block.h"
 #include "building.h"
-#include "interpreter.h"
-#include "importing.h"
+#include "hashtable.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -17,6 +16,7 @@
 #include "term.h"
 #include "tagged_value.h"
 #include "world.h"
+#include "vm.h"
 
 using namespace circa;
 
@@ -45,24 +45,6 @@ void caTerm::dump()
 caBlock* caTerm::parent()
 {
     return circa_parent_block(this);
-}
-
-Value* circa_set_default_input(Stack* stack, int index)
-{
-    Value* val = circa_input(stack, index);
-    caBlock* top = circa_stack_top_block(stack);
-    caTerm* placeholder = circa_input_placeholder(top, index);
-    circa_make(val, circa_term_declared_type(placeholder));
-    return val;
-}
-
-Value* circa_set_default_output(Stack* stack, int index)
-{
-    Value* val = circa_output(stack, index);
-    caBlock* top = circa_stack_top_block(stack);
-    caTerm* placeholder = circa_output_placeholder(top, index);
-    circa_make(val, circa_term_declared_type(placeholder));
-    return val;
 }
 
 void* circa_as_pointer(Value* container)
@@ -237,9 +219,9 @@ Value* circa_declare_value(caBlock* block, const char* name)
     return term_value(term);
 }
 
-void circa_dump_s(Stack* stack)
+void circa_dump_s(VM* vm)
 {
-    dump((Stack*) stack);
+    vm->dump();
 }
 
 void circa_dump_b(caBlock* block)
@@ -247,166 +229,88 @@ void circa_dump_b(caBlock* block)
     dump((Block*) block);
 }
 
-Stack* circa_create_stack(caWorld* world)
+VM* circa_create_vm(caBlock* block)
 {
-    return create_stack(world);
+    return new_vm(block);
 }
 
-void circa_free_stack(Stack* stack)
+void circa_free_vm(VM* vm)
 {
-    free_stack(stack);
+    free_vm(vm);
 }
 
-bool circa_has_error(Stack* stack)
+bool circa_has_error(VM* vm)
 {
-    return stack_errored(stack);
+    return vm_has_error(vm);
 }
 
-void circa_clear_stack(Stack* stack)
+void circa_clear_stack(VM* vm)
 {
-    stack_reset(stack);
+    vm_reset(vm, vm->mainBlock);
 }
 
-void circa_restart(Stack* stack)
+void circa_run(VM* vm)
 {
-    stack_restart(stack);
+    vm_run(vm, NULL);
 }
 
-void circa_push_function(Stack* stack, caBlock* func)
+int circa_num_inputs(VM* vm)
 {
-    block_finish_changes(func);
-    stack_init(stack, func);
+    return vm_num_inputs(vm);
 }
 
-void circa_push_module(Stack* stack, const char* name)
+int circa_int_input(VM* vm, int index)
 {
-    Value nameStr;
-    set_string(&nameStr, name);
-    Block* block = find_module(stack->world, NULL, &nameStr);
-    if (block == NULL) {
-        // TODO: Save this error on the stack instead of stdout
-        std::cout << "in circa_push_module, module not found: " << name << std::endl;
-        return;
-    }
-    stack_init(stack, block);
+    return circa_int(circa_input(vm, index));
 }
 
-Value* circa_frame_input(Stack* stack, int index)
+float circa_float_input(VM* vm, int index)
 {
-    Frame* top = top_frame(stack);
-    
-    if (top == NULL)
-        return NULL;
-
-    Term* term = frame_block(top)->get(index);
-
-    if (term->function != FUNCS.input)
-        return NULL;
-    
-    return get_top_register(stack, term);
+    return circa_to_float(circa_input(vm, index));
 }
 
-Value* circa_frame_output(Stack* stack, int index)
+float circa_bool_input(VM* vm, int index)
 {
-    Frame* top = top_frame(stack);
-
-    int realIndex = frame_block(top)->length() - index - 1;
-
-    Term* term = frame_block(top)->get(realIndex);
-    if (term->function != FUNCS.output)
-        return NULL;
-
-    return get_top_register(stack, term);
+    return circa_bool(circa_input(vm, index));
 }
 
-void circa_run(Stack* stack)
+const char* circa_string_input(VM* vm, int index)
 {
-    vm_run(stack);
+    return circa_string(circa_input(vm, index));
 }
 
-void circa_pop(Stack* stack)
+void circa_output_error_val(VM* vm, Value* val)
 {
-    pop_frame(stack);
+    vm->throw_error(val);
 }
 
-caBlock* circa_stack_top_block(Stack* stack)
-{
-    return (caBlock*) frame_block(top_frame(stack));
-}
-
-int circa_num_inputs(Stack* stack)
-{
-    return num_inputs(stack);
-}
-
-int circa_int_input(Stack* stack, int index)
-{
-    return circa_int(circa_input(stack, index));
-}
-
-float circa_float_input(Stack* stack, int index)
-{
-    return circa_to_float(circa_input(stack, index));
-}
-
-float circa_bool_input(Stack* stack, int index)
-{
-    return circa_bool(circa_input(stack, index));
-}
-
-const char* circa_string_input(Stack* stack, int index)
-{
-    return circa_string(circa_input(stack, index));
-}
-
-void circa_output_error_val(Stack* stack, Value* val)
-{
-    copy(val, circa_output(stack, 0));
-    Block* block = frame_block(top_frame(stack));
-    if (block != NULL)
-        top_frame(stack)->termIndex = block->length() - 1;
-    else
-        top_frame(stack)->termIndex = 0;
-    raise_error(stack);
-}
-
-void circa_output_error(Stack* stack, const char* msg)
+void circa_output_error(VM* vm, const char* msg)
 {
     Value val;
     set_error_string(&val, msg);
-    circa_output_error_val(stack, &val);
+    vm->throw_error(&val);
 }
 
-caTerm* circa_caller_input_term(Stack* stack, int index)
+caTerm* circa_caller_input_term(VM* vm, int index)
 {
-    return circa_term_get_input(circa_caller_term(stack), index);
+    return circa_term_get_input(circa_caller_term(vm), index);
 }
 
-caBlock* circa_caller_block(Stack* stack)
+caTerm* circa_caller_term(VM* vm)
 {
-    Frame* frame = top_frame_parent(stack);
-    if (frame == NULL)
-        return NULL;
-    return frame_block(frame);
+    return vm_calling_term(vm);
 }
 
-caTerm* circa_caller_term(Stack* stack)
+void circa_dump_stack_trace(VM* vm)
 {
-    return frame_caller(top_frame(stack));
+    // TODO
 }
 
-void circa_dump_stack_trace(Stack* stack)
-{
-    Value str;
-    stack_trace_to_string(stack, &str);
-    write_log(as_cstring(&str));
-}
-
-Value* circa_env_insert(Stack* stack, const char* name)
+Value* circa_env_insert(VM* vm, const char* name)
 {
     Value nameVal;
     set_symbol_from_string(&nameVal, name);
-    return stack_env_insert(stack, &nameVal);
+    return hashtable_insert(&vm->incomingEnv, &nameVal);
 }
 
 } // extern "C"

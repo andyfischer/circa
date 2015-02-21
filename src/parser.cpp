@@ -9,7 +9,6 @@
 #include "function.h"
 #include "hashtable.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "list.h"
 #include "kernel.h"
 #include "native_patch.h"
@@ -95,13 +94,6 @@ static ParseResult right_apply_to_function(Block* block, Term* lhs, Value* funct
 
 Term* parse(Block* block, ParsingStep step, Value* input)
 {
-#if 0
-    log_start(0, "parser::compile");
-    log_arg("block.id", block->id);
-    log_arg("input", input);
-    log_finish();
-#endif
-
     block_start_changes(block);
 
     TokenStream tokens(input);
@@ -113,12 +105,6 @@ Term* parse(Block* block, ParsingStep step, Value* input)
 
     Value invariantsCheck;
     ca_assert(block_check_invariants_print_result(block, &invariantsCheck));
-
-#if 0
-    log_start(0, "parser::compile finished");
-    log_arg("block.length", block->length());
-    log_finish();
-#endif
 
     return result;
 }
@@ -1068,11 +1054,6 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         Value str;
         tokens.consumeStr(&str, tok_ColonString);
 
-#if 0
-        if (string_equals(&str, ":handle")) {
-            handle_setup_type(as_type(result));
-        } else
-#endif
         if (string_equals(&str, ":interface")) {
             setup_interface_type(as_type(result));
         } else {
@@ -1090,37 +1071,8 @@ ParseResult struct_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         return ParseResult(result);
     }
 
-    #if 0
-    if (!tokens.nextIs(tok_LBrace) && !tokens.nextIs(tok_LSquare))
-        return syntax_error(block, tokens, startPosition);
-    #endif
-
     list_t::setup_type(unbox_type(result));
     Block* contents = nested_contents(result);
-
-    // Parse as compound type.
-    #if 0
-
-    // Opening brace.
-    int closingToken = tokens.nextIs(tok_LBrace) ? tok_RBrace : tok_RSquare;
-    tokens.consume();
-
-    result->setStringProp(s_Syntax_PostLBracketWs,
-            possible_whitespace_or_newline(tokens));
-
-    while (!tokens.nextIs(closingToken)) {
-
-        if (lookahead_next_non_whitespace(tokens, false) == closingToken) {
-            std::string preWs = possible_whitespace_or_newline(tokens);
-            result->setStringProp(s_Syntax_PreRBracketWs, preWs);
-            break;
-        }
-
-        struct_decl_line(contents, tokens, context);
-    }
-
-    tokens.consume(closingToken);
-    #endif
 
     context->pushInsideTypeDecl();
     consume_block(contents, tokens, context);

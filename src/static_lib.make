@@ -68,7 +68,6 @@ OBJECTS := \
 	$(OBJDIR)/block.o \
 	$(OBJDIR)/building.o \
 	$(OBJDIR)/builtin_types.o \
-	$(OBJDIR)/bytecode.o \
 	$(OBJDIR)/bytecode2.o \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/change_events.o \
@@ -81,9 +80,7 @@ OBJECTS := \
 	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/hashtable.o \
-	$(OBJDIR)/importing.o \
 	$(OBJDIR)/inspection.o \
-	$(OBJDIR)/interpreter.o \
 	$(OBJDIR)/json.o \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
@@ -101,7 +98,6 @@ OBJECTS := \
 	$(OBJDIR)/repl.o \
 	$(OBJDIR)/replication.o \
 	$(OBJDIR)/selector.o \
-	$(OBJDIR)/stack.o \
 	$(OBJDIR)/static_checking.o \
 	$(OBJDIR)/string_repr.o \
 	$(OBJDIR)/string_type.o \
@@ -194,9 +190,6 @@ $(OBJDIR)/building.o: building.cpp
 $(OBJDIR)/builtin_types.o: builtin_types.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/bytecode.o: bytecode.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/bytecode2.o: bytecode2.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
@@ -233,13 +226,7 @@ $(OBJDIR)/function.o: function.cpp
 $(OBJDIR)/hashtable.o: hashtable.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/importing.o: importing.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/inspection.o: inspection.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/interpreter.o: interpreter.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/json.o: json.cpp
@@ -291,9 +278,6 @@ $(OBJDIR)/replication.o: replication.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/selector.o: selector.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/stack.o: stack.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/static_checking.o: static_checking.cpp

@@ -7,12 +7,11 @@
 #include "closures.h"
 #include "code_iterators.h"
 #include "hashtable.h"
-#include "importing.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "tagged_value.h"
+#include "term.h"
 
 namespace circa {
 
@@ -78,15 +77,6 @@ void insert_nonlocal_terms(Block* block)
     }
 }
 
-void closure_block_evaluate(Stack* stack)
-{
-    Term* term = circa_caller_term(stack);
-    Value* closureOutput = circa_set_default_output(stack, 0);
-    Block* block = nested_contents(term);
-    set_block(list_get(closureOutput, 0), block);
-    closure_save_all_bindings(closureOutput, stack);
-}
-
 bool is_closure(Value* value)
 {
     return value->value_type == TYPES.func;
@@ -124,40 +114,6 @@ Value* func_bindings(Value* value)
     return list_get(value, 1);
 }
 
-void closure_save_bindings_for_frame(Value* closure, Frame* frame)
-{
-    Block* closureBlock = func_block(closure);
-
-    if (closureBlock == NULL)
-        return;
-
-    Block* finishingBlock = frame_block(frame);
-
-    for (int i=0; i < closureBlock->length(); i++) {
-        Term* term = closureBlock->get(i);
-        if (term->function != FUNCS.upvalue)
-            continue;
-
-        Term* input = term->input(0);
-
-        if (input->owningBlock != finishingBlock)
-            continue;
-
-        // Capture this binding.
-
-        Value key;
-        set_term_ref(&key, input);
-        Value* value = frame_register(frame, input);
-
-        // Don't overwrite an existing binding.
-        if (hashtable_get(func_bindings(closure), &key) != NULL)
-            continue;
-
-        touch(closure);
-        copy(value, hashtable_insert(func_bindings(closure), &key));
-    }
-}
-
 int find_first_closure_upvalue(Block* block)
 {
     for (int i=0; i < block->length(); i++) {
@@ -185,39 +141,8 @@ int count_closure_upvalues(Block* block)
     return count;
 }
 
-void closure_save_all_bindings(Value* closure, Stack* stack)
-{
-    Block* closureBlock = func_block(closure);
-
-    if (closureBlock == NULL)
-        return;
-
-    for (int i=0; i < closureBlock->length(); i++) {
-        Term* term = closureBlock->get(i);
-        if (term->function != FUNCS.upvalue)
-            continue;
-
-        Term* input = term->input(0);
-
-        Value key;
-        set_term_ref(&key, input);
-        Value* value = stack_find_nonlocal(top_frame(stack), input);
-
-        // Don't overwrite an existing binding.
-        if (hashtable_get(func_bindings(closure), &key) != NULL)
-            continue;
-
-        touch(closure);
-        copy(value, hashtable_insert(func_bindings(closure), &key));
-    }
-}
-
 void closures_install_functions(NativePatch* patch)
 {
-#if 0
-    circa_patch_function2(patch, "closure_block", closure_block_evaluate);
-    circa_patch_function2(patch, "function_decl", closure_block_evaluate);
-#endif
 }
 
 } // namespace circa

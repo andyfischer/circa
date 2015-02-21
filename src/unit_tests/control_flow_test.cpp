@@ -6,7 +6,6 @@
 #include "building.h"
 #include "control_flow.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "term.h"
 
 namespace control_flow_test {

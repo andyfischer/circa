@@ -8,7 +8,6 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "file_source.h"
-#include "interpreter.h"
 #include "file_watch.h"
 #include "hashtable.h"
 #include "kernel.h"
@@ -40,8 +39,6 @@ World* alloc_world()
     world->nextBlockID = 1;
     world->nextStackID = 1;
     world->nextTypeID = 1;
-    world->firstStack = NULL;
-    world->lastStack = NULL;
     world->builtinPatch = NULL;
     world->globalScriptVersion = 1;
 

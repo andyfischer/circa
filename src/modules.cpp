@@ -13,8 +13,6 @@
 #include "function.h"
 #include "hashtable.h"
 #include "inspection.h"
-#include "importing.h"
-#include "interpreter.h"
 #include "list.h"
 #include "kernel.h"
 #include "migration.h"
@@ -261,16 +259,20 @@ Term* module_lookup(World* world, Value* moduleRef, Value* name)
     return term;
 }
  
+#if 0
 void load_script_eval(Stack* stack)
 {
     Value* filename = circa_input(stack, 0);
     Block* block = load_module_by_filename(stack->world, filename);
     set_block(circa_output(stack, 0), block);
 }
+#endif
 
 void modules_install_functions(NativePatch* patch)
 {
+#if 0
     circa_patch_function(patch, "load_script", load_script_eval);
+#endif
 }
 
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)

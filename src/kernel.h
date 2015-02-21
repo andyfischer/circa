@@ -157,18 +157,6 @@ Block* global_builtins_block();
 
 void empty_evaluate_function(Term* caller);
 
-namespace assign_function {
-    void update_assign_contents(Term* term);
-}
-
-namespace copy_function {
-    void evaluate(Stack* stack);
-}
-
-namespace return_function {
-    void setup(Block* kernel);
-}
-
 // Interact with special debugging functions test_spy() and test_oracle()
 void test_spy_clear();
 Value* test_spy_get_results();

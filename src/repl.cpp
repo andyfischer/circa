@@ -3,11 +3,9 @@
 #include "common_headers.h"
 
 #include "block.h"
-#include "bytecode.h"
 #include "change_events.h"
 #include "debug.h"
 #include "file_watch.h"
-#include "interpreter.h"
 #include "hashtable.h"
 #include "inspection.h"
 #include "kernel.h"
@@ -21,6 +19,8 @@
 #include "world.h"
 
 namespace circa {
+
+#if 0
 
 void repl_start(Stack* stack)
 {
@@ -156,5 +156,7 @@ CIRCA_EXPORT void circa_repl_run_line(Stack* stack, Value* input, Value* output)
 {
     return repl_run_line(stack, input, output);
 }
+
+#endif
 
 }

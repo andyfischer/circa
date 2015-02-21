@@ -10,7 +10,7 @@ using namespace circa;
 void test_assert_function(bool condition, int line, const char* file);
 void test_assert_function(Term* term, int line, const char* file);
 void test_assert_function(Block* block, int line, const char* file);
-void test_assert_function(Stack* stack, int line, const char* file);
+void test_assert_function(VM* stack, int line, const char* file);
 void test_fail_function(int line, const char* file);
 void test_equals_function(TermList const& a, TermList const& b,
         const char* aText, const char* bText, int line, const char* file);
@@ -39,7 +39,7 @@ bool test_fail_on_static_error(Block* block);
 // If context has recorded a runtime error, then print something to stdout, and
 // declare the current test failed, and return true. If this returns false then
 // there was no error.
-bool test_fail_on_runtime_error(Stack& context);
+bool test_fail_on_runtime_error(VM* vm);
 
 Value* temp_string(const char* str);
 World* test_world();

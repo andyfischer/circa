@@ -4,7 +4,6 @@
 
 #include "block.h"
 #include "change_events.h"
-#include "interpreter.h"
 #include "list.h"
 #include "hashtable.h"
 #include "tagged_value.h"
@@ -12,87 +11,6 @@
 #include "world.h"
 
 namespace circa {
-
-struct WorldStacksIterator
-{
-    Stack* first;
-    Stack* _current;
-
-    WorldStacksIterator(World* world)
-    {
-        first = world->firstStack;
-        _current = first;
-    }
-    bool finished()
-    {
-        return _current == NULL;
-    }
-    operator bool()
-    {
-        return !finished();
-    }
-    Stack* current()
-    {
-        return _current;
-    }
-    WorldStacksIterator& operator++()
-    {
-        _current = _current->nextStack;
-        if (_current == first)
-            _current = NULL;
-        return *this;
-    }
-};
-
-struct WorldFramesIterator
-{
-    WorldStacksIterator stacksIterator;
-    Frame* frame;
-
-    WorldFramesIterator(World* world)
-      : stacksIterator(world)
-    {
-        frame = first_frame(stacksIterator.current());
-        advanceWhileInvalid();
-    }
-
-    void advanceWhileInvalid()
-    {
-    still_invalid:
-        if (finished())
-            return;
-
-        if (frame == NULL) {
-            ++stacksIterator;
-            frame = first_frame(stacksIterator.current());
-            goto still_invalid;
-        }
-    }
-
-    bool finished()
-    {
-        return stacksIterator.finished();
-    }
-
-    Frame* current()
-    {
-        ca_assert(!finished());
-        return frame;
-    }
-
-    void advance()
-    {
-        frame = next_frame(frame);
-        advanceWhileInvalid();
-    }
-
-    operator bool()
-    {
-        return !finished();
-    }
-
-    void operator++() { advance(); }
-};
 
 Value* change_event_type(Value* event)
 {

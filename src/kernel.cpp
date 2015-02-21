@@ -14,9 +14,7 @@
 #include "code_iterators.h"
 #include "function.h"
 #include "hashtable.h"
-#include "importing.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"
@@ -26,7 +24,6 @@
 #include "parser.h"
 #include "reflection.h"
 #include "selector.h"
-#include "stack.h"
 #include "static_checking.h"
 #include "string_repr.h"
 #include "string_type.h"
@@ -474,9 +471,7 @@ void bootstrap_kernel()
     closures_install_functions(world->builtinPatch);
     modules_install_functions(world->builtinPatch);
     reflection_install_functions(world->builtinPatch);
-    interpreter_install_functions(world->builtinPatch);
     misc_builtins_setup_functions(world->builtinPatch);
-    stack_install_functions(world->builtinPatch);
     type_install_functions(world->builtinPatch);
     vm_install_functions(world->builtinPatch);
 
@@ -528,8 +523,6 @@ void bootstrap_kernel()
             set_declared_type(*it, TYPES.func);
             set_closure_for_declared_function(*it);
         }
-
-    // stack_setup_type(TYPES.stack);
 
     nested_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 

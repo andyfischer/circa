@@ -102,9 +102,7 @@ struct RawOutputPrefs
     int indentLevel;
     bool showAllIDs;
     bool showProperties;
-    bool showBytecode;
-    RawOutputPrefs() : indentLevel(0), showAllIDs(false), showProperties(false),
-        showBytecode(false) {}
+    RawOutputPrefs() : indentLevel(0), showAllIDs(false), showProperties(false) {}
 };
 
 

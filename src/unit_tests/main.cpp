@@ -3,7 +3,6 @@
 #include "unit_test_common.h"
 
 #include "hashtable.h"
-#include "interpreter.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "static_checking.h"
@@ -71,11 +70,11 @@ void test_assert_function(Block* block, int line, const char* file)
     }
 }
 
-void test_assert_function(Stack* stack, int line, const char* file)
+void test_assert_function(VM* vm, int line, const char* file)
 {
-    if (stack_errored(stack)) {
-        std::cout << "Stack error caught at " << file << ", line " << line << std::endl;
-        circa_dump_stack_trace(stack);
+    if (vm_has_error(vm)) {
+        std::cout << "VM error caught at " << file << ", line " << line << std::endl;
+        //circa_dump_stack_trace(vm);
         declare_current_test_failed();
     }
 }
@@ -163,11 +162,11 @@ bool test_fail_on_static_error(Block* block)
     return false;
 }
 
-bool test_fail_on_runtime_error(Stack& context)
+bool test_fail_on_runtime_error(VM* vm)
 {
-    if (context.errorOccurred) {
+    if (vm_has_error(vm)) {
         std::cout << "Runtime error in " << get_current_test_name() << std::endl;
-        circa_dump_stack_trace(&context);
+        //circa_dump_stack_trace(&context);
         std::cout << std::endl;
         declare_current_test_failed();
         return true;
@@ -326,7 +325,6 @@ namespace file_watch_test { void register_tests(); }
 namespace function_test { void register_tests(); }
 namespace hashtable_test { void register_tests(); }
 namespace if_block_test { void register_tests(); }
-namespace interpreter_test { void register_tests(); }
 namespace list_test { void register_tests(); }
 namespace loop_test { void register_tests(); }
 namespace migration_test { void register_tests(); }
@@ -359,7 +357,6 @@ int main(int argc, char** argv)
     file_watch_test::register_tests();
     function_test::register_tests();
     if_block_test::register_tests();
-    interpreter_test::register_tests();
     list_test::register_tests();
     loop_test::register_tests();
     migration_test::register_tests();

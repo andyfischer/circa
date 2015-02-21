@@ -6,7 +6,6 @@
 #include "building.h"
 #include "closures.h"
 #include "function.h"
-#include "interpreter.h"
 #include "kernel.h"
 
 namespace function_test {

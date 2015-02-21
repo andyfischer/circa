@@ -7,7 +7,6 @@
 #include "function.h"
 #include "kernel.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "list.h"
 #include "native_patch.h"
 #include "string_type.h"
@@ -85,37 +84,6 @@ void finish_building_function(Block* contents)
     }
 
     // Write a list of output_placeholder terms.
-
-#if 0
-TODO: DELETE
-    // Look at every input declared as :output, these will be used to declare extra outputs.
-    // TODO is a way to declare extra outputs that are not rebound inputs.
-    for (int i = count_input_placeholders(contents) - 1; i >= 0; i--) {
-        Term* input = get_input_placeholder(contents, i);
-
-        if (input->boolProp(s_Output, false)) {
-
-            Term* result = find_name(contents, term_name(input));
-            
-            Term* output = append_output_placeholder(contents, result);
-            rename(output, term_name(input));
-            set_declared_type(output, input->type);
-            output->setIntProp(s_RebindsInput, i);
-        }
-    }
-
-    // After the output_placeholder terms are created, we might need to update any
-    // recursive calls.
-
-    for (BlockIterator it(contents); it; ++it) {
-        Term* term = it.current();
-        if (nested_contents(term->function) != contents)
-            continue;
-
-        // Update extra outputs
-        update_extra_outputs(term);
-    }
-#endif
 
     update_for_control_flow(contents);
     insert_nonlocal_terms(contents);

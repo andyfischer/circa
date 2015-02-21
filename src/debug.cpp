@@ -6,7 +6,6 @@
 
 #include "block.h"
 #include "hashtable.h"
-#include "interpreter.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -42,14 +41,6 @@ void dump_with_props(Block* block)
     print_block_with_properties(block, &str);
     std::cout << as_cstring(&str);
 }
-void dump_bytecode(Block* block)
-{
-    Value str;
-    RawOutputPrefs prefs;
-    prefs.showBytecode = true;
-    print_block(block, &prefs, &str);
-    std::cout << as_cstring(&str);
-}
 
 void dump_with_props(Block& block)
 {
@@ -76,13 +67,6 @@ void dump(Value* value)
     Value str;
     to_string(value, &str);
     std::cout << as_cstring(&str) << std::endl;
-}
-
-void dump(Stack* stack)
-{
-    Value str;
-    stack_to_string(stack, &str, false);
-    write_log(as_cstring(&str));
 }
 
 void internal_error(const char* message)

@@ -25,8 +25,6 @@ void dump_with_props(Block& block);
 void dump(Term* term);
 void dump(Value& value);
 void dump(Value* value);
-void dump(Stack* context);
-void dump(Stack* stack);
 
 // Signal that an unexpected error has occurred. Will trigger an assert().
 void internal_error(const char* message);

@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := static_lib command_line unit_tests
+PROJECTS := static_lib command_line
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -20,14 +20,9 @@ command_line: static_lib
 	@echo "==== Building command_line ($(config)) ===="
 	@${MAKE} --no-print-directory -C src -f command_line.make
 
-unit_tests: static_lib
-	@echo "==== Building unit_tests ($(config)) ===="
-	@${MAKE} --no-print-directory -C src -f unit_tests.make
-
 clean:
 	@${MAKE} --no-print-directory -C src -f static_lib.make clean
 	@${MAKE} --no-print-directory -C src -f command_line.make clean
-	@${MAKE} --no-print-directory -C src -f unit_tests.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -41,6 +36,5 @@ help:
 	@echo "   clean"
 	@echo "   static_lib"
 	@echo "   command_line"
-	@echo "   unit_tests"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

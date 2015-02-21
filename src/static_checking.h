@@ -25,11 +25,6 @@ int count_static_errors(Block* block);
 bool print_static_errors_formatted(Block* block);
 bool print_static_errors_formatted(Block* block, Value* out);
 
-#if 0
-std::string get_static_errors_formatted(Block* block);
-std::string get_static_error_message(Term* term);
-#endif
-
 void mark_static_error(Term* term, const char* msg);
 void mark_static_error(Term* term, Value* error);
 

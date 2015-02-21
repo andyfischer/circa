@@ -4,8 +4,6 @@
 
 #include <cstring>
 
-#include "importing.h"
-#include "interpreter.h"
 #include "kernel.h"
 #include "list.h"
 #include "string_type.h"

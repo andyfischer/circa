@@ -15,7 +15,6 @@
 #include "file.h"
 #include "function.h"
 #include "hashtable.h"
-#include "importing.h"
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"

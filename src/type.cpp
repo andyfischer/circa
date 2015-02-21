@@ -7,7 +7,6 @@
 #include "function.h"
 #include "kernel.h"
 #include "hashtable.h"
-#include "importing.h"
 #include "inspection.h"
 #include "modules.h"
 #include "parser.h"
@@ -22,10 +21,6 @@
 #include "world.h"
 
 namespace circa {
-
-// TODO: delete
-static Value* circa_input(Stack* stack, int index) { return NULL; }
-static Value* circa_output(Stack* stack, int index) { return NULL; }
 
 static void dealloc_type(Type* type);
 
@@ -504,10 +499,10 @@ void setup_interface_type(Type* type)
     type->hashFunc = NULL;
 }
 
-void Type__declaringTerm(Stack* stack)
+void Type__declaringTerm(VM* vm)
 {
-    Type* type = as_type(circa_input(stack, 0));
-    set_term_ref(circa_output(stack, 0), type->declaringTerm);
+    Type* type = as_type(circa_input(vm, 0));
+    set_term_ref(circa_output(vm), type->declaringTerm);
 }
 
 void Type__make(VM* vm)
@@ -583,21 +578,21 @@ void Type__make(VM* vm)
     type_incref(type);
 }
 
-void Type__name(Stack* stack)
+void Type__name(VM* vm)
 {
-    Type* type = as_type(circa_input(stack, 0));
-    copy(&type->name, circa_output(stack, 0));
+    Type* type = as_type(circa_input(vm, 0));
+    copy(&type->name, circa_output(vm));
 }
 
-void Type__property(Stack* stack)
+void Type__property(VM* vm)
 {
-    Type* type = as_type(circa_input(stack, 0));
-    const char* str = as_cstring(circa_input(stack, 1));
+    Type* type = as_type(circa_input(vm, 0));
+    const char* str = as_cstring(circa_input(vm, 1));
     Value* prop = get_type_property(type, str);
     if (prop == NULL)
-        set_null(circa_output(stack, 0));
+        set_null(circa_output(vm));
     else
-        copy(prop, circa_output(stack, 0));
+        copy(prop, circa_output(vm));
 }
 
 void type_install_functions(NativePatch* patch)

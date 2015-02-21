@@ -56,6 +56,7 @@ solution "Circa"
         configuration "Debug"
             targetname "circa_d"
 
+    --[[
     project "unit_tests"
         kind "ConsoleApp"
         targetname "circa_test"
@@ -65,3 +66,4 @@ solution "Circa"
 
         configuration "Release"
             targetname "circa_test_r"
+            ]]--

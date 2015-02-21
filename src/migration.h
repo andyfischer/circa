@@ -23,8 +23,7 @@ Block* migrate_block_pointer(Block* block, Migration* migration);
 // Migrate a type reference (by global name). May return NULL.
 Type* migrate_type(Type* type, Migration* migration);
 
-// Migrate (possibly modify) all code references inside the stack.
-void migrate_stack(Stack* stack, Migration* migration);
+// Migrate (possibly modify) all code references inside the vm.
 void migrate_VM(VM* vm, Migration* migration);
 
 void migrate_retained_frame(Value* retainedFrame, Migration* migration);
@@ -42,7 +41,6 @@ void migrate_world(World* world, Migration* migration);
 Term* migrate_term_pointer(Term* term, Block* oldBlock, Block* newBlock);
 Type* migrate_type(Type* type, Block* oldBlock, Block* newBlock);
 void migrate_block(Block* block, Block* oldBlock, Block* newBlock);
-void migrate_stack(Stack* stack, Block* oldBlock, Block* newBlock);
 void migrate_vm(VM* vm, Block* oldBlock, Block* newBlock);
 void migrate_value(Value* value, Block* oldBlock, Block* newBlock);
 

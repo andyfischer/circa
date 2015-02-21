@@ -22,7 +22,6 @@ namespace circa {
     struct Block;
     struct ListData;
     struct NativePatch;
-    struct Stack;
     struct Term;
     struct Type;
     struct World;
@@ -31,11 +30,6 @@ namespace circa {
 }
 
 typedef circa::Block caBlock;
-
-// a Stack holds the interpreter's current state, including a list of frames (activation
-// records).
-// TODO: replace with VM
-typedef circa::Stack caStack;
 
 typedef circa::VM caVM;
 
@@ -168,9 +162,9 @@ struct Value
 #endif // __cplusplus
 
 // EvaluateFunc is the signature for a C evaluation function. The function will access the
-// stack to read inputs (if any), possibly perform some action, and write output values
-// (if any) back to the stack.
-typedef void (*caEvaluateFunc)(caVM* stack);
+// vm to read inputs (if any), possibly perform some action, and write output values
+// (if any) back to the vm.
+typedef void (*caEvaluateFunc)(caVM* vm);
 
 typedef void (*caNativePtrRelease)(void* ptr);
 
@@ -198,94 +192,64 @@ caBlock* circa_load_module(caWorld* world, caBlock* loadedBy, const char* module
 
 // -- Interpreter --
 
-// Allocate a new Stack object.
-caStack* circa_create_stack(caWorld* world);
-
-// Deallocate a Stack object.
-void circa_free_stack(caStack* stack);
-
-// (Re)initialize the stack to have just one frame, using 'main' as its block. Existing data
-// is erased.
-void circa_stack_init(caStack* stack, caBlock* block);
-
-// Push a function to the stack.
-void circa_push_function(caStack* stack, caBlock* func);
-
-// Push a module to the stack by name.
-void circa_push_module(caStack* stack, const char* name);
-
 // Check for changed files, and run any relevant change actions.
 void circa_update_changed_files(caWorld* world);
 
-// Run the current stack.
-void circa_run(caStack* stack);
-
-// Pop the top stack frame.
-void circa_pop(caStack* stack);
-
-void circa_call_method(caStack* stack, const char* funcName, caValue* object, caValue* ins, caValue* outs);
+// Run the VM
+void circa_run(caVM* vm);
 
 // Signal that an error has occurred.
-void circa_output_error_val(caStack* stack, caValue* val);
-void circa_output_error(caStack* stack, const char* msg);
+void circa_output_error_val(caVM* vm, caValue* val);
+void circa_output_error(caVM* vm, const char* msg);
 
 // Return whether a runtime error occurred.
-bool circa_has_error(caStack* stack);
+bool circa_has_error(caVM* vm);
 
 // Clear all frames from a Stack.
-void circa_clear_stack(caStack* stack);
+void circa_clear_stack(caVM* vm);
 
 // Clear all frames but the topmost, rewind the PC, and clear temporary values.
-void circa_restart(caStack* stack);
+void circa_restart(caVM* vm);
 
-caValue* circa_get_state_field(caStack* stack, const char* name);
+caValue* circa_env_insert(caVM* vm, const char* name);
 
-caValue* circa_env_insert(caStack* stack, const char* name);
-
-void circa_dump_stack_trace(caStack* stack);
+void circa_throw(caVM* vm, const char* message);
 
 // -- Fetching Inputs & Outputs --
 
 // Get the number of inputs.
-int circa_num_inputs(caStack* stack);
+int circa_num_inputs(caVM* vm);
 
 // Retrieve the given input value. This value may not be modified.
-caValue* circa_input(caStack* stack, int index);
+caValue* circa_input(caVM* vm, int index);
 
 // Read the given input index as an integer.
-// Equivalent to: circa_int(circa_input(stack, index))
-int circa_int_input(caStack* stack, int index);
+// Equivalent to: circa_int(circa_input(vm, index))
+int circa_int_input(caVM* vm, int index);
 
 // Read the given input index as a string
-// Equivalent to: circa_string(circa_input(stack, index))
-const char* circa_string_input(caStack* stack, int index);
+// Equivalent to: circa_string(circa_input(vm, index))
+const char* circa_string_input(caVM* vm, int index);
 
 // Read the given input index as a float
-// Equivalent to: circa_to_float(circa_input(stack, index))
+// Equivalent to: circa_to_float(circa_input(vm, index))
 // (Note that we use circa_to_float, not circa_float)
-float circa_float_input(caStack* stack, int index);
+float circa_float_input(caVM* vm, int index);
 
 // Read the given input index as a bool
-// Equivalent to: circa_bool(circa_input(stack, index))
-float circa_bool_input(caStack* stack, int index);
+// Equivalent to: circa_bool(circa_input(vm, index))
+float circa_bool_input(caVM* vm, int index);
 
-// Fetch the given output value. This value should be modified.
-caValue* circa_output(caStack* stack, int index);
-
-// Initialize the given value, using the default create() function on the
-// Term's declared type. Also, returns the output value for convenient writing.
-// This function is unnecessary if you write to the output using one of the
-// circa_set_XXX functions.
-caValue* circa_set_default_input(caStack* stack, int index);
-caValue* circa_set_default_output(caStack* stack, int index);
+// Fetch the current frame's output value.
+caValue* circa_output(caVM* vm);
 
 // Fetch the caller Term, this is the term whose function is currently being evaluated.
-caTerm* circa_caller_term(caStack* stack);
+caTerm* circa_caller_term(caVM* vm);
 
 // Fetch the Block that holds the caller Term.
-caBlock* circa_caller_block(caStack* stack);
+caBlock* circa_caller_block(caVM* vm);
 
-caBlock* circa_stack_top_block(caStack* stack);
+caBlock* circa_stack_top_block(caVM* vm);
 
 // -- Tagged Values --
 //
@@ -386,7 +350,6 @@ caBlock*    circa_block(caValue* value);
 float       circa_float(caValue* value);
 int         circa_int(caValue* value);
 void*       circa_native_ptr(caValue* val);
-caStack*    circa_stack(caValue* value);
 const char* circa_string(caValue* value);
 caType*     circa_type(caValue* value);
 void        circa_vec2(caValue* vec2, float* xOut, float* yOut);
@@ -435,7 +398,6 @@ void circa_set_native_ptr(caValue* val, void* ptr, caNativePtrRelease release);
 void circa_set_null(caValue* container);
 void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);
-void circa_set_stack(caValue* container, caStack* stack);
 void circa_set_string(caValue* container, const char* str);
 void circa_set_symbol(caValue* container, const char* str);
 void circa_set_typed_pointer(caValue* container, caType* type, void* ptr);
@@ -511,10 +473,6 @@ caBlock* circa_find_function_local(caBlock* block, const char* name);
 // Find a Type by name, looking in the given block.
 caType* circa_find_type(caBlock* block, const char* name);
 
-// Retreive the nth input Term to the caller Term. May return NULL if the caller term
-// doesn't have that many inputs, or if there is no caller term.
-caTerm* circa_caller_input_term(caStack* stack, int index);
-
 // Get a Term from a Block by index.
 caTerm* circa_get_term(caBlock* block, int index);
 
@@ -571,7 +529,7 @@ void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --
 void circa_read_file(caWorld* world, const char* filename, caValue* contentsOut);
-void circa_read_file_with_stack(caStack* stack, const char* filename, caValue* contentsOut);
+void circa_read_file_with_vm(caVM* vm, const char* filename, caValue* contentsOut);
 bool circa_file_exists(caWorld* world, const char* filename);
 int circa_file_get_version(caWorld* world, const char* filename);
 void circa_use_local_filesystem(caWorld* world, const char* rootDir);
@@ -589,13 +547,13 @@ void circa_chdir(caValue* dir);
 void circa_cwd(caValue* cwd);
 
 // -- Builtin REPL --
-void circa_repl_start(caStack* stack);
-void circa_repl_run_line(caStack* stack, caValue* input, caValue* output);
+void circa_repl_start(caVM* vm);
+void circa_repl_run_line(caVM* vm, caValue* input, caValue* output);
 
 // -- Debugging --
 
 // 'dump' commands will print a representation to stdout
-void circa_dump_s(caStack* stack);
+void circa_dump_s(caVM* vm);
 void circa_dump_b(caBlock* block);
 
 void circa_perf_stats_dump();

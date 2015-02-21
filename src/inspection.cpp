@@ -4,12 +4,10 @@
 
 #include "block.h"
 #include "building.h"
-#include "bytecode.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "function.h"
 #include "inspection.h"
-#include "interpreter.h"
 #include "list.h"
 #include "names.h"
 #include "string_type.h"
@@ -81,11 +79,6 @@ bool is_hidden(Term* term)
 
     if (has_empty_name(term))
         return false;
-
-#if 0
-    if (term->name[0] == '#' && term->name != "#return")
-        return true;
-#endif
 
     return false;
 }
@@ -442,32 +435,6 @@ void print_block(Block* block, RawOutputPrefs* prefs, Value* out)
         prefs->indentLevel += 2;
         if (term->nestedContents != NULL) {
             print_block(term->nestedContents, prefs, out);
-        }
-
-        if (prefs->showBytecode && bytecodeData) {
-            bool opcodeIndent = false;
-            while (bytecodeData[bytecodePc] != bc_End) {
-                char opcode = bytecodeData[bytecodePc];
-
-                int currentTermIndex = bytecode_op_to_term_index(bytecodeData, bytecodePc);
-                if (currentTermIndex != -1 && currentTermIndex != i)
-                    break;
-
-                if (opcode == bc_EnterFrame || opcode == bc_EnterFrameNext)
-                    opcodeIndent = false;
-
-                print_indent(prefs, out);
-                string_append(out, "[");
-                string_append(out, bytecodePc);
-                string_append(out, "] ");
-                if (opcodeIndent)
-                    string_append(out, " ");
-                bytecode_op_to_string(bytecodeData, &bytecodePc, out);
-                string_append(out, "\n");
-
-                if (opcode == bc_PushFrame)
-                    opcodeIndent = true;
-            }
         }
 
         prefs->indentLevel -= 2;

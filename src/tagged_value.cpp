@@ -9,7 +9,6 @@
 #include "list.h"
 #include "names.h"
 #include "reflection.h"
-#include "stack.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -864,13 +863,6 @@ void set_opaque_pointer(Value* value, void* addr)
     value->value_data.ptr = addr;
 }
 
-void set_stack(Value* value, Stack* stack)
-{
-    stack_incref(stack);
-    make_no_initialize(TYPES.stack, value);
-    value->value_data.ptr = stack;
-}
-
 void set_block(Value* value, Block* block)
 {
     make_no_initialize(TYPES.block, value);
@@ -910,12 +902,6 @@ void* as_opaque_pointer(Value* value)
 {
     ca_assert(value->value_type->storageType == s_StorageTypeOpaquePointer);
     return value->value_data.ptr;
-}
-
-Stack* as_stack(Value* value)
-{
-    ca_assert(is_stack(value));
-    return (Stack*) value->value_data.ptr;
 }
 
 Symbol as_symbol(Value* tv)
@@ -1113,10 +1099,6 @@ int circa_int(Value* value) {
     ca_assert(circa_is_int(value));
     return value->value_data.asint;
 }
-Stack* circa_stack(Value* value)
-{
-    return as_stack(value);
-}
 const char* circa_string(Value* value) {
     ca_assert(circa_is_string(value));
     return as_cstring(value);
@@ -1218,10 +1200,6 @@ void circa_set_null(Value* container)
 void circa_set_pointer(Value* container, void* ptr)
 {
     set_opaque_pointer(container, ptr);
-}
-void circa_set_stack(Value* container, Stack* stack)
-{
-    set_stack(container, stack);
 }
 void circa_set_term(Value* container, caTerm* term)
 {

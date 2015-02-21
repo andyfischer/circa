@@ -5,7 +5,6 @@
 #include "block.h"
 #include "building.h"
 #include "code_iterators.h"
-#include "interpreter.h"
 #include "hashtable.h"
 #include "kernel.h"
 #include "list.h"
@@ -165,41 +164,6 @@ void migrate_state_list(Value* list, Block* oldBlock, Block* newBlock, Migration
     migrate_value(list, migration);
 }
 
-void migrate_stack(Stack* stack, Migration* migration)
-{
-#if 0
-    printf("migrating stack #%d\n", stack->id);
-#endif
-
-    stack_on_migration(stack);
-
-    migrate_value(&stack->state, migration);
-
-    Frame* frame = top_frame(stack);
-
-    while (frame != NULL) {
-
-        Block* oldBlock = frame->block;
-        frame->block = migrate_block_pointer(frame->block, migration);
-
-#if 0
-        printf("migrate_stack looking at frame with oldBlock #%d, newBlock = #%d\n",
-            oldBlock->id, frame->block->id);
-#endif
-
-        if (frame->block != NULL && frame->block != oldBlock)
-            frame = stack_resize_frame(stack, frame, block_locals_count(frame->block));
-
-        for (int i=0; i < frame_register_count(frame); i++)
-            migrate_value(frame_register(frame, i), migration);
-
-        migrate_value(&frame->bindings, migration);
-        migrate_value(&frame->env, migration);
-
-        frame = prev_frame(frame);
-    }
-}
-
 void migrate_vm(VM* vm, Migration* migration)
 {
     vm_on_code_change(vm);
@@ -252,8 +216,6 @@ void migrate_value(Value* value, Migration* migration)
         
     } else if (is_block(value)) {
         set_block(value, migrate_block_pointer(as_block(value), migration));
-    } else if (is_stack(value)) {
-        migrate_stack(as_stack(value), migration);
     } else if (is_list_based(value)) {
         migrate_list_value(value, migration);
 
@@ -290,22 +252,6 @@ void migrate_world(World* world, Migration* migration)
 
     // FIXME
 
-#if 0
-    // Update references in every module.
-    for (BlockIteratorFlat it(world->root); it; ++it) {
-        Term* term = it.current();
-        if (term->function == FUNCS.module)
-            migrate_block(term->nestedContents, migration);
-    }
-#endif
-
-    // Update references in every stack.
-    Stack* rootStack = world->firstStack;
-    while (rootStack != NULL) {
-        migrate_stack(rootStack, migration);
-        rootStack = rootStack->nextStack;
-    }
-
     world->globalScriptVersion++;
 }
 
@@ -331,14 +277,6 @@ void migrate_block(Block* block, Block* oldBlock, Block* newBlock)
     migration.oldBlock = oldBlock;
     migration.newBlock = newBlock;
     return migrate_block(block, &migration);
-}
-
-void migrate_stack(Stack* stack, Block* oldBlock, Block* newBlock)
-{
-    Migration migration;
-    migration.oldBlock = oldBlock;
-    migration.newBlock = newBlock;
-    return migrate_stack(stack, &migration);
 }
 
 void migrate_vm(VM* vm, Block* oldBlock, Block* newBlock)
