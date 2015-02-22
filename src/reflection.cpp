@@ -58,6 +58,11 @@ void Block__is_null(VM* vm)
     Block* block = as_block(vm->input(0));
     set_bool(vm->output(), block == NULL);
 }
+void Block__is_major(VM* vm)
+{
+    Block* block = as_block(vm->input(0));
+    set_bool(vm->output(), is_major_block(block));
+}
 void Block__output(VM* vm)
 {
     Block* block = as_block(vm->input(0));
@@ -659,6 +664,7 @@ void reflection_install_functions(NativePatch* patch)
     circa_patch_function2(patch, "Block.input", Block__input);
     circa_patch_function2(patch, "Block.inputs", Block__inputs);
     circa_patch_function2(patch, "Block.is_null", Block__is_null);
+    circa_patch_function2(patch, "Block.is_major", Block__is_major);
     circa_patch_function2(patch, "Block.link", Block__link);
     circa_patch_function2(patch, "Block.list_configs", Block__list_configs);
     circa_patch_function2(patch, "Block.output", Block__output);

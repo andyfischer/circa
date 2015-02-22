@@ -1,1 +1,2 @@
-Error occurred: 'Couldn't cast fish to type int'
+[tests/error/input_cast.ca:3] 
+ Error: Couldn't cast fish to type int

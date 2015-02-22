@@ -1,1 +1,2 @@
-Error occurred: 'Couldn't cast value 'hi' to type int (element 'p' of type A)'
+[tests/selectors/element_type_cast_error.ca:11] 
+ Error: Couldn't cast value 'hi' to type int (element 'p' of type A)

@@ -241,12 +241,6 @@ Type* type_make_specializeType(Term* caller)
     return TYPES.any;
 }
 
-void output_explicit_postCompile(Term* term)
-{
-    Term* out = insert_output_placeholder(term->owningBlock, term->input(0), 0);
-    hide_from_source(out);
-}
-
 World* global_world()
 {
     return g_world;
@@ -491,13 +485,9 @@ void bootstrap_kernel()
     FUNCS.length = builtins->get("length");
     FUNCS.list_append = builtins->get("List.append");
     FUNCS.native_patch = builtins->get("native_patch");
-    FUNCS.output_explicit = builtins->get("output");
     FUNCS.package = builtins->get("package");
 
     nested_contents(builtins->get("Type.cast"))->overrides.specializeType = Type_cast_specializeType;
-
-    FUNCS.memoize = builtins->get("memoize");
-    block_set_evaluation_empty(nested_contents(FUNCS.memoize), true);
 
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));
@@ -534,8 +524,6 @@ void bootstrap_kernel()
         set_evaluation_empty(comment);
         set_evaluation_empty(extra_output);
         set_evaluation_empty(loop_iterator);
-        set_evaluation_empty(loop_index);
-        set_evaluation_empty(loop_output_index);
         set_evaluation_empty(static_error);
     #undef set_evaluation_empty
 
@@ -570,7 +558,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(cond, "cond");
         find_func(continue_func, "continue");
         find_func(copy, "copy");
-        find_func(destructure_list, "destructure_list");
         find_func(declare_field, "declare_field");
         find_func(discard, "discard");
         find_func(div_f, "div_f"); find_func(div_i, "div_i");
@@ -594,21 +581,15 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(less_than_eq, "less_than_eq");
         find_func(loop_condition_bool, "loop_condition_bool");
         find_func(loop_iterator, "loop_iterator");
-        find_func(loop_index, "loop_index");
-        find_func(loop_get_element, "loop_get_element");
-        find_func(loop_output_index, "loop_output_index");
         find_func(map, "map");
         find_func(make, "make");
         find_func(make_list, "make_list");
-        find_func(memoize, "memoize");
         find_func(method_lookup, "method_lookup");
-        find_func(minor_return_if_empty, "minor_return_if_empty");
         find_func(native_patch, "native_patch");
         find_func(neg, "neg");
         find_func(not_equals, "not_equals");
         find_func(not_func, "not");
         find_func(or_func, "or");
-        find_func(output_explicit, "output");
         find_func(overload_error_no_match, "overload_error_no_match");
         find_func(range, "range");
         find_func(return_func, "return");
@@ -651,7 +632,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(require, "require");
         find_func(selector, "selector");
         find_func(set_with_selector, "set_with_selector");
-        find_func(save_state_result, "_save_state_result");
         find_func(type_make, "Type.make");
         find_func(upvalue, "_upvalue");
         find_func(vm_save_declared_state, "vm_save_declared_state");
@@ -682,7 +662,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
         has_post_compile("discard", controlFlow_postCompile);
         has_post_compile("break", controlFlow_postCompile);
         has_post_compile("continue", controlFlow_postCompile);
-        has_post_compile("output", output_explicit_postCompile);
 
     #undef has_post_compile
 }

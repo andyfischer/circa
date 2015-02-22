@@ -2,8 +2,7 @@
 def main()
   Vec2([0 0])
 
-stack = make_vm(main)
-stack.run
+vm = make_vm(main)
+vm.run
 
-assert(stack.has_error)
-assert(stack.error_message == "Left side is not a function")
+assert(vm.has_error)

@@ -253,6 +253,8 @@ Term* apply_lhs(Block* block, Term* term, Value* lhs)
         return term;
 
     case s_list: {
+        return NULL;
+#if 0
         term = apply(block, FUNCS.destructure_list, TermList(term));
 
         Value* items = lhs->field(s_items);
@@ -265,6 +267,7 @@ Term* apply_lhs(Block* block, Term* term, Value* lhs)
         }
 
         return term;
+#endif
     }
     default:
         internal_error("type not recognized in apply_lhs");

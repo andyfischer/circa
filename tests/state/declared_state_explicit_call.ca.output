@@ -1,1 +1,2 @@
-Error occurred: 'Assert failed'
+[tests/state/declared_state_explicit_call.ca:9] 
+ Error: Assert failed

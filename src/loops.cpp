@@ -99,11 +99,6 @@ Term* loop_find_iterator_advance(Block* block)
     return NULL;
 }
 
-Term* for_loop_find_index(Block* contents)
-{
-    return find_term_with_function(contents, FUNCS.loop_index);
-}
-
 const char* for_loop_get_iterator_name(Term* forTerm)
 {
     Term* iterator = loop_find_iterator_value(nested_contents(forTerm));

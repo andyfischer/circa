@@ -1582,7 +1582,7 @@ Term* find_active_term(Bytecode* bc, int addr)
         switch (md.mopcode) {
         case mop_term_eval_start:
             return md.term;
-        case mop_term_eval_end:
+        //case mop_term_eval_end:
         case mop_major_block_start:
             return NULL;
         }

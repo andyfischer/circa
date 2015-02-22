@@ -11,7 +11,6 @@ Term* loop_find_done_call(Block* block);
 Term* loop_find_key(Block* block);
 Term* loop_find_iterator_advance(Block* block);
 const char* for_loop_get_iterator_name(Term* forTerm);
-Term* for_loop_find_index(Block* contents);
 
 // Initialize the contents of a for-loop for a new term.
 //   'iteratorType' is the type to use  for the iterator. If it's NULL then we'll infer a

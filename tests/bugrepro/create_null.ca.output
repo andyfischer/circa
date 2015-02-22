@@ -1,1 +1,2 @@
-Error occurred: 'Couldn't cast null to type Type'
+[tests/bugrepro/create_null.ca:2] 
+ Error: Couldn't cast null to type Type

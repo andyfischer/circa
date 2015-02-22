@@ -1,1 +1,2 @@
-Error occurred: 'Not enough inputs for function 'cl': expected 3 and found 2'
+[tests/closure/apply_not_enough_inputs.ca:5] 
+ Error: Not enough inputs for function 'cl': expected 3 and found 2

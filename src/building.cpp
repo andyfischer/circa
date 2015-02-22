@@ -787,12 +787,6 @@ void update_extra_outputs(Term* term)
         return;
 
     int outputCount = count_output_placeholders(targetBlock);
-
-    // Special case: number of outputs in destructure_list depends on its count.
-    if (term->function == FUNCS.destructure_list) {
-        outputCount = term->intProp(s_count, 0);
-    }
-
     update_extra_output_count(term, outputCount - 1);
 
     for (int index=1; ; index++) {

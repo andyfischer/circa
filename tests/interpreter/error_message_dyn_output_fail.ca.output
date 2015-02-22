@@ -1,1 +1,3 @@
-Error occurred: 'Method ['hello', Term#5397] not found on {}'
+[tests/interpreter/error_message_dyn_output_fail.ca:8] 
+ [tests/interpreter/error_message_dyn_output_fail.ca:6 inside main()] 
+  Error: Method ['hello', Term#5404] not found on {}

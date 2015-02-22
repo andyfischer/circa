@@ -1,0 +1,9 @@
+
+require stack_trace
+
+def run(Func func)
+  vm = make_vm(func)
+  vm.call
+
+  if vm.has_error
+    stack_trace.dump(vm)

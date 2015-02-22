@@ -510,7 +510,6 @@ Block* static_dispatch_block(Term* term)
 bool term_is_observable_for_special_reasons(Term* term)
 {
     return (is_output_placeholder(term)
-        || (term->function == FUNCS.loop_index)
         || (term->function == FUNCS.function_decl)
         || (is_for_loop(term->owningBlock) && is_input_placeholder(term) && term->index == 0)
         || (is_loop(term->owningBlock) && is_output_placeholder(term))

@@ -7,6 +7,7 @@
 #include "block.h"
 #include "building.h"
 #include "bytecode.h"
+#include "closures.h"
 #include "debug.h"
 #include "file.h"
 #include "file_watch.h"
@@ -16,7 +17,6 @@
 #include "modules.h"
 #include "names.h"
 #include "parser.h"
-#include "repl.h"
 #include "static_checking.h"
 #include "string_repr.h"
 #include "string_type.h"
@@ -153,8 +153,6 @@ void print_usage()
         "  -p                  : Print out raw source\n"
         "  -pp                 : Print out raw source with properties\n"
         "  -n                  : Don't actually run the script (for use with -p, etc)\n"
-        "  -print-state        : Print state as text after running the script\n"
-        "  -break-on <id>      : Debugger break when term <id> is created\n"
         "\n"
         "Available commands:\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
@@ -309,19 +307,24 @@ int run_command_line(caWorld* world, Value* args)
         return -1;
     }
 
-    Block* block = load_module_by_filename(world, &filename);
+    Block* userBlock = load_module_by_filename(world, &filename);
 
-    VM* vm = new_vm(block);
+    Value commandLineFilename; commandLineFilename.set_string("$builtins/command_line.ca");
+    Block* clmodule = load_module_by_filename(world, &commandLineFilename);
+    Block* run = find_function_local(clmodule, "run");
+
+    VM* vm = new_vm(run);
 
     if (printRaw) {
         Value str;
-        print_block(block, &rawOutputPrefs, &str);
+        print_block(userBlock, &rawOutputPrefs, &str);
         printf("%s\n", as_cstring(&str));
     }
 
     if (dontRunScript)
         return 0;
 
+    set_closure(vm->input(0), userBlock, NULL);
     vm_run(vm, NULL);
 
     if (vm->has_error()) {

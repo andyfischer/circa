@@ -1,1 +1,3 @@
-Error occurred: 'Couldn't cast hi to type int'
+[tests/interpreter/error_message_output_cast.ca:5] 
+ [tests/interpreter/error_message_output_cast.ca:3 inside f()] 
+  Error: Couldn't cast hi to type int

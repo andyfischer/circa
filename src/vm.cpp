@@ -54,6 +54,9 @@ VM* new_vm(Block* main)
     initialize_null(&vm->env);
     set_hashtable(&vm->env);
     rand_init(&vm->randState, 0);
+
+    vm_grow_stack(vm, 1 + count_input_placeholders(main));
+    
     return vm;
 }
 
@@ -90,6 +93,8 @@ void vm_reset(VM* vm, Block* newBlock)
     set_hashtable(&vm->demandEvalMap);
     set_hashtable(&vm->incomingEnv);
     set_hashtable(&vm->env);
+    vm_grow_stack(vm, 1 + count_input_placeholders(newBlock));
+
     vm_on_code_change(vm);
 }
 

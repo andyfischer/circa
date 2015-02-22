@@ -1,1 +1,2 @@
-Error occurred: 'Couldn't cast 1 to type bool'
+[tests/error/if_input.ca:1] 
+ Error: Couldn't cast 1 to type bool

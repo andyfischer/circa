@@ -3,8 +3,6 @@ testBlock = ->
   print(a)
 
 vm = make_vm(testBlock)
-vm.run
+vm.call
 
-assert(vm.error_message == "Unknown identifier: a")
-
-
+assert(vm.has_error)

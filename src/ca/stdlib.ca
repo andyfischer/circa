@@ -8,6 +8,7 @@ def discard(any outs :multiple :optional)
 def dynamic_method(any inputs :multiple)
 def break(any outs :multiple :optional)
 def continue(any outs :multiple :optional)
+def make(Type t) -> any
 def extra_output(any _) -> any
 def func_call_implicit(any inputs :multiple)
 def get_field(any obj, String key) -> any
@@ -18,30 +19,12 @@ def get_with_selector(any object, Selector selector) -> any
 def set_with_selector(any object, Selector selector, any newValue) -> any
 def section()
 def loop_condition_bool(bool condition)
-def minor_return_if_empty()
-
--- Destructuring
-def destructure_list(List list, int count)
-
--- While-block
-def while()
-
--- For-block
-def for(List list) -> List
-def loop_index() -> int
 def loop_iterator()
-def loop_get_element(list, int index)
-def loop_output_index() -> any
-
--- If-block
+def while()
+def for(List list) -> List
 def if() -> any
 def case(bool b :optional)
-
--- Switch-block
 def switch(any input :optional) -> any
-
--- Explicit input/output (future questionable)
-def output(any _)
 
 -- List values
 def make_list(any vals :multiple) -> List
@@ -111,17 +94,6 @@ def arccos(number n) -> number
 def arctan(number n) -> number
   -- Trigonometric arctan() function
 
--- Secret functions used by interpreter
-def _get_local_stack_path() -> any
--- def _find_active_value(term) -> (any, bool)
-def _save_state_result(Term declaredStateTerm, any result)
--- def _get_demand_value(Term t) -> (bool, any)
-def _store_demand_value(Term t, any val)
-def _extract_stack_path() -> List
-def dbg_get_incoming_state() -> any
-def dbg_get_outgoing_state() -> any
-def dbg_set_incoming_state(val)
-def dbg_set_outgoing_state(val)
 def reflect_caller(int height) -> Term
 
 -- Type checking
@@ -237,8 +209,8 @@ def rand() -> number
 
 def copy(any val) -> any
 
--- Returns null if cast fails.
 def cast(any val, Type t) -> any
+  -- Cast the value to the given type. Returns null if cast fails.
 
 def cond(bool condition, any pos, any neg) -> any
   -- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.
@@ -283,8 +255,6 @@ def greater_than_eq_f(number a,number b) -> bool
 def length(List list) -> int
   -- Return the number of items in the given list
 
-def make(Type t) -> any
-
 def rpath(String path) -> String
 
 def set_field(any obj, String key, any val) -> any
@@ -297,11 +267,12 @@ def not_equals(any a,any b) -> bool
 def print(any items :multiple)
   -- Prints a line of text output to the console.
 
+def trace(any items :multiple)
+  -- Like print()
+
 def get(Map val, List path) -> any
 def set(Map val, List path, any newValue) -> any
 def delete(Map val, List path) -> Map
-
-def trace(any items :multiple)
 
 def to_string_repr(any val) -> String
   -- Encode a Circa value as a string representation.
@@ -318,9 +289,6 @@ def has_effects()
 
 def native_patch(String filename)
   -- Declare that this block should be patched by a native module.
-
-def memoize()
-  -- Instruct the VM to memoize the current frame. Not currently working.
 
 def write_text_file(String filename, String contents)
   -- Write contents to the given filename, overwriting any existing file.
@@ -346,6 +314,15 @@ def static_type(i) -> Type
 def term_ref(term :ref) -> Term
   caller = reflect_caller(1)
   caller.input(0)
+
+-- Builtin sequences
+
+-- to_seq is used inside loops, so don't write any loops before this declaration.
+def to_seq(val) -> any
+  if is_list(val)
+    val.to_seq
+  else
+    val
 
 struct ListSeq {
   List list
@@ -376,28 +353,52 @@ struct ConcatSeq {
 def ConcatSeq.done(self)
   self.left.done and self.right.done
 
-def ConcatSeq.settle(self)
-  cond(self.left.done, self.right, self)
-
 def ConcatSeq.next(self)
   self.left.next
+
+def ConcatSeq.key(self)
+  self.left.key
+
+def ConcatSeq.settle(self)
+  cond(self.left.done, self.right, self)
 
 def ConcatSeq.advance(@self)
   @self.left.advance
   @self.settle
 
-def ConcatSeq.key(self)
-  self.left.key
-
 def concat_seq(left, right)
   ConcatSeq.make(to_seq(left) to_seq(right)).settle
 
--- to_seq is used inside loops, so don't write any loops before this declaration.
-def to_seq(val) -> any
-  if is_list(val)
-    val.to_seq
-  else
-    val
+struct FilterSeq {
+  any seq
+  Func func
+}
+
+def FilterSeq.done(self)
+  self.seq.done
+
+def FilterSeq.next(self)
+  self.seq.next
+
+def FilterSeq.key(self)
+  self.seq.key
+
+def FilterSeq.settle(@self)
+  while true
+    if self.done
+      return self
+
+    if self.func.call(self.seq.next)
+      return self
+
+    @self.advance
+
+def FilterSeq.advance(self)
+  @self.seq.advance
+  self.settle
+
+def filter(s, func) -> FilterSeq
+  FilterSeq.make(to_seq(s), func).settle
 
 struct Range {
   int from
@@ -528,24 +529,6 @@ def vm_demand_eval(Term t) -> any
   result = t.function.to_func.apply(inputs)
   vm_demand_eval_store(t result)
   result
-
-{-
-def _eval_on_demand(Term t) -> any
-  -- Internal function, used when a nonlocal() term needs a value.
-  if t.is_value or t.is_func_decl
-    return t.value
-
-  found, val = _get_demand_value(t)
-  if found
-    return val
-
-  inputs = for Term input in t.inputs
-    _eval_on_demand(input)
-
-  result = _dynamic_term_eval(t inputs)
-  _store_demand_value(t result)
-  result
--}
 
 -- Misc builtin funcs --
 
@@ -699,6 +682,7 @@ def Block.has_static_error(self) -> bool
 def Block.id(self) -> int
 def Block.input(self, int index) -> Term
   -- Fetch an input placeholder term by index.
+def Block.is_major(self) -> bool
 def Block.is_null(self) -> bool
   -- Return whether this is a null Block reference.
 def Block.inputs(self) -> List
@@ -709,6 +693,11 @@ def Block.link(self, Block lib)
   -- then modify the term to use the named term in 'lib'.
 def Block.list_configs(self) -> List
   -- Return a list of Terms that look like configs (named literal values).
+def Block.nearest_major(self) -> Block
+  if self.is_major
+    self
+  else
+    self.parent.nearest_major
 def Block.output(self, int index) -> Term
   -- Return an output term by index.
 def Block.outputs(self) -> List
@@ -769,18 +758,10 @@ def Block.call(self, any inputs :multiple) -> any
   self.to_func.apply(inputs)
 
 def Block.get_loop_index(self) -> Term
-  -- For a for-loop, return the index term
-  for term in self.terms
-    if term.function == loop_index.block
-      return term
-  error("Iterator not found in Block.get_iterator")
+  error("todo")
 
 def Block.get_iterator(self) -> Term
-  -- For a for-loop, return the iterator term
-  for term in self.terms
-    if term.function == loop_get_element.block
-      return term
-  error("Iterator not found in Block.get_iterator")
+  error("todo")
 
 def Block.if_block_cases(self) -> List
   self.terms.filter((term) -> term.function.name == 'case')
@@ -916,10 +897,8 @@ def VM.frame_from_base(self, int height) -> Frame
   -- Return the Frame with the given height.
 def VM.frame_count(self) -> int
 
--- don't delete:
 def VM.frame_list(self) -> List
 def VM.slot(self, index) -> any
-
 
 def VM.frames_from_top(self) -> List
   for i in 0..self.frame_count
