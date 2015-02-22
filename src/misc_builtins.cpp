@@ -164,17 +164,15 @@ void hosted_is_type(VM* vm)
     set_bool(circa_output(vm), is_type(circa_input(vm, 0)));
 }
 
-#if 0
-void from_string(Stack* stack)
+void from_string(VM* vm)
 {
-    parse_string_repr(circa_input(stack, 0), circa_output(stack, 0));
+    parse_string_repr(circa_input(vm, 0), circa_output(vm));
 }
 
-void to_string_repr(Stack* stack)
+void to_string_repr(VM* vm)
 {
-    write_string_repr(circa_input(stack, 0), circa_output(stack, 0));
+    write_string_repr(circa_input(vm, 0), circa_output(vm));
 }
-#endif
 
 void test_oracle(VM* vm)
 {
@@ -1285,8 +1283,8 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "unique_id", unique_id);
     circa_patch_function(patch, "source_id", source_id);
     circa_patch_function(patch, "write_text_file", write_text_file_func);
-    circa_patch_function(patch, "from_string", from_string);
-    circa_patch_function(patch, "to_string_repr", to_string_repr);
+    circa_patch_function2(patch, "from_string", from_string);
+    circa_patch_function2(patch, "to_string_repr", to_string_repr);
     circa_patch_function2(patch, "test_spy", test_spy);
     circa_patch_function2(patch, "test_oracle", test_oracle);
     circa_patch_function(patch, "sys_module_search_paths", sys__module_search_paths);
