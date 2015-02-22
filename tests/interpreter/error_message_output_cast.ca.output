@@ -1,1 +1,1 @@
-Couldn't cast output value 'hi' to type int
+Error occurred: 'Couldn't cast hi to type int'

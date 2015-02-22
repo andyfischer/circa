@@ -222,12 +222,12 @@ void test_oracle_send(int i)
     set_int(list_append(g_oracleValues), i);
 }
 
-#if 0
-void perf_stats_dump(Stack* stack)
+void perf_stats_dump(VM* vm)
 {
-    perf_stats_to_map(circa_output(stack, 0));
+    perf_stats_to_map(vm->output());
     circa_perf_stats_reset();
 }
+#if 0
 void global_script_version(Stack* stack)
 {
     World* world = stack->world;
@@ -1288,7 +1288,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function2(patch, "test_spy", test_spy);
     circa_patch_function2(patch, "test_oracle", test_oracle);
     circa_patch_function(patch, "sys_module_search_paths", sys__module_search_paths);
-    circa_patch_function(patch, "_perf_stats_dump", perf_stats_dump);
+    circa_patch_function2(patch, "_perf_stats_dump", perf_stats_dump);
     circa_patch_function(patch, "global_script_version", global_script_version);
 }
 

@@ -48,7 +48,6 @@ bool is_under_same_major_block(Term* a, Term* b);
 // Find the nearest (parent) block that is a compilation unit (such as a module).
 Block* find_nearest_compilation_unit(Block* block);
 
-bool has_variable_args(Block* block);
 int find_index_of_vararg(Block* block);
 
 // Input & output placeholders
@@ -58,9 +57,6 @@ Term* get_input_placeholder(Block* block, int index);
 // into account.
 Term* get_effective_input_placeholder(Block* block, int inputIndex);
 
-Term* get_output_placeholder(Block* block, int index);
-int count_input_placeholders(Block* block);
-int count_output_placeholders(Block* block);
 int get_function_output_count(Block* block);
 int input_placeholder_index(Term* inputPlaceholder);
 int output_placeholder_index(Term* outputPlaceholder);

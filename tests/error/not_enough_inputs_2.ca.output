@@ -1,6 +1,3 @@
 a = 1
 b = [2]
-Error occurred:
-[tests/error/not_enough_inputs_2.ca 7,0] f()
-Too few inputs: expected 2 (or more), received 0
-
+Error occurred: 'Not enough inputs for function 'f': expected 1 (or more) and found 0'

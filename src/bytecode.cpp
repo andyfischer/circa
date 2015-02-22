@@ -622,6 +622,53 @@ void loop_condition_bool(Bytecode* bc, Term* term)
     append_unresolved(bc, addr, s_break);
 }
 
+void write_not_enough_inputs_error(Bytecode* bc, Block* func, int found)
+{
+    int expected = count_input_placeholders(func);
+    int varargs = has_variable_args(func);
+
+    if (varargs)
+        expected--;
+
+    if (found >= expected)
+        return;
+
+    Value message;
+    set_string(&message, "Not enough inputs for function '");
+    string_append(&message, func->name());
+    string_append(&message, "': expected ");
+    string_append(&message, expected);
+    if (varargs)
+        string_append(&message, " (or more)");
+    string_append(&message, " and found ");
+    string_append(&message, found);
+
+    int top = reserve_new_frame_slots(bc, 1);
+    move(&message, load_const(bc, top + 1));
+    call(bc, top, 1, FUNCS.error->nestedContents);
+}
+
+void write_too_many_inputs_error(Bytecode* bc, Block* func, int found)
+{
+    int expected = count_input_placeholders(func);
+    int varargs = has_variable_args(func);
+
+    if (varargs || found <= expected)
+        return;
+
+    Value message;
+    set_string(&message, "Too many inputs for function '");
+    string_append(&message, func->name());
+    string_append(&message, "': expected ");
+    string_append(&message, expected);
+    string_append(&message, " and found ");
+    string_append(&message, found);
+    
+    int top = reserve_new_frame_slots(bc, 1);
+    move(&message, load_const(bc, top + 1));
+    call(bc, top, 1, FUNCS.error->nestedContents);
+}
+
 void write_normal_call(Bytecode* bc, Term* term)
 {
 #if DEBUG
@@ -630,16 +677,21 @@ void write_normal_call(Bytecode* bc, Term* term)
     string_append(&commentStr, term_name(term->function));
     comment(bc, &commentStr);
 #endif
+
     Block* target = term->function->nestedContents;
 
     if (block_needs_no_evaluation(bc, target)) {
         int top = reserve_new_frame_slots(bc, 0);
-        comment(bc, "block needs no evaluation");
+        comment(bc, "this block needs no evaluation");
         append_liveness(bc, term, top);
         return;
     }
 
     int inputCount = term->numInputs();
+
+    write_not_enough_inputs_error(bc, target, inputCount);
+    write_too_many_inputs_error(bc, target, inputCount);
+
     int top = reserve_new_frame_slots(bc, inputCount);
     
     for (int i=0; i < inputCount; i++) {
@@ -888,7 +940,7 @@ void pop_frames_for_early_exit(Bytecode* bc, Symbol exitType, Term* atTerm, Bloc
 void write_break(Bytecode* bc, Term* term)
 {
     comment(bc, "break");
-    Block* loop = find_enclosing_for_loop_contents(term);
+    Block* loop = find_enclosing_loop(term->owningBlock);
     pop_frames_for_early_exit(bc, s_break, term, loop);
 
     close_state_frame(bc, loop, term);
@@ -901,7 +953,7 @@ void write_break(Bytecode* bc, Term* term)
 void write_continue(Bytecode* bc, Term* term)
 {
     comment(bc, "continue");
-    Block* loop = find_enclosing_for_loop_contents(term);
+    Block* loop = find_enclosing_loop(term->owningBlock);
     pop_frames_for_early_exit(bc, s_continue, term, loop);
 
     close_state_frame(bc, loop, term);
@@ -916,7 +968,7 @@ void write_continue(Bytecode* bc, Term* term)
 void write_discard(Bytecode* bc, Term* term)
 {
     comment(bc, "discard");
-    Block* loop = find_enclosing_for_loop_contents(term);
+    Block* loop = find_enclosing_loop(term->owningBlock);
     pop_frames_for_early_exit(bc, s_discard, term, loop);
 
     if (should_write_state_header(bc, loop))

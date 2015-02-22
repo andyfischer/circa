@@ -1,4 +1,1 @@
-Error occurred:
-[tests/closure/apply_not_enough_inputs.ca 5,0] Func.apply()
-Too few inputs: expected 3, received 2
-
+Error occurred: 'Not enough inputs for function 'cl': expected 3 and found 2'

@@ -158,7 +158,7 @@ def run_one_test(suite, file):
         failures = test_file(suite.process, file)
         if failures:
             failed = True
-            print(str(len(failures)) + " failure(s) in "+file+":")
+            print(str(len(failures)) + " failure(s) in "+file)
         for failure in failures:
             for line in failure.description:
                 print(" "+line)

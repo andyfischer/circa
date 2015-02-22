@@ -6,9 +6,9 @@ def f(int i)
 def check1()
   list(f(1) f(2) f(3))
 
-int = make_vm(check1)
-int.call
-print(int.get_state)
+vm = make_vm(check1)
+vm.call
+print(vm.get_state)
 
 -- Use state as a predicate to 'if'
 def sbool() -> bool
@@ -19,6 +19,6 @@ def check2()
   if sbool()
     a = 1
 
-int = make_vm(check2)
-int.call
-print(int.get_state)
+vm = make_vm(check2)
+vm.call
+print(vm.get_state)

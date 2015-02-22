@@ -1,11 +1,5 @@
 
-def main()
-    def f() -> int
-        return "hi"
+def f() -> int
+    return "hi"
 
-    f()
-
-int = make_vm(main)
-int.run
-
-print(int.error_message)
+f()

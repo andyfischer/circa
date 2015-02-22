@@ -130,9 +130,12 @@ Block* make_nested_contents(Term* term);
 Block* nested_contents(Term* term);
 Term* block_get_function_term(Block* block);
 Value* block_name(Block* block);
-const char* block_name2(Block* block);
-
 void remove_nested_contents(Term* term);
+
+Term* get_output_placeholder(Block* block, int index);
+int count_input_placeholders(Block* block);
+int count_output_placeholders(Block* block);
+bool has_variable_args(Block* block);
 
 // Insert this existing block as the nested contents for this term.
 void block_graft_replacement(Block* target, Block* replacement);
@@ -211,7 +214,8 @@ bool block_is_evaluation_empty(Block* block);
 void block_set_evaluation_empty(Block* block, bool empty);
 bool block_has_effects(Block* block);
 void block_set_has_effects(Block* block, bool hasEffects);
-int block_locals_count(Block* block);
+
+
 
 Type* get_input_type(Block* block, int index);
 Type* get_output_type(Block* block, int index);

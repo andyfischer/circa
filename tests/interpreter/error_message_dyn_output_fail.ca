@@ -5,8 +5,4 @@ def main()
   t = make(T)
   t.hello()
 
-int = make_vm(main)
-int.run
-
-assert(int.error_message == "Method 'hello' not found on type T")
-
+main()

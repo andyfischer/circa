@@ -7,6 +7,6 @@ assert(str.apply([1 2 3]) == "123")
 def no_args()
   str.apply()
 
-int = make_vm(no_args)
-int.run
-assert(int.has_error)
+vm = make_vm(no_args)
+vm.run
+assert(vm.has_error)

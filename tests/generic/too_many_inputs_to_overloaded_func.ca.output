@@ -1,4 +1,1 @@
-Error occurred:
-[tests/generic/too_many_inputs_to_overloaded_func.ca 2,0] add()
-Too many inputs: expected 2, received 4
-
+Error occurred: 'Too many inputs for function 'add': expected 2 and found 4'

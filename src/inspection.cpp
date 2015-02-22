@@ -174,31 +174,6 @@ Term* get_effective_input_placeholder(Block* block, int inputIndex)
         return get_input_placeholder(block, inputIndex);
 }
 
-Term* get_output_placeholder(Block* block, int index)
-{
-    if (index >= block->length())
-        return NULL;
-    Term* term = block->getFromEnd(index);
-    if (term == NULL || term->function != FUNCS.output)
-        return NULL;
-    return term;
-}
-
-int count_input_placeholders(Block* block)
-{
-    int result = 0;
-    while (get_input_placeholder(block, result) != NULL)
-        result++;
-    return result;
-}
-int count_output_placeholders(Block* block)
-{
-    int result = 0;
-    while (get_output_placeholder(block, result) != NULL)
-        result++;
-    return result;
-}
-
 int input_placeholder_index(Term* inputPlaceholder)
 {
     return inputPlaceholder->index;
@@ -285,17 +260,6 @@ int count_actual_output_terms(Term* term)
     while (get_extra_output(term, count) != NULL)
         count++;
     return count + 1;
-}
-
-bool has_variable_args(Block* block)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(block, i);
-        if (placeholder == NULL)
-            return false;
-        if (placeholder->boolProp(s_Multiple, false))
-            return true;
-    }
 }
 
 int find_index_of_vararg(Block* block)

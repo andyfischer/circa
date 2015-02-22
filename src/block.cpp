@@ -366,6 +366,42 @@ void remove_nested_contents(Term* term)
     term->nestedContents = NULL;
 }
 
+Term* get_output_placeholder(Block* block, int index)
+{
+    if (index >= block->length())
+        return NULL;
+    Term* term = block->getFromEnd(index);
+    if (term == NULL || term->function != FUNCS.output)
+        return NULL;
+    return term;
+}
+
+int count_input_placeholders(Block* block)
+{
+    int result = 0;
+    while (get_input_placeholder(block, result) != NULL)
+        result++;
+    return result;
+}
+int count_output_placeholders(Block* block)
+{
+    int result = 0;
+    while (get_output_placeholder(block, result) != NULL)
+        result++;
+    return result;
+}
+
+bool has_variable_args(Block* block)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(block, i);
+        if (placeholder == NULL)
+            return false;
+        if (placeholder->boolProp(s_Multiple, false))
+            return true;
+    }
+}
+
 void block_graft_replacement(Block* target, Block* replacement)
 {
     target->owningTerm->nestedContents = replacement;
@@ -860,11 +896,6 @@ void block_set_has_effects(Block* block, bool hasEffects)
         set_bool(block_insert_property(block, s_HasEffects), true);
     else
         block_remove_property(block, s_HasEffects);
-}
-
-int block_locals_count(Block* block)
-{
-    return block->length();
 }
 
 Type* get_input_type(Block* block, int index)

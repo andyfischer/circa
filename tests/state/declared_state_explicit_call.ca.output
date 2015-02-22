@@ -1,4 +1,1 @@
-Error occurred:
-[tests/state/declared_state_explicit_call.ca 8,0] assert()
-Assert failed
-
+Error occurred: 'Assert failed'

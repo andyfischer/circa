@@ -146,6 +146,40 @@ static inline void do_call_op(VM* vm, int top, int inputCount, int toAddr)
     vm->pc = toAddr;
 }
 
+static void vm_throw_error_not_enough_inputs(VM* vm, Block* func, int found)
+{
+    int expected = count_input_placeholders(func);
+    bool varargs = has_variable_args(func);
+
+    if (varargs)
+        expected--;
+
+    Value message;
+    set_string(&message, "Not enough inputs for function '");
+    string_append(&message, func->name());
+    string_append(&message, "': expected ");
+    string_append(&message, expected);
+    if (varargs)
+        string_append(&message, " (or more)");
+    string_append(&message, " and found ");
+    string_append(&message, found);
+    vm->throw_error(&message);
+}
+
+static void vm_throw_error_too_many_inputs(VM* vm, Block* func, int found)
+{
+    int expected = count_input_placeholders(func);
+
+    Value message;
+    set_string(&message, "Too many inputs for function '");
+    string_append(&message, func->name());
+    string_append(&message, "': expected ");
+    string_append(&message, expected);
+    string_append(&message, " and found ");
+    string_append(&message, found);
+    vm->throw_error(&message);
+}
+
 void vm_run(VM* vm, VM* callingVM)
 {
     vm_prepare_bytecode(vm, callingVM);
@@ -215,6 +249,15 @@ void vm_run(VM* vm, VM* callingVM)
 
             copy(func_bindings(func), &vm->incomingUpvalues);
 
+            int funcInputs = count_input_placeholders(block);
+            bool funcVarargs = has_variable_args(block);
+
+            if (op.b < (funcInputs + (funcVarargs? -1 : 0)))
+                return vm_throw_error_not_enough_inputs(vm, block, op.b);
+
+            if (!funcVarargs && op.b > funcInputs)
+                return vm_throw_error_too_many_inputs(vm, block, op.b);
+
             int addr = find_or_compile_major_block(vm->bc, block);
             ops = vm->bc->ops;
 
@@ -239,17 +282,30 @@ void vm_run(VM* vm, VM* callingVM)
             Block* block = func_block(func);
             copy(func_bindings(func), &vm->incomingUpvalues);
 
-            int addr = find_or_compile_major_block(vm->bc, block);
-            ops = vm->bc->ops;
-
             Value list;
             move(vm->stack[vm->stackTop + op.a + 1], &list);
+
+            if (!is_list(&list))
+                return vm->throw_str("Type error in input 1: expected list");
+
             int inputCount = list.length();
+
+            int funcInputs = count_input_placeholders(block);
+            int funcVarargs = has_variable_args(block);
+
+            if (inputCount < (funcInputs + (funcVarargs? -1 : 0)))
+                return vm_throw_error_not_enough_inputs(vm, block, inputCount);
+
+            if (!funcVarargs && inputCount > funcInputs)
+                return vm_throw_error_too_many_inputs(vm, block, inputCount);
 
             vm_grow_stack(vm, vm->stackTop + op.a + inputCount + 1);
 
             for (int i=0; i < inputCount; i++)
                 copy(list.index(i), vm->stack[vm->stackTop + op.a + 1 + i]);
+
+            int addr = find_or_compile_major_block(vm->bc, block);
+            ops = vm->bc->ops;
 
             do_call_op(vm, op.a, inputCount, addr);
 
