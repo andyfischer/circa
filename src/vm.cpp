@@ -2,14 +2,17 @@
 
 #include "common_headers.h"
 
-#include "bytecode2.h"
+#include "bytecode.h"
 #include "blob.h"
 #include "block.h"
 #include "closures.h"
 #include "hashtable.h"
 #include "kernel.h"
 #include "list.h"
+#include "modules.h"
 #include "names.h"
+#include "native_patch.h"
+#include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -120,6 +123,448 @@ void make_vm(VM* vm)
     Value* out = vm->output();
     make(TYPES.vm, out);
     set_pointer(out, newVm);
+}
+
+static inline Value* get_slot_fast(VM* vm, int slot)
+{
+    int index = vm->stackTop + slot;
+    return vm->stack[index];
+}
+
+static inline Value* get_const(VM* vm, int constIndex)
+{
+    return vm->bc->consts[constIndex];
+}
+
+static inline void do_call_op(VM* vm, int top, int inputCount, int toAddr)
+{
+    int prevTop = vm->stackTop;
+    vm->stackTop = vm->stackTop + top;
+    vm->inputCount = inputCount;
+    vm->stack[vm->stackTop - 1]->set_int(prevTop);
+    vm->stack[vm->stackTop - 2]->set_int(vm->pc);
+    vm->pc = toAddr;
+}
+
+void vm_run(VM* vm, VM* callingVM)
+{
+    vm_prepare_bytecode(vm, callingVM);
+
+    vm->pc = 0;
+    vm->stackTop = 0;
+    vm->stateTop = -1;
+    vm->error = false;
+    vm->inputCount = 0;
+    vm_grow_stack(vm, 1);
+
+    copy(&vm->topLevelUpvalues, &vm->incomingUpvalues);
+
+    Op* ops = vm->bc->ops;
+
+    #if TRACE_EXECUTION
+        int executionDepth = 0;
+    #endif
+
+    #define trace_execution_indent() for (int i=0; i < executionDepth; i++) printf(" ");
+
+    while (true) {
+
+        ca_assert(vm->pc < vm->bc->opCount);
+
+        Op op = ops[vm->pc++];
+
+        #if TRACE_EXECUTION
+            trace_execution_indent();
+            printf("[pc:%d top:%d]: ", vm->pc-1, vm->stackTop);
+            dump_op(vm->bc, op);
+        #endif
+
+        switch (op.opcode) {
+
+        case op_nope:
+            continue;
+        case op_uncompiled_call: {
+            vm->pc--;
+            Block* block = get_const(vm, op.c)->asBlock();
+            int addr = find_or_compile_major_block(vm->bc, block);
+            ops = vm->bc->ops;
+            ops[vm->pc].opcode = op_call;
+            ops[vm->pc].c = addr;
+            continue;
+        }
+        case op_call: {
+            do_call_op(vm, op.a, op.b, op.c);
+
+            #if TRACE_EXECUTION
+                executionDepth++;
+                trace_execution_indent();
+                printf("top is now: %d\n", vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_func_call_d: {
+            Value* func = get_slot_fast(vm, op.a);
+
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf("dyn_call with: %s\n", func->to_c_string());
+            #endif
+
+            Block* block = func_block(func);
+
+            copy(func_bindings(func), &vm->incomingUpvalues);
+
+            int addr = find_or_compile_major_block(vm->bc, block);
+            ops = vm->bc->ops;
+
+            do_call_op(vm, op.a, op.b, addr);
+
+            #if TRACE_EXECUTION
+                executionDepth++;
+                trace_execution_indent();
+                printf("top is now: %d\n", vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_func_apply_d: {
+            Value* func = get_slot_fast(vm, op.a);
+
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf("dyn_apply with: %s\n", func->to_c_string());
+            #endif
+
+            Block* block = func_block(func);
+            copy(func_bindings(func), &vm->incomingUpvalues);
+
+            int addr = find_or_compile_major_block(vm->bc, block);
+            ops = vm->bc->ops;
+
+            Value list;
+            move(vm->stack[vm->stackTop + op.a + 1], &list);
+            int inputCount = list.length();
+
+            vm_grow_stack(vm, vm->stackTop + op.a + inputCount + 1);
+
+            for (int i=0; i < inputCount; i++)
+                copy(list.index(i), vm->stack[vm->stackTop + op.a + 1 + i]);
+
+            do_call_op(vm, op.a, inputCount, addr);
+
+            #if TRACE_EXECUTION
+                executionDepth++;
+                trace_execution_indent();
+                printf("top is now: %d\n", vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_dyn_method: {
+            // grow in case we need to convert to Map.get call.
+            vm_grow_stack(vm, op.a + 3);
+
+            Value* object = get_slot_fast(vm, op.a + 1);
+            Value* nameLocation = get_const(vm, op.c);
+            Block* method = find_method_on_type(get_value_type(object), nameLocation);
+
+            if (method == NULL) {
+                if (is_module_ref(object)) {
+                    Term* function = module_lookup(vm->world, object, nameLocation->index(0));
+                    if (function != NULL && is_function(function)) {
+                        method = function->nestedContents;
+
+                        // Before calling, we need to discard input 0 (the module ref).
+                        int newTop = op.a;
+                        int inputCount = op.b;
+                        for (int input=1; input < inputCount; input++)
+                            move(get_slot_fast(vm, newTop+1+input), get_slot_fast(vm, newTop+input));
+
+                        int addr = find_or_compile_major_block(vm->bc, method);
+                        ops = vm->bc->ops;
+                        do_call_op(vm, op.a, inputCount - 1, addr);
+
+                        #if TRACE_EXECUTION
+                            executionDepth++;
+                            trace_execution_indent();
+                            printf("top is now: %d\n", vm->stackTop);
+                        #endif
+
+                        continue;
+                    }
+                } else if (is_hashtable(object)) {
+                    Block* function = FUNCS.map_get->nestedContents;
+                    int addr = find_or_compile_major_block(vm->bc, function);
+                    ops = vm->bc->ops;
+
+                    // Copy the name to input 1
+                    Value* input1 = get_slot_fast(vm, op.a + 2);
+                    copy(nameLocation->index(0), input1);
+
+                    // Temp, convert to symbol if needed
+                    if (is_string(input1))
+                        set_symbol(input1, symbol_from_string(as_cstring(input1)));
+
+                    do_call_op(vm, op.a, 2, addr);
+                    #if TRACE_EXECUTION
+                        executionDepth++;
+                        trace_execution_indent();
+                        printf("top is now: %d\n", vm->stackTop);
+                    #endif
+                    continue;
+                }
+
+                Value msg;
+                set_string(&msg, "Method ");
+                string_append(&msg, nameLocation);
+                string_append(&msg, " not found on ");
+                string_append(&msg, object);
+                return vm->throw_error(&msg);
+            }
+            
+            int addr = find_or_compile_major_block(vm->bc, method);
+            ops = vm->bc->ops;
+
+            do_call_op(vm, op.a, op.b, addr);
+
+            #if TRACE_EXECUTION
+                executionDepth++;
+                trace_execution_indent();
+                printf("top is now: %d\n", vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_jump:
+            vm->pc = op.c;
+            continue;
+        case op_jif: {
+            Value* a = get_slot_fast(vm, op.a);
+            if (a->asBool())
+                vm->pc = op.c;
+            continue;
+        }
+        case op_jnif: {
+            Value* a = get_slot_fast(vm, op.a);
+            if (!a->asBool())
+                vm->pc = op.c;
+            continue;
+        }
+        case op_jeq: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+            if (equals(a, b))
+                vm->pc = op.c;
+            continue;
+        }
+        case op_jneq: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+            if (!equals(a, b))
+                vm->pc = op.c;
+            continue;
+        }
+        case op_grow_frame: {
+            vm_grow_stack(vm, vm->stackTop + op.a);
+            continue;
+        }
+        case op_load_const: {
+            Value* val = get_const(vm, op.a);
+            Value* slot = get_slot_fast(vm, op.b);
+            copy(val, slot);
+
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf("loaded const %s to s%d\n", slot->to_c_string(), op.b + vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_load_i: {
+            Value* slot = get_slot_fast(vm, op.b);
+            set_int(slot, op.a);
+            continue;
+        }
+        case op_native: {
+            EvaluateFunc func = get_native_func(vm->world, op.a);
+            func(vm);
+
+            // some funcs can compile bytecode which invalidates our pointers.
+            ops = vm->bc->ops;
+
+            if (vm->error)
+                return;
+
+            continue;
+        }
+        case op_ret_or_stop: {
+            if (vm->stackTop == 0) {
+                vm_cleanup_on_stop(vm);
+                return;
+            }
+            // fallthrough
+        }
+        case op_ret: {
+            #if DEBUG
+                int prevTop = vm->stackTop;
+            #endif
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf("return value is: %s\n", get_slot_fast(vm, 0)->to_c_string());
+                executionDepth--;
+            #endif
+
+            vm->pc = get_slot_fast(vm, -2)->as_i();
+            vm->stackTop = get_slot_fast(vm, -1)->as_i();
+
+            continue;
+        }
+        case op_varargs_to_list: {
+            Value list;
+            int firstInputIndex = op.a;
+            int inputCount = vm->inputCount - firstInputIndex;
+            ca_assert(inputCount >= 0);
+            list.set_list(inputCount);
+            for (int i=0; i < inputCount; i++)
+                copy(vm->stack[vm->stackTop + 1 + firstInputIndex + i], list.index(i));
+            move(&list, vm->stack[vm->stackTop + firstInputIndex + 1]);
+            continue;
+        }
+        case op_splat_upvalues: {
+            if (is_null(&vm->incomingUpvalues))
+                return vm->throw_str("internal error: Called a closure without upvalues list");
+
+            for (int i=0; i < op.b; i++) {
+                Value* value = vm->incomingUpvalues.index(i);
+                copy(value, get_slot_fast(vm, op.a + i));
+            }
+            set_null(&vm->incomingUpvalues);
+            continue;
+        }
+        case op_copy: {
+            Value* left = get_slot_fast(vm, op.a);
+            Value* right = get_slot_fast(vm, op.b);
+            copy(left, right);
+
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf("copied value: %s to s%d\n", right->to_c_string(), op.b + vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_move: {
+            Value* left = get_slot_fast(vm, op.a);
+            Value* right = get_slot_fast(vm, op.b);
+            move(left, right);
+
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf("moved value: %s to s%d\n", right->to_c_string(), op.b + vm->stackTop);
+            #endif
+
+            continue;
+        }
+        case op_set_null: {
+            Value* val = get_slot_fast(vm, op.a);
+            set_null(val);
+            continue;
+        }
+        case op_cast_fixed_type: {
+            Value* val = get_slot_fast(vm, op.a);
+            Type* type = as_type(get_const(vm, op.b));
+            bool success = cast(val, type);
+            if (!success) {
+                Value msg;
+                set_string(&msg, "Couldn't cast ");
+                string_append(&msg, val);
+                string_append(&msg, " to type ");
+                string_append(&msg, &type->name);
+                return vm->throw_error(&msg);
+            }
+            continue;
+        }
+        case op_make_list: {
+            int count = op.b;
+
+            Value list;
+            list.set_list(count);
+
+            for (int i=0; i < count; i++)
+                copy(get_slot_fast(vm, op.a + i), list.index(i));
+
+            move(&list, get_slot_fast(vm, op.a));
+            continue;
+        }
+        case op_make_func: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+
+            Value func;
+            set_closure(a, a->asBlock(), b);
+            continue;
+        }
+        case op_add_i: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+            Value* c = get_slot_fast(vm, op.c);
+            set_int(c, a->as_i() + b->as_i());
+            continue;
+        }
+        case op_sub_i: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+            Value* c = get_slot_fast(vm, op.c);
+            set_int(c, a->as_i() - b->as_i());
+            continue;
+        }
+        case op_mult_i: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+            Value* c = get_slot_fast(vm, op.c);
+            set_int(c, a->as_i() * b->as_i());
+            continue;
+        }
+        case op_div_i: {
+            Value* a = get_slot_fast(vm, op.a);
+            Value* b = get_slot_fast(vm, op.b);
+            Value* c = get_slot_fast(vm, op.c);
+            set_int(c, a->as_i() / b->as_i());
+            continue;
+        }
+        case op_push_state_frame:
+            if (op.b == ((u16) -1)) {
+                Value* key = NULL;
+                Term* caller = vm_calling_term(vm);
+                if (caller != NULL)
+                    key = unique_name(caller);
+                push_state_frame(vm, vm->stackTop + op.a, key);
+            } else {
+                push_state_frame(vm, vm->stackTop + op.a, get_slot_fast(vm, op.b));
+            }
+
+            continue;
+        case op_pop_state_frame:
+            pop_state_frame(vm);
+            continue;
+        case op_pop_discard_state_frame:
+            pop_discard_state_frame(vm);
+            continue;
+        case op_get_state_value:
+            get_state_value(vm, get_slot_fast(vm, op.a), get_slot_fast(vm, op.b));
+            continue;
+        case op_save_state_value:
+            save_state_value(vm, get_slot_fast(vm, op.a), get_slot_fast(vm, op.b));
+            continue;
+        case op_comment:
+            continue;
+        default: {
+            printf("unrecognized op: 0x%x\n", op.opcode);
+            internal_error("unrecognized op in vm_run");
+        }
+        }
+    }
 }
 
 void VM__call(VM* vm)
@@ -669,16 +1114,6 @@ void vm_cleanup_on_stop(VM* vm)
         set_null(vm->stack[i]);
     vm->inputCount = 0;
     set_null(&vm->incomingUpvalues);
-}
-
-int find_state_slot(VM* vm, int addr)
-{
-    return -1;
-}
-
-Value* prepare_outgoing_state_frame_for_save(VM* vm)
-{
-    return NULL;
 }
 
 CIRCA_EXPORT Value* circa_input(VM* vm, int index)

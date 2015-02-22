@@ -68,7 +68,7 @@ OBJECTS := \
 	$(OBJDIR)/block.o \
 	$(OBJDIR)/building.o \
 	$(OBJDIR)/builtin_types.o \
-	$(OBJDIR)/bytecode2.o \
+	$(OBJDIR)/bytecode.o \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/change_events.o \
 	$(OBJDIR)/closures.o \
@@ -190,7 +190,7 @@ $(OBJDIR)/building.o: building.cpp
 $(OBJDIR)/builtin_types.o: builtin_types.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/bytecode2.o: bytecode2.cpp
+$(OBJDIR)/bytecode.o: bytecode.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_api.o: c_api.cpp
