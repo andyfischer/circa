@@ -7,6 +7,7 @@ def is_digit(String s)
 struct Reader {
   String str
   int pos
+  any last
 }
 
 def Reader.empty(self) -> bool
@@ -30,7 +31,7 @@ def Reader.matches(self, str) -> bool
 def Reader.consume(@self, str)
   self.pos += str.length
 
-def Reader.parse_string(self) -> (Reader, any)
+def Reader.parse_string(@self) -> Reader
   @self.advance
 
   p = self.pos
@@ -43,9 +44,9 @@ def Reader.parse_string(self) -> (Reader, any)
 
   result = self.str.slice(p, self.pos)
   @self.advance
-  return self, result
+  self.last = result
 
-def Reader.parse_value(self) -> (Reader, any)
+def Reader.parse_value(@self) -> Reader
   @self.consumeWhitespace
 
   result = null
@@ -68,13 +69,14 @@ def Reader.parse_value(self) -> (Reader, any)
         @self.advance
         @self.consumeWhitespace
 
-      val = @self.parse_value
-      @result.append(val)
+      @self.parse_value
+      @result.append(self.last)
       first = false
 
       @self.consumeWhitespace
 
     @self.advance
+
   if self.next == '{'
     @self.advance
     @self.consumeWhitespace
@@ -93,7 +95,8 @@ def Reader.parse_value(self) -> (Reader, any)
         @self.advance
         @self.consumeWhitespace
 
-      key = @self.parse_string
+      @self.parse_string
+      key = self.last
       @self.consumeWhitespace
 
       if self.next != ':'
@@ -101,9 +104,8 @@ def Reader.parse_value(self) -> (Reader, any)
       @self.advance
       @self.consumeWhitespace
 
-      val = @self.parse_value
-
-      @result.set(key,val)
+      @self.parse_value
+      @result.set(key,self.last)
       first = false
 
     @self.advance
@@ -147,14 +149,15 @@ def Reader.parse_value(self) -> (Reader, any)
       @result.to_int
 
   elif self.next == '"'
-    result = @self.parse_string
+    @self.parse_string
+    result = self.last
 
-  return self, result
+  self.last = result
 
 def parse(String str) -> any
   reader = Reader.make(str 0)
-  result = @reader.parse_value
-  return result
+  @reader.parse_value
+  return reader.last
 
 def String.quote(self) -> String
   -- TODO: insert escapes as needed

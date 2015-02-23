@@ -336,6 +336,14 @@ void write_state_header_with_term_name(Bytecode* bc, Term* term)
     write_state_header(bc, slot);
 }
 
+void write_pop_state_frame(Bytecode* bc)
+{
+    if (bc->vm->noSaveState)
+        append_op(bc, op_pop_discard_state_frame);
+    else
+        append_op(bc, op_pop_state_frame);
+}
+
 void end_major_frame(Bytecode* bc)
 {
     int blockStartMaddr = mop_find_active_mopcode(bc, mop_major_block_start, -1);
@@ -551,9 +559,8 @@ void write_loop(Bytecode* bc, Block* loop)
     comment(bc, "loop fin");
 
     if (should_write_state_header(bc, loop))
-        append_op(bc, op_pop_state_frame);
+        write_pop_state_frame(bc);
 }
-
 
 void loop_advance_iterator(Bytecode* bc, Block* loop)
 {
@@ -929,7 +936,7 @@ void pop_frames_for_early_exit(Bytecode* bc, Symbol exitType, Term* atTerm, Bloc
                 if (discard)
                     append_op(bc, op_pop_discard_state_frame);
                 else
-                    append_op(bc, op_pop_state_frame);
+                    write_pop_state_frame(bc);
             }
         }
 
@@ -1036,7 +1043,7 @@ void close_state_frame(Bytecode* bc, Block* block, Term* atTerm)
 {
     if (should_write_state_header(bc, block)) {
         save_declared_state(bc, block, atTerm);
-        append_op(bc, op_pop_state_frame);
+        write_pop_state_frame(bc);
     }
 }
 

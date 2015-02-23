@@ -28,9 +28,9 @@ struct VM {
     ValueArray stack;
     u8 inputCount;
     Value incomingUpvalues;
+    int stateTop;
 
     Value state;
-    int stateTop;
 
     Value demandEvalMap; // Map of Term -> value
 
@@ -53,11 +53,13 @@ struct VMStackFrame {
 
 VM* new_vm(Block* main);
 void free_vm(VM* vm);
+void vm_reset_call_stack(VM* vm);
+void vm_change_main(VM* vm, Block* newMain);
 void vm_reset(VM* vm, Block* newBlock);
 void vm_reset_with_closure(VM* vm, Value* closure);
+void vm_on_code_change(VM* vm);
 void vm_run(VM* vm, VM* callingVM);
 void vm_grow_stack(VM* vm, int newSize);
-void vm_on_code_change(VM* vm);
 bool vm_check_if_hacks_changed(VM* vm);
 void vm_update_derived_hack_info(VM* vm);
 int vm_num_inputs(VM* vm);

@@ -1683,8 +1683,7 @@ ParseResult expression_statement(Block* block, TokenStream& tokens, ParserCxt* c
         Term* left = term;
         Term* right = expression(block, tokens, context).term;
 
-        Term* output = find_or_create_next_unnamed_term_output(left);
-        Term* set = rebind_possible_accessor(block, output, right);
+        Term* set = rebind_possible_accessor(block, left, right);
 
         set->setStringProp(s_Syntax_PreEqualsSpace, preEqualsSpace);
         set->setStringProp(s_Syntax_PostEqualsSpace, postEqualsSpace);
@@ -1809,31 +1808,18 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
     Value nameBindingSyntax;
     set_list(&nameBindingSyntax, 0);
 
-    // 'names' is a list of name bindings.
-    Value names;
-    set_list(&names, 0);
+    Value name;
 
-    // Lookahead for a name binding. (or multiple)
+    // Lookahead for a name binding.
     if (lookahead_match_leading_name_binding(tokens)) {
 
         hasSimpleNameBinding = true;
 
-        for (int nameIndex=0;; nameIndex++) {
+        tokens.consumeStr(&name, tok_Identifier);
+        set_int(list_append(&nameBindingSyntax), 0);
 
-            tokens.consumeStr(list_append(&names), tok_Identifier);
-            set_int(list_append(&nameBindingSyntax), nameIndex);
-
-            if (tokens.nextIs(tok_Whitespace))
-                tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
-
-            if (!tokens.nextIs(tok_Comma))
-                break;
-
-            tokens.consumeStr(list_append(&nameBindingSyntax), tok_Comma);
-
-            if (tokens.nextIs(tok_Whitespace))
-                tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
-        }
+        if (tokens.nextIs(tok_Whitespace))
+            tokens.consumeStr(list_append(&nameBindingSyntax), tok_Whitespace);
         
         tokens.consumeStr(list_append(&nameBindingSyntax), tok_Equals);
         if (tokens.nextIs(tok_Whitespace))
@@ -1855,8 +1841,8 @@ ParseResult name_binding_expression(Block* block, TokenStream& tokens, ParserCxt
     if (hasSimpleNameBinding) {
         result->setProp(s_Syntax_NameBinding, &nameBindingSyntax);
 
-        for (int i=0; i < list_length(&names); i++)
-            rename(find_or_create_next_unnamed_term_output(result), list_get(&names, i));
+        if (!is_null(&name))
+            rename(result, &name);
     }
     
     set_source_location(result, startPosition, tokens);
@@ -2474,31 +2460,20 @@ static bool lookahead_match_leading_name_binding(TokenStream& tokens)
 
     bool expectIdentifier = true;
 
-    while (expectIdentifier) {
+    // optional whitespace
+    if (tokens.nextIs(tok_Whitespace, lookahead))
+        lookahead++;
+    
+    // required identifier
+    if (!tokens.nextIs(tok_Identifier, lookahead))
+        return false;
+    lookahead++;
 
-        // optional whitespace
-        if (tokens.nextIs(tok_Whitespace, lookahead))
-            lookahead++;
-        
-        // required identifier
-        if (!tokens.nextIs(tok_Identifier, lookahead))
-            return false;
+    // optional whitespace
+    if (tokens.nextIs(tok_Whitespace, lookahead))
         lookahead++;
 
-        // optional whitespace
-        if (tokens.nextIs(tok_Whitespace, lookahead))
-            lookahead++;
-
-        // possible comma
-        if (tokens.nextIs(tok_Comma, lookahead)) {
-            lookahead++;
-            expectIdentifier = true;
-        } else {
-            expectIdentifier = false;
-        }
-    }
-
-    // equals sign (required if no comma)
+    // equals sign
     if (!tokens.nextIs(tok_Equals, lookahead))
         return false;
     lookahead++;

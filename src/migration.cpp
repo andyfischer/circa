@@ -167,6 +167,12 @@ void migrate_state_list(Value* list, Block* oldBlock, Block* newBlock, Migration
 void migrate_vm(VM* vm, Migration* migration)
 {
     vm_on_code_change(vm);
+    migrate_value(&vm->state, migration);
+
+    Block* newMain = migrate_block_pointer(vm->mainBlock, migration);
+
+    if (newMain != vm->mainBlock)
+        vm_change_main(vm, newMain);
 }
 
 bool list_value_may_need_migration(Value* value, Migration* migration)
@@ -211,7 +217,7 @@ void migrate_list_value(Value* value, Migration* migration)
 
 void migrate_value(Value* value, Migration* migration)
 {
-    if (is_ref(value)) {
+    if (is_term_ref(value)) {
         set_term_ref(value, migrate_term_pointer(as_term_ref(value), migration));
         
     } else if (is_block(value)) {

@@ -16,5 +16,3 @@ int.run
 
 int.migrate_to(right)
 int.run
-
-assert(int.top.block == right.block)

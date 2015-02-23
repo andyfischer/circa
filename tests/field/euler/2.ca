@@ -1,0 +1,23 @@
+
+struct Fib {
+  int a
+  int b
+}
+
+def Fib.next(self)
+  self.a + self.b
+
+def Fib.advance(@self)
+  b = self.next
+  self.a = self.b
+  self.b = b
+
+def Fib.done(self) false
+def Fib.key(self) null
+
+def start_fib()
+  concat_seq([1 2] Fib.make(1 2))
+
+fib = take_until(start_fib(), (n) -> n > 4000000)
+
+filter(fib, (n) -> n%2 == 0) | sum | print

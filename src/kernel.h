@@ -115,14 +115,12 @@ struct BuiltinTypes {
     Type* color;
     Type* error;
     Type* file_signature;
-    Type* frame;
     Type* float_type;
     Type* func;
     Type* int_type;
     Type* list;
     Type* map;
     Type* module_ref;
-    Type* module_frame;
     Type* native_ptr;
     Type* null;
     Type* opaque_pointer;

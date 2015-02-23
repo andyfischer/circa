@@ -6,10 +6,8 @@ def right()
   state String a = 'new'
   print('after migration, a is: ' a)
 
-int = make_vm(left)
-int.run
+vm = make_vm(left)
+vm.run
 
-int.migrate_to(right)
-int.run
-
-assert(int.top.block == right.block)
+vm.migrate_to(right)
+vm.run

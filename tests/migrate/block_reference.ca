@@ -12,9 +12,7 @@ def right()
   assert(b == nested.block)
 
 int = make_vm(left)
-int.run
+int.call
 
 int.migrate_to(right)
-int.run
-
-assert(int.top.block == right.block)
+int.call

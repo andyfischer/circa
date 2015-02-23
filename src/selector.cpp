@@ -311,26 +311,6 @@ Term* rebind_possible_accessor(Block* block, Term* accessor, Term* result)
     return set;
 }
 
-Term* find_or_create_next_unnamed_term_output(Term* term)
-{
-    // require statement has a 'soft' name binding. It can receive a name from
-    // the module name, but any applied name will replace this.
-    if (term->function == FUNCS.require)
-        return term;
-    
-    for (int i=0;; i++) {
-        Term* output = get_output_term(term, i);
-        if (output == NULL)
-            return find_or_create_output_term(term, i);
-
-        if (has_empty_name(output))
-            return output;
-    }
-
-    internal_error("unreachable");
-    return NULL;
-}
-
 Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
 {
     for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
@@ -359,13 +339,10 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
                 || !as_bool(identifierRebindHint))
             continue;
 
-        // Find the output term (may be an extra_output or may be 'term')
-        Term* output = find_or_create_next_unnamed_term_output(term);
-
         if (input == head) {
             // No accessor expression, then just do a name rebind.
-            rename(output, &head->nameValue);
-            output->setBoolProp(s_Syntax_ImplicitName, true);
+            rename(term, &head->nameValue);
+            term->setBoolProp(s_Syntax_ImplicitName, true);
         } else {
             // Create a set_with_selector expression.
             TermList accessorChain;
@@ -374,7 +351,7 @@ Term* resolve_rebind_operators_in_inputs(Block* block, Term* term)
             Term* selector = write_selector_for_accessor_chain(block, &accessorChain);
 
             Term* set = apply(block, FUNCS.set_with_selector,
-                    TermList(head, selector, output), &head->nameValue);
+                    TermList(head, selector, term), &head->nameValue);
 
             set_declared_type(set, declared_type(head));
             return set;

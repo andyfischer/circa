@@ -1,4 +1,6 @@
 
+require stack_trace
+
 def left()
   state a = 'old'
 
@@ -8,8 +10,14 @@ def right()
   print('after migration, a is: ' a)
   print('b is: ' b)
 
-int = make_vm(left)
-int.run
+vm = make_vm(left)
+vm.call
 
-int.migrate_to(right)
-int.run
+if vm.has_error
+  stack_trace.dump(vm)
+
+vm.migrate_to(right)
+vm.call
+
+if vm.has_error
+  stack_trace.dump(vm)

@@ -25,6 +25,7 @@ def for(List list) -> List
 def if() -> any
 def case(bool b :optional)
 def switch(any input :optional) -> any
+def _upvalue(term :ref) -> any
 
 -- List values
 def make_list(any vals :multiple) -> List
@@ -329,18 +330,10 @@ struct ListSeq {
   int index
 }
 
-def ListSeq.key(self)
-  self.index
-
-def ListSeq.done(self) -> bool
-  self.index >= self.list.length
-
-def ListSeq.next(self) -> any
-  self.list.get(self.index)
-
-def ListSeq.advance(self) -> ListSeq
-  self.index += 1
-  self
+def ListSeq.key(self) self.index
+def ListSeq.done(self) self.index >= self.list.length
+def ListSeq.next(self) self.list.get(self.index)
+def ListSeq.advance(@self) self.index += 1
 
 def List.to_seq(self)
   ListSeq.make(self 0)
@@ -350,17 +343,10 @@ struct ConcatSeq {
   any right
 }
 
-def ConcatSeq.done(self)
-  self.left.done and self.right.done
-
-def ConcatSeq.next(self)
-  self.left.next
-
-def ConcatSeq.key(self)
-  self.left.key
-
-def ConcatSeq.settle(self)
-  cond(self.left.done, self.right, self)
+def ConcatSeq.done(self) self.left.done and self.right.done
+def ConcatSeq.next(self) self.left.next
+def ConcatSeq.key(self) self.left.key
+def ConcatSeq.settle(self) cond(self.left.done, self.right, self)
 
 def ConcatSeq.advance(@self)
   @self.left.advance
@@ -374,14 +360,9 @@ struct FilterSeq {
   Func func
 }
 
-def FilterSeq.done(self)
-  self.seq.done
-
-def FilterSeq.next(self)
-  self.seq.next
-
-def FilterSeq.key(self)
-  self.seq.key
+def FilterSeq.done(self) self.seq.done
+def FilterSeq.next(self) self.seq.next
+def FilterSeq.key(self) self.seq.key
 
 def FilterSeq.settle(@self)
   while true
@@ -399,6 +380,19 @@ def FilterSeq.advance(self)
 
 def filter(s, func) -> FilterSeq
   FilterSeq.make(to_seq(s), func).settle
+
+struct UntilSeq {
+  any seq
+  Func doneFunc
+}
+
+def UntilSeq.done(self) self.doneFunc.call(self.seq.next)
+def UntilSeq.next(self) self.seq.next
+def UntilSeq.advance(@self) @self.seq.advance
+def UntilSeq.key(self) self.seq.key
+
+def take_until(s, doneFunc)
+  UntilSeq.make(to_seq(s) doneFunc)
 
 struct Range {
   int from
@@ -440,8 +434,6 @@ def visit(it, func)
   for i in it
     func(i)
 
-def inputs_fit_function(List inputs, Func func) -> bool
-def overload_error_no_match(List inputs)
 def unique_id() -> int
 def source_id() -> any
 
@@ -486,14 +478,6 @@ def closure_block() -> Func
 
 -- Secret internally-used funcs
 
-def _upvalue(term :ref) -> any
-{-
-  value, found = _find_active_value(term)
-  if found
-    value
-  else
-    _eval_on_demand(term)
--}
 
 def _declared_state(existing, Type type, initializer) -> any
   -- Fetch a declared state variable. The 'state' keyword uses this.
@@ -776,39 +760,6 @@ def Block.find_while_condition(self) -> Term
       return term
   return null
 
-struct Frame { VM vm, int index }
-struct ModuleFrame { Block block, List registers }
-
-def Frame.active_value(self, Term) -> any
-def Frame.set_active_value(self, Term, any)
-def Frame.block(self) -> Block
-  -- Return the Block associated with this Frame.
-def Frame.current_term(self) -> Term
-  -- Fetch the term associated with the current program counter.
-def Frame.create_expansion(self, Term term) -> Frame
-  -- Create an expansion frame using the given Term.
-  -- Errors if the Term is not part of this frame's block.
-def Frame.height(self) -> int
-  -- Frame height, the distance from the base frame.
-def Frame.has_parent(self) -> bool
-def Frame.parent(self) -> Frame
-  -- Return this frame's parent.
-def Frame.pc(self) -> int
-  -- Fetch the current program counter (the interpreter's current position).
-def Frame.parentPc(self) -> int
-def Frame.register(self, int index) -> any
-  -- Fetch the value in the given register index.
-def Frame.registers(self) -> List
-  -- Fetch a list of all register values.
-def Frame.inputs(self) -> List
-  -- Returns a list of input register values
-def Frame.input(self, int nth) -> any
-  -- Returns the nth input register value
-def Frame.outputs(self) -> List
-  -- Returns a list of output register values
-def Frame.output(self, int nth) -> any
-  -- Returns the nth output register value
-
 def capture_stack() -> VM
   -- Returns a frozen copy of the currently executing stack.
 
@@ -839,7 +790,6 @@ def VM.rethrow(self)
   -- If the stack has an error, raise it in this context.
   if self.has_error
     error(self.error_message)
-def VM.find_active_frame_for_term(self, Term term) -> Frame
 def VM.id(self) -> int
 def VM.init(self, Func func)
 def VM.has_incoming_state(self) -> bool
@@ -889,30 +839,9 @@ def VM.migrate_to(self, Func func)
 def VM.reset(self)
 def VM.reset_state(self)
 def VM.restart(self)
-  -- Restart or "rewind" the stack, so the program counter is returned to the start
-  -- of the topmost frame. State is preserved.
-def VM.frame(self, int depth) -> Frame
-  -- Return the Frame with the given depth. The top of the stack has depth 0.
-def VM.frame_from_base(self, int height) -> Frame
-  -- Return the Frame with the given height.
-def VM.frame_count(self) -> int
 
 def VM.frame_list(self) -> List
 def VM.slot(self, index) -> any
-
-def VM.frames_from_top(self) -> List
-  for i in 0..self.frame_count
-    self.frame(i)
-
-def VM.frames_from_start(self) -> List
-  for i in self.frame_count..0
-    self.frame(i-1)
-
-
-
-def VM.top(self) -> Frame
-  -- Return the topmost Frame.
-  self.frame(0)
 
 def VM.active_value(self, Term term) -> any
   self.top.active_value(term)
@@ -1506,9 +1435,9 @@ def Rect.subtractFrom(self, Symbol side, number dimension) -> List
     return [self, out]
   error(str('Unrecognized side: ' side))
 
-def sum(List numbers) -> number
+def sum(numbersSeq)
   result = 0
-  for i in numbers
+  for i in numbersSeq
     result += i
   result
     

@@ -7,9 +7,7 @@ def right()
   print('after migration, a is: ' a)
 
 int = make_vm(left)
-int.run
+int.call
 
 int.migrate_to(right)
-int.run
-
-assert(int.top.block == right.block)
+int.call

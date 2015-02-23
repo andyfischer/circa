@@ -9,6 +9,7 @@
 #include "hashtable.h"
 #include "kernel.h"
 #include "list.h"
+#include "migration.h"
 #include "modules.h"
 #include "names.h"
 #include "native_patch.h"
@@ -28,7 +29,8 @@ VM* new_vm(Block* main)
     ca_assert(main->world != NULL);
 
     VM* vm = (VM*) malloc(sizeof(VM));
-    vm->pc = 0;
+
+    vm->stack.init();
     vm->world = main->world;
     vm->id = vm->world->nextStackID++;
     vm->mainBlock = main;
@@ -39,13 +41,8 @@ VM* new_vm(Block* main)
     vm->noEffect = false;
     initialize_null(&vm->termOverrides);
     set_hashtable(&vm->termOverrides);
-    vm->error = false;
-    vm->stackTop = 0;
-    vm->stack.init();
     initialize_null(&vm->state);
-    vm->stateTop = -1;
     set_hashtable(&vm->state);
-    vm->inputCount = 0;
     initialize_null(&vm->demandEvalMap);
     set_hashtable(&vm->demandEvalMap);
     initialize_null(&vm->incomingUpvalues);
@@ -55,6 +52,7 @@ VM* new_vm(Block* main)
     set_hashtable(&vm->env);
     rand_init(&vm->randState, 0);
 
+    vm_reset_call_stack(vm);
     vm_grow_stack(vm, 1 + count_input_placeholders(main));
     
     return vm;
@@ -72,6 +70,51 @@ void free_vm(VM* vm)
     set_null(&vm->env);
 }
 
+void vm_reset_call_stack(VM* vm)
+{
+    vm->pc = 0;
+    vm->stack.clear();
+    vm->stackTop = 0;
+    vm->error = false;
+    vm->stateTop = -1;
+    set_null(&vm->incomingUpvalues);
+    vm->inputCount = 0;
+}
+
+void vm_reset_bytecode(VM* vm)
+{
+    free_bytecode(vm->bc);
+    vm->bc = NULL;
+}
+
+void vm_change_main(VM* vm, Block* newMain)
+{
+    vm_reset_call_stack(vm);
+    vm_reset_bytecode(vm);
+    vm_grow_stack(vm, 1 + count_input_placeholders(newMain));
+    set_hashtable(&vm->demandEvalMap);
+    vm->mainBlock = newMain;
+}
+
+void vm_reset(VM* vm, Block* newMain)
+{
+    vm_change_main(vm, newMain);
+    set_hashtable(&vm->state);
+    set_hashtable(&vm->incomingEnv);
+    set_hashtable(&vm->env);
+}
+
+void vm_reset_with_closure(VM* vm, Value* func)
+{
+    vm_reset(vm, func_block(func));
+    copy(func_bindings(func), &vm->topLevelUpvalues);
+}
+
+void vm_on_code_change(VM* vm)
+{
+    vm_reset_bytecode(vm);
+}
+
 VM* vm_duplicate(VM* source)
 {
     VM* vm = new_vm(source->mainBlock);
@@ -80,27 +123,6 @@ VM* vm_duplicate(VM* source)
     return vm;
 }
 
-void vm_reset(VM* vm, Block* newBlock)
-{
-    vm->pc = 0;
-    vm->stack.clear();
-    vm->mainBlock = newBlock;
-    vm->error = false;
-    vm->stackTop = 0;
-    vm->stack.clear();
-    set_hashtable(&vm->state);
-    vm->stateTop = -1;
-    set_hashtable(&vm->demandEvalMap);
-    set_hashtable(&vm->incomingEnv);
-    set_hashtable(&vm->env);
-    vm_grow_stack(vm, 1 + count_input_placeholders(newBlock));
-
-    vm_on_code_change(vm);
-}
-
-void vm_reset_with_closure(VM* vm, Value* closure)
-{
-}
 
 static inline Value* get_slot(VM* vm, int slot)
 {
@@ -377,9 +399,9 @@ void vm_run(VM* vm, VM* callingVM)
                 }
 
                 Value msg;
-                set_string(&msg, "Method ");
-                string_append(&msg, nameLocation);
-                string_append(&msg, " not found on ");
+                set_string(&msg, "Method '");
+                string_append(&msg, nameLocation->index(0));
+                string_append(&msg, "' not found on ");
                 string_append(&msg, object);
                 return vm->throw_error(&msg);
             }
@@ -681,6 +703,23 @@ void VM__set_state(VM* vm)
     VM* self = (VM*) get_pointer(vm->input(0));
     Value* state = vm->input(1);
     vm_set_state(self, state);
+}
+
+void VM__migrate(VM* vm)
+{
+    VM* self = (VM*) get_pointer(vm->input(0));
+    Block* oldBlock = as_block(vm->input(1));
+    Block* newBlock = as_block(vm->input(2));
+    migrate_vm(self, oldBlock, newBlock);
+}
+
+void VM__migrate_to(VM* vm)
+{
+    VM* self = (VM*) get_pointer(vm->input(0));
+    Value* func = vm->input(1);
+    Block* newBlock = func_block(func);
+    migrate_vm(self, self->mainBlock, newBlock);
+    copy(func_bindings(func), &self->topLevelUpvalues);
 }
 
 void VM__frame_list(VM* vm)
@@ -1098,11 +1137,6 @@ void vm_set_state(VM* vm, Value* state)
     copy(state, &vm->state);
 }
 
-void vm_on_code_change(VM* vm)
-{
-    free_bytecode(vm->bc);
-    vm->bc = NULL;
-}
 
 bool vm_check_if_hacks_changed(VM* vm)
 {
@@ -1204,6 +1238,8 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function2(patch, "VM.get_state", VM__get_state);
     circa_patch_function2(patch, "VM.id", VM__id);
     circa_patch_function2(patch, "VM.set_state", VM__set_state);
+    circa_patch_function2(patch, "VM.migrate", VM__migrate);
+    circa_patch_function2(patch, "VM.migrate_to", VM__migrate_to);
     circa_patch_function2(patch, "VM.frame_list", VM__frame_list);
     circa_patch_function2(patch, "VM.slot", VM__slot);
     circa_patch_function2(patch, "VM.env_map", VM__env_map);

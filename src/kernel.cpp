@@ -494,9 +494,6 @@ void bootstrap_kernel()
     TYPES.file_signature = as_type(builtins->get("FileSignature"));
     TYPES.func = as_type(builtins->get("Func"));
     TYPES.module_ref = as_type(builtins->get("Module"));
-    //TYPES.stack = as_type(builtins->get("VM"));
-    TYPES.frame = as_type(builtins->get("Frame"));
-    TYPES.module_frame = as_type(builtins->get("ModuleFrame"));
     TYPES.vec2 = as_type(builtins->get("Vec2"));
 
     // Fix function_decl now that Func type is available.

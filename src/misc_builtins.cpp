@@ -1113,25 +1113,25 @@ void print(VM* vm)
     write_log(as_cstring(&out));
 }
 
-#if 0
-void compute_patch_hosted(Stack* stack)
+void compute_patch_hosted(VM* vm)
 {
     Value error;
 
-    compute_value_patch(circa_input(stack, 0), circa_input(stack, 1),
-        circa_output(stack, 0), &error);
+    compute_value_patch(circa_input(vm, 0), circa_input(vm, 1),
+        circa_output(vm), &error);
 
     if (!is_null(&error))
-        circa_output_error_val(stack, &error);
+        circa_output_error_val(vm, &error);
 }
 
-void apply_patch_hosted(Stack* stack)
+void apply_patch_hosted(VM* vm)
 {
-    Value* result = circa_output(stack, 0);
-    copy(circa_input(stack, 0), result);
-    apply_patch(result, circa_input(stack, 1));
+    Value* result = circa_output(vm);
+    copy(circa_input(vm, 0), result);
+    apply_patch(result, circa_input(vm, 1));
 }
 
+#if 0
 void destructure_list(Stack* stack)
 {
     Value* list = circa_input(stack, 0);
@@ -1269,17 +1269,15 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "channel_send", channel_send);
     circa_patch_function(patch, "channel_read", channel_read);
 
-    circa_patch_function(patch, "noise", noise);
+    circa_patch_function2(patch, "noise", noise);
     circa_patch_function2(patch, "not_equals", not_equals);
     circa_patch_function2(patch, "print", print);
     circa_patch_function2(patch, "rand", rand);
     circa_patch_function2(patch, "repeat", repeat);
     circa_patch_function2(patch, "trace", print);
     circa_patch_function2(patch, "typeof", typeof_func);
-    circa_patch_function(patch, "compute_patch", compute_patch_hosted);
-    circa_patch_function(patch, "apply_patch", apply_patch_hosted);
-    circa_patch_function(patch, "inputs_fit_function", inputs_fit_function);
-    circa_patch_function(patch, "overload_error_no_match", overload_error_no_match);
+    circa_patch_function2(patch, "compute_patch", compute_patch_hosted);
+    circa_patch_function2(patch, "apply_patch", apply_patch_hosted);
     circa_patch_function(patch, "unique_id", unique_id);
     circa_patch_function(patch, "source_id", source_id);
     circa_patch_function(patch, "write_text_file", write_text_file_func);
