@@ -442,7 +442,7 @@ void ceil(VM* vm)
 void average(VM* vm)
 {
     Value* args = circa_input(vm, 0);
-    int count = circa_count(args);
+    int count = args->length();
     Value* out = circa_output(vm);
 
     if (count == 0) {
@@ -1071,7 +1071,7 @@ void error(VM* vm)
 
     Value out;
 
-    for (int i = 0; i < circa_count(args); i++) {
+    for (int i = 0; i < args->length(); i++) {
         Value* val = circa_index(args, i);
         string_append(&out, val);
     }
@@ -1105,8 +1105,8 @@ void print(VM* vm)
 
     Value* args = vm->input(0);
 
-    for (int i = 0; i < circa_count(args); i++) {
-        Value* val = circa_index(args, i);
+    for (int i = 0; i < args->length(); i++) {
+        Value* val = args->index(i);
         string_append(&out, val);
     }
 
@@ -1148,146 +1148,153 @@ void destructure_list(Stack* stack)
 
 void misc_builtins_setup_functions(NativePatch* patch)
 {
-    circa_patch_function2(patch, "add_i", add_i);
-    circa_patch_function2(patch, "add_f", add_f);
-    circa_patch_function2(patch, "abs", abs);
-    circa_patch_function2(patch, "assert", assert_func);
-    circa_patch_function2(patch, "cast", cast_evaluate);
-    circa_patch_function2(patch, "str", str);
-    circa_patch_function2(patch, "cond", cond);
-    circa_patch_function2(patch, "copy", copy_eval);
-    circa_patch_function2(patch, "div_f", div_f);
-    circa_patch_function2(patch, "div_i", div_i);
-    circa_patch_function2(patch, "empty_list", empty_list);
-    circa_patch_function2(patch, "equals", equals_func);
-    circa_patch_function2(patch, "error", error);
-    circa_patch_function2(patch, "method_lookup", method_lookup);
-    circa_patch_function2(patch, "get_field", get_field);
-    circa_patch_function2(patch, "get_index", get_index);
-    circa_patch_function2(patch, "get_with_symbol", get_with_symbol);
-    circa_patch_function2(patch, "is_compound", hosted_is_compound);
-    circa_patch_function2(patch, "is_list", hosted_is_list);
-    circa_patch_function2(patch, "is_int", hosted_is_int);
-    circa_patch_function2(patch, "is_map", hosted_is_map);
-    circa_patch_function2(patch, "is_number", hosted_is_number);
-    circa_patch_function2(patch, "is_bool", hosted_is_bool);
-    circa_patch_function2(patch, "is_string", hosted_is_string);
-    circa_patch_function2(patch, "is_null", hosted_is_null);
-    circa_patch_function2(patch, "is_function", hosted_is_function);
-    circa_patch_function2(patch, "is_type", hosted_is_type);
-    circa_patch_function2(patch, "length", length);
-    circa_patch_function2(patch, "less_than_i", less_than_i);
-    circa_patch_function2(patch, "less_than_f", less_than_f);
-    circa_patch_function2(patch, "less_than_eq_i", less_than_eq_i);
-    circa_patch_function2(patch, "less_than_eq_f", less_than_eq_f);
-    circa_patch_function2(patch, "greater_than_i", greater_than_i);
-    circa_patch_function2(patch, "greater_than_f", greater_than_f);
-    circa_patch_function2(patch, "greater_than_eq_i", greater_than_eq_i);
-    circa_patch_function2(patch, "greater_than_eq_f", greater_than_eq_f);
-    circa_patch_function2(patch, "make_list", make_list);
-    circa_patch_function2(patch, "blank_list", blank_list);
-    circa_patch_function2(patch, "map", make_map);
-    circa_patch_function2(patch, "and", and_func);
-    circa_patch_function2(patch, "or", or_func);
-    circa_patch_function2(patch, "not", not_func);
-    circa_patch_function2(patch, "make", make_func);
-    circa_patch_function2(patch, "max_f", max_f);
-    circa_patch_function2(patch, "max_i", max_i);
-    circa_patch_function2(patch, "min_f", min_f);
-    circa_patch_function2(patch, "min_i", min_i);
-    circa_patch_function2(patch, "mod_i", mod_i);
-    circa_patch_function2(patch, "mod_f", mod_f);
-    circa_patch_function2(patch, "mult_i", mult_i);
-    circa_patch_function2(patch, "mult_f", mult_f);
-    circa_patch_function2(patch, "neg_i", neg_i);
-    circa_patch_function2(patch, "neg_f", neg_f);
-    circa_patch_function2(patch, "remainder_i", remainder_i);
-    circa_patch_function2(patch, "remainder_f", remainder_f);
-    circa_patch_function2(patch, "round", round);
-    circa_patch_function2(patch, "sub_i", sub_i);
-    circa_patch_function2(patch, "sub_f", sub_f);
-    circa_patch_function2(patch, "floor", floor);
-    circa_patch_function2(patch, "ceil", ceil);
-    circa_patch_function2(patch, "average", average);
-    circa_patch_function2(patch, "pow", pow);
-    circa_patch_function2(patch, "sqr", sqr);
-    circa_patch_function2(patch, "cube", cube);
-    circa_patch_function2(patch, "sqrt", sqrt);
-    circa_patch_function2(patch, "log", log);
+    circa_patch_function(patch, "add_i", add_i);
+    circa_patch_function(patch, "add_f", add_f);
+    circa_patch_function(patch, "abs", abs);
+    circa_patch_function(patch, "assert", assert_func);
+    circa_patch_function(patch, "cast", cast_evaluate);
+    circa_patch_function(patch, "str", str);
+    circa_patch_function(patch, "cond", cond);
+    circa_patch_function(patch, "copy", copy_eval);
+    circa_patch_function(patch, "div_f", div_f);
+    circa_patch_function(patch, "div_i", div_i);
+    circa_patch_function(patch, "empty_list", empty_list);
+    circa_patch_function(patch, "equals", equals_func);
+    circa_patch_function(patch, "error", error);
+    circa_patch_function(patch, "method_lookup", method_lookup);
+    circa_patch_function(patch, "get_field", get_field);
+    circa_patch_function(patch, "get_index", get_index);
+    circa_patch_function(patch, "get_with_symbol", get_with_symbol);
+    circa_patch_function(patch, "is_compound", hosted_is_compound);
+    circa_patch_function(patch, "is_list", hosted_is_list);
+    circa_patch_function(patch, "is_int", hosted_is_int);
+    circa_patch_function(patch, "is_map", hosted_is_map);
+    circa_patch_function(patch, "is_number", hosted_is_number);
+    circa_patch_function(patch, "is_bool", hosted_is_bool);
+    circa_patch_function(patch, "is_string", hosted_is_string);
+    circa_patch_function(patch, "is_null", hosted_is_null);
+    circa_patch_function(patch, "is_function", hosted_is_function);
+    circa_patch_function(patch, "is_type", hosted_is_type);
+    circa_patch_function(patch, "length", length);
+    circa_patch_function(patch, "less_than_i", less_than_i);
+    circa_patch_function(patch, "less_than_f", less_than_f);
+    circa_patch_function(patch, "less_than_eq_i", less_than_eq_i);
+    circa_patch_function(patch, "less_than_eq_f", less_than_eq_f);
+    circa_patch_function(patch, "greater_than_i", greater_than_i);
+    circa_patch_function(patch, "greater_than_f", greater_than_f);
+    circa_patch_function(patch, "greater_than_eq_i", greater_than_eq_i);
+    circa_patch_function(patch, "greater_than_eq_f", greater_than_eq_f);
+    circa_patch_function(patch, "make_list", make_list);
+    circa_patch_function(patch, "blank_list", blank_list);
+    circa_patch_function(patch, "map", make_map);
+    circa_patch_function(patch, "and", and_func);
+    circa_patch_function(patch, "or", or_func);
+    circa_patch_function(patch, "not", not_func);
+    circa_patch_function(patch, "make", make_func);
+    circa_patch_function(patch, "max_f", max_f);
+    circa_patch_function(patch, "max_i", max_i);
+    circa_patch_function(patch, "min_f", min_f);
+    circa_patch_function(patch, "min_i", min_i);
+    circa_patch_function(patch, "mod_i", mod_i);
+    circa_patch_function(patch, "mod_f", mod_f);
+    circa_patch_function(patch, "mult_i", mult_i);
+    circa_patch_function(patch, "mult_f", mult_f);
+    circa_patch_function(patch, "neg_i", neg_i);
+    circa_patch_function(patch, "neg_f", neg_f);
+    circa_patch_function(patch, "remainder_i", remainder_i);
+    circa_patch_function(patch, "remainder_f", remainder_f);
+    circa_patch_function(patch, "round", round);
+    circa_patch_function(patch, "sub_i", sub_i);
+    circa_patch_function(patch, "sub_f", sub_f);
+    circa_patch_function(patch, "floor", floor);
+    circa_patch_function(patch, "ceil", ceil);
+    circa_patch_function(patch, "average", average);
+    circa_patch_function(patch, "pow", pow);
+    circa_patch_function(patch, "sqr", sqr);
+    circa_patch_function(patch, "cube", cube);
+    circa_patch_function(patch, "sqrt", sqrt);
+    circa_patch_function(patch, "log", log);
 
-    circa_patch_function2(patch, "sin", sin_func);
-    circa_patch_function2(patch, "cos", cos_func);
-    circa_patch_function2(patch, "tan", tan_func);
-    circa_patch_function2(patch, "arcsin", arcsin_func);
-    circa_patch_function2(patch, "arccos", arccos_func);
-    circa_patch_function2(patch, "arctan", arctan_func);
+    circa_patch_function(patch, "sin", sin_func);
+    circa_patch_function(patch, "cos", cos_func);
+    circa_patch_function(patch, "tan", tan_func);
+    circa_patch_function(patch, "arcsin", arcsin_func);
+    circa_patch_function(patch, "arccos", arccos_func);
+    circa_patch_function(patch, "arctan", arctan_func);
 
+#if 0
     circa_patch_function(patch, "rpath", rpath);
-    circa_patch_function2(patch, "set_field", set_field);
-    circa_patch_function2(patch, "set_index", set_index);
+#endif
+    circa_patch_function(patch, "set_field", set_field);
+    circa_patch_function(patch, "set_index", set_index);
     
-    circa_patch_function2(patch, "List.append", List__append);
-    circa_patch_function2(patch, "List.concat", List__concat);
-    circa_patch_function2(patch, "List.resize", List__resize);
-    circa_patch_function2(patch, "List.count", List__count);
-    circa_patch_function2(patch, "List.insert", List__insert);
-    circa_patch_function2(patch, "List.length", List__length);
-    circa_patch_function2(patch, "List.join", List__join);
-    circa_patch_function2(patch, "List.slice", List__slice);
-    circa_patch_function2(patch, "List.get", List__get);
-    circa_patch_function2(patch, "List.set", List__set);
-    circa_patch_function2(patch, "List.remove", List__remove);
+    circa_patch_function(patch, "List.append", List__append);
+    circa_patch_function(patch, "List.concat", List__concat);
+    circa_patch_function(patch, "List.resize", List__resize);
+    circa_patch_function(patch, "List.count", List__count);
+    circa_patch_function(patch, "List.insert", List__insert);
+    circa_patch_function(patch, "List.length", List__length);
+    circa_patch_function(patch, "List.join", List__join);
+    circa_patch_function(patch, "List.slice", List__slice);
+    circa_patch_function(patch, "List.get", List__get);
+    circa_patch_function(patch, "List.set", List__set);
+    circa_patch_function(patch, "List.remove", List__remove);
 
-    circa_patch_function2(patch, "Map.contains", Map__contains);
-    circa_patch_function2(patch, "Map.keys", Map__keys);
-    circa_patch_function2(patch, "Map.remove", Map__remove);
-    circa_patch_function2(patch, "Map.get", Map__get);
-    circa_patch_function2(patch, "Map.set", Map__set);
-    circa_patch_function2(patch, "Map.empty", Map__empty);
+    circa_patch_function(patch, "Map.contains", Map__contains);
+    circa_patch_function(patch, "Map.keys", Map__keys);
+    circa_patch_function(patch, "Map.remove", Map__remove);
+    circa_patch_function(patch, "Map.get", Map__get);
+    circa_patch_function(patch, "Map.set", Map__set);
+    circa_patch_function(patch, "Map.empty", Map__empty);
 
-    circa_patch_function2(patch, "Module.block", Module__block);
-    circa_patch_function2(patch, "Module._get", Module__get);
+    circa_patch_function(patch, "Module.block", Module__block);
+    circa_patch_function(patch, "Module._get", Module__get);
 
-    circa_patch_function2(patch, "String.char_at", String__char_at);
-    circa_patch_function2(patch, "String.ends_with", String__ends_with);
-    circa_patch_function2(patch, "String.length", String__length);
-    circa_patch_function2(patch, "String.char_code", String__char_code);
-    circa_patch_function2(patch, "String.from_char_code", String__from_char_code);
-    circa_patch_function2(patch, "String.substr", String__substr);
-    circa_patch_function2(patch, "String.slice", String__slice);
-    circa_patch_function2(patch, "String.starts_with", String__starts_with);
-    circa_patch_function2(patch, "String.split", String__split);
-    circa_patch_function2(patch, "String.to_camel_case", String__to_camel_case);
-    circa_patch_function2(patch, "String.to_upper", String__to_upper);
-    circa_patch_function2(patch, "String.to_lower", String__to_lower);
-    circa_patch_function2(patch, "String.to_number", String__to_number);
-    circa_patch_function2(patch, "String.to_int", String__to_int);
+    circa_patch_function(patch, "String.char_at", String__char_at);
+    circa_patch_function(patch, "String.ends_with", String__ends_with);
+    circa_patch_function(patch, "String.length", String__length);
+    circa_patch_function(patch, "String.char_code", String__char_code);
+    circa_patch_function(patch, "String.from_char_code", String__from_char_code);
+    circa_patch_function(patch, "String.substr", String__substr);
+    circa_patch_function(patch, "String.slice", String__slice);
+    circa_patch_function(patch, "String.starts_with", String__starts_with);
+    circa_patch_function(patch, "String.split", String__split);
+    circa_patch_function(patch, "String.to_camel_case", String__to_camel_case);
+    circa_patch_function(patch, "String.to_upper", String__to_upper);
+    circa_patch_function(patch, "String.to_lower", String__to_lower);
+    circa_patch_function(patch, "String.to_number", String__to_number);
+    circa_patch_function(patch, "String.to_int", String__to_int);
 
+#if 0
     circa_patch_function(patch, "file_version", file__version);
     circa_patch_function(patch, "file_exists", file__exists);
     circa_patch_function(patch, "file_read_text", file__read_text);
     circa_patch_function(patch, "channel_send", channel_send);
     circa_patch_function(patch, "channel_read", channel_read);
+#endif
 
-    circa_patch_function2(patch, "noise", noise);
-    circa_patch_function2(patch, "not_equals", not_equals);
-    circa_patch_function2(patch, "print", print);
-    circa_patch_function2(patch, "rand", rand);
-    circa_patch_function2(patch, "repeat", repeat);
-    circa_patch_function2(patch, "trace", print);
-    circa_patch_function2(patch, "typeof", typeof_func);
-    circa_patch_function2(patch, "compute_patch", compute_patch_hosted);
-    circa_patch_function2(patch, "apply_patch", apply_patch_hosted);
+    circa_patch_function(patch, "noise", noise);
+    circa_patch_function(patch, "not_equals", not_equals);
+    circa_patch_function(patch, "print", print);
+    circa_patch_function(patch, "rand", rand);
+    circa_patch_function(patch, "repeat", repeat);
+    circa_patch_function(patch, "trace", print);
+    circa_patch_function(patch, "typeof", typeof_func);
+    circa_patch_function(patch, "compute_patch", compute_patch_hosted);
+    circa_patch_function(patch, "apply_patch", apply_patch_hosted);
+#if 0
     circa_patch_function(patch, "unique_id", unique_id);
     circa_patch_function(patch, "source_id", source_id);
     circa_patch_function(patch, "write_text_file", write_text_file_func);
-    circa_patch_function2(patch, "from_string", from_string);
-    circa_patch_function2(patch, "to_string_repr", to_string_repr);
-    circa_patch_function2(patch, "test_spy", test_spy);
-    circa_patch_function2(patch, "test_oracle", test_oracle);
-    circa_patch_function(patch, "sys_module_search_paths", sys__module_search_paths);
-    circa_patch_function2(patch, "_perf_stats_dump", perf_stats_dump);
+#endif
+    circa_patch_function(patch, "from_string", from_string);
+    circa_patch_function(patch, "to_string_repr", to_string_repr);
+    circa_patch_function(patch, "test_spy", test_spy);
+    circa_patch_function(patch, "test_oracle", test_oracle);
+    circa_patch_function(patch, "_perf_stats_dump", perf_stats_dump);
+#if 0
     circa_patch_function(patch, "global_script_version", global_script_version);
+#endif
 }
 
 } // namespace circa

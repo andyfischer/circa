@@ -598,7 +598,7 @@ void Type__property(VM* vm)
 void type_install_functions(NativePatch* patch)
 {
     circa_patch_function(patch, "Type.declaringTerm", Type__declaringTerm);
-    circa_patch_function2(patch, "Type.make", Type__make);
+    circa_patch_function(patch, "Type.make", Type__make);
     circa_patch_function(patch, "Type.name", Type__name);
     circa_patch_function(patch, "Type.property", Type__property);
 }

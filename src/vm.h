@@ -38,6 +38,8 @@ struct VM {
     Value env; // actual env (including inheritance)
     RandState randState;
 
+    Value channelOutput;
+
     Value* input(int index);
     Value* output();
     void throw_error(Value* err);

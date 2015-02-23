@@ -1,13 +1,18 @@
 
-require input
+require ./input
 require ./editor_main
+require ./improv
 
-state editor = editor_main.to_stack
+def make_window()
+  improv.make_window([0 0 1000 600])
+
+state main_window = make_window()
+
+state editor = editor_main.to_vm
 state userInput = input.new
 
-windowSize = env(:windowSize) -> Vec2.cast
-windowRect = Rect.make(0 0 windowSize.x windowSize.y)
 
+{-
 @userInput.handleEvents(env(:inputEvents))
 
 editor.init_env()
@@ -21,5 +26,6 @@ editor.set_env(:timeDelta, delta(env(:time)))
 editor.run
 
 if editor.has_error
-  require error_trace
-  error_trace.trace_to_string(editor) | print
+  require stack_trace
+  stack_trace.dump(editor)
+-}

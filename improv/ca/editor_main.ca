@@ -1,5 +1,5 @@
 
-require editor_env
+require ./editor_env
 
 state editorEnv = editor_env.new
 editorEnv.rect = env(:canvasRect)
@@ -12,6 +12,6 @@ userScript.run
 editorEnv.post(userScript)
 
 if userScript.has_error
-  require error_trace
-  error_trace.trace_to_string(userScript) | print
+  require stack_trace
+  stack_trace.dump(userScript)
 

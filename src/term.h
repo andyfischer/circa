@@ -199,7 +199,6 @@ bool term_used_by_nonlocal(Term* term);
 bool term_is_observable_after(Term* term, Term* location);
 bool is_located_after(Term* location, Term* term);
 bool term_uses_input_multiple_times(Term* term, Term* input);
-bool term_needs_no_evaluation(Term* term);
 bool term_needs_no_evaluation2(Term* term);
 bool should_use_term_value(Term* term);
 

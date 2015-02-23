@@ -7,8 +7,6 @@
 #include "improv_common.h"
 #include "circa/circa.h"
 
-namespace improv {
-
 enum UniformType {
     VEC2 = 1,
     VEC3,
@@ -100,7 +98,8 @@ struct Shader {
 
     void copy_to(caValue* value)
     {
-        circa_set_native_ptr(value, this, Shader::Release);
+        circa_set_list(value, 1);
+        circa_set_native_ptr(circa_index(value, 0), this, Shader::Release);
     }
     static Shader* get(caValue* value)
     {
@@ -160,7 +159,8 @@ struct VertexBuffer {
 
     void copy_to(caValue* value)
     {
-        circa_set_native_ptr(value, this, VertexBuffer::Release);
+        circa_set_list(value, 1);
+        circa_set_native_ptr(circa_index(value, 0), this, VertexBuffer::Release);
     }
 
     static VertexBuffer* get(caValue* value)
@@ -197,7 +197,8 @@ struct Texture
 
     void copy_to(caValue* value)
     {
-        circa_set_native_ptr(value, this, Texture::Release);
+        circa_set_list(value, 1);
+        circa_set_native_ptr(circa_index(value, 0), this, Texture::Release);
     }
 
     void loadCheckerPattern(int w, int h)
@@ -231,7 +232,7 @@ struct Texture
     }
 };
 
-bool check_shader_error(caStack* stack, GLuint shader)
+bool check_shader_error(caVM* vm, GLuint shader)
 {
     GLint success = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -248,13 +249,13 @@ bool check_shader_error(caStack* stack, GLuint shader)
     circa::Value msg;
     circa_set_string(&msg, "Shader error: ");
     circa_string_append(&msg, logData);
-    circa_output_error_val(stack, &msg);
+    circa_output_error_val(vm, &msg);
 
     free(logData);
     return true;
 }
 
-bool check_program_error(caStack* stack, GLuint program)
+bool check_program_error(caVM* vm, GLuint program)
 {
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
@@ -271,17 +272,17 @@ bool check_program_error(caStack* stack, GLuint program)
     circa::Value msg;
     circa_set_string(&msg, "Program error: ");
     circa_string_append(&msg, logData);
-    circa_output_error_val(stack, &msg);
+    circa_output_error_val(vm, &msg);
 
     free(logData);
     return true;
 }
 
-void shader_from_text(caStack* stack)
+void shader_from_text(caVM* vm)
 {
     //printf("Compiling shader..\n");
-    caValue* vertexText = circa_input(stack, 0);
-    caValue* fragmentText = circa_input(stack, 1);
+    caValue* vertexText = circa_input(vm, 0);
+    caValue* fragmentText = circa_input(vm, 1);
 
     Shader* shader = new Shader();
     shader->init();
@@ -291,7 +292,7 @@ void shader_from_text(caStack* stack)
     glShaderSource(shader->vertexId, 1, &vertexStr, NULL);
     glCompileShader(shader->vertexId);
 
-    if (check_shader_error(stack, shader->vertexId)) {
+    if (check_shader_error(vm, shader->vertexId)) {
         delete shader;
         return;
     }
@@ -301,7 +302,7 @@ void shader_from_text(caStack* stack)
     glShaderSource(shader->fragmentId, 1, &fragmentStr, NULL);
     glCompileShader(shader->fragmentId);
 
-    if (check_shader_error(stack, shader->fragmentId)) {
+    if (check_shader_error(vm, shader->fragmentId)) {
         delete shader;
         return;
     }
@@ -313,27 +314,26 @@ void shader_from_text(caStack* stack)
 
     glLinkProgram(shader->programId);
 
-    if (check_program_error(stack, shader->programId)) {
+    if (check_program_error(vm, shader->programId)) {
         delete shader;
         return;
     }
 
     glValidateProgram(shader->programId);
 
-    if (check_program_error(stack, shader->programId)) {
+    if (check_program_error(vm, shader->programId)) {
         delete shader;
         return;
     }
 
     gl_check_error();
 
-    caValue* out = circa_set_default_output(stack, 0);
-    shader->copy_to(circa_index(out, 0));
+    shader->copy_to(circa_output(vm));
 }
 
-void use_shader(caStack* stack)
+void use_shader(caVM* vm)
 {
-    Shader* shader = Shader::get(circa_input(stack, 0));
+    Shader* shader = Shader::get(circa_input(vm, 0));
     glUseProgram(shader->programId);
 
     g_context.currentShader = shader;
@@ -341,21 +341,20 @@ void use_shader(caStack* stack)
     gl_check_error();
 }
 
-void new_vertex_buffer(caStack* stack)
+void new_vertex_buffer(caVM* vm)
 {
     VertexBuffer* buffer = new VertexBuffer();
     buffer->init();
 
-    caValue* out = circa_set_default_output(stack, 0);
-    buffer->copy_to(circa_index(out, 0));
+    buffer->copy_to(circa_output(vm));
 }
 
-void VertexBuffer__set_data(caStack* stack)
+void VertexBuffer__set_data(caVM* vm)
 {
-    VertexBuffer* buffer = VertexBuffer::get(circa_input(stack, 0));
+    VertexBuffer* buffer = VertexBuffer::get(circa_input(vm, 0));
     glBindBuffer(GL_ARRAY_BUFFER, buffer->id);
 
-    caValue* vertices = circa_input(stack, 1);
+    caValue* vertices = circa_input(vm, 1);
     buffer->floatCount = circa_length(vertices);
     size_t rawDataSize = sizeof(GLfloat) * buffer->floatCount;
     GLfloat* rawData = (GLfloat*) malloc(rawDataSize);
@@ -367,18 +366,18 @@ void VertexBuffer__set_data(caStack* stack)
     free(rawData);
     gl_check_error();
 
-    circa_move(circa_input(stack, 0), circa_output(stack, 0));
+    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
-void VertexBuffer__draw(caStack* stack)
+void VertexBuffer__draw(caVM* vm)
 {
-    VertexBuffer* buffer = VertexBuffer::get(circa_input(stack, 0));
+    VertexBuffer* buffer = VertexBuffer::get(circa_input(vm, 0));
 
     if (buffer->drawType == 0)
-        return circa_output_error(stack, "Buffer does not have draw_type assigned");
+        return circa_output_error(vm, "Buffer does not have draw_type assigned");
 
     if (circa_is_null(&buffer->attribList))
-        return circa_output_error(stack, "Buffer does not have attribs assigned");
+        return circa_output_error(vm, "Buffer does not have attribs assigned");
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer->id);
 
@@ -395,7 +394,7 @@ void VertexBuffer__draw(caStack* stack)
             circa::Value msg;
             circa_set_string(&msg, "Attrib not found in current program: ");
             circa_string_append(&msg, name);
-            return circa_output_error_val(stack, &msg);
+            return circa_output_error_val(vm, &msg);
         }
 
         glEnableVertexAttribArray(vertexLoc);
@@ -415,59 +414,59 @@ void VertexBuffer__draw(caStack* stack)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    circa_move(circa_input(stack, 0), circa_output(stack, 0));
+    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
-void VertexBuffer__set_draw_type(caStack* stack)
+void VertexBuffer__set_draw_type(caVM* vm)
 {
-    VertexBuffer* buffer = VertexBuffer::get(circa_input(stack, 0));
+    VertexBuffer* buffer = VertexBuffer::get(circa_input(vm, 0));
 
-    if (circa_symbol_equals(circa_input(stack, 1), "triangles"))
+    if (circa_symbol_equals(circa_input(vm, 1), "triangles"))
         buffer->drawType = GL_TRIANGLES;
-    else if (circa_symbol_equals(circa_input(stack, 1), "triangle_strip"))
+    else if (circa_symbol_equals(circa_input(vm, 1), "triangle_strip"))
         buffer->drawType = GL_TRIANGLE_STRIP;
     else
-        return circa_output_error(stack, "Unrecognized draw type");
+        return circa_output_error(vm, "Unrecognized draw type");
 
-    circa_move(circa_input(stack, 0), circa_output(stack, 0));
+    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
-void VertexBuffer__set_attribs(caStack* stack)
+void VertexBuffer__set_attribs(caVM* vm)
 {
-    VertexBuffer* buffer = VertexBuffer::get(circa_input(stack, 0));
-    circa_copy(circa_input(stack, 1), &buffer->attribList);
+    VertexBuffer* buffer = VertexBuffer::get(circa_input(vm, 0));
+    circa_copy(circa_input(vm, 1), &buffer->attribList);
 
     buffer->floatsPerVertex = 0;
 
     if (circa_length(&buffer->attribList) == 0)
-        return circa_output_error(stack, "Empty attrib list");
+        return circa_output_error(vm, "Empty attrib list");
 
     for (int i=0; i < circa_length(&buffer->attribList); i++) {
         caValue* attrib = circa_index(&buffer->attribList, i);
         if (!circa_is_symbol(circa_index(attrib, 0)))
-            return circa_output_error(stack, "Expected symbol in element 0");
+            return circa_output_error(vm, "Expected symbol in element 0");
         if (!circa_is_int(circa_index(attrib, 1)))
-            return circa_output_error(stack, "Expected integer in element 1");
+            return circa_output_error(vm, "Expected integer in element 1");
         buffer->floatsPerVertex += circa_int(circa_index(attrib, 1));
     }
 
-    circa_move(circa_input(stack, 0), circa_output(stack, 0));
+    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
-void clear(caStack* stack)
+void clear(caVM* vm)
 {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void uniform(caStack* stack, UniformType dataType)
+void uniform(caVM* vm, UniformType dataType)
 {
     gl_check_error();
         
     if (g_context.currentShader == NULL)
-        return circa_output_error(stack, "No active shader");
+        return circa_output_error(vm, "No active shader");
 
-    caValue* name = circa_input(stack, 0);
-    caValue* val = circa_input(stack, 1);
+    caValue* name = circa_input(vm, 0);
+    caValue* val = circa_input(vm, 1);
 
     int loc = g_context.currentShader->findUniform(name);
     
@@ -475,7 +474,7 @@ void uniform(caStack* stack, UniformType dataType)
         circa::Value msg;
         circa_set_string(&msg, "No uniform found with name: ");
         circa_string_append(&msg, circa_symbol_text(name));
-        return circa_output_error_val(stack, &msg);
+        return circa_output_error_val(vm, &msg);
     }
 
     switch (dataType) {
@@ -543,27 +542,26 @@ void uniform(caStack* stack, UniformType dataType)
     gl_check_error();
 }
 
-void uniform_vec2(caStack* stack) { uniform(stack, VEC2); }
-void uniform_vec3(caStack* stack) { uniform(stack, VEC3); }
-void uniform_vec4(caStack* stack) { uniform(stack, VEC4); }
-void uniform_mat2(caStack* stack) { uniform(stack, MAT2); }
-void uniform_mat3(caStack* stack) { uniform(stack, MAT3); }
-void uniform_mat4(caStack* stack) { uniform(stack, MAT4); }
+void uniform_vec2(caVM* vm) { uniform(vm, VEC2); }
+void uniform_vec3(caVM* vm) { uniform(vm, VEC3); }
+void uniform_vec4(caVM* vm) { uniform(vm, VEC4); }
+void uniform_mat2(caVM* vm) { uniform(vm, MAT2); }
+void uniform_mat3(caVM* vm) { uniform(vm, MAT3); }
+void uniform_mat4(caVM* vm) { uniform(vm, MAT4); }
 
-void new_texture(caStack* stack)
+void new_texture(caVM* vm)
 {
     Texture* texture = new Texture();
     texture->init();
     texture->loadCheckerPattern(100, 100);
-    caValue* out = circa_set_default_output(stack, 0);
-    texture->copy_to(circa_index(out, 0));
+    texture->copy_to(circa_output(vm));
 }
 
-void Texture__set_data(caStack* stack)
+void Texture__set_data(caVM* vm)
 {
-    Texture* texture = (Texture*) circa_native_ptr(circa_index(circa_input(stack, 0), 0));
-    caValue* size = circa_input(stack, 1);
-    caValue* blob = circa_input(stack, 2);
+    Texture* texture = (Texture*) circa_native_ptr(circa_index(circa_input(vm, 0), 0));
+    caValue* size = circa_input(vm, 1);
+    caValue* blob = circa_input(vm, 2);
 
     float widthF;
     float heightF;
@@ -577,7 +575,7 @@ void Texture__set_data(caStack* stack)
     circa_blob_data(blob, &data, &blobSize);
 
     if (blobSize < (width*height))
-        return circa_output_error(stack, "Blob does not have enough bytes for dimensions");
+        return circa_output_error(vm, "Blob does not have enough bytes for dimensions");
     
     glBindTexture(GL_TEXTURE_2D, texture->id);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
@@ -586,13 +584,13 @@ void Texture__set_data(caStack* stack)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void bind_texture(caStack* stack)
+void bind_texture(caVM* vm)
 {
     if (g_context.currentShader == NULL)
-        return circa_output_error(stack, "No active shader");
+        return circa_output_error(vm, "No active shader");
     
-    Texture* texture = (Texture*) circa_native_ptr(circa_index(circa_input(stack, 0), 0));
-    caValue* samplerName = circa_input(stack, 1);
+    Texture* texture = (Texture*) circa_native_ptr(circa_index(circa_input(vm, 0), 0));
+    caValue* samplerName = circa_input(vm, 1);
 
     int samplerLoc = g_context.currentShader->findUniform(samplerName);
     
@@ -600,7 +598,7 @@ void bind_texture(caStack* stack)
         circa::Value msg;
         circa_set_string(&msg, "No uniform found with name: ");
         circa_string_append(&msg, circa_symbol_text(samplerName));
-        return circa_output_error_val(stack, &msg);
+        return circa_output_error_val(vm, &msg);
     }
     
     glActiveTexture(GL_TEXTURE0);
@@ -608,7 +606,7 @@ void bind_texture(caStack* stack)
     glUniform1i(samplerLoc, 0);
 }
 
-void unbind_texture(caStack* stack)
+void unbind_texture(caVM* vm)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -636,5 +634,3 @@ void gl_native_patch(caNativePatch* patch)
     circa_patch_function(patch, "unbind_texture", unbind_texture);
     circa_finish_native_patch(patch);
 }
-
-} // namespace improv

@@ -191,6 +191,8 @@ caBlock* circa_load_module_from_file(caWorld* world,
 caBlock* circa_load_module(caWorld* world, caBlock* loadedBy, const char* moduleName);
 
 // -- Interpreter --
+caVM* circa_new_vm(caBlock* main);
+void circa_free_vm(caVM* vm);
 
 // Check for changed files, and run any relevant change actions.
 void circa_update_changed_files(caWorld* world);
@@ -372,7 +374,6 @@ void*       circa_get_pointer(caValue* value);
 float circa_to_float(caValue* value);
 
 // Returns the number of elements in a list value.
-int circa_count(caValue* container); // TODO: delete
 int circa_length(caValue* container);
 
 // Allocate a new list value, with the given initial size.
@@ -395,6 +396,7 @@ void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);
 void circa_set_int(caValue* container, int value);
 void circa_set_native_ptr(caValue* val, void* ptr, caNativePtrRelease release);
+void circa_set_boxed_native_ptr(caValue* val, void* ptr, caNativePtrRelease release);
 void circa_set_null(caValue* container);
 void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);
@@ -520,11 +522,7 @@ caValue* circa_declare_value(caBlock* block, const char* name);
 
 // -- Native module support --
 caNativePatch* circa_create_native_patch(caWorld* world, const char* name);
-
-#define circa_patch_function(x,y,z) ;
-
-void circa_patch_function2(caNativePatch* patch, const char* nameStr, caEvaluateFunc func);
-// void circa_patch_type_release(caNativePatch* module, const char* typeName, caReleaseFunc func);
+void circa_patch_function(caNativePatch* patch, const char* nameStr, caEvaluateFunc func);
 void circa_finish_native_patch(caNativePatch* module);
 
 // -- File IO --

@@ -391,8 +391,8 @@ def UntilSeq.next(self) self.seq.next
 def UntilSeq.advance(@self) @self.seq.advance
 def UntilSeq.key(self) self.seq.key
 
-def take_until(s, doneFunc)
-  UntilSeq.make(to_seq(s) doneFunc)
+def take_until(s, Func done)
+  UntilSeq.make(to_seq(s) done)
 
 struct Range {
   int from
@@ -439,7 +439,6 @@ def source_id() -> any
 
 -- Channels
 def channel_send(Symbol name, any val)
-def channel_read(Symbol name) -> List
 
 def global_script_version() -> int
 
@@ -564,8 +563,8 @@ def Module.resolve(self) -> Block
   self.block
 def Module.to_func(self) -> Func
   self.block.to_func
-def Module.to_stack(self) -> VM
-  self.block.to_stack
+def Module.to_vm(self) -> VM
+  self.block.to_vm
 def Module.to_vm(self) -> VM
   self.block.to_vm
 
@@ -573,10 +572,13 @@ def load_script(String filename) -> Block
   -- Load a script file with the given filename.
 
 def require(String name) -> Module
-  -- Load a module.
+def require_local(String name) -> Module
 
 def require_check(Module module)
   block = module.resolve
+  if block.is_null
+    error("Couldn't find module: " module.name)
+
   if block.has_static_error
     msg = [str("Module '" module.name "' has static errors: ")]
     for error in block.get_static_errors_formatted
@@ -709,8 +711,8 @@ def Block.walk_terms(self) -> List
 def Block.to_func(self) -> Func
   Func.make(self)
 
-def Block.to_stack(self) -> VM
-  self.to_func.to_stack
+def Block.to_vm(self) -> VM
+  self.to_func.to_vm
 
 def Block.to_vm(self) -> VM
   self.to_func.to_vm
@@ -767,17 +769,14 @@ def VM.apply(self, List inputs) -> any
 def VM.block(self) -> Block
   -- Returns the (topmost) block.
 def VM.call(self, any inputs :multiple) -> any
+def VM.consume_channel(self, key) -> List
 def VM.run(self)
   self.call
 def VM.copy(self) -> VM
-def VM.current_term(self) -> Term
-  self.top.current_term
 def VM.dump(self)
   -- Dumps a string representation to stdout.
 def VM.dump_with_bytecode(self)
 def VM.dump_compiled(self)
-def VM.eval_on_demand(self, Term term) -> any
-def VM.find_active_value(self, Term term) -> any
 
 def VM.get_raw_slots(self) -> List
 def VM.get_raw_ops(self) -> Blob
@@ -865,10 +864,6 @@ def VM.toString(self) -> String
 
 def make_vm(Func func) -> VM
   -- Create a new VM
-
-def Func.to_stack(self) -> VM
-  -- TODO: delete
-  make_vm(self)
 
 def Func.to_vm(self) -> VM
   make_vm(self)

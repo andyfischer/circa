@@ -1,4 +1,0 @@
-
-require ./lib1
-
-print('lib1.get_x2 = ', lib1.get_x2)

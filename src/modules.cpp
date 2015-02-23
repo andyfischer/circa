@@ -25,6 +25,7 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "world.h"
+#include "vm.h"
 
 namespace circa {
 
@@ -258,23 +259,28 @@ Term* module_lookup(World* world, Value* moduleRef, Value* name)
     Term* term = find_local_name(module, name);
     return term;
 }
- 
-#if 0
-void load_script_eval(Stack* stack)
+
+void require_dynamic(VM* vm)
 {
-    Value* filename = circa_input(stack, 0);
-    Block* block = load_module_by_filename(stack->world, filename);
-    set_block(circa_output(stack, 0), block);
+    Value* path = vm->input(0);
+    load_module(vm->world, NULL, path);
+    set_module_ref(vm->output(), path, NULL);
 }
-#endif
+
+void require_local_dynamic(VM* vm)
+{
+    Value* path = vm->input(0);
+    Block* relativeTo = vm_calling_term(vm)->owningBlock;
+    load_module(vm->world, relativeTo, path);
+    set_module_ref(vm->output(), path, relativeTo);
+}
 
 void modules_install_functions(NativePatch* patch)
 {
-#if 0
-    circa_patch_function(patch, "load_script", load_script_eval);
-#endif
+    circa_patch_function(patch, "require", require_dynamic);
+    circa_patch_function(patch, "require_local", require_local_dynamic);
 }
-
+ 
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 {
     module_add_search_path(world, path);

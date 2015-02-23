@@ -35,7 +35,4 @@ Term* module_lookup(World* world, Value* moduleRef, Value* name);
 bool is_module_ref(Value* value);
 void set_module_ref(Value* value, Value* path, Block* relativeTo);
 
-// Install builtin modules functions.
-void modules_install_functions(NativePatch* patch);
-
 } // namespace circa

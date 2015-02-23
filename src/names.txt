@@ -154,6 +154,7 @@ Syntax_RebindOperator
 Syntax_RebindingInfix
 Syntax_ReturnStatement
 Syntax_Require
+Syntax_RequireLocal
 Syntax_StateKeyword
 Syntax_TypeMagicSymbol
 Syntax_WhitespaceBeforeEnd
@@ -365,6 +366,7 @@ tok_Continue
 tok_Switch
 tok_Case
 tok_Require
+tok_RequireLocal
 tok_Import
 tok_Package
 tok_Section

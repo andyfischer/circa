@@ -77,12 +77,9 @@ ship_radius = ship_size * ship_front
 
 asteroid_speed = 3.0
 
-draw_intersection_circles = false
-
 state gstate = :playing
 
 def srand() -> number
-  "srand"
   state number value = rand()
   return value
 

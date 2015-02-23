@@ -53,6 +53,7 @@ struct BuiltinFuncs {
     Term* if_block;
     Term* require;
     Term* require_check;
+    Term* require_local;
     Term* include_func;
     Term* input;
     Term* inputs_fit_function;

@@ -161,6 +161,7 @@ const char* builtin_symbol_to_string(int name)
     case s_Syntax_RebindingInfix: return "Syntax_RebindingInfix";
     case s_Syntax_ReturnStatement: return "Syntax_ReturnStatement";
     case s_Syntax_Require: return "Syntax_Require";
+    case s_Syntax_RequireLocal: return "Syntax_RequireLocal";
     case s_Syntax_StateKeyword: return "Syntax_StateKeyword";
     case s_Syntax_TypeMagicSymbol: return "Syntax_TypeMagicSymbol";
     case s_Syntax_WhitespaceBeforeEnd: return "Syntax_WhitespaceBeforeEnd";
@@ -334,6 +335,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_Switch: return "tok_Switch";
     case tok_Case: return "tok_Case";
     case tok_Require: return "tok_Require";
+    case tok_RequireLocal: return "tok_RequireLocal";
     case tok_Import: return "tok_Import";
     case tok_Package: return "tok_Package";
     case tok_Section: return "tok_Section";
@@ -1590,9 +1592,31 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'q':
-        if (strcmp(str + 10, "uire") == 0)
-            return s_Syntax_Require;
+    switch (str[10]) {
+    case 'u':
+    switch (str[11]) {
+    case 'i':
+    switch (str[12]) {
+    case 'r':
+    switch (str[13]) {
+    case 'e':
+    switch (str[14]) {
+    case 'L':
+        if (strcmp(str + 15, "ocal") == 0)
+            return s_Syntax_RequireLocal;
         break;
+    case 0:
+            return s_Syntax_Require;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 't':
         if (strcmp(str + 10, "urnStatement") == 0)
             return s_Syntax_ReturnStatement;
@@ -3528,9 +3552,31 @@ int builtin_symbol_from_string(const char* str)
     case 'e':
     switch (str[6]) {
     case 'q':
-        if (strcmp(str + 7, "uire") == 0)
-            return tok_Require;
+    switch (str[7]) {
+    case 'u':
+    switch (str[8]) {
+    case 'i':
+    switch (str[9]) {
+    case 'r':
+    switch (str[10]) {
+    case 'e':
+    switch (str[11]) {
+    case 'L':
+        if (strcmp(str + 12, "ocal") == 0)
+            return tok_RequireLocal;
         break;
+    case 0:
+            return tok_Require;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     case 't':
         if (strcmp(str + 7, "urn") == 0)
             return tok_Return;

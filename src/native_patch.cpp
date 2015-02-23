@@ -119,7 +119,7 @@ void remove_native_patch(World* world, const char* name)
     // TODO
 }
 
-CIRCA_EXPORT void circa_patch_function2(caNativePatch* patch, const char* nameStr,
+CIRCA_EXPORT void circa_patch_function(caNativePatch* patch, const char* nameStr,
         caEvaluateFunc func)
 {
     Value name;

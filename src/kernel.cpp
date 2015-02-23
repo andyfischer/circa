@@ -463,7 +463,6 @@ void bootstrap_kernel()
     blob_install_functions(world->builtinPatch);
     selector_setup_funcs(world->builtinPatch);
     closures_install_functions(world->builtinPatch);
-    modules_install_functions(world->builtinPatch);
     reflection_install_functions(world->builtinPatch);
     misc_builtins_setup_functions(world->builtinPatch);
     type_install_functions(world->builtinPatch);
@@ -591,7 +590,9 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(range, "range");
         find_func(return_func, "return");
         find_func(remainder, "remainder");
+        find_func(require, "require");
         find_func(require_check, "require_check");
+        find_func(require_local, "require_local");
         find_func(section_block, "section");
         find_func(selector, "selector");
         find_func(set_index, "set_index");
@@ -626,7 +627,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(map_get, "Map.get");
         find_func(module_get, "Module._get");
         find_func(not_equals, "not_equals");
-        find_func(require, "require");
         find_func(selector, "selector");
         find_func(set_with_selector, "set_with_selector");
         find_func(type_make, "Type.make");

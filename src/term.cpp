@@ -631,7 +631,6 @@ bool term_needs_no_evaluation(Term* term)
 {
     if (term == NULL
             || is_value(term)
-            || term->function == FUNCS.require
             || term->function == FUNCS.lambda
             || term->function == FUNCS.case_func
             || term->function == FUNCS.comment)
@@ -645,7 +644,6 @@ bool term_needs_no_evaluation2(Term* term)
 {
     if (term == NULL
             || is_value(term)
-            || term->function == FUNCS.require
             || term->function == FUNCS.lambda
             || term->function == FUNCS.case_func
             || term->function == FUNCS.input
@@ -660,9 +658,11 @@ bool term_needs_no_evaluation2(Term* term)
 
 bool should_use_term_value(Term* term)
 {
+    if (term->function == FUNCS.require && !is_null(term_value(term)))
+        return true;
+
     return is_value(term)
-        || term->owningBlock == global_builtins_block()
-        || term->function == FUNCS.require;
+        || term->owningBlock == global_builtins_block();
 }
 
 } // namespace circa

@@ -1,2 +1,8 @@
 
+struct Window {
+  native_ptr n
+}
+
+def make_window(Rect rect) -> Window
+
 def play_audio(Blob blob)

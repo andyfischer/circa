@@ -1344,7 +1344,7 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
 
     Symbol keyword = tokens.next().match;
 
-    tokens.consume(); // either 'import' or 'require'
+    tokens.consume(); // either 'require' or 'require_local'
     possible_whitespace(tokens);
 
     Value path;
@@ -1367,13 +1367,28 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     if (is_null(&path))
         return syntax_error(block, tokens, startPosition, "Expected path after 'require'");
 
-    Block* moduleRelativeTo = NULL;
+    Value localName;
 
-    if (string_starts_with(&path, "./")) {
-        string_slice(&path, 2, -1);
+    int slashLoc = string_find_char_from_end(&path, '/');
+    if (slashLoc == -1) {
+        copy(&path, &localName);
+    } else {
+        string_substr(&path, slashLoc + 1, -1, &localName);
+    }
+
+    Block* moduleRelativeTo = NULL;
+    Term* function = FUNCS.require;
+
+    if (keyword == tok_RequireLocal) {
+        function = FUNCS.require_local;
         moduleRelativeTo = block;
     }
 
+    // Create the require() call
+    Term* pathTerm = create_value(block, &path);
+    Term* requireTerm = apply(block, function, TermList(pathTerm), &localName);
+
+    // Try to load the module immediately
     Block* module = load_module(block->world, moduleRelativeTo, &path);
     
     if (module == NULL) {
@@ -1383,31 +1398,21 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
         return syntax_error(block, tokens, startPosition, as_cstring(&msg));
     }
 
-    Value localName;
-    int slashLoc = string_find_char_from_end(&path, '/');
-    if (slashLoc == -1) {
-        copy(&path, &localName);
-    } else {
-        string_substr(&path, slashLoc + 1, -1, &localName);
-    }
+    set_module_ref(term_value(requireTerm), &path, moduleRelativeTo);
 
-    Term* term = apply(block, FUNCS.require, TermList(), &localName);
-
-    set_module_ref(term_value(term), &path, moduleRelativeTo);
-
-    if (keyword == tok_Import) {
-        term->setBoolProp(s_Syntax_Import, true);
-    } else {
-        term->setBoolProp(s_Syntax_Require, true);
+    if (keyword == tok_Require) {
+        requireTerm->setBoolProp(s_Syntax_Require, true);
+    } else if (keyword == tok_RequireLocal) {
+        requireTerm->setBoolProp(s_Syntax_RequireLocal, true);
     }
 
     // Possibly add a require_check()
     if (FUNCS.require_check != NULL) {
-        Term* check = apply(block, FUNCS.require_check, TermList(term));
+        Term* check = apply(block, FUNCS.require_check, TermList(requireTerm));
         hide_from_source(check);
     }
 
-    return ParseResult(term);
+    return ParseResult(requireTerm);
 }
 
 ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -1862,7 +1867,7 @@ ParseResult expression(Block* block, TokenStream& tokens, ParserCxt* context)
         parseResult = switch_block(block, tokens, context);
     else if (tokens.nextIs(tok_While))
         parseResult = while_block(block, tokens, context);
-    else if (tokens.nextIs(tok_Require) || tokens.nextIs(tok_Import))
+    else if (tokens.nextIs(tok_Require) || tokens.nextIs(tok_RequireLocal))
         parseResult = require_statement(block, tokens, context);
     else
         parseResult = infix_expression(block, tokens, context, 0);

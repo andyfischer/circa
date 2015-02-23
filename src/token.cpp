@@ -93,6 +93,7 @@ const char* get_token_text(int match)
         case tok_Case: return "case";
         case tok_While: return "while";
         case tok_Require: return "require";
+        case tok_RequireLocal: return "require_local";
         case tok_Import: return "import";
         case tok_Package: return "package";
         case tok_Section: return "section";
@@ -130,6 +131,7 @@ bool token_is_identifier_or_keyword(int match)
     case tok_Case:
     case tok_While:
     case tok_Require:
+    case tok_RequireLocal:
     case tok_Import:
     case tok_Package:
     case tok_Section:
@@ -366,6 +368,7 @@ void top_level_consume_token(TokenizeContext &context)
             if (try_to_consume_keyword(context, tok_Switch)) return;
             if (try_to_consume_keyword(context, tok_True)) return;
             if (try_to_consume_keyword(context, tok_Require)) return;
+            if (try_to_consume_keyword(context, tok_RequireLocal)) return;
             if (try_to_consume_keyword(context, tok_Package)) return;
             if (try_to_consume_keyword(context, tok_Section)) return;
             if (try_to_consume_keyword(context, tok_While)) return;

@@ -22,15 +22,15 @@ void FontFaceRelease(void* ptr)
     delete (FontFace*) ptr;
 }
 
-void load_font(caStack* stack)
+void load_font(caVM* vm)
 {
-    caValue* filename = circa_input(stack, 0);
+    caValue* filename = circa_input(vm, 0);
 
     FontFace* font = new FontFace();
 
-    circa_read_file_with_stack(stack, circa_string(filename), &font->rawData);
+    circa_read_file_with_vm(vm, circa_string(filename), &font->rawData);
     if (circa_is_null(&font->rawData))
-        return circa_output_error(stack, "Failed to load file");
+        return circa_output_error(vm, "Failed to load file");
     
     if (!g_ftLibraryInitialized) {
         FT_Init_FreeType(&g_ftLibrary);
@@ -44,12 +44,11 @@ void load_font(caStack* stack)
                    &font->ftFace);
 
     if (error)
-        return circa_output_error(stack, "FT_New_Memory_Face failed");
+        return circa_output_error(vm, "FT_New_Memory_Face failed");
 
     font->cairoFace = cairo_ft_font_face_create_for_ft_face(font->ftFace, 0);
 
-    caValue* out = circa_set_default_output(stack, 0);
-    circa_set_native_ptr(circa_index(out, 0), font, FontFaceRelease);
+    circa_set_boxed_native_ptr(circa_output(vm), font, FontFaceRelease);
 }
 
 FontFace* as_font_face(caValue* value)

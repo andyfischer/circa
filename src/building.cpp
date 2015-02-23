@@ -410,7 +410,7 @@ Term* create_value(Block* block, Type* type, const char* name)
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
 
-    Term *term = apply(block, FUNCS.value, TermList(), name);
+    Term* term = apply(block, FUNCS.value, TermList(), name);
 
     set_declared_type(term, type);
     make(type, term_value(term));

@@ -49,6 +49,7 @@ VM* new_vm(Block* main)
     initialize_null(&vm->incomingEnv);
     set_hashtable(&vm->incomingEnv);
     initialize_null(&vm->env);
+    initialize_null(&vm->channelOutput);
     set_hashtable(&vm->env);
     rand_init(&vm->randState, 0);
 
@@ -67,6 +68,7 @@ void free_vm(VM* vm)
     set_null(&vm->state);
     set_null(&vm->demandEvalMap);
     set_null(&vm->incomingEnv);
+    set_null(&vm->channelOutput);
     set_null(&vm->env);
 }
 
@@ -219,6 +221,8 @@ void vm_run(VM* vm, VM* callingVM)
     vm_grow_stack(vm, 1);
 
     copy(&vm->topLevelUpvalues, &vm->incomingUpvalues);
+
+    set_hashtable(&vm->channelOutput);
 
     Op* ops = vm->bc->ops;
 
@@ -821,6 +825,30 @@ void get_env(VM* vm)
         set_null(vm->output());
 }
 
+void channel_send(VM* vm)
+{
+    Value* key = vm->input(0);
+    Value* val = vm->input(1);
+
+    Value* list = hashtable_insert(&vm->channelOutput, key);
+    if (!is_list(list))
+        set_list(list, 0);
+
+    copy(val, list_append(list));
+}
+
+void VM__consume_channel(VM* vm)
+{
+    VM* self = (VM*) get_pointer(vm->input(0));
+    Value* key = vm->input(1);
+
+    Value* list = hashtable_get(&self->channelOutput, key);
+    if (list == NULL || is_null(list))
+        set_list(vm->output(), 0);
+    else
+        move(list, vm->output());
+}
+
 VMStackFrame vm_top_stack_frame(VM* vm)
 {
     VMStackFrame out;
@@ -1211,6 +1239,9 @@ void vm_cleanup_on_stop(VM* vm)
     set_null(&vm->incomingUpvalues);
 }
 
+CIRCA_EXPORT caVM* circa_new_vm(caBlock* main) { return new_vm(main); }
+void circa_free_vm(caVM* vm) { free_vm(vm); }
+
 CIRCA_EXPORT Value* circa_input(VM* vm, int index)
 {
     return vm->input(index);
@@ -1230,31 +1261,33 @@ CIRCA_EXPORT void circa_throw(VM* vm, const char* msg)
 
 void vm_install_functions(NativePatch* patch)
 {
-    circa_patch_function2(patch, "make_vm", make_vm);
-    circa_patch_function2(patch, "VM.call", VM__call);
-    circa_patch_function2(patch, "VM.copy", VM__copy);
-    circa_patch_function2(patch, "VM.dump", VM__dump);
-    circa_patch_function2(patch, "VM.errored", VM__errored);
-    circa_patch_function2(patch, "VM.get_state", VM__get_state);
-    circa_patch_function2(patch, "VM.id", VM__id);
-    circa_patch_function2(patch, "VM.set_state", VM__set_state);
-    circa_patch_function2(patch, "VM.migrate", VM__migrate);
-    circa_patch_function2(patch, "VM.migrate_to", VM__migrate_to);
-    circa_patch_function2(patch, "VM.frame_list", VM__frame_list);
-    circa_patch_function2(patch, "VM.slot", VM__slot);
-    circa_patch_function2(patch, "VM.env_map", VM__env_map);
-    circa_patch_function2(patch, "VM.set_env", VM__set_env);
-    circa_patch_function2(patch, "VM.set_env_map", VM__set_env_map);
-    circa_patch_function2(patch, "VM.get_raw_slots", VM__get_raw_slots);
-    circa_patch_function2(patch, "VM.get_raw_ops", VM__get_raw_ops);
-    circa_patch_function2(patch, "VM.get_raw_mops", VM__get_raw_mops);
-    circa_patch_function2(patch, "VM.get_bytecode_const", VM__get_bytecode_const);
-    circa_patch_function2(patch, "VM.precompile", VM__precompile);
-    circa_patch_function2(patch, "bytecode_mop_size", bytecode_get_mop_size);
-    circa_patch_function2(patch, "reflect_caller", reflect_caller);
-    circa_patch_function2(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
-    circa_patch_function2(patch, "vm_demand_eval_store", vm_demand_eval_store);
-    circa_patch_function2(patch, "env", get_env);
+    circa_patch_function(patch, "make_vm", make_vm);
+    circa_patch_function(patch, "VM.call", VM__call);
+    circa_patch_function(patch, "VM.copy", VM__copy);
+    circa_patch_function(patch, "VM.consume_channel", VM__consume_channel);
+    circa_patch_function(patch, "VM.dump", VM__dump);
+    circa_patch_function(patch, "VM.errored", VM__errored);
+    circa_patch_function(patch, "VM.get_state", VM__get_state);
+    circa_patch_function(patch, "VM.id", VM__id);
+    circa_patch_function(patch, "VM.set_state", VM__set_state);
+    circa_patch_function(patch, "VM.migrate", VM__migrate);
+    circa_patch_function(patch, "VM.migrate_to", VM__migrate_to);
+    circa_patch_function(patch, "VM.frame_list", VM__frame_list);
+    circa_patch_function(patch, "VM.slot", VM__slot);
+    circa_patch_function(patch, "VM.env_map", VM__env_map);
+    circa_patch_function(patch, "VM.set_env", VM__set_env);
+    circa_patch_function(patch, "VM.set_env_map", VM__set_env_map);
+    circa_patch_function(patch, "VM.get_raw_slots", VM__get_raw_slots);
+    circa_patch_function(patch, "VM.get_raw_ops", VM__get_raw_ops);
+    circa_patch_function(patch, "VM.get_raw_mops", VM__get_raw_mops);
+    circa_patch_function(patch, "VM.get_bytecode_const", VM__get_bytecode_const);
+    circa_patch_function(patch, "VM.precompile", VM__precompile);
+    circa_patch_function(patch, "bytecode_mop_size", bytecode_get_mop_size);
+    circa_patch_function(patch, "reflect_caller", reflect_caller);
+    circa_patch_function(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
+    circa_patch_function(patch, "vm_demand_eval_store", vm_demand_eval_store);
+    circa_patch_function(patch, "env", get_env);
+    circa_patch_function(patch, "channel_send", channel_send);
 }
 
 void vm_setup_type(Type* type)

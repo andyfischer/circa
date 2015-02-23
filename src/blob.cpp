@@ -303,21 +303,21 @@ void Blob__i32(VM* vm)
 
 void blob_install_functions(NativePatch* patch)
 {
-    circa_patch_function2(patch, "make_blob", make_blob);
-    circa_patch_function2(patch, "Blob.size", Blob__size);
-    circa_patch_function2(patch, "Blob.slice", Blob__slice);
-    circa_patch_function2(patch, "Blob.set_u8", Blob__set_u8);
-    circa_patch_function2(patch, "Blob.set_u16", Blob__set_u16);
-    circa_patch_function2(patch, "Blob.set_u32", Blob__set_u32);
-    circa_patch_function2(patch, "Blob.set_i8", Blob__set_i8);
-    circa_patch_function2(patch, "Blob.set_i16", Blob__set_i16);
-    circa_patch_function2(patch, "Blob.set_i32", Blob__set_i32);
-    circa_patch_function2(patch, "Blob.i8", Blob__i8);
-    circa_patch_function2(patch, "Blob.i16", Blob__i16);
-    circa_patch_function2(patch, "Blob.i32", Blob__i32);
-    circa_patch_function2(patch, "Blob.u8", Blob__u8);
-    circa_patch_function2(patch, "Blob.u16", Blob__u16);
-    circa_patch_function2(patch, "Blob.u32", Blob__u32);
+    circa_patch_function(patch, "make_blob", make_blob);
+    circa_patch_function(patch, "Blob.size", Blob__size);
+    circa_patch_function(patch, "Blob.slice", Blob__slice);
+    circa_patch_function(patch, "Blob.set_u8", Blob__set_u8);
+    circa_patch_function(patch, "Blob.set_u16", Blob__set_u16);
+    circa_patch_function(patch, "Blob.set_u32", Blob__set_u32);
+    circa_patch_function(patch, "Blob.set_i8", Blob__set_i8);
+    circa_patch_function(patch, "Blob.set_i16", Blob__set_i16);
+    circa_patch_function(patch, "Blob.set_i32", Blob__set_i32);
+    circa_patch_function(patch, "Blob.i8", Blob__i8);
+    circa_patch_function(patch, "Blob.i16", Blob__i16);
+    circa_patch_function(patch, "Blob.i32", Blob__i32);
+    circa_patch_function(patch, "Blob.u8", Blob__u8);
+    circa_patch_function(patch, "Blob.u16", Blob__u16);
+    circa_patch_function(patch, "Blob.u32", Blob__u32);
 }
 
 } // namespace circa

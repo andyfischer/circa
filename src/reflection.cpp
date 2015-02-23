@@ -187,8 +187,8 @@ void Block__get_static_errors_formatted(VM* vm)
     }
 
     Value* out = vm->output();
-    set_list(out, circa_count(errors));
-    for (int i=0; i < circa_count(out); i++)
+    set_list(out, errors->length());
+    for (int i=0; i < out->length(); i++)
         format_static_error(circa_index(errors, i), circa_index(out, i));
 }
 
@@ -652,64 +652,64 @@ void Term__trace_dependents(VM* vm)
 
 void reflection_install_functions(NativePatch* patch)
 {
-    circa_patch_function2(patch, "Block.dump", Block__dump);
-    circa_patch_function2(patch, "Block.find_term", Block__find_term);
-    circa_patch_function2(patch, "Block.functions", Block__functions);
-    circa_patch_function2(patch, "Block.statements", Block__statements);
-    circa_patch_function2(patch, "Block.get_term", Block__get_term);
-    circa_patch_function2(patch, "Block.get_static_errors", Block__get_static_errors);
-    circa_patch_function2(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
-    circa_patch_function2(patch, "Block.has_static_error", Block__has_static_error);
-    circa_patch_function2(patch, "Block.id", Block__id);
-    circa_patch_function2(patch, "Block.input", Block__input);
-    circa_patch_function2(patch, "Block.inputs", Block__inputs);
-    circa_patch_function2(patch, "Block.is_null", Block__is_null);
-    circa_patch_function2(patch, "Block.is_major", Block__is_major);
-    circa_patch_function2(patch, "Block.link", Block__link);
-    circa_patch_function2(patch, "Block.list_configs", Block__list_configs);
-    circa_patch_function2(patch, "Block.output", Block__output);
-    circa_patch_function2(patch, "Block.outputs", Block__outputs);
-    circa_patch_function2(patch, "Block.output_placeholder", Block__output_placeholder);
-    circa_patch_function2(patch, "Block.owner", Block__owner);
-    circa_patch_function2(patch, "Block.parent", Block__parent);
-    circa_patch_function2(patch, "Block.property", Block__property);
-    circa_patch_function2(patch, "Block.properties", Block__properties);
-    circa_patch_function2(patch, "Block.source_filename", Block__source_filename);
-    circa_patch_function2(patch, "Block.term_named", Block__term_named);
-    circa_patch_function2(patch, "Block.terms", Block__terms);
-    circa_patch_function2(patch, "Block.walk_terms", Block__walk_terms);
-    circa_patch_function2(patch, "Term.assign", Term__assign);
-    circa_patch_function2(patch, "Term.asint", Term__asint);
-    circa_patch_function2(patch, "Term.asfloat", Term__asfloat);
-    circa_patch_function2(patch, "Term.id", Term__id);
-    circa_patch_function2(patch, "Term.index", Term__index);
-    circa_patch_function2(patch, "Term.function", Term__function);
-    circa_patch_function2(patch, "Term.get_type", Term__type);
-    circa_patch_function2(patch, "Term.input", Term__input);
-    circa_patch_function2(patch, "Term.inputs", Term__inputs);
-    circa_patch_function2(patch, "Term.name", Term__name);
-    circa_patch_function2(patch, "Term.num_inputs", Term__num_inputs);
-    circa_patch_function2(patch, "Term.parent", Term__parent);
-    circa_patch_function2(patch, "Term.contents", Term__contents);
-    circa_patch_function2(patch, "Term.is_input", Term__is_input);
-    circa_patch_function2(patch, "Term.is_output", Term__is_output);
-    circa_patch_function2(patch, "Term.is_null", Term__is_null);
-    circa_patch_function2(patch, "Term.is_value", Term__is_value);
-    circa_patch_function2(patch, "Term.source_location", Term__source_location);
-    circa_patch_function2(patch, "Term.location_string", Term__location_string);
-    circa_patch_function2(patch, "Term.global_id", Term__global_id);
-    circa_patch_function2(patch, "Term.to_string", Term__to_string);
-    circa_patch_function2(patch, "Term.unique_name", Term__unique_name);
-    circa_patch_function2(patch, "Term.properties", Term__properties);
-    circa_patch_function2(patch, "Term.has_property", Term__has_property);
-    circa_patch_function2(patch, "Term.property", Term__property);
-    circa_patch_function2(patch, "Term.property_opt", Term__property_opt);
-    circa_patch_function2(patch, "Term.has_input_property", Term__has_input_property);
-    circa_patch_function2(patch, "Term.input_property", Term__input_property);
-    circa_patch_function2(patch, "Term.input_property_opt", Term__input_property_opt);
-    circa_patch_function2(patch, "Term.trace_dependents", Term__trace_dependents);
-    circa_patch_function2(patch, "Term.value", Term__value);
-    circa_patch_function2(patch, "Term.set_value", Term__set_value);
+    circa_patch_function(patch, "Block.dump", Block__dump);
+    circa_patch_function(patch, "Block.find_term", Block__find_term);
+    circa_patch_function(patch, "Block.functions", Block__functions);
+    circa_patch_function(patch, "Block.statements", Block__statements);
+    circa_patch_function(patch, "Block.get_term", Block__get_term);
+    circa_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
+    circa_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
+    circa_patch_function(patch, "Block.has_static_error", Block__has_static_error);
+    circa_patch_function(patch, "Block.id", Block__id);
+    circa_patch_function(patch, "Block.input", Block__input);
+    circa_patch_function(patch, "Block.inputs", Block__inputs);
+    circa_patch_function(patch, "Block.is_null", Block__is_null);
+    circa_patch_function(patch, "Block.is_major", Block__is_major);
+    circa_patch_function(patch, "Block.link", Block__link);
+    circa_patch_function(patch, "Block.list_configs", Block__list_configs);
+    circa_patch_function(patch, "Block.output", Block__output);
+    circa_patch_function(patch, "Block.outputs", Block__outputs);
+    circa_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
+    circa_patch_function(patch, "Block.owner", Block__owner);
+    circa_patch_function(patch, "Block.parent", Block__parent);
+    circa_patch_function(patch, "Block.property", Block__property);
+    circa_patch_function(patch, "Block.properties", Block__properties);
+    circa_patch_function(patch, "Block.source_filename", Block__source_filename);
+    circa_patch_function(patch, "Block.term_named", Block__term_named);
+    circa_patch_function(patch, "Block.terms", Block__terms);
+    circa_patch_function(patch, "Block.walk_terms", Block__walk_terms);
+    circa_patch_function(patch, "Term.assign", Term__assign);
+    circa_patch_function(patch, "Term.asint", Term__asint);
+    circa_patch_function(patch, "Term.asfloat", Term__asfloat);
+    circa_patch_function(patch, "Term.id", Term__id);
+    circa_patch_function(patch, "Term.index", Term__index);
+    circa_patch_function(patch, "Term.function", Term__function);
+    circa_patch_function(patch, "Term.get_type", Term__type);
+    circa_patch_function(patch, "Term.input", Term__input);
+    circa_patch_function(patch, "Term.inputs", Term__inputs);
+    circa_patch_function(patch, "Term.name", Term__name);
+    circa_patch_function(patch, "Term.num_inputs", Term__num_inputs);
+    circa_patch_function(patch, "Term.parent", Term__parent);
+    circa_patch_function(patch, "Term.contents", Term__contents);
+    circa_patch_function(patch, "Term.is_input", Term__is_input);
+    circa_patch_function(patch, "Term.is_output", Term__is_output);
+    circa_patch_function(patch, "Term.is_null", Term__is_null);
+    circa_patch_function(patch, "Term.is_value", Term__is_value);
+    circa_patch_function(patch, "Term.source_location", Term__source_location);
+    circa_patch_function(patch, "Term.location_string", Term__location_string);
+    circa_patch_function(patch, "Term.global_id", Term__global_id);
+    circa_patch_function(patch, "Term.to_string", Term__to_string);
+    circa_patch_function(patch, "Term.unique_name", Term__unique_name);
+    circa_patch_function(patch, "Term.properties", Term__properties);
+    circa_patch_function(patch, "Term.has_property", Term__has_property);
+    circa_patch_function(patch, "Term.property", Term__property);
+    circa_patch_function(patch, "Term.property_opt", Term__property_opt);
+    circa_patch_function(patch, "Term.has_input_property", Term__has_input_property);
+    circa_patch_function(patch, "Term.input_property", Term__input_property);
+    circa_patch_function(patch, "Term.input_property_opt", Term__input_property_opt);
+    circa_patch_function(patch, "Term.trace_dependents", Term__trace_dependents);
+    circa_patch_function(patch, "Term.value", Term__value);
+    circa_patch_function(patch, "Term.set_value", Term__set_value);
 }
 
 } // namespace circa

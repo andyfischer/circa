@@ -414,12 +414,12 @@ void path_delete_func(VM* vm)
 
 void selector_setup_funcs(NativePatch* patch)
 {
-    circa_patch_function2(patch, "selector", evaluate_selector);
-    circa_patch_function2(patch, "get_with_selector", get_with_selector_evaluate);
-    circa_patch_function2(patch, "set_with_selector", set_with_selector_evaluate);
-    circa_patch_function2(patch, "get", path_get_func);
-    circa_patch_function2(patch, "set", path_set_func);
-    circa_patch_function2(patch, "delete", path_delete_func);
+    circa_patch_function(patch, "selector", evaluate_selector);
+    circa_patch_function(patch, "get_with_selector", get_with_selector_evaluate);
+    circa_patch_function(patch, "set_with_selector", set_with_selector_evaluate);
+    circa_patch_function(patch, "get", path_get_func);
+    circa_patch_function(patch, "set", path_set_func);
+    circa_patch_function(patch, "delete", path_delete_func);
 }
 
 } // namespace circa

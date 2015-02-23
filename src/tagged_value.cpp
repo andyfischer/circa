@@ -1129,10 +1129,6 @@ Value* circa_index(Value* container, int index)
 {
     return get_index(container, index);
 }
-int circa_count(Value* container)
-{
-    return list_length(container);
-}
 int circa_length(Value* container)
 {
     return list_length(container);
@@ -1223,7 +1219,7 @@ void circa_set_vec3(Value* container, float x, float y, float z)
 {
     if (!circa_is_list(container))
         circa_set_list(container, 3);
-    else if (circa_count(container) != 3)
+    else if (circa_length(container) != 3)
         circa_resize(container, 3);
     else
         circa_touch(container);
@@ -1236,7 +1232,7 @@ void circa_set_vec4(Value* container, float x, float y, float z, float w)
 {
     if (!circa_is_list(container))
         circa_set_list(container, 4);
-    else if (circa_count(container) != 4)
+    else if (circa_length(container) != 4)
         circa_resize(container, 4);
     else
         circa_touch(container);

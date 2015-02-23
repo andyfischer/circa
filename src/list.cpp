@@ -741,8 +741,8 @@ int list_find_field_index_by_name(Type* listType, const char* name)
     if (names == NULL)
         return -1;
 
-    for (int i=0; i < circa_count(names); i++)
-        if (string_equals(circa_index(names, i), name))
+    for (int i=0; i < names->length(); i++)
+        if (string_equals(names->index(i), name))
             return i;
 
     // Not found
@@ -898,10 +898,10 @@ namespace list_t {
         // looking at the result.
         if (subject && subject->function == FUNCS.make_list)
         {
-            if (subject->numInputs() != circa_count(expectedElementTypes))
+            if (subject->numInputs() != expectedElementTypes->length())
                 return query->fail();
 
-            for (int i=0; i < circa_count(expectedElementTypes); i++)
+            for (int i=0; i < expectedElementTypes->length(); i++)
                 if (!circa::term_output_always_satisfies_type(
                             subject->input(i), as_type(circa_index(expectedElementTypes, i))))
                     return query->fail();
@@ -917,8 +917,8 @@ namespace list_t {
 
         bool anyUnableToDetermine = false;
 
-        for (int i=0; i < circa_count(expectedElementTypes); i++) {
-            if (i >= circa_count(subjectElementTypes))
+        for (int i=0; i < expectedElementTypes->length(); i++) {
+            if (i >= subjectElementTypes->length())
                 return query->fail();
 
             StaticTypeQuery::Result result = run_static_type_query(
