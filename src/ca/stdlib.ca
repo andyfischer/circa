@@ -565,19 +565,27 @@ def Module.to_func(self) -> Func
   self.block.to_func
 def Module.to_vm(self) -> VM
   self.block.to_vm
-def Module.to_vm(self) -> VM
-  self.block.to_vm
-
-def load_script(String filename) -> Block
-  -- Load a script file with the given filename.
+def Module._load(self) -> Block
+def Module.is_local(self) -> bool
+  not self.relativeTo.is_null
 
 def require(String name) -> Module
+  m = Module.make(name, Block.make)
+  m._load
+  require_check(m)
+  m
+
 def require_local(String name) -> Module
+  relativeTo = reflect_caller(1).parent
+  m = Module.make(name, relativeTo)
+  m._load
+  require_check(m)
+  m
 
 def require_check(Module module)
   block = module.resolve
   if block.is_null
-    error("Couldn't find module: " module.name)
+    error("Couldn't find ", cond(module.is_local, "local ", "") "module: " module.name)
 
   if block.has_static_error
     msg = [str("Module '" module.name "' has static errors: ")]

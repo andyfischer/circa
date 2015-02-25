@@ -1,6 +1,6 @@
 
-require ./lib1
-require ./lib2
+require_local lib1
+require_local lib2
 
 funcs = [lib1.:f, lib2.:f]
 

@@ -1,5 +1,5 @@
 
-require ./lib1
+require_local lib1
 
 print('evaluating lib2.ca')
 
@@ -7,3 +7,6 @@ def f(i)
   print('Calling lib2.f with ' i)
   print('lib2.f is calling lib1.f ..')
   lib1.f(i)
+
+def g(i)
+  print('Called lib2.g with ' i)

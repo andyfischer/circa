@@ -1,0 +1,4 @@
+calling main('lib1')
+Called lib1.g with 1
+calling main('lib2')
+Called lib2.g with 1

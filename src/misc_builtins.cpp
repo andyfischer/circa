@@ -851,6 +851,13 @@ void Module__get(VM* vm)
     copy(term_value(term), circa_output(vm));
 }
 
+void Module__load(VM* vm)
+{
+    Value* moduleRef = circa_input(vm, 0);
+    Block* result = load_module(vm->world, as_block(moduleRef->index(1)), moduleRef->index(0));
+    set_block(vm->output(), result);
+}
+
 void String__char_at(VM* vm)
 {
     const char* str = circa_input(vm, 0)->as_str();
@@ -1249,6 +1256,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
 
     circa_patch_function(patch, "Module.block", Module__block);
     circa_patch_function(patch, "Module._get", Module__get);
+    circa_patch_function(patch, "Module._load", Module__load);
 
     circa_patch_function(patch, "String.char_at", String__char_at);
     circa_patch_function(patch, "String.ends_with", String__ends_with);

@@ -1391,14 +1391,8 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     // Try to load the module immediately
     Block* module = load_module(block->world, moduleRelativeTo, &path);
     
-    if (module == NULL) {
-        Value msg;
-        set_string(&msg, "Couldn't find module: ");
-        string_append(&msg, &path);
-        return syntax_error(block, tokens, startPosition, as_cstring(&msg));
-    }
-
-    set_module_ref(term_value(requireTerm), &path, moduleRelativeTo);
+    if (module != NULL)
+        set_module_ref(term_value(requireTerm), &path, moduleRelativeTo);
 
     if (keyword == tok_Require) {
         requireTerm->setBoolProp(s_Syntax_Require, true);

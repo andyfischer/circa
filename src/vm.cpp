@@ -522,6 +522,9 @@ void vm_run(VM* vm, VM* callingVM)
             if (is_null(&vm->incomingUpvalues))
                 return vm->throw_str("internal error: Called a closure without upvalues list");
 
+            if (op.b != vm->incomingUpvalues.length())
+                return vm->throw_str("internal error: Called a closure with wrong number of upvalues");
+
             for (int i=0; i < op.b; i++) {
                 Value* value = vm->incomingUpvalues.index(i);
                 copy(value, get_slot_fast(vm, op.a + i));

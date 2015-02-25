@@ -1,5 +1,5 @@
 
-require ./lib1
+require_local lib1
 
 t = lib1.Lib1_T.make
 

@@ -120,9 +120,23 @@ void resolve_possible_module_path(World* world, Value* path, Value* result)
     set_null(result);
 }
 
+Value* find_enclosing_filename(Block* block)
+{
+    if (block == NULL)
+        return NULL;
+
+    Value* filename = block_get_property(block, s_filename);
+
+    if (filename != NULL)
+        return filename;
+
+    return find_enclosing_filename(get_parent_block(block));
+}
+
 void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut)
 {
-    Value* loadedByFilename = block_get_property(loadedBy, s_filename);
+    Value* loadedByFilename = find_enclosing_filename(loadedBy);
+
     if (loadedByFilename != NULL) {
         Value path;
         get_directory_for_filename(loadedByFilename, &path);
@@ -260,27 +274,7 @@ Term* module_lookup(World* world, Value* moduleRef, Value* name)
     return term;
 }
 
-void require_dynamic(VM* vm)
-{
-    Value* path = vm->input(0);
-    load_module(vm->world, NULL, path);
-    set_module_ref(vm->output(), path, NULL);
-}
 
-void require_local_dynamic(VM* vm)
-{
-    Value* path = vm->input(0);
-    Block* relativeTo = vm_calling_term(vm)->owningBlock;
-    load_module(vm->world, relativeTo, path);
-    set_module_ref(vm->output(), path, relativeTo);
-}
-
-void modules_install_functions(NativePatch* patch)
-{
-    circa_patch_function(patch, "require", require_dynamic);
-    circa_patch_function(patch, "require_local", require_local_dynamic);
-}
- 
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 {
     module_add_search_path(world, path);

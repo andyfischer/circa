@@ -1,0 +1,9 @@
+
+def main(library)
+  lib = require_local(library)
+  lib.g(1)
+
+print("calling main('lib1')")
+main("lib1")
+print("calling main('lib2')")
+main("lib2")

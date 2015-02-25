@@ -1,4 +1,4 @@
 
-require ./lib2
+require_local lib2
 
 lib2.lib1.f(5)

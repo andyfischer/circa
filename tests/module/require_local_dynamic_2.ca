@@ -1,0 +1,3 @@
+
+lib = require_local("lib1")
+lib.f

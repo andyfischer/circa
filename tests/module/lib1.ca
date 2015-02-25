@@ -11,6 +11,9 @@ def Lib1_T.f(self, i)
 def f(i)
     print('Called lib1.f with ' i)
 
+def g(i)
+  print('Called lib1.g with ' i)
+
 def get_x()
     print('Called lib1.get_x')
     1
