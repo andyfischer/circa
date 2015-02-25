@@ -52,7 +52,7 @@ const char op_cast_fixed_type = 0x40; // a: slot, b: const index of type
 const char op_make_func = 0x13;       // a: blockSlot (and output), b: bindingSlot
 const char op_make_list = 0x41;       // a: first, b: count
 
-const char op_add_i = 0x20;
+const char op_add_i = 0x20;           // a: left, b: right, c: dest
 const char op_sub_i = 0x21;
 const char op_mult_i = 0x22;
 const char op_div_i = 0x23;
@@ -72,17 +72,8 @@ const char mop_term_eval_end = 0x2;
 const char mop_term_live = 0x3;
 const char mop_major_block_start = 0x4;
 const char mop_major_block_end = 0x5;
-//const char mop_minor_block_start = 0x6;
-
-// minor_block_end(mopaddr) - the mopaddr points to the matching minor_block_start
-//const char mop_minor_block_end = 0x7;
-
-// mop_state_key(slot) - this minor frame's state key can be found at the given slot
-//const char mop_state_key = 0x8;
-
-// mop_state_header(slot) - the two slots starting at 'slot' are reserved for in-progress
-// state values [incoming, outgoing].
-//const char mop_state_header = 0x9;
+const char mop_minor_block_start = 0x6;
+const char mop_minor_block_end = 0x7;
 
 struct Op {
     u16 a : 16;
@@ -90,6 +81,14 @@ struct Op {
     u16 c : 16;
     u16 opcode : 16;
 };
+
+const int OP_READS_SLOT_A = 0x1;
+const int OP_READS_SLOT_B = 0x2;
+const int OP_READS_SLOT_C = 0x4;
+const int OP_WRITES_SLOT_A = 0x8;
+const int OP_WRITES_SLOT_B = 0x10;
+const int OP_WRITES_SLOT_C = 0x20;
+const int OP_READS_N_SLOTS = 0x40;
 
 struct BytecodeMetadata {
     u32 mopcode;
@@ -100,6 +99,19 @@ struct BytecodeMetadata {
         Term* term;
         Block* block;
     };
+};
+
+struct Liveness {
+    Term* term;
+    int slot;
+};
+
+struct MinorBlock {
+    MinorBlock* parent;
+    int livenessCount;
+    Liveness* liveness;
+    bool hasBeenExited;
+    int firstTemporarySlot;
 };
 
 struct Bytecode {
@@ -117,6 +129,9 @@ struct Bytecode {
     // Used for in-progress major block compilation:
     Value unresolved; // list of {addr, type}
     Value minorBlockInfo; // map of block -> {slot}
+    MinorBlock* currentMinorBlock;
+
+    int nextFreeSlot;
     int slotCount;
 
     // Used for an assembled program:
@@ -124,6 +139,12 @@ struct Bytecode {
 
     void dump();
     void dump_metadata();
+};
+
+struct SlotUsage {
+    int lastReadPc;
+    int lastWritePc;
+    bool notReusable;
 };
 
 void free_bytecode(Bytecode* bc);
@@ -143,5 +164,6 @@ bool mopcode_uses_related_maddr(int mopcode);
 //Block* find_active_minor_block(Bytecode* bc, int addr);
 //int find_active_state_key_slot(Bytecode* bc, int addr);
 //int find_active_state_header_slot(Bytecode* bc, int addr);
+void dump_op(Bytecode* bc, Op op);
 
 } // namespace circa

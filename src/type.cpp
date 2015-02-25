@@ -465,6 +465,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
                 TermList(selfInput, accessorIndex));
         Term* accessorOutput = append_output_placeholder(accessorContents, accessorGetIndex);
         set_declared_type(accessorOutput, as_type(fieldType));
+        finish_building_function(accessorContents);
     }
 
     // Add setter.
@@ -484,6 +485,7 @@ Term* type_decl_append_field(Block* declaration, const char* fieldName, Term* fi
         Term* output = append_output_placeholder(setterContents, setIndex);
         set_declared_type(output, owningType);
         output->setBoolProp(s_ExplicitType, true);
+        finish_building_function(setterContents);
     }
 
     return accessor;

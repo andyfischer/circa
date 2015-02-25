@@ -25,39 +25,47 @@ Term* find_nonlocal_term_for_input(Block* block, Term* input)
     return NULL;
 }
 
-void insert_nonlocal_terms(Block* block)
+void insert_upvalue_terms(Block* block)
 {
+    if (get_parent_block(block) == global_builtins_block())
+        return;
+
     int nextInsertPosition = count_input_placeholders(block);
     Block* compilationUnit = find_nearest_compilation_unit(block);
 
     for (BlockIterator it(block); it; ++it) {
         Term* innerTerm = *it;
 
-        // Skip nonlocal() terms in this block. But, don't skip nonlocal terms that are
+        // Skip upvalue() terms in this block. But, don't skip upvalue terms that are
         // in nested major blocks.
         if (innerTerm->function == FUNCS.upvalue
                 && innerTerm->owningBlock == block)
             continue;
 
-        for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
-            Term* input = innerTerm->input(inputIndex);
+        for (int depIndex=0; depIndex < innerTerm->numDependencies(); depIndex++) {
+            Term* input = innerTerm->dependency(depIndex);
             if (input == NULL)
                 continue;
 
-            // No nonlocal needed for a fixed value.
-            if (is_value(input) || input->function == FUNCS.require)
+            // No upvalue needed for a static value.
+            if (has_static_value(input))
                 continue;
 
-            // No nonlocal needed if input is inside this major block.
+            // Recursive call might not yet have its static value.
+            if (block->owningTerm == input)
+                continue;
+
+            // No upvalue needed if input is inside this major block.
             if (term_is_nested_in_block(input, block))
                 continue;
 
-            // No nonlocal needed if input is in a different compilation unit.
+            // No upvalue needed if input is in a different compilation unit.
             // (Should only happen for a value reference to builtins)
             if (find_nearest_compilation_unit(input->owningBlock) != compilationUnit)
                 continue;
 
-            // This input needs a nonlocal() term.
+
+            // This input needs a upvalue() term.
 
             // Check if we've already created an input for this one
             Term* existing = find_nonlocal_term_for_input(block, input);
@@ -66,7 +74,7 @@ void insert_nonlocal_terms(Block* block)
                 remap_pointers_quick(innerTerm, input, existing);
 
             } else {
-                // Create a new nonlocal term.
+                // Create a new upvalue term.
                 Term* unbound = apply(block, FUNCS.upvalue, TermList(input), &input->nameValue);
                 set_declared_type(unbound, input->type);
                 block->move(unbound, nextInsertPosition++);

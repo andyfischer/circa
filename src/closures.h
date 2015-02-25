@@ -4,7 +4,7 @@
 
 namespace circa {
 
-void insert_nonlocal_terms(Block* block);
+void insert_upvalue_terms(Block* block);
 int count_closure_upvalues(Block* block);
 
 // Returns 0 if no closure bindings are found. Caller should use count_closure_upvalues

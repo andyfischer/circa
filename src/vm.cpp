@@ -20,6 +20,7 @@
 #include "vm.h"
 #include "world.h"
 
+#define TRACE_EXECUTION 0
 #define TRACE_STATE_EXECUTION 0
 
 namespace circa {

@@ -41,10 +41,31 @@ Type* find_implicit_output_type(Block* block)
     return type;
 }
 
-void set_closure_for_declared_function(Term* term)
+void update_static_closure_force(Term* term)
 {
-    if (TYPES.func != NULL)
-        set_closure(term_value(term), term->nestedContents, NULL);
+    ca_assert(TYPES.func != NULL);
+
+    Block* func = term->nestedContents;
+
+    if (count_closure_upvalues(func) != 0) {
+        printf("function has upvalues: %s\n", func->name());
+        internal_error("Can't assign a static closure, function has upvalues");
+    }
+
+    set_closure(term_value(term), func, NULL);
+}
+
+void update_static_closure_if_possible(Term* term)
+{
+    if (TYPES.func == NULL)
+        return;
+
+    Block* func = term->nestedContents;
+
+    if (count_closure_upvalues(func) != 0)
+        return;
+
+    set_closure(term_value(term), func, NULL);
 }
 
 Value* function_find_output_name_from_inputs(Block* contents)
@@ -65,32 +86,29 @@ void finish_building_function(Block* contents)
     // Connect the primary output placeholder. If an input has @ syntax then use the
     // last term with that name. Otherwise, use the last expression.
     Term* primaryOutput = get_output_placeholder(contents, 0);
-    ca_assert(primaryOutput->input(0) == NULL);
+    if (primaryOutput->input(0) == NULL) {
 
-    Term* result = NULL;
+        Term* result = NULL;
 
-    Value* outputName = function_find_output_name_from_inputs(contents);
-    if (outputName != NULL) {
-        result = find_name(contents, outputName);
-    } else {
-        result = find_expression_for_implicit_output(contents);
+        Value* outputName = function_find_output_name_from_inputs(contents);
+        if (outputName != NULL) {
+            result = find_name(contents, outputName);
+        } else {
+            result = find_expression_for_implicit_output(contents);
+        }
+
+
+        if (result != NULL) {
+            set_input(primaryOutput, 0, result);
+            if (!primaryOutput->boolProp(s_ExplicitType, false))
+                set_declared_type(primaryOutput, find_implicit_output_type(contents));
+        }
     }
-
-
-    if (result != NULL) {
-        set_input(primaryOutput, 0, result);
-        if (!primaryOutput->boolProp(s_ExplicitType, false))
-            set_declared_type(primaryOutput, find_implicit_output_type(contents));
-    }
-
-    // Write a list of output_placeholder terms.
 
     update_for_control_flow(contents);
-    insert_nonlocal_terms(contents);
-
+    insert_upvalue_terms(contents);
     if (contents->owningTerm != NULL)
-        set_closure_for_declared_function(contents->owningTerm);
-
+        update_static_closure_if_possible(contents->owningTerm);
     block_finish_changes(contents);
 }
 

@@ -656,12 +656,15 @@ bool term_needs_no_evaluation2(Term* term)
     return false;
 }
 
-bool should_use_term_value(Term* term)
+bool has_static_value(Term* term)
 {
     if (term->function == FUNCS.require && !is_null(term_value(term)))
         return true;
+    if (term->function == FUNCS.require_local && !is_null(term_value(term)))
+        return true;
 
     return is_value(term)
+        || !is_null(term_value(term))
         || term->owningBlock == global_builtins_block();
 }
 

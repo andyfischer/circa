@@ -59,6 +59,7 @@ Bytecode* new_bytecode(VM* vm)
     Bytecode* bc = (Bytecode*) malloc(sizeof(Bytecode));
     initialize_null(&bc->unresolved);
     initialize_null(&bc->minorBlockInfo);
+    bc->currentMinorBlock = NULL;
     initialize_null(&bc->blockToAddr);
     set_list(&bc->unresolved, 0);
     set_hashtable(&bc->minorBlockInfo);
@@ -88,15 +89,14 @@ int reserve_slots(Bytecode* bc, int count)
 {
     int first = bc->slotCount;
     bc->slotCount += count;
+    bc->nextFreeSlot += count;
     return first;
 }
 
 int reserve_new_frame_slots(Bytecode* bc, int inputCount)
 {
     // Reserve slots for a function call. Returns the first slot (the function's output)
-    int top = bc->slotCount + 2;
-    bc->slotCount += inputCount + 3;
-    return top;
+    return reserve_slots(bc, inputCount + 3) + 2;
 }
 
 Value* get_const(Bytecode* bc, int index)
@@ -156,21 +156,61 @@ BytecodeMetadata* append_metadata(Bytecode* bc, u8 mopcode, int slot)
     return md;
 }
 
+void start_minor_block(Bytecode* bc)
+{
+    MinorBlock* minorBlock = (MinorBlock*) malloc(sizeof(MinorBlock));
+    minorBlock->parent = bc->currentMinorBlock;
+    minorBlock->livenessCount = 0;
+    minorBlock->liveness = NULL;
+    minorBlock->hasBeenExited = false;
+    minorBlock->firstTemporarySlot = bc->nextFreeSlot;
+    bc->currentMinorBlock = minorBlock;
+}
+
+void end_minor_block(Bytecode* bc)
+{
+    MinorBlock* minorBlock = bc->currentMinorBlock;
+    bc->currentMinorBlock = minorBlock->parent;
+    free(minorBlock);
+    //bc->nextFreeSlot = minorBlock->firstTemporarySlot;
+}
+
+bool minor_block_was_exited(Bytecode* bc)
+{
+    return bc->currentMinorBlock->hasBeenExited;
+}
+
 void append_liveness(Bytecode* bc, Term* term, int slot)
 {
     append_metadata(bc, mop_term_live, slot)->term = term;
+
+    MinorBlock* minorBlock = bc->currentMinorBlock;
+    minorBlock->livenessCount++;
+    minorBlock->liveness = (Liveness*) realloc(minorBlock->liveness,
+        sizeof(Liveness) * minorBlock->livenessCount);
+    Liveness* liveness = &minorBlock->liveness[minorBlock->livenessCount - 1];
+    liveness->term = term;
+    liveness->slot = slot;
 }
 
-int find_live_slot(Bytecode* bc, Term* term, int addr = -1, bool allowNull = false)
+int find_live_slot(Bytecode* bc, Term* term, bool allowNull = false)
 {
     for (int i=bc->metadataSize-1; i >= 0; i--) {
         BytecodeMetadata md = bc->metadata[i];
-        if (addr != -1 && addr < md.addr)
-            continue;
-
         if (md.mopcode == mop_term_live && md.term == term)
             return md.slot;
     }
+
+#if 0
+    MinorBlock* minorBlock = bc->currentMinorBlock;
+    while (minorBlock != NULL) {
+        for (int i=minorBlock->livenessCount - 1; i >= 0; i--)
+            if (minorBlock->liveness[i].term == term)
+                return minorBlock->liveness[i].slot;
+
+        minorBlock = minorBlock->parent;
+    }
+#endif
 
     if (allowNull)
         return -1;
@@ -201,7 +241,7 @@ void load_term(Bytecode* bc, Term* term, int slot)
         return;
     }
 
-    int liveSlot = find_live_slot(bc, term, -1, true);
+    int liveSlot = find_live_slot(bc, term, true);
 
     if (liveSlot != -1) {
         if (liveSlot != slot)
@@ -209,7 +249,7 @@ void load_term(Bytecode* bc, Term* term, int slot)
         return;
     }
 
-    if (should_use_term_value(term)) {
+    if (has_static_value(term)) {
         int constIndex;
         copy(term_value(term), append_const(bc, &constIndex));
         append_op(bc, op_load_const, constIndex, slot);
@@ -221,7 +261,7 @@ void load_term(Bytecode* bc, Term* term, int slot)
 
 int load_or_find_term(Bytecode* bc, Term* term)
 {
-    int liveSlot = find_live_slot(bc, term, -1, true);
+    int liveSlot = find_live_slot(bc, term, true);
 
     if (liveSlot != -1)
         return liveSlot;
@@ -447,6 +487,14 @@ void write_loop(Bytecode* bc, Block* loop)
     bool produceOutput = term_is_observable(callingTerm);
     blockInfo->insert(s_produceOutput)->set_bool(produceOutput);
 
+    int outputSlot = -1;
+    if (produceOutput) {
+        outputSlot = reserve_new_frame_slots(bc, 1);
+        append_op(bc, op_load_i, 0, outputSlot + 1);
+        call(bc, outputSlot, 1, FUNCS.blank_list->nestedContents);
+        blockInfo->insert(s_outputSlot)->set_int(outputSlot);
+    }
+
     // Load initial values into loop body
     int firstLocalSlot = reserve_slots(bc, count_input_placeholders(loop));
     blockInfo->insert(s_slot)->set_int(firstLocalSlot);
@@ -461,6 +509,8 @@ void write_loop(Bytecode* bc, Block* loop)
         append_liveness(bc, placeholder, slot);
     }
 
+    start_minor_block(bc);
+
     if (is_for_loop(loop)) {
         // Load initial iterator value
         Term* iterator = loop_find_iterator(loop);
@@ -468,14 +518,6 @@ void write_loop(Bytecode* bc, Block* loop)
         load_term(bc, iterator->input(0), iteratorSlot);
         append_liveness(bc, iterator, iteratorSlot);
         blockInfo->insert(s_iterator)->set_int(iteratorSlot);
-    }
-
-    int outputSlot = -1;
-    if (produceOutput) {
-        outputSlot = reserve_new_frame_slots(bc, 1);
-        append_op(bc, op_load_i, 0, outputSlot + 1);
-        call(bc, outputSlot, 1, FUNCS.blank_list->nestedContents);
-        blockInfo->insert(s_outputSlot)->set_int(outputSlot);
     }
     
     // Start loop
@@ -506,6 +548,9 @@ void write_loop(Bytecode* bc, Block* loop)
     
     // Contents
     for (int i=0; i < loop->length(); i++) {
+        if (minor_block_was_exited(bc))
+            break;
+
         Term* term = loop->get(i);
 
         if (term == doneTerm || term == keyTerm || term == advanceTerm)
@@ -544,6 +589,13 @@ void write_loop(Bytecode* bc, Block* loop)
         bc->ops[addr].c = loopFin;
     }
 
+    comment(bc, "loop fin");
+
+    if (should_write_state_header(bc, loop))
+        write_pop_state_frame(bc);
+
+    end_minor_block(bc);
+
     // Update liveness
     if (produceOutput)
         append_liveness(bc, callingTerm, outputSlot);
@@ -555,11 +607,6 @@ void write_loop(Bytecode* bc, Block* loop)
         Term* placeholder = get_input_placeholder(loop, i - 1);
         append_liveness(bc, termOutput, find_live_slot(bc, placeholder));
     }
-
-    comment(bc, "loop fin");
-
-    if (should_write_state_header(bc, loop))
-        write_pop_state_frame(bc);
 }
 
 void loop_advance_iterator(Bytecode* bc, Block* loop)
@@ -718,6 +765,8 @@ void write_normal_call(Bytecode* bc, Term* term)
 
 void write_conditional_case(Bytecode* bc, Block* block, int conditionIndex)
 {
+    start_minor_block(bc);
+
     // Update jump from previous case
     int caseStartAddr = bc->opCount;
 
@@ -753,23 +802,12 @@ void write_conditional_case(Bytecode* bc, Block* block, int conditionIndex)
 
     // Case contents
     for (int i=0; i < block->length(); i++) {
-        write_term(bc, block->get(i));
+        if (minor_block_was_exited(bc))
+            break;
 
-        if (block->get(i)->function == FUNCS.return_func) {
-            comment(bc, "case fin (return)");
-            return;
-        }
+        write_term(bc, block->get(i));
     }
 
-    close_conditional_case(bc, block);
-
-    // Jump to switch-finish.
-    int addr = append_op(bc, op_jump, 0, 0, 0);
-    append_unresolved(bc, addr, s_conditional_done);
-}
-
-void close_conditional_case(Bytecode* bc, Block* block)
-{
     close_state_frame(bc, block, NULL);
 
     comment(bc, "case move outputs");
@@ -797,12 +835,18 @@ void close_conditional_case(Bytecode* bc, Block* block)
     }
 
     comment(bc, "case fin");
+
+    // Jump to switch-finish.
+    int addr = append_op(bc, op_jump, 0, 0, 0);
+    append_unresolved(bc, addr, s_conditional_done);
+    end_minor_block(bc);
 }
 
 void write_conditional_chain(Bytecode* bc, Block* block)
 {
     comment(bc, "conditional start");
     int startAddr = bc->opCount;
+    start_minor_block(bc);
 
     if (should_write_state_header(bc, block))
         write_state_header_with_term_name(bc, block->owningTerm);
@@ -833,6 +877,9 @@ void write_conditional_chain(Bytecode* bc, Block* block)
 
     close_state_frame(bc, block, NULL);
 
+    comment(bc, "conditional fin");
+    end_minor_block(bc);
+
     // Update liveness for term outputs
     for (int i=0;; i++) {
         Term* placeholder = get_output_placeholder(block, i);
@@ -842,7 +889,6 @@ void write_conditional_chain(Bytecode* bc, Block* block)
         append_liveness(bc, output, firstOutputSlot + i);
     }
 
-    comment(bc, "conditional fin");
 }
 
 void func_call(Bytecode* bc, Term* term)
@@ -858,6 +904,23 @@ void func_call(Bytecode* bc, Term* term)
     }
 
     load_term(bc, term->input(0), top);
+    append_op(bc, op_func_call_d, top, inputCount);
+    append_liveness(bc, term, top);
+}
+
+void func_call_implicit(Bytecode* bc, Term* term)
+{
+    comment(bc, "func call (implicit)");
+
+    int inputCount = term->numInputs();
+    int top = reserve_new_frame_slots(bc, inputCount);
+
+    for (int i=0; i < inputCount; i++) {
+        int inputSlot = top + 1 + i;
+        load_term(bc, term->input(i), inputSlot);
+    }
+
+    load_term(bc, term->function, top);
     append_op(bc, op_func_call_d, top, inputCount);
     append_liveness(bc, term, top);
 }
@@ -1091,14 +1154,14 @@ void write_term(Bytecode* bc, Term* term)
     else if (term->function == FUNCS.loop_condition_bool)
         loop_condition_bool(bc, term);
 
-    //else if (term->function == FUNCS.case_condition_bool)
-    //    case_condition_bool(bc, term);
-
     else if (term->function == FUNCS.switch_func || term->function == FUNCS.if_block)
         write_conditional_chain(bc, term->nestedContents);
 
     else if (term->function == FUNCS.func_call || term->function == FUNCS.func_call_method)
         func_call(bc, term);
+
+    else if (!is_function(term->function) && is_closure(term_value(term->function)))
+        func_call_implicit(bc, term);
 
     else if (term->function == FUNCS.func_apply || term->function == FUNCS.func_apply_method)
         func_apply(bc, term);
@@ -1131,11 +1194,10 @@ void write_term(Bytecode* bc, Term* term)
         mop_find_active_mopcode(bc, mop_term_eval_start, -1);
 }
 
-
 void handle_function_inputs(Bytecode* bc, Block* block)
 {
     // always reserve a slot for output
-    bc->slotCount = 1;
+    reserve_slots(bc, count_input_placeholders(block) + 1);
 
     for (int i=0;; i++) {
         Term* placeholder = get_input_placeholder(block, i);
@@ -1143,7 +1205,6 @@ void handle_function_inputs(Bytecode* bc, Block* block)
             break;
 
         int inputSlot = 1 + i;
-        bc->slotCount = inputSlot + 1;
 
         bool castNecessary = declared_type(placeholder) != TYPES.any;
 
@@ -1161,8 +1222,8 @@ void handle_function_inputs(Bytecode* bc, Block* block)
 
     int upvalueCount = count_closure_upvalues(block);
     if (upvalueCount > 0) {
-        int firstSlot = bc->slotCount;
-        bc->slotCount += upvalueCount;
+        int firstSlot = bc->nextFreeSlot;
+        reserve_slots(bc, upvalueCount);
         append_op(bc, op_splat_upvalues, firstSlot, upvalueCount);
 
         int firstUpvalue = find_first_closure_upvalue(block);
@@ -1181,6 +1242,7 @@ void major_block_contents(Bytecode* bc, Block* block)
         return;
     }
 
+    start_minor_block(bc);
     handle_function_inputs(bc, block);
 
     if (should_write_state_header(bc, block))
@@ -1199,16 +1261,18 @@ void major_block_contents(Bytecode* bc, Block* block)
         // Subroutine
 
         for (int i=0; i < block->length(); i++) {
-            write_term(bc, block->get(i));
+            if (minor_block_was_exited(bc))
+                break;
 
-            if (block->get(i)->function == FUNCS.return_func)
-                return;
+            write_term(bc, block->get(i));
         }
 
         close_state_frame(bc, block, NULL);
         set_subroutine_output(bc, block, get_output_placeholder(block, 0)->input(0));
         append_op(bc, op_ret_or_stop);
     }
+
+    end_minor_block(bc);
 }
 
 void set_subroutine_output(Bytecode* bc, Block* block, Term* result)
@@ -1227,6 +1291,103 @@ void set_subroutine_output(Bytecode* bc, Block* block, Term* result)
         if (castNecessary)
             cast_fixed_type(bc, 0, declared_type(placeholder));
     }
+}
+
+int op_attributes(Op op)
+{
+    switch (op.opcode) {
+    case op_uncompiled_call:
+    case op_call:
+    case op_func_call_s:
+    case op_func_call_d:
+    case op_dyn_method:
+        return OP_READS_N_SLOTS | OP_WRITES_SLOT_A;
+    case op_func_apply_d:
+        return OP_READS_SLOT_A | OP_READS_SLOT_C | OP_WRITES_SLOT_A;
+    case op_jump:
+        return 0;
+    case op_jif:
+    case op_jnif:
+        return OP_READS_SLOT_A;
+    case op_jeq:
+    case op_jneq:
+    case op_jgt:
+    case op_jgte:
+    case op_jlt:
+    case op_jlte:
+        return OP_READS_SLOT_A | OP_READS_SLOT_B;
+    case op_ret:
+    case op_ret_or_stop:
+    case op_grow_frame:
+        return 0;
+    case op_load_const:
+    case op_load_i:
+        return OP_WRITES_SLOT_B;
+    case op_varargs_to_list:
+        return OP_WRITES_SLOT_A;
+    case op_splat_upvalues:
+    case op_native:
+        return 0;
+    case op_copy:
+    case op_move:
+        return OP_READS_SLOT_A | OP_WRITES_SLOT_B;
+    case op_set_null:
+        return OP_WRITES_SLOT_B;
+    case op_cast_fixed_type:
+        return OP_READS_SLOT_A | OP_WRITES_SLOT_A;
+    case op_make_func:
+    case op_make_list:
+    case op_add_i:
+    case op_sub_i:
+    case op_mult_i:
+    case op_div_i:
+        return OP_READS_SLOT_A | OP_READS_SLOT_B | OP_WRITES_SLOT_C;
+    case op_push_state_frame:
+        return OP_READS_SLOT_B;
+    case op_pop_state_frame:
+    case op_pop_discard_state_frame:
+    case op_get_state_value:
+        return OP_READS_SLOT_A | OP_WRITES_SLOT_B;
+    case op_save_state_value:
+        return OP_READS_SLOT_A | OP_READS_SLOT_B;
+    case op_comment:
+    default:
+        return 0;
+    }
+}
+
+void perform_slot_compaction(Bytecode* bc)
+{
+#if 0
+    SlotUsage* slotUsage = (SlotUsage*) malloc(bc->slotCount*sizeof(SlotUsage));
+
+    for (int i=0; i < bc->slotCount; i++) {
+        slotUsage[i].lastReadPc = -1;
+        slotUsage[i].lastWritePc = -1;
+        slotUsage[i].notReusable = false;
+    }
+
+    for (int pc=0; pc < bc->opCount; pc++) {
+        Op op = bc->ops[pc];
+        int attrs = op_attributes(op);
+        if (attrs & OP_READS_SLOT_A)
+            slotUsage[op.a].lastReadPc = pc;
+        if (attrs & OP_READS_SLOT_B)
+            slotUsage[op.b].lastReadPc = pc;
+        if (attrs & OP_READS_SLOT_C)
+            slotUsage[op.c].lastReadPc = pc;
+        if (attrs & OP_WRITES_SLOT_A)
+            slotUsage[op.a].lastWritePc = pc;
+        if (attrs & OP_WRITES_SLOT_B)
+            slotUsage[op.b].lastWritePc = pc;
+        if (attrs & OP_WRITES_SLOT_C)
+            slotUsage[op.c].lastWritePc = pc;
+        if (attrs & OP_READS_N_SLOTS) {
+            for (int slot=op.a; slot < op.a + op.b; slot++)
+                slotUsage[slot].lastReadPc = pc;
+        }
+    }
+#endif
 }
 
 Bytecode* compile_major_block(Block* block, VM* vm)
@@ -1248,6 +1409,7 @@ Bytecode* compile_major_block(Block* block, VM* vm)
     int growFrameAddr = append_op(bc, op_grow_frame, 0);
 
     major_block_contents(bc, block);
+    perform_slot_compaction(bc);
 
     bc->ops[growFrameAddr].a = bc->slotCount;
 
@@ -1573,7 +1735,7 @@ int mop_find_active_mopcode(Bytecode* bc, int mopcode, int maddr)
 bool mopcode_uses_related_maddr(int mopcode)
 {
     return mopcode == mop_term_eval_end
-        //|| mopcode == mop_minor_block_end
+        || mopcode == mop_minor_block_end
         || mopcode == mop_major_block_end;
 }
 

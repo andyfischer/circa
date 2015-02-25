@@ -503,12 +503,18 @@ void bootstrap_kernel()
         finish_building_function(nested_contents(FUNCS.function_decl));
     }
 
-    // Also, now that Func type is available, make sure all builtin functions have closure values.
-    for (BlockIterator it(builtins); it; ++it)
-        if (is_function(*it)) {
-            set_declared_type(*it, TYPES.func);
-            set_closure_for_declared_function(*it);
+    // Also, now that Func type is available, update all static closures.
+    for (BlockIterator it(builtins); it; ++it) {
+        Term* term = *it;
+        if (is_function(term)) {
+            set_declared_type(term, TYPES.func);
+            if (term->owningBlock == builtins)
+                // Functions at top level must be static closures
+                update_static_closure_force(term);
+            else
+                update_static_closure_if_possible(term);
         }
+    }
 
     nested_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 

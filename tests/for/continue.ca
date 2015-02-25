@@ -4,14 +4,3 @@ for i in [0, 1, 2, 3]
     continue
     print('don\'t print this')
 
-for i in [0, 1, 2, 3]
-    print('first loop reached top: ' i)
-    if i == 2
-      continue
-    print('first loop reached bottom: ' i)
-
--- This once had a bug, the get_index was going out of range
-for i in [0, 1, 2, 3]
-    print('step: ' i)
-    continue
-

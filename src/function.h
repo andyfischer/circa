@@ -12,7 +12,8 @@ namespace circa {
 // Create a declared function
 Term* create_function(Block* block, const char* name);
 
-void set_closure_for_declared_function(Term* term);
+void update_static_closure_force(Term* term);
+void update_static_closure_if_possible(Term* term);
 void finish_building_function(Block* func);
 
 Type* derive_specialized_output_type(Term* function, Term* call);

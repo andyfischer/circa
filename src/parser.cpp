@@ -1637,7 +1637,7 @@ ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context)
         }*/
 
         append_output_placeholder(contents, initialValue);
-        insert_nonlocal_terms(contents);
+        insert_upvalue_terms(contents);
         block_finish_changes(contents);
 
         // If an initial value was used and no specific type was mentioned, use

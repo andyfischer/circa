@@ -1,8 +1,8 @@
 
 --require canvas
-require ui_script_control
-require code_view
-require time
+require_local ui_script_control
+require_local code_view
+require_local time
 
 state userScript = load_script(env(:scriptName)).to_stack
 

@@ -166,18 +166,11 @@ Term* get_input_placeholder(Block* block, int index)
     return term;
 }
 
-Term* get_effective_input_placeholder(Block* block, int inputIndex)
-{
-    if (has_variable_args(block))
-        return get_input_placeholder(block, 0);
-    else
-        return get_input_placeholder(block, inputIndex);
-}
-
 int input_placeholder_index(Term* inputPlaceholder)
 {
     return inputPlaceholder->index;
 }
+
 int output_placeholder_index(Term* outputPlaceholder)
 {
     return outputPlaceholder->owningBlock->length() - 1 - outputPlaceholder->index;

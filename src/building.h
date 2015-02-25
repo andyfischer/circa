@@ -22,9 +22,6 @@ Term* apply_dynamic_method(Block* block, Symbol methodName, TermList const& inpu
 // Example:  [Term#add [Term#a Term#b] :name 'c']
 Term* apply_spec(Block* block, Value* spec);
 
-// Create a duplicate of the given term. Doesn't duplicate nestedContents.
-Term* create_duplicate(Block* block, Term* original, Value* name);
-
 // Inputs and user lists:
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, TermList const& inputs);

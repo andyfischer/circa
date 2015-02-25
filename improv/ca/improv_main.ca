@@ -1,15 +1,35 @@
 
-require ./input
-require ./editor_main
-require ./improv
 
-def make_window()
-  improv.make_window([0 0 1000 600])
+def main()
+    require_local input
+    require_local editor_main
+    require_local improv
 
-state main_window = make_window()
+    def make_window()
+      improv.make_window([0 0 1000 600])
 
+    state main_window = make_window()
+
+    userScript = load_script(env(:scriptName))
+    if userScript.is_null
+      print('script not found: ' env(:scriptName))
+      return
+
+    state VM user_vm = userScript.to_vm
+
+    user_vm.call
+
+vm = make_vm(main)
+vm.call
+
+if vm.has_error
+  require stack_trace
+  stack_trace.dump(vm)
+
+{-
 state editor = editor_main.to_vm
 state userInput = input.new
+-}
 
 
 {-

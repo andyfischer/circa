@@ -1138,6 +1138,13 @@ void apply_patch_hosted(VM* vm)
     apply_patch(result, circa_input(vm, 1));
 }
 
+void load_script(VM* vm)
+{
+    Value* filename = vm->input(0);
+    Block* block = load_module_by_filename(vm->world, filename);
+    set_block(vm->output(), block);
+}
+
 #if 0
 void destructure_list(Stack* stack)
 {
@@ -1277,9 +1284,8 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "file_version", file__version);
     circa_patch_function(patch, "file_exists", file__exists);
     circa_patch_function(patch, "file_read_text", file__read_text);
-    circa_patch_function(patch, "channel_send", channel_send);
-    circa_patch_function(patch, "channel_read", channel_read);
 #endif
+    circa_patch_function(patch, "load_script", load_script);
 
     circa_patch_function(patch, "noise", noise);
     circa_patch_function(patch, "not_equals", not_equals);
@@ -1300,6 +1306,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "test_spy", test_spy);
     circa_patch_function(patch, "test_oracle", test_oracle);
     circa_patch_function(patch, "_perf_stats_dump", perf_stats_dump);
+
 #if 0
     circa_patch_function(patch, "global_script_version", global_script_version);
 #endif

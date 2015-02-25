@@ -1822,6 +1822,7 @@ const char* find_builtin_file(const char* filename) {
         "def case(bool b :optional)\n"
         "def switch(any input :optional) -> any\n"
         "def _upvalue(term :ref) -> any\n"
+        "def load_script(String filename) -> Block\n"
         "\n"
         "-- List values\n"
         "def make_list(any vals :multiple) -> List\n"

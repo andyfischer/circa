@@ -35,8 +35,6 @@ bool is_declared_state(Term* term);
 
 bool is_an_unknown_identifier(Term* term);
 
-// Checks if term->nestedContents is a major block.
-bool is_major_block(Term* term);
 bool is_major_block(Block* block);
 bool is_minor_block(Block* block);
 bool is_module(Block* block);
@@ -53,11 +51,6 @@ int find_index_of_vararg(Block* block);
 // Input & output placeholders
 Term* get_input_placeholder(Block* block, int index);
 
-// Get the input placeholder that corresponds with a call-site index. This takes varargs
-// into account.
-Term* get_effective_input_placeholder(Block* block, int inputIndex);
-
-int get_function_output_count(Block* block);
 int input_placeholder_index(Term* inputPlaceholder);
 int output_placeholder_index(Term* outputPlaceholder);
 bool is_input_placeholder(Term* term);
@@ -100,7 +93,6 @@ struct RawOutputPrefs
     bool showProperties;
     RawOutputPrefs() : indentLevel(0), showAllIDs(false), showProperties(false) {}
 };
-
 
 void print_block(Block* block, RawOutputPrefs* prefs, Value* out);
 void print_term(Term* term, RawOutputPrefs* prefs, Value* out);

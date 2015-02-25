@@ -1,2 +1,4 @@
 Module 'lib_with_static_error' has static errors: 
   [tests/module/lib_with_static_error.ca 2,0 - 3,0] Syntax error: Expected: )
+Module 'lib_with_static_error' has static errors: 
+  [tests/module/lib_with_static_error.ca 2,0 - 3,0] Syntax error: Expected: )

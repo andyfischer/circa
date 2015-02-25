@@ -26,6 +26,7 @@ def if() -> any
 def case(bool b :optional)
 def switch(any input :optional) -> any
 def _upvalue(term :ref) -> any
+def load_script(String filename) -> Block
 
 -- List values
 def make_list(any vals :multiple) -> List

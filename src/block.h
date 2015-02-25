@@ -168,9 +168,6 @@ void erase_term(Term* term);
 // Delete the contents of 'block'.
 void clear_block(Block* block);
 
-// Deep copy of a block. Handles the migration of inner term references.
-void duplicate_block(Block* source, Block* dest);
-
 // Compile the string as a statement list. Appends new terms to the block and
 // returns the last new term.
 Term* compile(Block* block, const char* str);
@@ -179,15 +176,6 @@ void load_script_from_text(Block* block, const char* text);
 void load_script(Block* block, const char* filename);
 
 void post_module_load(Block* block);
-
-// Create an include() call that loads the given file. Returns the included
-// block.
-Block* include_script(Block* block, const char* filename);
-
-// Create a load_script() call that loads the given file. The load_script
-// function doesn't evaluate the contents when called. Returns the included
-// block.
-Block* load_script_term(Block* block, const char* filename);
 
 void remove_nulls(Block* block);
 
@@ -214,8 +202,6 @@ bool block_is_evaluation_empty(Block* block);
 void block_set_evaluation_empty(Block* block, bool empty);
 bool block_has_effects(Block* block);
 void block_set_has_effects(Block* block, bool hasEffects);
-
-
 
 Type* get_input_type(Block* block, int index);
 Type* get_output_type(Block* block, int index);

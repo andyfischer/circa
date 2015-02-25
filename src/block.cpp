@@ -701,38 +701,6 @@ Term* find_term_by_id(Block* block, int id)
     return NULL;
 }
 
-void duplicate_block_nested(TermMap& newTermMap, Block* source, Block* dest)
-{
-    // Duplicate every term
-    for (int index=0; index < source->length(); index++) {
-        Term* source_term = source->get(index);
-
-        Term* dest_term = create_duplicate(dest, source_term, &source_term->nameValue);
-
-        newTermMap[source_term] = dest_term;
-
-        // duplicate nested contents
-        clear_block(nested_contents(dest_term));
-        duplicate_block_nested(newTermMap,
-                nested_contents(source_term), nested_contents(dest_term));
-    }
-}
-
-void duplicate_block(Block* source, Block* dest)
-{
-    TermMap newTermMap;
-
-    duplicate_block_nested(newTermMap, source, dest);
-
-    // Remap pointers
-    for (int i=0; i < dest->length(); i++)
-        remap_pointers(dest->get(i), newTermMap);
-
-    // Include/overwrite names
-    dest->names.append(source->names);
-    dest->names.remapPointers(newTermMap);
-}
-
 Term* compile(Block* block, const char* str)
 {
     return parse(block, parse_statement_list, str);
@@ -776,22 +744,6 @@ void load_script(Block* block, const char* filename)
     update_static_error_list(block);
 
     return;
-}
-
-Block* include_script(Block* block, const char* filename)
-{
-    ca_assert(block != NULL);
-    Term* filenameTerm = create_string(block, filename);
-    Term* includeFunc = apply(block, FUNCS.include_func, TermList(filenameTerm));
-    return nested_contents(includeFunc);
-}
-
-Block* load_script_term(Block* block, const char* filename)
-{
-    ca_assert(block != NULL);
-    Term* filenameTerm = create_string(block, filename);
-    Term* includeFunc = apply(block, FUNCS.load_script, TermList(filenameTerm));
-    return nested_contents(includeFunc);
 }
 
 bool block_has_property(Block* block, Symbol key)

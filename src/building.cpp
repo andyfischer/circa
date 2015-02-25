@@ -72,7 +72,6 @@ Term* apply(Block* block, Term* function, TermList const& inputs, Value* name)
     change_function(term, function);
 
     update_unique_name(term);
-    update_extra_outputs(term);
 
     // Post-compile steps
 
@@ -381,28 +380,6 @@ void rename(Term* term, const char* name)
     Value nameVal;
     set_string(&nameVal, name);
     return rename(term, &nameVal);
-}
-
-Term* create_duplicate(Block* block, Term* original, Value* name)
-{
-    ca_assert(original != NULL);
-
-    TermList inputs;
-    original->inputsToList(inputs);
-
-    Term* term = apply(block, original->function, inputs, name);
-    set_declared_type(term, original->type);
-
-    copy(term_value(original), term_value(term));
-
-    term->sourceLoc = original->sourceLoc;
-    copy(&original->properties, &term->properties);
-
-    // Special case for certain types, update declaringTerm.
-    if (is_type(term))
-        as_type(term_value(term))->declaringTerm = term;
-
-    return term;
 }
 
 Term* create_value(Block* block, Type* type, const char* name)
@@ -1176,9 +1153,9 @@ void remove_term(Term* term)
 
 void remap_pointers_quick(Term* term, Term* old, Term* newTerm)
 {
-    for (int i=0; i < term->numInputs(); i++)
-        if (term->input(i) == old)
-            set_input(term, i, newTerm);
+    for (int i=0; i < term->numDependencies(); i++)
+        if (term->dependency(i) == old)
+            term->setDependency(i, newTerm);
 }
 
 void remap_pointers_quick(Block* block, Term* old, Term* newTerm)
