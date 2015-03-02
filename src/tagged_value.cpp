@@ -1057,6 +1057,8 @@ void ValueArray::clear()
 
 Value* ValueArray::operator[](int index)
 {
+    ca_assert(index >= 0);
+    ca_assert(index < size);
     return &items[index];
 }
 

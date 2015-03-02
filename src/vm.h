@@ -43,6 +43,7 @@ struct VM {
     Value* input(int index);
     Value* output();
     void throw_error(Value* err);
+    void throw_error_height(int height, Value* err);
     void throw_str(const char* str);
     void dump();
     bool has_error() { return error; }

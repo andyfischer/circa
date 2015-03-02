@@ -1,1 +1,3 @@
-Error occurred: 'Syntax error: Couldn't find module: jfkdsjflkds'
+[tests/module/nonexistant_module.ca:0] 
+ [:586 inside require()] 
+  Error: Couldn't find module: jfkdsjflkds

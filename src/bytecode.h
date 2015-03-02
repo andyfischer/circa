@@ -21,7 +21,7 @@ const char op_uncompiled_call = 0x3;  // a: top, b: inputCount, c: const index o
 const char op_call = 0x8;             // a: top, b: inputCount, c: addr
 const char op_func_call_s = 0x43;     // a: top, b: inputCount, c: addr
 const char op_func_call_d = 0x2;      // a: top, b: inputCount
-const char op_func_apply_d = 0x39;    // a: top,                c: slot index of func
+const char op_func_apply_d = 0x39;    // a: top & slot of input func
 const char op_dyn_method = 0x38;      // a: top, b: inputCount, c: const index of [name,location]
 
 const char op_jump = 0x4;             // c: addr
@@ -57,7 +57,8 @@ const char op_sub_i = 0x21;
 const char op_mult_i = 0x22;
 const char op_div_i = 0x23;
 
-const char op_push_state_frame = 0x35; // a: frameSlot, b: keySlot
+const char op_push_state_frame = 0x35; // a: frameSlot
+const char op_push_state_frame_dkey = 0x47; // a: frameSlot, b: keySlot
 const char op_pop_state_frame = 0x36;
 const char op_pop_discard_state_frame = 0x46;
 const char op_get_state_value = 0x37; // a: key, b: dest
@@ -87,7 +88,6 @@ const int OP_READS_SLOT_B = 0x2;
 const int OP_READS_SLOT_C = 0x4;
 const int OP_WRITES_SLOT_A = 0x8;
 const int OP_WRITES_SLOT_B = 0x10;
-const int OP_WRITES_SLOT_C = 0x20;
 const int OP_READS_N_SLOTS = 0x40;
 
 struct BytecodeMetadata {
@@ -102,14 +102,13 @@ struct BytecodeMetadata {
 };
 
 struct Liveness {
-    Term* term;
-    int slot;
+    Term* term;       // may be NULL
+    int firstWritePc; // may be -1
+    int lastReadPc;   // may be -1
 };
 
 struct MinorBlock {
     MinorBlock* parent;
-    int livenessCount;
-    Liveness* liveness;
     bool hasBeenExited;
     int firstTemporarySlot;
 };
@@ -129,6 +128,8 @@ struct Bytecode {
     // Used for in-progress major block compilation:
     Value unresolved; // list of {addr, type}
     Value minorBlockInfo; // map of block -> {slot}
+    int livenessCount;
+    Liveness* liveness;
     MinorBlock* currentMinorBlock;
 
     int nextFreeSlot;
@@ -139,12 +140,6 @@ struct Bytecode {
 
     void dump();
     void dump_metadata();
-};
-
-struct SlotUsage {
-    int lastReadPc;
-    int lastWritePc;
-    bool notReusable;
 };
 
 void free_bytecode(Bytecode* bc);

@@ -1,0 +1,4 @@
+
+require_local libc
+
+libc.three | print

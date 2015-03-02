@@ -2,6 +2,9 @@ def f()
     for i in [10 12 14]
         state s = i
 
-int = make_vm(f)
-int.call
-print(int.get_state)
+vm = make_vm(f)
+vm.call
+print(vm.get_state)
+
+--require bytecode_analysis
+--bytecode_analysis.dump(vm)

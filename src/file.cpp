@@ -139,9 +139,7 @@ void get_path_relative_to_source(caBlock* relativeTo, Value* relPath, Value* res
         string_append(result, "/");
         string_append(result, relPath);
     }
-
 }
-
 
 void join_path(Value* left, Value* right)
 {

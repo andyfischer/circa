@@ -550,13 +550,27 @@ void arctan_func(VM* vm)
     set_float(circa_output(vm), radians_to_degrees(result));
 }
 
-#if 0
-void rpath(Stack* stack)
+void path_dirname(VM* vm)
 {
-    caBlock* block = circa_caller_block(stack);
-    get_path_relative_to_source(block, circa_input(stack, 0), circa_output(stack, 0));
+    Value* path = vm->input(0);
+    get_directory_for_filename(path, vm->output());
 }
-#endif
+
+void path_join(VM* vm)
+{
+    Value* left = vm->output();
+    Value* args = vm->input(0);
+    if (args->length() == 0) {
+        set_string(left, "");
+        return;
+    }
+
+    copy(args->index(0), left);
+
+    for (int i=1; i < args->length(); i++) {
+        join_path(left, args->index(i));
+    }
+}
 
 void set_field(VM* vm)
 {
@@ -1086,6 +1100,19 @@ void error(VM* vm)
     vm->throw_error(&out);
 }
 
+void error_up(VM* vm)
+{
+    Value* height = circa_input(vm, 0);
+    Value* args = circa_input(vm, 1);
+
+    Value out;
+    for (int i = 0; i < args->length(); i++) {
+        Value* val = circa_index(args, i);
+        string_append(&out, val);
+    }
+    vm->throw_error_height(height->asInt(), &out);
+}
+
 void get_with_symbol(VM* vm)
 {
     Value* left = vm->input(0);
@@ -1175,6 +1202,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "empty_list", empty_list);
     circa_patch_function(patch, "equals", equals_func);
     circa_patch_function(patch, "error", error);
+    circa_patch_function(patch, "error_up", error_up);
     circa_patch_function(patch, "method_lookup", method_lookup);
     circa_patch_function(patch, "get_field", get_field);
     circa_patch_function(patch, "get_index", get_index);
@@ -1236,9 +1264,8 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "arccos", arccos_func);
     circa_patch_function(patch, "arctan", arctan_func);
 
-#if 0
-    circa_patch_function(patch, "rpath", rpath);
-#endif
+    circa_patch_function(patch, "path_dirname", path_dirname);
+    circa_patch_function(patch, "path_join", path_join);
     circa_patch_function(patch, "set_field", set_field);
     circa_patch_function(patch, "set_index", set_index);
     

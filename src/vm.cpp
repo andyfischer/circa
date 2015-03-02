@@ -210,6 +210,14 @@ static void vm_throw_error_too_many_inputs(VM* vm, Block* func, int found)
     vm->throw_error(&message);
 }
 
+static void vm_throw_error_expected_closure(VM* vm, Value* value)
+{
+    Value message;
+    set_string(&message, "Tried to call a non-function value: ");
+    string_append(&message, value);
+    vm->throw_error(&message);
+}
+
 void vm_run(VM* vm, VM* callingVM)
 {
     vm_prepare_bytecode(vm, callingVM);
@@ -272,6 +280,9 @@ void vm_run(VM* vm, VM* callingVM)
         case op_func_call_d: {
             Value* func = get_slot_fast(vm, op.a);
 
+            if (!is_closure(func))
+                return vm_throw_error_expected_closure(vm, func);
+
             #if TRACE_EXECUTION
                 trace_execution_indent();
                 printf("dyn_call with: %s\n", func->to_c_string());
@@ -305,6 +316,9 @@ void vm_run(VM* vm, VM* callingVM)
         }
         case op_func_apply_d: {
             Value* func = get_slot_fast(vm, op.a);
+
+            if (!is_closure(func))
+                return vm_throw_error_expected_closure(vm, func);
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
@@ -359,28 +373,36 @@ void vm_run(VM* vm, VM* callingVM)
 
             if (method == NULL) {
                 if (is_module_ref(object)) {
-                    Term* function = module_lookup(vm->world, object, nameLocation->index(0));
-                    if (function != NULL && is_function(function)) {
-                        method = function->nestedContents;
+                    Term* found = module_lookup(vm->world, object, nameLocation->index(0));
+                    if (found != NULL) {
+                        if (is_function(found)) {
+                            method = found->nestedContents;
 
-                        // Before calling, we need to discard input 0 (the module ref).
-                        int newTop = op.a;
-                        int inputCount = op.b;
-                        for (int input=1; input < inputCount; input++)
-                            move(get_slot_fast(vm, newTop+1+input), get_slot_fast(vm, newTop+input));
+                            // Before calling, we need to discard input 0 (the module ref).
+                            int newTop = op.a;
+                            int inputCount = op.b;
+                            for (int input=1; input < inputCount; input++)
+                                move(get_slot_fast(vm, newTop+1+input), get_slot_fast(vm, newTop+input));
 
-                        int addr = find_or_compile_major_block(vm->bc, method);
-                        ops = vm->bc->ops;
-                        do_call_op(vm, op.a, inputCount - 1, addr);
+                            int addr = find_or_compile_major_block(vm->bc, method);
+                            ops = vm->bc->ops;
+                            do_call_op(vm, op.a, inputCount - 1, addr);
 
-                        #if TRACE_EXECUTION
-                            executionDepth++;
-                            trace_execution_indent();
-                            printf("top is now: %d\n", vm->stackTop);
-                        #endif
+                            #if TRACE_EXECUTION
+                                executionDepth++;
+                                trace_execution_indent();
+                                printf("top is now: %d\n", vm->stackTop);
+                            #endif
 
-                        continue;
+                            continue;
+                        } else {
+                            if (has_static_value(found)) {
+                                copy(term_value(found), get_slot_fast(vm, op.a));
+                                continue;
+                            }
+                        }
                     }
+
                 } else if (is_hashtable(object)) {
                     Block* function = FUNCS.map_get->nestedContents;
                     int addr = find_or_compile_major_block(vm->bc, function);
@@ -600,41 +622,40 @@ void vm_run(VM* vm, VM* callingVM)
             Value* a = get_slot_fast(vm, op.a);
             Value* b = get_slot_fast(vm, op.b);
             Value* c = get_slot_fast(vm, op.c);
-            set_int(c, a->as_i() + b->as_i());
+            set_int(a, b->as_i() + c->as_i());
             continue;
         }
         case op_sub_i: {
             Value* a = get_slot_fast(vm, op.a);
             Value* b = get_slot_fast(vm, op.b);
             Value* c = get_slot_fast(vm, op.c);
-            set_int(c, a->as_i() - b->as_i());
+            set_int(a, b->as_i() - c->as_i());
             continue;
         }
         case op_mult_i: {
             Value* a = get_slot_fast(vm, op.a);
             Value* b = get_slot_fast(vm, op.b);
             Value* c = get_slot_fast(vm, op.c);
-            set_int(c, a->as_i() * b->as_i());
+            set_int(a, b->as_i() * c->as_i());
             continue;
         }
         case op_div_i: {
             Value* a = get_slot_fast(vm, op.a);
             Value* b = get_slot_fast(vm, op.b);
             Value* c = get_slot_fast(vm, op.c);
-            set_int(c, a->as_i() / b->as_i());
+            set_int(a, b->as_i() / c->as_i());
             continue;
         }
-        case op_push_state_frame:
-            if (op.b == ((u16) -1)) {
-                Value* key = NULL;
-                Term* caller = vm_calling_term(vm);
-                if (caller != NULL)
-                    key = unique_name(caller);
-                push_state_frame(vm, vm->stackTop + op.a, key);
-            } else {
-                push_state_frame(vm, vm->stackTop + op.a, get_slot_fast(vm, op.b));
-            }
-
+        case op_push_state_frame: {
+            Value* key = NULL;
+            Term* caller = vm_calling_term(vm);
+            if (caller != NULL)
+                key = unique_name(caller);
+            push_state_frame(vm, vm->stackTop + op.a, key);
+            continue;
+        }
+        case op_push_state_frame_dkey:
+            push_state_frame(vm, vm->stackTop + op.a, get_slot_fast(vm, op.b));
             continue;
         case op_pop_state_frame:
             pop_state_frame(vm);
@@ -1137,6 +1158,20 @@ void VM::throw_error(Value* err)
 {
     this->error = true;
     copy(err, this->output());
+}
+
+void vm_pop_frames(VM* vm, int height)
+{
+    while (height > 0) {
+        vm->stackTop = get_slot(vm, -1)->as_i();
+        height--;
+    }
+}
+
+void VM::throw_error_height(int height, Value* err)
+{
+    vm_pop_frames(this, height);
+    throw_error(err);
 }
 
 void VM::throw_str(const char* str)

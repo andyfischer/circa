@@ -240,9 +240,10 @@ def assert(bool condition)
 def equals(any a,any b) -> bool
 
 def from_string(String s) -> any
-  -- Parse a string representation to a Circa value
+  -- Parse a string representation to a value
 
 def error(any msg :multiple)
+def error_up(int height, any msg :multiple)
 
 -- Comparison
 def less_than_i(int a,int b) -> bool
@@ -257,7 +258,6 @@ def greater_than_eq_f(number a,number b) -> bool
 def length(List list) -> int
   -- Return the number of items in the given list
 
-def rpath(String path) -> String
 
 def set_field(any obj, String key, any val) -> any
 def set_index(any list, int index, any val) -> List
@@ -296,17 +296,26 @@ def write_text_file(String filename, String contents)
   -- Write contents to the given filename, overwriting any existing file.
   -- TODO: delete, replace with library
 
+def path_dirname(path)
+def path_join(paths :multiple)
+
 def syntax_error()
   caller = reflect_caller(1)
-  error(str("Syntax error: " caller.property(:Message)))
+  error_up(1, str("Syntax error: " caller.property(:Message)))
 
 def unknown_identifier()
   caller = reflect_caller(1)
-  error(str("Unknown identifier: " caller.name))
+  error_up(1, str("Unknown identifier: " caller.name))
 
 def unknown_function(i :multiple)
   caller = reflect_caller(1)
-  error(str("Unknown function: " caller.property(:Syntax_FunctionName)))
+  error_up(1, str("Unknown function: " caller.property(:Syntax_FunctionName)))
+
+def rpath(String path) -> String
+  callerBlock = reflect_caller(1).parent
+  dir = callerBlock.source_filename
+  path_dirname(@dir)
+  path_join(dir path)
 
 def static_type(i) -> Type
   caller = reflect_caller(1)
@@ -470,7 +479,7 @@ def call(Func func, inputs :multiple) -> any
 def method_call(location, obj, Symbol name, List args)
   func = method_lookup(location obj name)
   if func == null
-    error('Method not found: ' name)
+    error_up(1, 'Method not found: ' name)
   func.call(args)
 
 def closure_block() -> Func
@@ -586,7 +595,7 @@ def require_local(String name) -> Module
 def require_check(Module module)
   block = module.resolve
   if block.is_null
-    error("Couldn't find ", cond(module.is_local, "local ", "") "module: " module.name)
+    error_up(1, "Couldn't find ", cond(module.is_local, "local ", "") "module: " module.name)
 
   if block.has_static_error
     msg = [str("Module '" module.name "' has static errors: ")]

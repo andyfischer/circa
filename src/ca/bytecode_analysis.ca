@@ -57,6 +57,7 @@ def opcode_from_int(int opcode) -> Symbol
     case 0x22 :mult_i
     case 0x23 :div_i
     case 0x35 :push_state_frame
+    case 0x47 :push_state_frame_dkey
     case 0x36 :pop_state_frame
     case 0x46 :pop_discard_state_frame
     case 0x37 :get_state_value
