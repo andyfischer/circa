@@ -1,11 +1,4 @@
 
-struct Op {
-  Symbol opcode
-  int a
-  int b
-  int c
-}
-
 struct Mop {
   int maddr
   Symbol opcode
@@ -14,8 +7,8 @@ struct Mop {
   int related_maddr
 }
 
-def read_op(Blob blob) -> Op
-  Op.make(opcode_from_int(blob.i16(6)) blob.i16(0), blob.i16(2), blob.i16(4))
+def read_op(Blob blob)
+  {:opcode => opcode_from_int(blob.i16(6)), :a => blob.i16(0), :b => blob.i16(2), :c => blob.i16(4)}
 
 def read_mop(int maddr, Blob blob) -> Mop
   Mop.make(maddr, mopcode_from_int(blob.i32(0)), blob.i32(4), blob.i32(8) blob.i32(12))
@@ -84,37 +77,39 @@ def Blob.slices(self, int sliceSize)
   for b in range_by(0, self.size, sliceSize)
     self.slice(b, sliceSize)
 
-def dump_bytecode(VM vm)
-  mopByAddr = Map.make
+def dump_ops(VM vm, Blob ops)
+  for addr, op in ops.slices(8)
+    op = read_op(op)
+    @op.set(:addr addr)
 
-  for maddr, mop in vm.get_raw_mops.slices(bytecode_mop_size())
-    mop = read_mop(maddr, mop)
-    @mopByAddr.list_append(mop.addr, mop)
+    s = switch op.opcode
+      case :comment
+        msg = vm.get_bytecode_const(op.a)
+        str('# ' msg)
+      case :grow_frame
+        str('grow_frame ' op.a)
+      case :load_const
+        str('load_const slot: ' op.b ', value: ' vm.get_bytecode_const(op.a))
+      case :ret_or_stop
+        str('ret_or_stop')
+      else
+        str(op.opcode ' ' op.a ' ' op.b ' ' op.c)
 
-  for addr, op in vm.get_raw_ops.slices(8).append(null)
+    @s.prepend(str('[' addr '] '))
+    print(s)
 
-    mops = mopByAddr.get_opt(addr, [])
-    for mop in mops
-      print(' -- ' mop)
+def parse_ops(VM vm, Blob ops) -> List
+  for addr, op in ops.slices(8)
+    op = read_op(op)
+    @op.set(:addr addr)
 
-    if op != null
-      op = read_op(op)
+def func_ops(VM vm, Func func)
+  vm.precompile(func.block)
+  parse_ops(vm, vm.get_func_raw_ops(func))
 
-      s = switch op.opcode
-        case :comment
-          msg = vm.get_bytecode_const(op.a)
-          str('# ' msg)
-        case :grow_frame
-          str('grow_frame ' op.a)
-        case :load_const
-          str('load_const slot: ' op.b ', value: ' vm.get_bytecode_const(op.a))
-        case :ret_or_stop
-          str('ret_or_stop')
-        else
-          str(op.opcode ' ' op.a ' ' op.b ' ' op.c)
-
-      @s.prepend(str('[' addr '] '))
-      print(s)
-  
 def dump(VM vm)
-  dump_bytecode(vm)
+  dump_ops(vm, vm.get_raw_ops)
+
+def dump_func(VM vm, Func func)
+  vm.precompile(func.block)
+  dump_ops(vm, vm.get_func_raw_ops(func))

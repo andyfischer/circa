@@ -1,0 +1,11 @@
+
+def main()
+  a = [1 2 3]
+  @a.append(4)
+  @a.append(5)
+  print(a)
+
+vm = make_vm(main)
+
+require_local helper
+helper.assert_no_copy(vm, main)

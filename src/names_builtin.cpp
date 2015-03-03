@@ -56,6 +56,7 @@ const char* builtin_symbol_to_string(int name)
     case s_next: return "next";
     case s_next_case: return "next_case";
     case s_no: return "no";
+    case s_normal: return "normal";
     case s_none: return "none";
     case s_newline: return "newline";
     case s_out: return "out";
@@ -196,6 +197,7 @@ const char* builtin_symbol_to_string(int name)
     case s_Anonymous: return "Anonymous";
     case s_Entropy: return "Entropy";
     case s_OnDemand: return "OnDemand";
+    case s_dev_compile: return "dev_compile";
     case s_hacks: return "hacks";
     case s_no_effect: return "no_effect";
     case s_no_save_state: return "no_save_state";
@@ -1870,9 +1872,17 @@ int builtin_symbol_from_string(const char* str)
     case 'd':
     switch (str[1]) {
     case 'e':
-        if (strcmp(str + 2, "clared_state") == 0)
+    switch (str[2]) {
+    case 'c':
+        if (strcmp(str + 3, "lared_state") == 0)
             return s_declared_state;
         break;
+    case 'v':
+        if (strcmp(str + 3, "_compile") == 0)
+            return s_dev_compile;
+        break;
+    default: return -1;
+    }
     case 'i':
         if (strcmp(str + 2, "scard") == 0)
             return s_discard;
@@ -2162,6 +2172,10 @@ int builtin_symbol_from_string(const char* str)
     case 'n':
         if (strcmp(str + 3, "e") == 0)
             return s_none;
+        break;
+    case 'r':
+        if (strcmp(str + 3, "mal") == 0)
+            return s_normal;
         break;
     case 0:
             return s_no;

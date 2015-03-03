@@ -1,0 +1,10 @@
+
+require bytecode_analysis
+
+def assert_no_copy(VM vm, Func func)
+  vm.precompile(func.block)
+  for op in bytecode_analysis.func_ops(vm func)
+    if op.opcode == :copy
+      bytecode_analysis.dump_func(vm func)
+      error("found a :copy op")
+

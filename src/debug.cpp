@@ -21,7 +21,7 @@ bool DEBUG_TRAP_RAISE_ERROR = false;
 
 int DEBUG_BREAK_ON_TERM = -1;
 
-uint64 PERF_STATS[c_numPerfStats];
+PerfStatList* g_perfStatList;
 
 void dump(Block& block)
 {
@@ -101,39 +101,21 @@ void ca_debugger_break()
 #endif
 }
 
-CIRCA_EXPORT void circa_perf_stats_dump()
+void perf_stats_init(PerfStatList* stats)
 {
-    printf("perf_stats_dump:\n");
-    for (int i=c_firstStatIndex; i < s_LastStatIndex-1; i++)
-        printf("  %s = %llu\n", builtin_symbol_to_string(i), PERF_STATS[i - c_firstStatIndex]);
-}
-CIRCA_EXPORT void circa_perf_stats_reset()
-{
-    for (int i = c_firstStatIndex; i < s_LastStatIndex-1; i++)
-        PERF_STATS[i - c_firstStatIndex] = 0;
-}
-void perf_stats_to_list(Value* list)
-{
-    set_list(list, c_numPerfStats);
-    for (int i = c_firstStatIndex; i < s_LastStatIndex-1; i++) {
-        Symbol name = i;
-        int64 value = PERF_STATS[i - c_firstStatIndex];
-        Value* element = list_get(list, i - c_firstStatIndex);
-        set_list(element, 2);
-        set_symbol(list_get(element, 0), name);
-        char buf[100];
-        sprintf(buf, "%llu", value);
-        set_string(list_get(element, 1), buf);
+    for (int name = c_firstStatIndex; name < s_LastStatIndex-1; name++) {
+        int i = name - c_firstStatIndex;
+        stats->stat[i] = 0;
     }
 }
 
-void perf_stats_to_map(Value* map)
+void perf_stats_to_map(PerfStatList* stats, Value* map)
 {
     u64 frozenStats[c_numPerfStats];
 
     for (int name = c_firstStatIndex; name < s_LastStatIndex-1; name++) {
         int i = name - c_firstStatIndex;
-        frozenStats[i] = PERF_STATS[i];
+        frozenStats[i] = stats->stat[i];
     }
 
     set_hashtable(map);
@@ -147,12 +129,18 @@ void perf_stats_to_map(Value* map)
 
 void perf_stat_inc(int name)
 {
-    PERF_STATS[name - c_firstStatIndex]++;
+    if (g_perfStatList == NULL)
+        return;
+
+    g_perfStatList->stat[name - c_firstStatIndex]++;
 }
 
 void perf_stat_add(int name, int n)
 {
-    PERF_STATS[name - c_firstStatIndex] += n;
+    if (g_perfStatList == NULL)
+        return;
+
+    g_perfStatList->stat[name - c_firstStatIndex] += n;
 }
 
 #if CIRCA_ENABLE_LOGGING

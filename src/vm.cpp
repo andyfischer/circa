@@ -40,6 +40,7 @@ VM* new_vm(Block* main)
     initialize_null(&vm->bcHacks);
     vm->noSaveState = false;
     vm->noEffect = false;
+    vm->devCompile = false;
     initialize_null(&vm->termOverrides);
     set_hashtable(&vm->termOverrides);
     initialize_null(&vm->state);
@@ -220,6 +221,12 @@ static void vm_throw_error_expected_closure(VM* vm, Value* value)
 
 void vm_run(VM* vm, VM* callingVM)
 {
+    #if CIRCA_ENABLE_PERF_STATS
+        PerfStatList* prevPerfStatList = g_perfStatList;
+        g_perfStatList = &vm->perfStats;
+        perf_stats_init(g_perfStatList);
+    #endif
+
     vm_prepare_bytecode(vm, callingVM);
 
     vm->pc = 0;
@@ -280,8 +287,10 @@ void vm_run(VM* vm, VM* callingVM)
         case op_func_call_d: {
             Value* func = get_slot_fast(vm, op.a);
 
-            if (!is_closure(func))
-                return vm_throw_error_expected_closure(vm, func);
+            if (!is_closure(func)) {
+                vm_throw_error_expected_closure(vm, func);
+                goto finish_run;
+            }
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
@@ -295,11 +304,15 @@ void vm_run(VM* vm, VM* callingVM)
             int funcInputs = count_input_placeholders(block);
             bool funcVarargs = has_variable_args(block);
 
-            if (op.b < (funcInputs + (funcVarargs? -1 : 0)))
-                return vm_throw_error_not_enough_inputs(vm, block, op.b);
+            if (op.b < (funcInputs + (funcVarargs? -1 : 0))) {
+                vm_throw_error_not_enough_inputs(vm, block, op.b);
+                goto finish_run;
+            }
 
-            if (!funcVarargs && op.b > funcInputs)
-                return vm_throw_error_too_many_inputs(vm, block, op.b);
+            if (!funcVarargs && op.b > funcInputs) {
+                vm_throw_error_too_many_inputs(vm, block, op.b);
+                goto finish_run;
+            }
 
             int addr = find_or_compile_major_block(vm->bc, block);
             ops = vm->bc->ops;
@@ -317,8 +330,10 @@ void vm_run(VM* vm, VM* callingVM)
         case op_func_apply_d: {
             Value* func = get_slot_fast(vm, op.a);
 
-            if (!is_closure(func))
-                return vm_throw_error_expected_closure(vm, func);
+            if (!is_closure(func)) {
+                vm_throw_error_expected_closure(vm, func);
+                goto finish_run;
+            }
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
@@ -331,19 +346,25 @@ void vm_run(VM* vm, VM* callingVM)
             Value list;
             move(vm->stack[vm->stackTop + op.a + 1], &list);
 
-            if (!is_list(&list))
-                return vm->throw_str("Type error in input 1: expected list");
+            if (!is_list(&list)) {
+                vm->throw_str("Type error in input 1: expected list");
+                goto finish_run;
+            }
 
             int inputCount = list.length();
 
             int funcInputs = count_input_placeholders(block);
             int funcVarargs = has_variable_args(block);
 
-            if (inputCount < (funcInputs + (funcVarargs? -1 : 0)))
-                return vm_throw_error_not_enough_inputs(vm, block, inputCount);
+            if (inputCount < (funcInputs + (funcVarargs? -1 : 0))) {
+                vm_throw_error_not_enough_inputs(vm, block, inputCount);
+                goto finish_run;
+            }
 
-            if (!funcVarargs && inputCount > funcInputs)
-                return vm_throw_error_too_many_inputs(vm, block, inputCount);
+            if (!funcVarargs && inputCount > funcInputs) {
+                vm_throw_error_too_many_inputs(vm, block, inputCount);
+                goto finish_run;
+            }
 
             vm_grow_stack(vm, vm->stackTop + op.a + inputCount + 1);
 
@@ -408,6 +429,9 @@ void vm_run(VM* vm, VM* callingVM)
                     int addr = find_or_compile_major_block(vm->bc, function);
                     ops = vm->bc->ops;
 
+                    // re-acquire nameLocation because it can be invalidated by compile.
+                    nameLocation = get_const(vm, op.c);
+
                     // Copy the name to input 1
                     Value* input1 = get_slot_fast(vm, op.a + 2);
                     copy(nameLocation->index(0), input1);
@@ -430,7 +454,8 @@ void vm_run(VM* vm, VM* callingVM)
                 string_append(&msg, nameLocation->index(0));
                 string_append(&msg, "' not found on ");
                 string_append(&msg, object);
-                return vm->throw_error(&msg);
+                vm->throw_error(&msg);
+                goto finish_run;
             }
             
             int addr = find_or_compile_major_block(vm->bc, method);
@@ -504,14 +529,14 @@ void vm_run(VM* vm, VM* callingVM)
             ops = vm->bc->ops;
 
             if (vm->error)
-                return;
+                goto finish_run;
 
             continue;
         }
         case op_ret_or_stop: {
             if (vm->stackTop == 0) {
                 vm_cleanup_on_stop(vm);
-                return;
+                goto finish_run;
             }
             // fallthrough
         }
@@ -542,11 +567,15 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_splat_upvalues: {
-            if (is_null(&vm->incomingUpvalues))
-                return vm->throw_str("internal error: Called a closure without upvalues list");
+            if (is_null(&vm->incomingUpvalues)) {
+                vm->throw_str("internal error: Called a closure without upvalues list");
+                goto finish_run;
+            }
 
-            if (op.b != vm->incomingUpvalues.length())
-                return vm->throw_str("internal error: Called a closure with wrong number of upvalues");
+            if (op.b != vm->incomingUpvalues.length()) {
+                vm->throw_str("internal error: Called a closure with wrong number of upvalues");
+                goto finish_run;
+            }
 
             for (int i=0; i < op.b; i++) {
                 Value* value = vm->incomingUpvalues.index(i);
@@ -594,7 +623,8 @@ void vm_run(VM* vm, VM* callingVM)
                 string_append(&msg, val);
                 string_append(&msg, " to type ");
                 string_append(&msg, &type->name);
-                return vm->throw_error(&msg);
+                vm->throw_error(&msg);
+                goto finish_run;
             }
             continue;
         }
@@ -677,6 +707,11 @@ void vm_run(VM* vm, VM* callingVM)
         }
         }
     }
+
+finish_run:
+    #if CIRCA_ENABLE_PERF_STATS
+        g_perfStatList = prevPerfStatList;
+    #endif
 }
 
 void VM__call(VM* vm)
@@ -797,20 +832,47 @@ void VM__get_raw_slots(VM* vm)
 void VM__get_raw_ops(VM* vm)
 {
     VM* self = (VM*) get_pointer(vm->input(0));
-    if (self->bc == NULL)
+    if (self->bc == NULL) {
         set_blob_alloc_raw(vm->output(), NULL, 0);
-    else
-        set_blob_alloc_raw(vm->output(), (char*) self->bc->ops, self->bc->opCount * sizeof(Op));
+        return;
+    }
+
+    set_blob_alloc_raw(vm->output(), (char*) self->bc->ops, self->bc->opCount * sizeof(Op));
+}
+
+void VM__get_func_raw_ops(VM* vm)
+{
+    VM* self = (VM*) get_pointer(vm->input(0));
+    Value* func = vm->input(1);
+
+    if (self->bc == NULL) {
+        set_blob_alloc_raw(vm->output(), NULL, 0);
+        return;
+    }
+
+    Value* record = self->bc->blockToAddr.val_key(func->index(0));
+
+    if (record == NULL) {
+        set_blob_alloc_raw(vm->output(), NULL, 0);
+        return;
+    }
+
+    int start = record->index(0)->as_i();
+    int fin = record->index(1)->as_i();
+
+    set_blob_alloc_raw(vm->output(), (char*) (self->bc->ops + start), (fin - start) * sizeof(Op));
 }
 
 void VM__get_raw_mops(VM* vm)
 {
     VM* self = (VM*) get_pointer(vm->input(0));
-    if (self->bc == NULL)
+    if (self->bc == NULL) {
         set_blob_alloc_raw(vm->output(), NULL, 0);
-    else
-        set_blob_alloc_raw(vm->output(), (char*) self->bc->metadata,
-            self->bc->metadataSize * sizeof(BytecodeMetadata));
+        return;
+    }
+
+    set_blob_alloc_raw(vm->output(), (char*) self->bc->metadata,
+        self->bc->metadataSize * sizeof(BytecodeMetadata));
 }
 
 void VM__get_bytecode_const(VM* vm)
@@ -826,6 +888,16 @@ void VM__precompile(VM* vm)
     Block* block = vm->input(1)->asBlock();
     vm_prepare_bytecode(self, vm);
     find_or_compile_major_block(self->bc, block);
+}
+
+void VM__perf_stats(VM* vm)
+{
+#if CIRCA_ENABLE_PERF_STATS
+    VM* self = (VM*) get_pointer(vm->input(0));
+    perf_stats_to_map(&self->perfStats, vm->output());
+#else
+    set_hashtable(vm->output());
+#endif
 }
 
 void bytecode_get_mop_size(VM* vm)
@@ -1229,6 +1301,7 @@ void vm_update_derived_hack_info(VM* vm)
 {
     vm->noSaveState = false;
     vm->noEffect = false;
+    vm->devCompile = false;
     set_hashtable(&vm->termOverrides);
 
     Value* hacks = &vm->bcHacks;
@@ -1242,6 +1315,8 @@ void vm_update_derived_hack_info(VM* vm)
             vm->noEffect = true;
         else if (symbol_eq(element, s_no_save_state))
             vm->noSaveState = true;
+        else if (symbol_eq(element, s_dev_compile))
+            vm->devCompile = true;
         else if (is_list_with_length(element, 3) && symbol_eq(element->index(0), s_set_value))
             copy(element->index(2), vm->termOverrides.insert_val(element->index(1)));
     }
@@ -1318,9 +1393,11 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function(patch, "VM.set_env_map", VM__set_env_map);
     circa_patch_function(patch, "VM.get_raw_slots", VM__get_raw_slots);
     circa_patch_function(patch, "VM.get_raw_ops", VM__get_raw_ops);
+    circa_patch_function(patch, "VM.get_func_raw_ops", VM__get_func_raw_ops);
     circa_patch_function(patch, "VM.get_raw_mops", VM__get_raw_mops);
     circa_patch_function(patch, "VM.get_bytecode_const", VM__get_bytecode_const);
     circa_patch_function(patch, "VM.precompile", VM__precompile);
+    circa_patch_function(patch, "VM.perf_stats", VM__perf_stats);
     circa_patch_function(patch, "bytecode_mop_size", bytecode_get_mop_size);
     circa_patch_function(patch, "reflect_caller", reflect_caller);
     circa_patch_function(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);

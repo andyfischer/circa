@@ -1,10 +1,12 @@
 
-long_list = repeat(0 100)
+def main()
+  long_list = repeat(0 100)
 
-_perf_stats_dump()
+  long_list[0] = [1 long_list]
 
-long_list[0] = [1 long_list]
+vm = make_vm(main)
+vm.call
 
-dupeCount = _perf_stats_dump().get(:stat_ListDuplicate_100Count)
+dupeCount = vm.perf_stats.get(:stat_ListDuplicate_100Count)
 
 assert(dupeCount == 1)

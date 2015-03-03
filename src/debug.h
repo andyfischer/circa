@@ -32,16 +32,22 @@ void internal_error(std::string const& message);
 
 void ca_debugger_break();
 
-void perf_stats_to_list(Value* list);
-void perf_stats_to_map(Value* map);
+const int c_firstStatIndex = s_FirstStatIndex + 1;
+const int c_numPerfStats = s_LastStatIndex - c_firstStatIndex;
+
+struct PerfStatList {
+    uint64 stat[c_numPerfStats];
+};
+
+void perf_stats_init(PerfStatList* stats);
+void perf_stats_to_map(PerfStatList* stats, Value* map);
+
 void perf_stat_inc(int name);
 void perf_stat_add(int name, int n);
 
-const int c_firstStatIndex = s_FirstStatIndex + 1;
-const int c_numPerfStats = s_LastStatIndex - c_firstStatIndex;
-extern uint64 PERF_STATS[c_numPerfStats];
-
 #if CIRCA_ENABLE_PERF_STATS
+
+extern PerfStatList* g_perfStatList;
 
 #define stat_increment(x) perf_stat_inc(stat_##x);
 #define stat_add(x,n) perf_stat_add(stat_##x, (n));

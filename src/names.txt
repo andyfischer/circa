@@ -42,6 +42,7 @@ methodCache
 next
 next_case
 no
+normal
 none
 newline
 out
@@ -203,6 +204,7 @@ Anonymous
 # Interpreter misc
 Entropy
 OnDemand
+dev_compile
 hacks
 no_effect
 no_save_state

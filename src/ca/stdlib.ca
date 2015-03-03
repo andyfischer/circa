@@ -628,7 +628,6 @@ def file_changed(String filename) -> bool
 -- Sys module
 def sys_arg(int index) -> String
 def sys_module_search_paths() -> List
-def _perf_stats_dump() -> Map
 
 def make_blob(int size) -> Blob
 def Blob.size(self) -> int
@@ -799,6 +798,7 @@ def VM.dump_compiled(self)
 def VM.get_raw_slots(self) -> List
 def VM.get_raw_ops(self) -> Blob
 def VM.get_raw_mops(self) -> Blob
+def VM.get_func_raw_ops(self, Func func) -> Blob
 def VM.get_bytecode_const(self, index) -> any
 def VM.precompile(self, Block b)
 def bytecode_mop_size() -> int
@@ -879,6 +879,8 @@ def VM.error_message(self) -> String
   -- If there is a recorded error, returns a human-readable description string.
 
 def VM.toString(self) -> String
+
+def VM.perf_stats(self) -> Map
 
 def make_vm(Func func) -> VM
   -- Create a new VM

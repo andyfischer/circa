@@ -105,12 +105,24 @@ struct Liveness {
     Term* term;       // may be NULL
     int firstWritePc; // may be -1
     int lastReadPc;   // may be -1
+    int reassignedTo;
 };
 
-struct MinorBlock {
-    MinorBlock* parent;
+struct MinorFrame {
+    MinorFrame* parent;
+    Block* block;
+    int firstPc;
     bool hasBeenExited;
     int firstTemporarySlot;
+    int stateHeaderSlot;
+
+    int loopIteratorSlot;
+    bool loopProduceOutput;
+    int loopOutputSlot;
+    int loopFirstLocalInitial;
+    int loopFirstLocalOutput;
+
+    int conditionalFirstOutputSlot;
 };
 
 struct Bytecode {
@@ -127,16 +139,15 @@ struct Bytecode {
 
     // Used for in-progress major block compilation:
     Value unresolved; // list of {addr, type}
-    Value minorBlockInfo; // map of block -> {slot}
     int livenessCount;
     Liveness* liveness;
-    MinorBlock* currentMinorBlock;
+    MinorFrame* topMinorFrame;
 
     int nextFreeSlot;
     int slotCount;
 
     // Used for an assembled program:
-    Value blockToAddr; // map of major block -> int address
+    Value blockToAddr; // map of major block -> [int start, int fin]
 
     void dump();
     void dump_metadata();
@@ -156,9 +167,6 @@ int find_metadata_addr_for_addr(Bytecode* bc, int addr);
 int mop_search_skip_minor_blocks(Bytecode* bc, int maddr);
 int mop_find_active_mopcode(Bytecode* bc, int mopcode, int maddr);
 bool mopcode_uses_related_maddr(int mopcode);
-//Block* find_active_minor_block(Bytecode* bc, int addr);
-//int find_active_state_key_slot(Bytecode* bc, int addr);
-//int find_active_state_header_slot(Bytecode* bc, int addr);
 void dump_op(Bytecode* bc, Op op);
 
 } // namespace circa

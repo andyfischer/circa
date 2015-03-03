@@ -21,6 +21,7 @@ struct VM {
     bool noSaveState;
     bool noEffect;
     Value termOverrides;
+    bool devCompile;
 
     bool error;
 
@@ -39,6 +40,10 @@ struct VM {
     RandState randState;
 
     Value channelOutput;
+
+#if CIRCA_ENABLE_PERF_STATS
+    PerfStatList perfStats;
+#endif
 
     Value* input(int index);
     Value* output();
