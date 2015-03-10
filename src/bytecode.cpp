@@ -733,24 +733,12 @@ void write_loop(Bytecode* bc, Block* loop)
 
     // Done check
     Term* doneTerm = NULL;
-    if (is_for_loop(loop)) {
-        comment(bc, "done check");
+    if (is_for_loop(loop))
         doneTerm = loop_find_done_call(loop);
-        advanceTerm = loop_find_iterator_advance(loop);
-        write_term(bc, doneTerm);
-        int addr = append_op(bc, op_jif, find_live_slot(bc, doneTerm));
-        append_unresolved_jump(bc, addr, s_done);
-    }
 
-    // Fetch key
     Term* keyTerm = NULL;
-    if (is_for_loop(loop)) {
-        comment(bc, "loop key");
-        Term* keyTerm = loop_find_key(loop);
-        write_term(bc, keyTerm);
-        if (should_write_state_header(bc, loop))
-            write_state_header(bc, load_or_find_term(bc, keyTerm));
-    }
+    if (is_for_loop(loop))
+        keyTerm = loop_find_key(loop);
 
     comment(bc, "loop contents");
     
@@ -761,8 +749,24 @@ void write_loop(Bytecode* bc, Block* loop)
 
         Term* term = loop->get(i);
 
-        if (term == doneTerm || term == keyTerm || term == advanceTerm)
+        if (term == keyTerm) {
+            comment(bc, "loop key");
+            write_term(bc, keyTerm);
+            if (should_write_state_header(bc, loop))
+                write_state_header(bc, load_or_find_term(bc, keyTerm));
+
             continue;
+        }
+
+        if (term == doneTerm) {
+            comment(bc, "done check");
+            doneTerm = loop_find_done_call(loop);
+            advanceTerm = loop_find_iterator_advance(loop);
+            write_term(bc, doneTerm);
+            int addr = append_op(bc, op_jif, find_live_slot(bc, doneTerm));
+            append_unresolved_jump(bc, addr, s_done);
+            continue;
+        }
 
         write_term(bc, term);
     }
@@ -776,8 +780,11 @@ void write_loop(Bytecode* bc, Block* loop)
 
     comment(bc, "jump back to loop start");
     append_op(bc, op_jump, 0, 0, iterationStart);
+
+    // unresolved 'continue' jumps go to iterationStart
     resolve_unresolved_jump(bc, s_continue, iterationStart, iterationStart);
 
+    // unresolved 'done' jumps go here
     resolve_unresolved_jump(bc, s_done, iterationStart, bc->opCount);
 
     comment(bc, "move locals and finish");
