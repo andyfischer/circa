@@ -1,7 +1,0 @@
-
-import imported
-import zmq
-
-imported:f()
-
-zmq:admin_command_subscribe("tcp://localhost:2222")

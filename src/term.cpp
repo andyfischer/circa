@@ -262,18 +262,6 @@ int user_count(Term* term)
     return term->users.length();
 }
 
-int real_user_count(Term* term)
-{
-    int count = 0;
-    for (int i=0; i < user_count(term); i++) {
-        Term* user = term_user(term, i);
-        if (user->function == FUNCS.extra_output)
-            continue;
-        count++;
-    }
-    return count;
-}
-
 Value* term_insert_property(Term* term, Symbol key)
 {
     return hashtable_insert_symbol_key(&term->properties, key);
@@ -521,7 +509,7 @@ bool term_is_observable(Term* term)
     if (term_is_observable_for_special_reasons(term))
         return true;
 
-    if (real_user_count(term) == 0)
+    if (user_count(term) == 0)
         return false;
 
     // Future: Some more smarts here
@@ -628,19 +616,6 @@ bool term_uses_input_multiple_times(Term* term, Term* input)
 }
 
 bool term_needs_no_evaluation(Term* term)
-{
-    if (term == NULL
-            || is_value(term)
-            || term->function == FUNCS.lambda
-            || term->function == FUNCS.case_func
-            || term->function == FUNCS.comment)
-
-        return true;
-
-    return false;
-}
-
-bool term_needs_no_evaluation2(Term* term)
 {
     if (term == NULL
             || is_value(term)

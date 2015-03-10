@@ -102,12 +102,6 @@ struct Block
     // Bind a name to a term
     void bindName(Term* term, Value* name);
 
-    // Remap pointers
-    void remapPointers(TermMap const& map);
-
-    // Compile the given statement, return the result term.
-    Term* compile(const char* statement);
-
     void dump();
     void dump_with_props();
     Term* owner();

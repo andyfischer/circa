@@ -229,7 +229,7 @@ void finish_while_loop(Block* block)
     // Add looped_inputs
     insert_looped_placeholders(block);
 
-    update_extra_outputs(block->owningTerm);
+    update_extra_outputs(block->owningTerm, block);
     update_for_control_flow(block);
 
     block_finish_changes(block);
@@ -255,7 +255,7 @@ void finish_for_loop(Term* forTerm)
 
     insert_looped_placeholders(block);
 
-    update_extra_outputs(forTerm);
+    update_extra_outputs(forTerm, block);
 
     block_finish_changes(block);
 }

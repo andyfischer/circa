@@ -359,24 +359,24 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
     }
 }
 
-void finish_if_block(Term* ifBlock)
+void finish_if_block(Term* ifTerm)
 {
-    Block* contents = nested_contents(ifBlock);
+    Block* contents = nested_contents(ifTerm);
 
     // Make sure there is a primary output
     if (get_output_placeholder(contents, 0) == NULL)
-        if_block_prepend_primary_output(ifBlock);
+        if_block_prepend_primary_output(ifTerm);
 
     // Turn name rebinds into outer name rebinds.
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if_block_turn_outer_name_rebinds_into_outputs(ifBlock, nested_contents(term));
+        if_block_turn_outer_name_rebinds_into_outputs(ifTerm, nested_contents(term));
     }
 
-    if_block_turn_common_rebinds_into_outputs(ifBlock);
+    if_block_turn_common_rebinds_into_outputs(ifTerm);
 
-    if_block_update_output_placeholder_types_from_cases(ifBlock);
-    update_extra_outputs(ifBlock);
+    if_block_update_output_placeholder_types_from_cases(ifTerm);
+    update_extra_outputs(ifTerm, ifTerm->nestedContents);
 }
 
 bool switch_has_default_case(Block* block)

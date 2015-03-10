@@ -1,8 +1,13 @@
-f 1, level = 3
-f 2, level = 3
-f 1, level = 2
-f 2, level = 2
-f 1, level = 1
-f 2, level = 1
-f 1, level = 0
-{s: 6, t: 9, _f: {s: 4, t: 6, _f: {s: 2, t: 3, _f: {s: 0, t: null, _f: null}}}}
+top level, calling f with level = 3
+called f with level = 3
+recursively calling f with level: 2
+called f with level = 2
+recursively calling f with level: 1
+called f with level = 1
+recursively calling f with level: 0
+called f with level = 0
+finished call to f with level: 1
+finished call to f with level: 2
+finished call to f with level: 3
+finished, state looks like:
+{'_f' => {'_f' => {'_f' => {'_f' => {'level_2' => 0, 'level_s' => 0}, 'level_2' => 2, 'level_3' => 3, 'level_s' => 1}, 'level_2' => 4, 'level_3' => 6, 'level_s' => 2}, 'level_2' => 6, 'level_3' => 9, 'level_s' => 3}}

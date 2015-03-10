@@ -22,22 +22,10 @@ Term* apply_dynamic_method(Block* block, Symbol methodName, TermList const& inpu
 // Example:  [Term#add [Term#a Term#b] :name 'c']
 Term* apply_spec(Block* block, Value* spec);
 
-// Inputs and user lists:
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, TermList const& inputs);
 void insert_input(Term* term, Term* input);
 void insert_input(Term* term, int index, Term* input);
-void append_user(Term* user, Term* usee);
-void possibly_prune_user_list(Term* user, Term* usee);
-
-// This finds all the terms which have this term as a user, and removes it from
-// their user list. This creates a temporary inconsistency (because the term is
-// still technically using those things) but it's appropriate when you want to delete
-// this term.
-void remove_from_any_user_lists(Term* term);
-
-// This checks every user of this term, and removes it from their input lists.
-void clear_from_dependencies_of_users(Term* term);
 
 // Change a term's function
 void change_function(Term* term, Term* function);
@@ -65,7 +53,6 @@ Block* create_block(Block* owner, const char* name);
 Term* create_type(Block* block, const char* name);
 Term* create_type_value(Block* block, Type* value, const char* name=NULL);
 Term* create_symbol_value(Block* block, int value, const char* name=NULL);
-Term* duplicate_value(Block* block, Term* term);
 
 // Add an input_placeholder() term after the existing placeholders.
 Term* append_input_placeholder(Block* block);
@@ -90,10 +77,8 @@ Term* find_or_create_output_term(Term* term, int index);
 // the intermediate value is the nearby term with the same name binding.
 Term* find_intermediate_result_for_output(Term* location, Term* output);
 
-int count_anonymous_outputs(Block* block);
-
 // Extra outputs
-void update_extra_outputs(Term* term);
+void update_extra_outputs(Term* term, Block* target);
 
 Symbol block_has_state(Block* block);
 
@@ -103,10 +88,10 @@ void block_start_changes(Block* block);
 // Set the block as no longer 'in progress', perform any final cleanup actions.
 void block_finish_changes(Block* block);
 
+void update_term_user_lists(Block* block);
 void annotate_stateful_values(Block* block);
 
 // Code modification
-Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);
 Term* apply_after(Term* existing, Term* function);
 void move_before(Term* movee, Term* pivot);
@@ -114,7 +99,6 @@ void move_after(Term* movee, Term* position); void move_after_inputs(Term* term)
 void move_before_outputs(Term* term);
 void move_before_final_terms(Term* term);
 void move_to_index(Term* term, int index);
-void transfer_users(Term* from, Term* to);
 
 void input_placeholders_to_list(Block* block, TermList* list);
 void list_outer_pointers(Block* block, TermList* list);
@@ -129,20 +113,12 @@ void update_declared_type(Term* term);
 // Modify term so that it has the given function and inputs.
 void rewrite(Term* term, Term* function, TermList const& _inputs);
 
-// Make sure that block[index] is a value with the given type. If that term exists and
-// has a different function or type, then change it. If the block doesn't have that
-// index, then add NULL terms until it does.
-void rewrite_as_value(Block* block, int index, Type* type);
-
 // Calls erase_term, and will also shuffle the terms inside the owning block to
 // fill in the empty index.
 void remove_term(Term* term);
 
 void remap_pointers_quick(Term* term, Term* old, Term* newTerm);
 void remap_pointers_quick(Block* block, Term* old, Term* newTerm);
-void remap_pointers(Term* term, TermMap const& map);
-void remap_pointers(Term* term, Term* original, Term* replacement);
-void remap_pointers(Block* block, Term* original, Term* replacement);
 
 bool term_is_nested_in_block(Term* term, Block* block);
 

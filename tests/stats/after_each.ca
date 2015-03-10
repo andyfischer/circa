@@ -15,5 +15,3 @@ vm.call
 dupeCount = vm.perf_stats.get(:stat_ListDuplicate_100Count)
 print(dupeCount)
 
-require bytecode_analysis
-bytecode_analysis.dump_func(vm after_each)

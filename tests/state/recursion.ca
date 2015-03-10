@@ -16,9 +16,12 @@ def f(int level)
 
     print('finished call to f with level: ' level)
 
-s = null
-print('top level, calling f with level = 3')
-f(3, state = s)
+def main()
+    print('top level, calling f with level = 3')
+    f(3)
+
+vm = make_vm(main)
+vm.call
 
 print('finished, state looks like:')
-print(s)
+print(vm.get_state)

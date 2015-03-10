@@ -885,7 +885,7 @@ void loop_condition_bool(Bytecode* bc, Term* term)
     append_unresolved_jump(bc, addr, s_done);
 }
 
-void write_not_enough_inputs_error(Bytecode* bc, Block* func, int found)
+void maybe_write_not_enough_inputs_error(Bytecode* bc, Block* func, int found)
 {
     ca_assert(func != NULL);
     int expected = count_input_placeholders(func);
@@ -912,7 +912,7 @@ void write_not_enough_inputs_error(Bytecode* bc, Block* func, int found)
     call(bc, top, 1, FUNCS.error->nestedContents);
 }
 
-void write_too_many_inputs_error(Bytecode* bc, Block* func, int found)
+void maybe_write_too_many_inputs_error(Bytecode* bc, Block* func, int found)
 {
     int expected = count_input_placeholders(func);
     int varargs = has_variable_args(func);
@@ -953,8 +953,8 @@ void write_normal_call(Bytecode* bc, Term* term)
 
     int inputCount = term->numInputs();
 
-    write_not_enough_inputs_error(bc, target, inputCount);
-    write_too_many_inputs_error(bc, target, inputCount);
+    maybe_write_not_enough_inputs_error(bc, target, inputCount);
+    maybe_write_too_many_inputs_error(bc, target, inputCount);
 
     int top = reserve_new_frame_slots(bc, inputCount);
     
@@ -1233,7 +1233,11 @@ void write_continue(Bytecode* bc, Term* term)
     close_state_frame(bc, loop, term);
     loop_advance_iterator(bc, loop);
     loop_handle_locals_at_iteration_end(bc, loop, term, s_continue);
-    loop_preserve_iteration_result(bc, loop);
+
+    // investigate-
+    // how to preserve the iteration result? real result might not be live,
+    // we'd have to grab an intermediate value with the same name.
+    //loop_preserve_iteration_result(bc, loop);
 
     int addr = append_op(bc, op_jump);
     append_unresolved_jump(bc, addr, s_continue);
@@ -1338,7 +1342,7 @@ bool block_needs_no_evaluation(Bytecode* bc, Block* block)
 void write_term(Bytecode* bc, Term* term)
 {
     bool ignore = is_value(term)
-        || term_needs_no_evaluation2(term)
+        || term_needs_no_evaluation(term)
         || term->function == FUNCS.upvalue
         || term->function == FUNCS.loop_iterator;
 
@@ -1573,10 +1577,9 @@ int op_flags(int opcode)
     }
 }
 
-void perform_slot_compaction(Bytecode* bc)
+void perform_move_optimization(Bytecode* bc)
 {
-    // Precondition: The major block has finished being compiled, and every slot
-    // has a single assignment.
+    // Convert op_copy to op_move when it's safe to do so.
     
     for (int pc=0; pc < bc->opCount; pc++) {
         Op* op = &bc->ops[pc];
@@ -1587,6 +1590,11 @@ void perform_slot_compaction(Bytecode* bc)
                 op->opcode = op_move;
         }
     }
+}
+
+void perform_slot_compaction(Bytecode* bc)
+{
+    // TODO
 }
 
 Bytecode* compile_major_block(Block* block, VM* vm)
@@ -1608,6 +1616,7 @@ Bytecode* compile_major_block(Block* block, VM* vm)
     int growFrameAddr = append_op(bc, op_grow_frame, 0);
 
     major_block_contents(bc, block);
+    perform_move_optimization(bc);
     perform_slot_compaction(bc);
 
     bc->ops[growFrameAddr].a = bc->slotCount;

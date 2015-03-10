@@ -292,23 +292,6 @@ void Block::bindName(Term* term, Value* name)
     update_unique_name(term);
 }
 
-void Block::remapPointers(TermMap const& map)
-{
-    names.remapPointers(map);
-
-    for (int i = 0; i < _terms.length(); i++) {
-        Term* term = _terms[i];
-        if (term != NULL)
-            remap_pointers(term, map);
-    }
-}
-
-Term*
-Block::compile(const char* code)
-{
-    return parse(this, parse_statement_list, code);
-}
-
 const char* Block::name()
 {
     if (this->owningTerm == NULL)
@@ -605,10 +588,6 @@ void erase_term(Term* term)
     term->type = NULL;
     remove_nested_contents(term);
 
-    // for each user, clear that user's input list of this term
-    remove_from_any_user_lists(term);
-    clear_from_dependencies_of_users(term);
-
     if (term->owningBlock != NULL) {
         // remove name binding if necessary
         term->owningBlock->removeNameBinding(term);
@@ -637,7 +616,6 @@ void clear_block(Block* block)
 
         pre_erase_term(*it);
         set_inputs(*it, TermList());
-        remove_from_any_user_lists(*it);
         change_function(*it, NULL);
     }
 

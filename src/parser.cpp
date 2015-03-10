@@ -2139,12 +2139,10 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
             set_bool(&trueValue, true);
             inputHints.set(index, s_State, &trueValue);
             inputHints.set(index, s_ExplicitState, &trueValue);
-            inputHints.set(index, s_RebindsInput, "t");
         }
 
         if (lookahead_match_rebind_argument(tokens)) {
             tokens.consume(tok_Ampersand);
-            inputHints.set(index, s_RebindsInput, "t");
         }
 
         ParseResult parseResult = expression(block, tokens, context);

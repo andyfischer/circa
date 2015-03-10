@@ -139,12 +139,6 @@ void set_input(Term* term, int index, Term* input)
         term->inputs.push_back(NULL);
 
     term->inputs[index].term = input;
-
-    // Add 'term' to the user list of 'input'
-    append_user(term, input);
-
-    // Check if we should remove 'term' from the user list of previousInput
-    possibly_prune_user_list(term, previousInput);
 }
 
 void set_inputs(Term* term, TermList const& inputs)
@@ -154,14 +148,6 @@ void set_inputs(Term* term, TermList const& inputs)
     term->inputs.resize(inputs.length());
     for (int i=0; i < inputs.length(); i++)
         term->inputs[i] = Term::Input(inputs[i]);
-
-    // Add 'term' as a user to these new inputs
-    for (int i=0; i < inputs.length(); i++)
-        append_user(term, inputs[i]);
-
-    // Check to remove 'term' from user list of any previous inputs
-    for (size_t i=0; i < previousInputs.size(); i++)
-        possibly_prune_user_list(term, previousInputs[i].term);
 }
 
 void insert_input(Term* term, Term* input)
@@ -176,58 +162,6 @@ void insert_input(Term* term, int index, Term* input)
     set_input(term, index, input);
 }
 
-void append_user(Term* user, Term* usee)
-{
-    if (usee == NULL)
-        return;
-
-    if (usee != NULL && user != NULL)
-        usee->users.appendUnique(user);
-}
-
-static void remove_user(Term* usee, Term* user)
-{
-    usee->users.remove(user);
-}
-
-void possibly_prune_user_list(Term* user, Term* usee)
-{
-    if (usee == NULL)
-        return;
-
-    if (!is_actually_using(user, usee))
-        remove_user(usee, user);
-}
-
-void remove_from_any_user_lists(Term* term)
-{
-    for (int i=0; i < term->numDependencies(); i++) {
-        Term* usee = term->dependency(i);
-        if (usee == NULL)
-            continue;
-
-        remove_user(usee, term);
-    }
-}
-
-void clear_from_dependencies_of_users(Term* term)
-{
-    // Make a local copy of 'users', because these calls will want to modify
-    // the list.
-    TermList users = term->users;
-
-    term->users.clear();
-
-    for (int i=0; i < users.length(); i++) {
-        Term* user = users[i];
-        for (int input=0; input < user->numInputs(); input++)
-            if (user->input(input) == term)
-                set_input(user, input, NULL);
-        if (user->function == term)
-            change_function(user, NULL);
-    }
-}
-
 void change_function(Term* term, Term* function)
 {
     if (term->function == function)
@@ -237,16 +171,7 @@ void change_function(Term* term, Term* function)
 
     term->function = function;
 
-    possibly_prune_user_list(term, previousFunction);
-
     respecialize_type(term);
-
-    // Don't append user for certain functions. Need to make this more robust.
-    if (function != NULL
-            && function != FUNCS.value
-            && function != FUNCS.input) {
-        append_user(term, function);
-    }
 
     if (function != NULL
             && is_function(function) 
@@ -277,8 +202,6 @@ void set_declared_type(Term *term, Type *newType)
     term->type = newType;
 
     set_null(term_value(term));
-
-    // TODO: Use update_cascades to update inferred type on all users.
 }
 
 void respecialize_type(Term* term)
@@ -485,13 +408,6 @@ Term* create_symbol_value(Block* block, int value, const char* name)
     Term* term = create_value(block, TYPES.symbol, name);
     set_symbol(term_value(term), value);
     return term;
-}
-
-Term* duplicate_value(Block* block, Term* term)
-{
-    Term* dup = create_value(block, term->type);
-    copy(term_value(term), term_value(dup));
-    return dup;
 }
 
 Term* append_input_placeholder(Block* block)
@@ -723,20 +639,6 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     return NULL;
 }
 
-int count_anonymous_outputs(Block* block)
-{
-    int result = 0;
-    while (true) {
-        Term* output = get_output_placeholder(block, result);
-        if (output == NULL)
-            break;
-        if (!has_empty_name(output))
-            break;
-        result++;
-    }
-    return result;
-}
-
 void update_extra_output_count(Term* term, int count)
 {
     Block* block = term->owningBlock;
@@ -756,13 +658,8 @@ void update_extra_output_count(Term* term, int count)
     }
 }
 
-void update_extra_outputs(Term* term)
+void update_extra_outputs(Term* term, Block* targetBlock)
 {
-    Block* targetBlock = term_get_dispatch_block(term);
-
-    if (targetBlock == NULL)
-        return;
-
     int outputCount = count_output_placeholders(targetBlock);
     update_extra_output_count(term, outputCount - 1);
 
@@ -772,22 +669,7 @@ void update_extra_outputs(Term* term)
             break;
 
         Term* extraOutput = get_output_term(term, index);
-
-        // Find the associated input placeholder (if any).
-        int rebindsInput = placeholder->intProp(s_RebindsInput, -1);
-
-        // Use the appropriate name
-        if (rebindsInput >= 0) {
-            extraOutput->setIntProp(s_RebindsInput, rebindsInput);
-            Term* input = term->input(rebindsInput);
-
-            if (input != NULL)
-                rename(extraOutput, &input->nameValue);
-
-        } else {
-            rename(extraOutput, &placeholder->nameValue);
-        }
-
+        rename(extraOutput, &placeholder->nameValue);
         set_declared_type(extraOutput, placeholder->type);
     }
 }
@@ -865,9 +747,10 @@ void block_finish_changes(Block* block)
             block_finish_changes(term->nestedContents);
     }
 
+    if (is_major_block(block))
+        update_term_user_lists(block);
 
     fix_forward_function_references(block);
-
     annotate_stateful_values(block);
 
     // After we are finished creating outputs, update any nested control flow operators.
@@ -892,6 +775,27 @@ void block_finish_changes(Block* block)
     }
 
     block->inProgress = false;
+}
+
+void update_term_user_lists(Block* block)
+{
+    for (BlockIterator it(block); it; ++it) {
+        Term* term = *it;
+        term->users.clear();
+
+        for (int depi=0; depi < term->numDependencies(); depi++) {
+            Term* dep = term->dependency(depi);
+
+            if (dep == NULL)
+                continue;
+
+            if (dep->function == FUNCS.extra_output)
+                continue;
+                
+            if (is_under_same_major_block(term, dep))
+                dep->users.append(term);
+        }
+    }
 }
 
 void annotate_stateful_values(Block* block)
@@ -920,15 +824,6 @@ void annotate_stateful_values(Block* block)
     }
 }
 
-Term* find_user_with_function(Term* term, const char* funcName)
-{
-    for (int i=0; i < term->users.length(); i++) {
-        Term* user = term->users[i];
-        if (string_equals(&user->function->nameValue, funcName))
-            return user;
-    }
-    return NULL;
-}
 Term* apply_before(Term* existing, Term* function, int input)
 {
     Block* block = existing->owningBlock;
@@ -941,17 +836,8 @@ Term* apply_after(Term* existing, Term* function)
 {
     Block* block = existing->owningBlock;
 
-    // Grab a copy of users before we start messing with it
-    TermList users = existing->users;
-
     Term* newTerm = apply(block, function, TermList(existing));
     block->move(newTerm, existing->index + 1);
-
-    // Rewrite users to use the new term
-    for (int i=0; i < users.length(); i++) {
-        Term* user = users[i];
-        remap_pointers_quick(user, existing, newTerm);
-    }
 
     return newTerm;
 }
@@ -1051,16 +937,6 @@ void move_to_index(Term* term, int index)
     term->owningBlock->move(term, index);
 }
 
-void transfer_users(Term* from, Term* to)
-{
-    TermList users = from->users;
-    for (int i=0; i < users.length(); i++) {
-        if (users[i] == to)
-            continue;
-        remap_pointers_quick(users[i], from, to);
-    }
-}
-
 void input_placeholders_to_list(Block* block, TermList* list)
 {
     for (int i=0;; i++) {
@@ -1120,22 +996,6 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     update_declared_type(term);
 }
 
-void rewrite_as_value(Block* block, int index, Type* type)
-{
-    while (index > block->length())
-        block->append(NULL);
-
-    if (index >= block->length()) {
-        create_value(block, type);
-    } else {
-        Term* term = block->get(index);
-
-        change_function(term, FUNCS.value);
-        set_declared_type(term, type);
-        set_inputs(term, TermList());
-    }
-}
-
 void remove_term(Term* term)
 {
     int index = term->index;
@@ -1162,56 +1022,6 @@ void remap_pointers_quick(Block* block, Term* old, Term* newTerm)
 {
     for (int i=0; i < block->length(); i++)
         remap_pointers_quick(block->get(i), old, newTerm);
-}
-
-void remap_pointers(Term* term, TermMap const& map)
-{
-    // make sure this map doesn't try to remap NULL, because such a thing
-    // would almost definitely lead to errors.
-    ca_assert(!map.contains(NULL));
-
-    for (int i=0; i < term->numInputs(); i++)
-        set_input(term, i, map.getRemapped(term->input(i)));
-
-    term->function = map.getRemapped(term->function);
-
-    // TODO, call changeType if our type is changed
-    
-    Type::RemapPointers remapPointers = term->type->remapPointers;
-
-    // Remap on value
-    if ((term_value(term)->value_data.ptr != NULL)
-            && term->type != NULL
-            && (remapPointers)) {
-
-        remapPointers(term, map);
-    }
-
-    // This code once called remap on term->properties
-
-    // Remap inside nestedContents
-    if (has_nested_contents(term))
-        nested_contents(term)->remapPointers(map);
-}
-
-void remap_pointers(Term* term, Term* original, Term* replacement)
-{
-    ca_assert(original != NULL);
-
-    TermMap map;
-    map[original] = replacement;
-    remap_pointers(term, map);
-}
-
-void remap_pointers(Block* block, Term* original, Term* replacement)
-{
-    TermMap map;
-    map[original] = replacement;
-
-    for (int i=0; i < block->length(); i++) {
-        if (block->get(i) == NULL) continue;
-        remap_pointers(block->get(i), map);
-    }
 }
 
 bool term_is_nested_in_block(Term* term, Block* block)
