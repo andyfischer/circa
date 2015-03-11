@@ -365,17 +365,19 @@ int find_live_slot(Bytecode* bc, Term* term, bool allowNull = false)
     return -1;
 }
 
-void load_term(Bytecode* bc, Term* term, int slot)
+bool load_term_static(Bytecode* bc, Term* term, int slot)
 {
-    Value* foundOverride = hashtable_get_term_key(&bc->vm->termOverrides, term);
-    if (foundOverride != NULL) {
-        load_const(bc, slot)->set(foundOverride);
-        return;
-    }
+    // Try to load a static value for this term to 'slot'. Returns true if successful.
 
     if (term == NULL) {
         append_op(bc, op_set_null, slot);
-        return;
+        return true;
+    }
+
+    Value* foundOverride = hashtable_get_term_key(&bc->vm->termOverrides, term);
+    if (foundOverride != NULL) {
+        load_const(bc, slot)->set(foundOverride);
+        return true;
     }
 
     if (term->function == FUNCS.break_func
@@ -384,16 +386,7 @@ void load_term(Bytecode* bc, Term* term, int slot)
             || term->function == FUNCS.return_func) {
         // No output value
         append_op(bc, op_set_null, slot);
-        return;
-    }
-
-    int liveSlot = find_live_slot(bc, term, true);
-
-    if (liveSlot != -1) {
-        if (liveSlot != slot) {
-            append_op(bc, op_copy, liveSlot, slot);
-        }
-        return;
+        return true;
     }
 
     if (has_static_value(term)) {
@@ -401,13 +394,44 @@ void load_term(Bytecode* bc, Term* term, int slot)
         copy(term_value(term), append_const(bc, &constIndex));
         append_op(bc, op_load_const, constIndex, slot);
         //set_term_live(bc, term, slot);
-        return;
+        return true;
     }
 
-    internal_error("load_term: term is not live or loadable");
+    return false;
 }
 
-int load_or_find_term(Bytecode* bc, Term* term)
+bool load_term_live(Bytecode* bc, Term* term, int toSlot, bool move)
+{
+    int liveSlot = find_live_slot(bc, term, true);
+
+    if (liveSlot != -1) {
+        if (liveSlot != toSlot)
+            append_op(bc, move ? op_move : op_copy, liveSlot, toSlot);
+        return true;
+    }
+
+    return false;
+}
+
+void load_term(Bytecode* bc, Term* term, int toSlot, bool move)
+{
+    if (load_term_static(bc, term, toSlot))
+        return;
+
+    if (load_term_live(bc, term, toSlot, move))
+        return;
+
+    internal_error("load_term: term is not loadable");
+}
+
+void load_input_term(Bytecode* bc, Term* term, Term* input, int toSlot)
+{
+    bool move = can_move_term_result(input, term);
+
+    load_term(bc, input, toSlot, move);
+}
+
+int find_or_load_term(Bytecode* bc, Term* term)
 {
     int liveSlot = find_live_slot(bc, term, true);
 
@@ -415,7 +439,7 @@ int load_or_find_term(Bytecode* bc, Term* term)
         return liveSlot;
 
     int slot = reserve_slots(bc, 1);
-    load_term(bc, term, slot);
+    load_term(bc, term, slot, false);
     return slot;
 }
 
@@ -597,8 +621,8 @@ bool use_inline_bytecode(Bytecode* bc, Term* term)
         return false;
 
     int top = reserve_slots(bc, 3);
-    load_term(bc, term->input(0), top+1);
-    load_term(bc, term->input(1), top+2);
+    load_input_term(bc, term, term->input(0), top+1);
+    load_input_term(bc, term, term->input(1), top+2);
 
     append_op(bc, opcode, top, top+1, top+2);
     set_term_live(bc, term, top);
@@ -624,7 +648,7 @@ void dynamic_method(Bytecode* bc, Term* term)
     int top = reserve_new_frame_slots(bc, inputCount);
 
     for (int i=0; i < inputCount; i++)
-        load_term(bc, term->input(i), top + 1 + i);
+        load_input_term(bc, term, term->input(i), top + 1 + i);
     
     append_op(bc, op_dyn_method, top, inputCount, constIndex);
     set_term_live(bc, term, top);
@@ -706,7 +730,7 @@ void write_loop(Bytecode* bc, Block* loop)
             break;
 
         int slot = firstLocalInitial + i;
-        load_term(bc, placeholder->input(0), slot);
+        load_input_term(bc, placeholder, placeholder->input(0), slot);
         set_term_live(bc, placeholder, slot);
     }
 
@@ -720,7 +744,7 @@ void write_loop(Bytecode* bc, Block* loop)
         comment(bc, "load initial iterator value");
         Term* iterator = loop_find_iterator(loop);
         int iteratorSlot = reserve_slots(bc, 1);
-        load_term(bc, iterator->input(0), iteratorSlot);
+        load_input_term(bc, iterator, iterator->input(0), iteratorSlot);
         set_term_live(bc, iterator, iteratorSlot);
         minorFrame->loopIteratorSlot = iteratorSlot;
     }
@@ -729,16 +753,12 @@ void write_loop(Bytecode* bc, Block* loop)
     int iterationStart = bc->opCount;
     comment(bc, "loop iteration start");
 
-    Term* advanceTerm = NULL;
-
-    // Done check
     Term* doneTerm = NULL;
-    if (is_for_loop(loop))
-        doneTerm = loop_find_done_call(loop);
-
     Term* keyTerm = NULL;
-    if (is_for_loop(loop))
+    if (is_for_loop(loop)) {
+        doneTerm = loop_find_done_call(loop);
         keyTerm = loop_find_key(loop);
+    }
 
     comment(bc, "loop contents");
     
@@ -753,15 +773,13 @@ void write_loop(Bytecode* bc, Block* loop)
             comment(bc, "loop key");
             write_term(bc, keyTerm);
             if (should_write_state_header(bc, loop))
-                write_state_header(bc, load_or_find_term(bc, keyTerm));
-
+                write_state_header(bc, find_or_load_term(bc, keyTerm));
             continue;
         }
 
         if (term == doneTerm) {
             comment(bc, "done check");
             doneTerm = loop_find_done_call(loop);
-            advanceTerm = loop_find_iterator_advance(loop);
             write_term(bc, doneTerm);
             int addr = append_op(bc, op_jif, find_live_slot(bc, doneTerm));
             append_unresolved_jump(bc, addr, s_done);
@@ -824,7 +842,7 @@ void loop_advance_iterator(Bytecode* bc, Block* loop)
     Term* advanceTerm = loop_find_iterator_advance(loop);
     if (is_for_loop(loop)) {
         write_term(bc, advanceTerm);
-        load_term(bc, advanceTerm, mframe->loopIteratorSlot);
+        load_term(bc, advanceTerm, mframe->loopIteratorSlot, true);
     }
 }
 
@@ -859,7 +877,7 @@ void loop_handle_locals_at_iteration_end(Bytecode* bc, Block* loop, Term* atTerm
         else
             slot = mframe->loopFirstLocalOutput + i;
 
-        load_term(bc, finalValue, slot);
+        load_term(bc, finalValue, slot, false);
     }
 }
 
@@ -877,7 +895,7 @@ void loop_preserve_iteration_result(Bytecode* bc, Block* loop)
 
         int top = reserve_new_frame_slots(bc, 2);
         append_op(bc, op_copy, mframe->loopOutputSlot, top + 1);
-        load_term(bc, result, top + 2);
+        load_term(bc, result, top + 2, false);
         call(bc, top, 2, FUNCS.list_append->nestedContents);
         append_op(bc, op_copy, top, mframe->loopOutputSlot);
     }
@@ -887,7 +905,7 @@ void loop_condition_bool(Bytecode* bc, Term* term)
 {
     comment(bc, "loop condition");
     int slot = reserve_slots(bc, 1);
-    load_term(bc, term->input(0), slot);
+    load_input_term(bc, term, term->input(0), slot);
     int addr = append_op(bc, op_jnif, slot);
     append_unresolved_jump(bc, addr, s_done);
 }
@@ -967,11 +985,11 @@ void write_normal_call(Bytecode* bc, Term* term)
     
     for (int i=0; i < inputCount; i++) {
         int inputSlot = top + 1 + i;
-        load_term(bc, term->input(i), inputSlot);
+        load_input_term(bc, term, term->input(i), inputSlot);
     }
 
     if (count_closure_upvalues(target) != 0) {
-        load_term(bc, term->function, top);
+        load_input_term(bc, term, term->function, top);
         append_op(bc, op_func_call_d, top, inputCount);
     } else {
         call(bc, top, inputCount, target);
@@ -999,7 +1017,7 @@ void write_conditional_case(Bytecode* bc, Block* block, int conditionIndex)
     Term* condition = case_find_condition(block);
     if (condition != NULL) {
         int conditionSlot = reserve_slots(bc, 1);
-        load_term(bc, condition, conditionSlot);
+        load_term(bc, condition, conditionSlot, false);
 
         if (declared_type(condition) != TYPES.bool_type)
             cast_fixed_type(bc, conditionSlot, TYPES.bool_type);
@@ -1050,7 +1068,7 @@ void write_conditional_case(Bytecode* bc, Block* block, int conditionIndex)
         if (localResult && localResult->function == FUNCS.case_condition_bool)
             localResult = NULL;
 
-        load_term(bc, localResult, parentMframe->conditionalFirstOutputSlot + i);
+        load_term(bc, localResult, parentMframe->conditionalFirstOutputSlot + i, false);
     }
 
     comment(bc, "case fin");
@@ -1109,10 +1127,10 @@ void func_call(Bytecode* bc, Term* term)
 
     for (int i=0; i < inputCount; i++) {
         int inputSlot = top + 1 + i;
-        load_term(bc, term->input(i + 1), inputSlot);
+        load_input_term(bc, term, term->input(i + 1), inputSlot);
     }
 
-    load_term(bc, term->input(0), top);
+    load_input_term(bc, term, term->input(0), top);
     append_op(bc, op_func_call_d, top, inputCount);
     set_term_live(bc, term, top);
 }
@@ -1126,10 +1144,10 @@ void func_call_implicit(Bytecode* bc, Term* term)
 
     for (int i=0; i < inputCount; i++) {
         int inputSlot = top + 1 + i;
-        load_term(bc, term->input(i), inputSlot);
+        load_input_term(bc, term, term->input(i), inputSlot);
     }
 
-    load_term(bc, term->function, top);
+    load_input_term(bc, term, term->function, top);
     append_op(bc, op_func_call_d, top, inputCount);
     set_term_live(bc, term, top);
 }
@@ -1140,8 +1158,8 @@ void func_apply(Bytecode* bc, Term* term)
 
     int top = reserve_new_frame_slots(bc, 1);
 
-    load_term(bc, term->input(0), top);
-    load_term(bc, term->input(1), top + 1);
+    load_input_term(bc, term, term->input(0), top);
+    load_input_term(bc, term, term->input(1), top + 1);
     append_op(bc, op_func_apply_d, top, 0);
     set_term_live(bc, term, top);
 }
@@ -1164,7 +1182,7 @@ void closure_value(Bytecode* bc, Term* term)
         for (int i=0; i < inputCount; i++) {
             Term* term = block->get(i + firstTermIndex);
             ca_assert(term->function == FUNCS.upvalue);
-            load_term(bc, term->input(0), firstSlot + i);
+            load_input_term(bc, term, term->input(0), firstSlot + i);
         }
 
         append_op(bc, op_make_list, firstSlot, inputCount);
@@ -1285,8 +1303,8 @@ void write_declared_state(Bytecode* bc, Term* term)
 
     int top = reserve_new_frame_slots(bc, 3);
     append_op(bc, op_get_state_value, name_slot, top+1);
-    load_term(bc, term->input(1), top + 2);
-    load_term(bc, term->input(2), top + 3);
+    load_input_term(bc, term, term->input(1), top + 2);
+    load_input_term(bc, term, term->input(2), top + 3);
 
     call(bc, top, 4, FUNCS.declared_state->nestedContents);
     set_term_live(bc, term, top);
@@ -1313,7 +1331,7 @@ void save_declared_state(Bytecode* bc, Block* block, Term* atTerm)
         int slot = reserve_slots(bc, 2);
         copy(term_name(term), load_const(bc, slot));
         set_term_live(bc, NULL, slot);
-        load_term(bc, result, slot+1);
+        load_term(bc, result, slot+1, false);
         append_op(bc, op_save_state_value, slot, slot+1);
     }
 }
@@ -1508,7 +1526,7 @@ void set_subroutine_output(Bytecode* bc, Block* block, Term* result)
         bool castNecessary = (declared_type(placeholder) != declared_type(result))
             && (declared_type(placeholder) != TYPES.any);
 
-        load_term(bc, result, 0);
+        load_term(bc, result, 0, false);
         //set_term_live(bc, result, 0);
 
         if (castNecessary)
@@ -1675,49 +1693,49 @@ void dump_op(Bytecode* bc, Op op)
         printf("nope\n");
         break;
     case op_uncompiled_call:
-        printf("uncompiled_call top:%d inputCount:%d const:%d\n", op.a, op.b , op.c);
+        printf("uncompiled_call top:r%d count:%d const:%d\n", op.a, op.b , op.c);
         break;
     case op_call:
-        printf("call top:%d inputCount:%d addr:%d\n", op.a, op.b , op.c);
+        printf("call top:r%d count:%d addr:%d\n", op.a, op.b , op.c);
         break;
     case op_func_call_d:
-        printf("func_call_d top:%d inputCount:%d funcSlot:%d\n", op.a, op.b, op.c);
+        printf("func_call_d top:r%d count:%d funcSlot:%d\n", op.a, op.b, op.c);
         break;
     case op_func_apply_d:
-        printf("func_apply_d top:%d funcSlot:%d\n", op.a, op.c);
+        printf("func_apply_d top:r%d funcSlot:%d\n", op.a, op.c);
         break;
     case op_dyn_method:
-        printf("dyn_method top:%d inputCount:%d nameLocationConst:%d\n", op.a, op.b, op.c);
+        printf("dyn_method top:r%d count:%d nameLocationConst:%d\n", op.a, op.b, op.c);
         break;
-    case op_jump: printf("jump %d\n", op.c); break;
-    case op_jif: printf("jif %d %d\n", op.a, op.c); break;
-    case op_jnif: printf("jnif %d %d\n", op.a, op.c); break;
-    case op_jeq: printf("jeq %d %d %d\n", op.a, op.b, op.c); break;
-    case op_jneq: printf("jneq %d %d %d\n", op.a, op.b, op.c); break;
-    case op_jgt: printf("jgt %d %d %d\n", op.a, op.b, op.c); break;
-    case op_jgte: printf("jgte %d %d %d\n", op.a, op.b, op.c); break;
-    case op_jlt: printf("jlt %d %d %d\n", op.a, op.b, op.c); break;
-    case op_jlte: printf("jlte %d %d %d\n", op.a, op.b, op.c); break;
+    case op_jump: printf("jump r%d\n", op.c); break;
+    case op_jif: printf("jif r%d r%d\n", op.a, op.c); break;
+    case op_jnif: printf("jnif r%d r%d\n", op.a, op.c); break;
+    case op_jeq: printf("jeq r%d r%d r%d\n", op.a, op.b, op.c); break;
+    case op_jneq: printf("jneq r%d r%d r%d\n", op.a, op.b, op.c); break;
+    case op_jgt: printf("jgt r%d r%d r%d\n", op.a, op.b, op.c); break;
+    case op_jgte: printf("jgte r%d r%d r%d\n", op.a, op.b, op.c); break;
+    case op_jlt: printf("jlt r%d r%d r%d\n", op.a, op.b, op.c); break;
+    case op_jlte: printf("jlte r%d r%d r%d\n", op.a, op.b, op.c); break;
     case op_grow_frame: printf("grow_frame %d\n", op.a); break;
-    case op_load_const: printf("load_const const:%d slot:%d\n", op.a, op.b); break;
-    case op_load_i: printf("load_i value:%d slot:%d\n", op.a, op.b); break;
+    case op_load_const: printf("load_const const:%d slot:r%d\n", op.a, op.b); break;
+    case op_load_i: printf("load_i value:%d r%d\n", op.a, op.b); break;
     case op_native: printf("native %d\n", op.a); break;
     case op_ret: printf("ret\n"); break;
     case op_ret_or_stop: printf("ret_or_stop\n"); break;
-    case op_varargs_to_list: printf("varargs_to_list firstSlot:%d\n", op.a); break;
-    case op_splat_upvalues: printf("splat_upvalues firstSlot:%d count:%d\n", op.a, op.b); break;
-    case op_copy: printf("copy fromSlot:%d toSlot:%d\n", op.a, op.b); break;
-    case op_move: printf("move fromSlot:%d toSlot:%d\n", op.a, op.b); break;
-    case op_set_null: printf("set_null slot:%d\n", op.a); break;
-    case op_cast_fixed_type: printf("cast_fixed_type slot:%d\n", op.a); break;
-    case op_make_list: printf("make_list first:%d count:%d\n", op.a, op.b); break;
-    case op_make_func: printf("make_func %d %d\n", op.a, op.b); break;
-    case op_add_i: printf("add_i left:%d right:%d dest:%d\n", op.a, op.b, op.c); break;
-    case op_sub_i: printf("sub_i left:%d right:%d dest:%d\n", op.a, op.b, op.c); break;
-    case op_mult_i: printf("mult_i left:%d right:%d dest:%d\n", op.a, op.b, op.c); break;
-    case op_div_i: printf("div_i left:%d right:%d dest:%d\n", op.a, op.b, op.c); break;
-    case op_push_state_frame: printf("push_state_frame %d\n", op.a); break;
-    case op_push_state_frame_dkey: printf("push_state_frame %d %d\n", op.a, op.b); break;
+    case op_varargs_to_list: printf("varargs_to_list first:r%d\n", op.a); break;
+    case op_splat_upvalues: printf("splat_upvalues first:r%d count:%d\n", op.a, op.b); break;
+    case op_copy: printf("copy r%d to r%d\n", op.a, op.b); break;
+    case op_move: printf("move r%d to r%d\n", op.a, op.b); break;
+    case op_set_null: printf("set_null r%d\n", op.a); break;
+    case op_cast_fixed_type: printf("cast_fixed_type r%d\n", op.a); break;
+    case op_make_list: printf("make_list first:r%d count:%d\n", op.a, op.b); break;
+    case op_make_func: printf("make_func r%d r%d\n", op.a, op.b); break;
+    case op_add_i: printf("add_i r%d r%d dest:r%d\n", op.a, op.b, op.c); break;
+    case op_sub_i: printf("sub_i r%d r%d dest:r%d\n", op.a, op.b, op.c); break;
+    case op_mult_i: printf("mult_i r%d r%d dest:r%d\n", op.a, op.b, op.c); break;
+    case op_div_i: printf("div_i r%d r%d dest:r%d\n", op.a, op.b, op.c); break;
+    case op_push_state_frame: printf("push_state_frame first:r%d\n", op.a); break;
+    case op_push_state_frame_dkey: printf("push_state_frame first:r%d key:r%d\n", op.a, op.b); break;
     case op_pop_state_frame: printf("pop_state_frame\n"); break;
     case op_comment: {
         Value* val = (op.a < bc->consts.size) ? bc->consts[op.a] : NULL;

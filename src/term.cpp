@@ -499,6 +499,7 @@ bool term_is_observable_for_special_reasons(Term* term)
 {
     return (is_output_placeholder(term)
         || (term->function == FUNCS.function_decl)
+        || (term->function == FUNCS.loop_iterator)
         || (is_for_loop(term->owningBlock) && is_input_placeholder(term) && term->index == 0)
         || (is_loop(term->owningBlock) && is_output_placeholder(term))
         || (term_get_bool_prop(term, s_LocalStateResult, false)));
@@ -636,6 +637,23 @@ bool has_static_value(Term* term)
     return is_value(term)
         || !is_null(term_value(term))
         || term->owningBlock == global_builtins_block();
+}
+
+bool can_move_term_result(Term* input, Term* user)
+{
+    if (input == NULL)
+        return false;
+
+    if (has_static_value(input))
+        return false;
+
+    if (term_is_observable_after(input, user))
+        return false;
+
+    if (term_uses_input_multiple_times(user, input))
+        return false;
+
+    return false;
 }
 
 } // namespace circa

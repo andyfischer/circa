@@ -783,13 +783,13 @@ void update_term_user_lists(Block* block)
         Term* term = *it;
         term->users.clear();
 
+        if (term->function == FUNCS.extra_output)
+            continue;
+
         for (int depi=0; depi < term->numDependencies(); depi++) {
             Term* dep = term->dependency(depi);
 
             if (dep == NULL)
-                continue;
-
-            if (dep->function == FUNCS.extra_output)
                 continue;
                 
             if (is_under_same_major_block(term, dep))

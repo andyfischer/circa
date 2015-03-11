@@ -21,6 +21,7 @@
 #include "world.h"
 
 #define TRACE_EXECUTION 0
+#define TRACE_INCLUDE_REGISTERS 0
 #define TRACE_STATE_EXECUTION 0
 
 namespace circa {
@@ -256,7 +257,7 @@ void vm_run(VM* vm, VM* callingVM)
 
         #if TRACE_EXECUTION
             trace_execution_indent();
-            printf("[pc:%d top:%d]: ", vm->pc-1, vm->stackTop);
+            printf("[pc:%d]: ", vm->pc-1);
             dump_op(vm->bc, op);
         #endif
 
@@ -274,12 +275,23 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_call: {
+            #if TRACE_EXECUTION
+                trace_execution_indent();
+                printf(" inputs: (");
+                for (int i=0; i < op.b; i++) {
+                    if ( i > 0)
+                        printf(", ");
+                    char* s = get_slot(vm, op.a + 1 + i)->to_c_string();
+                    printf("%s", s);
+                    free(s);
+                }
+                printf(")\n");
+            #endif
+
             do_call_op(vm, op.a, op.b, op.c);
 
             #if TRACE_EXECUTION
                 executionDepth++;
-                trace_execution_indent();
-                printf("top is now: %d\n", vm->stackTop);
             #endif
 
             continue;
@@ -321,8 +333,6 @@ void vm_run(VM* vm, VM* callingVM)
 
             #if TRACE_EXECUTION
                 executionDepth++;
-                trace_execution_indent();
-                printf("top is now: %d\n", vm->stackTop);
             #endif
 
             continue;
@@ -378,8 +388,6 @@ void vm_run(VM* vm, VM* callingVM)
 
             #if TRACE_EXECUTION
                 executionDepth++;
-                trace_execution_indent();
-                printf("top is now: %d\n", vm->stackTop);
             #endif
 
             continue;
@@ -411,8 +419,6 @@ void vm_run(VM* vm, VM* callingVM)
 
                             #if TRACE_EXECUTION
                                 executionDepth++;
-                                trace_execution_indent();
-                                printf("top is now: %d\n", vm->stackTop);
                             #endif
 
                             continue;
@@ -443,8 +449,6 @@ void vm_run(VM* vm, VM* callingVM)
                     do_call_op(vm, op.a, 2, addr);
                     #if TRACE_EXECUTION
                         executionDepth++;
-                        trace_execution_indent();
-                        printf("top is now: %d\n", vm->stackTop);
                     #endif
                     continue;
                 }
@@ -465,8 +469,6 @@ void vm_run(VM* vm, VM* callingVM)
 
             #if TRACE_EXECUTION
                 executionDepth++;
-                trace_execution_indent();
-                printf("top is now: %d\n", vm->stackTop);
             #endif
 
             continue;
@@ -709,6 +711,12 @@ void vm_run(VM* vm, VM* callingVM)
     }
 
 finish_run:
+    #if TRACE_EXECUTION
+        printf("vm_run finished");
+        if (vm->error)
+            printf(" (with error)");
+        printf("\n");
+    #endif
     #if CIRCA_ENABLE_PERF_STATS
         g_perfStatList = prevPerfStatList;
     #endif
