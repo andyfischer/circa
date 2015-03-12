@@ -87,8 +87,8 @@ const int OP_READS_SLOT_A = 0x1;
 const int OP_READS_SLOT_B = 0x2;
 const int OP_READS_SLOT_C = 0x4;
 const int OP_WRITES_SLOT_A = 0x8;
-const int OP_WRITES_SLOT_B = 0x10;
-const int OP_READS_N_SLOTS = 0x40;
+const int OP_READS_N_SLOTS = 0x10;
+const int OP_PUSHES_FRAME = 0x20;
 
 struct BytecodeMetadata {
     u32 mopcode;
@@ -103,9 +103,10 @@ struct BytecodeMetadata {
 
 struct Liveness {
     Term* term;       // may be NULL
-    int firstWritePc; // may be -1
+    int writePc;      // may be -1
     int lastReadPc;   // may be -1
-    int reassignedTo;
+    bool relocateable;
+    bool usedInCall;
 };
 
 struct MinorFrame {

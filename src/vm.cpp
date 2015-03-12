@@ -20,8 +20,7 @@
 #include "vm.h"
 #include "world.h"
 
-#define TRACE_EXECUTION 0
-#define TRACE_INCLUDE_REGISTERS 0
+#define TRACE_EXECUTION 1
 #define TRACE_STATE_EXECUTION 0
 
 namespace circa {
@@ -507,8 +506,8 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_load_const: {
-            Value* val = get_const(vm, op.a);
-            Value* slot = get_slot_fast(vm, op.b);
+            Value* slot = get_slot_fast(vm, op.a);
+            Value* val = get_const(vm, op.b);
             copy(val, slot);
 
             #if TRACE_EXECUTION
@@ -519,8 +518,8 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_load_i: {
-            Value* slot = get_slot_fast(vm, op.b);
-            set_int(slot, op.a);
+            Value* slot = get_slot_fast(vm, op.a);
+            set_int(slot, op.b);
             continue;
         }
         case op_native: {
@@ -587,25 +586,25 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_copy: {
-            Value* left = get_slot_fast(vm, op.a);
-            Value* right = get_slot_fast(vm, op.b);
-            copy(left, right);
+            Value* dest = get_slot_fast(vm, op.a);
+            Value* source = get_slot_fast(vm, op.b);
+            copy(source, dest);
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
-                printf("copied value: %s to s%d\n", right->to_c_string(), op.b + vm->stackTop);
+                printf("copied value: %s to s%d\n", dest->to_c_string(), op.a + vm->stackTop);
             #endif
 
             continue;
         }
         case op_move: {
-            Value* left = get_slot_fast(vm, op.a);
-            Value* right = get_slot_fast(vm, op.b);
-            move(left, right);
+            Value* dest = get_slot_fast(vm, op.a);
+            Value* source = get_slot_fast(vm, op.b);
+            move(source, dest);
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
-                printf("moved value: %s to s%d\n", right->to_c_string(), op.b + vm->stackTop);
+                printf("moved value: %s to s%d\n", dest->to_c_string(), op.a + vm->stackTop);
             #endif
 
             continue;
@@ -696,7 +695,7 @@ void vm_run(VM* vm, VM* callingVM)
             pop_discard_state_frame(vm);
             continue;
         case op_get_state_value:
-            get_state_value(vm, get_slot_fast(vm, op.a), get_slot_fast(vm, op.b));
+            get_state_value(vm, get_slot_fast(vm, op.b), get_slot_fast(vm, op.a));
             continue;
         case op_save_state_value:
             save_state_value(vm, get_slot_fast(vm, op.a), get_slot_fast(vm, op.b));

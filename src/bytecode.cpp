@@ -61,6 +61,8 @@ namespace circa {
 int op_flags(int opcode);
 Liveness* get_liveness(Bytecode* bc, int slot);
 Value* append_const(Bytecode* bc, int* index);
+void comment(Bytecode* bc, Value* val);
+void comment(Bytecode* bc, const char* str);
 Liveness* set_term_live(Bytecode* bc, Term* term, int slot);
 bool block_needs_no_evaluation(Bytecode* bc, Block* block);
 Value* load_const(Bytecode* bc, int slot);
@@ -147,15 +149,15 @@ void grow_metadata(Bytecode* bc, int newSize)
 void update_slot_first_write(Bytecode* bc, int slot)
 {
     Liveness* liveness = get_liveness(bc, slot);
-    if (liveness->firstWritePc == -1)
-        liveness->firstWritePc = bc->opCount - 1;
+    if (liveness->writePc == -1)
+        liveness->writePc = bc->opCount - 1;
 }
 
 void update_slot_last_read(Bytecode* bc, int slot)
 {
     Liveness* liveness = get_liveness(bc, slot);
 
-    if (liveness->firstWritePc == -1)
+    if (liveness->writePc == -1)
         internal_error("update_slot_last_read called before slot had a write");
 
     liveness->lastReadPc = bc->opCount - 1;
@@ -167,26 +169,40 @@ struct OpReadSlotsIter {
     //   1) Ops that read one or more slot indexes in A, B, or C
     //   2) Ops that read N slots (where A = slot index 0, and B = slot count)
     
-    Op op;
+    Op* op;
     int opflags;
     int step;
 
     bool done() {
         if (opflags & OP_READS_N_SLOTS)
-            return step >= op.b;
+            return step >= op->b;
         else
             return step >= 3;
     }
 
     int current() {
         if (opflags & OP_READS_N_SLOTS)
-            return op.a + step;
+            return op->a + step + 1;
 
-        if (step == 0) return op.a;
-        if (step == 1) return op.b;
-        if (step == 2) return op.c;
+        if (step == 0) return op->a;
+        if (step == 1) return op->b;
+        if (step == 2) return op->c;
 
         return -1;
+    }
+
+    void set(int newval) {
+        ca_assert(!done());
+
+        if (opflags & OP_READS_N_SLOTS) {
+            if (step == 0)
+                op->a = newval;
+            return;
+        }
+
+        if (step == 0) op->a = newval;
+        if (step == 1) op->b = newval;
+        if (step == 2) op->c = newval;
     }
 
     void advance() {
@@ -207,11 +223,11 @@ struct OpReadSlotsIter {
     }
 };
 
-OpReadSlotsIter op_slots_read_iter(Op op)
+OpReadSlotsIter op_slots_read_iter(Op* op)
 {
     OpReadSlotsIter iter;
     iter.op = op;
-    iter.opflags = op_flags(op.opcode);
+    iter.opflags = op_flags(op->opcode);
     iter.step = 0;
     iter.settle();
     return iter;
@@ -221,10 +237,10 @@ int append_op(Bytecode* bc, u8 opcode, u16 a = 0, u16 b = 0, u16 c = 0)
 {
     ca_assert(opcode != 0);
 
-    int addr = bc->opCount;
+    int pc = bc->opCount;
     grow_ops(bc, bc->opCount + 1);
 
-    Op* op = &bc->ops[addr];
+    Op* op = &bc->ops[pc];
     op->opcode = opcode;
     op->a = a;
     op->b = b;
@@ -233,17 +249,26 @@ int append_op(Bytecode* bc, u8 opcode, u16 a = 0, u16 b = 0, u16 c = 0)
     // Update liveness
     int opflags = op_flags(opcode);
 
-    if (opflags & OP_WRITES_SLOT_A) update_slot_first_write(bc, a);
-    if (opflags & OP_WRITES_SLOT_B) update_slot_first_write(bc, b);
+    if (opflags & OP_WRITES_SLOT_A)
+        update_slot_first_write(bc, a);
 
     if (opcode == op_push_state_frame || opcode == op_push_state_frame_dkey)
-        for (int i=0; i < 4; i++)
+        for (int i=0; i < 4; i++) {
             update_slot_first_write(bc, a + i);
+            get_liveness(bc, a + i)->relocateable = false;
+        }
 
-    for (OpReadSlotsIter iter = op_slots_read_iter(*op); !iter.done(); iter.advance())
-        update_slot_last_read(bc, iter.current());
+    for (OpReadSlotsIter it = op_slots_read_iter(op); !it.done(); it.advance())
+        update_slot_last_read(bc, it.current());
 
-    return addr;
+    // Update 'usedInCall' of inputs.
+    if (opflags & OP_PUSHES_FRAME) {
+        for (OpReadSlotsIter it = op_slots_read_iter(op); !it.done(); it.advance())
+            get_liveness(bc, it.current())->usedInCall = true;
+        get_liveness(bc, op->a)->usedInCall = true;
+    }
+
+    return pc;
 }
 
 void update_op_reads_to_end_of_loop(Bytecode* bc, MinorFrame* loopFrame, int iterationStart)
@@ -255,7 +280,7 @@ void update_op_reads_to_end_of_loop(Bytecode* bc, MinorFrame* loopFrame, int ite
     // iterations.
 
     for (int pc=iterationStart; pc < bc->opCount; pc++) {
-        Op op = bc->ops[pc];
+        Op* op = &bc->ops[pc];
 
         for (OpReadSlotsIter iter = op_slots_read_iter(op); !iter.done(); iter.advance()) {
             if (iter.current() < loopFrame->loopFirstLocalInitial)
@@ -334,9 +359,10 @@ Liveness* get_liveness(Bytecode* bc, int slot)
         for (int i=bc->livenessCount; i < newSize; i++) {
             Liveness* liveness = &bc->liveness[i];
             liveness->term = 0;
-            liveness->firstWritePc = -1;
+            liveness->writePc = -1;
             liveness->lastReadPc = -1;
-            liveness->reassignedTo = -1;
+            liveness->usedInCall = false;
+            liveness->relocateable = true;
         }
         bc->livenessCount = newSize;
     }
@@ -392,7 +418,7 @@ bool load_term_static(Bytecode* bc, Term* term, int slot)
     if (has_static_value(term)) {
         int constIndex;
         copy(term_value(term), append_const(bc, &constIndex));
-        append_op(bc, op_load_const, constIndex, slot);
+        append_op(bc, op_load_const, slot, constIndex);
         //set_term_live(bc, term, slot);
         return true;
     }
@@ -406,7 +432,7 @@ bool load_term_live(Bytecode* bc, Term* term, int toSlot, bool move)
 
     if (liveSlot != -1) {
         if (liveSlot != toSlot)
-            append_op(bc, move ? op_move : op_copy, liveSlot, toSlot);
+            append_op(bc, move ? op_move : op_copy, toSlot, liveSlot);
         return true;
     }
 
@@ -427,6 +453,9 @@ void load_term(Bytecode* bc, Term* term, int toSlot, bool move)
 void load_input_term(Bytecode* bc, Term* term, Term* input, int toSlot)
 {
     bool move = can_move_term_result(input, term);
+
+    if (move)
+        comment(bc, "can move input");
 
     load_term(bc, input, toSlot, move);
 }
@@ -517,7 +546,7 @@ Value* load_const(Bytecode* bc, int slot)
 {
     int constIndex;
     Value* value = append_const(bc, &constIndex);
-    append_op(bc, op_load_const, constIndex, slot);
+    append_op(bc, op_load_const, slot, constIndex);
     return value;
 }
 
@@ -716,7 +745,7 @@ void write_loop(Bytecode* bc, Block* loop)
     int outputSlot = -1;
     if (produceOutput) {
         outputSlot = reserve_new_frame_slots(bc, 1);
-        append_op(bc, op_load_i, 0, outputSlot + 1);
+        append_op(bc, op_load_i, outputSlot + 1, 0);
         call(bc, outputSlot, 1, FUNCS.blank_list->nestedContents);
     }
 
@@ -810,7 +839,7 @@ void write_loop(Bytecode* bc, Block* loop)
         Term* placeholder = get_input_placeholder(loop, i);
         if (placeholder == NULL)
             break;
-        append_op(bc, op_move, firstLocalInitial + i, firstLocalOutput + i);
+        append_op(bc, op_move, firstLocalOutput + i, firstLocalInitial + i);
     }
 
     comment(bc, "finish loop");
@@ -894,10 +923,10 @@ void loop_preserve_iteration_result(Bytecode* bc, Block* loop)
             result = result->input(0);
 
         int top = reserve_new_frame_slots(bc, 2);
-        append_op(bc, op_copy, mframe->loopOutputSlot, top + 1);
+        append_op(bc, op_copy, top + 1, mframe->loopOutputSlot);
         load_term(bc, result, top + 2, false);
         call(bc, top, 2, FUNCS.list_append->nestedContents);
-        append_op(bc, op_copy, top, mframe->loopOutputSlot);
+        append_op(bc, op_copy, mframe->loopOutputSlot, top);
     }
 }
 
@@ -1302,7 +1331,7 @@ void write_declared_state(Bytecode* bc, Term* term)
     //set_term_live(bc, NULL, name_slot);
 
     int top = reserve_new_frame_slots(bc, 3);
-    append_op(bc, op_get_state_value, name_slot, top+1);
+    append_op(bc, op_get_state_value, top+1, name_slot);
     load_input_term(bc, term, term->input(1), top + 2);
     load_input_term(bc, term, term->input(2), top + 3);
 
@@ -1431,7 +1460,11 @@ void write_term(Bytecode* bc, Term* term)
 void handle_function_inputs(Bytecode* bc, Block* block)
 {
     // Reserve slots, including 1 for the output.
-    reserve_slots(bc, count_input_placeholders(block) + 1);
+    int headerSlots = count_input_placeholders(block) + 1;
+    reserve_slots(bc, headerSlots);
+
+    for (int i=0; i < headerSlots; i++)
+        get_liveness(bc, i)->relocateable = false;
 
     // Inputs are "live" at start of function.
     for (int i=0;; i++) {
@@ -1542,9 +1575,9 @@ int op_flags(int opcode)
     case op_func_call_s:
     case op_func_call_d:
     case op_dyn_method:
-        return OP_READS_N_SLOTS | OP_WRITES_SLOT_A;
+        return OP_READS_N_SLOTS | OP_WRITES_SLOT_A | OP_PUSHES_FRAME;
     case op_func_apply_d:
-        return OP_READS_SLOT_A | OP_WRITES_SLOT_A;
+        return OP_READS_SLOT_A | OP_WRITES_SLOT_A | OP_PUSHES_FRAME;
     case op_jump:
         return 0;
     case op_jif:
@@ -1563,7 +1596,6 @@ int op_flags(int opcode)
         return 0;
     case op_load_const:
     case op_load_i:
-        return OP_WRITES_SLOT_B;
     case op_varargs_to_list:
         return OP_WRITES_SLOT_A;
     case op_splat_upvalues:
@@ -1571,7 +1603,7 @@ int op_flags(int opcode)
         return 0;
     case op_copy:
     case op_move:
-        return OP_READS_SLOT_A | OP_WRITES_SLOT_B;
+        return OP_READS_SLOT_B | OP_WRITES_SLOT_A;
     case op_set_null:
         return OP_WRITES_SLOT_A;
     case op_cast_fixed_type:
@@ -1593,7 +1625,7 @@ int op_flags(int opcode)
     case op_pop_discard_state_frame:
         return 0;
     case op_get_state_value:
-        return OP_READS_SLOT_A | OP_WRITES_SLOT_B;
+        return OP_READS_SLOT_B | OP_WRITES_SLOT_A;
     case op_save_state_value:
         return OP_READS_SLOT_A | OP_READS_SLOT_B;
     case op_comment:
@@ -1605,21 +1637,127 @@ int op_flags(int opcode)
 void perform_move_optimization(Bytecode* bc)
 {
     // Convert op_copy to op_move when it's safe to do so.
+    // Bytecode is still in SSA form.
+    
+    int copyCount = 0;
+    int convertedCount = 0;
     
     for (int pc=0; pc < bc->opCount; pc++) {
         Op* op = &bc->ops[pc];
 
         if (op->opcode == op_copy) {
-            Liveness* al = get_liveness(bc, op->a);
-            if (al->lastReadPc <= pc)
+            copyCount++;
+            Liveness* al = get_liveness(bc, op->b);
+            if (al->lastReadPc <= pc) {
                 op->opcode = op_move;
+                convertedCount++;
+            }
         }
     }
+
+#if TRACE_MOVE_OPTIMIZATION
+    if (copyCount > 0) {
+        printf("move optimization: converted %.1f%% of %d op_copys to op_move\n",
+            100.0 * convertedCount / (copyCount), copyCount);
+    }
+#endif
 }
+
+struct SlotCompaction {
+    Bytecode* bc;
+    int* new_slot_to_old;
+    int* old_slot_to_new;
+
+    ~SlotCompaction() {
+        free(new_slot_to_old);
+        free(old_slot_to_new);
+    }
+
+    void init(Bytecode* _bc) {
+        bc = _bc;
+        new_slot_to_old = (int*) malloc(sizeof(int) * bc->slotCount);
+        old_slot_to_new = (int*) malloc(sizeof(int) * bc->slotCount);
+        for (int i=0; i < bc->slotCount; i++) {
+            new_slot_to_old[i] = -1;
+            old_slot_to_new[i] = -1;
+        }
+    }
+
+    bool is_new_slot_available(int slot, int pc) {
+        if (new_slot_to_old[slot] == -1)
+            // Haven't used this slot yet.
+            return true;
+
+        Liveness* liveness = get_liveness(bc, new_slot_to_old[slot]);
+
+        if ((pc > liveness->lastReadPc) && (pc > liveness->writePc))
+            // This slot had a mapping, but it expired.
+            return true;
+
+        return false;
+    }
+
+    int remap_to_first_available(int pc, int old) {
+        if (!get_liveness(bc, old)->relocateable)
+            return old;
+
+        if (old_slot_to_new[old] != -1) {
+            // already remapped
+            return old_slot_to_new[old];
+        }
+
+        for (int candidate=0; candidate < bc->slotCount; candidate++) {
+            if (!get_liveness(bc, candidate)->relocateable)
+                continue;
+
+            if (is_new_slot_available(candidate, pc)) {
+                new_slot_to_old[candidate] = old;
+                old_slot_to_new[old] = candidate;
+                return candidate;
+            }
+        }
+
+        internal_error("unexpected fallthrough in SlotCompaction.first_available");
+        return 0;
+    }
+};
 
 void perform_slot_compaction(Bytecode* bc)
 {
-    // TODO
+    // Convert SSA bytecode into bytecode that efficiently reuses slots.
+    
+    SlotCompaction map;
+    map.init(bc);
+
+    bool anyRemapped = false;
+
+    for (int pc=0; pc < bc->opCount; pc++) {
+        Op* op = &bc->ops[pc];
+        int opflags = op_flags(op->opcode);
+
+        // Update read slots
+        for (OpReadSlotsIter it = op_slots_read_iter(op); !it.done(); it.advance()) {
+            int remapped = map.old_slot_to_new[it.current()];
+            if (remapped != -1) {
+                printf("remapping read: r%d to r%d (pc:%d)\n", it.current(), remapped, pc);
+                it.set(remapped);
+            }
+        }
+
+        if (op->opcode == op_push_state_frame || op->opcode == op_push_state_frame_dkey)
+            continue;
+        
+        // If this op writes but doesn't push a frame, then it can write to the first available slot.
+        if (anyRemapped)
+            continue;
+
+        if (opflags & OP_WRITES_SLOT_A && !get_liveness(bc, op->a)->usedInCall) {
+            int prev = op->a;
+            op->a = map.remap_to_first_available(pc, op->a);
+            printf("remapping write: r%d to r%d (pc:%d)\n", prev, op->a, pc);
+            //anyRemapped = true;
+        }
+    }
 }
 
 Bytecode* compile_major_block(Block* block, VM* vm)
@@ -1641,6 +1779,8 @@ Bytecode* compile_major_block(Block* block, VM* vm)
     int growFrameAddr = append_op(bc, op_grow_frame, 0);
 
     major_block_contents(bc, block);
+
+    // Optimization
     perform_move_optimization(bc);
     perform_slot_compaction(bc);
 
@@ -1675,6 +1815,8 @@ void relocate(Op* op, int constDelta, int opsDelta)
         op->c += opsDelta;
         break;
     case op_load_const:
+        op->b += constDelta;
+        break;
     case op_comment:
         op->a += constDelta;
         break;
@@ -1707,25 +1849,25 @@ void dump_op(Bytecode* bc, Op op)
     case op_dyn_method:
         printf("dyn_method top:r%d count:%d nameLocationConst:%d\n", op.a, op.b, op.c);
         break;
-    case op_jump: printf("jump r%d\n", op.c); break;
-    case op_jif: printf("jif r%d r%d\n", op.a, op.c); break;
-    case op_jnif: printf("jnif r%d r%d\n", op.a, op.c); break;
-    case op_jeq: printf("jeq r%d r%d r%d\n", op.a, op.b, op.c); break;
-    case op_jneq: printf("jneq r%d r%d r%d\n", op.a, op.b, op.c); break;
-    case op_jgt: printf("jgt r%d r%d r%d\n", op.a, op.b, op.c); break;
-    case op_jgte: printf("jgte r%d r%d r%d\n", op.a, op.b, op.c); break;
-    case op_jlt: printf("jlt r%d r%d r%d\n", op.a, op.b, op.c); break;
-    case op_jlte: printf("jlte r%d r%d r%d\n", op.a, op.b, op.c); break;
+    case op_jump: printf("jump addr:%d\n", op.c); break;
+    case op_jif: printf("jif r%d addr:%d\n", op.a, op.c); break;
+    case op_jnif: printf("jnif r%d addr:%d\n", op.a, op.c); break;
+    case op_jeq: printf("jeq r%d r%d addr:%d\n", op.a, op.b, op.c); break;
+    case op_jneq: printf("jneq r%d r%d addr:%d\n", op.a, op.b, op.c); break;
+    case op_jgt: printf("jgt r%d r%d addr:%d\n", op.a, op.b, op.c); break;
+    case op_jgte: printf("jgte r%d r%d addr:%d\n", op.a, op.b, op.c); break;
+    case op_jlt: printf("jlt r%d r%d addr:%d\n", op.a, op.b, op.c); break;
+    case op_jlte: printf("jlte r%d r%d addr:%d\n", op.a, op.b, op.c); break;
     case op_grow_frame: printf("grow_frame %d\n", op.a); break;
-    case op_load_const: printf("load_const const:%d slot:r%d\n", op.a, op.b); break;
-    case op_load_i: printf("load_i value:%d r%d\n", op.a, op.b); break;
+    case op_load_const: printf("load_const slot:r%d const:%d\n", op.a, op.b); break;
+    case op_load_i: printf("load_i r%d value:%d\n", op.a, op.b); break;
     case op_native: printf("native %d\n", op.a); break;
     case op_ret: printf("ret\n"); break;
     case op_ret_or_stop: printf("ret_or_stop\n"); break;
     case op_varargs_to_list: printf("varargs_to_list first:r%d\n", op.a); break;
     case op_splat_upvalues: printf("splat_upvalues first:r%d count:%d\n", op.a, op.b); break;
-    case op_copy: printf("copy r%d to r%d\n", op.a, op.b); break;
-    case op_move: printf("move r%d to r%d\n", op.a, op.b); break;
+    case op_copy: printf("copy r%d to r%d\n", op.b, op.a); break;
+    case op_move: printf("move r%d to r%d\n", op.b, op.a); break;
     case op_set_null: printf("set_null r%d\n", op.a); break;
     case op_cast_fixed_type: printf("cast_fixed_type r%d\n", op.a); break;
     case op_make_list: printf("make_list first:r%d count:%d\n", op.a, op.b); break;
@@ -1788,9 +1930,9 @@ void Bytecode::dump()
     printf(" Slot count = %d\n", bc->slotCount);
     
     printf(" [Ops (count = %d)]\n", bc->opCount);
-    for (int i=0; i < bc->opCount; i++) {
-        printf("  ");
-        dump_op(bc, bc->ops[i]);
+    for (int pc=0; pc < bc->opCount; pc++) {
+        printf("  %d: ", pc);
+        dump_op(bc, bc->ops[pc]);
     }
 }
 
@@ -1842,6 +1984,8 @@ int append_compiled_major_block(Bytecode* assembled, Block* block)
     blockRecord->set_list(2);
     blockRecord->index(0)->set_int(baseOp);
     blockRecord->index(1)->set_int(assembled->opCount);
+
+    bc->dump();
 
     free_bytecode(bc);
 
