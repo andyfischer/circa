@@ -29,7 +29,8 @@ struct VM {
     ValueArray stack;
     u8 inputCount;
     Value incomingUpvalues;
-    int stateTop;
+
+    Value stateStack;
 
     Value state;
 
@@ -78,7 +79,7 @@ Value* vm_get_error(VM* vm);
 Value* vm_get_state(VM* vm);
 void vm_set_state(VM* vm, Value* state);
 
-void push_state_frame(VM* vm, int newTop, Value* key);
+void push_state_frame(VM* vm, Value* key);
 void pop_state_frame(VM* vm);
 void pop_discard_state_frame(VM* vm);
 void get_state_value(VM* vm, Value* key, Value* dest);

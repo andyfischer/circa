@@ -792,8 +792,10 @@ void update_term_user_lists(Block* block)
             if (dep == NULL)
                 continue;
                 
-            if (is_under_same_major_block(term, dep))
-                dep->users.append(term);
+            //if (!is_under_same_major_block(term, dep))
+            //    continue;
+
+            dep->users.append(term);
         }
     }
 }

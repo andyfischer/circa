@@ -87,6 +87,8 @@ void read_stdin_line(Value* line)
 
 void parse_string_as_argument_list(Value* str, Value* output)
 {
+    ca_assert(str != output);
+
     // Read the tokens as a space-seperated list of strings.
     // TODO is to be more smart about word boundaries: spaces inside
     // quotes or parentheses shouldn't break apart items.

@@ -20,8 +20,30 @@
 #include "vm.h"
 #include "world.h"
 
-#define TRACE_EXECUTION 1
-#define TRACE_STATE_EXECUTION 0
+#define TRACE_EXECUTION           0
+#define TRACE_EXECUTION_REGISTERS 0
+#define TRACE_STATE_EXECUTION     0
+
+/*
+ State frames
+
+ Each state frame consists of:
+   [parent, key, incoming, outgoing]
+
+ Frame is created with op_push_state_frame which provides the value 'key'
+   On creation we do a lookup in the topmost frame to digout 'incoming' (using key)
+   New frame is now 'topmost'
+
+ op_save_state_value will write to 'outgoing' hashtable of the topmost frame
+
+ op_pop_state_frame will:
+   Take 'outgoing' value from topmost frame
+   Make 'topmost->parent' the new topmost
+   Save 'outgoing' from previous top into 'outgoing' of the current topmost
+
+ op_pop_state_frame is similar, but it discards 'outgoing'
+
+*/
 
 namespace circa {
 
@@ -48,6 +70,7 @@ VM* new_vm(Block* main)
     initialize_null(&vm->demandEvalMap);
     set_hashtable(&vm->demandEvalMap);
     initialize_null(&vm->incomingUpvalues);
+    initialize_null(&vm->stateStack);
     initialize_null(&vm->incomingEnv);
     set_hashtable(&vm->incomingEnv);
     initialize_null(&vm->env);
@@ -80,7 +103,7 @@ void vm_reset_call_stack(VM* vm)
     vm->stack.clear();
     vm->stackTop = 0;
     vm->error = false;
-    vm->stateTop = -1;
+    set_null(&vm->stateStack);
     set_null(&vm->incomingUpvalues);
     vm->inputCount = 0;
 }
@@ -231,7 +254,7 @@ void vm_run(VM* vm, VM* callingVM)
 
     vm->pc = 0;
     vm->stackTop = 0;
-    vm->stateTop = -1;
+    set_null(&vm->stateStack);
     vm->error = false;
     vm->inputCount = 0;
     vm_grow_stack(vm, 1);
@@ -248,11 +271,43 @@ void vm_run(VM* vm, VM* callingVM)
 
     #define trace_execution_indent() for (int i=0; i < executionDepth; i++) printf(" ");
 
+    #if TRACE_EXECUTION
+        #define trace_call_inputs() \
+            trace_execution_indent(); \
+            printf(" inputs: ("); \
+            for (int i=0; i < op.b; i++) { \
+                if ( i > 0) \
+                    printf(", "); \
+                char* s = get_slot(vm, op.a + 1 + i)->to_c_string(); \
+                printf("%s", s); \
+                free(s); \
+            } \
+            printf(")\n");
+    #else
+        #define trace_call_inputs()
+    #endif
+
+
     while (true) {
 
         ca_assert(vm->pc < vm->bc->opCount);
 
         Op op = ops[vm->pc++];
+
+        #if TRACE_EXECUTION_REGISTERS
+            trace_execution_indent();
+            printf("(registers) ");
+            int count = std::min(vm->bc->slotCount, vm->stack.size - vm->stackTop);
+
+            for (int i=0; i < count; i++) {
+                char* s = get_slot_fast(vm, i)->to_c_string();
+                if (i != 0)
+                    printf(", ");
+                printf("%d:%s", i, s);
+                free(s);
+            }
+            printf("\n");
+        #endif
 
         #if TRACE_EXECUTION
             trace_execution_indent();
@@ -274,18 +329,7 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_call: {
-            #if TRACE_EXECUTION
-                trace_execution_indent();
-                printf(" inputs: (");
-                for (int i=0; i < op.b; i++) {
-                    if ( i > 0)
-                        printf(", ");
-                    char* s = get_slot(vm, op.a + 1 + i)->to_c_string();
-                    printf("%s", s);
-                    free(s);
-                }
-                printf(")\n");
-            #endif
+            trace_call_inputs();
 
             do_call_op(vm, op.a, op.b, op.c);
 
@@ -296,6 +340,8 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_func_call_d: {
+            trace_call_inputs();
+
             Value* func = get_slot_fast(vm, op.a);
 
             if (!is_closure(func)) {
@@ -337,7 +383,15 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_func_apply_d: {
-            Value* func = get_slot_fast(vm, op.a);
+            trace_call_inputs();
+
+            int top = op.a;
+
+            Value* func = get_slot_fast(vm, top+1);
+            Value* inputs = get_slot_fast(vm, top+2);
+            
+            Value inputsList;
+            move(inputs, &inputsList);
 
             if (!is_closure(func)) {
                 vm_throw_error_expected_closure(vm, func);
@@ -352,15 +406,12 @@ void vm_run(VM* vm, VM* callingVM)
             Block* block = func_block(func);
             copy(func_bindings(func), &vm->incomingUpvalues);
 
-            Value list;
-            move(vm->stack[vm->stackTop + op.a + 1], &list);
-
-            if (!is_list(&list)) {
+            if (!is_list(&inputsList)) {
                 vm->throw_str("Type error in input 1: expected list");
                 goto finish_run;
             }
 
-            int inputCount = list.length();
+            int inputCount = inputsList.length();
 
             int funcInputs = count_input_placeholders(block);
             int funcVarargs = has_variable_args(block);
@@ -378,7 +429,7 @@ void vm_run(VM* vm, VM* callingVM)
             vm_grow_stack(vm, vm->stackTop + op.a + inputCount + 1);
 
             for (int i=0; i < inputCount; i++)
-                copy(list.index(i), vm->stack[vm->stackTop + op.a + 1 + i]);
+                copy(inputsList.index(i), vm->stack[vm->stackTop + op.a + 1 + i]);
 
             int addr = find_or_compile_major_block(vm->bc, block);
             ops = vm->bc->ops;
@@ -392,6 +443,8 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_dyn_method: {
+            trace_call_inputs();
+
             // grow in case we need to convert to Map.get call.
             vm_grow_stack(vm, op.a + 3);
 
@@ -512,7 +565,7 @@ void vm_run(VM* vm, VM* callingVM)
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
-                printf("loaded const %s to s%d\n", slot->to_c_string(), op.b + vm->stackTop);
+                printf("loaded const %s to r%d\n", val->to_c_string(), op.a);
             #endif
 
             continue;
@@ -592,7 +645,7 @@ void vm_run(VM* vm, VM* callingVM)
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
-                printf("copied value: %s to s%d\n", dest->to_c_string(), op.a + vm->stackTop);
+                printf("copied: %s from r%d to r%d\n", dest->to_c_string(), op.b, op.a);
             #endif
 
             continue;
@@ -604,7 +657,7 @@ void vm_run(VM* vm, VM* callingVM)
 
             #if TRACE_EXECUTION
                 trace_execution_indent();
-                printf("moved value: %s to s%d\n", dest->to_c_string(), op.a + vm->stackTop);
+                printf("moved: %s from r%d to r%d\n", dest->to_c_string(), op.b, op.a);
             #endif
 
             continue;
@@ -615,8 +668,12 @@ void vm_run(VM* vm, VM* callingVM)
             continue;
         }
         case op_cast_fixed_type: {
-            Value* val = get_slot_fast(vm, op.a);
-            Type* type = as_type(get_const(vm, op.b));
+            Value* dest = get_slot_fast(vm, op.a);
+            Value* val = get_slot_fast(vm, op.b);
+
+            ca_assert(dest == val);
+
+            Type* type = as_type(get_const(vm, op.c));
             bool success = cast(val, type);
             if (!success) {
                 Value msg;
@@ -629,24 +686,11 @@ void vm_run(VM* vm, VM* callingVM)
             }
             continue;
         }
-        case op_make_list: {
-            int count = op.b;
-
-            Value list;
-            list.set_list(count);
-
-            for (int i=0; i < count; i++)
-                copy(get_slot_fast(vm, op.a + i), list.index(i));
-
-            move(&list, get_slot_fast(vm, op.a));
-            continue;
-        }
         case op_make_func: {
             Value* a = get_slot_fast(vm, op.a);
             Value* b = get_slot_fast(vm, op.b);
-
-            Value func;
-            set_closure(a, a->asBlock(), b);
+            Value* c = get_slot_fast(vm, op.c);
+            set_closure(a, b->asBlock(), c);
             continue;
         }
         case op_add_i: {
@@ -682,11 +726,11 @@ void vm_run(VM* vm, VM* callingVM)
             Term* caller = vm_calling_term(vm);
             if (caller != NULL)
                 key = unique_name(caller);
-            push_state_frame(vm, vm->stackTop + op.a, key);
+            push_state_frame(vm, key);
             continue;
         }
         case op_push_state_frame_dkey:
-            push_state_frame(vm, vm->stackTop + op.a, get_slot_fast(vm, op.b));
+            push_state_frame(vm, get_slot_fast(vm, op.a));
             continue;
         case op_pop_state_frame:
             pop_state_frame(vm);
@@ -886,6 +930,8 @@ void VM__get_bytecode_const(VM* vm)
 {
     VM* self = (VM*) get_pointer(vm->input(0));
     int index = vm->input(1)->as_i();
+    if (index < 0 || index >= self->bc->consts.size)
+        return vm->throw_str("index out of bounds");
     copy(get_const(self->bc, index), vm->output());
 }
 
@@ -1005,107 +1051,100 @@ void vm_demand_eval_store(VM* vm)
     copy(vm->input(1), hashtable_insert_term_key(&vm->demandEvalMap, term));
 }
 
-void push_state_frame(VM* vm, int newTop, Value* key)
+void push_state_frame(VM* vm, Value* key)
 {
     #if TRACE_STATE_EXECUTION
         printf("pushing state frame, top = %d (was %d), key = %s\n", newTop,
             vm->stateTop, key->to_c_string());
     #endif
 
-    Value* frameRetTop = vm->stack[newTop];
-    Value* frameKey = vm->stack[newTop + 1];
-    Value* frameIncoming = vm->stack[newTop + 2];
-    Value* frameOutgoing = vm->stack[newTop + 3];
-
-    set_int(frameRetTop, vm->stateTop);
-
-    if (vm->stateTop == -1) {
-        copy(&vm->state, frameIncoming);
-        set_null(frameKey);
-        #if TRACE_STATE_EXECUTION
-            printf("  top frame, copied vm->state: %s\n", frameIncoming->to_c_string());
-        #endif
-    } else {
-        copy(key, frameKey);
-        Value* parentIncoming = vm->stack[vm->stateTop + 2];
-        #if TRACE_STATE_EXECUTION
-            printf("  parent state frame is: %s\n", parentIncoming->to_c_string());
-        #endif
-        Value* found = NULL;
-        if (is_hashtable(parentIncoming))
-            found = hashtable_get(parentIncoming, key);
-        if (found != NULL) {
-            copy(found, frameIncoming);
-
-            #if TRACE_STATE_EXECUTION
-                printf("  incoming state frame is: %s\n", frameIncoming->to_c_string());
-            #endif
-        } else {
-            set_hashtable(frameIncoming);
-            #if TRACE_STATE_EXECUTION
-                printf("  incoming state frame is null\n");
-            #endif
-        }
+    if (is_null(&vm->stateStack)) {
+        // First frame
+        set_list(&vm->stateStack, 4);
+        copy(&vm->state, vm->stateStack.index(2));
+        return;
     }
 
-    set_null(frameOutgoing);
+    ca_assert(key != NULL);
 
-    vm->stateTop = newTop;
+    Value parent;
+    Value top;
+
+    move(&vm->stateStack, &parent);
+    set_list(&top, 4);
+    copy(key, top.index(1));
+
+    Value* parentIncoming = parent.index(2);
+    Value* incoming = top.index(2);
+
+    Value* found = NULL;
+
+    if (is_hashtable(parentIncoming))
+        found = hashtable_get(parentIncoming, key);
+
+    if (found != NULL) {
+        copy(found, incoming);
+
+        #if TRACE_STATE_EXECUTION
+            printf("  incoming state frame is: %s\n", incoming->to_c_string());
+        #endif
+    } else {
+        set_hashtable(incoming);
+        #if TRACE_STATE_EXECUTION
+            printf("  incoming state frame is null\n");
+        #endif
+    }
+
+    move(&parent, top.index(0));
+    move(&top, &vm->stateStack);
 }
 
 void pop_state_frame(VM* vm)
 {
-    int top = vm->stateTop;
-    ca_assert(top >= 0);
+    ca_assert(!is_null(&vm->stateStack));
 
-    Value* frameRetTop = vm->stack[top];
-    Value* frameKey = vm->stack[top + 1];
-    Value* frameIncoming = vm->stack[top + 2];
-    Value* frameOutgoing = vm->stack[top + 3];
+    Value top;
+    Value parent;
 
-    int retTop = frameRetTop->as_i();
+    move(&vm->stateStack, &top);
+    move(top.index(0), &parent);
 
-    #if TRACE_STATE_EXECUTION
-        printf("popping state frame, top = %d (was %d), key = %s\n", retTop,
-            vm->stateTop, frameKey->to_c_string());
-        printf("  frameOutgoing is %s\n", frameOutgoing->to_c_string());
-    #endif
+    Value* topOutgoing = top.index(3);
 
-    if (retTop == -1) {
-        move(frameOutgoing, &vm->state);
-        #if TRACE_STATE_EXECUTION
-            printf("  saved to vm->state: %s\n", vm->state.to_c_string());
-        #endif
-    } else {
-        Value* parentOutgoing = vm->stack[retTop + 3];
-        if (is_null(frameOutgoing)) {
-            if (is_hashtable(parentOutgoing))
-                hashtable_remove(parentOutgoing, frameKey);
-            #if TRACE_STATE_EXECUTION
-                printf("  deleted key from parent\n");
-            #endif
-        } else {
-            if (!is_hashtable(parentOutgoing))
-                set_hashtable(parentOutgoing);
-            move(frameOutgoing, hashtable_insert(parentOutgoing, frameKey));
-        }
+    if (is_null(&parent)) {
+        // First frame
+        move(topOutgoing, &vm->state);
+        return;
     }
 
-    vm->stateTop = retTop;
+    Value* key = top.index(1);
+    Value* parentOutgoing = parent.index(3);
+
+    if (is_null(topOutgoing)) {
+        if (is_hashtable(parentOutgoing))
+            hashtable_remove(parentOutgoing, key);
+        #if TRACE_STATE_EXECUTION
+            printf("  deleted key from parent\n");
+        #endif
+    } else {
+        if (!is_hashtable(parentOutgoing))
+            set_hashtable(parentOutgoing);
+        move(topOutgoing, hashtable_insert(parentOutgoing, key));
+    }
+
+    move(&parent, &vm->stateStack);
 }
 
 void pop_discard_state_frame(VM* vm)
 {
-    int top = vm->stateTop;
-    Value* frameRetTop = vm->stack[top];
-    vm->stateTop = frameRetTop->as_i();
+    Value top;
+    move(&vm->stateStack, &top);
+    move(top.index(0), &vm->stateStack);
 }
 
 void get_state_value(VM* vm, Value* key, Value* dest)
 {
-    ca_assert(vm->stateTop >= 0);
-
-    Value* frameIncoming = vm->stack[vm->stateTop + 2];
+    Value* frameIncoming = vm->stateStack.index(2);
     Value* found = NULL;
     if (is_hashtable(frameIncoming))
         found = hashtable_get(frameIncoming, key);
@@ -1126,9 +1165,7 @@ void save_state_value(VM* vm, Value* key, Value* value)
             value->to_c_string());
     #endif
 
-    ca_assert(vm->stateTop >= 0);
-
-    Value* frameOutgoing = vm->stack[vm->stateTop + 3];
+    Value* frameOutgoing = vm->stateStack.index(3);
     if (is_null(value)) {
         if (is_hashtable(frameOutgoing))
             hashtable_remove(frameOutgoing, key);

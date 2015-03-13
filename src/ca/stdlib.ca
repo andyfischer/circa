@@ -898,12 +898,12 @@ def List.append(self, any item) -> List
 def List.by_pairs(self) -> List
   out = []
   for i in range(0, self.length // 2)
-    @out.append([self.get(i*2) self.get(i*2 + 1)])
+    @out.append(1)
 
-  if self.length > 0 and (self.length % 2) == 1
-    @out.append([self.get(self.length - 1)])
+  if true
+    @out.append(2)
 
-  out
+  []
 
 def List.clear(self) -> List
   -- Return an empty list.

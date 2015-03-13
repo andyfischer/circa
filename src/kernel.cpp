@@ -191,7 +191,6 @@ Type* extra_output_specializeType(Term* term)
     return get_output_type(term->input(0), myOutputIndex);
 }
 
-
 Type* List__append_specializeType(Term* term)
 {
     Term* listInput = term->input(0);
@@ -676,6 +675,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
     caWorld* world = global_world();
 
     Block* builtins = global_builtins_block();
+    //dump(builtins);
 
     // Make sure there are no static errors in builtins. This shouldn't happen.
     if (has_static_errors(builtins)) {

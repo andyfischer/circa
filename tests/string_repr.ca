@@ -8,8 +8,13 @@ assert(from_string("'hi'") == 'hi')
 assert(from_string("\"hi\"") == 'hi')
 
 def round_trip(any val)
-    if from_string(to_string_repr(val)) != val
-        print('round trip failed on: ' val)
+  repr = to_string_repr(val)
+  from_repr = from_string(repr)
+ 
+  if val != from_repr
+    print('round trip failed on: ' val)
+    print('  repr: ' repr)
+    print('  from_repr: ' from_repr)
 
 
 round_trip(1)

@@ -28,6 +28,8 @@ static void drop_whitespace(TokenStream* tokens)
 
 static void parse_value(TokenStream* tokens, Value* out)
 {
+    set_null(out);
+
     // ignore leading whitespace
     drop_whitespace(tokens);
 
@@ -105,12 +107,17 @@ void parse_string_repr(const char* str, int len, Value* out)
 
 void parse_string_repr(Value* str, Value* out)
 {
+    ca_assert(str != out);
+
     TokenStream tokens(str);
     parse_value(&tokens, out);
 }
 
 void write_string_repr(Value* value, Value* out)
 {
+    ca_assert(value != out);
+    set_null(out);
+
     // For certain types, just use to_string
     if (is_int(value) || is_float(value) || is_bool(value)) {
         to_string(value, out);

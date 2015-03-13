@@ -28,6 +28,8 @@ static void drop_whitespace(TokenStream* tokens)
 
 static void parse_value(TokenStream* tokens, Value* out)
 {
+    set_null(out);
+
     // ignore leading whitespace
     drop_whitespace(tokens);
 

@@ -89,7 +89,7 @@ def dump_ops(VM vm, Blob ops)
       case :grow_frame
         str('grow_frame ' op.a)
       case :load_const
-        str('load_const slot: ' op.b ', value: ' vm.get_bytecode_const(op.a))
+        str('load_const slot: ' op.a ', value: ' vm.get_bytecode_const(op.b))
       case :ret_or_stop
         str('ret_or_stop')
       else

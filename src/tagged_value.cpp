@@ -400,6 +400,9 @@ bool cast_possible(Value* source, Type* type)
 
 void copy(Value* source, Value* dest)
 {
+    if (source == dest)
+        internal_error("copy() called with source == dest");
+
     stat_increment(Copy);
 
     ca_assert(source);
@@ -441,6 +444,9 @@ void swap(Value* left, Value* right)
 
 void move(Value* source, Value* dest)
 {
+    if (source == dest)
+        internal_error("move() called with source == dest");
+
     set_null(dest);
     dest->value_type = source->value_type;
     dest->value_data = source->value_data;

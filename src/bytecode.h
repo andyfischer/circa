@@ -17,12 +17,13 @@ namespace circa {
 
 const char op_nope = 0x1;
 
-const char op_uncompiled_call = 0x3;  // a: top, b: inputCount, c: const index of block
-const char op_call = 0x8;             // a: top, b: inputCount, c: addr
-const char op_func_call_s = 0x43;     // a: top, b: inputCount, c: addr
-const char op_func_call_d = 0x2;      // a: top, b: inputCount
-const char op_func_apply_d = 0x39;    // a: top & slot of input func
-const char op_dyn_method = 0x38;      // a: top, b: inputCount, c: const index of [name,location]
+const char op_uncompiled_call = 0x3;  // a: top, b: count, c: const index of block.
+const char op_call = 0x8;             // a: top, b: count, c: addr.
+const char op_func_call_s = 0x43;     // a: top, b: count, c: addr.
+const char op_func_call_d = 0x2;      // a: top, b: count.
+const char op_func_apply_d = 0x39;    // a: top, b: count. (count is always 2 in this case)
+const char op_dyn_method = 0x38;      // a: top, b: count, c: const index of [name,location]
+const char op_precall = 0x70;         // a: top, b: count. (precall is discarded during optimization)
 
 const char op_jump = 0x4;             // c: addr
 const char op_jif = 0x30;             // a: slot, c: addr
@@ -50,7 +51,6 @@ const char op_move = 0x7;             // a: sourceSlot, b: destSlot
 const char op_set_null = 0x6;         // a: slot
 const char op_cast_fixed_type = 0x40; // a: slot, b: const index of type
 const char op_make_func = 0x13;       // a: blockSlot (and output), b: bindingSlot
-const char op_make_list = 0x41;       // a: first, b: count
 
 const char op_add_i = 0x20;           // a: left, b: right, c: dest
 const char op_sub_i = 0x21;
@@ -106,7 +106,6 @@ struct Liveness {
     int writePc;      // may be -1
     int lastReadPc;   // may be -1
     bool relocateable;
-    bool usedInCall;
 };
 
 struct MinorFrame {
@@ -115,7 +114,7 @@ struct MinorFrame {
     int firstPc;
     bool hasBeenExited;
     int firstTemporarySlot;
-    int stateHeaderSlot;
+    int hasStateFrame;
 
     int loopIteratorSlot;
     bool loopProduceOutput;

@@ -639,9 +639,12 @@ bool has_static_value(Term* term)
         || term->owningBlock == global_builtins_block();
 }
 
-bool can_move_term_result(Term* input, Term* user)
+bool can_consume_term_result(Term* input, Term* user)
 {
     if (input == NULL)
+        return false;
+
+    if (user->function == FUNCS.upvalue)
         return false;
 
     if (has_static_value(input))
@@ -653,6 +656,8 @@ bool can_move_term_result(Term* input, Term* user)
     if (term_uses_input_multiple_times(user, input))
         return false;
 
+    //printf("can_consume_term_result: user %d can consume %d\n", user->id, input->id);
+    //return true;
     return false;
 }
 

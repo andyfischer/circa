@@ -110,7 +110,6 @@ const char* builtin_symbol_to_string(int name)
     case s_OverloadedFunc: return "OverloadedFunc";
     case s_Ref: return "Ref";
     case s_Rebind: return "Rebind";
-    case s_RebindsInput: return "RebindsInput";
     case s_Setter: return "Setter";
     case s_State: return "State";
     case s_Step: return "Step";
@@ -1090,27 +1089,9 @@ int builtin_symbol_from_string(const char* str)
     case 'e':
     switch (str[2]) {
     case 'b':
-    switch (str[3]) {
-    case 'i':
-    switch (str[4]) {
-    case 'n':
-    switch (str[5]) {
-    case 'd':
-    switch (str[6]) {
-    case 's':
-        if (strcmp(str + 7, "Input") == 0)
-            return s_RebindsInput;
-        break;
-    case 0:
+        if (strcmp(str + 3, "ind") == 0)
             return s_Rebind;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
+        break;
     case 'c':
     switch (str[3]) {
     case 'o':

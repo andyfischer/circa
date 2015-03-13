@@ -105,11 +105,14 @@ Value* closure_get_bindings(Value* value)
 
 void set_closure(Value* value, Block* block, Value* bindings)
 {
+    Value bindingsCopy;
+    if (bindings != NULL)
+        copy(bindings, &bindingsCopy);
+
     make(TYPES.func, value);
     touch(value);
     set_block(closure_get_block(value), block);
-    if (bindings != NULL)
-        set_value(closure_get_bindings(value), bindings);
+    move(&bindingsCopy, closure_get_bindings(value));
 }
 
 Block* func_block(Value* value)
