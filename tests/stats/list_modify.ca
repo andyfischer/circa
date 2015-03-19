@@ -2,9 +2,12 @@
 def main()
   long_list = repeat(0 100)
 
-  long_list[0] = [1 long_list]
+
+  def increment(int x)
+    x + 1
+
+  @long_list.modify(50 increment)
 
 vm = make_vm(main)
 vm.call
-
 print('large list dupes = ' vm.perf_stats.get(:stat_ListDuplicate_100Count))

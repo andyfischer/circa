@@ -425,6 +425,7 @@ stat_Copy
 stat_Cast
 stat_ValueCastDispatched
 stat_Touch
+stat_BlobDuplicate
 
 # List values
 stat_ListsCreated

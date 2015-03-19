@@ -156,6 +156,7 @@ char* blob_touch(Value* blobVal)
     if (blob->concreteType == BLOB_RAW && ((BlobRaw*) blob)->refcount == 1)
         return ((BlobRaw*) blob)->data;
 
+    stat_increment(BlobDuplicate);
     char* data;
     u32 numBytes;
     blob_data(blobVal, &data, &numBytes);

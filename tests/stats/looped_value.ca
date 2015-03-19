@@ -1,0 +1,12 @@
+
+def main()
+  b = make_blob(1)
+
+  for i in range(0 5)
+    @b.set_u8(0 i)
+
+  b
+
+vm = make_vm(main)
+vm.call
+print('dupes = ' vm.perf_stats.get(:stat_BlobDuplicate))

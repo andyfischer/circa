@@ -1,18 +1,18 @@
 
-def points(List points, Color color)
-  tris = for Vec2 point in points
-    [point color point.add([1.5 0]) color point.add([0 1.5]) color]
-  @tris.flatten
+def main()
+  def points(List points, Color color)
+    tris = for Vec2 point in points
+      [point color point.add([1.5 0]) color point.add([0 1.5]) color]
+    @tris.flatten
 
-  command = [:triangles tris.flatten]
-  channel_send(:render_commands command)
+    command = [:triangles tris.flatten]
+    channel_send(:render_commands command)
 
-my_points = for i in 0..1000
-  [i, i+0.5]
+  my_points = for i in 0..1000
+    [i, i+0.5]
 
-_perf_stats_dump()
+  points(my_points #123)
 
-points(my_points #123)
-
-listDuplications = _perf_stats_dump().get(:stat_ListDuplicate)
-assert(listDuplications < 4000)
+vm = make_vm(main)
+vm.call
+print('large list dupes = ' vm.perf_stats.get(:stat_ListDuplicate_100Count))

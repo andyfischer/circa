@@ -1,9 +1,0 @@
-
-def function_from_a() -> string
-  return "Success 1"
-
-namespace a_namespace
-  def function_from_a_2() -> string
-    return "Success 2"
-
-reflect_kernel().dump()

@@ -1,11 +1,10 @@
 
-long_list = repeat(0 100)
+def main()
+  long_list = repeat(0 100)
 
-_perf_stats_dump()
+  if true
+    @long_list.append(1)
 
-if true
-  @long_list.append(1)
-
-dupeCount = _perf_stats_dump().get(:stat_ListDuplicate_100Count)
-
-assert(dupeCount == 0)
+vm = make_vm(main)
+vm.call
+print('large list dupes = ' vm.perf_stats.get(:stat_ListDuplicate_100Count))

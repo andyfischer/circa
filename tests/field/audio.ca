@@ -1,12 +1,12 @@
 
 samples_per_sec = 44000
 bytes_per_sample = 4
-duration = 5.0
+duration = 0.5
 
 def audio_render(number duration, Func func) -> Blob
   samples = round(duration * samples_per_sec)
   sample = make_blob(samples * bytes_per_sample)
-  for s in 0..samples
+  for s in range(0 samples)
     t = s / samples_per_sec
 
     v = func.call(t)
@@ -23,3 +23,4 @@ audio_render(duration, (t) ->
 )
 
 print('Done')
+

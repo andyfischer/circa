@@ -1,5 +1,0 @@
-
-import a
-
-def some_function_from_b() -> string
-  return some_function_from_a()

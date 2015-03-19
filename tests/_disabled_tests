@@ -1,17 +1,9 @@
-benchmarks/*
 embed/*
-import_*
-perf/*
 syntax/local_typedef.ca
-recursion_tree.ca
-parser/omitted_closing_bracket.ca
 parser/at_symbol_resolved_first.ca
 hacks/derivative_test.ca
 hacks/watch.ca
 state/list_state_synced_across_discard.ca
-stats/after_each.ca
 stats/field_draw_points.ca
-stats/if_block_observability.ca
-stats/list_modify_move_opt.ca
 stats/module_no_dynamic_lookup.ca
 stats/no_unnecessary_state_calls.ca

@@ -1,3 +1,0 @@
-
-def some_function_from_a() -> string
-  return "Success"

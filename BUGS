@@ -1,43 +1,18 @@
 
 Miscellanous (most-recent first)
 
-  using @ on a function input is broken again (it creates an extra output)
-
   make 'make' optional on a type. As in, "Type.something" is equivalent to "Type.make.something"
  
   to_string should escape the stuff inside the string.. quotes and newlines and etc.
 
-  When pressing the reset_state button in Improv, suddenly got an old syntax
-  error. As if it was no longer using my recently-updated module.
-  
   Really confusing the way @ symbol is not added to field assignment
 
     Ex:
       struct.a.b = x
 
     Seems like @ should be in the mix somewhere.
-  
-  switch can't be used as expression. Example:
-      
-      x += switch 1
-        case 1
-          1
-
-  "else if" (instead of the correct elif) causes bad parsing. Example:
-      if t < 1/6
-        p + (q - p) * 6 * t
-      else if t < 1/2
-        q
-      else if t < 2/3
-        p + (q - p) * (2/3 - t) * 6
-      else
-        p
-
-  Defining a method on non-existant type: weird parser errors
 
   Can't use a type before it's defined. Should be able to post-define it like functions?
-
-  Error trace for dynamic_method: should have the actual method name, when possible.
 
   A superfluous @ symbol causes problems:
 
@@ -57,9 +32,6 @@ Code reload
 Modules
   When compiling a module, the last value is automatically turned into an output (just
     like a function). This should probably be explicit for modules?
-
-Functions
-  Return multiple values from a function, without using a `return` keyword.
 
 Anonymous functions
   Allow the same input syntax on non-anonymous functions (such as, explicit types, :multiple keyword, and etc)

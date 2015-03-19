@@ -1,8 +1,0 @@
-
-a = [{
-    print('inside closure')
-    ]
-
-print('top level 1')
-
-a[0].call()

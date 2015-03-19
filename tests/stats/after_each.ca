@@ -12,6 +12,4 @@ def main()
 
 vm = make_vm(main)
 vm.call
-dupeCount = vm.perf_stats.get(:stat_ListDuplicate_100Count)
-print(dupeCount)
-
+print('large list dupes = ' vm.perf_stats.get(:stat_ListDuplicate_100Count))

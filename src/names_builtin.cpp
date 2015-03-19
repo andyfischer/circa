@@ -379,6 +379,7 @@ const char* builtin_symbol_to_string(int name)
     case stat_Cast: return "stat_Cast";
     case stat_ValueCastDispatched: return "stat_ValueCastDispatched";
     case stat_Touch: return "stat_Touch";
+    case stat_BlobDuplicate: return "stat_BlobDuplicate";
     case stat_ListsCreated: return "stat_ListsCreated";
     case stat_ListsGrown: return "stat_ListsGrown";
     case stat_ListSoftCopy: return "stat_ListSoftCopy";
@@ -2252,6 +2253,10 @@ int builtin_symbol_from_string(const char* str)
         break;
     case 'B':
     switch (str[6]) {
+    case 'l':
+        if (strcmp(str + 7, "obDuplicate") == 0)
+            return stat_BlobDuplicate;
+        break;
     case 'y':
     switch (str[7]) {
     case 't':

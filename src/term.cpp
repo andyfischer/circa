@@ -500,7 +500,6 @@ bool term_is_observable_for_special_reasons(Term* term)
     return (is_output_placeholder(term)
         || (term->function == FUNCS.function_decl)
         || (term->function == FUNCS.loop_iterator)
-        || (is_for_loop(term->owningBlock) && is_input_placeholder(term) && term->index == 0)
         || (is_loop(term->owningBlock) && is_output_placeholder(term))
         || (term_get_bool_prop(term, s_LocalStateResult, false)));
 }
@@ -657,8 +656,7 @@ bool can_consume_term_result(Term* input, Term* user)
         return false;
 
     //printf("can_consume_term_result: user %d can consume %d\n", user->id, input->id);
-    //return true;
-    return false;
+    return true;
 }
 
 } // namespace circa

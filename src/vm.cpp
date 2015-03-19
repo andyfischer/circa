@@ -753,7 +753,7 @@ void vm_run(VM* vm, VM* callingVM)
         }
     }
 
-finish_run:
+finish_run:;
     #if TRACE_EXECUTION
         printf("vm_run finished");
         if (vm->error)
