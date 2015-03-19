@@ -49,12 +49,12 @@ Term* declared_type_term(Term* term)
 
 void set_is_statement(Term* term, bool value)
 {
-    term->setBoolProp(s_Statement, value);
+    term->setBoolProp(s_statement, value);
 }
 
 bool is_statement(Term* term)
 {
-    return term->boolProp(s_Statement, false);
+    return term->boolProp(s_statement, false);
 }
 
 bool is_comment(Term* term)
@@ -64,7 +64,7 @@ bool is_comment(Term* term)
 
 bool is_empty_comment(Term* term)
 {
-    return is_comment(term) && term->stringProp(s_Comment,"") == "";
+    return is_comment(term) && term->stringProp(s_comment,"") == "";
 }
 
 bool is_value(Term* term)
@@ -74,7 +74,7 @@ bool is_value(Term* term)
 
 bool is_hidden(Term* term)
 {
-    if (term->boolProp(s_Hidden, false))
+    if (term->boolProp(s_hidden, false))
         return true;
 
     if (has_empty_name(term))
@@ -606,7 +606,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
         string_append(out, ":multiple ");
     if (term->boolProp(s_Output, false))
         string_append(out, ":output ");
-    if (term->boolProp(s_State, false))
+    if (term->boolProp(s_state, false))
         string_append(out, ":state ");
     if (term->hasProperty(s_Field)) {
         string_append(out, ":field(");

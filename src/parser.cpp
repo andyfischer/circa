@@ -575,7 +575,7 @@ ParseResult comment(Block* block, TokenStream& tokens, ParserCxt* context)
     }
 
     Term* result = apply(block, FUNCS.comment, TermList());
-    result->setProp(s_Comment, &commentText);
+    result->setProp(s_comment, &commentText);
 
     return ParseResult(result);
 }
@@ -770,7 +770,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             input->setBoolProp(s_Syntax_ExplicitType, false);
 
         if (isStateArgument)
-            input->setBoolProp(s_State, true);
+            input->setBoolProp(s_state, true);
 
         if (rebindSymbol) {
             input->setBoolProp(s_Output, true);
@@ -2137,7 +2137,7 @@ void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
             possible_whitespace(tokens);
             Value trueValue;
             set_bool(&trueValue, true);
-            inputHints.set(index, s_State, &trueValue);
+            inputHints.set(index, s_state, &trueValue);
             inputHints.set(index, s_ExplicitState, &trueValue);
         }
 
@@ -2657,7 +2657,7 @@ ParseResult literal_float(Block* block, TokenStream& tokens, ParserCxt* context)
     // Assign a default step value, using the # of decimal figures
     int decimalFigures = get_number_of_decimal_figures(text);
     float step = (float) std::pow(0.1, decimalFigures);
-    term->setFloatProp(s_Step, step);
+    term->setFloatProp(s_step, step);
 
     // Store the original string
     term->setStringProp(s_Syntax_OriginalFormat, text);

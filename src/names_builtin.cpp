@@ -18,9 +18,11 @@ const char* builtin_symbol_to_string(int name)
     case s_block: return "block";
     case s_break: return "break";
     case s_case: return "case";
+    case s_comment: return "comment";
     case s_continue: return "continue";
     case s_conditional_done: return "conditional_done";
     case s_count: return "count";
+    case s_current: return "current";
     case s_current_term: return "current_term";
     case s_declared_state: return "declared_state";
     case s_discard: return "discard";
@@ -33,6 +35,7 @@ const char* builtin_symbol_to_string(int name)
     case s_format: return "format";
     case s_frames: return "frames";
     case s_has_state: return "has_state";
+    case s_hidden: return "hidden";
     case s_ident: return "ident";
     case s_incoming: return "incoming";
     case s_index: return "index";
@@ -69,6 +72,9 @@ const char* builtin_symbol_to_string(int name)
     case s_slot: return "slot";
     case s_slots: return "slots";
     case s_slotCount: return "slotCount";
+    case s_state: return "state";
+    case s_statement: return "statement";
+    case s_step: return "step";
     case s_switch: return "switch";
     case s_success: return "success";
     case s_type: return "type";
@@ -86,7 +92,6 @@ const char* builtin_symbol_to_string(int name)
     case s_StaticErrors: return "StaticErrors";
     case s_IsModule: return "IsModule";
     case s_AccumulatingOutput: return "AccumulatingOutput";
-    case s_Comment: return "Comment";
     case s_Constructor: return "Constructor";
     case s_Error: return "Error";
     case s_ExplicitState: return "ExplicitState";
@@ -94,7 +99,6 @@ const char* builtin_symbol_to_string(int name)
     case s_Field: return "Field";
     case s_FieldAccessor: return "FieldAccessor";
     case s_Final: return "Final";
-    case s_Hidden: return "Hidden";
     case s_HiddenInput: return "HiddenInput";
     case s_Implicit: return "Implicit";
     case s_IgnoreError: return "IgnoreError";
@@ -111,9 +115,6 @@ const char* builtin_symbol_to_string(int name)
     case s_Ref: return "Ref";
     case s_Rebind: return "Rebind";
     case s_Setter: return "Setter";
-    case s_State: return "State";
-    case s_Step: return "Step";
-    case s_Statement: return "Statement";
     case s_Output: return "Output";
     case s_PreferSpecialize: return "PreferSpecialize";
     case s_Error_UnknownType: return "Error_UnknownType";
@@ -497,10 +498,6 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'o':
     switch (str[2]) {
-    case 'm':
-        if (strcmp(str + 3, "ment") == 0)
-            return s_Comment;
-        break;
     case 'n':
     switch (str[3]) {
     case 's':
@@ -816,27 +813,9 @@ int builtin_symbol_from_string(const char* str)
     case 'i':
     switch (str[2]) {
     case 'd':
-    switch (str[3]) {
-    case 'd':
-    switch (str[4]) {
-    case 'e':
-    switch (str[5]) {
-    case 'n':
-    switch (str[6]) {
-    case 'I':
-        if (strcmp(str + 7, "nput") == 0)
+        if (strcmp(str + 3, "denInput") == 0)
             return s_HiddenInput;
         break;
-    case 0:
-            return s_Hidden;
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
-    default: return -1;
-    }
     case 'g':
         if (strcmp(str + 3, "hestExitLevel") == 0)
             return s_HighestExitLevel;
@@ -1154,29 +1133,11 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 't':
-    switch (str[4]) {
-    case 'e':
-    switch (str[5]) {
-    case 'm':
-        if (strcmp(str + 6, "ent") == 0)
-            return s_Statement;
-        break;
-    case 0:
-            return s_State;
-    default: return -1;
-    }
-    case 'i':
-        if (strcmp(str + 5, "cErrors") == 0)
+        if (strcmp(str + 4, "icErrors") == 0)
             return s_StaticErrors;
         break;
     default: return -1;
     }
-    default: return -1;
-    }
-    case 'e':
-        if (strcmp(str + 3, "p") == 0)
-            return s_Step;
-        break;
     case 'o':
     switch (str[3]) {
     case 'r':
@@ -1827,6 +1788,10 @@ int builtin_symbol_from_string(const char* str)
         break;
     case 'o':
     switch (str[2]) {
+    case 'm':
+        if (strcmp(str + 3, "ment") == 0)
+            return s_comment;
+        break;
     case 'n':
     switch (str[3]) {
     case 'd':
@@ -1846,9 +1811,35 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'u':
-        if (strcmp(str + 2, "rrent_term") == 0)
+    switch (str[2]) {
+    case 'r':
+    switch (str[3]) {
+    case 'r':
+    switch (str[4]) {
+    case 'e':
+    switch (str[5]) {
+    case 'n':
+    switch (str[6]) {
+    case 't':
+    switch (str[7]) {
+    case '_':
+        if (strcmp(str + 8, "term") == 0)
             return s_current_term;
         break;
+    case 0:
+            return s_current;
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
     default: return -1;
     }
     case 'd':
@@ -1939,6 +1930,10 @@ int builtin_symbol_from_string(const char* str)
         break;
     default: return -1;
     }
+    case 'i':
+        if (strcmp(str + 2, "dden") == 0)
+            return s_hidden;
+        break;
     default: return -1;
     }
     case 'i':
@@ -3101,10 +3096,24 @@ int builtin_symbol_from_string(const char* str)
         break;
     default: return -1;
     }
+    case 'e':
+    switch (str[5]) {
+    case 'm':
+        if (strcmp(str + 6, "ent") == 0)
+            return s_statement;
+        break;
+    case 0:
+            return s_state;
     default: return -1;
     }
     default: return -1;
     }
+    default: return -1;
+    }
+    case 'e':
+        if (strcmp(str + 3, "p") == 0)
+            return s_step;
+        break;
     default: return -1;
     }
     case 'u':

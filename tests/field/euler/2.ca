@@ -4,11 +4,11 @@ struct Fib {
   int b
 }
 
-def Fib.next(self)
+def Fib.current(self)
   self.a + self.b
 
 def Fib.advance(@self)
-  b = self.next
+  b = self.current
   self.a = self.b
   self.b = b
 

@@ -130,13 +130,13 @@ void start_building_for_loop(Block* contents, Term* listExpr, Value* indexName,
         hide_from_source(getIndex);
     }
 
-    Term* getNext = apply_dynamic_method(contents, s_next, TermList(iterator), elementName);
-    getNext->setBoolProp(s_iterator_value, true);
-    hide_from_source(getNext);
+    Term* getCurrent = apply_dynamic_method(contents, s_current, TermList(iterator), elementName);
+    getCurrent->setBoolProp(s_iterator_value, true);
+    hide_from_source(getCurrent);
 
     if (iteratorType != NULL) {
         Term* castedValue = apply(contents, FUNCS.cast,
-            TermList(getNext, iteratorType->declaringTerm), elementName);
+            TermList(getCurrent, iteratorType->declaringTerm), elementName);
     }
 }
 

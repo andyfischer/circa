@@ -4,9 +4,11 @@ advance
 block
 break
 case
+comment
 continue
 conditional_done
 count
+current
 current_term
 declared_state
 discard
@@ -19,6 +21,7 @@ filename
 format
 frames
 has_state
+hidden
 ident
 incoming
 index
@@ -55,6 +58,9 @@ return
 slot
 slots
 slotCount
+state
+statement
+step
 switch
 success
 type
@@ -76,7 +82,6 @@ IsModule
 
 # Term properties
 AccumulatingOutput
-Comment
 Constructor
 Error
 ExplicitState
@@ -84,7 +89,6 @@ ExplicitType
 Field
 FieldAccessor
 Final
-Hidden
 HiddenInput
 Implicit
 IgnoreError
@@ -101,14 +105,10 @@ OverloadedFunc
 Ref
 Rebind
 Setter
-State
-Step
-Statement
 Output
 PreferSpecialize
 
 Error_UnknownType
-
 
 Syntax_AnonFunction
 Syntax_BlockStyle

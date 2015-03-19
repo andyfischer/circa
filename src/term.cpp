@@ -357,20 +357,20 @@ void set_input_implicit(Term* term, int index, bool implicit)
 }
 bool is_input_hidden(Term* term, int index)
 {
-    Value* val = term_get_input_property(term, index, s_Hidden);
+    Value* val = term_get_input_property(term, index, s_hidden);
     if (val == NULL)
         return false;
     return as_bool(val);
 }
 void set_input_hidden(Term* term, int index, bool hidden)
 {
-    set_bool(term_insert_input_property(term, index, s_Hidden), true);
+    set_bool(term_insert_input_property(term, index, s_hidden), true);
 }
 
 void hide_from_source(Term* term)
 {
     ca_assert(term != NULL);
-    term->setBoolProp(s_Hidden, true);
+    term->setBoolProp(s_hidden, true);
 }
 
 Value* term_name(Term* term)

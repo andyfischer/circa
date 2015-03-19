@@ -342,7 +342,7 @@ struct ListSeq {
 
 def ListSeq.key(self) self.index
 def ListSeq.done(self) self.index >= self.list.length
-def ListSeq.next(self) self.list.get(self.index)
+def ListSeq.current(self) self.list.get(self.index)
 def ListSeq.advance(@self) self.index += 1
 
 def List.to_seq(self)
@@ -354,7 +354,7 @@ struct ConcatSeq {
 }
 
 def ConcatSeq.done(self) self.left.done and self.right.done
-def ConcatSeq.next(self) self.left.next
+def ConcatSeq.current(self) self.left.current
 def ConcatSeq.key(self) self.left.key
 def ConcatSeq.settle(self) cond(self.left.done, self.right, self)
 
@@ -371,7 +371,7 @@ struct FilterSeq {
 }
 
 def FilterSeq.done(self) self.seq.done
-def FilterSeq.next(self) self.seq.next
+def FilterSeq.current(self) self.seq.current
 def FilterSeq.key(self) self.seq.key
 
 def FilterSeq.settle(@self)
@@ -379,7 +379,7 @@ def FilterSeq.settle(@self)
     if self.done
       return self
 
-    if self.func.call(self.seq.next)
+    if self.func.call(self.seq.current)
       return self
 
     @self.advance
@@ -396,8 +396,8 @@ struct UntilSeq {
   Func doneFunc
 }
 
-def UntilSeq.done(self) self.doneFunc.call(self.seq.next)
-def UntilSeq.next(self) self.seq.next
+def UntilSeq.done(self) self.doneFunc.call(self.seq.current)
+def UntilSeq.current(self) self.seq.current
 def UntilSeq.advance(@self) @self.seq.advance
 def UntilSeq.key(self) self.seq.key
 
@@ -413,7 +413,7 @@ struct Range {
 def Range.done(self) -> bool
   self.from >= self.to
 
-def Range.next(self)
+def Range.current(self)
   self.from
 
 def Range.key(self) -> int
@@ -1254,9 +1254,9 @@ def Term.is_func_decl(self) -> bool
 def Term.has_name(term) -> bool
   term.name != ''
 def Term.is_hidden(term) -> bool
-  term.property_opt(:Hidden, false)
+  term.property_opt(:hidden, false)
 def Term.is_statement(term) -> bool
-  term.property_opt(:Statement, false)
+  term.property_opt(:statement, false)
 def Term.is_type(self) -> bool
     self.is_value and is_type(self.value)
 def Term.is_input_placeholder(self) -> bool
