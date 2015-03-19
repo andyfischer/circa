@@ -440,15 +440,10 @@ def flatten(it) -> List
     
   fold(it append [])
 
-def visit(it, func)
-  for i in it
-    func(i)
-
 def unique_id() -> int
 def source_id() -> any
 
--- Channels
-def channel_send(Symbol name, any val)
+def emit(Symbol name, any val)
 
 def global_script_version() -> int
 
@@ -786,7 +781,8 @@ def VM.apply(self, List inputs) -> any
 def VM.block(self) -> Block
   -- Returns the (topmost) block.
 def VM.call(self, any inputs :multiple) -> any
-def VM.consume_channel(self, key) -> List
+def VM.expect_messages(self, key)
+def VM.consume_messages(self, key) -> List
 def VM.run(self)
   self.call
 def VM.copy(self) -> VM
@@ -830,14 +826,6 @@ def VM.forward_env(self, names :multiple)
   for name in names
     self.set_env(name env(name))
 
-def VM.init_channel(self, any name)
-  self.set_env(name, [])
-
-def VM.read_channel(self, any name)
-  out = self.env_map.get(name)
-  self.set_env(name, [])
-  return out
-
 def VM.get_watch_result(self, key) -> any
 def VM.stack_push(self, Block b, List inputs)
   -- Push a new frame, using the given block and input list.
@@ -876,7 +864,8 @@ def VM.has_error(self) -> bool
   self.errored
 
 def VM.error_message(self) -> String
-  -- If there is a recorded error, returns a human-readable description string.
+  assert(self.has_error)
+  self.slot(0)
 
 def VM.toString(self) -> String
 

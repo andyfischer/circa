@@ -1,0 +1,11 @@
+
+def main()
+  emit(:a 1)
+  emit(:a 2)
+  emit(:a 3)
+
+
+vm = make_vm(main)
+vm.expect_messages(:a)
+vm.call
+assert(vm.consume_messages(:a) == [1 2 3])

@@ -8,3 +8,10 @@ def assert_no_copy(VM vm, Func func)
       bytecode_analysis.dump_func(vm func)
       error("found a :copy op")
 
+def assert_no_dyn_method(Func func)
+  vm = make_vm(func)
+  vm.precompile(func.block)
+  for op in bytecode_analysis.func_ops(vm func)
+    if op.opcode == :dyn_method
+      bytecode_analysis.dump_func(vm func)
+      error("found a :dyn_method op")

@@ -202,5 +202,6 @@ bool term_uses_input_multiple_times(Term* term, Term* input);
 bool term_needs_no_evaluation(Term* term);
 bool has_static_value(Term* term);
 bool can_consume_term_result(Term* input, Term* user);
+Block* statically_resolve_dynamic_method(Term* term);
 
 } // namespace circa

@@ -74,7 +74,7 @@ Liveness* set_term_live(Bytecode* bc, Term* term, int slot);
 bool block_needs_no_evaluation(Bytecode* bc, Block* block);
 Value* load_const(Bytecode* bc, int slot);
 void write_term(Bytecode* bc, Term* term);
-void write_normal_call(Bytecode* bc, Term* term);
+void write_normal_call(Bytecode* bc, Term* term, Block* function);
 int find_compiled_major_block(Bytecode* bc, Block* block);
 void close_conditional_case(Bytecode* bc, Block* block);
 void loop_advance_iterator(Bytecode* bc, Block* loop);
@@ -628,6 +628,12 @@ bool use_inline_bytecode(Bytecode* bc, Term* term)
 
 void dynamic_method(Bytecode* bc, Term* term)
 {
+    // See if we can resolve this method right now.
+    Block* method = statically_resolve_dynamic_method(term);
+    
+    if (method != NULL)
+        return write_normal_call(bc, term, method);
+
 #if DEBUG
     Value msg;
     set_string(&msg, "dynamic method, slow lookup of: ");
@@ -960,7 +966,7 @@ void maybe_write_too_many_inputs_error(Bytecode* bc, Block* func, int found)
     call(bc, top, 1, FUNCS.error->nestedContents);
 }
 
-void write_normal_call(Bytecode* bc, Term* term)
+void write_normal_call(Bytecode* bc, Term* term, Block* function)
 {
 #if DEBUG
     Value commentStr;
@@ -969,9 +975,7 @@ void write_normal_call(Bytecode* bc, Term* term)
     comment(bc, &commentStr);
 #endif
 
-    Block* target = term->function->nestedContents;
-
-    if (block_needs_no_evaluation(bc, target)) {
+    if (block_needs_no_evaluation(bc, function)) {
         comment(bc, "this block needs no evaluation");
         int top = reserve_new_frame_slots(bc, 0);
         append_op(bc, op_set_null, top);
@@ -981,8 +985,8 @@ void write_normal_call(Bytecode* bc, Term* term)
 
     int inputCount = term->numInputs();
 
-    maybe_write_not_enough_inputs_error(bc, target, inputCount);
-    maybe_write_too_many_inputs_error(bc, target, inputCount);
+    maybe_write_not_enough_inputs_error(bc, function, inputCount);
+    maybe_write_too_many_inputs_error(bc, function, inputCount);
 
     int top = reserve_new_frame_slots(bc, inputCount);
 
@@ -993,11 +997,11 @@ void write_normal_call(Bytecode* bc, Term* term)
         load_input_term(bc, term, term->input(i), inputSlot);
     }
 
-    if (count_closure_upvalues(target) != 0) {
+    if (count_closure_upvalues(function) != 0) {
         load_input_term(bc, term, term->function, top);
         append_op(bc, op_func_call_d, top, inputCount);
     } else {
-        call(bc, top, inputCount, target);
+        call(bc, top, inputCount, function);
     }
 
     set_term_live(bc, term, top);
@@ -1434,7 +1438,7 @@ void write_term(Bytecode* bc, Term* term)
         internal_error("bytecode: found unlinked call to unknown_function_prelude()");
 
     else
-        write_normal_call(bc, term);
+        write_normal_call(bc, term, term->function->nestedContents);
 
     append_metadata(bc, mop_term_eval_end, 0)->related_maddr =
         mop_find_active_mopcode(bc, mop_term_eval_start, -1);

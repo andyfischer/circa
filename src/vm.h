@@ -40,7 +40,7 @@ struct VM {
     Value env; // actual env (including inheritance)
     RandState randState;
 
-    Value channelOutput;
+    Value messageOutput;
 
 #if CIRCA_ENABLE_PERF_STATS
     PerfStatList perfStats;

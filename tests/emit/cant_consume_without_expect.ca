@@ -1,0 +1,13 @@
+
+def main()
+  def func()
+    emit(:a 1)
+
+  vm = make_vm(func)
+  vm.call
+  vm.consume_messages(:a) == [1 2 3]
+
+vm = make_vm(main)
+vm.call
+assert(vm.has_error)
+assert(vm.error_message == 'Message channel was not expected: :a')

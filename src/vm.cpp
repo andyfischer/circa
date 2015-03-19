@@ -74,7 +74,8 @@ VM* new_vm(Block* main)
     initialize_null(&vm->incomingEnv);
     set_hashtable(&vm->incomingEnv);
     initialize_null(&vm->env);
-    initialize_null(&vm->channelOutput);
+    initialize_null(&vm->messageOutput);
+    set_hashtable(&vm->messageOutput);
     set_hashtable(&vm->env);
     rand_init(&vm->randState, 0);
 
@@ -93,7 +94,7 @@ void free_vm(VM* vm)
     set_null(&vm->state);
     set_null(&vm->demandEvalMap);
     set_null(&vm->incomingEnv);
-    set_null(&vm->channelOutput);
+    set_null(&vm->messageOutput);
     set_null(&vm->env);
 }
 
@@ -260,8 +261,6 @@ void vm_run(VM* vm, VM* callingVM)
     vm_grow_stack(vm, 1);
 
     copy(&vm->topLevelUpvalues, &vm->incomingUpvalues);
-
-    set_hashtable(&vm->channelOutput);
 
     Op* ops = vm->bc->ops;
 
@@ -975,28 +974,41 @@ void get_env(VM* vm)
         set_null(vm->output());
 }
 
-void channel_send(VM* vm)
+void emit(VM* vm)
 {
     Value* key = vm->input(0);
     Value* val = vm->input(1);
 
-    Value* list = hashtable_insert(&vm->channelOutput, key);
-    if (!is_list(list))
-        set_list(list, 0);
+    Value* list = hashtable_get(&vm->messageOutput, key);
+    if (list == NULL || is_null(list))
+        // Message was not expected
+        return;
 
-    copy(val, list_append(list));
+    move(val, list_append(list));
 }
 
-void VM__consume_channel(VM* vm)
+void VM__expect_messages(VM* vm)
+{
+    VM* self = (VM*) get_pointer(vm->input(0));
+    Value* key = vm->input(1);
+    set_list(hashtable_insert(&self->messageOutput, key), 0);
+}
+
+void VM__consume_messages(VM* vm)
 {
     VM* self = (VM*) get_pointer(vm->input(0));
     Value* key = vm->input(1);
 
-    Value* list = hashtable_get(&self->channelOutput, key);
-    if (list == NULL || is_null(list))
-        set_list(vm->output(), 0);
-    else
-        move(list, vm->output());
+    Value* list = hashtable_get(&self->messageOutput, key);
+    if (list == NULL || is_null(list)) {
+        Value msg;
+        set_string(&msg, "Message channel was not expected: ");
+        string_append(&msg, key);
+        vm->throw_error(&msg);
+        return;
+    }
+
+    move(list, vm->output());
 }
 
 VMStackFrame vm_top_stack_frame(VM* vm)
@@ -1422,7 +1434,8 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function(patch, "make_vm", make_vm);
     circa_patch_function(patch, "VM.call", VM__call);
     circa_patch_function(patch, "VM.copy", VM__copy);
-    circa_patch_function(patch, "VM.consume_channel", VM__consume_channel);
+    circa_patch_function(patch, "VM.expect_messages", VM__expect_messages);
+    circa_patch_function(patch, "VM.consume_messages", VM__consume_messages);
     circa_patch_function(patch, "VM.dump", VM__dump);
     circa_patch_function(patch, "VM.errored", VM__errored);
     circa_patch_function(patch, "VM.get_state", VM__get_state);
@@ -1447,7 +1460,7 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
     circa_patch_function(patch, "vm_demand_eval_store", vm_demand_eval_store);
     circa_patch_function(patch, "env", get_env);
-    circa_patch_function(patch, "channel_send", channel_send);
+    circa_patch_function(patch, "emit", emit);
 }
 
 void vm_setup_type(Type* type)

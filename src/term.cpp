@@ -351,10 +351,12 @@ bool is_input_implicit(Term* term, int index)
         return false;
     return as_bool(val);
 }
+
 void set_input_implicit(Term* term, int index, bool implicit)
 {
     set_bool(term_insert_input_property(term, index, s_Implicit), true);
 }
+
 bool is_input_hidden(Term* term, int index)
 {
     Value* val = term_get_input_property(term, index, s_hidden);
@@ -362,6 +364,7 @@ bool is_input_hidden(Term* term, int index)
         return false;
     return as_bool(val);
 }
+
 void set_input_hidden(Term* term, int index, bool hidden)
 {
     set_bool(term_insert_input_property(term, index, s_hidden), true);
@@ -657,6 +660,18 @@ bool can_consume_term_result(Term* input, Term* user)
 
     //printf("can_consume_term_result: user %d can consume %d\n", user->id, input->id);
     return true;
+}
+
+Block* statically_resolve_dynamic_method(Term* term)
+{
+    ca_assert(term->function == FUNCS.dynamic_method);
+
+    Value nameLocation;
+    nameLocation.set_list(2);
+    nameLocation.index(0)->set(term->getProp(s_MethodName));
+    nameLocation.index(1)->set_term(term);
+
+    return find_method_on_type(declared_type(term), &nameLocation);
 }
 
 } // namespace circa

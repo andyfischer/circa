@@ -1,2 +1,7 @@
 
-foo = require jfkdsjflkds
+def main()
+  foo = require jfkdsjflkds
+
+vm = make_vm(main)
+vm.call
+assert(vm.error_message == "Couldn't find module: jfkdsjflkds")

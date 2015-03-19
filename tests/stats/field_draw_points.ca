@@ -6,7 +6,7 @@ def main()
     @tris.flatten
 
     command = [:triangles tris.flatten]
-    channel_send(:render_commands command)
+    emit(:render_commands command)
 
   my_points = for i in 0..1000
     [i, i+0.5]
