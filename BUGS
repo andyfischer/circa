@@ -20,9 +20,6 @@ Miscellanous (most-recent first)
       a = make(A)
       @a.i += 4
    
-Deprecated code to delete
-  Unique names (replaced with global names and uniqueOrdinal)
-  
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)
 
@@ -35,6 +32,3 @@ Modules
 
 Anonymous functions
   Allow the same input syntax on non-anonymous functions (such as, explicit types, :multiple keyword, and etc)
-
-Methods
-  Add a way to use a method as a closure
