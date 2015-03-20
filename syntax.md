@@ -26,8 +26,8 @@ At a high level, the syntax is designed with these features/goals:
 
 ## Literal values
 
-    1       -- integer
-    0x123   -- integer, hexadecimal syntax
+    1       -- int
+    0x123   -- int, hexadecimal syntax
     1.2     -- number (IEEE 754 float)
     'hello' -- string, single quotes
     "hello" -- string, double quotes
@@ -97,4 +97,73 @@ Equivalent to calling `make_list`, such as: `make_list(1 2 3)`
     
 Equivalent to calling `make_map`, such as `make_map(:a 1)`
 
-##
+## Conditionals
+
+    if condition
+      do_something()
+
+    if a
+      something()
+    elif b
+      something_else()
+    else
+      another_thing()
+    
+A conditional can be used as an expression. The last expression of the inner contents is used as the overall value.
+
+    a = if true
+      1
+    else
+      2
+    -- 'a' will now equal 1
+    
+## Switch blocks
+
+    -- when no expression is after the 'switch' keyword, we pick the first 'case' expression that equals true.
+    switch
+      case a == 1
+        print('a is 1')
+      case a == 2
+        print('a is 2')
+      else
+        print('a is something else')
+        
+    -- when there is an expression after 'switch', we pick the first 'case' that equals the initial value.
+    switch a
+      case 1
+        print('a is 1')
+      case 2
+        print('a is 2')
+      else
+        print('a is something else')
+        
+## For-loop
+
+    for i in [1 2 3]
+      print('i = ' i)
+      
+    -- loops can also output a value
+    out = for i in [1 2 3]
+      i * 2
+    -- 'out' is now equal to [2 4 6]
+    
+## Function definition
+
+    def my_function()
+      print('hi')
+      
+    my_function()  -- calls the function and prints 'hi'
+      
+If there's no `return`, the last expression of the function is used as the return value.
+
+    def my_add(a, b, c)
+      a + b + c
+      
+    sum = my_add(1 2 3)
+    -- 'sum' now equals 6
+    
+Types can be explicit for inputs and outputs.
+
+    def my_add(int a, int b) -> int
+      a + b
+      
