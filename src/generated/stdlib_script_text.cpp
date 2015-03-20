@@ -1832,7 +1832,7 @@ const char* find_builtin_file(const char* filename) {
         "def not(bool b) -> bool\n"
         "\n"
         "-- Map values\n"
-        "def map(any vals :multiple) -> Map\n"
+        "def make_map(any vals :multiple) -> Map\n"
         "\n"
         "-- Math\n"
         "def add_i(int a, int b) -> int\n"

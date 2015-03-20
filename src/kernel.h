@@ -67,7 +67,7 @@ struct BuiltinFuncs {
     Term* load_script;
     Term* make;
     Term* make_list;
-    Term* map;
+    Term* make_map;
     Term* map_get;
     Term* method_lookup;
     Term* module_get;

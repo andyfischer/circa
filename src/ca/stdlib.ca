@@ -40,7 +40,7 @@ def or(bool a, bool b) -> bool
 def not(bool b) -> bool
 
 -- Map values
-def map(any vals :multiple) -> Map
+def make_map(any vals :multiple) -> Map
 
 -- Math
 def add_i(int a, int b) -> int

@@ -1223,7 +1223,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "greater_than_eq_f", greater_than_eq_f);
     circa_patch_function(patch, "make_list", make_list);
     circa_patch_function(patch, "blank_list", blank_list);
-    circa_patch_function(patch, "map", make_map);
+    circa_patch_function(patch, "make_map", make_map);
     circa_patch_function(patch, "and", and_func);
     circa_patch_function(patch, "or", or_func);
     circa_patch_function(patch, "not", not_func);

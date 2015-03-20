@@ -582,7 +582,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(less_than_eq, "less_than_eq");
         find_func(loop_condition_bool, "loop_condition_bool");
         find_func(loop_iterator, "loop_iterator");
-        find_func(map, "map");
+        find_func(make_map, "make_map");
         find_func(make, "make");
         find_func(make_list, "make_list");
         find_func(method_lookup, "method_lookup");
