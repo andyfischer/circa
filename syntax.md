@@ -1,3 +1,7 @@
+---
+title: Syntax
+---
+
 # Syntax documentation
 
 Circa's syntax is directly influenced by Algol-family languages like Coffeescript, ES6 and Python.
