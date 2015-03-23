@@ -521,10 +521,6 @@ ParseResult parse_statement(Block* block, TokenStream& tokens, ParserCxt* contex
         result = let_statement(block, context);
     }
 
-    // Annotation
-    else if (tokens.nextIs(tok_ColonString))
-        result = annotation_statement(block, context);
-
     // Otherwise, expression statement
     else {
         result = expression_statement(block, tokens, context);
@@ -1411,26 +1407,6 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     }
 
     return ParseResult(requireTerm);
-}
-
-ParseResult annotation_statement(Block* block, ParserCxt* context)
-{
-    Value name;
-    context->consume(&name, tok_ColonString);
-
-    TermList args;
-
-    possible_whitespace(*context->tokens);
-
-    while (!context->nextIs(tok_Newline) && !context->finished()) {
-        Term* arg = expression(block, *context->tokens, context).term;
-        args.append(arg);
-        possible_whitespace(*context->tokens);
-    }
-
-    Term* result = apply(block, FUNCS.annotation, args);
-    result->setProp(s_Name, &name);
-    return ParseResult(result);
 }
 
 ParseResult package_statement(Block* block, TokenStream& tokens, ParserCxt* context)

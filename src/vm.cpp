@@ -495,7 +495,7 @@ void vm_run(VM* vm, VM* callingVM)
 
                     // Temp, convert to symbol if needed
                     if (is_string(input1))
-                        set_symbol(input1, symbol_from_string(as_cstring(input1)));
+                        set_symbol(input1, string_to_symbol(as_cstring(input1)));
 
                     do_call_op(vm, op.a, 2, addr);
                     #if TRACE_EXECUTION

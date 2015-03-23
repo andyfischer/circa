@@ -1112,7 +1112,7 @@ void get_with_symbol(VM* vm)
 {
     Value* left = vm->input(0);
     Value str;
-    symbol_as_string(vm->input(1), &str);
+    symbol_to_string(vm->input(1), &str);
 
     if (is_module_ref(left)) {
         Block* block = module_ref_resolve(vm->world, left);
