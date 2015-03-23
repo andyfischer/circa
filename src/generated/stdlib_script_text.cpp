@@ -9,6 +9,16 @@ const char* find_builtin_file(const char* filename) {
     if (strncmp(filename, "$builtins/", 10) != 0)
         return NULL;
 
+    if (strncmp(filename, "$builtins/annotations.ca", 24) == 0) return
+        "\n"
+        "def get(Func func)\n"
+        "  for term in func.block.terms.filter((t) -> t.function.name == 'annotation')\n"
+        "    args = for input in term.inputs\n"
+        "      input.value\n"
+        "\n"
+        "    {:id => term.property(:Name), :args => args}\n"
+        ;
+
     if (strncmp(filename, "$builtins/bytecode_analysis.ca", 30) == 0) return
         "\n"
         "struct Mop {\n"
@@ -1793,7 +1803,7 @@ const char* find_builtin_file(const char* filename) {
         "\n"
         "def unknown_function_prelude(any ins :multiple)\n"
         "\n"
-        "-- Misc builtins\n"
+        "def annotation(args :multiple)\n"
         "def declare_field()\n"
         "def return(any outs :multiple :optional)\n"
         "def discard(any outs :multiple :optional)\n"
@@ -1802,7 +1812,7 @@ const char* find_builtin_file(const char* filename) {
         "def continue(any outs :multiple :optional)\n"
         "def make(Type t) -> any\n"
         "def extra_output(any _) -> any\n"
-        "def func_call_implicit(any inputs :multiple)\n"
+        "def func_call_implicit(inputs :multiple)\n"
         "def get_field(any obj, String key) -> any\n"
         "def method_lookup(location, any obj, Symbol name) -> any -- Func or null\n"
         "def get_index(List list, int index) -> any\n"
@@ -3000,7 +3010,7 @@ const char* find_builtin_file(const char* filename) {
         "    -- Fetch the declared type of this term.\n"
         "def Term.id(self) -> int\n"
         "def Term.value(self) -> any\n"
-        "    -- For a value term, this fetches the actual value.\n"
+        "    -- Static value\n"
         "def Term.set_value(self, any val)\n"
         "    -- For a value term, permanently change the value.\n"
         "def Term.input(self, int index) -> Term\n"

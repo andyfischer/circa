@@ -5,10 +5,8 @@
 # miscellaneous artifacts:
 /tags
 
-# generated docs
-/docs/nanodoc/index.html
-
 # miscellaneous
+/gh-pages
 /*.ca
 /*.xcodeproj
 /src/*.xcodeproj

@@ -549,6 +549,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
     #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
         find_func(add_i, "add_i"); find_func(add_f, "add_f");
         find_func(and_func, "and");
+        find_func(annotation, "annotation");
         find_func(break_func, "break");
         find_func(blank_list, "blank_list");
         find_func(case_func, "case");

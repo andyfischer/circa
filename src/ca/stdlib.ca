@@ -1,7 +1,7 @@
 
 def unknown_function_prelude(any ins :multiple)
 
--- Misc builtins
+def annotation(args :multiple)
 def declare_field()
 def return(any outs :multiple :optional)
 def discard(any outs :multiple :optional)
@@ -10,7 +10,7 @@ def break(any outs :multiple :optional)
 def continue(any outs :multiple :optional)
 def make(Type t) -> any
 def extra_output(any _) -> any
-def func_call_implicit(any inputs :multiple)
+def func_call_implicit(inputs :multiple)
 def get_field(any obj, String key) -> any
 def method_lookup(location, any obj, Symbol name) -> any -- Func or null
 def get_index(List list, int index) -> any
@@ -1208,7 +1208,7 @@ def Term.get_type(self) -> Type
     -- Fetch the declared type of this term.
 def Term.id(self) -> int
 def Term.value(self) -> any
-    -- For a value term, this fetches the actual value.
+    -- Static value
 def Term.set_value(self, any val)
     -- For a value term, permanently change the value.
 def Term.input(self, int index) -> Term

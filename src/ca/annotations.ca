@@ -1,0 +1,7 @@
+
+def get(Func func)
+  for term in func.block.terms.filter((t) -> t.function.name == 'annotation')
+    args = for input in term.inputs
+      input.value
+
+    {:id => term.property(:Name), :args => args}
