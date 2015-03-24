@@ -12,6 +12,7 @@
 #include "names_builtin.h"
 #include "string_type.h"
 #include "switch.h"
+#include "symbols.h"
 #include "term.h"
 #include "world.h"
 
@@ -61,6 +62,10 @@ Block* find_builtins_block(Block* block)
 Term* run_name_search(NameSearch* params)
 {
     stat_increment(NameSearch);
+
+    // Temp: Input name can be a symbol, but convert it to a string for now.
+    if (is_symbol(&params->name))
+        set_symbol_from_string(&params->name, &params->name);
 
     if (is_null(&params->name) || string_equals(&params->name, ""))
         return NULL;

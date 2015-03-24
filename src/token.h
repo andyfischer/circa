@@ -79,6 +79,9 @@ struct TokenStream
     // Like consume(), but appends the text of the consumed token to a Value.
     void consumeStr(Value* output, int match = -1);
 
+    // Consume to a Symbol value
+    void consumeSymbol(Value* output, int match = -1);
+
     void dropRemainder();
 
     int getPosition();

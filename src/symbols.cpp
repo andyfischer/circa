@@ -43,6 +43,12 @@ Symbol string_to_symbol(const char* str)
 
 void set_symbol_from_string(Value* val, Value* str)
 {
+    if (val == str) {
+        Value temp;
+        move(str, &temp);
+        return set_symbol_from_string(val, &temp);
+    }
+
     set_symbol(val, string_to_symbol(as_cstring(str)));
 }
 

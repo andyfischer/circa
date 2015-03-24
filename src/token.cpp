@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "names.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "token.h"
 
@@ -916,7 +917,16 @@ TokenStream::consumeStr(Value* output, int match)
     Value next;
     getNextStr(&next);
     string_append(output, &next);
-    consume(-1);
+    consume(match);
+}
+
+void
+TokenStream::consumeSymbol(Value* output, int match)
+{
+    Value next;
+    getNextStr(&next);
+    set_symbol_from_string(output, &next);
+    consume(match);
 }
 
 void

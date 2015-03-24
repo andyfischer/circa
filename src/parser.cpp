@@ -51,6 +51,7 @@ struct ParserCxt {
     bool nextIs(int match, int lookahead=0) { return tokens->nextIs(match, lookahead); }
     void consume(int match = -1) { return tokens->consume(match); }
     void consume(Value* output, int match = -1) { return tokens->consumeStr(output, match); }
+    void consumeSymbol(Value* output, int match = -1) { return tokens->consumeSymbol(output, match); }
     int getPosition() { return tokens->getPosition(); }
     bool finished() { return tokens->finished(); }
 
@@ -1493,6 +1494,7 @@ ParseResult for_block(Block* block, TokenStream& tokens, ParserCxt* context)
         move(&iteratorName, &indexName);
         move(&iteratorTypeName, &indexTypeName);
 
+        possible_whitespace(tokens);
         tokens.consumeStr(&iteratorName, tok_Identifier);
         possible_whitespace(tokens);
         if (tokens.nextIs(tok_Identifier)) {
@@ -1969,7 +1971,8 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             preOperatorWhitespace = possible_whitespace(tokens);
 
         int operatorMatch = tokens.next().match;
-        std::string operatorStr = tokens.consumeStr();
+        Value operatorStr;
+        tokens.consumeStr(&operatorStr);
 
         std::string postOperatorWhitespace = possible_whitespace_or_newline(tokens);
 
@@ -2030,7 +2033,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             Term* term = apply(block, opInfo.function, TermList(left.term, rightExpr.term));
 
             term->setStringProp(s_Syntax_DeclarationStyle, "infix");
-            term->setStringProp(s_Syntax_FunctionName, operatorStr);
+            term->setProp(s_Syntax_FunctionName, &operatorStr);
             
             if (opInfo.isRebinding)
                 term->setBoolProp(s_Syntax_RebindingInfix, true);
@@ -2050,7 +2053,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
                     Term* set = rebind_possible_accessor(block, left.term, newValue);
 
-                    set->setStringProp(s_Syntax_RebindOperator, operatorStr);
+                    set->setProp(s_Syntax_RebindOperator, &operatorStr);
                     set_is_statement(set, true);
 
                     // Move an input's post-whitespace to this term.
@@ -2247,7 +2250,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     inputHints.apply(term);
     apply_hints_from_parsed_input(term, 0, lhs);
-    term->setStringProp(s_Syntax_FunctionName, as_cstring(&functionName));
+    term->setProp(s_Syntax_FunctionName, &functionName);
     term->setStringProp(s_Syntax_DeclarationStyle, "method-call");
     if (!hasParens)
         term->setBoolProp(s_Syntax_NoParens, true);
@@ -2260,9 +2263,10 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    std::string functionName = tokens.consumeStr(tok_Identifier);
+    Value functionName;
+    context->consume(&functionName, tok_Identifier);
 
-    Term* function = find_name(block, functionName.c_str());
+    Term* function = find_name(block, &functionName);
 
     tokens.consume(tok_LParen);
 
@@ -2275,25 +2279,16 @@ ParseResult function_call(Block* block, TokenStream& tokens, ParserCxt* context)
         return syntax_error(block, tokens, startPosition, "Expected: )");
     tokens.consume(tok_RParen);
 
-    // If function isn't found, bail out with unknown_function.
     if (function == NULL) {
-        Term* unknown_function = FUNCS.unknown_function;
-        if (unknown_function == NULL)
-            unknown_function = FUNCS.unknown_function_prelude;
-        Term* result = apply(block, unknown_function, inputs);
-        result->setStringProp(s_Syntax_FunctionName, functionName);
-        return ParseResult(result);
+        function = FUNCS.unknown_function;
+        if (function == NULL)
+            function = FUNCS.unknown_function_prelude;
     }
 
     Term* result = apply(block, function, inputs);
-
-    // Store the function name that they used, if it wasn't the function's
-    // actual name (for example, the function might be inside a namespace).
-    if (function == NULL || result->function->name() != functionName)
-        result->setStringProp(s_Syntax_FunctionName, functionName);
+    result->setProp(s_Syntax_FunctionName, &functionName);
 
     inputHints.apply(result);
-
     return ParseResult(result);
 }
 
