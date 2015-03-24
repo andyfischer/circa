@@ -22,7 +22,6 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "token.h"
-#include "update_cascades.h"
 #include "vm.h"
 #include "world.h"
 

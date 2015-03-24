@@ -16,7 +16,6 @@
 #include "token.h"
 #include "type.h"
 #include "type_inference.h"
-#include "update_cascades.h"
 #include "world.h"
 
 namespace circa {

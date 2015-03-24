@@ -7,7 +7,6 @@
 #include "list.h"
 #include "hashtable.h"
 #include "tagged_value.h"
-#include "update_cascades.h"
 #include "world.h"
 
 namespace circa {

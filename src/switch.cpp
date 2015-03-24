@@ -15,7 +15,6 @@
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
-#include "update_cascades.h"
 
 namespace circa {
 

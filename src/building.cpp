@@ -19,7 +19,6 @@
 #include "symbols.h"
 #include "term.h"
 #include "type.h"
-#include "update_cascades.h"
 
 namespace circa {
 
@@ -1105,6 +1104,23 @@ Term* preceding_term_recr_minor(Term* term)
 Term* following_term(Term* term)
 {
     return term->owningBlock->getSafe(term->index + 1);
+}
+
+void fix_forward_function_references(Block* block)
+{
+    for (BlockIterator it(block); it; ++it) {
+        Term* term = *it;
+        if (term->function == NULL || term->function == FUNCS.unknown_function) {
+            // See if we can now find this function
+            Value* functionName = term->getProp(s_Syntax_FunctionName);
+
+            if (functionName != NULL) {
+                Term* func = find_name(block, functionName, s_LookupFunction);
+                if (func != NULL)
+                    change_function(term, func);
+            }
+        }
+    }
 }
 
 } // namespace circa

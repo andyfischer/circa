@@ -137,4 +137,6 @@ Term* preceding_term_recr_minor(Term* term);
 // Following term in the same block (may be NULL).
 Term* following_term(Term* term);
 
+void fix_forward_function_references(Block* block);
+
 } // namespace circa

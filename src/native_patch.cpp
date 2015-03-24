@@ -24,7 +24,6 @@
 #include "string_type.h"
 #include "term.h"
 #include "type.h"
-#include "update_cascades.h"
 #include "world.h"
 
 namespace circa {

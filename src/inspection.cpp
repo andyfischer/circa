@@ -15,7 +15,6 @@
 #include "term_list.h"
 #include "token.h"
 #include "type.h"
-#include "update_cascades.h"
 
 namespace circa {
 

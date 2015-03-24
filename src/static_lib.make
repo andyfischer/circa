@@ -108,7 +108,6 @@ OBJECTS := \
 	$(OBJDIR)/token.o \
 	$(OBJDIR)/type.o \
 	$(OBJDIR)/type_inference.o \
-	$(OBJDIR)/update_cascades.o \
 	$(OBJDIR)/vm.o \
 	$(OBJDIR)/world.o \
 	$(OBJDIR)/read_tar.o \
@@ -306,9 +305,6 @@ $(OBJDIR)/type.o: type.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/type_inference.o: type_inference.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/update_cascades.o: update_cascades.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/vm.o: vm.cpp
