@@ -10,7 +10,6 @@
 #include "modules.h"
 #include "names.h"
 #include "native_patch.h"
-#include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
 #include "world.h"
@@ -135,6 +134,8 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
             Block* block = alloc_block(world);
             load_script(block, as_cstring(&watch->filename));
 
+
+#if 0
             if (has_static_errors(block)) {
                 // Temp solution, log to stdout.
 
@@ -144,7 +145,9 @@ void file_watch_trigger_actions(World* world, FileWatch* watch)
                 write_log(world, as_cstring(&msg));
                 print_static_errors_formatted(block, &msg);
                 write_log(world, as_cstring(&msg));
-            } else {
+            } else
+#endif
+            {
                 module_install_replacement(world, &watch->filename, block);
             }
             break;

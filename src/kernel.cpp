@@ -24,7 +24,6 @@
 #include "parser.h"
 #include "reflection.h"
 #include "selector.h"
-#include "static_checking.h"
 #include "string_repr.h"
 #include "string_type.h"
 #include "symbols.h"
@@ -678,6 +677,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
     //dump(builtins);
 
     // Make sure there are no static errors in builtins. This shouldn't happen.
+    #if 0
     if (has_static_errors(builtins)) {
         std::cout << "Static errors found in kernel:" << std::endl;
         dump(builtins);
@@ -685,6 +685,7 @@ CIRCA_EXPORT caWorld* circa_initialize()
         print_static_errors_formatted(builtins, &msg);
         dump(&msg);
     }
+    #endif
 
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");

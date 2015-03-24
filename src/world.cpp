@@ -16,7 +16,6 @@
 #include "modules.h"
 #include "native_patch.h"
 #include "reflection.h"
-#include "static_checking.h"
 #include "string_type.h"
 #include "tagged_value.h"
 #include "term.h"

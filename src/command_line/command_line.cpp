@@ -17,7 +17,6 @@
 #include "modules.h"
 #include "names.h"
 #include "parser.h"
-#include "static_checking.h"
 #include "string_repr.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -28,7 +27,6 @@
 #include "world.h"
 
 #include "circa/file.h"
-#include "file_checker.h"
 
 #include "command_line.h"
 

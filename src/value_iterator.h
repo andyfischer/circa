@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "list.h"
 #include "tagged_value.h"
 #include "term.h"
 

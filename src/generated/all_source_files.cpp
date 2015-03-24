@@ -31,7 +31,6 @@
 #include "../reflection.cpp"
 #include "../replication.cpp"
 #include "../selector.cpp"
-#include "../static_checking.cpp"
 #include "../string_repr.cpp"
 #include "../string_type.cpp"
 #include "../switch.cpp"

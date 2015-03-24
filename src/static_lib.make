@@ -97,7 +97,6 @@ OBJECTS := \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/replication.o \
 	$(OBJDIR)/selector.o \
-	$(OBJDIR)/static_checking.o \
 	$(OBJDIR)/string_repr.o \
 	$(OBJDIR)/string_type.o \
 	$(OBJDIR)/switch.o \
@@ -274,9 +273,6 @@ $(OBJDIR)/replication.o: replication.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/selector.o: selector.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/static_checking.o: static_checking.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_repr.o: string_repr.cpp

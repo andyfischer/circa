@@ -3,6 +3,7 @@ syntax/local_typedef.ca
 parser/at_symbol_resolved_first.ca
 hacks/derivative_test.ca
 hacks/watch.ca
+module/require_error_module.ca
 state/list_state_synced_across_discard.ca
 stats/field_draw_points.ca
 stats/module_no_dynamic_lookup.ca

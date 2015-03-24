@@ -15,7 +15,6 @@
 #include "modules.h"
 #include "parser.h"
 #include "selector.h"
-#include "static_checking.h"
 #include "string_type.h"
 #include "switch.h"
 #include "symbols.h"
@@ -3085,7 +3084,7 @@ ParseResult syntax_error(Block* block, TokenStream& tokens, int exprStart,
     result->setStringProp(s_OriginalText, as_cstring(&consumed));
     result->setStringProp(s_Message, message.c_str());
 
-    ca_assert(has_static_error(result));
+    //ca_assert(has_static_error(result));
 
     return ParseResult(result);
 }

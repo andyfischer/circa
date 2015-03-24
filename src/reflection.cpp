@@ -14,7 +14,6 @@
 #include "modules.h"
 #include "native_patch.h"
 #include "reflection.h"
-#include "static_checking.h"
 #include "term.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -150,49 +149,6 @@ void Block__source_filename(VM* vm)
     }
     set_string(vm->output(), "");
 }
-
-void Block__has_static_error(VM* vm)
-{
-    Block* block = as_block(vm->input(0));
-    if (block == NULL)
-        return vm->throw_str("NULL block");
-    set_bool(vm->output(), has_static_errors_cached(block));
-}
-
-void Block__get_static_errors(VM* vm)
-{
-    Block* block = as_block(vm->input(0));
-
-    if (block == NULL)
-        return vm->throw_str("NULL block");
-
-    Value* errors = block_get_static_errors(block);
-
-    if (errors == NULL)
-        set_list(vm->output(), 0);
-    else
-        copy(errors, vm->output());
-}
-
-void Block__get_static_errors_formatted(VM* vm)
-{
-    Block* block = as_block(vm->input(0));
-    if (block == NULL)
-        return vm->throw_str("NULL block");
-
-    Value* errors = block_get_static_errors(block);
-    if (errors == NULL) {
-        set_list(vm->output(), 0);
-        return;
-    }
-
-    Value* out = vm->output();
-    set_list(out, errors->length());
-    for (int i=0; i < out->length(); i++)
-        format_static_error(circa_index(errors, i), circa_index(out, i));
-}
-
-// Reflection
 
 void Block__term_named(VM* vm)
 {
@@ -657,9 +613,6 @@ void reflection_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Block.functions", Block__functions);
     circa_patch_function(patch, "Block.statements", Block__statements);
     circa_patch_function(patch, "Block.get_term", Block__get_term);
-    circa_patch_function(patch, "Block.get_static_errors", Block__get_static_errors);
-    circa_patch_function(patch, "Block.get_static_errors_formatted", Block__get_static_errors_formatted);
-    circa_patch_function(patch, "Block.has_static_error", Block__has_static_error);
     circa_patch_function(patch, "Block.id", Block__id);
     circa_patch_function(patch, "Block.input", Block__input);
     circa_patch_function(patch, "Block.inputs", Block__inputs);

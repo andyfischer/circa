@@ -2479,6 +2479,8 @@ const char* find_builtin_file(const char* filename) {
         "  -- Return a formatted list of static errors inside this block.\n"
         "def Block.has_static_error(self) -> bool\n"
         "  -- Return whether this block has any static errors.\n"
+        "  -- TODO\n"
+        "  false\n"
         "def Block.id(self) -> int\n"
         "def Block.input(self, int index) -> Term\n"
         "  -- Fetch an input placeholder term by index.\n"

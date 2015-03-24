@@ -673,10 +673,16 @@ def Block.get_term(self, int index) -> Term
   -- Fetch a term by index.
 def Block.get_static_errors(self) -> List
   -- Return a raw list of static errors inside this block.
+  -- TODO
+  []
 def Block.get_static_errors_formatted(self) -> List
   -- Return a formatted list of static errors inside this block.
+  -- TODO
+  []
 def Block.has_static_error(self) -> bool
   -- Return whether this block has any static errors.
+  -- TODO
+  false
 def Block.id(self) -> int
 def Block.input(self, int index) -> Term
   -- Fetch an input placeholder term by index.

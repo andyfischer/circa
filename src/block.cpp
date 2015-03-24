@@ -16,7 +16,6 @@
 #include "names.h"
 #include "native_patch.h"
 #include "parser.h"
-#include "static_checking.h"
 #include "string_type.h"
 #include "names.h"
 #include "tagged_value.h"
@@ -692,7 +691,7 @@ void load_script_from_text(Block* block, const char* text)
     if (get_output_placeholder(block, 0) == NULL)
         append_output_placeholder(block, NULL);
 
-    update_static_error_list(block);
+    //update_static_error_list(block);
 }
 
 void load_script(Block* block, const char* filename)
@@ -719,7 +718,7 @@ void load_script(Block* block, const char* filename)
     if (get_output_placeholder(block, 0) == NULL)
         append_output_placeholder(block, NULL);
 
-    update_static_error_list(block);
+    //update_static_error_list(block);
 
     return;
 }
