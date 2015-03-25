@@ -773,6 +773,30 @@ void block_finish_changes(Block* block)
             block_set_bool_prop(block, s_HasDynamicDispatch, true);
     }
 
+    // Propogate annotate() and annotate_block() values
+    for (int i=0; i < block->length(); i++) {
+        Term* term = block->get(i);
+        if (term->function == FUNCS.annotate && term->numInputs() >= 2) {
+            Value* key = term_value(term->input(1));
+            if (is_symbol(key)) {
+                if (term->input(2) == NULL)
+                    term->input(0)->setBoolProp(as_symbol(key), true);
+                else
+                    term->input(0)->setProp(as_symbol(key), term_value(term->input(2)));
+            }
+        }
+        
+        if (term->function == FUNCS.annotate_block && term->numInputs() >= 1) {
+            Value* key = term_value(term->input(0));
+            if (is_symbol(key)) {
+                if (term->input(1) == NULL)
+                    set_bool(block_insert_property(block, as_symbol(key)), true);
+                else
+                    copy(term_value(term->input(1)), block_insert_property(block, as_symbol(key)));
+            }
+        }
+    }
+
     block->inProgress = false;
 }
 

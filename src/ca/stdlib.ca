@@ -1,7 +1,8 @@
 
 def unknown_function_prelude(any ins :multiple)
 
-def annotation(args :multiple)
+def annotate(term, Symbol key, value :optional)
+def annotate_block(Symbol key, value :optional)
 def declare_field()
 def return(any outs :multiple :optional)
 def discard(any outs :multiple :optional)

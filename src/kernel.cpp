@@ -517,6 +517,8 @@ void bootstrap_kernel()
     nested_contents(FUNCS.list_append)->overrides.specializeType = List__append_specializeType;
 
     #define set_evaluation_empty(name) block_set_evaluation_empty(nested_contents(FUNCS.name), true)
+        set_evaluation_empty(annotate);
+        set_evaluation_empty(annotate_block);
         set_evaluation_empty(return_func);
         set_evaluation_empty(discard);
         set_evaluation_empty(break_func);
@@ -547,6 +549,8 @@ void on_new_function_parsed(Term* func, Value* functionName)
 
     #define find_func(name, sourceName) if (string_equals(functionName, sourceName)) FUNCS.name = func;
         find_func(add_i, "add_i"); find_func(add_f, "add_f");
+        find_func(annotate, "annotate");
+        find_func(annotate_block, "annotate_block");
         find_func(and_func, "and");
         find_func(break_func, "break");
         find_func(blank_list, "blank_list");
