@@ -39,8 +39,10 @@ def to_string_repr(any val) -> String
   -- Encode a value as a string representation.
 def typeof(any val) -> Type
   -- Returns the runtime type of a value.
+
 def env(any name) -> any
   -- Fetch an env variable
+def env_opt(any name, any default) -> any
 def copy(any val) -> any
 
 def cast(any val, Type t) -> any
@@ -499,7 +501,7 @@ def method_call(location, obj, Symbol name, List args)
 def method_capture(object, Symbol name) -> List
   if typeof(object) == Module
     found = object._get(name)
-    found.filter(is_function)
+    @found.filter(is_function)
     return found
   
   found = method_lookup(null object name)

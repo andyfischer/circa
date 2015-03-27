@@ -994,6 +994,15 @@ void get_env(VM* vm)
         set_null(vm->output());
 }
 
+void get_env_opt(VM* vm)
+{
+    Value* value = hashtable_get(&vm->env, vm->input(0));
+    if (value != NULL)
+        copy(value, vm->output());
+    else
+        move(vm->input(1), vm->output());
+}
+
 void emit(VM* vm)
 {
     Value* key = vm->input(0);
@@ -1480,6 +1489,7 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
     circa_patch_function(patch, "vm_demand_eval_store", vm_demand_eval_store);
     circa_patch_function(patch, "env", get_env);
+    circa_patch_function(patch, "env_opt", get_env_opt);
     circa_patch_function(patch, "emit", emit);
 }
 

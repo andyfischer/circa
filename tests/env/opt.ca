@@ -1,0 +1,9 @@
+
+def main()
+  print('env_opt(:a :default) = ' env_opt(:a :default))
+
+vm = make_vm(main)
+vm.call
+
+vm.set_env(:a 1)
+vm.call

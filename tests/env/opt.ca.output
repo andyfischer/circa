@@ -1,0 +1,2 @@
+env_opt(:a :default) = :default
+env_opt(:a :default) = 1

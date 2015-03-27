@@ -10,7 +10,7 @@ def main(module)
   size = method_opt(module :window_rect [] [0 0 1000 500])
 
   window = improv.window(:main size)
-  userActor = actor(method_capture(module :main).first)
+  userActor = actor(method_capture(module :main).some)
   userActor.expect_messages(:render_commands)
 
   userActor.call
@@ -18,15 +18,15 @@ def main(module)
   if userActor.has_error
     stack_trace.dump(userActor)
 
-  --print(method_capture(render_list :submit))
-  --print('hi')
-  {-
-  renderActor = actor(method_capture(render_list :submit).first)
-  renderActor.call(userActor.consume_messages(:render_commands))
+  print('found ' method_capture(render_list :submit))
 
-  if renderActor.has_error
-    stack_trace.dump(renderActor)
-    -}
+  for submit in method_capture(render_list :submit)
+    renderActor = actor(submit)
+    print('renderActor = ' renderActor)
+    renderActor.call(userActor.consume_messages(:render_commands))
+
+    if renderActor.has_error
+      stack_trace.dump(renderActor)
 
 struct Main {
 }
@@ -34,7 +34,7 @@ struct Main {
 def Main.window_rect(self) [0 0 1000 500]
 def Main.main(self)
 
-main(Main.make)
+
 
 {-
 def realmain()
@@ -45,3 +45,4 @@ vm.call
 stack_trace.dump(vm)
 -}
 
+main(Main.make)
