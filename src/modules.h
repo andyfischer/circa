@@ -7,6 +7,7 @@
 namespace circa {
 
 #define resolve_possible_module_path circa_resolve_possible_module_path
+#define load_module_by_filename circa_load_module_by_filename
 
 // -- Search paths --
 Value* module_search_paths(World* world);
@@ -24,7 +25,6 @@ Block* find_module_by_filename(World* world, Value* filename);
 void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut);
 
 Block* load_module(World* world, Block* relativeTo, Value* moduleName);
-Block* load_module_by_filename(World* world, Value* filename);
 
 Block* module_ref_resolve(World* world, Value* module);
 

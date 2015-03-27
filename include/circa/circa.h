@@ -549,6 +549,7 @@ void circa_repl_start(caVM* vm);
 void circa_repl_run_line(caVM* vm, caValue* input, caValue* output);
 
 void circa_resolve_possible_module_path(caWorld* world, caValue* path, caValue* result);
+caBlock* circa_load_module_by_filename(caWorld* world, caValue* filename);
 
 // -- Debugging --
 

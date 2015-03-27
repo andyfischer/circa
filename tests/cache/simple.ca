@@ -1,8 +1,0 @@
-
-def func(int i)
-  print('called func: ' i)
-  i
-
-print('a: ' cached(func [1]))
-print('b: ' cached(func [1]))
-print('c: ' cached(func [2]))

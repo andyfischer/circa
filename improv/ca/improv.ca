@@ -8,9 +8,7 @@ def make_window(Rect rect) -> Window
   Window.make
 
 def window(id, Rect size)
-  create = (id) ->
-    make_window(size)
-
-  window = cached(create [id])
+  state window = make_window(size)
+  window
 
 def play_audio(Blob blob)

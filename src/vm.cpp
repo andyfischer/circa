@@ -55,6 +55,13 @@ VM* new_vm(Block* main)
 
     vm->stack.init();
     vm->world = main->world;
+
+    vm->nextLiveVM = vm->world->firstLiveVM;
+    if (vm->nextLiveVM != NULL)
+        vm->nextLiveVM->prevLiveVM = vm;
+    vm->world->firstLiveVM = vm;
+    vm->prevLiveVM = NULL;
+
     vm->id = vm->world->nextStackID++;
     vm->mainBlock = main;
     initialize_null(&vm->topLevelUpvalues);
@@ -90,6 +97,13 @@ VM* new_vm(Block* main)
 
 void free_vm(VM* vm)
 {
+    if (vm->world->firstLiveVM == vm)
+        vm->world->firstLiveVM = vm->nextLiveVM;
+    if (vm->nextLiveVM != NULL)
+        vm->nextLiveVM->prevLiveVM = vm->prevLiveVM;
+    if (vm->prevLiveVM != NULL)
+        vm->prevLiveVM->nextLiveVM = vm->nextLiveVM;
+        
     set_null(&vm->topLevelUpvalues);
     set_null(&vm->bcHacks);
     vm->stack.clear();

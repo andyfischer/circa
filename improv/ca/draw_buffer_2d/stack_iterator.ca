@@ -12,14 +12,14 @@ def StackIterator.settle(self)
 
   while not it.done
     switch
-      case it.next == :pop
+      case it.current == :pop
         @it.advance
         fromStack = self.stack.last
         @self.stack.pop
         iter.concat([fromStack] @it)
 
-      case match.match_list(it.next [:push any])
-        el = it.next[1]
+      case match.match_list(it.current [:push any])
+        el = it.current[1]
         @it.advance
         @self.stack.push(el)
 
@@ -32,8 +32,8 @@ def StackIterator.settle(self)
 def StackIterator.done(self)
   self.it.done
 
-def StackIterator.next(self)
-  self.it.next
+def StackIterator.current(self)
+  self.it.current
 
 def StackIterator.advance(self)
   @self.it.advance

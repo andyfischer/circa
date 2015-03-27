@@ -44,6 +44,9 @@ struct VM {
 
     Value messageOutput;
 
+    VM* prevLiveVM;
+    VM* nextLiveVM;
+
 #if CIRCA_ENABLE_PERF_STATS
     PerfStatList perfStats;
 #endif

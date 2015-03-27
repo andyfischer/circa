@@ -186,7 +186,7 @@ void module_install_replacement(World* world, Value* filename, Block* replacemen
     migrate_world(world, &migration);
 }
 
-Block* load_module_by_filename(World* world, Value* filename)
+CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, Value* filename)
 {
     Value resolved;
     resolve_possible_module_path(world, filename, &resolved);

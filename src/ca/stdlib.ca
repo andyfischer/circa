@@ -438,6 +438,7 @@ def flatten(it) -> List
     
   fold(it append [])
 
+{-
 def cache_get(key) -> List
 def cache_set(key, val)
 def cached(func, inputs) -> any
@@ -449,6 +450,7 @@ def cached(func, inputs) -> any
     val
   else
     existing.get(0)
+-}
 
 def global_script_version() -> int
 
@@ -1474,6 +1476,12 @@ def changed(any val) -> bool
   result = prev != val
   prev = val
   result
+
+def scache(Func refresh)
+  state out
+  if changed([refresh global_script_version()])
+    out = refresh.call()
+  out
 
 def delta(number val) -> number
   -- Stateful function, return the difference between this value and the value from

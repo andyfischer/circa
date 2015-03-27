@@ -1,31 +1,47 @@
-require_local input
-require_local editor_main
 require_local improv
 require stack_trace
 
-def to_vm(Func func)
-  state id = unique_id()
-  get = (id) ->
-    func.to_vm
-  cached(get [id])
+def actor(Func func)
+  scache(-> make_vm(func))
 
 def main(module)
+  render_list = require gl/render_list
+
   size = method_opt(module :window_rect [] [0 0 1000 500])
 
   window = improv.window(:main size)
-  vm = to_vm(method_capture(module :main).first)
+  userActor = actor(method_capture(module :main).first)
+  userActor.expect_messages(:render_commands)
 
-  vm.call
+  userActor.call
 
-  if vm.has_error
-    stack_trace.dump(vm)
+  if userActor.has_error
+    stack_trace.dump(userActor)
+
+  --print(method_capture(render_list :submit))
+  --print('hi')
+  {-
+  renderActor = actor(method_capture(render_list :submit).first)
+  renderActor.call(userActor.consume_messages(:render_commands))
+
+  if renderActor.has_error
+    stack_trace.dump(renderActor)
+    -}
 
 struct Main {
 }
 
 def Main.window_rect(self) [0 0 1000 500]
-
 def Main.main(self)
-  print('Main.main')
 
 main(Main.make)
+
+{-
+def realmain()
+  main(Main.make)
+
+vm = make_vm(realmain)
+vm.call
+stack_trace.dump(vm)
+-}
+

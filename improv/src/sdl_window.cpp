@@ -25,35 +25,6 @@
 double get_time();
 
 #if 0
-struct ImprovWindow {
-
-    SDL_Window* _sdl_window;
-    SDL_Surface* _sdl_screen;
-    
-    float _width;
-    float _height;
-    caValue* _inputEvents;
-    caWorld* _world;
-    
-    float _mouseX;
-    float _mouseY;
-    
-    double _elapsedTime;
-    double _lastFrameDuration;
-
-    ImprovWindow() :
-        _sdl_window(NULL),
-        _sdl_screen(NULL)
-    {}
-
-    void init(caWorld* world);
-    void initOpenGL();
-    void redraw();
-};
-#endif
-
-
-#if 0
 void ImprovWindow::init(caWorld* world)
 {
     _world = world;
@@ -194,7 +165,7 @@ void play_audio(caVM* vm)
     audio->effectPos = 0;
 }
 
-void fill_audio(void *udata, Uint8 *stream, int numBytes)
+void fill_audio(void* udata, Uint8* stream, int numBytes)
 {
     uint16_t* samples = (uint16_t*) stream;
     int sampleCount = numBytes / 4;
@@ -448,23 +419,12 @@ extern "C" int main(int argc, char *argv[])
         return -1;
     }
 
-    Block* userModule = load_module_by_filename(world, &filename);
-
-    caBlock* main = circa_load_module(world, NULL, "improv_main");
-    caVM* vm = circa_new_vm(main);
+    caBlock* userModule = circa_load_module_by_filename(world, &filename);
+    // TODO: Possibly load shell
+    caVM* vm = circa_new_vm(userModule);
 
 #ifdef NACL
     circa_set_bool(circa_env_insert(vm, "gl_es2"), true);
-#endif
-
-#if 0
-    //ImprovWindow window;
-    //window.init(world);
-
-    const char* arg = argv[1];
-    circa_set_string(circa_env_insert(vm, "scriptName"), arg);
-
-    SDL_PauseAudio(0);
 #endif
 
     // Main loop
@@ -476,13 +436,12 @@ extern "C" int main(int argc, char *argv[])
         circa::Value inputEvents;
         sdl_consume_input_events(circa_env_insert(vm, "inputEvents"));
         sdl_get_mouse_pos(circa_env_insert(vm, "mouse"));
-
         circa_set_float(circa_env_insert(vm, "time"), SDL_GetTicks() / 1000.0);
 
         circa_run(vm);
 
         if (circa_has_error(vm)) {
-            printf("improv_main has an error\n");
+            printf("top level error\n");
 
             // circa_dump_stack_trace(vm);
             

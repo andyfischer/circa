@@ -256,7 +256,8 @@ void migrate_world(World* world, Migration* migration)
         migration->oldBlock->id, migration->newBlock->id);
 #endif
 
-    // FIXME
+    for (VM* vm = world->firstLiveVM; vm != NULL; vm = vm->nextLiveVM)
+        migrate_vm(vm, migration);
 
     world->globalScriptVersion++;
 }

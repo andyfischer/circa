@@ -45,6 +45,9 @@ struct World {
     caLogFunc logFunc;
     void* logContext;
 
+    // Linked list of valid VM objects.
+    VM* firstLiveVM;
+
 protected:
     // Disallow C++ construction
     World();

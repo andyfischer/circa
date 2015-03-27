@@ -41,7 +41,7 @@ def line_list(Color color, List points, number thickness)
   if points.length < 2
     return
 
-  for i in 0 .. (points.length - 1)
+  for i in range(0, points.length - 1)
     a = points[i]
     b = points[i+1]
     line(color a b thickness)
@@ -83,7 +83,7 @@ def fill_rect(Color color, Rect rect)
 
 def fill_ellipse(Color color, Vec2 center, Vec2 size)
   edgeCount = 30
-  tris = for i in 0..edgeCount
+  tris = for i in range(0 edgeCount)
     angle1 = 360*i/edgeCount
     angle2 = 360*(i+1)/edgeCount
     p1 = polar(angle1).mult(size).add(center)
@@ -102,7 +102,7 @@ def draw_rect(Color color, Rect rect, number thickness)
 
 def draw_ellipse(Color color, Vec2 center, Vec2 size, number thickness)
   pointCount = 50
-  points = for i in 0..pointCount
+  points = for i in range(0 pointCount)
     angle1 = 360*i/pointCount
     angle2 = 360*(i+1)/pointCount
     polar(angle1).mult(size).add(center)
