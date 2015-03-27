@@ -443,6 +443,17 @@ def flatten(it) -> List
 
 def unique_id() -> int
 def source_id() -> any
+def cache_get(key) -> List
+def cache_set(key, val)
+def cached(func, inputs) -> any
+  key = [func inputs]
+  existing = cache_get(key)
+  if existing.length == 0
+    val = func.apply(inputs)
+    cache_set(key val)
+    val
+  else
+    existing.get(0)
 
 def emit(Symbol name, any val)
 
@@ -1457,18 +1468,6 @@ def zip(List left, List right) -> List
     [l, right.get_opt(i, null)]
 
 -- Stateful functions
-
-def cached(Func refresh) -> any
-  -- Cache a function's result, the function will only be (re)evaluated as needed.
-
-  state Func prev_refresh
-  state prev_version = global_script_version()
-  state out
-  if prev_refresh != refresh or prev_version != global_script_version()
-    prev_refresh = refresh
-    prev_version = global_script_version()
-    out = refresh.call()
-  out
 
 def changed(any val) -> bool
   -- Stateful function; returns true if the value has changed since the

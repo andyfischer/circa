@@ -1160,6 +1160,29 @@ void apply_patch_hosted(VM* vm)
     apply_patch(result, circa_input(vm, 1));
 }
 
+void unique_id(VM* vm)
+{
+    int id = vm->nextUniqueId++;
+    set_int(vm->output(), id);
+}
+
+void cache_get(VM* vm)
+{
+    Value* key = vm->input(0);
+    Value* found = hashtable_get(&vm->cache, key);
+    if (found == NULL)
+        set_list(vm->output(), 0);
+    else
+        set_list_1(vm->output(), found);
+}
+
+void cache_set(VM* vm)
+{
+    Value* key = vm->input(0);
+    Value* val = vm->input(1);
+    move(val, hashtable_insert(&vm->cache, key));
+}
+
 void load_script(VM* vm)
 {
     Value* filename = vm->input(0);
@@ -1318,8 +1341,10 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "typeof", typeof_func);
     circa_patch_function(patch, "compute_patch", compute_patch_hosted);
     circa_patch_function(patch, "apply_patch", apply_patch_hosted);
-#if 0
     circa_patch_function(patch, "unique_id", unique_id);
+    circa_patch_function(patch, "cache_get", cache_get);
+    circa_patch_function(patch, "cache_set", cache_set);
+#if 0
     circa_patch_function(patch, "source_id", source_id);
     circa_patch_function(patch, "write_text_file", write_text_file_func);
 #endif

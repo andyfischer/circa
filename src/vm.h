@@ -39,6 +39,8 @@ struct VM {
     Value incomingEnv; // env from calling context
     Value env; // actual env (including inheritance)
     RandState randState;
+    int nextUniqueId;
+    Value cache;
 
     Value messageOutput;
 

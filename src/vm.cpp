@@ -78,6 +78,9 @@ VM* new_vm(Block* main)
     set_hashtable(&vm->messageOutput);
     set_hashtable(&vm->env);
     rand_init(&vm->randState, 0);
+    vm->nextUniqueId = 1;
+    initialize_null(&vm->cache);
+    set_hashtable(&vm->cache);
 
     vm_reset_call_stack(vm);
     vm_grow_stack(vm, 1 + count_input_placeholders(main));
@@ -96,6 +99,7 @@ void free_vm(VM* vm)
     set_null(&vm->incomingEnv);
     set_null(&vm->messageOutput);
     set_null(&vm->env);
+    set_null(&vm->cache);
 }
 
 void vm_reset_call_stack(VM* vm)
