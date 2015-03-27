@@ -861,7 +861,10 @@ void Module__get(VM* vm)
     Value* moduleRef = circa_input(vm, 0);
     Block* moduleBlock = module_ref_resolve(vm->world, moduleRef);
     Term* term = find_local_name(moduleBlock, circa_input(vm, 1));
-    copy(term_value(term), circa_output(vm));
+    if (term == NULL)
+        set_list(vm->output(), 0);
+    else
+        copy(term_value(term), vm->output()->set_list(1)->index(0));
 }
 
 void Module__load(VM* vm)

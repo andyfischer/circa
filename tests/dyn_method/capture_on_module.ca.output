@@ -1,0 +1,2 @@
+called lib.func
+called lib.func1 with: input_value

@@ -217,6 +217,8 @@ static inline void do_call_op(VM* vm, int top, int inputCount, int toAddr)
     vm->stack[vm->stackTop - 1]->set_int(prevTop);
     vm->stack[vm->stackTop - 2]->set_int(vm->pc);
     vm->pc = toAddr;
+
+    set_null(get_slot_fast(vm, 0));
 }
 
 static void vm_throw_error_not_enough_inputs(VM* vm, Block* func, int found)

@@ -295,6 +295,18 @@ def write_text_file(String filename, String contents)
 def path_dirname(path)
 def path_join(paths :multiple)
 
+-- Builtin types
+struct FileSignature { String filename, int time_modified }
+struct Callable;
+struct Color { number r, number g, number b, number a }
+struct Module { String name, Block relativeTo }
+struct Vec2 { number x, number y }
+struct Vec2i { int x, int y }
+struct Vec3 { number x, number y, number z }
+struct Vec4 { number x, number y, number z, number w }
+struct Rect { number x1, number y1, number x2, number y2 }
+struct Rect_i { int x1, int y1, int x2, int y2 }
+
 -- Errors
 
 def syntax_error()
@@ -482,20 +494,25 @@ def method_call(location, obj, Symbol name, List args)
   found = method_lookup(location obj name)
   if found.length == 0
     error_up(1, 'Method not found: ' name)
-  found.first.call(args)
-
-def method_opt(object, Symbol name, List args, Value default)
-  found = method_lookup(null object name)
-  if found.length == 0
-    default
-  else
-    found.first.apply([object].concat(args))
+  found.some.call(args)
 
 def method_capture(object, Symbol name) -> List
+  if typeof(object) == Module
+    found = object._get(name)
+    found.filter(is_function)
+    return found
+  
   found = method_lookup(null object name)
   for f in @found
     curry(@f [object])
   found
+
+def method_opt(object, Symbol name, List args, Value default)
+  found = method_capture(object name)
+  if found.length == 0
+    default
+  else
+    found.some.apply(args)
 
 def closure_block() -> Func
   -- Internally used function for declaring a closure.
@@ -531,7 +548,7 @@ def vm_demand_eval(Term t) -> any
 
   existing = vm_demand_eval_find_existing(t)
   if existing != []
-    return existing.first
+    return existing.some
 
   inputs = for Term input in t.inputs
     vm_demand_eval(input)
@@ -570,19 +587,7 @@ def increment(int i) -> int
 def decrement(int i) -> int
   i - 1
 
--- Builtin types
-struct FileSignature { String filename, int time_modified }
-struct Callable;
-struct Color { number r, number g, number b, number a }
-struct Module { String name, Block relativeTo }
-struct Vec2 { number x, number y }
-struct Vec2i { int x, int y }
-struct Vec3 { number x, number y, number z }
-struct Vec4 { number x, number y, number z, number w }
-struct Rect { number x1, number y1, number x2, number y2 }
-struct Rect_i { int x1, int y1, int x2, int y2 }
-
-def Module._get(self, name)
+def Module._get(self, name) -> List
 def Module.block(self) -> Block
 def Module.resolve(self) -> Block
   self.block
@@ -1042,6 +1047,11 @@ def List.empty(self) -> bool
 
 def List.first(self) -> any
   -- Returns the first element
+  self.get(0)
+
+def List.some(self) -> any
+  if self.length == 0
+    error("Tried to get some but there's none")
   self.get(0)
 
 def List.last(self) -> any

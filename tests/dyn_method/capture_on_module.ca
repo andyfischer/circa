@@ -1,0 +1,8 @@
+
+require_local lib
+
+cap = method_capture(lib :func)
+cap.some.call
+
+cap1 = method_capture(lib :func1)
+cap1.some.call('input_value')

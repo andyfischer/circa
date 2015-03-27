@@ -1,0 +1,6 @@
+
+def func()
+  print('called lib.func')
+
+def func1(i)
+  print('called lib.func1 with: ' i)

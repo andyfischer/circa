@@ -1,0 +1,5 @@
+called lib.func
+1 | null
+called lib.func1 with: input
+2 | null
+3 | :default

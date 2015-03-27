@@ -1,0 +1,6 @@
+
+require_local lib
+
+print('1 | ' method_opt(lib :func [] :default))
+print('2 | ' method_opt(lib :func1 ['input'] :default))
+print('3 | ' method_opt(lib :nonexistant [] :default))
