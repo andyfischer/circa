@@ -9,8 +9,8 @@ void set_symbol_from_string(Value* val, Value* str);
 void set_symbol_from_string(Value* val, const char* str);
 
 void symbol_to_string(Value* symbol, Value* str);
-const char* symbol_to_string(Value* symbol);
-const char* symbol_to_string(Symbol symbol);
+const char* symbol_as_string(Value* symbol);
+const char* symbol_as_string(Symbol symbol);
 
 bool symbol_eq(Value* val, Symbol s);
 

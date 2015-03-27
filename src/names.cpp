@@ -64,8 +64,11 @@ Term* run_name_search(NameSearch* params)
     stat_increment(NameSearch);
 
     // Temp: Input name can be a symbol, but convert it to a string for now.
-    if (is_symbol(&params->name))
-        set_symbol_from_string(&params->name, &params->name);
+    if (is_symbol(&params->name)) {
+        Value temp;
+        move(&params->name, &temp);
+        symbol_to_string(&temp, &params->name);
+    }
 
     if (is_null(&params->name) || string_equals(&params->name, ""))
         return NULL;

@@ -12,6 +12,7 @@
 #include "modules.h"
 #include "parser.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "term.h"
@@ -391,7 +392,11 @@ Block* find_method_on_type(Type* type, Value* nameLocation)
     Value searchName;
     set_value(&searchName, &type->name);
     string_append(&searchName, ".");
-    string_append(&searchName, name);
+    if (is_symbol(name)) {
+        string_append(&searchName, symbol_as_string(name));
+    } else {
+        string_append(&searchName, name);
+    }
 
     Block* method = NULL;
     

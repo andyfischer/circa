@@ -57,7 +57,7 @@ void set_symbol_from_string(Value* val, const char* str)
     set_symbol(val, string_to_symbol(str));
 }
 
-const char* symbol_to_string(Symbol symbol)
+const char* symbol_as_string(Symbol symbol)
 {
     const char* builtinName = builtin_symbol_to_string(symbol);
     if (builtinName != NULL)
@@ -70,13 +70,15 @@ const char* symbol_to_string(Symbol symbol)
     return NULL;
 }
 
-const char* symbol_to_string(Value* symbol)
+const char* symbol_as_string(Value* symbol)
 {
-    return symbol_to_string(as_symbol(symbol));
+    return symbol_as_string(as_symbol(symbol));
 }
 
 void symbol_to_string(Value* symbol, Value* str)
 {
+    ca_assert(symbol != str);
+
     const char* builtinName = builtin_symbol_to_string(as_symbol(symbol));
     if (builtinName != NULL) {
         set_string(str, builtinName);
@@ -96,7 +98,7 @@ void symbol_to_string(Value* symbol, Value* str)
 static void symbol_to_source_string(Value* value, Value* out)
 {
     string_append(out, ":");
-    string_append(out, symbol_to_string(value));
+    string_append(out, symbol_as_string(value));
 }
 
 static int hash_func(Value* value)
@@ -138,12 +140,12 @@ void symbol_setup_type(Type* type)
 
 CIRCA_EXPORT const char* circa_symbol_text(Value* symbol)
 {
-    return symbol_to_string(symbol);
+    return symbol_as_string(symbol);
 }
 
 CIRCA_EXPORT bool circa_symbol_equals(Value* symbol, const char* text)
 {
-    return strcmp(symbol_to_string(symbol), text) == 0;
+    return strcmp(symbol_as_string(symbol), text) == 0;
 }
 
 }

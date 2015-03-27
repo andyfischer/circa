@@ -243,7 +243,11 @@ void method_lookup(VM* vm)
 
     Block* block = find_method_on_type(get_value_type(obj), &nameLocation);
 
-    set_closure(vm->output(), block, NULL);
+    if (block == NULL)
+        set_list(vm->output(), 0);
+    else {
+        set_closure(vm->output()->set_list(1)->index(0), block, NULL);
+    }
 }
 
 void get_field(VM* vm)

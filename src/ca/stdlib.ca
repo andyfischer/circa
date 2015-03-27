@@ -15,7 +15,7 @@ def make(Type t) -> any
 def extra_output(any _) -> any
 def func_call_implicit(inputs :multiple)
 def get_field(any obj, String key) -> any
-def method_lookup(location, any obj, Symbol name) -> any -- Func or null
+def method_lookup(location, any obj, Symbol name) -> List
 def get_index(List list, int index) -> any
 def selector(any elements :multiple) -> Selector
 def get_with_selector(any object, Selector selector) -> any
@@ -438,7 +438,6 @@ def flatten(it) -> List
     
   fold(it append [])
 
-
 def cache_get(key) -> List
 def cache_set(key, val)
 def cached(func, inputs) -> any
@@ -450,7 +449,6 @@ def cached(func, inputs) -> any
     val
   else
     existing.get(0)
-
 
 def global_script_version() -> int
 
@@ -479,10 +477,23 @@ def call(Func func, inputs :multiple) -> any
   func.apply(inputs)
 
 def method_call(location, obj, Symbol name, List args)
-  func = method_lookup(location obj name)
-  if func == null
+  found = method_lookup(location obj name)
+  if found.length == 0
     error_up(1, 'Method not found: ' name)
-  func.call(args)
+  found.first.call(args)
+
+def method_opt(object, Symbol name, List args, Value default)
+  found = method_lookup(null object name)
+  if found.length == 0
+    default
+  else
+    found.first.apply(args)
+
+def method_capture(object, Symbol name) -> List
+  found = method_lookup(null object name)
+  for f in @found
+    curry(@f [object])
+  found
 
 def closure_block() -> Func
   -- Internally used function for declaring a closure.

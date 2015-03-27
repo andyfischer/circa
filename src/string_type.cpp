@@ -349,7 +349,7 @@ bool string_equals(Value* s, const char* str)
         if (str[0] != ':')
             return false;
 
-        return strcmp(symbol_to_string(s), str + 1) == 0;
+        return strcmp(symbol_as_string(s), str + 1) == 0;
     }
 
     return false;
