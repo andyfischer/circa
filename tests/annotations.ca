@@ -1,6 +1,0 @@
-
-def func()
-  :anno1
-  :anno2 'hello' 2
-
-require('annotations').get(func) | print

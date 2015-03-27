@@ -4,7 +4,8 @@ def unknown_function_prelude(any ins :multiple)
 def annotate(term, Symbol key, value :optional)
 def annotate_block(Symbol key, value :optional)
 def declare_field()
-def return(any outs :multiple :optional)
+def equals(any a,any b) -> bool
+def not_equals(any a,any b) -> bool
 def discard(any outs :multiple :optional)
 def dynamic_method(any inputs :multiple)
 def break(any outs :multiple :optional)
@@ -17,6 +18,7 @@ def method_lookup(location, any obj, Symbol name) -> any -- Func or null
 def get_index(List list, int index) -> any
 def selector(any elements :multiple) -> Selector
 def get_with_selector(any object, Selector selector) -> any
+def return(any outs :multiple :optional)
 def set_with_selector(any object, Selector selector, any newValue) -> any
 def section()
 def loop_condition_bool(bool condition)
@@ -28,6 +30,43 @@ def case(bool b :optional)
 def switch(any input :optional) -> any
 def _upvalue(term :ref) -> any
 def load_script(String filename) -> Block
+def reflect_caller(int height) -> Term
+def rand() -> number
+def error(any msg :multiple)
+def error_up(int height, any msg :multiple)
+def to_string_repr(any val) -> String
+  -- Encode a value as a string representation.
+def typeof(any val) -> Type
+  -- Returns the runtime type of a value.
+def env(any name) -> any
+  -- Fetch an env variable
+def copy(any val) -> any
+
+def cast(any val, Type t) -> any
+  -- Cast the value to the given type. Returns null if cast fails.
+
+def cond(bool condition, any pos, any neg) -> any
+  -- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.
+
+def str(any vals :multiple) -> String
+  -- Convert inputs to a string and concatenate the result
+
+def copy(any val) -> any
+
+def convert(any value, Type t) -> any
+  -- Convert the value to the given type, if possible.
+
+def compute_patch(existing, new) -> any
+  -- Compute a patch, which when applied to 'existing' will equal 'new'
+
+def apply_patch(existing, patch) -> any
+  -- Apply a patch
+
+def assert(bool condition)
+  -- Raises an error if 'condition' is false.
+
+def from_string(String s) -> any
+  -- Parse a string representation to a value
 
 -- List values
 def make_list(any vals :multiple) -> List
@@ -46,6 +85,8 @@ def make_map(any vals :multiple) -> Map
 -- Math
 def add_i(int a, int b) -> int
 def add_f(number a, number b) -> number
+def div_f(number a,number b) -> number
+def div_i(number a,number b) -> int
 def max_f(number a,number b) -> number
   -- Maximum of two numbers
 def max_i(int a,int b) -> int
@@ -96,8 +137,6 @@ def arccos(number n) -> number
   -- Trigonometric arccos() function
 def arctan(number n) -> number
   -- Trigonometric arctan() function
-
-def reflect_caller(int height) -> Term
 
 -- Type checking
 def is_compound(n) -> bool
@@ -208,43 +247,6 @@ def number.mult(left, right) -> number
 def number.div(left, right) -> number
   div(left, right)
 
-def rand() -> number
-
-def copy(any val) -> any
-
-def cast(any val, Type t) -> any
-  -- Cast the value to the given type. Returns null if cast fails.
-
-def cond(bool condition, any pos, any neg) -> any
-  -- If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.
-
-def str(any vals :multiple) -> String
-  -- Convert inputs to a string and concatenate the result
-
-def copy(any val) -> any
-
-def convert(any value, Type t) -> any
-  -- Convert the value to the given type, if possible.
-
-def compute_patch(existing, new) -> any
-  -- Compute a patch, which when applied to 'existing' will equal 'new'
-
-def div_f(number a,number b) -> number
-def div_i(number a,number b) -> int
-
-def apply_patch(existing, patch) -> any
-  -- Apply a patch
-
-def assert(bool condition)
-  -- Raises an error if 'condition' is false.
-
-def equals(any a,any b) -> bool
-
-def from_string(String s) -> any
-  -- Parse a string representation to a value
-
-def error(any msg :multiple)
-def error_up(int height, any msg :multiple)
 
 -- Comparison
 def less_than_i(int a,int b) -> bool
@@ -259,13 +261,11 @@ def greater_than_eq_f(number a,number b) -> bool
 def length(List list) -> int
   -- Return the number of items in the given list
 
-
 def set_field(any obj, String key, any val) -> any
 def set_index(any list, int index, any val) -> List
 
 def static_error(any msg)
 
-def not_equals(any a,any b) -> bool
 
 def print(any items :multiple)
   -- Prints a line of text output to the console.
@@ -277,14 +277,6 @@ def get(Map val, List path) -> any
 def set(Map val, List path, any newValue) -> any
 def delete(Map val, List path) -> Map
 
-def to_string_repr(any val) -> String
-  -- Encode a Circa value as a string representation.
-
-def typeof(any val) -> Type
-  -- Returns the runtime type of a value.
-
-def env(any name) -> any
-  -- Fetch an env variable
 
 def has_effects()
   -- Annotation, declare that a function has effects. Used in native-patched
