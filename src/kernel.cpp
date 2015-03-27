@@ -555,9 +555,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(break_func, "break");
         find_func(blank_list, "blank_list");
         find_func(case_func, "case");
-#if 0
-        find_func(case_condition_bool, "case_condition_bool");
-#endif
         find_func(cast, "cast");
         find_func(cond, "cond");
         find_func(continue_func, "continue");

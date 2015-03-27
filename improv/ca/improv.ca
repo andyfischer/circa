@@ -5,4 +5,10 @@ struct Window {
 
 def make_window(Rect rect) -> Window
 
+def window(id, Rect size)
+  create = (id) ->
+    make_window(size)
+
+  window = cached(create [id])
+
 def play_audio(Blob blob)

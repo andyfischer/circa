@@ -1,0 +1,17 @@
+
+def f(a,b,c)
+  print('called f with a: ' a ', b: ' b ', c: ' c)
+
+f(1 2 3)
+
+g = curry(f [4])
+g.call(5 6)
+
+h = curry(g [7])
+h.call(8)
+
+j = curry(f [9 10])
+j.call(11)
+
+h = curry(f [12 13 14])
+h.call()

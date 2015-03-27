@@ -22,6 +22,7 @@
 #include "term.h"
 #include "token.h"
 #include "type.h"
+#include "world.h"
 
 namespace circa {
 

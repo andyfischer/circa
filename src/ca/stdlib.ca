@@ -4,6 +4,7 @@ def unknown_function_prelude(any ins :multiple)
 def annotate(term, Symbol key, value :optional)
 def annotate_block(Symbol key, value :optional)
 def declare_field()
+def emit(Symbol name, any val)
 def equals(any a,any b) -> bool
 def not_equals(any a,any b) -> bool
 def discard(any outs :multiple :optional)
@@ -68,6 +69,16 @@ def assert(bool condition)
 def from_string(String s) -> any
   -- Parse a string representation to a value
 
+def print(any items :multiple)
+  -- Prints a line of text output to the console.
+
+def trace(any items :multiple)
+  -- Like print()
+
+def get(Map val, List path) -> any
+def set(Map val, List path, any newValue) -> any
+def delete(Map val, List path) -> Map
+
 -- List values
 def make_list(any vals :multiple) -> List
 def blank_list(int count) -> List
@@ -82,7 +93,12 @@ def not(bool b) -> bool
 -- Map values
 def make_map(any vals :multiple) -> Map
 
+def unique_id() -> int
+def source_id() -> any
+
 -- Math
+def abs(number n) -> number
+  -- Absolute value
 def add_i(int a, int b) -> int
 def add_f(number a, number b) -> number
 def div_f(number a,number b) -> number
@@ -247,7 +263,6 @@ def number.mult(left, right) -> number
 def number.div(left, right) -> number
   div(left, right)
 
-
 -- Comparison
 def less_than_i(int a,int b) -> bool
 def less_than_f(number a,number b) -> bool
@@ -266,18 +281,6 @@ def set_index(any list, int index, any val) -> List
 
 def static_error(any msg)
 
-
-def print(any items :multiple)
-  -- Prints a line of text output to the console.
-
-def trace(any items :multiple)
-  -- Like print()
-
-def get(Map val, List path) -> any
-def set(Map val, List path, any newValue) -> any
-def delete(Map val, List path) -> Map
-
-
 def has_effects()
   -- Annotation, declare that a function has effects. Used in native-patched
   -- functions. Not fully supported yet.
@@ -291,6 +294,8 @@ def write_text_file(String filename, String contents)
 
 def path_dirname(path)
 def path_join(paths :multiple)
+
+-- Errors
 
 def syntax_error()
   caller = reflect_caller(1)
@@ -433,8 +438,7 @@ def flatten(it) -> List
     
   fold(it append [])
 
-def unique_id() -> int
-def source_id() -> any
+
 def cache_get(key) -> List
 def cache_set(key, val)
 def cached(func, inputs) -> any
@@ -447,7 +451,6 @@ def cached(func, inputs) -> any
   else
     existing.get(0)
 
-def emit(Symbol name, any val)
 
 def global_script_version() -> int
 
@@ -484,8 +487,10 @@ def method_call(location, obj, Symbol name, List args)
 def closure_block() -> Func
   -- Internally used function for declaring a closure.
 
--- Secret internally-used funcs
-
+def curry(Func func, List frontInputs) -> Func
+  def callback(ins :multiple)
+    func.apply(frontInputs.concat(ins))
+  callback
 
 def _declared_state(existing, Type type, initializer) -> any
   -- Fetch a declared state variable. The 'state' keyword uses this.
@@ -524,8 +529,6 @@ def vm_demand_eval(Term t) -> any
 
 -- Misc builtin funcs --
 
-def abs(number n) -> number
-  -- Absolute value
 
 def any_true(list) -> bool
   for i in list
@@ -1058,14 +1061,6 @@ def List.each(self, Func func) -> List
 
 def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
-  
-{-
-interface Iterator
-  def current() -> any
-  def done() -> bool
-  def advance() -> Iterator
--}
-
 
 def Map.contains(self, any key) -> bool
   -- Returns true if the map contains the given key.
@@ -1705,9 +1700,3 @@ def int.map(x, Vec2 fromRange, Vec2 toRange)
 
 def noise(number x)
   -- Perlin noise
-
--- Codechange objects
-def codechange_set_value(Term target, any newValue) -> List
-  [:set_value target newValue]
-
-def debug_break()
