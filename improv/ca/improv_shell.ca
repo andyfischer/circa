@@ -1,0 +1,31 @@
+require_local input
+require_local editor_main
+require_local improv
+require stack_trace
+
+def to_vm(Func func)
+  state id = unique_id()
+  get = (id) ->
+    func.to_vm
+  cached(get [id])
+
+def main(module)
+  size = method_opt(module :window_rect [] [0 0 1000 500])
+
+  window = improv.window(:main size)
+  vm = to_vm(method_capture(module :main).first)
+
+  vm.call
+
+  if vm.has_error
+    stack_trace.dump(vm)
+
+struct Main {
+}
+
+def Main.window_rect(self) [0 0 1000 500]
+
+def Main.main(self)
+  print('Main.main')
+
+main(Main.make)

@@ -90,7 +90,7 @@ void module_set_filename(World* world, Block* block, Value* filename)
     set_block(hashtable_insert(&world->modulesByFilename, filename), block);
 }
 
-void resolve_possible_module_path(World* world, Value* path, Value* result)
+CIRCA_EXPORT void circa_resolve_possible_module_path(World* world, Value* path, Value* result)
 {
     // try original path
     if (circa_file_exists(world, as_cstring(path))) {

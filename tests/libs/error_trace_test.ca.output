@@ -1,3 +1,4 @@
 [tests/libs/error_trace_test.ca:8 inside main()] 
  [tests/libs/error_trace_test.ca:6 inside func()] 
-  Error: an error occurred!
+  [inside error()] 
+   Error: an error occurred!

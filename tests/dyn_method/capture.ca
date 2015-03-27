@@ -1,0 +1,19 @@
+
+def method_capture(object, Symbol name) -> List
+  found = method_lookup(null object name)
+  for f in @found
+    curry(@f [object])
+  found
+
+struct T {
+  String f
+}
+
+t = make(T)
+t.f = "my field"
+
+def T.func(self, i)
+  print('T.func called | self = ' self ', i = ' i)
+
+cap = method_capture(t :func)
+cap.first.call(:the_input)

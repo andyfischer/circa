@@ -548,6 +548,8 @@ void circa_cwd(caValue* cwd);
 void circa_repl_start(caVM* vm);
 void circa_repl_run_line(caVM* vm, caValue* input, caValue* output);
 
+void circa_resolve_possible_module_path(caWorld* world, caValue* path, caValue* result);
+
 // -- Debugging --
 
 // 'dump' commands will print a representation to stdout

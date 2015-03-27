@@ -302,7 +302,7 @@ int run_command_line(caWorld* world, Value* args)
     resolve_possible_module_path(world, arg, &filename);
 
     if (is_null(&filename)) {
-        printf("Local module not found: %s\n", as_cstring(arg));
+        printf("Module not found: %s\n", as_cstring(arg));
         return -1;
     }
 
@@ -366,14 +366,14 @@ void run_repl_stdin(World* world)
 #endif
 }
 
-int run_command_line(caWorld* world, int argc, const char* args[])
+int run_command_line(caWorld* world, int argc, const char* argv[])
 {
-    Value args_v;
-    set_list(&args_v, 0);
+    Value args;
+    set_list(&args, 0);
     for (int i=1; i < argc; i++)
-        circa_set_string(circa_append(&args_v), args[i]);
+        circa_set_string(circa_append(&args), argv[i]);
 
-    return run_command_line(world, &args_v);
+    return run_command_line(world, &args);
 }
 
 } // namespace circa

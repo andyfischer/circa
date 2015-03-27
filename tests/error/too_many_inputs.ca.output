@@ -1,4 +1,5 @@
 a = 1
 b = 2
 [tests/error/too_many_inputs.ca:7] 
- Error: Too many inputs for function 'f': expected 2 and found 3
+ [inside error()] 
+  Error: Too many inputs for function 'f': expected 2 and found 3

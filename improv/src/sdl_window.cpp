@@ -416,12 +416,12 @@ void sdl_get_mouse_pos(caValue* output)
 
 extern "C" int main(int argc, char *argv[])
 {
-    if (argc <= 1) {
-        printf("Missing script argument\n");
-        return 1;
-    }
-    
     caWorld* world = circa_initialize();
+
+    caValue args;
+    args.set_list(0);
+    for (int i=1; i < argc; i++)
+        circa_set_string(circa_append(&args), argv[i]);
 
     fix_current_directory();
 
@@ -434,20 +434,38 @@ extern "C" int main(int argc, char *argv[])
     if (!sdl_init())
         return 1;
 
+    if (circa_length(&args) < 1) {
+        printf("Missing script argument\n");
+        return 1;
+    }
+    
+    caValue* arg = circa_index(&args, 0);
+    caValue filename;
+    circa_resolve_possible_module_path(world, arg, &filename);
+
+    if (circa_is_null(&filename)) {
+        printf("Module not found: %s\n", circa_string(arg));
+        return -1;
+    }
+
+    Block* userModule = load_module_by_filename(world, &filename);
+
     caBlock* main = circa_load_module(world, NULL, "improv_main");
     caVM* vm = circa_new_vm(main);
 
+#ifdef NACL
+    circa_set_bool(circa_env_insert(vm, "gl_es2"), true);
+#endif
+
+#if 0
     //ImprovWindow window;
     //window.init(world);
 
     const char* arg = argv[1];
     circa_set_string(circa_env_insert(vm, "scriptName"), arg);
 
-#ifdef NACL
-    circa_set_bool(circa_env_insert(vm, "gl_es2"), true);
-#endif
-
     SDL_PauseAudio(0);
+#endif
 
     // Main loop
     while (true) {
@@ -473,7 +491,6 @@ extern "C" int main(int argc, char *argv[])
             #endif
         }
 #if 0
-
         SDL_GL_SwapWindow(_sdl_window);
 #endif
 

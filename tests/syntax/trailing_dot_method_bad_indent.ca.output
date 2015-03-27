@@ -1,2 +1,3 @@
 [tests/syntax/trailing_dot_method_bad_indent.ca:10] 
- Error: Syntax error: Unrecognized start of expression (next token = '.')
+ [inside error_up()] 
+  Error: Syntax error: Unrecognized start of expression (next token = '.')

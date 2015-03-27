@@ -25,11 +25,14 @@ def Term.location_str(self) -> String
 def trace_to_string(VM vm) -> String
   writer = indent_writer.new
 
-  for frame in vm.frame_list.filter((f) -> not f.current_term.is_null)
+  for frame in vm.frame_list
 
     term = frame.current_term
 
-    @writer.write('[' term.location_str '] ')
+    if term.is_null
+      @writer.write('[inside ' frame.block.name '()] ')
+    else
+      @writer.write('[' term.location_str '] ')
 
     @writer.writeln
     @writer.indent

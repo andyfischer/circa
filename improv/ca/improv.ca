@@ -4,6 +4,8 @@ struct Window {
 }
 
 def make_window(Rect rect) -> Window
+  print('make window: ' rect)
+  Window.make
 
 def window(id, Rect size)
   create = (id) ->

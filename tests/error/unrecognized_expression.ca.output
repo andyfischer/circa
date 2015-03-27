@@ -1,2 +1,3 @@
 [tests/error/unrecognized_expression.ca:3] 
- Error: Syntax error: Expected identifier after def, found: 1
+ [inside error_up()] 
+  Error: Syntax error: Expected identifier after def, found: 1
