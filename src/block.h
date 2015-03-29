@@ -130,6 +130,7 @@ Term* get_output_placeholder(Block* block, int index);
 int count_input_placeholders(Block* block);
 int count_output_placeholders(Block* block);
 bool has_variable_args(Block* block);
+int count_minimum_num_inputs(Block* block);
 
 // Insert this existing block as the nested contents for this term.
 void block_graft_replacement(Block* target, Block* replacement);

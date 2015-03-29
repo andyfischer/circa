@@ -1,0 +1,9 @@
+
+def f(i, j :optional)
+  print('i = ' i ', j = ' j)
+
+print('f(1)')
+f(1)
+
+print('f(1 2)')
+f(1 2)

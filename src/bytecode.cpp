@@ -919,11 +919,8 @@ void loop_condition_bool(Bytecode* bc, Term* term)
 void maybe_write_not_enough_inputs_error(Bytecode* bc, Block* func, int found)
 {
     ca_assert(func != NULL);
-    int expected = count_input_placeholders(func);
+    int expected = count_minimum_num_inputs(func);
     int varargs = has_variable_args(func);
-
-    if (varargs)
-        expected--;
 
     if (found >= expected)
         return;

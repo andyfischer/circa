@@ -383,6 +383,22 @@ bool has_variable_args(Block* block)
     }
 }
 
+int count_minimum_num_inputs(Block* block)
+{
+    int count = 0;
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(block, i);
+        if (placeholder == NULL)
+            break;
+        if (placeholder->boolProp(s_Multiple, false))
+            break;
+        if (placeholder->boolProp(s_Optional, false))
+            break;
+        count++;
+    }
+    return count;
+}
+
 void block_graft_replacement(Block* target, Block* replacement)
 {
     target->owningTerm->nestedContents = replacement;
