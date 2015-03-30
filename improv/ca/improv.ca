@@ -12,3 +12,6 @@ def window(id, Rect size)
   window
 
 def play_audio(Blob blob)
+
+def window_size() -> Vec2
+  env(:window_rect).size

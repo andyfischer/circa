@@ -3291,7 +3291,7 @@ const char* find_builtin_file(const char* filename) {
         "  prev = val\n"
         "  result\n"
         "\n"
-        "def scache(Func refresh)\n"
+        "def cached(Func refresh)\n"
         "  state out\n"
         "  if changed([refresh global_script_version()])\n"
         "    out = refresh.call()\n"

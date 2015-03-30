@@ -2,13 +2,12 @@
 require draw
 require time
 require input
+require improv
 
-windowRect = env(:canvasRect) -> Rect.cast
-windowSize = windowRect.size
+window_size = improv.window_size
 
 def random_location() -> Vec2
-  for i in windowSize
-    i * rand()
+  window_size * [rand() rand()]
 
 -- Black background
 draw.background(#000)
@@ -53,10 +52,10 @@ def Asteroid.size_speed_mod(self) -> number
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Vec2 p) -> Vec2
-  [mod(p.x, windowSize.x), mod(p.y, windowSize.y)]
+  [mod(p.x, window_size.x), mod(p.y, window_size.y)]
 
 def new_ship() -> Ship
-  [[windowSize.x/2, windowSize.y/2] [0 0] 0]
+  [[window_size.x/2, window_size.y/2] [0 0] 0]
 
 state Ship ship = new_ship()
 state List bullets = []
@@ -87,7 +86,7 @@ drift = Vec2.cast(repeat(time.elapsed 2))
 mult(@drift 5)
 
 num_stars = 100
-points = for i in 0..num_stars
+points = for i in range(0 num_stars)
   state Vec2 original_loc = random_location()
   loc = add(original_loc, drift)
   wrap_around(@loc)

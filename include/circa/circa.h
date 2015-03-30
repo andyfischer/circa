@@ -193,6 +193,7 @@ caBlock* circa_load_module(caWorld* world, caBlock* loadedBy, const char* module
 // -- Interpreter --
 caVM* circa_new_vm(caBlock* main);
 void circa_free_vm(caVM* vm);
+caValue* circa_vm_get_error(caVM* vm);
 
 // Check for changed files, and run any relevant change actions.
 void circa_update_changed_files(caWorld* world);

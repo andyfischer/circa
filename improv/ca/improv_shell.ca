@@ -1,39 +1,58 @@
 require_local improv
 require stack_trace
 
+def module_main(module) -> Func
+  func = method_capture(module :main)
+  if func.length == 0
+    module.to_func
+  else
+    func.some
+
 def actor(Func func)
-  scache(-> make_vm(func))
+  cached(-> make_vm(func))
 
 def main(module)
   render_list = require gl/render_list
 
-  size = method_opt(module :window_rect [] [0 0 1000 500])
+  rect = method_opt(module :window_rect [] [0 0 1000 500])
+  Rect.cast(@rect)
 
-  window = improv.window(:main size)
-  userActor = actor(method_capture(module :main).some)
+  time = env(:time)
+  timeDelta = delta(time)
+
+  def actor_setup(actor)
+    actor.set_env(:window_rect rect)
+    actor.set_env(:time time)
+    actor.set_env(:timeDelta timeDelta)
+
+  window = improv.window(:main rect)
+  userActor = actor(module_main(module))
   userActor.expect_messages(:render_commands)
+
+  actor_setup(userActor)
 
   userActor.call
 
   if userActor.has_error
     stack_trace.dump(userActor)
 
-  print('found ' method_capture(render_list :submit))
-
   for submit in method_capture(render_list :submit)
     renderActor = actor(submit)
-    print('renderActor = ' renderActor)
+    actor_setup(renderActor)
     renderActor.call(userActor.consume_messages(:render_commands))
 
     if renderActor.has_error
       stack_trace.dump(renderActor)
+
+asteroids = require_local ../demos/asteroids
+
+main(asteroids)
 
 struct Main {
 }
 
 def Main.window_rect(self) [0 0 1000 500]
 def Main.main(self)
-
 
 
 {-
@@ -43,6 +62,6 @@ def realmain()
 vm = make_vm(realmain)
 vm.call
 stack_trace.dump(vm)
--}
 
 main(Main.make)
+-}

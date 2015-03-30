@@ -637,14 +637,14 @@ void dynamic_method(Bytecode* bc, Term* term)
 #if DEBUG
     Value msg;
     set_string(&msg, "dynamic method, slow lookup of: ");
-    string_append(&msg, term->getProp(s_MethodName));
+    string_append(&msg, term->getProp(s_method_name));
     comment(bc, &msg);
 #endif
 
     int constIndex;
     Value* nameLocation = append_const(bc, &constIndex);
     nameLocation->set_list(2);
-    nameLocation->index(0)->set(term->getProp(s_MethodName));
+    nameLocation->index(0)->set(term->getProp(s_method_name));
     nameLocation->index(1)->set_term(term);
 
     int inputCount = term->numInputs();
@@ -1466,7 +1466,7 @@ void handle_function_inputs(Bytecode* bc, Block* block)
         if (castNecessary)
             cast_fixed_type(bc, inputSlot, declared_type(placeholder));
 
-        if (placeholder->boolProp(s_Multiple, false)) {
+        if (placeholder->boolProp(s_multiple, false)) {
             // Collapse remaining args into a list.
             append_op(bc, op_varargs_to_list, i);
             break;
@@ -1510,6 +1510,10 @@ void major_block_contents(Bytecode* bc, Block* block)
 
         // Native func
         append_op(bc, op_native, nativePatchIndex);
+
+        Term* output = get_output_placeholder(block, 0);
+        cast_fixed_type(bc, 0, declared_type(output));
+
         append_op(bc, op_ret_or_stop);
 
     } else {
@@ -1533,20 +1537,20 @@ void major_block_contents(Bytecode* bc, Block* block)
 
 void set_subroutine_output(Bytecode* bc, Block* block, Term* result)
 {
-    Term* placeholder = get_output_placeholder(block, 0);
+    Term* output = get_output_placeholder(block, 0);
 
     if (result == NULL) {
         append_op(bc, op_set_null, 0);
     } else {
 
-        bool castNecessary = (declared_type(placeholder) != declared_type(result))
-            && (declared_type(placeholder) != TYPES.any);
+        bool castNecessary = (declared_type(output) != declared_type(result))
+            && (declared_type(output) != TYPES.any);
 
         load_term(bc, result, 0, false);
         //set_term_live(bc, result, 0);
 
         if (castNecessary)
-            cast_fixed_type(bc, 0, declared_type(placeholder));
+            cast_fixed_type(bc, 0, declared_type(output));
     }
 }
 

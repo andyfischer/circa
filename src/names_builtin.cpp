@@ -54,8 +54,11 @@ const char* builtin_symbol_to_string(int name)
     case s_maddr: return "maddr";
     case s_major_block: return "major_block";
     case s_maybe: return "maybe";
+    case s_memoize: return "memoize";
     case s_message: return "message";
+    case s_method_name: return "method_name";
     case s_methodCache: return "methodCache";
+    case s_multiple: return "multiple";
     case s_next: return "next";
     case s_next_case: return "next_case";
     case s_no: return "no";
@@ -107,7 +110,6 @@ const char* builtin_symbol_to_string(int name)
     case s_Message: return "Message";
     case s_MethodName: return "MethodName";
     case s_ModifyList: return "ModifyList";
-    case s_Multiple: return "Multiple";
     case s_Mutability: return "Mutability";
     case s_Optional: return "Optional";
     case s_OriginalText: return "OriginalText";
@@ -983,17 +985,9 @@ int builtin_symbol_from_string(const char* str)
     default: return -1;
     }
     case 'u':
-    switch (str[2]) {
-    case 'l':
-        if (strcmp(str + 3, "tiple") == 0)
-            return s_Multiple;
-        break;
-    case 't':
-        if (strcmp(str + 3, "ability") == 0)
+        if (strcmp(str + 2, "tability") == 0)
             return s_Mutability;
         break;
-    default: return -1;
-    }
     default: return -1;
     }
     case 'N':
@@ -2096,16 +2090,44 @@ int builtin_symbol_from_string(const char* str)
     }
     case 'e':
     switch (str[2]) {
+    case 'm':
+        if (strcmp(str + 3, "oize") == 0)
+            return s_memoize;
+        break;
     case 's':
         if (strcmp(str + 3, "sage") == 0)
             return s_message;
         break;
     case 't':
-        if (strcmp(str + 3, "hodCache") == 0)
+    switch (str[3]) {
+    case 'h':
+    switch (str[4]) {
+    case 'o':
+    switch (str[5]) {
+    case 'd':
+    switch (str[6]) {
+    case 'C':
+        if (strcmp(str + 7, "ache") == 0)
             return s_methodCache;
+        break;
+    case '_':
+        if (strcmp(str + 7, "name") == 0)
+            return s_method_name;
         break;
     default: return -1;
     }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    default: return -1;
+    }
+    case 'u':
+        if (strcmp(str + 2, "ltiple") == 0)
+            return s_multiple;
+        break;
     default: return -1;
     }
     case 'n':

@@ -378,7 +378,7 @@ bool has_variable_args(Block* block)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return false;
-        if (placeholder->boolProp(s_Multiple, false))
+        if (placeholder->boolProp(s_multiple, false))
             return true;
     }
 }
@@ -390,7 +390,7 @@ int count_minimum_num_inputs(Block* block)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             break;
-        if (placeholder->boolProp(s_Multiple, false))
+        if (placeholder->boolProp(s_multiple, false))
             break;
         if (placeholder->boolProp(s_Optional, false))
             break;

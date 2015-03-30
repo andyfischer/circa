@@ -63,7 +63,7 @@ Term* loop_find_done_call(Block* block)
 {
     for (int i=0; i < block->length(); i++) {
         Term* term = block->get(i);
-        Value* methodName = term->getProp(s_MethodName);
+        Value* methodName = term->getProp(s_method_name);
         if (methodName && string_equals(methodName, "done"))
             return term;
     }
@@ -77,7 +77,7 @@ Term* loop_find_key(Block* block)
         Term* term = block->get(i);
         if (term->input(0) != iterator)
             continue;
-        Value* methodName = term->getProp(s_MethodName);
+        Value* methodName = term->getProp(s_method_name);
         if (methodName && string_equals(methodName, "key"))
             return term;
     }
@@ -91,7 +91,7 @@ Term* loop_find_iterator_advance(Block* block)
         Term* term = block->get(i);
         if (term->input(0) != iterator)
             continue;
-        Value* methodName = term->getProp(s_MethodName);
+        Value* methodName = term->getProp(s_method_name);
         if (methodName && string_equals(methodName, "advance"))
             return term;
     }

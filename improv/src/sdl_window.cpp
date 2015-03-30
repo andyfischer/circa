@@ -441,7 +441,7 @@ extern "C" int main(int argc, char *argv[])
         circa_run(vm);
 
         if (circa_has_error(vm)) {
-            printf("top level error\n");
+            printf("top level error: %s\n", circa_vm_get_error(vm)->to_c_string());
 
             // circa_dump_stack_trace(vm);
             

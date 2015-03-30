@@ -40,8 +40,11 @@ loop
 maddr
 major_block
 maybe
+memoize
 message
+method_name
 methodCache
+multiple
 next
 next_case
 no
@@ -97,7 +100,6 @@ Meta
 Message
 MethodName
 ModifyList
-Multiple
 Mutability
 Optional
 OriginalText

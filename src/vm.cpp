@@ -1343,7 +1343,7 @@ bool vm_has_error(VM* vm)
     return vm->error;
 }
 
-Value* vm_get_error(VM* vm)
+CIRCA_EXPORT caValue* circa_vm_get_error(VM* vm)
 {
     if (!vm->error)
         return NULL;

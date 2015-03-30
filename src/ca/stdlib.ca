@@ -1489,7 +1489,7 @@ def changed(any val) -> bool
   prev = val
   result
 
-def scache(Func refresh)
+def cached(Func refresh)
   state out
   if changed([refresh global_script_version()])
     out = refresh.call()

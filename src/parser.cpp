@@ -790,7 +790,7 @@ ParseResult function_decl(Block* block, TokenStream& tokens, ParserCxt* context)
             } else if (symbolText == ":output" || symbolText == ":out") {
                 input->setBoolProp(s_Output, true);
             } else if (symbolText == ":multiple") {
-                input->setBoolProp(s_Multiple, true);
+                input->setBoolProp(s_multiple, true);
             } else if (symbolText == ":ref") {
                 input->setBoolProp(s_Ref, true);
             } else if (symbolText == ":meta") {
@@ -2242,7 +2242,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         // Method could not be statically found. Create a dynamic_method call.
         function = FUNCS.dynamic_method;
         term = apply(block, function, inputs);
-        term->setStringProp(s_MethodName, as_cstring(&functionName));
+        term->setStringProp(s_method_name, as_cstring(&functionName));
 
     } else {
         term = apply(block, function, inputs);

@@ -668,7 +668,7 @@ Block* statically_resolve_dynamic_method(Term* term)
 
     Value nameLocation;
     nameLocation.set_list(2);
-    nameLocation.index(0)->set(term->getProp(s_MethodName));
+    nameLocation.index(0)->set(term->getProp(s_method_name));
     nameLocation.index(1)->set_term(term);
 
     return find_method_on_type(declared_type(term), &nameLocation);

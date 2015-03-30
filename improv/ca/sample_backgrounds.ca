@@ -59,8 +59,8 @@ def grey_shaded()
         .set_attribs([:uv 2])
   )
 
-  channel_send(:render_commands CustomShaderCommand.make(:custom_shader shader vbo))
-  channel_send(:render_commands :layer_boundary)
+  emit(:render_commands CustomShaderCommand.make(:custom_shader shader vbo))
+  emit(:render_commands :layer_boundary)
 
 def flat_color(Color color)
   shader = cached(->
@@ -100,6 +100,6 @@ def flat_color(Color color)
     gl.uniform_vec4(:color color)
     vbo.draw
 
-  channel_send(:render_commands CallbackCommand.make(:callback func))
-  channel_send(:render_commands :layer_boundary)
+  emit(:render_commands CallbackCommand.make(:callback func))
+  emit(:render_commands :layer_boundary)
 

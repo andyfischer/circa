@@ -256,7 +256,7 @@ void set_module_ref(Value* value, Value* path, Block* relativeTo)
 
 Term* module_lookup(Block* module, Term* caller)
 {
-    Value* elementName = caller->getProp(s_MethodName);
+    Value* elementName = caller->getProp(s_method_name);
     Term* term = find_local_name(module, elementName);
     return term;
 }

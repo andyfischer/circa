@@ -260,7 +260,7 @@ int find_index_of_vararg(Block* block)
         Term* placeholder = get_input_placeholder(block, i);
         if (placeholder == NULL)
             return -1;
-        if (placeholder->boolProp(s_Multiple, false))
+        if (placeholder->boolProp(s_multiple, false))
             return i;
     }
 }
@@ -579,7 +579,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
         string_append(out, " <NULL function>");
     } else if (term->function == FUNCS.dynamic_method) {
         string_append(out, " .");
-        string_append(out, term->stringProp(s_MethodName, ""));
+        string_append(out, term->stringProp(s_method_name, ""));
     } else {
         string_append(out, " ");
         string_append(out, term_name(term->function));
@@ -601,7 +601,7 @@ void print_term(Term* term, RawOutputPrefs* prefs, Value* out)
     string_append(out, ") ");
 
     // Print out certain properties
-    if (term->boolProp(s_Multiple, false))
+    if (term->boolProp(s_multiple, false))
         string_append(out, ":multiple ");
     if (term->boolProp(s_Output, false))
         string_append(out, ":output ");

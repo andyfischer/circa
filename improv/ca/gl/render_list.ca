@@ -4,7 +4,8 @@ require gl/shader_builder
 require matrix
 
 def screenspace_mat3()
-  scale = Vec2.make(2 / env(:canvasRect).width, 2 / env(:canvasRect).height)
+  window_rect = env(:window_rect)
+  scale = Vec2.make(2 / window_rect.width, 2 / window_rect.height)
   matrix.make_mat3.scale([1 -1]).translate([-1 -1]).scale(scale)
 
 struct TrianglesCommand {
@@ -12,15 +13,7 @@ struct TrianglesCommand {
   List data
 }
 
-def bucketize(List list, Func key)
-  result = Map.make
-  for el in list
-    @result.list_append(key.call(el) el)
-  result
-
-def geom_shader()
-  annotate_block(:cache)
-
+def make_geom_shader()
   builder = shader_builder.new
   @builder.attribute('vec2', 'pos')
   @builder.attribute('vec4', 'color')
@@ -47,6 +40,9 @@ def geom_shader()
   )
   builder.to_shader
 
+def geom_shader()
+  cached(make_geom_shader)
+
 def submit_triangles_data(List data)
   vbo = cached(->
     gl.new_vertex_buffer
@@ -56,11 +52,11 @@ def submit_triangles_data(List data)
   
   vbo.set_data(data)
 
-  gl.use_shader(geom_shader)
+  gl.use_shader(geom_shader())
   gl.uniform_mat3(:view screenspace_mat3())
   vbo.draw
 
-def geom_monocolor_shader()
+def make_geom_monocolor_shader()
   builder = shader_builder.new
   @builder.attribute('vec2', 'pos')
   @builder.vertexUniform('mat3', 'view')
@@ -85,7 +81,9 @@ def geom_monocolor_shader()
   )
 
   builder.to_shader
-)
+
+def geom_monocolor_shader()
+  cached(make_geom_monocolor_shader)
 
 def submit_triangles_monocolor(Color color, List data)
   vbo = cached(->
@@ -96,12 +94,12 @@ def submit_triangles_monocolor(Color color, List data)
   
   vbo.set_data(data)
 
-  gl.use_shader(geom_monocolor_shader)
+  gl.use_shader(geom_monocolor_shader())
   gl.uniform_mat3(:view screenspace_mat3())
   gl.uniform_vec4(:color color)
   vbo.draw
 
-def sprite_shader()
+def make_sprite_shader()
   builder = shader_builder.new
   @builder.attribute('vec2', 'pos')
   @builder.attribute('vec2', 'uv')
@@ -130,7 +128,9 @@ def sprite_shader()
   )
 
   builder.to_shader
-)
+
+def sprite_shader()
+  cached(make_sprite_shader)
 
 def submit_sprite(Texture texture, Rect loc)
   vbo = cached(->
@@ -141,7 +141,7 @@ def submit_sprite(Texture texture, Rect loc)
 
   vbo.set_data([loc.top_left [0 0] loc.top_right [1 0] loc.bottom_left [0 1] loc.bottom_right [1 1]].flatten)
 
-  gl.use_shader(sprite_shader)
+  gl.use_shader(sprite_shader())
   gl.uniform_mat3(:view screenspace_mat3())
   gl.bind_texture(texture :sampler)
   vbo.draw

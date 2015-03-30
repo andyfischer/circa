@@ -96,7 +96,7 @@ Term* apply(Block* block, Term* function, TermList const& inputs, const char* na
 Term* apply_dynamic_method(Block* block, Symbol methodName, TermList const& inputs, Value* name)
 {
     Term* term = apply(block, FUNCS.dynamic_method, inputs, name);
-    term->setStringProp(s_MethodName, symbol_as_string(methodName));
+    term->setStringProp(s_method_name, symbol_as_string(methodName));
     return term;
 }
 

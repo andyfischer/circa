@@ -21,11 +21,11 @@ def List.after_each(self, suffix) -> List
 
 def triangle(Color color, Vec2 a, Vec2 b, Vec2 c)
   command = PolysMono.make(:PolysMono color [a b c].flatten)
-  channel_send(:render_commands command)
+  emit(:render_commands command)
 
 def quad(Color color, Vec2 a, Vec2 b, Vec2 c, Vec2 d)
   command = PolysMono.make(:PolysMono color [a b c c d a].flatten)
-  channel_send(:render_commands command)
+  emit(:render_commands command)
 
 def line(Color color, Vec2 a, Vec2 b, number thickness)
   if a.distance(b) < 0.1
@@ -59,7 +59,7 @@ def points(List points, Color color)
   @tris.flatten
 
   command = PolysMono.make(:PolysMono color tris.flatten)
-  channel_send(:render_commands command)
+  emit(:render_commands command)
 
 struct Circle {
   Vec2 center
@@ -79,7 +79,7 @@ def fill_rect(Color color, Rect rect)
   points = [rect.top_left rect.top_right rect.bottom_left rect.top_right rect.bottom_right rect.bottom_left]
 
   command = PolysMono.make(:PolysMono color points.flatten)
-  channel_send(:render_commands command)
+  emit(:render_commands command)
 
 def fill_ellipse(Color color, Vec2 center, Vec2 size)
   edgeCount = 30
@@ -92,7 +92,7 @@ def fill_ellipse(Color color, Vec2 center, Vec2 size)
 
   @tris.flatten
   command = PolysMono.make(:PolysMono color tris.flatten)
-  channel_send(:render_commands command)
+  emit(:render_commands command)
 
 def draw_rect(Color color, Rect rect, number thickness)
   line(color rect.top_left rect.top_right thickness)
@@ -119,8 +119,7 @@ struct SpriteCommand {
 }
 
 def image(texture, Rect rect)
-  channel_send(:render_commands SpriteCommand.make(:sprite texture rect))
-
+  emit(:render_commands SpriteCommand.make(:sprite texture rect))
 
 def set_font_size(number size)
   env(:canvas).set_font_size(size)
