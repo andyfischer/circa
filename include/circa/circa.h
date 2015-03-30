@@ -359,6 +359,7 @@ void        circa_vec2(caValue* vec2, float* xOut, float* yOut);
 void        circa_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
 void        circa_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
 
+void* circa_get_boxed_native_ptr(caValue* val);
 void circa_blob_data(caValue* blob, char** dataOut, uint32_t* sizeOut);
 uint32_t circa_blob_size(caValue* blob);
 

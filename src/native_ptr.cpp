@@ -95,4 +95,9 @@ CIRCA_EXPORT void circa_set_boxed_native_ptr(Value* val, void* ptr, caNativePtrR
     set_native_ptr(val->index(0), ptr, release);
 }
 
+CIRCA_EXPORT void* circa_get_boxed_native_ptr(Value* val)
+{
+    return as_native_ptr(val->index(0));
+}
+
 } // namespace circa

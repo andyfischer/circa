@@ -35,20 +35,16 @@ struct Asteroid {
 }
 
 def Asteroid.radius(self) -> number
-  if self.size == 2
-    50.0
-  elif self.size == 1
-    27.0
-  else
-    12.0
+  switch self.size
+    case 0 12
+    case 1 27
+    case 2 50
 
 def Asteroid.size_speed_mod(self) -> number
-  if self.size == 2
-    1.0
-  elif self.size == 1
-    2.0
-  else
-    3.0
+  switch self.size
+    case 0 3
+    case 1 2
+    case 2 1
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Vec2 p) -> Vec2
@@ -131,9 +127,7 @@ for Bullet bullet in @bullets
 
 -- Remove old bullets
 bullet_max_lifespan = 1.8
-for Bullet bullet in @bullets
-  if bullet.lifespan >= bullet_max_lifespan
-    discard
+@bullets.filter((bullet) -> bullet.lifespan < bullet_max_lifespan)
 
 -- Draw bullets
 for Bullet bullet in bullets
@@ -178,8 +172,11 @@ def new_child_asteroid(Asteroid parent) -> Asteroid
   asteroid
 
 def generate_particle_burst(List particles, Vec2 loc, Vec2 vel) -> List
-  for i in 0..6
-    for v in @vel { v = v * rand() + (rand()-.5)*100 }
+  def rand_v()
+    rand() + (rand()-.5)*100
+
+  for i in range(0 6)
+    vel = [rand_v() rand_v()]
     @particles.append(Particle.make(0.0 loc vel))
   return particles
 
@@ -188,8 +185,7 @@ state List asteroids = []
 -- Initalize starting asteroids
 if once()
   for i in 0..5
-    as = new_asteroid()
-    @asteroids.append(as)
+    @asteroids.append(new_asteroid())
 
 -- move asteroids
 for Asteroid asteroid in @asteroids
@@ -218,6 +214,7 @@ for Asteroid asteroid in asteroids
 
 -- Check for collisions of asteroids and bullets
 spawned = []
+
 
 for Asteroid asteroid in @asteroids
   collides = false
@@ -265,8 +262,7 @@ def Ship.draw(ship)
     for side in @sides
       drift = (srand()-.5) * time.elapsed() * 100
       for p in @side
-        for c in @p
-          c += drift
+        add(@p [drift drift])
 
   lines = for side in sides
     [side[0] side[1]]
@@ -312,3 +308,4 @@ for Particle particle in @particles
 
   if particle.age > max_particle_age
     discard
+

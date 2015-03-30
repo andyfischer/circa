@@ -2,9 +2,10 @@
 require gl
 require gl/shader_builder
 require matrix
+require improv
 
 def screenspace_mat3()
-  window_rect = env(:window_rect)
+  window_rect = improv.window_rect
   scale = Vec2.make(2 / window_rect.width, 2 / window_rect.height)
   matrix.make_mat3.scale([1 -1]).translate([-1 -1]).scale(scale)
 
@@ -122,7 +123,6 @@ def make_sprite_shader()
     void main()
     {
         gl_FragColor = texture2D(sampler, _uv);
-        //gl_FragColor = vec4(1.0,0,0,1.0);
     }
     >>>
   )

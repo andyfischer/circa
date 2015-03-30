@@ -1,0 +1,5 @@
+cd ..
+make config=release
+cd improv
+rm build/improv
+make config=release

@@ -788,24 +788,8 @@ def Block.call(self, any inputs :multiple) -> any
   -- Invoke this Block with the given inputs.
   self.to_func.apply(inputs)
 
-def Block.get_loop_index(self) -> Term
-  error("todo")
-
-def Block.get_iterator(self) -> Term
-  error("todo")
-
 def Block.if_block_cases(self) -> List
   self.terms.filter((term) -> term.function.name == 'case')
-
-def Block.case_find_condition(self) -> Term
-  -- FIXME
-  return null
-
-def Block.find_while_condition(self) -> Term
-  for term in self.terms
-    if term.function == loop_condition_bool.block
-      return term
-  return null
 
 def capture_stack() -> VM
   -- Returns a frozen copy of the currently executing stack.
@@ -1484,7 +1468,7 @@ def zip(List left, List right) -> List
 def changed(any val) -> bool
   -- Stateful function; returns true if the value has changed since the
   -- previous step.
-  state any prev = null
+  state any prev
   result = prev != val
   prev = val
   result

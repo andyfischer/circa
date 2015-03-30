@@ -24,68 +24,6 @@
 
 double get_time();
 
-#if 0
-void ImprovWindow::init(caWorld* world)
-{
-    _world = world;
-
-    _inputEvents = circa_alloc_value();
-    circa_set_list(_inputEvents, 0);
-
-
-    if (main == NULL) {
-        printf("fatal: Couldn't load improv_top_layer.ca module\n");
-        return;
-    }
-
-}
-#endif
-
-#if 0
-void ImprovWindow::redraw()
-{
-
-    
-    if (_width == 0 && _height == 0) {
-        printf("error: App::redraw() called before setSize()\n");
-        return;
-    }
-    
-    double startTime = get_time();
-    
-    glClear( GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/ );
-    
-    circa_set_vec2(circa_env_insert(_vm, "mouse"), _mouseX, _mouseY);
-    circa_set_vec2(circa_env_insert(_vm, "windowSize"), _width, _height);
-    circa_set_float(circa_env_insert(_vm, "time"), _elapsedTime);
-    circa_set_float(circa_env_insert(_vm, "lastFrameDuration"), _lastFrameDuration);
-    
-    
-    circa_run(_vm);
-    
-    if (circa_has_error(_vm)) {
-        // circa_dump_stack_trace(_vm);
-        
-#ifndef NACL
-        exit(1);
-#endif
-    }
-    
-    // Cleanup
-    circa_set_list(_inputEvents, 0);
-    
-    _lastFrameDuration = get_time() - startTime;
-    
-#define DUMP_PERF_STATS 0
-#if DUMP_PERF_STATS
-    printf("frame duration = %f\n", (float) _lastFrameDuration);
-    circa_perf_stats_dump();
-    circa_perf_stats_reset();
-#endif
-
-}
-#endif
-
 static bool file_exists(const char* filename)
 {
     FILE* fp = fopen(filename, "r");
@@ -232,9 +170,8 @@ void make_window(caVM* vm)
             SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
     SDL_GL_CreateContext(window);
+
     glViewport(0, 0, width, height);
-    
-    //printf("glViewport %f %f", _width, _height);
     
     // Other GL setup
     glDisable(GL_CULL_FACE);
@@ -257,12 +194,19 @@ void Window__set_size(caVM* vm)
     //todo
 }
 
+void Window__swap(caVM* vm)
+{
+    SDL_Window* window = (SDL_Window*) circa_get_boxed_native_ptr(circa_input(vm, 0));
+    SDL_GL_SwapWindow(window);
+}
+
 void setup_native_patches(caWorld* world)
 {
     caNativePatch* improvPatch = circa_create_native_patch(world, "improv");
     circa_patch_function(improvPatch, "play_audio", play_audio);
     circa_patch_function(improvPatch, "make_window", make_window);
-    circa_patch_function(improvPatch, "Window__set_size", Window__set_size);
+    circa_patch_function(improvPatch, "Window.set_size", Window__set_size);
+    circa_patch_function(improvPatch, "Window.swap", Window__swap);
     circa_finish_native_patch(improvPatch);
 
     cairo_native_patch(circa_create_native_patch(world, "cairo"));
@@ -411,6 +355,7 @@ extern "C" int main(int argc, char *argv[])
     }
     
     caValue* arg = circa_index(&args, 0);
+#if 0
     caValue filename;
     circa_resolve_possible_module_path(world, arg, &filename);
 
@@ -418,10 +363,27 @@ extern "C" int main(int argc, char *argv[])
         printf("Module not found: %s\n", circa_string(arg));
         return -1;
     }
+#endif
 
-    caBlock* userModule = circa_load_module_by_filename(world, &filename);
-    // TODO: Possibly load shell
-    caVM* vm = circa_new_vm(userModule);
+    caValue improvShellFilename;
+    circa_set_string(&improvShellFilename, "ca/improv_shell.ca");
+
+    caBlock* module = circa_load_module_by_filename(world, &improvShellFilename);
+    caBlock* moduleMain = circa_find_function_local(module, "main");
+
+#if 0
+
+    Value shellName;
+
+    circa_module_find_requested_shell(userModule, &shellName);
+
+    if (circa_is_null
+#endif
+
+
+    caVM* vm = circa_new_vm(moduleMain);
+
+    circa_copy(&args, circa_input(vm, 0));
 
 #ifdef NACL
     circa_set_bool(circa_env_insert(vm, "gl_es2"), true);
@@ -449,9 +411,6 @@ extern "C" int main(int argc, char *argv[])
                 exit(1);
             #endif
         }
-#if 0
-        SDL_GL_SwapWindow(_sdl_window);
-#endif
 
         SDL_Delay(1);
     }

@@ -1,7 +1,8 @@
 require_local improv
 require stack_trace
+require input
 
-def module_main(module) -> Func
+def find_module_main(module) -> Func
   func = method_capture(module :main)
   if func.length == 0
     module.to_func
@@ -11,8 +12,23 @@ def module_main(module) -> Func
 def actor(Func func)
   cached(-> make_vm(func))
 
-def main(module)
+def main(args)
+
+  scriptFilename = args[0]
+
+  print('scriptFilename = ' scriptFilename)
+  
+  module = load_script(scriptFilename)
+
+  print('module = ' module)
+
   render_list = require gl/render_list
+
+  state userInput = input.new
+
+  print('module = ' module)
+
+  @userInput.handleEvents(env(:inputEvents))
 
   rect = method_opt(module :window_rect [] [0 0 1000 500])
   Rect.cast(@rect)
@@ -24,9 +40,11 @@ def main(module)
     actor.set_env(:window_rect rect)
     actor.set_env(:time time)
     actor.set_env(:timeDelta timeDelta)
+    actor.set_env(:inputEvents [])
+    actor.set_env(:userInput userInput)
 
   window = improv.window(:main rect)
-  userActor = actor(module_main(module))
+  userActor = actor(find_module_main(module))
   userActor.expect_messages(:render_commands)
 
   actor_setup(userActor)
@@ -44,6 +62,9 @@ def main(module)
     if renderActor.has_error
       stack_trace.dump(renderActor)
 
+  window.swap()
+
+{-
 asteroids = require_local ../demos/asteroids
 
 main(asteroids)
@@ -55,7 +76,6 @@ def Main.window_rect(self) [0 0 1000 500]
 def Main.main(self)
 
 
-{-
 def realmain()
   main(Main.make)
 

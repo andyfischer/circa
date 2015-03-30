@@ -7,11 +7,16 @@ def make_window(Rect rect) -> Window
   print('make window: ' rect)
   Window.make
 
+def Window.swap(self)
+
 def window(id, Rect size)
   state window = make_window(size)
   window
 
 def play_audio(Blob blob)
+
+def window_rect() -> Rect
+  env(:window_rect)
 
 def window_size() -> Vec2
   env(:window_rect).size
