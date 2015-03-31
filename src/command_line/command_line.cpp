@@ -299,7 +299,7 @@ int run_command_line(caWorld* world, Value* args)
 
     Value* arg = list_get(args, 0);
     Value filename;
-    resolve_possible_module_path(world, arg, &filename);
+    resolve_possible_module_path(world, arg, NULL, &filename);
 
     if (is_null(&filename)) {
         printf("Module not found: %s\n", as_cstring(arg));

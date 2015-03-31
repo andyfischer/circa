@@ -38,10 +38,10 @@ void module_add_search_path(World* world, const char* str)
     set_string(list_append(&world->moduleSearchPaths), str);
 }
 
-Block* find_module_local(World* world, Block* relativeTo, Value* name)
+Block* find_module_local(World* world, Value* relativeDir, Value* name)
 {
     Value filename;
-    find_module_file_local(world, relativeTo, name, &filename);
+    resolve_possible_module_path(world, relativeDir, name, &filename);
 
     if (is_null(&filename))
         return NULL;
@@ -49,12 +49,12 @@ Block* find_module_local(World* world, Block* relativeTo, Value* name)
     return find_module_by_filename(world, &filename);
 }
 
-Block* find_module(World* world, Block* relativeTo, Value* name)
+Block* find_module(World* world, Value* relativeDir, Value* name)
 {
     stat_increment(FindModule);
 
-    if (relativeTo != NULL)
-        return find_module_local(world, relativeTo, name);
+    if (relativeDir != NULL && !is_null(relativeDir))
+        return find_module_local(world, relativeDir, name);
 
     Value* block = hashtable_get(&world->modulesByName, name);
     if (block == NULL)
@@ -90,23 +90,29 @@ void module_set_filename(World* world, Block* block, Value* filename)
     set_block(hashtable_insert(&world->modulesByFilename, filename), block);
 }
 
-CIRCA_EXPORT void circa_resolve_possible_module_path(World* world, Value* path, Value* result)
+CIRCA_EXPORT void circa_resolve_possible_module_path(World* world, Value* dir, Value* moduleName, Value* result)
 {
+    Value path;
+    copy(dir, &path);
+
+    if (moduleName != NULL)
+        join_path(&path, moduleName);
+
     // try original path
-    if (circa_file_exists(world, as_cstring(path))) {
-        copy(path, result);
+    if (circa_file_exists(world, as_cstring(&path))) {
+        copy(&path, result);
         return;
     }
 
     // try <path>.ca
-    copy(path, result);
+    copy(&path, result);
 
     string_append(result, ".ca");
     if (circa_file_exists(world, as_cstring(result)))
         return;
         
     // try <path>/main.ca
-    copy(path, result);
+    copy(&path, result);
 
     Value mainStr;
     set_string(&mainStr, "main.ca");
@@ -132,19 +138,23 @@ Value* find_enclosing_filename(Block* block)
     return find_enclosing_filename(get_parent_block(block));
 }
 
+void find_enclosing_dirname(Block* block, Value* result)
+{
+    Value* filename = find_enclosing_filename(block);
+    if (filename == NULL) {
+        set_null(result);
+        return;
+    }
+
+    get_directory_for_filename(filename, result);
+}
+
 void find_module_file_local(World* world, Block* loadedBy, Value* moduleName, Value* filenameOut)
 {
     Value* loadedByFilename = find_enclosing_filename(loadedBy);
 
-    if (loadedByFilename != NULL) {
-        Value path;
-        get_directory_for_filename(loadedByFilename, &path);
-        join_path(&path, moduleName);
-
-        resolve_possible_module_path(world, &path, filenameOut);
-        if (!is_null(filenameOut))
-            return;
-    }
+    if (loadedByFilename != NULL)
+        resolve_possible_module_path(world, loadedByFilename, moduleName, filenameOut);
 }
 
 void find_module_file_global(World* world, Value* moduleName, Value* filenameOut)
@@ -153,12 +163,7 @@ void find_module_file_global(World* world, Value* moduleName, Value* filenameOut
     for (int i=0; i < count; i++) {
 
         Value* searchPath = list_get(&world->moduleSearchPaths, i);
-
-        Value path;
-        copy(searchPath, &path);
-        join_path(&path, moduleName);
-
-        resolve_possible_module_path(world, &path, filenameOut);
+        resolve_possible_module_path(world, searchPath, moduleName, filenameOut);
         if (!is_null(filenameOut))
             return;
     }
@@ -189,7 +194,7 @@ void module_install_replacement(World* world, Value* filename, Block* replacemen
 CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, Value* filename)
 {
     Value resolved;
-    resolve_possible_module_path(world, filename, &resolved);
+    resolve_possible_module_path(world, filename, NULL, &resolved);
     if (is_null(&resolved))
         return NULL;
 
@@ -208,13 +213,12 @@ CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, Value* filename)
     return block;
 }
 
-Block* load_module(World* world, Block* relativeTo, Value* moduleName)
+Block* load_module(World* world, Value* relativeDir, Value* moduleName)
 {
     Value filename;
 
-    if (relativeTo != NULL) {
-        Value filename;
-        find_module_file_local(world, relativeTo, moduleName, &filename);
+    if (relativeDir != NULL && !is_null(relativeDir)) {
+        resolve_possible_module_path(world, relativeDir, moduleName, &filename);
 
         if (!is_null(&filename))
             return load_module_by_filename(world, &filename);
@@ -235,11 +239,16 @@ Block* load_module(World* world, Block* relativeTo, Value* moduleName)
     return NULL;
 }
 
+Block* load_module_relative_to(World* world, Block* relativeTo, Value* moduleName)
+{
+    return load_module(world, find_enclosing_filename(relativeTo), moduleName);
+}
+
 Block* module_ref_resolve(World* world, Value* moduleRef)
 {
     Value* name = moduleRef->index(0);
-    Block* relativeTo = as_block(moduleRef->index(1));
-    return find_module(world, relativeTo, name);
+    Value* relativeDir = moduleRef->index(1);
+    return find_module(world, relativeDir, name);
 }
 
 bool is_module_ref(Value* value)
@@ -247,11 +256,12 @@ bool is_module_ref(Value* value)
     return value->value_type == TYPES.module_ref;
 }
 
-void set_module_ref(Value* value, Value* path, Block* relativeTo)
+void set_module_ref(Value* value, Value* name, Value* relativeDir)
 {
     make(TYPES.module_ref, value);
-    set_value(value->index(0), path);
-    set_block(value->index(1), relativeTo);
+    set_value(value->index(0), name);
+    if (relativeDir != NULL)
+        set_value(value->index(1), relativeDir);
 }
 
 Term* module_lookup(Block* module, Term* caller)
@@ -285,11 +295,11 @@ CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* mo
     return NULL;
 }
 
-CIRCA_EXPORT caBlock* circa_load_module(caWorld* world, Block* relativeTo, const char* moduleName)
+CIRCA_EXPORT caBlock* circa_load_module(caWorld* world, const char* moduleName)
 {
     Value moduleNameVal;
     set_string(&moduleNameVal, moduleName);
-    return load_module(world, relativeTo, &moduleNameVal);
+    return load_module(world, NULL, &moduleNameVal);
 }
 
 } // namespace circa

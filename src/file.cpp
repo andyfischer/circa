@@ -54,8 +54,6 @@ bool is_absolute_path(Value* path)
     
 void get_directory_for_filename(Value* filename, Value* result)
 {
-    // TODO: This function is bad, need to use an existing library for dealing
-    // with paths.
     int last_slash = string_find_char_from_end(filename, '/');
 
     if (last_slash == -1) {

@@ -1377,12 +1377,12 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
         string_substr(&path, slashLoc + 1, -1, &localName);
     }
 
-    Block* moduleRelativeTo = NULL;
     Term* function = FUNCS.require;
+    Value relativeDir;
 
     if (keyword == tok_RequireLocal) {
         function = FUNCS.require_local;
-        moduleRelativeTo = block;
+        find_enclosing_dirname(block, &relativeDir);
     }
 
     // Create the require() call
@@ -1390,21 +1390,15 @@ ParseResult require_statement(Block* block, TokenStream& tokens, ParserCxt* cont
     Term* requireTerm = apply(block, function, TermList(pathTerm), &localName);
 
     // Try to load the module immediately
-    Block* module = load_module(block->world, moduleRelativeTo, &path);
+    Block* module = load_module(block->world, &relativeDir, &path);
     
     if (module != NULL)
-        set_module_ref(term_value(requireTerm), &path, moduleRelativeTo);
+        set_module_ref(term_value(requireTerm), &path, &relativeDir);
 
     if (keyword == tok_Require) {
         requireTerm->setBoolProp(s_Syntax_Require, true);
     } else if (keyword == tok_RequireLocal) {
         requireTerm->setBoolProp(s_Syntax_RequireLocal, true);
-    }
-
-    // Possibly add a require_check()
-    if (FUNCS.require_check != NULL) {
-        Term* check = apply(block, FUNCS.require_check, TermList(requireTerm));
-        hide_from_source(check);
     }
 
     return ParseResult(requireTerm);

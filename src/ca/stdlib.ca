@@ -301,7 +301,7 @@ def path_join(paths :multiple)
 struct FileSignature { String filename, int time_modified }
 struct Callable;
 struct Color { number r, number g, number b, number a }
-struct Module { String name, Block relativeTo }
+struct Module { String name, any relativeDir }
 struct Vec2 { number x, number y }
 struct Vec2i { int x, int y }
 struct Vec3 { number x, number y, number z }
@@ -589,6 +589,7 @@ def increment(int i) -> int
 def decrement(int i) -> int
   i - 1
 
+def make_module(name, relativeTo) -> Module
 def Module._get(self, name) -> List
 def Module.block(self) -> Block
 def Module.resolve(self) -> Block
@@ -597,20 +598,17 @@ def Module.to_func(self) -> Func
   self.block.to_func
 def Module.to_vm(self) -> VM
   self.block.to_vm
-def Module._load(self) -> Block
 def Module.is_local(self) -> bool
-  not self.relativeTo.is_null
+  self.relativeDir != null
 
 def require(String name) -> Module
-  m = Module.make(name, Block.make)
-  m._load
+  m = make_module(name, null)
   require_check(m)
   m
 
 def require_local(String name) -> Module
   relativeTo = reflect_caller(1).parent
-  m = Module.make(name, relativeTo)
-  m._load
+  m = make_module(name, relativeTo)
   require_check(m)
   m
 
@@ -692,6 +690,8 @@ def Blob.to_hex_string(self, offset :optional, len :optional) -> String
 
 def Block.dump(self)
   -- Dump this block's raw contents to stdout.
+def Block.enclosing_filename(self)
+  filename = self.property
 def Block.find_term(self, String name) -> Term
   -- Find a term inside this Block with the given name.
 def Block.functions(self) -> List
@@ -742,8 +742,18 @@ def Block.parent(self) -> Block
 def Block.primary_output(self) -> Term
   -- Return the primary output.
   self.output(0)
+def Block.find_property(self, Symbol key) -> List
 def Block.property(self, Symbol key) -> any
+  self.find_property(key).or(null)
 def Block.properties(self) -> Map
+def Block.filename(self)
+  n = self.find_property(:filename)
+  if not n.empty
+    n.first
+  elif self.parent.is_null
+    null
+  else
+    self.parent.filename
 def Block.source_filename(self) -> String
 def Block.statements(self) -> List
   -- Return a list of Terms that are statements.

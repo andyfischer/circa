@@ -122,6 +122,21 @@ void Block__property(VM* vm)
     else
         copy(value, vm->output());
 }
+
+void Block__find_property(VM* vm)
+{
+    Block* block = as_block(vm->input(0));
+
+    if (block == NULL)
+        return vm->throw_str("NULL block");
+
+    Value* value = block_get_property(block, as_symbol(vm->input(1)));
+
+    if (value == NULL)
+        set_list(vm->output(), 0);
+    else
+        copy(value, vm->output()->set_list(1)->index(0));
+}
 void Block__properties(VM* vm)
 {
     Block* block = as_block(vm->input(0));
@@ -625,7 +640,7 @@ void reflection_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Block.output_placeholder", Block__output_placeholder);
     circa_patch_function(patch, "Block.owner", Block__owner);
     circa_patch_function(patch, "Block.parent", Block__parent);
-    circa_patch_function(patch, "Block.property", Block__property);
+    circa_patch_function(patch, "Block.find_property", Block__find_property);
     circa_patch_function(patch, "Block.properties", Block__properties);
     circa_patch_function(patch, "Block.source_filename", Block__source_filename);
     circa_patch_function(patch, "Block.term_named", Block__term_named);
