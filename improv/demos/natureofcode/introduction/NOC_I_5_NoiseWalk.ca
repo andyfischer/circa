@@ -1,9 +1,10 @@
 
 require draw
 require time
+require improv
 
-width = env(:size).x
-height = env(:size).y
+width = improv.window_size.x
+height = improv.window_size.y
 
 struct Walker {
   Vec2 loc

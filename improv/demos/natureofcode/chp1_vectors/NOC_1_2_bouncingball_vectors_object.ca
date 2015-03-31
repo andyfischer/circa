@@ -1,7 +1,8 @@
 
 require draw
-width = env(:size).x
-height = env(:size).y
+require improv
+width = improv.window_size.x
+height = improv.window_size.y
 
 struct Ball {
   Vec2 location

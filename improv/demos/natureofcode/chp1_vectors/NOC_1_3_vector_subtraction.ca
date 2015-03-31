@@ -1,9 +1,10 @@
 
 require draw
 require input
+require improv
 
 draw.background(#fff)
 
-center = env(:size).mult(1/2)
+center = improv.window_size.mult(1/2)
 
 draw.line(#000 center, input.mouse 2.0)

@@ -2,11 +2,12 @@
 
 require draw
 require time
+require improv
 
 draw.background(#fff)
 
-width = env(:size).x
-height = env(:size).y
+width = improv.window_size.x
+height = improv.window_size.y
 
 points = for x in 0..round(width)
   y = rand() * height

@@ -1,12 +1,13 @@
 
 require draw
 require input
+require improv
 
 draw.background(#fff)
 
 e = 2.71828183
-width = env(:size).x
-height = env(:size).y
+width = improv.window_size.x
+height = improv.window_size.y
 mean = 0
 sd = input.mouse.x.map([0 width], [0.4 2])
 

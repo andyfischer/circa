@@ -1,7 +1,8 @@
 
 require draw
-width = env(:size).x
-height = env(:size).y
+require improv
+width = improv.window_size.x
+height = improv.window_size.y
 
 -- Example 1-1: Bouncing Ball, with Vec2!
 state Vec2 location = [100, 100]

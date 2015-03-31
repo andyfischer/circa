@@ -1,0 +1,41 @@
+
+require draw
+require improv
+width = improv.window_size.x
+height = improv.window_size.y
+
+struct Mover {
+  Vec2 location
+  Vec2 velocity
+}
+
+def make_mover()
+  location = [rand() * width, rand() * height]
+  velocity = [rand_range(-2 2) rand_range(-2 2)]
+  Mover.make(location velocity)
+
+def Mover.update(@self)
+  @self.location.add(self.velocity)
+
+def Mover.display(self)
+  size = [48 48]
+  draw.fill_ellipse(#555 self.location size)
+  draw.draw_ellipse(#111 self.velocity size 3.0)
+
+def Mover.checkEdges(@self)
+  if self.location > width
+    self.location.x = 0
+  elif self.location < 0
+    self.location.x = width
+
+  if self.location.y > height
+    self.location.y = 0
+  elif self.location.y < 0
+    self.location.y = height
+
+state mover = make_mover()
+
+draw.background(#fff)
+@mover.update
+@mover.checkEdges
+mover.display
