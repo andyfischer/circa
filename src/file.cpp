@@ -151,7 +151,7 @@ void join_path(Value* left, Value* right)
         return;
     }
 
-    if (string_equals(right, ""))
+    if (string_equals(right, "") || string_equals(right, "."))
         return;
 
     int seperatorCount = 0;

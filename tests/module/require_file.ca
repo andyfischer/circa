@@ -1,0 +1,5 @@
+
+filename = rpath('lib1.ca')
+print('loading ' filename)
+m = require_file(filename)
+m.f(5)

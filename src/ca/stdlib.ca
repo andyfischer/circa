@@ -30,7 +30,6 @@ def if() -> any
 def case(bool b :optional)
 def switch(any input :optional) -> any
 def _upvalue(term :ref) -> any
-def load_script(String filename) -> Block
 def reflect_caller(int height) -> Term
 def rand() -> number
 def error(any msg :multiple)
@@ -602,13 +601,18 @@ def Module.is_local(self) -> bool
   self.relativeDir != null
 
 def require(String name) -> Module
-  m = make_module(name, null)
+  m = make_module(name null)
   require_check(m)
   m
 
 def require_local(String name) -> Module
   relativeTo = reflect_caller(1).parent
-  m = make_module(name, relativeTo)
+  m = make_module(name relativeTo)
+  require_check(m)
+  m
+
+def require_file(String filename) -> Module
+  m = make_module('' filename)
   require_check(m)
   m
 

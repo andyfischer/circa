@@ -1198,13 +1198,6 @@ void make_module(VM* vm)
     load_module(vm->world, &resolved, name);
 }
 
-void load_script(VM* vm)
-{
-    Value* filename = vm->input(0);
-    Block* block = load_module_by_filename(vm->world, filename);
-    set_block(vm->output(), block);
-}
-
 #if 0
 void destructure_list(Stack* stack)
 {
@@ -1345,7 +1338,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "file_read_text", file__read_text);
 #endif
     circa_patch_function(patch, "make_module", make_module);
-    circa_patch_function(patch, "load_script", load_script);
 
     circa_patch_function(patch, "noise", noise);
     circa_patch_function(patch, "not_equals", not_equals);
