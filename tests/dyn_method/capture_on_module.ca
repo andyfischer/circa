@@ -2,7 +2,7 @@
 require_local lib
 
 cap = method_capture(lib :func)
-cap.some.call
+cap.first.call
 
 cap1 = method_capture(lib :func1)
-cap1.some.call('input_value')
+cap1.first.call('input_value')

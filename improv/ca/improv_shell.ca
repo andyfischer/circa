@@ -3,11 +3,7 @@ require stack_trace
 require input
 
 def find_module_main(module) -> Func
-  func = method_capture(module :main)
-  if func.length == 0
-    module.to_func
-  else
-    func.some
+  method_capture(module :main).or(module.to_func)
 
 def actor(Func func)
   cached(-> make_vm(func))

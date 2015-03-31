@@ -1,0 +1,4 @@
+
+
+assert(equals([1].or(2), 1))
+assert(equals([].or(2), 2))

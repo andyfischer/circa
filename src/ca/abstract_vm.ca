@@ -1,0 +1,12 @@
+
+struct AVM {
+  Func func
+  Map results
+}
+
+def AVM.get_result(self, Term term)
+  found = self.results.find(term)
+  if not found.empty
+    found.head
+
+def step(Func func)

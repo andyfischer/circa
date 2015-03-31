@@ -496,7 +496,7 @@ def method_call(location, obj, Symbol name, List args)
   found = method_lookup(location obj name)
   if found.length == 0
     error_up(1, 'Method not found: ' name)
-  found.some.call(args)
+  found.first.call(args)
 
 def method_capture(object, Symbol name) -> List
   if typeof(object) == Module
@@ -514,7 +514,7 @@ def method_opt(object, Symbol name, List args, Value default)
   if found.length == 0
     default
   else
-    found.some.apply(args)
+    found.first.apply(args)
 
 def closure_block() -> Func
   -- Internally used function for declaring a closure.
@@ -550,7 +550,7 @@ def vm_demand_eval(Term t) -> any
 
   existing = vm_demand_eval_find_existing(t)
   if existing != []
-    return existing.some
+    return existing.first
 
   inputs = for Term input in t.inputs
     vm_demand_eval(input)
@@ -956,6 +956,13 @@ def List.join(self, String joiner) -> String
   -- 
   -- Outputs: '1, 2, 3'
 
+def List.or(self, right) -> any
+  -- If list is not empty, returns self.first. Otherwise, returns 'right'
+  if self.length == 0
+    right
+  else
+    self.first
+
 def List.split(self, boundaryValue) -> List
   out = [[]]
   for item in self
@@ -1033,11 +1040,8 @@ def List.empty(self) -> bool
 
 def List.first(self) -> any
   -- Returns the first element
-  self.get(0)
-
-def List.some(self) -> any
   if self.length == 0
-    error("Tried to get some but there's none")
+    error("Tried to get .first of empty list")
   self.get(0)
 
 def List.last(self) -> any
@@ -1071,20 +1075,26 @@ def List.each(self, Func func) -> List
 def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
 
-def Map.contains(self, any key) -> bool
+def Map.contains(self, key) -> bool
   -- Returns true if the map contains the given key.
 
-def Map.remove(self, any key) -> Map
+def Map.remove(self, key) -> Map
   -- Removes the given key from the map.
 
-def Map.get(self, any key) -> any
+def Map.get(self, key) -> any
   -- Gets the key associated with this value.
 
-def Map.get_opt(self, any key, any default) -> any
+def Map.get_opt(self, key, default) -> any
   if self.contains(key)
     self.get(key)
   else
     default
+
+def Map.find(self, key) -> List
+  if self.contains(key)
+    [self.get(key)]
+  else
+    []
     
 def Map.set(self, any key, any value) -> Map
   -- Sets the value associated with this key.
