@@ -215,7 +215,6 @@ for Asteroid asteroid in asteroids
 -- Check for collisions of asteroids and bullets
 spawned = []
 
-
 for Asteroid asteroid in @asteroids
   collides = false
 

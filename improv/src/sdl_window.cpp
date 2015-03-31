@@ -371,6 +371,7 @@ extern "C" int main(int argc, char *argv[])
     caBlock* module = circa_load_module_by_filename(world, &improvShellFilename);
     caBlock* moduleMain = circa_find_function_local(module, "main");
 
+
 #if 0
 
     Value shellName;
@@ -383,7 +384,7 @@ extern "C" int main(int argc, char *argv[])
 
     caVM* vm = circa_new_vm(moduleMain);
 
-    circa_copy(&args, circa_input(vm, 0));
+    circa_copy(&args, circa_env_insert(vm, "args"));
 
 #ifdef NACL
     circa_set_bool(circa_env_insert(vm, "gl_es2"), true);
@@ -405,7 +406,7 @@ extern "C" int main(int argc, char *argv[])
         if (circa_has_error(vm)) {
             printf("top level error: %s\n", circa_vm_get_error(vm)->to_c_string());
 
-            // circa_dump_stack_trace(vm);
+            circa_dump_stack_trace(vm);
             
             #ifndef NACL
                 exit(1);

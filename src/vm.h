@@ -99,6 +99,8 @@ void vm_to_frame_list(VM* vm, Value* frameList);
 void vm_install_functions(NativePatch* patch);
 void vm_setup_type(Type* type);
 
+void set_vm(Value* value, VM* vm);
+
 #define vm_get_error circa_vm_get_error
 
 } // namespace circa

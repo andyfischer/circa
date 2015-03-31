@@ -244,6 +244,17 @@ bool circa_has_error(VM* vm)
     return vm_has_error(vm);
 }
 
+void circa_dump_stack_trace(VM* vm)
+{
+    printf("dumping stack trace..\n");
+    Block* stack_trace = circa_load_module(vm->world, "stack_trace");
+    Block* dump = circa_find_function_local(stack_trace, "dump");
+    VM* stackTraceVM = new_vm(dump);
+    set_vm(stackTraceVM->input(0), vm);
+    vm_run(stackTraceVM, NULL);
+    free_vm(stackTraceVM);
+}
+
 void circa_clear_stack(VM* vm)
 {
     vm_reset(vm, vm->mainBlock);
@@ -299,11 +310,6 @@ caTerm* circa_caller_input_term(VM* vm, int index)
 caTerm* circa_caller_term(VM* vm)
 {
     return vm_calling_term(vm);
-}
-
-void circa_dump_stack_trace(VM* vm)
-{
-    // TODO
 }
 
 Value* circa_env_insert(VM* vm, const char* name)

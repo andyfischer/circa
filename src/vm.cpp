@@ -1498,4 +1498,10 @@ void vm_setup_type(Type* type)
     set_string(&type->name, "VM");
 }
 
+void set_vm(Value* value, VM* vm)
+{
+    make(TYPES.vm, value);
+    set_pointer(value, vm);
+}
+
 } // namespace circa

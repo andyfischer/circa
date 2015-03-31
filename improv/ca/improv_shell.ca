@@ -8,21 +8,16 @@ def find_module_main(module) -> Func
 def actor(Func func)
   cached(-> make_vm(func))
 
-def main(args)
+def main()
+
+  args = env(:args)
 
   scriptFilename = args[0]
 
-  print('scriptFilename = ' scriptFilename)
-  
-  module = load_script(scriptFilename)
-
-  print('module = ' module)
-
+  module = require_file(scriptFilename)
   render_list = require gl/render_list
 
   state userInput = input.new
-
-  print('module = ' module)
 
   @userInput.handleEvents(env(:inputEvents))
 

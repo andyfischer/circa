@@ -208,6 +208,8 @@ void circa_output_error(caVM* vm, const char* msg);
 // Return whether a runtime error occurred.
 bool circa_has_error(caVM* vm);
 
+void circa_dump_stack_trace(caVM* vm);
+
 // Clear all frames from a Stack.
 void circa_clear_stack(caVM* vm);
 
