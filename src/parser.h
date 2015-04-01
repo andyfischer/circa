@@ -74,7 +74,7 @@ ParseResult literal_string(Block* block, TokenStream& tokens, ParserCxt* context
 ParseResult literal_bool(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_null(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_color(Block* block, TokenStream& tokens, ParserCxt* context);
-ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context);
+Term* literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context);
 ParseResult section_block(Block* block, TokenStream& tokens, ParserCxt* context);

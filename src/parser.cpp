@@ -52,6 +52,7 @@ struct ParserCxt {
     void consume(int match = -1) { return tokens->consume(match); }
     void consume(Value* output, int match = -1) { return tokens->consumeStr(output, match); }
     void consumeSymbol(Value* output, int match = -1) { return tokens->consumeSymbol(output, match); }
+    void getNextStr(Value* value, int lookahead) { return tokens->getNextStr(value, lookahead); }
     int getPosition() { return tokens->getPosition(); }
     bool finished() { return tokens->finished(); }
 
@@ -2309,9 +2310,9 @@ ParseResult dot_symbol(Block* block, TokenStream& tokens, ParserCxt* context, Pa
 {
     int startPosition = tokens.getPosition();
 
-    ParseResult symbol = literal_symbol(block, tokens, context);
+    Term* symbol = literal_symbol(block, tokens, context);
 
-    Term* term = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol.term));
+    Term* term = apply(block, FUNCS.get_with_symbol, TermList(lhs.term, symbol));
 
     term->setStringProp(s_Syntax_DeclarationStyle, "dot-access");
     term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string("");
@@ -2570,8 +2571,7 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
 
     // literal symbol?
     else if (tokens.nextIs(tok_ColonString))
-        result = literal_symbol(block, tokens, context);
-
+        result = ParseResult(literal_symbol(block, tokens, context));
 
     // section block?
     else if (tokens.nextIs(tok_Section))
@@ -2779,21 +2779,29 @@ ParseResult literal_color(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(resultTerm);
 }
 
-ParseResult literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context)
+Term* literal_symbol(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
+    // This function is sometimes used to consume a tok_Identifier as a symbol value.
+
+    ca_assert(context->nextIs(tok_ColonString) || context->nextIs(tok_Identifier));
+
     Value str;
-    tokens.getNextStr(&str);
-    tokens.consume(tok_ColonString);
+    int match = context->next().match;
+    context->consume(&str);
 
     Term* term = create_value(block, TYPES.symbol);
 
-    // Skip the leading ':' in the name string
-    set_symbol_from_string(term_value(term), as_cstring(&str) + 1);
+    if (match == tok_ColonString)
+        // Skip the leading ':' in the name string
+        set_symbol_from_string(term_value(term), as_cstring(&str) + 1);
+    else
+        set_symbol_from_string(term_value(term), as_cstring(&str));
+
     set_source_location(term, startPosition, tokens);
 
-    return ParseResult(term);
+    return term;
 }
 
 ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
@@ -2821,6 +2829,41 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(term);
 }
 
+Term* literal_map_key(Block* block, ParserCxt* context, Value* format, int inputIndex, int mapStartPosition)
+{
+    // Shorthand if the key is written as <identifier><colon>
+    // Example: {a: 1} is equivalent to {:a => 1}
+        
+    if (context->nextIs(tok_Identifier) && context->nextIs(tok_Colon, 1)) {
+        context->getNextStr(format->append(), 0);
+        Term* keyExpr = literal_symbol(block, *context->tokens, context);
+        context->consume(format->append(), tok_Colon);
+        return keyExpr;
+    }
+
+    ParseResult keyExpr = expression(block, *context->tokens, context);
+
+    // @format.append([:ident inputIndex])
+    // or
+    // @format.append([:expr inputIndex])
+    Value* formatElement = format->append();
+    formatElement->set_list(2);
+    if (keyExpr.isIdentifier()) {
+        formatElement->set_element_sym(0, s_ident);
+    } else {
+        formatElement->set_element_sym(0, s_expr);
+    }
+    formatElement->set_element_int(1, inputIndex);
+
+    possible_whitespace_or_newline(context, format);
+
+    if (!context->nextIs(tok_FatArrow))
+        return syntax_error(block, *context->tokens, mapStartPosition, "Expected '=>' inside map value").term;
+    context->consume(format->append(), tok_FatArrow);
+        
+    return keyExpr.term;
+}
+
 ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = context->getPosition();
@@ -2839,46 +2882,24 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
         possible_whitespace_or_newline(context, &format);
 
         if (!first) {
-            if (!context->nextIs(tok_Comma)) {
-                return syntax_error(block, tokens, startPosition, "Expected ','");
+            if (context->nextIs(tok_Comma)) {
+                context->consume(format.append(), tok_Comma);
+                possible_whitespace_or_newline(context, &format);
             }
-
-            context->consume(format.append(), tok_Comma);
-            possible_whitespace_or_newline(context, &format);
         }
         first = false;
 
         possible_whitespace_or_newline(context, &format);
-        ParseResult keyExpr = expression(block, tokens, context);
 
-        // @format.append([:ident inputIndex])
-        // or
-        // @format.append([:expr inputIndex])
-        int inputIndex = inputs.length();
-        Value* formatElement = format.append();
-        formatElement->set_list(2);
-        if (keyExpr.isIdentifier()) {
-            formatElement->set_element_sym(0, s_ident);
-        } else {
-            formatElement->set_element_sym(0, s_expr);
-        }
-        formatElement->set_element_int(1, inputIndex);
-
-        inputs.append(keyExpr.term);
-
-        possible_whitespace_or_newline(context, &format);
-
-        if (!context->nextIs(tok_FatArrow))
-            return syntax_error(block, tokens, startPosition, "Expected '=>' inside map value");
-
-        context->consume(format.append(), tok_FatArrow);
+        Term* keyExpr = literal_map_key(block, context, &format, inputs.length(), startPosition);
+        inputs.append(keyExpr);
 
         possible_whitespace_or_newline(context, &format);
 
         ParseResult valueExpr = expression(block, tokens, context);
         
-        inputIndex = inputs.length();
-        formatElement = format.append();
+        int inputIndex = inputs.length();
+        Value* formatElement = format.append();
         formatElement->set_list(2);
         if (valueExpr.isIdentifier()) {
             formatElement->set_element_sym(0, s_ident);
