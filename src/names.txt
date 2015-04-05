@@ -13,6 +13,7 @@ current_term
 declared_state
 discard
 done
+entity_id
 error
 expr
 failure

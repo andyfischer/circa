@@ -1,3 +1,4 @@
 [tests/module/lib_with_static_error.ca:2] 
- [inside error_up()] 
-  Error: Syntax error: Expected: )
+ [:301 inside syntax_error()] 
+  [inside error()] 
+   Error: Syntax error: Expected: )

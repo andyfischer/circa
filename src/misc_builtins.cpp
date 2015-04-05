@@ -1353,7 +1353,6 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "cache_set", cache_set);
 #if 0
     circa_patch_function(patch, "source_id", source_id);
-    circa_patch_function(patch, "write_text_file", write_text_file_func);
 #endif
     circa_patch_function(patch, "from_string", from_string);
     circa_patch_function(patch, "to_string_repr", to_string_repr);

@@ -27,6 +27,7 @@ const char* builtin_symbol_to_string(int name)
     case s_declared_state: return "declared_state";
     case s_discard: return "discard";
     case s_done: return "done";
+    case s_entity_id: return "entity_id";
     case s_error: return "error";
     case s_expr: return "expr";
     case s_failure: return "failure";
@@ -1865,6 +1866,10 @@ int builtin_symbol_from_string(const char* str)
     case 'f':
         if (strcmp(str + 2, "fect") == 0)
             return s_effect;
+        break;
+    case 'n':
+        if (strcmp(str + 2, "tity_id") == 0)
+            return s_entity_id;
         break;
     case 'r':
         if (strcmp(str + 2, "ror") == 0)

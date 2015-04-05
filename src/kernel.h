@@ -117,7 +117,6 @@ struct BuiltinTypes {
     Type* bool_type;
     Type* color;
     Type* error;
-    Type* file_signature;
     Type* float_type;
     Type* func;
     Type* int_type;

@@ -1092,7 +1092,7 @@ ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* conte
     int startPosition = tokens.getPosition();
     std::string preWs = possible_whitespace_or_newline(tokens);
 
-    // Look for comment
+    // Comment
     if (tokens.nextIs(tok_Comment)) {
         Term* commentTerm = comment(block, tokens, context).term;
         std::string lineEnding = possible_whitespace_or_newline(tokens);
@@ -1100,6 +1100,22 @@ ParseResult struct_decl_line(Block* block, TokenStream& tokens, ParserCxt* conte
             commentTerm->setStringProp(s_Syntax_LineEnding, lineEnding);
         return ParseResult(commentTerm);
     }
+
+    // Special fields
+    #if 0
+    if (token.nextIs(tok_ColonString)) {
+        Term* field = literal_symbol(block, tokens, context);
+
+        if (symbol_eq(term_value(field), s_entity_id)) {
+
+        } else {
+            Value msg;
+            set_string(&msg, "Unrecognized special field: ");
+            string_append(&msg, term_value(field));
+            return syntax_error(block, tokens, startPosition, as_cstring(&msg));
+        }
+    }
+    #endif
 
     if (!tokens.nextIs(tok_Identifier))
         return syntax_error(block, tokens, startPosition);

@@ -470,9 +470,6 @@ void bootstrap_kernel()
 
     ca_assert(FUNCS.declared_state != NULL);
 
-    FUNCS.has_effects = builtins->get("has_effects");
-    block_set_has_effects(nested_contents(FUNCS.has_effects), true);
-
     nested_contents(FUNCS.add)->overrides.specializeType = specializeType_add_sub_mult;
     nested_contents(FUNCS.sub)->overrides.specializeType = specializeType_add_sub_mult;
     nested_contents(FUNCS.mult)->overrides.specializeType = specializeType_add_sub_mult;
@@ -488,7 +485,6 @@ void bootstrap_kernel()
 
     // Finish setting up types that are declared in stdlib.ca.
     TYPES.color = as_type(builtins->get("Color"));
-    TYPES.file_signature = as_type(builtins->get("FileSignature"));
     TYPES.func = as_type(builtins->get("Func"));
     TYPES.module_ref = as_type(builtins->get("Module"));
     TYPES.vec2 = as_type(builtins->get("Vec2"));
@@ -574,7 +570,6 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(get_with_selector, "get_with_selector");
         find_func(greater_than, "greater_than");
         find_func(greater_than_eq, "greater_than_eq");
-        find_func(has_effects, "has_effects");
         find_func(if_block, "if");
         find_func(inputs_fit_function, "inputs_fit_function");
         find_func(length, "length");

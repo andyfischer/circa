@@ -33,14 +33,13 @@ def _upvalue(term :ref) -> any
 def reflect_caller(int height) -> Term
 def rand() -> number
 def error(any msg :multiple)
-def error_up(int height, any msg :multiple)
 def to_string_repr(any val) -> String
   -- Encode a value as a string representation.
 def typeof(any val) -> Type
   -- Returns the runtime type of a value.
 
 def env(any name) -> any
-  -- Fetch an env variable
+  -- Fetch an env variable.
 def env_opt(any name, any default) -> any
 def copy(any val) -> any
 
@@ -282,23 +281,10 @@ def set_index(any list, int index, any val) -> List
 
 def static_error(any msg)
 
-def has_effects()
-  -- Annotation, declare that a function has effects. Used in native-patched
-  -- functions. Not fully supported yet.
-
-def native_patch(String filename)
-  -- Declare that this block should be patched by a native module.
-
-def write_text_file(String filename, String contents)
-  -- Write contents to the given filename, overwriting any existing file.
-  -- TODO: delete, replace with library
-
 def path_dirname(path)
 def path_join(paths :multiple)
 
 -- Builtin types
-struct FileSignature { String filename, int time_modified }
-struct Callable;
 struct Color { number r, number g, number b, number a }
 struct Module { String name, any relativeDir }
 struct Vec2 { number x, number y }
@@ -306,21 +292,21 @@ struct Vec2i { int x, int y }
 struct Vec3 { number x, number y, number z }
 struct Vec4 { number x, number y, number z, number w }
 struct Rect { number x1, number y1, number x2, number y2 }
-struct Rect_i { int x1, int y1, int x2, int y2 }
+struct Recti { int x1, int y1, int x2, int y2 }
 
 -- Errors
 
 def syntax_error()
   caller = reflect_caller(1)
-  error_up(1, str("Syntax error: " caller.property(:Message)))
+  error("Syntax error: " caller.property(:Message))
 
 def unknown_identifier()
   caller = reflect_caller(1)
-  error_up(1, str("Unknown identifier: " caller.name))
+  error("Unknown identifier: " caller.name)
 
 def unknown_function(i :multiple)
   caller = reflect_caller(1)
-  error_up(1, str("Unknown function: " caller.property(:Syntax_FunctionName)))
+  error("Unknown function: " caller.property(:Syntax_FunctionName))
 
 def rpath(String path) -> String
   callerBlock = reflect_caller(1).parent
@@ -494,7 +480,7 @@ def call(Func func, inputs :multiple) -> any
 def method_call(location, obj, Symbol name, List args)
   found = method_lookup(location obj name)
   if found.length == 0
-    error_up(1, 'Method not found: ' name)
+    error('Method not found: ' name)
   found.first.call(args)
 
 def method_capture(object, Symbol name) -> List
@@ -619,7 +605,7 @@ def require_file(String filename) -> Module
 def require_check(Module module)
   block = module.resolve
   if block.is_null
-    error_up(1, "Couldn't find ", cond(module.is_local, "local ", "") "module: " module.name)
+    error("Couldn't find ", cond(module.is_local, "local ", "") "module: " module.name)
 
   if block.has_static_error
     msg = [str("Module '" module.name "' has static errors: ")]
@@ -1256,8 +1242,8 @@ def Term.inputs(self) -> List
     -- Return a list of input terms.
 def Term.num_inputs(self) -> int
     -- Return the number of inputs.
-def Term.source_location(self) -> Rect_i
-    -- Return a Rect_i that describes where this term occurs in its source file.
+def Term.source_location(self) -> Recti
+    -- Return a Recti that describes where this term occurs in its source file.
 def Term.location_string(self) -> String
 def Term.global_id(self) -> int
     -- Fetch this term's global identifier.
