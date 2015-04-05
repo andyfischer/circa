@@ -14,7 +14,7 @@ struct KeyEvent {
   Symbol key
 }
 
-def UserInput.handleEvents(self, events) -> UserInput
+def UserInput.handle_events(self, events) -> UserInput
   self.recentEvents = events
   for event in events
     if event[0] == :down
@@ -23,15 +23,17 @@ def UserInput.handleEvents(self, events) -> UserInput
       @self.buttonsPressed.remove(event[1])
   self
 
+def UserInput.key_pressed(self, Symbol key) -> bool
+  for event in self.recentEvents
+    if event == [:down key]
+      return true
+  return false
+
 def new() -> UserInput
   UserInput.make
 
 def key_pressed(Symbol key) -> bool
-  userInput = env(:userInput) -> UserInput.cast
-  for event in userInput.recentEvents
-    if event == [:down key]
-      return true
-  return false
+  env(:userInput).key_pressed(key)
 
 def key_down(Symbol key) -> bool
   userInput = env(:userInput)

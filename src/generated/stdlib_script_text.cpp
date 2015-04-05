@@ -2691,6 +2691,7 @@ const char* find_builtin_file(const char* filename) {
         "  -- Use 'func' as the new root, and migrate data and state.\n"
         "def VM.reset(self)\n"
         "def VM.reset_state(self)\n"
+        "  self.set_state(null)\n"
         "def VM.restart(self)\n"
         "\n"
         "def VM.frame_list(self) -> List\n"

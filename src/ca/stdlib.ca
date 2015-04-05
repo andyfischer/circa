@@ -874,6 +874,7 @@ def VM.migrate_to(self, Func func)
   -- Use 'func' as the new root, and migrate data and state.
 def VM.reset(self)
 def VM.reset_state(self)
+  self.set_state(null)
 def VM.restart(self)
 
 def VM.frame_list(self) -> List

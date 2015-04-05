@@ -46,6 +46,9 @@ def Asteroid.size_speed_mod(self) -> number
     case 1 2
     case 2 1
 
+def Asteroid.contains_point(self, Vec2 p) -> bool
+  self.location.distance(p) < self.radius
+
 -- Return a point that is wrapped around the playable area
 def wrap_around(Vec2 p) -> Vec2
   [mod(p.x, window_size.x), mod(p.y, window_size.y)]
@@ -215,11 +218,13 @@ for Asteroid asteroid in asteroids
 -- Check for collisions of asteroids and bullets
 spawned = []
 
+
 for Asteroid asteroid in @asteroids
+  
   collides = false
 
   for Bullet bullet in @bullets
-    if asteroid.location.distance(bullet.loc) < asteroid.radius
+    if asteroid.contains_point(bullet.loc)
       collides = true
 
       bullet_vel = Vec2.cast(bullet.direction * bullet_speed)

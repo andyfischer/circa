@@ -19,7 +19,7 @@ def main()
 
   state userInput = input.new
 
-  @userInput.handleEvents(env(:inputEvents))
+  @userInput.handle_events(env(:inputEvents))
 
   rect = method_opt(module :window_rect [] [0 0 1000 500])
   Rect.cast(@rect)
@@ -39,6 +39,9 @@ def main()
   userActor.expect_messages(:render_commands)
 
   actor_setup(userActor)
+
+  if userInput.key_pressed(:r)
+    userActor.reset_state
 
   userActor.call
 

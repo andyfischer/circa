@@ -169,7 +169,6 @@ VM* vm_duplicate(VM* source)
     return vm;
 }
 
-
 static inline Value* get_slot(VM* vm, int slot)
 {
     int index = vm->stackTop + slot;
@@ -1360,7 +1359,6 @@ void vm_set_state(VM* vm, Value* state)
 {
     copy(state, &vm->state);
 }
-
 
 bool vm_check_if_hacks_changed(VM* vm)
 {
