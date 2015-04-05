@@ -630,7 +630,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(selector, "selector");
         find_func(set_with_selector, "set_with_selector");
         find_func(type_make, "Type.make");
-        find_func(upvalue, "_upvalue");
+        find_func(upvalue, "upvalue");
         find_func(vm_save_declared_state, "vm_save_declared_state");
         find_func(vm_close_stateful_minor_frame, "vm_close_stateful_minor_frame");
     #undef find_func

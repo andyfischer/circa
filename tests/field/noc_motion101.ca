@@ -1,8 +1,6 @@
 
-require draw
-require improv
-width = improv.window_size.x
-height = improv.window_size.y
+width = 50
+height = 100
 
 struct Mover {
   Vec2 location
@@ -19,13 +17,11 @@ def Mover.update(@self)
 
 def Mover.display(self)
   size = [48 48]
-  draw.fill_ellipse(#555 self.location size)
-  draw.draw_ellipse(#111 self.velocity size 3.0)
 
 def Mover.checkEdges(@self)
-  if self.location > width
+  if self.location.x > width
     self.location.x = 0
-  elif self.location < 0
+  elif self.location.x < 0
     self.location.x = width
 
   if self.location.y > height
@@ -35,7 +31,6 @@ def Mover.checkEdges(@self)
 
 state mover = make_mover()
 
-draw.background(#fff)
 @mover.update
 @mover.checkEdges
 mover.display
