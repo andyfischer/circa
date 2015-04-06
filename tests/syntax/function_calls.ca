@@ -42,8 +42,8 @@ a = 1.0; -a
 
 -- Methods
 'string'.length()
-make(Map).set(1,2)
-make(Map).set(1, 2)
+make(Table).set(1,2)
+make(Table).set(1, 2)
 make(Vec2).x = 1.0
 
 -- Rebinding

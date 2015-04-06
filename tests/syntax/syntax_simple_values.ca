@@ -25,10 +25,10 @@ false
 a = true
 [false true false true]
 
--- Null
-null
-a = null
-[null null null]
+-- Nil
+nil
+a = nil
+[nil nil nil]
 
 -- Colors
 #123

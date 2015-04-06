@@ -3,7 +3,7 @@ def left()
   a = 1
   b = 2
 
-  state map = Map.make.set(term_ref(a), term_ref(b))
+  state map = Table.make.set(term_ref(a), term_ref(b))
 
 def right()
   a = 3

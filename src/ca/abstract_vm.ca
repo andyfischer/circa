@@ -1,7 +1,7 @@
 
 struct AVM {
   Func func
-  Map results
+  Table results
 }
 
 def AVM.get_result(self, Term term)

@@ -1655,7 +1655,7 @@ ParseResult state_decl(Block* block, TokenStream& tokens, ParserCxt* context)
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
-        if (is_null(&typeName) && initialValue->type != TYPES.null) {
+        if (is_null(&typeName) && initialValue->type != TYPES.nil) {
             type = initialValue->type;
         }
     }
@@ -2561,9 +2561,9 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_True) || tokens.nextIs(tok_False))
         result = literal_bool(block, tokens, context);
 
-    // literal null?
-    else if (tokens.nextIs(tok_Null))
-        result = literal_null(block, tokens, context);
+    // literal nil?
+    else if (tokens.nextIs(tok_Nil))
+        result = literal_nil(block, tokens, context);
 
     // literal hex?
     else if (tokens.nextIs(tok_HexInteger))
@@ -2581,9 +2581,9 @@ ParseResult atom(Block* block, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_LSquare))
         result = literal_list(block, tokens, context);
 
-    // literal map?
+    // literal table?
     else if (tokens.nextIs(tok_LBrace))
-        result = literal_map(block, tokens, context);
+        result = literal_table(block, tokens, context);
 
     // literal symbol?
     else if (tokens.nextIs(tok_ColonString))
@@ -2716,13 +2716,13 @@ ParseResult literal_bool(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(term);
 }
 
-ParseResult literal_null(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult literal_nil(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(tok_Null);
+    tokens.consume(tok_Nil);
 
-    Term* term = create_value(block, TYPES.null);
+    Term* term = create_value(block, TYPES.nil);
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
@@ -2845,7 +2845,7 @@ ParseResult literal_list(Block* block, TokenStream& tokens, ParserCxt* context)
     return ParseResult(term);
 }
 
-Term* literal_map_key(Block* block, ParserCxt* context, Value* format, int inputIndex, int mapStartPosition)
+Term* literal_table_key(Block* block, ParserCxt* context, Value* format, int inputIndex, int mapStartPosition)
 {
     // Shorthand if the key is written as <identifier><colon>
     // Example: {a: 1} is equivalent to {:a => 1}
@@ -2880,7 +2880,7 @@ Term* literal_map_key(Block* block, ParserCxt* context, Value* format, int input
     return keyExpr.term;
 }
 
-ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
+ParseResult literal_table(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = context->getPosition();
     context->consume(tok_LBrace);
@@ -2907,7 +2907,7 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
 
         possible_whitespace_or_newline(context, &format);
 
-        Term* keyExpr = literal_map_key(block, context, &format, inputs.length(), startPosition);
+        Term* keyExpr = literal_table_key(block, context, &format, inputs.length(), startPosition);
         inputs.append(keyExpr);
 
         possible_whitespace_or_newline(context, &format);
@@ -2931,9 +2931,9 @@ ParseResult literal_map(Block* block, TokenStream& tokens, ParserCxt* context)
 
     context->consume(tok_RBrace);
 
-    Term* term = apply(block, FUNCS.make_map, inputs);
+    Term* term = apply(block, FUNCS.make_table, inputs);
     term->setProp(s_Syntax_InputFormat, &format);
-    term->setStringProp(s_Syntax_DeclarationStyle, "braces-map");
+    term->setStringProp(s_Syntax_DeclarationStyle, "braces-table");
     return ParseResult(term);
 }
 

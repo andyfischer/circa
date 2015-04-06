@@ -3,7 +3,7 @@ require source_repro
 
 struct SourceView {
   List entities
-  Map termToId
+  Table termToId
 }
 
 struct TermEntity {

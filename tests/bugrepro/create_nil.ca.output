@@ -1,0 +1,3 @@
+[tests/bugrepro/create_nil.ca:2] 
+ [inside make()] 
+  Error: Couldn't cast nil to type Type

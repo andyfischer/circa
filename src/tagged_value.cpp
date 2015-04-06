@@ -302,8 +302,8 @@ char* Value::to_c_string()
 
 void initialize_null(Value* value)
 {
-    ca_assert(TYPES.null != NULL);
-    value->value_type = TYPES.null;
+    ca_assert(TYPES.nil != NULL);
+    value->value_type = TYPES.nil;
     value->value_data.ptr = NULL;
 }
 
@@ -347,14 +347,14 @@ int value_type_id(Value* v)
 
 void set_null(Value* value)
 {
-    if (value->value_type == NULL || value->value_type == TYPES.null)
+    if (value->value_type == NULL || value->value_type == TYPES.nil)
         return;
 
     if (value->value_type->release != NULL)
         value->value_type->release(value);
 
     type_decref(value->value_type);
-    value->value_type = TYPES.null;
+    value->value_type = TYPES.nil;
     value->value_data.ptr = NULL;
 }
 
@@ -801,7 +801,7 @@ void set_error_string(Value* value, const char* s)
 
 void set_hashtable(Value* value)
 {
-    make(TYPES.map, value);
+    make(TYPES.table, value);
 }
 
 void set_int(Value* value, int i)
@@ -969,7 +969,7 @@ bool is_stack(Value* value) { return value->value_type == TYPES.stack; }
 bool is_hashtable(Value* value) { return value->value_type->storageType == s_StorageTypeHashtable; }
 bool is_list(Value* value) { return value->value_type == TYPES.list; }
 bool is_list_based(Value* value) { return value->value_type->storageType == s_StorageTypeList; }
-bool is_null(Value* value) { return value->value_type == TYPES.null; }
+bool is_null(Value* value) { return value->value_type == TYPES.nil; }
 bool is_opaque_pointer(Value* value) { return value->value_type->storageType == s_StorageTypeOpaquePointer; }
 bool is_ref(Value* value) { return value->value_type->storageType == s_StorageTypeTerm; }
 bool is_string(Value* value) { return value->value_type->storageType == s_StorageTypeString; }
@@ -1081,7 +1081,7 @@ bool circa_is_float(Value* value) { return value->value_type->storageType == s_S
 bool circa_is_func(Value* value) { return value->value_type == TYPES.func; }
 bool circa_is_int(Value* value) { return value->value_type->storageType == s_StorageTypeInt; }
 bool circa_is_list(Value* value) { return value->value_type->storageType == s_StorageTypeList; }
-bool circa_is_null(Value* value)  { return value->value_type == TYPES.null; }
+bool circa_is_null(Value* value)  { return value->value_type == TYPES.nil; }
 bool circa_is_number(Value* value) { return circa_is_int(value) || circa_is_float(value); }
 bool circa_is_stack(Value* value) { return is_stack(value); }
 bool circa_is_string(Value* value) { return value->value_type->storageType == s_StorageTypeString; }

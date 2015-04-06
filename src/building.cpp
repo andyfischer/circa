@@ -183,8 +183,8 @@ void set_declared_type(Term *term, Type *newType)
     if (newType == NULL)
         newType = TYPES.any;
 
-    // Don't allow the null type to be used as a declared type
-    if (newType == TYPES.null)
+    // Don't allow the nil type to be used as a declared type
+    if (newType == TYPES.nil)
         newType = TYPES.any;
 
     ca_assert(term != NULL);

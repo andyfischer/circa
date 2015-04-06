@@ -1,5 +1,5 @@
 
-m = make(Map)
+m = make(Table)
 @m.set('a' 1)
 @m.set('b' 2)
 

@@ -148,7 +148,7 @@ def submit_sprite(Texture texture, Rect loc)
   gl.unbind_texture
 
 def submit_layer(List commands)
-  byName = Map.make.bucketize(commands, (command) -> command.name)
+  byName = Table.make.bucketize(commands, (command) -> command.name)
 
   if byName.contains(:Polys)
     triangleDatas = for command in byName.get(:Polys)
@@ -157,7 +157,7 @@ def submit_layer(List commands)
     submit_triangles_data(triangleDatas.flatten)
 
   if byName.contains(:PolysMono)
-    byColor = Map.make.bucketize(byName.get(:PolysMono), (command) -> command.color)
+    byColor = Table.make.bucketize(byName.get(:PolysMono), (command) -> command.color)
 
     for color in byColor.keys
       datas = for command in byColor.get(color)

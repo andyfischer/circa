@@ -47,7 +47,7 @@ def Label.left(label) -> number
 def create_font(String name, int size) -> Font
   make(Font)
 def font(String name, int size) -> Font
-  state f = null
+  state f = nil
   if changed([name size])
     f = create_font(name, size)
   return f

@@ -422,7 +422,7 @@ namespace tagged_value_wrappers {
 
 void set_mutable_hashtable(Value* value)
 {
-    make_no_initialize(TYPES.map, value);
+    make_no_initialize(TYPES.table, value);
     Hashtable* table = create_table();
     table->mut = true;
     value->value_data.ptr = table;
@@ -622,7 +622,7 @@ int hashtable_hash(Value* value)
 
 void hashtable_setup_type(Type* type)
 {
-    set_string(&type->name, "Map");
+    set_string(&type->name, "Table");
     type->initialize = tagged_value_wrappers::initialize;
     type->release = tagged_value_wrappers::release;
     type->copy = hashtable_copy;

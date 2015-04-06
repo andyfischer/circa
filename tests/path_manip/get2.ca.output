@@ -3,4 +3,4 @@ get [] = {:x => {:y => {:z => 123}}}
 get :x = {:y => {:z => 123}}
 get :x :y = {:z => 123}
 get :x :y :z = 123
-get :x :y :z :w = null
+get :x :y :z :w = nil

@@ -17,7 +17,7 @@ def Frame.next(frame) -> any
   if frame.height + 1 < frame.stack.frame_count
     frame.stack.frame_from_base(frame.height + 1)
   else
-    null
+    nil
 
 def trace_to_string(VM stack) -> String
   writer = indent_writer.new

@@ -1,5 +1,5 @@
 
-a = Map.make
+a = Table.make
 
 set(@a [:x :y :z] 123)
 

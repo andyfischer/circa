@@ -31,8 +31,8 @@ def Rect.resize_s(self, number size) -> Rect
 def Rect.grow_s(self, number size) -> Rect
   [self.x1 - size/2, self.y1 - size/2, self.x2 + size/2, self.y2 + size/2]
 
-def map_keyed(List list, Func getKey) -> Map
-  m = Map.make
+def map_keyed(List list, Func getKey) -> Table
+  m = Table.make
   for el in list
     @m.set(getKey.call(el) el)
   m
@@ -88,22 +88,22 @@ pieceSize = 10
 
 --boardRect = boardSize.to_rect(pieceSize).
 
-struct BlockMap { Map map }
+struct BlockMap { Table table }
 
 def BlockMap.normalizeKey(self, block)
   [round(block.x) round(block.y)]
 
 def BlockMap.contains(self, block)
-  self.map.contains(self.normalizeKey(block))
+  self.table.contains(self.normalizeKey(block))
 
 def BlockMap.get(self, block)
-  self.map.get(self.normalizeKey(block))
+  self.table.get(self.normalizeKey(block))
 
 def BlockMap.set(self, block, val)
-  @self.map.set(self.normalizeKey(block), val)
+  @self.table.set(self.normalizeKey(block), val)
 
 def BlockMap.keys(self)
-  self.map.keys
+  self.table.keys
 
 
 struct Board {

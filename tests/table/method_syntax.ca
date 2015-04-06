@@ -1,11 +1,11 @@
 
-m = Map.make.set(:one, 1).set(:two 2)
+m = Table.make.set(:one, 1).set(:two 2)
 
 assert(m.one == 1)
 assert(m.two == 2)
 
 def error_test()
-  m = Map.make
+  m = Table.make
   m.three
 
 vm = error_test.to_vm

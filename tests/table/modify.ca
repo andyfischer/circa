@@ -1,5 +1,5 @@
 
-m = Map.make
+m = Table.make
 
 @m.set(:a 1)
 print(m)

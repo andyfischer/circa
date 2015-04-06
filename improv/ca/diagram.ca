@@ -61,7 +61,7 @@ def draw_arrow(canvas, Vec2 a, Vec2 b)
 struct Diagram {
     List boxes
     int layer
-    Map nameToIndex
+    Table nameToIndex
 }
 
 def Diagram.countInLayer(self, layer) -> int

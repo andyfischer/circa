@@ -4,4 +4,4 @@ index = "abcdef".index_of('bc')
 assert(index == 1)
 
 index = "abcdef".index_of('fg')
-assert(index == null)
+assert(index == nil)

@@ -334,7 +334,7 @@ const char* builtin_symbol_to_string(int name)
     case tok_Or: return "tok_Or";
     case tok_Not: return "tok_Not";
     case tok_Discard: return "tok_Discard";
-    case tok_Null: return "tok_Null";
+    case tok_Nil: return "tok_Nil";
     case tok_Break: return "tok_Break";
     case tok_Continue: return "tok_Continue";
     case tok_Switch: return "tok_Switch";
@@ -3509,6 +3509,10 @@ int builtin_symbol_from_string(const char* str)
         if (strcmp(str + 6, "wline") == 0)
             return tok_Newline;
         break;
+    case 'i':
+        if (strcmp(str + 6, "l") == 0)
+            return tok_Nil;
+        break;
     case 'o':
     switch (str[6]) {
     case 't':
@@ -3523,10 +3527,6 @@ int builtin_symbol_from_string(const char* str)
     }
     default: return -1;
     }
-    case 'u':
-        if (strcmp(str + 6, "ll") == 0)
-            return tok_Null;
-        break;
     default: return -1;
     }
     case 'O':

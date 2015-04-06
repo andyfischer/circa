@@ -1,5 +1,5 @@
 
-m = Map.make
+m = Table.make
 
 @m.set(#f00, "Color is hashable")
 print(m.get(#f00))

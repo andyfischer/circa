@@ -657,7 +657,7 @@ def SourceRepro.term_default_format(self, Term term) -> SourceRepro
     for index in 0..(term.num_inputs)
       @self.term_input(term index)
     @self.phrase(:text ']')
-  elif declarationStyle == 'braces-map'
+  elif declarationStyle == 'braces-table'
     @self.phrase(:text '{')
     @self.term_inputs_new_style(term)
     @self.phrase(:text '}')

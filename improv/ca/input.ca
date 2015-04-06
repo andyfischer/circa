@@ -89,12 +89,12 @@ def click_resolver(any message)
             mousePos = message[1] -> Vec2.cast
             event = message[2]
 
-            listener = null
+            listener = nil
             for ClickArea area in clickAreas
                 if area.rect.contains(mousePos)
                     listener = area.listener
 
-            if listener != null
+            if listener != nil
                 -- Language defect: Unnecessary cast
                 Func.cast(@listener)
                 listener.call(mousePos event)

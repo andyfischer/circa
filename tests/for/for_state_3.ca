@@ -7,4 +7,4 @@ def f()
 vm = make_vm(f)
 vm.call
 s = vm.get_state
-assert(s == null or s == [])
+assert(s == nil or s == [])

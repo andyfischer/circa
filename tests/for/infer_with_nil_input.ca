@@ -1,0 +1,11 @@
+
+-- This once caused a runtime error: Couldn't cast value 5 to type nil
+-- The reason is that, inside the for-loop there was an input 'non_zero',
+-- which had declared type 'nil', even though it wasn't necessarily nil.
+
+non_zero = nil
+
+for i in [5 0]
+    if i != 0
+        non_zero = i
+

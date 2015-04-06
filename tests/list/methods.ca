@@ -41,7 +41,7 @@ assert([0 1 2].last == 2)
 -- Resize
 a = [1 2]
 @a.resize(4)
-assert(a == [1 2 null null])
+assert(a == [1 2 nil nil])
 @a.resize(2)
 assert(a == [1 2])
 @a.resize(1)

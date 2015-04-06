@@ -87,7 +87,7 @@ const char* get_token_text(int match)
         case tok_Or: return "or";
         case tok_Not: return "not";
         case tok_Discard: return "discard";
-        case tok_Null: return "null";
+        case tok_Nil: return "nil";
         case tok_Break: return "break";
         case tok_Continue: return "continue";
         case tok_Switch: return "switch";
@@ -125,7 +125,7 @@ bool token_is_identifier_or_keyword(int match)
     case tok_Or:
     case tok_Not:
     case tok_Discard:
-    case tok_Null:
+    case tok_Nil:
     case tok_Break:
     case tok_Continue:
     case tok_Switch:
@@ -361,7 +361,7 @@ void top_level_consume_token(TokenizeContext &context)
             // n through z
             if (try_to_consume_keyword(context, tok_Namespace)) return;
             if (try_to_consume_keyword(context, tok_Not)) return;
-            if (try_to_consume_keyword(context, tok_Null)) return;
+            if (try_to_consume_keyword(context, tok_Nil)) return;
             if (try_to_consume_keyword(context, tok_Or)) return;
             if (try_to_consume_keyword(context, tok_Return)) return;
             if (try_to_consume_keyword(context, tok_State)) return;

@@ -135,7 +135,7 @@ void hosted_is_int(VM* vm)
 {
     set_bool(circa_output(vm), is_int(circa_input(vm, 0)));
 }
-void hosted_is_map(VM* vm)
+void hosted_is_table(VM* vm)
 {
     set_bool(circa_output(vm), is_hashtable(circa_input(vm, 0)));
 }
@@ -150,10 +150,6 @@ void hosted_is_bool(VM* vm)
 void hosted_is_string(VM* vm)
 {
     set_bool(circa_output(vm), is_string(circa_input(vm, 0)));
-}
-void hosted_is_null(VM* vm)
-{
-    set_bool(circa_output(vm), is_null(circa_input(vm, 0)));
 }
 void hosted_is_function(VM* vm)
 {
@@ -309,7 +305,7 @@ void make_list(VM* vm)
     move(vm->input(0), vm->output());
 }
 
-void make_map(VM* vm)
+void make_table(VM* vm)
 {
     Value* out = vm->output();
     Value* args = vm->input(0);
@@ -787,7 +783,7 @@ void List__remove(VM* vm)
     list_remove_index(self, index);
 }
 
-void Map__contains(VM* vm)
+void Table__contains(VM* vm)
 {
     Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
@@ -797,13 +793,13 @@ void Map__contains(VM* vm)
     set_bool(circa_output(vm), value != NULL);
 }
 
-void Map__keys(VM* vm)
+void Table__keys(VM* vm)
 {
     Value* table = circa_input(vm, 0);
     hashtable_get_keys(table, circa_output(vm));
 }
 
-void Map__remove(VM* vm)
+void Table__remove(VM* vm)
 {
     Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
@@ -814,7 +810,7 @@ void Map__remove(VM* vm)
     hashtable_remove(self, key);
 }
 
-void Map__get(VM* vm)
+void Table__get(VM* vm)
 {
     Value* table = circa_input(vm, 0);
     Value* key = circa_input(vm, 1);
@@ -831,7 +827,7 @@ void Map__get(VM* vm)
     copy(value, circa_output(vm));
 }
 
-void Map__set(VM* vm)
+void Table__set(VM* vm)
 {
     Value* key = circa_input(vm, 1);
     if (!value_hashable(key))
@@ -844,7 +840,7 @@ void Map__set(VM* vm)
     move(value, hashtable_insert(self, key, false));
 }
 
-void Map__empty(VM* vm)
+void Table__empty(VM* vm)
 {
     set_bool(circa_output(vm), hashtable_is_empty(circa_input(vm, 0)));
 }
@@ -1236,11 +1232,10 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "is_compound", hosted_is_compound);
     circa_patch_function(patch, "is_list", hosted_is_list);
     circa_patch_function(patch, "is_int", hosted_is_int);
-    circa_patch_function(patch, "is_map", hosted_is_map);
+    circa_patch_function(patch, "is_table", hosted_is_table);
     circa_patch_function(patch, "is_number", hosted_is_number);
     circa_patch_function(patch, "is_bool", hosted_is_bool);
     circa_patch_function(patch, "is_string", hosted_is_string);
-    circa_patch_function(patch, "is_null", hosted_is_null);
     circa_patch_function(patch, "is_function", hosted_is_function);
     circa_patch_function(patch, "is_type", hosted_is_type);
     circa_patch_function(patch, "length", length);
@@ -1254,7 +1249,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "greater_than_eq_f", greater_than_eq_f);
     circa_patch_function(patch, "make_list", make_list);
     circa_patch_function(patch, "blank_list", blank_list);
-    circa_patch_function(patch, "make_map", make_map);
+    circa_patch_function(patch, "make_table", make_table);
     circa_patch_function(patch, "and", and_func);
     circa_patch_function(patch, "or", or_func);
     circa_patch_function(patch, "not", not_func);
@@ -1307,12 +1302,12 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "List.set", List__set);
     circa_patch_function(patch, "List.remove", List__remove);
 
-    circa_patch_function(patch, "Map.contains", Map__contains);
-    circa_patch_function(patch, "Map.keys", Map__keys);
-    circa_patch_function(patch, "Map.remove", Map__remove);
-    circa_patch_function(patch, "Map.get", Map__get);
-    circa_patch_function(patch, "Map.set", Map__set);
-    circa_patch_function(patch, "Map.empty", Map__empty);
+    circa_patch_function(patch, "Table.contains", Table__contains);
+    circa_patch_function(patch, "Table.keys", Table__keys);
+    circa_patch_function(patch, "Table.remove", Table__remove);
+    circa_patch_function(patch, "Table.get", Table__get);
+    circa_patch_function(patch, "Table.set", Table__set);
+    circa_patch_function(patch, "Table.empty", Table__empty);
 
     circa_patch_function(patch, "Module.block", Module__block);
     circa_patch_function(patch, "Module._get", Module__get);

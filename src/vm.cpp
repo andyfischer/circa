@@ -463,7 +463,7 @@ void vm_run(VM* vm, VM* callingVM)
         case op_dyn_method: {
             trace_call_inputs();
 
-            // grow in case we need to convert to Map.get call.
+            // grow in case we need to convert to Table.get call.
             vm_grow_stack(vm, op.a + 3);
 
             Value* object = get_slot_fast(vm, op.a + 1);
@@ -501,7 +501,7 @@ void vm_run(VM* vm, VM* callingVM)
                     }
 
                 } else if (is_hashtable(object)) {
-                    Block* function = FUNCS.map_get->nestedContents;
+                    Block* function = FUNCS.table_get->nestedContents;
                     int addr = find_or_compile_major_block(vm->bc, function);
                     ops = vm->bc->ops;
 

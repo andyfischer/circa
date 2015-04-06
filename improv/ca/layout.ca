@@ -3,7 +3,7 @@ struct Node {
     int parent
     List children
     Name strategy
-    Map props
+    Table props
     any data
 }
 
@@ -55,7 +55,7 @@ def Layout.setProp(self, name, value) -> Layout
 
 def Layout.solveDim(self, String dim) -> List
     -- Return a [(Number,Number)] list of pairs for each node.
-    results = empty_list(null, self.nodes.length)
+    results = empty_list(nil, self.nodes.length)
     results[0] = [0 self.size.x]
 
     for Node node in self.nodes
@@ -85,7 +85,7 @@ def Layout.solveDim(self, String dim) -> List
 
 -- Returns a list of layed-out [Rect, any] pairs.
 def Layout.getRects(self) -> List
-    positions = empty_list(null, self.nodes.length)
+    positions = empty_list(nil, self.nodes.length)
 
     -- Position the root element
     positions[0] = rect(0 0 self.size.x self.size.y)

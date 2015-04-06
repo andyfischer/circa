@@ -1,6 +1,0 @@
-
-print('with numbers: ' make_map(1, 2, 3, 4))
-
-print('with symbols: ' make_map(:fruit 'apple' :vegetable 'broccoli'))
-
-print('empty: ' make_map())

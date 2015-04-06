@@ -36,10 +36,10 @@ subject.set_env_val(:observe_listener, observe_listener)
 subject.run
 
 observed = observe_listener.call([:get])
-if observed != null
+if observed != nil
     observed.dump
 else
-    print('null observed')
+    print('nil observed')
 -}
 
 struct VMIterator {
@@ -51,7 +51,7 @@ def VMIterator.next(self) -> Term
     self.frame.block.get_term(self.index)
 
 def VMIterator.finished(self) -> bool
-    return self.frame == null
+    return self.frame == nil
 
 def VMIterator.advance(@self)
     if self.index == 0
@@ -59,7 +59,7 @@ def VMIterator.advance(@self)
             self.frame = self.frame.parent
             self.index = self.frame.current_term.index
         else
-            self.frame = null
+            self.frame = nil
     else
         self.index -= 1
 
@@ -72,7 +72,7 @@ def start_stack_iterator(VM stack, Term term) -> VMIterator
 struct FeedbackOperation {
     VM stack
     List modifyTargets
-    Map pendingFeedback
+    Table pendingFeedback
 }
 
 def start_feedback_operation(VM stack) -> FeedbackOperation
@@ -152,7 +152,7 @@ def FeedbackOperation.feedback_propogate(self, Term term, any signal) -> List
     return [:unknown]
 
 struct MapOfLists {
-    Map map
+    Table map
 }
 
 def MapOfLists.add(@self, any key, any val)

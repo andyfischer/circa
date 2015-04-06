@@ -18,7 +18,7 @@ void any_to_string(Value*, Value* out)
 void any_initialize(Type*, Value* value)
 {
     // Attempting to create an instance of 'any' will result in a value of null.
-    value->value_type = TYPES.null;
+    value->value_type = TYPES.nil;
 }
 void any_staticTypeQuery(Type*, StaticTypeQuery* query)
 {
@@ -108,11 +108,11 @@ int null_hashFunc(Value*)
 }
 void null_toString(Value* value, Value* out)
 {
-    string_append(out, "null");
+    string_append(out, "nil");
 }
 void null_setup_type(Type* type)
 {
-    set_string(&type->name, "null");
+    set_string(&type->name, "nil");
     type->toString = null_toString;
     type->hashFunc = null_hashFunc;
 }

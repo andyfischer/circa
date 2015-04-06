@@ -1,19 +1,19 @@
 
 struct MapOfLists {
-    Map map
+    Table table
 }
 
 def MapOfLists.add(@self, any key, any val)
-    if self.map.contains(key)
-        @self.map.apply(key, (list) -> list.append(val) )
+    if self.table.contains(key)
+        @self.table.apply(key, (list) -> list.append(val) )
     else
-        @self.map.set(key, [val])
+        @self.table.set(key, [val])
 
 def MapOfLists.remove(@self, any key)
-    @self.map.remove(key)
+    @self.table.remove(key)
 
 def MapOfLists.get(self, any key)
-    self.map.get_opt(key, [])
+    self.table.get_opt(key, [])
 
 m = make(MapOfLists)
 @m.add(:a 1)

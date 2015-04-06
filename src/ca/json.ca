@@ -49,7 +49,7 @@ def Reader.parse_string(@self) -> Reader
 def Reader.parse_value(@self) -> Reader
   @self.consumeWhitespace
 
-  result = null
+  result = nil
 
   if self.next == '['
     @self.advance
@@ -81,7 +81,7 @@ def Reader.parse_value(@self) -> Reader
     @self.advance
     @self.consumeWhitespace
 
-    result = Map.make
+    result = Table.make
 
     first = true
     while self.next != '}'
@@ -120,7 +120,7 @@ def Reader.parse_value(@self) -> Reader
 
   elif self.matches("null")
     @self.consume("null")
-    result = null
+    result = nil
 
   elif is_digit(self.next) or self.next == '-'
 
@@ -166,7 +166,7 @@ def String.quote(self) -> String
 def write(val) -> String
   if is_list(val)
     str('[' (for el in val { write(el) }).join(', ') ']')
-  elif is_map(val)
+  elif is_table(val)
     str('{' (for k in val.keys { str(k.quote, ": ", write(val.get(k))) }).join(', ') '}')
   elif is_string(val)
     val.quote

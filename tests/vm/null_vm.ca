@@ -4,4 +4,4 @@ struct T {
 }
 
 t = T.make
-t = null
+t = nil

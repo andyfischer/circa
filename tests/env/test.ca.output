@@ -1,5 +1,5 @@
 inside f
 env(:a) = 1
 env(:b) = 2
-env(:c) = null
+env(:c) = nil
 inside g, env(:a) = 1

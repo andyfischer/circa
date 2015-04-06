@@ -33,7 +33,7 @@ def LinewiseLayout.positioned_elements(self) -> List
 
       pos = cursor.set_y(centeredY)
 
-      @out.append(Map.make.set(:pos pos).set(:content item))
+      @out.append(Table.make.set(:pos pos).set(:content item))
 
       cursor.x += item.size.x
 

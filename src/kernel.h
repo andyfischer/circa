@@ -69,8 +69,8 @@ struct BuiltinFuncs {
     Term* load_script;
     Term* make;
     Term* make_list;
-    Term* make_map;
-    Term* map_get;
+    Term* make_table;
+    Term* table_get;
     Term* method_lookup;
     Term* module_get;
     Term* mult;
@@ -121,10 +121,10 @@ struct BuiltinTypes {
     Type* func;
     Type* int_type;
     Type* list;
-    Type* map;
+    Type* table;
     Type* module_ref;
     Type* native_ptr;
-    Type* null;
+    Type* nil;
     Type* opaque_pointer;
     Type* vec2;
     Type* selector;

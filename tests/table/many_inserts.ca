@@ -1,0 +1,18 @@
+
+table = make(Table)
+
+@table.set('a', 1)
+@table.set('b', 2)
+@table.set('c', 2)
+@table.set('d', 2)
+@table.set('e', 2)
+@table.set('f', 2)
+@table.set(:a, 2)
+@table.set(:b, 2)
+@table.set(:c, 2)
+@table.set(1, 2)
+@table.set(2, 2)
+@table.set(10, 2)
+@table.set(11, 2)
+
+print(table)

@@ -21,7 +21,7 @@ struct CodeFilter {
 
 struct CodeView {
   Block block
-  Map lineMetrics
+  Table lineMetrics
   int selectedLine
   int actualFirstLineNumber
   Actor listener
@@ -31,7 +31,7 @@ struct CodeView {
 
 def List.max(self) -> any
   if self.length == 0
-    null
+    nil
   else
     m = self[0]
     for i in self
@@ -228,7 +228,7 @@ def CodeView.oldRun(@self, Rect rect)
 
   cursor = rect.top_left + scroll
 
-  if self.filter != null
+  if self.filter != nil
     areaTop = cursor
     cursor += [0 fontExtents.ascent]
     lineRect = Rect.make(rect.left, areaTop.y, rect.right, cursor.y + fontExtents.descent)
@@ -242,7 +242,7 @@ def CodeView.oldRun(@self, Rect rect)
 
   lines = []
   for i, CodeLine line in lines
-    if self.filter != null
+    if self.filter != nil
       if not self.filter.func(line.term)
         continue
     
@@ -283,7 +283,7 @@ def CodeView.oldRun(@self, Rect rect)
       pos = input()
       event = input()
 
-      if event == :right_down and self.listener != null
+      if event == :right_down and self.listener != nil
           self.listener.call([:right_click_term line.term pos])
       }])
     -}

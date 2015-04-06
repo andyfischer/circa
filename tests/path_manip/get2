@@ -1,6 +1,0 @@
-
-a = Map.make
-
-set(@a [:x :y :z] 123)
-
-print('a = ' a)

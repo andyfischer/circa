@@ -1,0 +1,6 @@
+
+print('with numbers: ' make_table(1, 2, 3, 4))
+
+print('with symbols: ' make_table(:fruit 'apple' :vegetable 'broccoli'))
+
+print('empty: ' make_table())

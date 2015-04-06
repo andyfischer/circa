@@ -1,5 +1,5 @@
 
-a = Map.make
+a = Table.make
 
 @a.set(:x 5)
 

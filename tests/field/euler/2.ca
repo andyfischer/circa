@@ -13,7 +13,7 @@ def Fib.advance(@self)
   self.b = b
 
 def Fib.done(self) false
-def Fib.key(self) null
+def Fib.key(self) nil
 
 def start_fib()
   concat_seq([1 2] Fib.make(1 2))

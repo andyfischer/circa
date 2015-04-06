@@ -287,10 +287,10 @@ void for_each_root_type(void (*callback)(Type* type))
     (*callback)(TYPES.float_type);
     (*callback)(TYPES.int_type);
     (*callback)(TYPES.list);
-    (*callback)(TYPES.map);
+    (*callback)(TYPES.table);
     (*callback)(TYPES.opaque_pointer);
     (*callback)(TYPES.native_ptr);
-    (*callback)(TYPES.null);
+    (*callback)(TYPES.nil);
     (*callback)(TYPES.string);
     (*callback)(TYPES.symbol);
     (*callback)(TYPES.term);
@@ -310,14 +310,14 @@ void bootstrap_kernel()
     World* world = g_world;
 
     // Instanciate the types that are used by Type.
-    TYPES.map = create_type_unconstructed();
-    TYPES.null = create_type_unconstructed();
+    TYPES.table = create_type_unconstructed();
+    TYPES.nil = create_type_unconstructed();
     TYPES.string = create_type_unconstructed();
     TYPES.type = create_type_unconstructed();
 
     // Now we can fully instanciate types.
-    type_finish_construction(TYPES.map);
-    type_finish_construction(TYPES.null);
+    type_finish_construction(TYPES.table);
+    type_finish_construction(TYPES.nil);
     type_finish_construction(TYPES.string);
     type_finish_construction(TYPES.type);
     string_setup_type(TYPES.string);
@@ -332,7 +332,7 @@ void bootstrap_kernel()
     TYPES.int_type = create_type();
     TYPES.list = create_type();
     TYPES.native_ptr = create_type();
-    TYPES.map = create_type();
+    TYPES.table = create_type();
     TYPES.opaque_pointer = create_type();
     TYPES.symbol = create_type();
     TYPES.term = create_type();
@@ -345,12 +345,12 @@ void bootstrap_kernel()
     blob_setup_type(TYPES.blob);
     block_setup_type(TYPES.block);
     bool_setup_type(TYPES.bool_type);
-    hashtable_setup_type(TYPES.map);
+    hashtable_setup_type(TYPES.table);
     int_setup_type(TYPES.int_type);
     list_t::setup_type(TYPES.list);
     symbol_setup_type(TYPES.symbol);
     native_ptr_setup_type(TYPES.native_ptr);
-    null_setup_type(TYPES.null);
+    null_setup_type(TYPES.nil);
     number_setup_type(TYPES.float_type);
     opaque_pointer_setup_type(TYPES.opaque_pointer);
     term_setup_type(TYPES.term);
@@ -418,7 +418,7 @@ void bootstrap_kernel()
     create_type_value(builtins, TYPES.string, "String");
     create_type_value(builtins, TYPES.symbol, "Symbol");
     create_type_value(builtins, TYPES.term, "Term");
-    create_type_value(builtins, TYPES.map, "Map");
+    create_type_value(builtins, TYPES.table, "Table");
     create_type_value(builtins, TYPES.void_type, "void");
     create_type_value(builtins, TYPES.vm, "VM");
 
@@ -577,7 +577,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(less_than_eq, "less_than_eq");
         find_func(loop_condition_bool, "loop_condition_bool");
         find_func(loop_iterator, "loop_iterator");
-        find_func(make_map, "make_map");
+        find_func(make_table, "make_table");
         find_func(make, "make");
         find_func(make_list, "make_list");
         find_func(method_lookup, "method_lookup");
@@ -624,7 +624,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(func_apply, "func_apply");
         find_func(func_apply_method, "Func.apply");
         find_func(get_with_selector, "get_with_selector");
-        find_func(map_get, "Map.get");
+        find_func(table_get, "Table.get");
         find_func(module_get, "Module._get");
         find_func(not_equals, "not_equals");
         find_func(selector, "selector");

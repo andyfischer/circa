@@ -1,0 +1,12 @@
+
+m = Table.make
+
+-- Remove from empty table
+m.remove(:a)
+print(m)
+
+-- Remove from nonempty table
+@m.set(:b 1)
+m.remove(:a)
+
+print(m)

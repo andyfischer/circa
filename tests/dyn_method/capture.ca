@@ -1,6 +1,6 @@
 
 def method_capture(object, Symbol name) -> List
-  found = method_lookup(null object name)
+  found = method_lookup(nil object name)
   for f in @found
     curry(@f [object])
   found

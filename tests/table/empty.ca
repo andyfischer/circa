@@ -1,5 +1,5 @@
 
-m = make(Map)
+m = make(Table)
 assert(m.empty)
 @m.set(1,2)
 assert(not m.empty)

@@ -45,7 +45,7 @@ def run_script(id, VM vm, Rect rect)
   canvas.translate(rect.top_left)
   -}
 
-  vm.set_env(Map.make)
+  vm.set_env(Table.make)
   vm.set_env_val(:userInput env(:userInput))
   vm.set_env_val(:time env(:time))
   vm.set_env_val(:timeDelta, delta(env(:time)))

@@ -2,7 +2,7 @@ check 1
 check 2
 check 3
 check 4
-f, result = null
+f, result = nil
 f, result = check 5
 should equal 2: 2
 should equal 5: 5

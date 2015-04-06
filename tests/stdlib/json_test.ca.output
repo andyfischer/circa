@@ -10,7 +10,7 @@
 [-1, -2] -> [-1, -2] -> [-1, -2]
 true -> true -> true
 false -> false -> false
-null -> null -> null
+null -> nil -> nil
 {} -> {} -> {}
 {"a":"b"} -> {'a' => 'b'} -> {"a": "b"}
 {"a":"b", "c":"d"} -> {'a' => 'b', 'c' => 'd'} -> {"a": "b", "c": "d"}

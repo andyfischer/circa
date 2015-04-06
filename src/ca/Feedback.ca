@@ -5,7 +5,7 @@ struct TargetSubElement {
 
 def TargetSubElement.top(self) -> List
     if self.list.empty
-        null
+        nil
     else
         self.list.last
 def TargetSubElement.pop(@self)
@@ -21,7 +21,7 @@ struct Target {
 }
 
 struct ConstraintSet {
-    Map byTerm
+    Table byTerm
 }
 def ConstraintSet.setValue(@self, Term term, any value)
     self.byTerm.set(term, value)
@@ -31,7 +31,7 @@ def ConstraintSet.getKnowledge(@self, Term term) -> any
     elif term.is_value
         term.value
     else
-        null
+        nil
 
 struct Desire {
     Symbol name
@@ -88,7 +88,7 @@ def advance_request(Request request) -> any
         -- Dispatch based on our knowledge of the index
         knowledge = request.constraints.getKnowledge(indexTerm)
 
-        if knowledge == null
+        if knowledge == nil
             return Failure([:NotEnoughInformation request])
 
         indexValue = term.value()

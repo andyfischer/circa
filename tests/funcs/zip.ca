@@ -1,5 +1,5 @@
 
 assert(zip([1] [2]) == [[1 2]])
 assert(zip([] []) == [])
-assert(zip([1 2 3] []) == [[1 null] [2 null] [3 null]])
+assert(zip([1 2 3] []) == [[1 nil] [2 nil] [3 nil]])
 assert(zip([1 2 3] [4 5 6]) == [[1 4] [2 5] [3 6]])

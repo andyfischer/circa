@@ -364,7 +364,7 @@ tok_And
 tok_Or
 tok_Not
 tok_Discard
-tok_Null
+tok_Nil
 tok_Break
 tok_Continue
 tok_Switch

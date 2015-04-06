@@ -3,4 +3,4 @@ def f() {}
 
 assert(comment.block.property(:EvaluationEmpty) == true)
 
-assert(f.block.property(:EvaluationEmpty) == null)
+assert(f.block.property(:EvaluationEmpty) == nil)

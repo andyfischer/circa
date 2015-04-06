@@ -1,0 +1,15 @@
+
+left = Table.make
+assert(equals(left, Table.make))
+assert(not_equals(left, Table.make.set(1,2)))
+assert(equals(left.set(1,2), Table.make.set(1,2)))
+
+left = Table.make.set('a' 1).set('b' 2).set('c' 3)
+right = Table.make.set('c' 3)
+
+assert(not_equals(left right))
+@right.set('b' 2)
+@right.set('a' 1)
+assert(equals(left right))
+@right.set('d' 4)
+assert(not_equals(left right))

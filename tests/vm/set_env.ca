@@ -3,7 +3,7 @@ def main()
   env(:key)
 
 vm = make_vm(main)
-assert(vm.call == null)
+assert(vm.call == nil)
 
 vm.set_env(:key 'value')
 assert(vm.call == 'value')

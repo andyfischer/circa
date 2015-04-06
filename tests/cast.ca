@@ -5,4 +5,4 @@ assert(v == [1 1])
 assert(v.x == 1)
 
 v = cast('hello', number)
-assert(v == null)
+assert(v == nil)

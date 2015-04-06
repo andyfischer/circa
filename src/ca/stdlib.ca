@@ -78,9 +78,9 @@ def print(any items :multiple)
 def trace(any items :multiple)
   -- Like print()
 
-def get(Map val, List path) -> any
-def set(Map val, List path, any newValue) -> any
-def delete(Map val, List path) -> Map
+def get(Table val, List path) -> any
+def set(Table val, List path, any newValue) -> any
+def delete(Table val, List path) -> Table
 
 -- List values
 def make_list(any vals :multiple) -> List
@@ -93,8 +93,7 @@ def or(bool a, bool b) -> bool
   -- Return whether a or b are both true
 def not(bool b) -> bool
 
--- Map values
-def make_map(any vals :multiple) -> Map
+def make_table(any vals :multiple) -> Table
 
 def unique_id() -> int
 def source_id() -> any
@@ -160,12 +159,11 @@ def arctan(number n) -> number
 -- Type checking
 def is_compound(n) -> bool
 def is_list(n) -> bool
-def is_map(n) -> bool
+def is_table(n) -> bool
 def is_int(n) -> bool
 def is_number(n) -> bool
 def is_bool(n) -> bool
 def is_string(n) -> bool
-def is_null(n) -> bool
 def is_function(n) -> bool
 def is_type(n) -> bool
 
@@ -492,7 +490,7 @@ def method_capture(object, Symbol name) -> List
     @found.filter(is_function)
     return found
   
-  found = method_lookup(null object name)
+  found = method_lookup(nil object name)
   for f in @found
     curry(@f [object])
   found
@@ -515,15 +513,15 @@ def curry(Func func, List frontInputs) -> Func
 def _declared_state(existing, Type type, initializer) -> any
   -- Fetch a declared state variable. The 'state' keyword uses this.
   
-  if existing != null
+  if existing != nil
     -- Try to cast to the desired type
     existing = cast(existing, type)
 
-    if existing != null
+    if existing != nil
       return existing
 
   -- Cast failed. Try to use the initializer.
-  if initializer != null
+  if initializer != nil
     return initializer.call()
 
   -- No initializer. Use the type's default value.
@@ -587,10 +585,10 @@ def Module.to_func(self) -> Func
 def Module.to_vm(self) -> VM
   self.block.to_vm
 def Module.is_local(self) -> bool
-  self.relativeDir != null
+  self.relativeDir != nil
 
 def require(String name) -> Module
-  m = make_module(name null)
+  m = make_module(name nil)
   require_check(m)
   m
 
@@ -659,10 +657,10 @@ def Blob.i16(self, int offset) -> int
 def Blob.i32(self, int offset) -> int
 
 def Blob.to_hex_string(self, offset :optional, len :optional) -> String
-  if offset == null
+  if offset == nil
     offset = 0
 
-  if len == null
+  if len == nil
     len = self.size
 
   if len + offset > self.size
@@ -737,14 +735,14 @@ def Block.primary_output(self) -> Term
   self.output(0)
 def Block.find_property(self, Symbol key) -> List
 def Block.property(self, Symbol key) -> any
-  self.find_property(key).or(null)
-def Block.properties(self) -> Map
+  self.find_property(key).or(nil)
+def Block.properties(self) -> Table
 def Block.filename(self)
   n = self.find_property(:filename)
   if not n.empty
     n.first
   elif self.parent.is_null
-    null
+    nil
   else
     self.parent.filename
 def Block.source_filename(self) -> String
@@ -828,12 +826,12 @@ def VM.init(self, Func func)
 def VM.has_incoming_state(self) -> bool
 
 def VM.env(self, name) -> any
-def VM.env_map(self) -> Map
+def VM.env_map(self) -> Table
 def VM.set_env(self, any name, any val)
-def VM.set_env_map(self, Map map)
+def VM.set_env_map(self, Table table)
 
 def VM.init_env(self)
-  self.set_env_map(Map.make)
+  self.set_env_map(Table.make)
 
 def VM.modify_env(self, Func func)
   new = func.call(self.env_map)
@@ -863,7 +861,7 @@ def VM.migrate_to(self, Func func)
   -- Use 'func' as the new root, and migrate data and state.
 def VM.reset(self)
 def VM.reset_state(self)
-  self.set_state(null)
+  self.set_state(nil)
 def VM.restart(self)
 
 def VM.frame_list(self) -> List
@@ -890,7 +888,7 @@ def VM.error_message(self) -> String
 
 def VM.toString(self) -> String
 
-def VM.perf_stats(self) -> Map
+def VM.perf_stats(self) -> Table
 
 def make_vm(Func func) -> VM
   -- Create a new VM
@@ -1079,56 +1077,56 @@ def List.each(self, Func func) -> List
 def List.apply(self, int index, Func func) -> List
   self.set(index, func.call(self[index]))
 
-def Map.contains(self, key) -> bool
+def Table.contains(self, key) -> bool
   -- Returns true if the map contains the given key.
 
-def Map.remove(self, key) -> Map
+def Table.remove(self, key) -> Table
   -- Removes the given key from the map.
 
-def Map.get(self, key) -> any
+def Table.get(self, key) -> any
   -- Gets the key associated with this value.
 
-def Map.get_opt(self, key, default) -> any
+def Table.get_opt(self, key, default) -> any
   if self.contains(key)
     self.get(key)
   else
     default
 
-def Map.find(self, key) -> List
+def Table.find(self, key) -> List
   if self.contains(key)
     [self.get(key)]
   else
     []
     
-def Map.set(self, any key, any value) -> Map
+def Table.set(self, any key, any value) -> Table
   -- Sets the value associated with this key.
 
-def Map.empty(self) -> bool
+def Table.empty(self) -> bool
   -- Whether the map has no values
 
-def Map.apply(self, any key, Func func) -> Map
+def Table.apply(self, any key, Func func) -> Table
   self.set(key, func.call(self.get(key)))
 
-def Map.modify(self, any key, Func func) -> Map
+def Table.modify(self, any key, Func func) -> Table
   self.set(key, func.call(self.get(key)))
 
-def Map.list_append(self, any key, any value) -> Map
+def Table.list_append(self, any key, any value) -> Table
   if self.contains(key)
     self.modify(key, (l) -> l.append(value))
   else
     self.set(key, [value])
 
-def Map.bucketize(self, List list, Func getKey) -> Map
+def Table.bucketize(self, List list, Func getKey) -> Table
   for el in list
     @self.list_append(getKey.call(el), el)
 
   -- language defect, shouldn't be required:
   self
 
-def Map.keys(self) -> List
+def Table.keys(self) -> List
 
 struct Set {
-  Map m
+  Table m
 }
 
 def Set.add(self, element) -> Set
@@ -1163,7 +1161,7 @@ def String.index_of(self, String substr) -> any
   for i in 0..self.length
     if self.substr(i, substr.length) == substr
       return i
-  return null
+  return nil
 
 def String.ends_with(self, String suffix) -> bool
   -- Return true if this string ends with the given substring.
@@ -1206,11 +1204,11 @@ def Type.name(self) -> String
 def Type.property(self, String name) -> any
 def Type.includes(self, value) -> bool
   result = cast(value self)
-  result != null
+  result != nil
 
 def Type.cast(self, any value) -> any
   result = cast(value, self)
-  if result == null
+  if result == nil
     error(str("Couldn't cast value " value " to type " self.name))
   result
 
@@ -1251,7 +1249,7 @@ def Term.location_string(self) -> String
 def Term.global_id(self) -> int
     -- Fetch this term's global identifier.
 
-def Term.properties(self) -> Map
+def Term.properties(self) -> Table
 
 def Term.has_property(self, Symbol key) -> bool
 def Term.property(self, Symbol key) -> any
@@ -1294,28 +1292,28 @@ def vec2(number x, number y)
 
 def Vec2.add(self, rhs) -> Vec2
   rvec = cast(rhs, Vec2)
-  if rvec != null
+  if rvec != nil
     [self.x + rvec.x, self.y + rvec.y]
   else
     [self.x + rhs, self.y + rhs]
 
 def Vec2.sub(self, rhs) -> Vec2
   rvec = cast(rhs, Vec2)
-  if rvec != null
+  if rvec != nil
     [self.x - rvec.x, self.y - rvec.y]
   else
     [self.x - rhs, self.y - rhs]
 
 def Vec2.mult(self, rhs) -> Vec2
   rvec = cast(rhs, Vec2)
-  if rvec != null
+  if rvec != nil
     [self.x * rvec.x, self.y * rvec.y]
   else
     [self.x * rhs, self.y * rhs]
 
 def Vec2.div(self, rhs) -> Vec2
   rvec = cast(rhs, Vec2)
-  if rvec != null
+  if rvec != nil
     [self.x / rvec.x, self.y / rvec.y]
   else
     [self.x / rhs, self.y / rhs]
@@ -1486,7 +1484,7 @@ def sum(numbersSeq)
     
 def zip(List left, List right) -> List
   for i,l in left
-    [l, right.get_opt(i, null)]
+    [l, right.get_opt(i, nil)]
 
 -- Stateful functions
 
@@ -1719,7 +1717,7 @@ def weighted_rand(List choices :multiple) -> any
     if r < 0
       return choice[1]
 
-  return null
+  return nil
 
 def rand_gaussian()
   -- Box-Muller transform
