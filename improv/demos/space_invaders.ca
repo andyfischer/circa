@@ -1,0 +1,19 @@
+
+require draw
+require input
+require improv
+
+struct PlayerShip {
+  Vec2 loc
+}
+
+state PlayerShip playerShip
+
+if once()
+  playerShip.loc = improv.window_size.div(2)
+
+@playerShip.loc.add(input.arrows_vec * 3)
+
+draw.background(#333)
+
+draw.fill_rect(#f00 playerShip.loc.to_rect_center([40 20]))

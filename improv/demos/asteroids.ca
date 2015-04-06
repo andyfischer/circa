@@ -163,7 +163,7 @@ def new_asteroid() -> Asteroid
   rotation = (rand() * .2 - .1) * 360
   asteroid.edges = edges
   asteroid.location = random_location()
-  asteroid.vel = random_norm_vector()*10
+  asteroid.vel = Vec2.make.rand*10
   asteroid.rotation_vel = rotation
   asteroid
 

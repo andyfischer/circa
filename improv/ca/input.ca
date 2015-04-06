@@ -69,6 +69,14 @@ def wheel_delta() -> Vec2
       @result.add(event[1])
   result
 
+def arrows_vec() -> Vec2
+  out = Vec2.make
+  out.x += cond(key_down(:left) -1 0)
+  out.x += cond(key_down(:right) 1 0)
+  out.y += cond(key_down(:up) -1 0)
+  out.y += cond(key_down(:down) 1 0)
+  out
+
 {-
 type ClickArea {
     Rect rect
