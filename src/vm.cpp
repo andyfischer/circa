@@ -640,12 +640,12 @@ void vm_run(VM* vm, VM* callingVM)
         }
         case op_splat_upvalues: {
             if (is_null(&vm->incomingUpvalues)) {
-                vm->throw_str("internal error: Called a closure without upvalues list");
+                vm->throw_str("vm error: Called a closure without any bindings (maybe was a dyn_method call?)");
                 goto finish_run;
             }
 
             if (op.b != vm->incomingUpvalues.length()) {
-                vm->throw_str("internal error: Called a closure with wrong number of upvalues");
+                vm->throw_str("vm error: Called a closure with wrong number of upvalues");
                 goto finish_run;
             }
 

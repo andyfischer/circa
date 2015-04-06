@@ -1,4 +1,3 @@
-
 require draw
 require improv
 require time
@@ -12,10 +11,15 @@ struct Mover {
 
 def make_mover()
   location = [rand() * width, rand() * height]
-  velocity = [rand_range(-2 2) rand_range(-2 2)]
+  velocity = [0 0]
   Mover.make(location velocity)
 
 def Mover.update(@self)
+  topspeed = 6
+  acceleration = Vec2.make.rand.mult(rand() * 2)
+
+  @self.velocity.add(acceleration)
+  @self.velocity.limit(topspeed)
   @self.location.add(self.velocity)
 
 def Mover.display(self)
@@ -40,3 +44,5 @@ draw.background(#fff)
 @mover.update
 check_edges(@mover)
 mover.display
+
+

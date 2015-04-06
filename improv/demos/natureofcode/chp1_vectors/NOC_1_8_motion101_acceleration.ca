@@ -1,4 +1,3 @@
-
 require draw
 require improv
 require time
@@ -8,14 +7,19 @@ height = improv.window_size.y
 struct Mover {
   Vec2 location
   Vec2 velocity
+  Vec2 acceleration
+  number topspeed
 }
 
 def make_mover()
   location = [rand() * width, rand() * height]
-  velocity = [rand_range(-2 2) rand_range(-2 2)]
-  Mover.make(location velocity)
+  velocity = [0 0]
+  acceleration = [-0.001 0.01]
+  Mover.make(location velocity acceleration 10)
 
 def Mover.update(@self)
+  @self.velocity.add(self.acceleration)
+  @self.velocity.limit(self.topspeed)
   @self.location.add(self.velocity)
 
 def Mover.display(self)
@@ -40,3 +44,4 @@ draw.background(#fff)
 @mover.update
 check_edges(@mover)
 mover.display
+

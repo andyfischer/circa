@@ -1367,6 +1367,17 @@ def Vec2.rotate(self, number rotation) -> Vec2
   -- Return the point rotated around [0 0] by the given angle.
   [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
 
+def Vec2.limit(self, number max_magnitude) -> Vec2
+  m = self.magnitude
+  if m > max_magnitude
+    self.mult(max_magnitude / m)
+  else
+    self
+
+def Vec2.rand(self) -> Vec2
+  angle = rand() * 360
+  [cos(angle) sin(angle)]
+
 def vec3(number x, number y, number z)
   Vec3.make(x y z)
 def Vec3.add(self, Vec3 b) -> Vec3
@@ -1559,8 +1570,6 @@ def polar(number angle) -> Vec2
 
 def random_norm_vector() -> Vec2
   -- Return a random normalized vector.
-  angle = rand() * 360
-  [cos(angle) sin(angle)]
 
 def rect(number x1, number y1, number x2, number y2) -> Rect
   [x1 y1 x2 y2]
