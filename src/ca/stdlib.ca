@@ -1096,6 +1096,10 @@ def Table.get_opt(self, key, default) -> any
   else
     default
 
+def Table.get_and_call(self, key, args :multiple)
+  func = self.get(key)
+  func.call(args)
+
 def Table.find(self, key) -> List
   if self.contains(key)
     [self.get(key)]

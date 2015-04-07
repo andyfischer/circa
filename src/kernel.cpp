@@ -625,6 +625,7 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(func_apply_method, "Func.apply");
         find_func(get_with_selector, "get_with_selector");
         find_func(table_get, "Table.get");
+        find_func(table_get_and_call, "Table.get_and_call");
         find_func(module_get, "Module._get");
         find_func(not_equals, "not_equals");
         find_func(selector, "selector");

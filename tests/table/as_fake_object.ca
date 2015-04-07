@@ -1,0 +1,6 @@
+
+o = {f: (i) ->
+  print('called f with: ' i)
+}
+
+print(o.f(3))

@@ -71,6 +71,7 @@ struct BuiltinFuncs {
     Term* make_list;
     Term* make_table;
     Term* table_get;
+    Term* table_get_and_call;
     Term* method_lookup;
     Term* module_get;
     Term* mult;
