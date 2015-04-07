@@ -944,6 +944,12 @@ ParseResult anon_function_decl(Block* block, TokenStream& tokens, ParserCxt* con
         }
 
         tokens.consume(tok_RParen);
+    } else if (tokens.nextIs(tok_Identifier)) {
+        Value name;
+        tokens.consumeStr(&name, tok_Identifier);
+
+        Term* input = apply(contents, FUNCS.input, TermList(), as_cstring(&name));
+        hide_from_source(input);
     }
 
     possible_whitespace_or_newline(tokens);
@@ -997,6 +1003,8 @@ bool lookahead_match_anon_function(TokenStream& tokens)
         lookahead_skip_whitespace_and_newlines(tokens, &lookahead);
         if (!tokens.nextIs(tok_RParen, lookahead))
             return false;
+        lookahead++;
+    } else if (tokens.nextIs(tok_Identifier, lookahead)) {
         lookahead++;
     }
 

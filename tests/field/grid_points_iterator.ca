@@ -1,0 +1,19 @@
+
+def grid_points(Vec2 size)
+  
+  {done: false, key: 0, current: Vec2.make(0 0), advance: seq ->
+    seq.key += 1
+    seq.x += 1
+    if seq.x >= size.x
+      seq.x = 0
+      seq.y += 1
+    if seq.y >= size.y
+      seq.done = true
+    seq
+  }
+
+print('1: ' grid_points([10 3]))
+print('2: ' grid_points([10 3]).advance)
+
+for p in grid_points([10 3])
+  print('iterating across [10 3], p = ' p)
