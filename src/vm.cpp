@@ -478,10 +478,9 @@ void vm_run(VM* vm, VM* callingVM)
                             method = found->nestedContents;
 
                             // Before calling, we need to discard input 0 (the module ref).
-                            int newTop = op.a;
                             int inputCount = op.b;
                             for (int input=1; input < inputCount; input++)
-                                move(get_slot_fast(vm, newTop+1+input), get_slot_fast(vm, newTop+input));
+                                move(get_slot_fast(vm, op.a+1+input), get_slot_fast(vm, op.a+input));
 
                             int addr = find_or_compile_major_block(vm->bc, method);
                             ops = vm->bc->ops;
@@ -501,12 +500,17 @@ void vm_run(VM* vm, VM* callingVM)
                     }
 
                 } else if (is_hashtable(object)) {
-                    Block* function = FUNCS.table_get->nestedContents;
+                    Block* function = FUNCS.table_implicit_get->nestedContents;;
+
                     int addr = find_or_compile_major_block(vm->bc, function);
                     ops = vm->bc->ops;
 
                     // re-acquire nameLocation because it can be invalidated by compile.
                     nameLocation = get_const(vm, op.c);
+
+                    for (int input=op.b - 1; input >= 1; input--) {
+                        move(get_slot_fast(vm, op.a+1+input), get_slot_fast(vm, op.a+2+input));
+                    }
 
                     // Copy the name to input 1
                     Value* input1 = get_slot_fast(vm, op.a + 2);
@@ -516,7 +520,7 @@ void vm_run(VM* vm, VM* callingVM)
                     if (is_string(input1))
                         set_symbol(input1, string_to_symbol(as_cstring(input1)));
 
-                    do_call_op(vm, op.a, 2, addr);
+                    do_call_op(vm, op.a, op.b + 1, addr);
                     #if TRACE_EXECUTION
                         executionDepth++;
                     #endif

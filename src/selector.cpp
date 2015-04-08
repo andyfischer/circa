@@ -9,6 +9,7 @@
 #include "list.h"
 #include "selector.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "type.h"
 #include "vm.h"
 
@@ -38,7 +39,7 @@ Value* selector_advance(Value* value, Value* selectorElement, Value* error)
 
         return get_index(value, selectorIndex);
 
-    } else if (is_string(selectorElement)) {
+    } else if (is_symbol(selectorElement)) {
         Value* field = get_field(value, selectorElement, NULL);
         if (field == NULL) {
             if (error != NULL) {
@@ -65,7 +66,7 @@ Type* element_type_from_selector(Type* type, Value* selectorElement)
     if (is_int(selectorElement)) {
         return compound_type_get_field_type(type, as_int(selectorElement));
     } else if (is_string(selectorElement)) {
-        int index = list_find_field_index_by_name(type, as_cstring(selectorElement));
+        int index = list_find_field_index_by_name(type, selectorElement);
         return compound_type_get_field_type(type, index);
     }
 
@@ -280,7 +281,9 @@ Term* write_selector_for_accessor_chain(Block* block, TermList* chain)
             selectorInputs.append(term->input(1));
 
         } else if (is_accessor_function(term)) {
-            Term* element = create_string(block, term->stringProp(s_Syntax_FunctionName, "").c_str());
+            Value sym;
+            set_symbol_from_string(&sym, term->getProp(s_Syntax_FunctionName));
+            Term* element = create_value(block, &sym);
             selectorInputs.append(element);
         }
     }

@@ -2,6 +2,6 @@
 def func(a, b) -> int
     return a + b
 
-f = func -> any.cast
+f = untyped(func)
 
 assert(f.call(1 2) == 3)

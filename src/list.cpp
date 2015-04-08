@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "list.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -630,7 +631,13 @@ void compound_type_append_field(Type* type, Type* fieldType, Value* fieldName)
     Value* names = list_get(&type->parameter, 1);
 
     set_type(list_append(types), fieldType);
-    set_value(list_append(names), fieldName);
+
+    Value name;
+    copy(fieldName, &name);
+    if (is_string(&name))
+        set_symbol_from_string(&name, &name);
+
+    set_value(list_append(names), &name);
 }
 
 int compound_type_get_field_count(Type* type)
@@ -638,10 +645,10 @@ int compound_type_get_field_count(Type* type)
     Value* types = list_get(&type->parameter, 0);
     return list_length(types);
 }
-const char* compound_type_get_field_name(Type* type, int index)
+Value* compound_type_get_field_name(Type* type, int index)
 {
     Value* names = list_get(&type->parameter, 1);
-    return as_cstring(list_get(names, index));
+    return list_get(names, index);
 }
 Type* compound_type_get_field_type(Type* type, int index)
 {
@@ -666,8 +673,8 @@ void compound_type_to_string(Value* value, Value* out)
         if (i != 0)
             string_append(out, ", ");
 
-        const char* name = compound_type_get_field_name(type, i);
-        string_append(out, name);
+        Value* name = compound_type_get_field_name(type, i);
+        string_append(out, symbol_as_string(name));
         string_append(out, ": ");
         string_append_quoted(out, list_get(value, i));
     }
@@ -732,7 +739,7 @@ Type* list_get_repeated_type_from_type(Type* type)
     ca_assert(is_list_based_type(type));
     return as_type(&type->parameter);
 }
-int list_find_field_index_by_name(Type* listType, const char* name)
+int list_find_field_index_by_name(Type* listType, Value* name)
 {
     if (!is_list_based_type(listType))
         return -1;
@@ -742,7 +749,7 @@ int list_find_field_index_by_name(Type* listType, const char* name)
         return -1;
 
     for (int i=0; i < names->length(); i++)
-        if (string_equals(names->index(i), name))
+        if (equals(names->index(i), name))
             return i;
 
     // Not found
@@ -857,7 +864,6 @@ namespace list_t {
 
         return list_to_string((ListData*) get_pointer(value), out);
     }
-
 
     u32 circular_shift(u32 value, int shift)
     {

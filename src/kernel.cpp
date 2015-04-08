@@ -134,9 +134,9 @@ Type* get_field_specializeType(Term* caller)
         if (!is_list_based_type(head))
             return TYPES.any;
 
-        std::string const& name = as_string(term_value(caller->input(1)));
+        Value* name = term_value(caller->input(1));
 
-        int fieldIndex = list_find_field_index_by_name(head, name.c_str());
+        int fieldIndex = list_find_field_index_by_name(head, name);
 
         if (fieldIndex == -1)
             return TYPES.any;

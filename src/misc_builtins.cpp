@@ -151,7 +151,7 @@ void hosted_is_string(VM* vm)
 {
     set_bool(circa_output(vm), is_string(circa_input(vm, 0)));
 }
-void hosted_is_function(VM* vm)
+void hosted_is_func(VM* vm)
 {
     set_bool(circa_output(vm), is_func(circa_input(vm, 0)));
 }
@@ -1236,7 +1236,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "is_number", hosted_is_number);
     circa_patch_function(patch, "is_bool", hosted_is_bool);
     circa_patch_function(patch, "is_string", hosted_is_string);
-    circa_patch_function(patch, "is_function", hosted_is_function);
+    circa_patch_function(patch, "is_func", hosted_is_func);
     circa_patch_function(patch, "is_type", hosted_is_type);
     circa_patch_function(patch, "length", length);
     circa_patch_function(patch, "less_than_i", less_than_i);

@@ -87,7 +87,6 @@ Value* get_index(Value* value, int index);
 void set_index(Value* value, int index, Value* element);
 
 Value* get_field(Value* value, Value* field, Value* error);
-Value* get_field(Value* value, const char* field, Value* error=NULL);
 
 int num_elements(Value* value);
 

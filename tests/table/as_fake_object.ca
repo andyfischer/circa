@@ -1,6 +1,7 @@
 
-o = {f: (i) ->
+obj = {f: (i) ->
   print('called f with: ' i)
+  return i * 2
 }
 
-print(o.f(3))
+print('obj.f(3) = ' obj.f(3))

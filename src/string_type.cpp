@@ -272,6 +272,7 @@ void string_append_quoted(Value* out, Value* s)
     else
         string_append(out, s);
 }
+
 void string_append(Value* left, int value)
 {
     ca_assert(is_string(left));

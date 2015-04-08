@@ -1,17 +1,17 @@
 
 l = [1,2]
 
-print(l -> str)
-print(l.count() -> str)
-print(l -> str)
+print(l | str)
+print(l.count() | str)
+print(l | str)
 
 @l.append(3)
 
-print(l -> str)
-print(l.count() -> str)
+print(l | str)
+print(l.count() | str)
 
-[1,2,3] -> str -> print
+[1,2,3] | str | print
 
 -- omitting commas
 l = [1 2 3]
-l -> str -> print
+l | str | print

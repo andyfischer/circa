@@ -15,7 +15,7 @@ struct Composite {
 }
 
 c = make(Composite)
-c -> print
+c | print
 
 v = make(Vector)
 
@@ -23,7 +23,7 @@ v = make(Vector)
 v.x = 5.0
 v.y = 6.0
 
-v -> print
+v | print
 
 print("v.x = " v.x)
 print("v.y = " v.y)

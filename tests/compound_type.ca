@@ -1,5 +1,4 @@
 
-
 struct MyType {
   int a,
   int b,
@@ -30,7 +29,7 @@ struct MyType2 {
 }
 
 plain_list = ['hello' 'there' 3]
-mt2 = plain_list -> MyType2.cast
+mt2 = plain_list | MyType2.cast
 assert(mt2.a == 'hello')
 assert(mt2.b == 'there')
 assert(mt2.c == 3)

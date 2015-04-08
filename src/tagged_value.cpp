@@ -575,7 +575,7 @@ Value* get_field(Value* value, Value* field, Value* error)
         return NULL;
     }
 
-    int fieldIndex = list_find_field_index_by_name(value->value_type, as_cstring(field));
+    int fieldIndex = list_find_field_index_by_name(value->value_type, field);
 
     if (fieldIndex == -1) {
         if (error != NULL) {
@@ -586,13 +586,6 @@ Value* get_field(Value* value, Value* field, Value* error)
     }
 
     return list_get(value, fieldIndex);
-}
-
-Value* get_field(Value* value, const char* field, Value* error)
-{
-    circa::Value fieldStr;
-    set_string(&fieldStr, field);
-    return get_field(value, &fieldStr, error);
 }
 
 int num_elements(Value* value)

@@ -1,12 +1,12 @@
 
 -- simple test
 for i in 0..5
-  i -> print
+  i | print
 
 -- iterate over a collection
 names = ["absalom", "bouffant", "chilton"]
 for name in names
-  name -> print
+  name | print
 
 -- modify an outside value
 x = 10.0

@@ -129,7 +129,7 @@ void compound_type_append_field(Type* type, Type* fieldType, Value* fieldName);
 // For a List-based type, this returns the number of elements.
 int compound_type_get_field_count(Type* type);
 
-const char* compound_type_get_field_name(Type* type, int index);
+Value* compound_type_get_field_name(Type* type, int index);
 
 // For a List-based type, retrieve the type of the given field index.
 Type* compound_type_get_field_type(Type* listType, int index);
@@ -151,7 +151,7 @@ Type* list_get_repeated_type_from_type(Type* type);
 
 // For a List-based type, this returns the index of the field with the given name.
 // Returns -1 if the field is not found.
-int list_find_field_index_by_name(Type* listType, const char* name);
+int list_find_field_index_by_name(Type* listType, Value* name);
 
 bool is_list_based_type(Type*);
 

@@ -164,7 +164,7 @@ def is_int(n) -> bool
 def is_number(n) -> bool
 def is_bool(n) -> bool
 def is_string(n) -> bool
-def is_function(n) -> bool
+def is_func(n) -> bool
 def is_type(n) -> bool
 
 def is_scalar(n) -> bool
@@ -487,7 +487,7 @@ def method_call(location, obj, Symbol name, List args)
 def method_capture(object, Symbol name) -> List
   if typeof(object) == Module
     found = object._get(name)
-    @found.filter(is_function)
+    @found.filter(is_func)
     return found
   
   found = method_lookup(nil object name)
@@ -1097,8 +1097,8 @@ def Table.get_opt(self, key, default) -> any
     default
 
 def Table.get_and_call(self, key, args :multiple)
-  func = self.get(key)
-  func.call(args)
+  val = self.get(key)
+  val.apply(args)
 
 def Table.find(self, key) -> List
   if self.contains(key)

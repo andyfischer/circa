@@ -2195,7 +2195,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     tokens.consume(tok_Dot);
     
-    // Check for name.symbol syntax.
+    // Check for name.:symbol syntax.
     if (tokens.nextIs(tok_ColonString)) {
         Term* term = dot_symbol(block, tokens, context, lhs).term;
         set_source_location(term, startPosition, tokens);

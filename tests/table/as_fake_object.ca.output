@@ -1,0 +1,2 @@
+called f with: 3
+obj.f(3) = 6
