@@ -500,7 +500,12 @@ void vm_run(VM* vm, VM* callingVM)
                     }
 
                 } else if (is_hashtable(object)) {
-                    Block* function = FUNCS.table_implicit_get->nestedContents;;
+                    Block* function = NULL;
+                    if (op.b > 1) {
+                        function = FUNCS.table_get_and_call->nestedContents;
+                    } else {
+                        function = FUNCS.table_get->nestedContents;
+                    }
 
                     int addr = find_or_compile_major_block(vm->bc, function);
                     ops = vm->bc->ops;
