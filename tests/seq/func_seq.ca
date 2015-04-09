@@ -1,0 +1,18 @@
+
+def grid_points(Vec2 size)
+  set(FuncSeq.make
+    :done false
+    :key 0
+    :current Vec2.make(0 0)
+    :advanceFunc (seq) ->
+      seq.key += 1
+      seq.x += 1
+      if seq.x >= size.x
+        set(@seq :x 0)
+        seq.y += 1
+      if seq.y >= size.y
+        seq.done = true
+      seq
+  )
+
+print(flatten(grid_points([2 3])))

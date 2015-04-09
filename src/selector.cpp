@@ -65,7 +65,7 @@ Type* element_type_from_selector(Type* type, Value* selectorElement)
 
     if (is_int(selectorElement)) {
         return compound_type_get_field_type(type, as_int(selectorElement));
-    } else if (is_string(selectorElement)) {
+    } else if (is_symbol(selectorElement)) {
         int index = list_find_field_index_by_name(type, selectorElement);
         return compound_type_get_field_type(type, index);
     }

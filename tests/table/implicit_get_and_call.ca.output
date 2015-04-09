@@ -1,4 +1,2 @@
-args = [3]
-val = {block: Block#918, bindings: nil}
 called f with: 3
 obj.f(3) = 6

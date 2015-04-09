@@ -311,7 +311,7 @@ void make_table(VM* vm)
     Value* args = vm->input(0);
     int len = list_length(args);
     if ((len % 2) != 0)
-        return vm->throw_str("Number of arguments must be an even number");
+        return vm->throw_str("Number of arguments must be even");
 
     set_hashtable(out);
     for (int i=0; i < len; i += 2) {
@@ -580,7 +580,7 @@ void set_field(VM* vm)
     Value* slot = get_field(out, name, NULL);
     if (slot == NULL) {
         Value msg;
-        set_string(&msg, "field not found: ");
+        set_string(&msg, "Field not found: ");
         string_append(&msg, name);
         return vm->throw_error(&msg);
     }
@@ -1138,6 +1138,76 @@ void print(VM* vm)
     write_log(as_cstring(&out));
 }
 
+bool set_field(VM* vm, Value* object, Value* name, Value* val)
+{
+    // preconditions:
+    //   'object' is writeable
+    //   'val' is safe to consume
+    
+    if (is_hashtable(object)) {
+        move(val, hashtable_insert(object, name));
+        return true;
+    }
+
+    if (is_list_based_type(object->value_type)) {
+        Type* type = object->value_type;
+        int fieldIndex = list_find_field_index_by_name(type, name);
+        if (fieldIndex == -1) {
+            Value msg;
+            set_string(&msg, "Field not found (");
+            string_append(&msg, name);
+            string_append(&msg, ")");
+            vm->throw_error(&msg);
+            return false;
+        }
+
+        Value* slot = list_get(object, fieldIndex);
+
+        move(val, slot);
+
+        Type* fieldType = compound_type_get_field_type(type, fieldIndex);
+        if (!cast(slot, fieldType)) {
+            Value msg;
+            set_string(&msg, "Couldn't cast value ");
+            string_append_quoted(&msg, slot);
+            string_append(&msg, " to type ");
+            string_append(&msg, &fieldType->name);
+            string_append(&msg, " (field ");
+            string_append_quoted(&msg, name);
+            string_append(&msg, " of type ");
+            string_append(&msg, &type->name);
+            string_append(&msg, ")");
+            vm->throw_error(&msg);
+            return false;
+        }
+
+        return true;
+    }
+
+    Value msg;
+    set_string(&msg, "Can't assign a field to value ");
+    string_append_quoted(&msg, object);
+    vm->throw_error(&msg);
+    return false;
+}
+
+void set_func(VM* vm)
+{
+    Value* obj = vm->input(0);
+    Value* args = vm->input(1);
+    int numArgs = args->length();
+    if ((numArgs % 2) != 0)
+        return vm->throw_str("Number of arguments must be even");
+
+    touch(obj);
+    for (int i=0; i < numArgs; i += 2) {
+        if (!set_field(vm, obj, args->index(i), args->index(i+1)))
+            break;
+    }
+
+    move(obj, vm->output());
+}
+
 void compute_patch_hosted(VM* vm)
 {
     Value error;
@@ -1341,6 +1411,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "repeat", repeat);
     circa_patch_function(patch, "trace", print);
     circa_patch_function(patch, "typeof", typeof_func);
+    circa_patch_function(patch, "set", set_func);
     circa_patch_function(patch, "compute_patch", compute_patch_hosted);
     circa_patch_function(patch, "apply_patch", apply_patch_hosted);
     circa_patch_function(patch, "unique_id", unique_id);

@@ -78,8 +78,11 @@ def print(any items :multiple)
 def trace(any items :multiple)
   -- Like print()
 
+def set(obj, vals :multiple) -> any
+
+-- deprecated:
 def get(Table val, List path) -> any
-def set(Table val, List path, any newValue) -> any
+-- deprecated:
 def delete(Table val, List path) -> Table
 
 -- List values
@@ -401,6 +404,17 @@ def UntilSeq.key(self) self.seq.key
 
 def take_until(s, Func done)
   UntilSeq.make(to_seq(s) done)
+
+struct FuncSeq {
+  any current
+  any done
+  any key
+  any private
+  Func advanceFunc
+}
+
+def FuncSeq.advance(self)
+  self.advanceFunc.call(self)
 
 struct Range {
   int from
@@ -1097,9 +1111,7 @@ def Table.get_opt(self, key, default) -> any
     default
 
 def Table.get_and_call(self, key, args :multiple)
-  print('args = ' args)
   val = self.get(key)
-  print('val = ' val)
   val.apply(args)
 
 def Table.find(self, key) -> List
@@ -1728,7 +1740,6 @@ def weighted_rand(List choices :multiple) -> any
 
 def rand_gaussian()
   -- Box-Muller transform
-
   rand1 = -2 * log(rand())
   rand2 = (rand()) * 360
   sqrt(rand1) * cos(rand2)
