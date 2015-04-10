@@ -390,8 +390,25 @@ def FilterSeq.advance(self)
   @self.seq.advance
   self.settle
 
-def filter(s, func) -> FilterSeq
+def filter(seq, func) -> FilterSeq
   FilterSeq.make(to_seq(s), func).settle
+
+struct MappedSeq {
+  any seq
+  Func func
+}
+
+def MappedSeq.done(self) self.seq.done
+def MappedSeq.current(self) self.func.call(self.seq.current)
+def MappedSeq.advance(@self) @self.seq.advance
+def MappedSeq.key(self) self.seq.key
+
+def map(seq, func) -> MappedSeq
+  MappedSeq.make(seq func)
+
+def for_each(seq, func)
+  for it in seq
+    func(it)
 
 struct UntilSeq {
   any seq
@@ -1400,6 +1417,13 @@ def Vec2.perpendicular(self) -> Vec2
 def Vec2.translate(self, Vec2 b) -> Vec2
   [self.x + b.x, self.y + b.y]
 
+def Vec2.to_rect(self, Symbol anchor, Vec2 size) -> Rect
+  switch anchor
+    case :center
+      Rect.make.from_size(self - size * .5, size)
+    case :topleft
+      Rect.make.from_size(self, size)
+
 def Vec2.to_rect_center(self, Vec2 size) -> Rect
   -- Returns a Rect with this point as the center, and the given size.
   size_half = (size * 0.5) -> Vec2.cast
@@ -1446,6 +1470,9 @@ def Vec3.div(self, number s) -> Vec3
 def vec4(number x, number y, number z, number w)
   Vec4.make(x y z w)
 
+def Rect.from_size(self, Vec2 topleft, Vec2 size) -> Rect
+  [topleft.x, topleft.y, topleft.x + size.x, topleft.y + size.y]
+  
 def Rect.add(self, Rect b) -> Rect
   [self.x1 + b.x1, self.y1 + b.y1, self.x2 + b.x2, self.y2 + b.y2]
 def Rect.sub(self, Rect b) -> Rect

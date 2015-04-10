@@ -693,8 +693,8 @@ Symbol block_has_state(Block* block)
             break;
         }
 
-        if (uses_dynamic_dispatch(term) && result == s_no)
-            result = s_maybe;
+        //if (uses_dynamic_dispatch(term) && result == s_no)
+        //    result = s_maybe;
 
         Block* contents = static_dispatch_block(term);
         if (contents == NULL)
