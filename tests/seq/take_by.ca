@@ -1,0 +1,9 @@
+
+print('by 1: ' take_by(range(0 20), 1) | flatten)
+print('by 2: ' take_by(range(0 20), 2) | flatten)
+print('by 3: ' take_by(range(0 20), 3) | flatten)
+print('by 4: ' take_by(range(0 20), 4) | flatten)
+print('by 10: ' take_by(range(0 20), 10) | flatten)
+print('by 19: ' take_by(range(0 20), 19) | flatten)
+print('by 20: ' take_by(range(0 20), 20) | flatten)
+print('by 100: ' take_by(range(0 20), 100) | flatten)

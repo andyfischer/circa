@@ -1,0 +1,39 @@
+
+t = {a: 1, b: 2}
+print('table initial = ' t)
+
+add2 = (x) -> x + 2
+set0 = (x) -> 0
+
+update(@t :a add2)
+
+print(t)
+
+update(@t :a set0 :b set0)
+
+print(t)
+
+update(@t :a add2 :a add2)
+
+print(t)
+
+struct S {
+  int a
+  int b
+}
+
+s = S.make(1 2)
+
+print('struct initial = ' s)
+
+update(@s :a add2)
+
+print(s)
+
+update(@s :a set0 :b set0)
+
+print(s)
+
+update(@s :a add2 :a add2)
+
+print(s)

@@ -78,10 +78,11 @@ def print(any items :multiple)
 def trace(any items :multiple)
   -- Like print()
 
-def set(obj, vals :multiple) -> any
+def global_script_version() -> int
 
--- deprecated:
-def get(Table val, List path) -> any
+def get(obj, name) -> any
+def set(obj, names_and_vals :multiple) -> any
+
 -- deprecated:
 def delete(Table val, List path) -> Table
 
@@ -452,6 +453,30 @@ def flatten(it) -> List
     
   fold(it append [])
 
+struct GroupingSeq {
+  int count
+  any seq
+  List current
+}
+
+def GroupingSeq.settle(@self)
+  while self.current.length < self.count and not self.seq.done
+    @self.current.append(self.seq.current)
+    @self.seq.advance
+
+def GroupingSeq.done(self)
+  self.current.length == 0 and self.seq.done
+
+def GroupingSeq.advance(@self)
+  set(@self :current [])
+  @self.settle
+
+def GroupingSeq.key(self)
+  self.seq.key
+
+def take_by(s, int count) -> GroupingSeq
+  GroupingSeq.make(count to_seq(s)).settle
+
 {-
 def cache_get(key) -> List
 def cache_set(key, val)
@@ -466,7 +491,6 @@ def cached(func, inputs) -> any
     existing.get(0)
 -}
 
-def global_script_version() -> int
 
 -- Func
 struct Func {
@@ -523,6 +547,16 @@ def curry(Func func, List frontInputs) -> Func
   def callback(ins :multiple)
     func.apply(frontInputs.concat(ins))
   callback
+
+def update(@obj, keys_and_funcs_or_values :multiple)
+  for p in take_by(keys_and_funcs_or_values 2)
+    key = p[0]
+    val = p[1]
+
+    if is_func(val)
+      set(@obj key val.call(get(obj key)))
+    else
+      set(@obj key val)
 
 def _declared_state(existing, Type type, initializer) -> any
   -- Fetch a declared state variable. The 'state' keyword uses this.

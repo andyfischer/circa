@@ -1208,6 +1208,49 @@ void set_func(VM* vm)
     move(obj, vm->output());
 }
 
+void get_func(VM* vm)
+{
+    Value* obj = vm->input(0);
+    Value* name = vm->input(1);
+    Value* found = NULL;
+    Type* type = obj->value_type;
+
+    if (is_hashtable(obj)) {
+        found = hashtable_get(obj, name);
+        if (found == NULL) {
+            Value msg;
+            set_string(&msg, "Field not found (");
+            string_append(&msg, name);
+            string_append(&msg, ")");
+            vm->throw_error(&msg);
+            return;
+        }
+
+        copy(found, vm->output());
+        return;
+    }
+    
+    if (is_list_based_type(type)) {
+        int fieldIndex = list_find_field_index_by_name(type, name);
+        if (fieldIndex == -1) {
+            Value msg;
+            set_string(&msg, "Field not found (");
+            string_append(&msg, name);
+            string_append(&msg, ")");
+            vm->throw_error(&msg);
+            return;
+        }
+        found = list_get(obj, fieldIndex);
+        copy(found, vm->output());
+        return;
+    }
+
+    Value msg;
+    set_string(&msg, "Can't get field from value ");
+    string_append_quoted(&msg, obj);
+    vm->throw_error(&msg);
+}
+
 void compute_patch_hosted(VM* vm)
 {
     Value error;
@@ -1412,6 +1455,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "trace", print);
     circa_patch_function(patch, "typeof", typeof_func);
     circa_patch_function(patch, "set", set_func);
+    circa_patch_function(patch, "get", get_func);
     circa_patch_function(patch, "compute_patch", compute_patch_hosted);
     circa_patch_function(patch, "apply_patch", apply_patch_hosted);
     circa_patch_function(patch, "unique_id", unique_id);
