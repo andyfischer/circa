@@ -613,7 +613,8 @@ void on_new_function_parsed(Term* func, Value* functionName)
         find_func(mult, "mult");
         find_func(sub, "sub");
         find_func(closure_block, "closure_block");
-        find_func(declared_state, "_declared_state");
+        find_func(declared_state, "declared_state");
+        find_func(declared_state_close, "declared_state_close");
         find_func(dynamic_method, "dynamic_method");
         find_func(dynamic_term_eval, "_dynamic_term_eval");
         find_func(equals, "equals");

@@ -89,7 +89,7 @@ void block_start_changes(Block* block);
 void block_finish_changes(Block* block);
 
 void update_term_user_lists(Block* block);
-void annotate_stateful_values(Block* block);
+void close_stateful_values(Block* block);
 
 // Code modification
 Term* apply_before(Term* existing, Term* function, int input);

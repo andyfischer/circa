@@ -37,6 +37,7 @@ def to_string_repr(any val) -> String
   -- Encode a value as a string representation.
 def typeof(any val) -> Type
   -- Returns the runtime type of a value.
+def declared_state_close(v)
 
 def env(any name) -> any
   -- Fetch an env variable.
@@ -391,7 +392,7 @@ def FilterSeq.advance(self)
   self.settle
 
 def filter(seq, func) -> FilterSeq
-  FilterSeq.make(to_seq(s), func).settle
+  FilterSeq.make(to_seq(seq), func).settle
 
 struct MappedSeq {
   any seq
@@ -575,7 +576,7 @@ def update(@obj, keys_and_funcs_or_values :multiple)
     else
       set(@obj key val)
 
-def _declared_state(existing, Type type, initializer) -> any
+def declared_state(existing, Type type, initializer) -> any
   -- Fetch a declared state variable. The 'state' keyword uses this.
   
   if existing != nil

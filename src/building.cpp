@@ -693,8 +693,8 @@ Symbol block_has_state(Block* block)
             break;
         }
 
-        //if (uses_dynamic_dispatch(term) && result == s_no)
-        //    result = s_maybe;
+        if (uses_dynamic_dispatch(term) && result == s_no)
+            result = s_maybe;
 
         Block* contents = static_dispatch_block(term);
         if (contents == NULL)
@@ -750,7 +750,7 @@ void block_finish_changes(Block* block)
         update_term_user_lists(block);
 
     fix_forward_function_references(block);
-    annotate_stateful_values(block);
+    close_stateful_values(block);
 
     // After we are finished creating outputs, update any nested control flow operators.
     update_for_control_flow(block);
@@ -823,15 +823,18 @@ void update_term_user_lists(Block* block)
     }
 }
 
-void annotate_stateful_values(Block* block)
+void close_stateful_values(Block* block)
 {
     for (BlockIteratorFlat it(block); it; ++it) {
         Term* term = *it;
         if (term->function != FUNCS.declared_state)
             continue;
 
-        Term* result = find_name(block, term_name(term)); 
-        term_set_bool_prop(result, s_LocalStateResult, true);
+        Term* finalResult = find_name(block, term_name(term)); 
+        term_set_bool_prop(finalResult, s_LocalStateResult, true);
+
+        Term* closer = apply(finalResult->owningBlock, FUNCS.declared_state_close, TermList(finalResult));
+        move_after(closer, finalResult);
 
         BlockIterator2 exitPointSearch;
         exitPointSearch.startAt(term);
@@ -844,6 +847,10 @@ void annotate_stateful_values(Block* block)
             termVal.set_term(*exitPointSearch);
 
             Term* localResult = find_name_at(&termVal, term_name(term)); 
+
+            Term* closer = apply(localResult->owningBlock, FUNCS.declared_state_close, TermList(localResult));
+            move_after(closer, localResult);
+
             term_set_bool_prop(localResult, s_LocalStateResult, true);
         }
     }

@@ -27,6 +27,7 @@ struct BuiltinFuncs {
     Term* cull_state;
     Term* declare_field;
     Term* declared_state;
+    Term* declared_state_close;
     Term* discard;
     Term* div;
     Term* div_f;
