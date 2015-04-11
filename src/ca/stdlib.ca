@@ -33,6 +33,8 @@ def upvalue(term :ref) -> any
 def reflect_caller(int height) -> Term
 def rand() -> number
 def error(any msg :multiple)
+  annotate_block(:hide_from_trace)
+
 def to_string_repr(any val) -> String
   -- Encode a value as a string representation.
 def typeof(any val) -> Type
@@ -303,14 +305,17 @@ struct Recti { int x1, int y1, int x2, int y2 }
 -- Errors
 
 def syntax_error()
+  annotate_block(:hide_from_trace)
   caller = reflect_caller(1)
   error("Syntax error: " caller.property(:Message))
 
 def unknown_identifier()
+  annotate_block(:hide_from_trace)
   caller = reflect_caller(1)
   error("Unknown identifier: " caller.name)
 
 def unknown_function(i :multiple)
+  annotate_block(:hide_from_trace)
   caller = reflect_caller(1)
   error("Unknown function: " caller.property(:Syntax_FunctionName))
 
@@ -393,6 +398,9 @@ def FilterSeq.advance(self)
 
 def filter(seq, func) -> FilterSeq
   FilterSeq.make(to_seq(seq), func).settle
+
+def remove(seq, func) -> FilterSeq
+  FilterSeq.make(to_seq(seq) (it) -> not(func.call(it)))
 
 struct MappedSeq {
   any seq
@@ -659,17 +667,21 @@ def require(String name) -> Module
   m
 
 def require_local(String name) -> Module
+  annotate_block(:hide_from_trace)
   relativeTo = reflect_caller(1).parent
   m = make_module(name relativeTo)
   require_check(m)
   m
 
 def require_file(String filename) -> Module
+  annotate_block(:hide_from_trace)
   m = make_module('' filename)
   require_check(m)
   m
 
 def require_check(Module module)
+  annotate_block(:hide_from_trace)
+
   block = module.resolve
   if block.is_null
     error("Couldn't find ", cond(module.is_local, "local ", "") "module: " module.name)

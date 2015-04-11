@@ -1,5 +1,4 @@
 a = 1
 b = 2
 [tests/error/not_enough_inputs.ca:7] 
- [inside error()] 
-  Error: Not enough inputs for function 'f': expected 2 and found 1
+ Error: Not enough inputs for function 'f': expected 2 and found 1

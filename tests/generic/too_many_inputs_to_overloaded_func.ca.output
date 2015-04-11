@@ -1,3 +1,2 @@
 [tests/generic/too_many_inputs_to_overloaded_func.ca:2] 
- [inside error()] 
-  Error: Too many inputs for function 'add': expected 2 and found 4
+ Error: Too many inputs for function 'add': expected 2 and found 4

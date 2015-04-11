@@ -1,4 +1,2 @@
 [tests/syntax/trailing_dot_method_bad_indent.ca:10] 
- [:307 inside syntax_error()] 
-  [inside error()] 
-   Error: Syntax error: Unrecognized start of expression (next token = '.')
+ Error: Syntax error: Unrecognized start of expression (next token = '.')
