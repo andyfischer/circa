@@ -1084,6 +1084,11 @@ void reflect_caller(VM* vm)
     set_term_ref(vm->output(), term);
 }
 
+void reflect_stack_trace(VM* vm)
+{
+    vm_to_frame_list(vm, vm->output());
+}
+
 void vm_demand_eval_find_existing(VM* vm)
 {
     Term* term = vm->input(0)->asTerm();
@@ -1493,6 +1498,7 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function(patch, "VM.perf_stats", VM__perf_stats);
     circa_patch_function(patch, "bytecode_mop_size", bytecode_get_mop_size);
     circa_patch_function(patch, "reflect_caller", reflect_caller);
+    circa_patch_function(patch, "reflect_stack_trace", reflect_stack_trace);
     circa_patch_function(patch, "vm_demand_eval_find_existing", vm_demand_eval_find_existing);
     circa_patch_function(patch, "vm_demand_eval_store", vm_demand_eval_store);
     circa_patch_function(patch, "env", get_env);

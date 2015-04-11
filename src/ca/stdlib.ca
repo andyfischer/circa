@@ -31,6 +31,7 @@ def case(bool b :optional)
 def switch(any input :optional) -> any
 def upvalue(term :ref) -> any
 def reflect_caller(int height) -> Term
+def reflect_stack_trace() -> List
 def rand() -> number
 def error(any msg :multiple)
   annotate_block(:hide_from_trace)
