@@ -34,27 +34,27 @@
    On creation we do a lookup in the topmost frame to digout 'incoming' (using key)
    New frame is now 'topmost'
 
- op_save_state_value will write to 'outgoing' hashtable of the topmost frame
+ save_state_value will write to 'outgoing' hashtable of the topmost frame
 
- op_pop_state_frame will:
+ pop_state_frame will:
    Take 'outgoing' value from topmost frame
    Make 'topmost->parent' the new topmost
    Save 'outgoing' from previous top into 'outgoing' of the current topmost
 
- op_pop_state_frame is similar, but it discards 'outgoing'
+ pop_state_frame_discard is similar, but it discards 'outgoing'
 
 */
 
 namespace circa {
 
-VM* new_vm(Block* main)
+VM* new_vm(World* world)
 {
-    ca_assert(main->world != NULL);
+    ca_assert(world != NULL);
 
     VM* vm = (VM*) malloc(sizeof(VM));
 
     vm->stack.init();
-    vm->world = main->world;
+    vm->world = world;
 
     vm->nextLiveVM = vm->world->firstLiveVM;
     if (vm->nextLiveVM != NULL)
@@ -63,7 +63,7 @@ VM* new_vm(Block* main)
     vm->prevLiveVM = NULL;
 
     vm->id = vm->world->nextStackID++;
-    vm->mainBlock = main;
+    vm->mainBlock = NULL;
     initialize_null(&vm->topLevelUpvalues);
     vm->bc = NULL;
     initialize_null(&vm->bcHacks);
@@ -88,10 +88,24 @@ VM* new_vm(Block* main)
     vm->nextUniqueId = 1;
     initialize_null(&vm->cache);
     set_hashtable(&vm->cache);
-
     vm_reset_call_stack(vm);
-    vm_grow_stack(vm, 1 + count_input_placeholders(main));
     
+    return vm;
+}
+
+void vm_set_main(VM* vm, Block* main)
+{
+    vm_reset_call_stack(vm);
+    vm_reset_bytecode(vm);
+    vm_grow_stack(vm, 1 + count_input_placeholders(main));
+    set_hashtable(&vm->demandEvalMap);
+    vm->mainBlock = main;
+}
+
+VM* new_vm(Block* block)
+{
+    VM* vm = new_vm(block->world);
+    vm_set_main(vm, block);
     return vm;
 }
 
@@ -133,18 +147,9 @@ void vm_reset_bytecode(VM* vm)
     vm->bc = NULL;
 }
 
-void vm_change_main(VM* vm, Block* newMain)
-{
-    vm_reset_call_stack(vm);
-    vm_reset_bytecode(vm);
-    vm_grow_stack(vm, 1 + count_input_placeholders(newMain));
-    set_hashtable(&vm->demandEvalMap);
-    vm->mainBlock = newMain;
-}
-
 void vm_reset(VM* vm, Block* newMain)
 {
-    vm_change_main(vm, newMain);
+    vm_set_main(vm, newMain);
     set_hashtable(&vm->state);
     set_hashtable(&vm->incomingEnv);
     set_hashtable(&vm->env);
@@ -1468,6 +1473,13 @@ CIRCA_EXPORT void circa_throw(VM* vm, const char* msg)
     Value str;
     set_string(&str, msg);
     vm->throw_error(&str);
+}
+
+CIRCA_EXPORT void circa_vm_setup(VM* vm, const char* moduleName, const char* functionName)
+{
+    caBlock* module = circa_load_module_by_filename(vm->world, moduleName);
+    caBlock* main = circa_find_function_local(module, functionName);
+    vm_set_main(vm, main);
 }
 
 void vm_install_functions(NativePatch* patch)

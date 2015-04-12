@@ -35,7 +35,6 @@ def reflect_stack_trace() -> List
 def rand() -> number
 def error(any msg :multiple)
   annotate_block(:hide_from_trace)
-
 def to_string_repr(any val) -> String
   -- Encode a value as a string representation.
 def typeof(any val) -> Type

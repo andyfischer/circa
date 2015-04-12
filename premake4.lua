@@ -15,8 +15,7 @@ solution "Circa"
     flags { "Symbols", "Cxx0x", "NoRTTI", "NoExceptions" }
     targetdir "build"
     objdir "build/obj"
-    includedirs { "include", "src", "3rdparty", "/usr/local/include" }
-    libdirs { "/usr/local/lib" }
+    includedirs { "include", "src", "3rdparty" }
 
     configuration "Release"
         flags { "OptimizeSpeed" }
@@ -24,8 +23,9 @@ solution "Circa"
     configuration "Debug"
         defines { "DEBUG" }
 
-    project "static_lib"
+    project "library"
         kind "StaticLib"
+
         targetname "circa"
         location "src"
         files {
@@ -33,8 +33,7 @@ solution "Circa"
             "src/ext/read_tar.cpp",
             "src/ext/perlin.cpp",
             "src/generated/stdlib_script_text.cpp",
-            "3rdparty/tinymt/tinymt64.cc",
-            "3rdparty/http-parser/http_parser.c"
+            "3rdparty/tinymt/tinymt64.cc"
             }
 
         configuration "Debug"
@@ -50,7 +49,7 @@ solution "Circa"
             "src/command_line/command_line_main.cpp",
             "3rdparty/linenoise/linenoise.c",
         }
-        links {"static_lib","dl"}
+        links {"library","dl"}
 
         configuration "Debug"
             targetname "circa_d"

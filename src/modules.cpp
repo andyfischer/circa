@@ -191,7 +191,7 @@ void module_install_replacement(World* world, Value* filename, Block* replacemen
     migrate_world(world, &migration);
 }
 
-CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, Value* filename)
+Block* load_module_by_filename(World* world, Value* filename)
 {
     Value resolved;
     resolve_possible_module_path(world, filename, NULL, &resolved);
@@ -211,6 +211,13 @@ CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, Value* filename)
     file_watch_ignore_latest_change(watch);
 
     return block;
+}
+
+CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, const char* filename)
+{
+    Value filenameVal;
+    set_string(&filenameVal, filename);
+    return load_module_by_filename(world, &filenameVal);
 }
 
 Block* load_module(World* world, Value* relativeDir, Value* moduleName)

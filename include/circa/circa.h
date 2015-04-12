@@ -190,9 +190,10 @@ caBlock* circa_load_module_from_file(caWorld* world,
                                       const char* filename);
 caBlock* circa_load_module(caWorld* world, const char* moduleName);
 
-// -- Interpreter --
+// -- VM --
 caVM* circa_new_vm(caBlock* main);
 void circa_free_vm(caVM* vm);
+void circa_vm_setup(caVM* vm, const char* module, const char* function);
 caValue* circa_vm_get_error(caVM* vm);
 
 // Check for changed files, and run any relevant change actions.
@@ -553,7 +554,7 @@ void circa_repl_start(caVM* vm);
 void circa_repl_run_line(caVM* vm, caValue* input, caValue* output);
 
 void circa_resolve_possible_module_path(caWorld* world, caValue* dir, caValue* moduleName, caValue* result);
-caBlock* circa_load_module_by_filename(caWorld* world, caValue* filename);
+caBlock* circa_load_module_by_filename(caWorld* world, const char* filename);
 
 // -- Debugging --
 

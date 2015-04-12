@@ -65,10 +65,12 @@ struct VMStackFrame {
     int pc;
 };
 
+VM* new_vm(World* world);
 VM* new_vm(Block* main);
+void vm_set_main(VM* vm, Block* newMain);
 void free_vm(VM* vm);
 void vm_reset_call_stack(VM* vm);
-void vm_change_main(VM* vm, Block* newMain);
+void vm_reset_bytecode(VM* vm);
 void vm_reset(VM* vm, Block* newBlock);
 void vm_reset_with_closure(VM* vm, Value* closure);
 void vm_on_code_change(VM* vm);

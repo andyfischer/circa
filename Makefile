@@ -6,22 +6,22 @@ ifndef config
 endif
 export config
 
-PROJECTS := static_lib command_line
+PROJECTS := library command_line
 
 .PHONY: all clean help $(PROJECTS)
 
 all: $(PROJECTS)
 
-static_lib: 
-	@echo "==== Building static_lib ($(config)) ===="
-	@${MAKE} --no-print-directory -C src -f static_lib.make
+library: 
+	@echo "==== Building library ($(config)) ===="
+	@${MAKE} --no-print-directory -C src -f library.make
 
-command_line: static_lib
+command_line: library
 	@echo "==== Building command_line ($(config)) ===="
 	@${MAKE} --no-print-directory -C src -f command_line.make
 
 clean:
-	@${MAKE} --no-print-directory -C src -f static_lib.make clean
+	@${MAKE} --no-print-directory -C src -f library.make clean
 	@${MAKE} --no-print-directory -C src -f command_line.make clean
 
 help:
@@ -34,7 +34,7 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
-	@echo "   static_lib"
+	@echo "   library"
 	@echo "   command_line"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

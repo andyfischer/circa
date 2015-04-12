@@ -172,7 +172,7 @@ void migrate_vm(VM* vm, Migration* migration)
     Block* newMain = migrate_block_pointer(vm->mainBlock, migration);
 
     if (newMain != vm->mainBlock)
-        vm_change_main(vm, newMain);
+        vm_set_main(vm, newMain);
 }
 
 bool list_value_may_need_migration(Value* value, Migration* migration)

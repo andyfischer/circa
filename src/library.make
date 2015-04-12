@@ -20,15 +20,15 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = ../build/obj/Debug/static_lib
+  OBJDIR     = ../build/obj/Debug/library
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca_d.a
   DEFINES   += -DDEBUG
-  INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
+  INCLUDES  += -I../include -I. -I../3rdparty
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) -fno-rtti -fno-exceptions -std=c++0x
-  LDFLAGS   += -L/usr/local/lib
+  LDFLAGS   += 
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
@@ -42,15 +42,15 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = ../build/obj/Release/static_lib
+  OBJDIR     = ../build/obj/Release/library
   TARGETDIR  = ../build
   TARGET     = $(TARGETDIR)/libcirca.a
   DEFINES   += 
-  INCLUDES  += -I../include -I. -I../3rdparty -I/usr/local/include
+  INCLUDES  += -I../include -I. -I../3rdparty
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) -fno-rtti -fno-exceptions -std=c++0x
-  LDFLAGS   += -L/usr/local/lib
+  LDFLAGS   += 
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
@@ -114,7 +114,6 @@ OBJECTS := \
 	$(OBJDIR)/perlin.o \
 	$(OBJDIR)/stdlib_script_text.o \
 	$(OBJDIR)/tinymt64.o \
-	$(OBJDIR)/http_parser.o \
 
 RESOURCES := \
 
@@ -132,7 +131,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking static_lib
+	@echo Linking library
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -153,7 +152,7 @@ else
 endif
 
 clean:
-	@echo Cleaning static_lib
+	@echo Cleaning library
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -325,8 +324,5 @@ $(OBJDIR)/stdlib_script_text.o: generated/stdlib_script_text.cpp
 $(OBJDIR)/tinymt64.o: ../3rdparty/tinymt/tinymt64.cc
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/http_parser.o: ../3rdparty/http-parser/http_parser.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
