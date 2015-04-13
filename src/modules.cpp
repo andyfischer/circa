@@ -220,6 +220,13 @@ CIRCA_EXPORT Block* circa_load_module_by_filename(World* world, const char* file
     return load_module_by_filename(world, &filenameVal);
 }
 
+CIRCA_EXPORT Block* circa_load_module(World* world, const char* filename)
+{
+    Value filenameVal;
+    set_string(&filenameVal, filename);
+    return load_module_by_filename(world, &filenameVal);
+}
+
 Block* load_module(World* world, Value* relativeDir, Value* moduleName)
 {
     Value filename;
@@ -294,19 +301,6 @@ Term* module_lookup(World* world, Value* moduleRef, Value* name)
 CIRCA_EXPORT void circa_add_module_search_path(caWorld* world, const char* path)
 {
     module_add_search_path(world, path);
-}
-
-CIRCA_EXPORT caBlock* circa_load_module_from_file(caWorld* world, const char* moduleName,
-        const char* filename)
-{
-    return NULL;
-}
-
-CIRCA_EXPORT caBlock* circa_load_module(caWorld* world, const char* moduleName)
-{
-    Value moduleNameVal;
-    set_string(&moduleNameVal, moduleName);
-    return load_module(world, NULL, &moduleNameVal);
 }
 
 } // namespace circa

@@ -191,9 +191,9 @@ caBlock* circa_load_module_from_file(caWorld* world,
 caBlock* circa_load_module(caWorld* world, const char* moduleName);
 
 // -- VM --
-caVM* circa_new_vm(caBlock* main);
+caVM* circa_new_vm(caWorld* world);
 void circa_free_vm(caVM* vm);
-void circa_vm_setup(caVM* vm, const char* module, const char* function);
+void circa_set_main(caVM* vm, caBlock* main);
 caValue* circa_vm_get_error(caVM* vm);
 
 // Check for changed files, and run any relevant change actions.

@@ -621,7 +621,6 @@ def vm_demand_eval(Term t) -> any
 
 -- Misc builtin funcs --
 
-
 def any_true(list) -> bool
   for i in list
     if not(i)

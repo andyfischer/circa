@@ -312,7 +312,8 @@ int run_command_line(caWorld* world, Value* args)
     Block* clmodule = load_module_by_filename(world, &commandLineFilename);
     Block* run = find_function_local(clmodule, "run");
 
-    VM* vm = new_vm(run);
+    VM* vm = new_vm(world);
+    vm_set_main(vm, run);
 
     if (printRaw) {
         Value str;

@@ -95,6 +95,8 @@ VM* new_vm(World* world)
 
 void vm_set_main(VM* vm, Block* main)
 {
+    ca_assert(main != NULL);
+
     vm_reset_call_stack(vm);
     vm_reset_bytecode(vm);
     vm_grow_stack(vm, 1 + count_input_placeholders(main));
@@ -1455,7 +1457,7 @@ void vm_cleanup_on_stop(VM* vm)
     set_null(&vm->incomingUpvalues);
 }
 
-CIRCA_EXPORT caVM* circa_new_vm(caBlock* main) { return new_vm(main); }
+CIRCA_EXPORT caVM* circa_new_vm(caWorld* world) { return new_vm(world); }
 void circa_free_vm(caVM* vm) { free_vm(vm); }
 
 CIRCA_EXPORT Value* circa_input(VM* vm, int index)
@@ -1475,10 +1477,8 @@ CIRCA_EXPORT void circa_throw(VM* vm, const char* msg)
     vm->throw_error(&str);
 }
 
-CIRCA_EXPORT void circa_vm_setup(VM* vm, const char* moduleName, const char* functionName)
+CIRCA_EXPORT void circa_set_main(VM* vm, Block* main)
 {
-    caBlock* module = circa_load_module_by_filename(vm->world, moduleName);
-    caBlock* main = circa_find_function_local(module, functionName);
     vm_set_main(vm, main);
 }
 

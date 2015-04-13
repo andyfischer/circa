@@ -136,6 +136,10 @@ caBlock* circa_find_function_local(caBlock* block, const char* name)
 {
     return find_function_local(block, name);
 }
+caBlock* circa_find_function(caBlock* block, const char* name)
+{
+    return find_function_local(block, name);
+}
 caType* circa_find_type(caBlock* block, const char* name)
 {
     return find_type(block, name);
