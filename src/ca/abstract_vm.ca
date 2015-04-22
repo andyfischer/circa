@@ -1,12 +1,19 @@
 
+{-
+  Goals for abstract interpreter:
+    Constant propogation
+    Lift expressions out of loops
+    Type information
+    Unused expression elimination
+    Common subexpression elimination
+    Escape analysis
+-}
+
 struct AVM {
   Func func
   Table results
 }
 
-def AVM.get_result(self, Term term)
-  found = self.results.find(term)
-  if not found.empty
-    found.head
+def AVM.eval(self, Term term)
 
 def step(Func func)
