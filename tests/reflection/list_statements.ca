@@ -1,6 +1,6 @@
 
-def Block.list_statements(self) -> List
-  for term in self.terms
+def list_statements(Block b) -> List
+  for term in b.terms
     if not term.is_statement or term.is_hidden or term.is_comment
       discard
     term
@@ -16,5 +16,5 @@ def main()
   main(a b)
 
 print('statements:')
-for term in main.block.list_statements
+for term in list_statements(main.block)
   print(' ' cond(term.has_name, str(term.name ' = '), '') term.function.name '(...)')

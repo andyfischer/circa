@@ -355,34 +355,12 @@ extern "C" int main(int argc, char *argv[])
     }
     
     caValue* arg = circa_index(&args, 0);
-#if 0
-    caValue filename;
-    circa_resolve_possible_module_path(world, arg, &filename);
 
-    if (circa_is_null(&filename)) {
-        printf("Module not found: %s\n", circa_string(arg));
-        return -1;
-    }
-#endif
-
-    caValue improvShellFilename;
-    circa_set_string(&improvShellFilename, "ca/improv_shell.ca");
-
-    caBlock* module = circa_load_module_by_filename(world, &improvShellFilename);
+    caBlock* module = circa_load_module_by_filename(world, "ca/improv_shell.ca");
     caBlock* moduleMain = circa_find_function_local(module, "main");
 
-
-#if 0
-
-    Value shellName;
-
-    circa_module_find_requested_shell(userModule, &shellName);
-
-    if (circa_is_null
-#endif
-
-
-    caVM* vm = circa_new_vm(moduleMain);
+    caVM* vm = circa_new_vm(world);
+    circa_set_main(vm, moduleMain);
 
     circa_copy(&args, circa_env_insert(vm, "args"));
 

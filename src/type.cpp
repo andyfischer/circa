@@ -356,6 +356,7 @@ Block* find_method_inner(Type* type, Value* shortName, Value* fullName)
     return NULL;
 }
 
+#if 0
 Block* find_method_outer(Value* location, Type* type, Value* fullName)
 {
     // An 'outer' method is one declared outside the type's declaration block.
@@ -370,6 +371,7 @@ Block* find_method_outer(Value* location, Type* type, Value* fullName)
 
     return term->nestedContents;
 }
+#endif
 
 Block* find_method_on_type(Type* type, Value* nameLocation)
 {
@@ -399,9 +401,6 @@ Block* find_method_on_type(Type* type, Value* nameLocation)
     }
 
     Block* method = NULL;
-    
-    if (!is_null(location))
-        method = find_method_outer(location, type, &searchName);
 
     if (method == NULL)
         method = find_method_inner(type, name, &searchName);

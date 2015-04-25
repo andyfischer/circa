@@ -159,16 +159,16 @@ def parse(String str) -> any
   @reader.parse_value
   return reader.last
 
-def String.quote(self) -> String
+def quote(String s) -> String
   -- TODO: insert escapes as needed
-  str('"' self '"')
+  str('"' s '"')
 
 def write(val) -> String
   if is_list(val)
     str('[' (for el in val { write(el) }).join(', ') ']')
   elif is_table(val)
-    str('{' (for k in val.keys { str(k.quote, ": ", write(val.get(k))) }).join(', ') '}')
+    str('{' (for k in val.keys { str(quote(k), ": ", write(val.get(k))) }).join(', ') '}')
   elif is_string(val)
-    val.quote
+    quote(val)
   else
     str(val)

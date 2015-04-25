@@ -1,23 +1,23 @@
 
 require indent_writer
 
-def Block.name(self) -> String
-  if self.owner.is_null
+def block_name(Block block) -> String
+  if block.owner.is_null
     ""
   else
-    self.owner.name
+    block.owner.name
 
-def Term.parent_major(self) -> Block
-  self.parent.nearest_major
+def parent_major(Term term) -> Block
+  term.parent.nearest_major
 
-def Term.location_str(self) -> String
-  if self.is_null
+def location_str(Term term) -> String
+  if term.is_null
     return ""
 
-  loc = self.source_location
-  s = str(self.parent.source_filename ':' loc.y1)
+  loc = term.source_location
+  s = str(term.parent.source_filename ':' loc.y1)
 
-  blockName = self.parent_major.name
+  blockName = parent_major(term) | block_name
   if blockName != ""
     @s.append(str(' inside ' blockName '()'))
   s
@@ -32,9 +32,9 @@ def trace_to_string(VM vm) -> String
     term = frame.current_term
 
     if term.is_null
-      @writer.write('[inside ' frame.block.name '()] ')
+      @writer.write('[inside ' block_name(frame.block) '()] ')
     else
-      @writer.write('[' term.location_str '] ')
+      @writer.write('[' location_str(term) '] ')
 
     @writer.writeln
     @writer.indent

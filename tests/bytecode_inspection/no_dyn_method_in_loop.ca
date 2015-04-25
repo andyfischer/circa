@@ -3,6 +3,5 @@ def main()
   for a in range(0 10)
     print(a)
 
-
 --require_local helper
 --helper.assert_no_dyn_method(main)

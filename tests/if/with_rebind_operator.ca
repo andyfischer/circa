@@ -1,16 +1,16 @@
 
-def int.increment(i)
+def increment(int i)
   i + 1
 
-def int.decrement(i)
+def decrement(int i)
   i - 1
 
 a = 1
 if true
-  @a.increment
+  increment(@a)
 else
-  @a.decrement
+  decrement(@a)
 
-@a.increment
+increment(@a)
 
 assert(a == 3)

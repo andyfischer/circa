@@ -73,12 +73,12 @@ def mopcode_from_int(int mopcode) -> Symbol
     else
       error('mopcode not found: ' mopcode)
 
-def Blob.slices(self, int sliceSize)
-  for b in range_by(0, self.size, sliceSize)
-    self.slice(b, sliceSize)
+def slices(Blob blob, int sliceSize)
+  for b in range_by(0, blob.size, sliceSize)
+    blob.slice(b, sliceSize)
 
 def dump_ops(VM vm, Blob ops)
-  for addr, op in ops.slices(8)
+  for addr, op in slices(ops 8)
     op = read_op(op)
     @op.set(:addr addr)
 
@@ -99,7 +99,7 @@ def dump_ops(VM vm, Blob ops)
     print(s)
 
 def parse_ops(VM vm, Blob ops) -> List
-  for addr, op in ops.slices(8)
+  for addr, op in slices(ops 8)
     op = read_op(op)
     @op.set(:addr addr)
 
