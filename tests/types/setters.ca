@@ -5,13 +5,13 @@ struct T {
 }
 
 t = T.make(1, 'x')
-assert(str(t) == "{a: 1, b: 'x'}")
+assert(str(t) == "T{a: 1, b: 'x'}")
 
 @t.set_a(4)
-assert(str(t) == "{a: 4, b: 'x'}")
+assert(str(t) == "T{a: 4, b: 'x'}")
 
 @t.set_a(5).set_b('y')
-assert(str(t) == "{a: 5, b: 'y'}")
+assert(str(t) == "T{a: 5, b: 'y'}")
 
 def error_test(t)
   t.set_a('hi')

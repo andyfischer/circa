@@ -2,7 +2,7 @@ table initial = {:b => 2, :a => 1}
 {:b => 2, :a => 3}
 {:b => 0, :a => 0}
 {:b => 0, :a => 4}
-struct initial = {a: 1, b: 2}
-{a: 3, b: 2}
-{a: 0, b: 0}
-{a: 4, b: 0}
+struct initial = S{a: 1, b: 2}
+S{a: 3, b: 2}
+S{a: 0, b: 0}
+S{a: 4, b: 0}

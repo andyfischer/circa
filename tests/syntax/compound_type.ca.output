@@ -1,4 +1,4 @@
-{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}
-{x: 5.0, y: 6.0}
+Composite{myClass: MyClass{a: 0, b: 0, name: '', distance: 0.0}, myClass2: MyClass{a: 0, b: 0, name: '', distance: 0.0}, name: ''}
+Vector{x: 5.0, y: 6.0}
 v.x = 5.0
 v.y = 6.0

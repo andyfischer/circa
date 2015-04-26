@@ -22,6 +22,12 @@ def grid_points(Vec2 size)
       seq
   )
 
+def within_rect(Vec2 @vec, Rect rect)
+  max(@vec.x rect.x1)
+  min(@vec.x rect.x2)
+  max(@vec.y rect.y1)
+  min(@vec.y rect.y2)
+
 struct PlayerShip {
   Vec2 loc
 }
@@ -30,12 +36,6 @@ state PlayerShip playerShip
 
 if once()
   playerShip.loc = improv.window_size.div(2)
-
-def Vec2.within_rect(@self, Rect rect)
-  max(@self.x rect.x1)
-  min(@self.x rect.x2)
-  max(@self.y rect.y1)
-  min(@self.y rect.y2)
 
 def PlayerShip.draw(self)
   loc = self.loc
@@ -47,8 +47,8 @@ def PlayerShip.draw(self)
     draw.fill_rect(#f00 rect)
 
 def PlayerShip.update(self)
-  @self.loc.add(input.arrows_vec * 3)
-  @self.loc.within_rect(improv.window_rect.grow([-20 -20]))
+  @self.loc | add(input.arrows_vec * 3)
+  @self.loc | within_rect(improv.window_rect.grow([-20 -20]))
 
 @playerShip.update
 
@@ -70,8 +70,8 @@ state List bullets
 if input.key_pressed(:space)
   @bullets.append(Bullet.make(playerShip.loc))
 
-@bullets.map(b -> b.update)
-@bullets.filter(b -> b.alive)
+@bullets | map(b -> b.update)
+@bullets | filter(b -> b.alive)
 
 draw.background(#333)
 

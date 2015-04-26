@@ -1,4 +1,4 @@
 Calling t_from_left.func:
- [left] called T.func with: {a: 1}
+ [left] called T.func with: T{a: 1}
 Calling t_from_right.func:
- [right] called T.func with: {a: 1}
+ [right] called T.func with: T{a: 1}

@@ -2037,6 +2037,12 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
                 Term* function = find_name(block, &functionNameVal);
                 Term* term = apply(block, function, inputs);
+                set_source_location(term, startPosition, tokens);
+
+                if (left.identifierRebind) {
+                    set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
+                }
+
                 result = ParseResult(term);
 
             } else {
@@ -3055,7 +3061,6 @@ ParseResult identifier_with_rebind(Block* block, TokenStream& tokens, ParserCxt*
 
     return result;
 }
-
 
 // --- More Utility functions ---
 

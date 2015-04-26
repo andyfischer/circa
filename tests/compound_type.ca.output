@@ -1,0 +1,3 @@
+[tests/compound_type.ca:20] 
+ [inside assert()] 
+  Error: Assert failed

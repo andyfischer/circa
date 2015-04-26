@@ -668,6 +668,7 @@ void compound_type_to_string(Value* value, Value* out)
 
     Type* type = value->value_type;
     
+    string_append(out, &type->name);
     string_append(out, "{");
     for (int i=0; i < compound_type_get_field_count(type); i++) {
         if (i != 0)

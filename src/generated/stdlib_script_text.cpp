@@ -2240,7 +2240,7 @@ const char* find_builtin_file(const char* filename) {
         "def MappedSeq.key(self) self.seq.key\n"
         "\n"
         "def map(seq, func) -> MappedSeq\n"
-        "  MappedSeq.make(seq func)\n"
+        "  MappedSeq.make(to_seq(seq) func)\n"
         "\n"
         "def for_each(seq, func)\n"
         "  for it in seq\n"

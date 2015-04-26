@@ -1,2 +1,2 @@
-f() = {a: 1}
+f() = T{a: 1}
 output type = <Type any>

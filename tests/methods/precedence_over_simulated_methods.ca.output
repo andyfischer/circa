@@ -1,2 +1,2 @@
 setting i to: 6
-result: {i: 6}
+result: A{i: 6}

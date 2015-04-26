@@ -1,4 +1,4 @@
-Created a Lib1_T instance: {s: ''}
+Created a Lib1_T instance: Lib1_T{s: ''}
 Called Lib1_T.f with: 123
-Created a Lib1_T instance: {s: 'hello'}
+Created a Lib1_T instance: Lib1_T{s: 'hello'}
 Called Lib1_T.f with: 456

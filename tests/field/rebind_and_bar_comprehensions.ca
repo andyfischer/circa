@@ -1,0 +1,17 @@
+
+struct T {
+  int i
+}
+
+def T.inc(t)
+  @t.i | add(1)
+
+def T.odd(t)
+  t.i % 2 == 1
+
+list = [1 2 3 4 5]
+@list | map(n -> T.make(n))
+@list | map(b -> b.inc)
+@list | filter(b -> b.odd)
+
+list | flatten | print

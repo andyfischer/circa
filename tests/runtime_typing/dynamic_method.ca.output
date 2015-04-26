@@ -3,8 +3,8 @@ B.blah
 A.blah2: str1
 B.blah2: str2
 calling blah3: 11
-A.blah3: {x: 11}
+A.blah3: A{x: 11}
 calling blah3: 22
-B.blah3: {x: 22}
-{x: 1}
-{x: 2}
+B.blah3: B{x: 22}
+A{x: 1}
+B{x: 2}
