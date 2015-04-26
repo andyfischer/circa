@@ -1,0 +1,11 @@
+
+require bytecode_analysis
+
+vm = make_vm(->)
+def ops(f)
+  bytecode_analysis.func_ops(vm f)
+  
+def func()
+  add(1 2)
+
+ops(func) | filter(op -> op.opcode == :push_state_frame) | flatten | equals([]) | assert

@@ -535,7 +535,7 @@ bool should_write_state_header(Bytecode* bc, Block* block)
     // No state allowed in while-loop. Maybe temp, maybe permanant.
     if (is_while_loop(block))
         return false;
-    return block_has_state(block) != s_no;
+    return block_has_state(block) == s_yes;
 }
 
 void write_state_header(Bytecode* bc, int keySlot)
