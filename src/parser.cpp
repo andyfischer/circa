@@ -173,6 +173,9 @@ struct ListSyntaxHints {
     }
 };
 
+void function_call_inputs(Block* block, TokenStream& tokens, ParserCxt* context,
+        TermList& arguments, ListSyntaxHints& inputHints);
+
 void consume_block(Block* block, TokenStream& tokens, ParserCxt* context)
 {
     Term* parentTerm = block->owningTerm;
@@ -2018,11 +2021,30 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                 term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string("");
                 term_insert_input_property(term, 1, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
 
+            } else if (tokens.nextIs(tok_LParen)) {
+                tokens.consume(tok_LParen);
+
+                ListSyntaxHints syntaxHints;
+
+                Value functionNameVal;
+                set_string(&functionNameVal, functionName.identifierName);
+
+                TermList inputs;
+                inputs.append(left.term);
+
+                function_call_inputs(block, tokens, context, inputs, syntaxHints);
+                tokens.consume(tok_RParen);
+
+                Term* function = find_name(block, &functionNameVal);
+                Term* term = apply(block, function, inputs);
+                result = ParseResult(term);
+
             } else {
 
                 Value functionNameVal;
                 set_string(&functionNameVal, functionName.identifierName);
                 result = right_apply_to_function(block, left.term, &functionNameVal);
+
 
                 Term* term = result.term;
                 if (operatorMatch == tok_RightArrow)

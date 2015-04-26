@@ -343,6 +343,9 @@ def to_seq(val) -> any
   else
     val
 
+def List.length(self) -> int
+  -- Return the number of elements in this list.
+
 struct ListSeq {
   List list
   int index
@@ -1023,9 +1026,6 @@ def List.insert(self, int index, any val) -> List
 def List.prepend(self, any val) -> List
   self.insert(0, val)
     
-def List.length(self) -> int
-  -- Return the number of elements in this list.
-
 def List.join(self, String joiner) -> String
   -- Return a string constructed by converting every element to a string, and
   -- concatenating those strings, each separated by 'joiner'.
@@ -1364,13 +1364,13 @@ def Term.is_input_placeholder(self) -> bool
 def Term.is_comment(self) -> bool
     self.function == comment.block
 def Term.trace_dependents(self, Block untilBlock) -> List
+def Term.extra_output(self, int index)
+  self.parent.get_term(self.index + index + 1)
 def Term.output(self, int index) -> Term
   if index == 0
     self
   else
     self.extra_output(index - 1)
-def Term.extra_output(self, int index)
-  self.parent.get_term(self.index + index + 1)
 
 def vec2(number x, number y)
   Vec2.make(x y)

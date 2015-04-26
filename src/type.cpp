@@ -375,6 +375,9 @@ Block* find_method_outer(Value* location, Type* type, Value* fullName)
 
 Block* find_method_on_type(Type* type, Value* nameLocation)
 {
+    if (type == TYPES.any)
+        return NULL;
+
     if (is_null(&type->attrs)) {
         set_hashtable(&type->attrs);
         type->attrs.insert(s_methodCache)->set_hashtable();
@@ -406,7 +409,21 @@ Block* find_method_on_type(Type* type, Value* nameLocation)
         method = find_method_inner(type, name, &searchName);
 
     // Cache save
+    // TODO: This cache is no longer useful with outer methods removed
     cache->insert_val(nameLocation)->set_block(method);
+
+#if 0
+    if (method == NULL) {
+        // UFCS
+        Term* term = find_name_at(location, name, s_LookupFunction);
+        if (term != NULL && is_function(term)) {
+            //printf("ufcs active: ");
+            //name->dump();
+            //as_block(location)->dump();
+            return term->nestedContents;
+        }
+    }
+#endif
 
     return method;
 }
