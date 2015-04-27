@@ -2053,6 +2053,11 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
 
                 Term* term = result.term;
+
+                if (left.identifierRebind) {
+                    set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
+                }
+
                 if (operatorMatch == tok_RightArrow)
                     term->setStringProp(s_Syntax_DeclarationStyle, "arrow-concat");
                 else

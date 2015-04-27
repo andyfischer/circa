@@ -29,7 +29,7 @@ def main()
 
   def actor_setup(actor)
     actor.set_env(:window_rect rect)
-    actor.set_env(:time time)
+    actor.set_env(:time env(:time))
     actor.set_env(:timeDelta timeDelta)
     actor.set_env(:inputEvents [])
     actor.set_env(:userInput userInput)
@@ -43,7 +43,11 @@ def main()
   if userInput.key_pressed(:r)
     userActor.reset_state
 
-  userActor.call
+  state renderCommands
+  
+  if true
+    userActor.call
+    renderCommands = userActor.consume_messages(:render_commands)
 
   if userActor.has_error
     stack_trace.dump(userActor)
@@ -51,31 +55,11 @@ def main()
   for submit in method_capture(render_list :submit)
     renderActor = actor(submit)
     actor_setup(renderActor)
-    renderActor.call(userActor.consume_messages(:render_commands))
+    renderActor.call(renderCommands)
 
     if renderActor.has_error
       stack_trace.dump(renderActor)
 
   window.swap()
 
-{-
-asteroids = require_local ../demos/asteroids
-
-main(asteroids)
-
-struct Main {
-}
-
-def Main.window_rect(self) [0 0 1000 500]
-def Main.main(self)
-
-
-def realmain()
-  main(Main.make)
-
-vm = make_vm(realmain)
-vm.call
-stack_trace.dump(vm)
-
-main(Main.make)
--}
+  print('time per frame: ' timeDelta)

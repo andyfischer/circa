@@ -14,15 +14,24 @@ def VertexBuffer.set_data(self, List vertices) -> VertexBuffer
 def VertexBuffer.set_draw_type(self, Symbol t) -> VertexBuffer
 def VertexBuffer.set_attribs(self, List attribs :multiple) -> VertexBuffer
 def VertexBuffer.draw(self)
+  annotate_block(:effect)
 
 def clear(Symbol flags :multiple)
+  annotate_block(:effect)
 def use_shader(Shader shader)
+  annotate_block(:effect)
 def uniform_vec2(Symbol name, Vec2 vec)
+  annotate_block(:effect)
 def uniform_vec3(Symbol name, Vec3 vec)
+  annotate_block(:effect)
 def uniform_vec4(Symbol name, Vec4 vec)
+  annotate_block(:effect)
 def uniform_mat2(Symbol name, Mat2 mat)
+  annotate_block(:effect)
 def uniform_mat3(Symbol name, Mat3 mat)
+  annotate_block(:effect)
 def uniform_mat4(Symbol name, Mat4 mat)
+  annotate_block(:effect)
 
 struct Texture {
   native_ptr native
@@ -32,5 +41,8 @@ def new_texture(Symbol type) -> Texture
   -- valid types are: ( :2d )
 
 def Texture.set_data(self, Vec2 size, Blob data)
+  annotate_block(:effect)
 def bind_texture(Texture texture, Symbol samplerName)
+  annotate_block(:effect)
 def unbind_texture()
+  annotate_block(:effect)

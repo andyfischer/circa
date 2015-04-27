@@ -5,6 +5,7 @@ def annotate(term, Symbol key, value :optional)
 def annotate_block(Symbol key, value :optional)
 def declare_field()
 def emit(Symbol name, any val)
+  annotate_block(:effect)
 def equals(any a,any b) -> bool
 def not_equals(any a,any b) -> bool
 def discard(any outs :multiple :optional)

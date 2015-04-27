@@ -1371,7 +1371,7 @@ static bool block_contains_literal_symbol(Block* block, Symbol symbol)
 
 bool block_needs_no_evaluation(Bytecode* bc, Block* block)
 {
-    if (bc->vm->noEffect && block_contains_literal_symbol(block, s_effect))
+    if (bc->vm->noEffect && block_get_bool_prop(block, s_effect, false))
         return true;
 
     return false;

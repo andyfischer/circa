@@ -3,7 +3,7 @@ def f()
   trace('called f()')
 
 def g()
-  :effect
+  annotate_block(:effect)
   trace('called g()')
 
 def main()

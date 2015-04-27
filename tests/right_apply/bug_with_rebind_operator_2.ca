@@ -1,0 +1,8 @@
+
+def increment(x)
+  x + 1
+
+x = 1
+@x | increment
+
+assert(x == 2)

@@ -1,4 +1,6 @@
 
+require time
+
 struct FPSTracker {
     number lastCheckTime
 
@@ -12,3 +14,8 @@ def FPSTracker.onFrame(@self, number time)
 
     self.recentDelay = time - lastCheckTime
     self.recentFps = 1 / self.recentDelay
+
+def fps()
+  state FPSTracker tracker
+  @tracker.onFrame(time.now)
+  tracker.recentFps

@@ -25,27 +25,3 @@ vm.call
 if vm.has_error
   require stack_trace
   stack_trace.dump(vm)
-
-{-
-state editor = editor_main.to_vm
-state userInput = input.new
--}
-
-
-{-
-@userInput.handleEvents(env(:inputEvents))
-
-editor.init_env()
-editor.set_env(:userInput userInput)
-editor.set_env(:canvasRect windowRect)
-editor.set_env(:mouse env(:mouse))
-editor.set_env(:scriptName, env(:scriptName))
-editor.set_env(:time env(:time))
-editor.set_env(:timeDelta, delta(env(:time)))
-
-editor.run
-
-if editor.has_error
-  require stack_trace
-  stack_trace.dump(editor)
--}

@@ -72,6 +72,7 @@ if input.key_pressed(:space)
 
 @bullets | map(b -> b.update)
 @bullets | filter(b -> b.alive)
+@bullets | flatten
 
 draw.background(#333)
 
@@ -111,3 +112,4 @@ def new_mob_list()
 mobs = new_mob_list()
 
 for_each(mobs, m -> m.draw)
+
