@@ -1,11 +1,10 @@
 
 def has_effect()
-  :effect
+  annotate_block(:effect)
   print(' called has_effect')
 
 def no_effect(i)
-  :pretend_no_effect
-  print(' called no_effect')
+  trace(' called no_effect')
   i + 1
 
 def main()
