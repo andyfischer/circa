@@ -1,0 +1,71 @@
+
+struct Time {
+}
+
+def Time.delta(self) -> number
+  env(:timeDelta)
+
+def Time.now(self) -> number
+  env(:time)
+
+def Time.elapsed(self) -> number
+  state number el = 0
+  el += env(:timeDelta)
+  el
+
+def time()
+  Time.make
+
+struct Input {
+}
+
+def Input.key_down(s, Symbol key) -> bool
+
+def Input.key_pressed(s, Symbol key) -> bool
+  env(:userInput).key_pressed(key)
+
+def Input.key_down(s, Symbol key) -> bool
+  userInput = env(:userInput)
+  userInput.buttonsPressed.contains(key)
+
+def Input.mouse(s) -> Vec2
+  env(:mouse)
+
+def vec_div(Vec2 a, Vec2 b) -> Vec2
+  [a.x/b.x, a.y/b.y]
+
+def Input.mouse_ratio(s) -> Vec2
+  env(:mouse).vdiv(env(:canvasRect).size)
+
+def Input.mouse_in(s, Rect rect) -> bool
+  rect.contains(env(:mouse))
+
+def Input.mouse_pressed(s) -> bool
+  for event in env(:userInput).recentEvents
+    if event.slice(0 2) == [:down :left_mouse]
+      return true
+
+def Input.mouse_click_in(s,Rect rect) -> bool
+  for event in env(:userInput).recentEvents
+    if event.slice(0 2) == [:down :left_mouse] and mouse_in(rect)
+      return true
+  return false
+
+def Input.wheel_delta(s) -> Vec2
+  result = Vec2.make
+  for event in env(:userInput).recentEvents
+    if event[0] == :mouse_wheel
+      @result.add(event[1])
+  result
+
+def Input.arrows_vec(s) -> Vec2
+  out = Vec2.make
+  out.x += cond(key_down(:left) -1 0)
+  out.x += cond(key_down(:right) 1 0)
+  out.y += cond(key_down(:up) -1 0)
+  out.y += cond(key_down(:down) 1 0)
+  out
+
+def input()
+  Input.make
+

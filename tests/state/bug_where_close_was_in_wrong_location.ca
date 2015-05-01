@@ -1,0 +1,7 @@
+
+state hi = 1
+
+for i in [1]
+  if i == 2
+    @hi | add(1)
+    break

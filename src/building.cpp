@@ -831,6 +831,9 @@ void close_stateful_values(Block* block)
             continue;
 
         Term* finalResult = find_name(block, term_name(term)); 
+        if (finalResult == term)
+            continue;
+
         term_set_bool_prop(finalResult, s_LocalStateResult, true);
 
         Term* closer = apply(finalResult->owningBlock, FUNCS.declared_state_close, TermList(finalResult));
@@ -843,13 +846,15 @@ void close_stateful_values(Block* block)
             if (!is_exit_point(*exitPointSearch))
                 continue;
 
+            Term* exitPoint = *exitPointSearch;
+
             Value termVal;
-            termVal.set_term(*exitPointSearch);
+            termVal.set_term(exitPoint);
 
             Term* localResult = find_name_at(&termVal, term_name(term)); 
 
-            Term* closer = apply(localResult->owningBlock, FUNCS.declared_state_close, TermList(localResult));
-            move_after(closer, localResult);
+            Term* closer = apply(exitPoint->owningBlock, FUNCS.declared_state_close, TermList(localResult));
+            move_before(closer, exitPoint);
 
             term_set_bool_prop(localResult, s_LocalStateResult, true);
         }

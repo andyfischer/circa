@@ -6,7 +6,7 @@ import traceback
 from glob import glob
 
 # Path for the circa binary to use in testing. This can be overridden by command-line args.
-ExecutablePath = 'build/circa_d'
+ExecutablePath = 'build/circa_d -path modules'
 
 # Location of test scripts
 TestRoot = 'tests'
