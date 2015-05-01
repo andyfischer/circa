@@ -616,6 +616,7 @@ void set_string(Value* value, const char* s, int length)
     value->value_data.ptr = data;
 }
 
+#if 0
 char* set_blob(Value* value, int length)
 {
     make(TYPES.string, value);
@@ -624,6 +625,7 @@ char* set_blob(Value* value, int length)
     value->value_data.ptr = data;
     return data->str;
 }
+#endif
 
 char* circa_strdup(const char* s)
 {
@@ -633,6 +635,7 @@ char* circa_strdup(const char* s)
     return out;
 }
 
+#if 0
 char* as_blob(Value* value)
 {
     return (char*) as_cstring(value);
@@ -760,6 +763,7 @@ void blob_to_hex_string(Value* blob, Value* str)
         string_append_char(str, to_hex_digit(c % 16));
     }
 }
+#endif
 
 CIRCA_EXPORT int circa_string_length(Value* string)
 {

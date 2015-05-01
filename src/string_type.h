@@ -64,6 +64,7 @@ void set_string(Value* value, const char* s);
 void set_string(Value* value, const char* s, int length);
 
 // Manipulate a string as a blob
+#if 0
 char* set_blob(Value* value, int len);
 char* as_blob(Value* val);
 void blob_append_char(Value* blob, char c);
@@ -85,6 +86,7 @@ void blob_write_u32(char* data, u32* pos, u32 value);
 void blob_write_pointer(char* data, u32* pos, void* value);
 
 void blob_to_hex_string(Value* blob, Value* str);
+#endif
 
 char* circa_strdup(const char* s);
 

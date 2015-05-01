@@ -395,7 +395,7 @@ caValue* circa_map_get(caValue* map, caValue* key);
 // -- Writing to a caValue --
 
 // Assign to a caValue.
-void circa_set_blob(caValue* container, int size);
+void circa_set_blob(caValue* container, uint32_t size);
 void circa_set_bool(caValue* container, bool value);
 void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);

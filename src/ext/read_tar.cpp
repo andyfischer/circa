@@ -3,6 +3,7 @@
 
 #include "common_headers.h"
 
+#include "blob.h"
 #include "debug.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -65,7 +66,7 @@ static void file_copy_contents(char* data, Value* out)
     int size = file_size(data);
     char* file = data + 512;
     set_blob(out, size);
-    memcpy(as_blob(out), file, size);
+    memcpy(blob_data_flat(out), file, size);
 }
 
 static void advance_to_next_file(char** data)
@@ -86,7 +87,7 @@ static bool eof(char* data)
 void tar_read_file(Value* tarBlob, const char* filename, Value* fileOut)
 {
     ca_assert(is_string(tarBlob));
-    char* data = as_blob(tarBlob);
+    char* data = blob_data_flat(tarBlob);
 
     while (!eof(data)) {
         if (strcmp(file_name(data), filename) == 0) {
@@ -102,7 +103,7 @@ void tar_read_file(Value* tarBlob, const char* filename, Value* fileOut)
 
 bool tar_file_exists(Value* tarBlob, const char* filename)
 {
-    char* data = as_blob(tarBlob);
+    char* data = blob_data_flat(tarBlob);
     while (!eof(data)) {
         if (strcmp(file_name(data), filename) == 0)
             return true;
@@ -129,7 +130,7 @@ CIRCA_EXPORT void circa_load_tar_in_memory(World* world, char* data, uint32_t nu
 
 void tar_debug_dump_listing(Value* tarBlob)
 {
-    char* data = as_blob(tarBlob);
+    char* data = blob_data_flat(tarBlob);
 
     while (!eof(data)) {
         printf("file: %s\n", file_name(data));

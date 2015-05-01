@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#include "blob.h"
 #include "list.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -208,9 +209,9 @@ void read_text_file(const char* filename, Value* contentsOut)
 
     // Read raw data.
     touch(contentsOut);
-    set_blob(contentsOut, int(file_size));
+    set_blob(contentsOut, (u32)file_size);
 
-    size_t bytesRead = fread(as_blob(contentsOut), 1, file_size, fp);
+    size_t bytesRead = fread(blob_data_flat(contentsOut), 1, file_size, fp);
     
     if (bytesRead < file_size)
         string_resize(contentsOut, (int) bytesRead);

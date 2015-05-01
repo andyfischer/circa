@@ -4,69 +4,85 @@
 
 #include "blob.h"
 #include "kernel.h"
+#include "string_type.h"
 #include "tagged_value.h"
 #include "type.h"
 #include "vm.h"
 
 namespace circa {
 
-const int BLOB_SLICE = 1;
-const int BLOB_RAW = 2;
+const int BLOB_ZERO = 1;
+const int BLOB_SLICE = 2;
+const int BLOB_FLAT = 3;
 
-struct BlobAbstract {
-    int concreteType;
+/*
+  Abstract blob - Header common to all blob types.
+*/
+struct AbstractBlob {
+    int type;
     int refcount;
-    u32 numBytes;
+    u32 size;
 };
 
-struct BlobRaw {
-    int concreteType;
-    int refcount;
-    u32 numBytes;
+/*
+  Flat - a contiguous block of bytes
+*/
+struct Flat {
+    AbstractBlob header;
     char data[0];
 };
 
-struct BlobSlice {
-    int concreteType;
-    int refcount;
-    u32 numBytes;
+/*
+  Slice - a size-delimited pointer into unowned data. Data should be referenced by 'backingValue'.
+*/
+
+struct Slice {
+    AbstractBlob header;
     Value backingValue;
     char* data;
 };
 
-BlobSlice* blob_alloc_slice()
+Slice* alloc_slice()
 {
-    BlobSlice* slice = (BlobSlice*) malloc(sizeof(*slice));
-    slice->concreteType = BLOB_SLICE;
-    slice->refcount = 1;
+    Slice* slice = (Slice*) ca_realloc(NULL, sizeof(*slice));
+    slice->header.type = BLOB_SLICE;
+    slice->header.refcount = 1;
+    slice->header.size = 0;
     initialize_null(&slice->backingValue);
     slice->data = NULL;
-    slice->numBytes = 0;
     return slice;
 }
 
-BlobRaw* blob_alloc_raw(const char* data, u32 numBytes)
+Flat* alloc_flat(u32 size)
 {
-    BlobRaw* blob = (BlobRaw*) malloc(sizeof(*blob) + numBytes);
-    blob->concreteType = BLOB_RAW;
-    blob->refcount = 1;
-    blob->numBytes = numBytes;
-    if (data == NULL)
-        memset(blob->data, 0, numBytes);
+    Flat* flat = (Flat*) ca_realloc(NULL, sizeof(*flat) + size);
+    flat->header.type = BLOB_FLAT;
+    flat->header.refcount = 1;
+    flat->header.size = size;
+    //printf("flat alloc: %p %u\n", flat, size);
+    return flat;
+}
+
+int get_type(AbstractBlob* abstract)
+{
+    if (abstract == NULL)
+        return BLOB_ZERO;
     else
-        memcpy(blob->data, data, numBytes);
-    return blob;
+        return abstract->type;
 }
 
-char* set_blob_alloc_raw(Value* value, const char* data, u32 numBytes)
+Flat* alloc_flat_and_fill(u32 size, const char* initialData, u32 initialDataSize)
 {
-    BlobRaw* raw = blob_alloc_raw(data, numBytes);
-    make_no_initialize(TYPES.blob, value);
-    value->value_data.ptr = raw;
-    return raw->data;
+    ca_assert(initialDataSize <= size);
+
+    Flat* flat = alloc_flat(size);
+    memcpy(flat->data, initialData, std::min(size, initialDataSize));
+    if (initialDataSize < size)
+        memset(flat->data + initialDataSize, 0, size - initialDataSize);
+    return flat;
 }
 
-void decref(BlobAbstract* blob)
+void decref(AbstractBlob* blob)
 {
     if (blob == NULL)
         return;
@@ -74,10 +90,11 @@ void decref(BlobAbstract* blob)
     ca_assert(blob->refcount > 0);
 
     blob->refcount--;
+
     if (blob->refcount == 0) {
-        switch (blob->concreteType) {
+        switch (blob->type) {
         case BLOB_SLICE:
-            BlobSlice* slice = (BlobSlice*) blob;
+            Slice* slice = (Slice*) blob;
             set_null(&slice->backingValue);
             break;
         }
@@ -85,7 +102,56 @@ void decref(BlobAbstract* blob)
     }
 }
 
-CIRCA_EXPORT void circa_blob_data(Value* blobVal, char** dataOut, u32* sizeOut)
+Flat* blob_resize(AbstractBlob* abstract, u32 newSize)
+{
+    switch (get_type(abstract)) {
+    case BLOB_ZERO:
+        return alloc_flat(newSize);
+
+    case BLOB_SLICE: {
+        Slice* slice = (Slice*) abstract;
+        Flat* flat = alloc_flat_and_fill(newSize, slice->data, slice->header.size);
+        decref(abstract);
+        return flat;
+    }
+    case BLOB_FLAT: {
+        Flat* flat = (Flat*) abstract;
+        if (flat->header.refcount == 1) {
+            //printf("flat realloc: %p %u\n", flat, newSize);
+            flat = (Flat*) ca_realloc(flat, sizeof(Flat) + newSize);
+            flat->header.size = newSize;
+            return flat;
+        }
+
+        flat = alloc_flat_and_fill(newSize, flat->data, flat->header.size);
+        decref(abstract);
+        return flat;
+    }
+    }
+
+    return NULL;
+}
+
+char* blob_data_flat(Value* blob)
+{
+    AbstractBlob* abstract = (AbstractBlob*) blob->value_data.ptr;
+    switch (get_type(abstract)) {
+    case BLOB_ZERO:
+        return NULL;
+
+    case BLOB_SLICE: {
+        Slice* slice = (Slice*) abstract;
+        return slice->data;
+    }
+    case BLOB_FLAT: {
+        Flat* flat = (Flat*) abstract;
+        return flat->data;
+    }
+    }
+    return NULL;
+}
+
+void blob_data(Value* blobVal, char** dataOut, u32* sizeOut)
 {
     ca_assert(is_blob(blobVal));
 
@@ -95,19 +161,19 @@ CIRCA_EXPORT void circa_blob_data(Value* blobVal, char** dataOut, u32* sizeOut)
         return;
     }
 
-    BlobAbstract* blob = (BlobAbstract*) blobVal->value_data.ptr;
+    AbstractBlob* blob = (AbstractBlob*) blobVal->value_data.ptr;
 
-    switch (blob->concreteType) {
+    switch (blob->type) {
     case BLOB_SLICE: {
-        BlobSlice* slice = (BlobSlice*) blob;
+        Slice* slice = (Slice*) blob;
         *dataOut = slice->data;
-        *sizeOut = slice->numBytes;
+        *sizeOut = slice->header.size;
         break;
     }
-    case BLOB_RAW: {
-        BlobRaw* raw = (BlobRaw*) blob;
-        *dataOut = raw->data;
-        *sizeOut = raw->numBytes;
+    case BLOB_FLAT: {
+        Flat* flat = (Flat*) blob;
+        *dataOut = flat->data;
+        *sizeOut = flat->header.size;
         break;
     }
     }
@@ -119,7 +185,7 @@ void blob_copy(Value* source, Value* dest)
 
     if (source->value_data.ptr != NULL) {
         dest->value_data.ptr = source->value_data.ptr;
-        ((BlobAbstract*) source->value_data.ptr)->refcount++;
+        ((AbstractBlob*) source->value_data.ptr)->refcount++;
     }
 }
 
@@ -127,7 +193,12 @@ void blob_release(Value* value)
 {
     if (value->value_data.ptr == NULL)
         return;
-    decref((BlobAbstract*) value->value_data.ptr);
+    decref((AbstractBlob*) value->value_data.ptr);
+}
+
+void blob_resize(Value* blob, u32 size)
+{
+    blob->value_data.ptr = blob_resize((AbstractBlob*) blob->value_data.ptr, size);
 }
 
 int blob_hash(Value* value)
@@ -148,32 +219,37 @@ int blob_hash(Value* value)
 
 char* blob_touch(Value* blobVal)
 {
-    BlobAbstract* blob = (BlobAbstract*) blobVal->value_data.ptr;
+    AbstractBlob* abstract = (AbstractBlob*) blobVal->value_data.ptr;
 
-    if (blob == NULL)
+    if (abstract == NULL)
         return NULL;
 
-    if (blob->concreteType == BLOB_RAW && ((BlobRaw*) blob)->refcount == 1)
-        return ((BlobRaw*) blob)->data;
+    if (abstract->type == BLOB_FLAT && (abstract->refcount == 1))
+        return ((Flat*) abstract)->data;
 
     stat_increment(BlobDuplicate);
     char* data;
     u32 numBytes;
     blob_data(blobVal, &data, &numBytes);
-    return set_blob_alloc_raw(blobVal, data, numBytes);
+
+    Flat* flat = alloc_flat_and_fill(numBytes, data, numBytes);
+    decref((AbstractBlob*) blobVal->value_data.ptr);
+    blobVal->value_data.ptr = flat;
+    return flat->data;
 }
 
-CIRCA_EXPORT uint32_t circa_blob_size(Value* blobVal)
+u32 blob_size(Value* blob)
 {
-    BlobAbstract* blob = (BlobAbstract*) blobVal->value_data.ptr;
-    if (blob == NULL)
+    AbstractBlob* abstract = (AbstractBlob*) blob->value_data.ptr;
+    if (abstract == NULL)
         return 0;
-    return blob->numBytes;
+    return abstract->size;
 }
 
-CIRCA_EXPORT void circa_set_blob_from_backing_value(Value* blob, Value* backingValue, char* data, u32 numBytes)
+#if 0
+void set_blob_from_backing_value(Value* blob, Value* backingValue, char* data, u32 numBytes)
 {
-    BlobSlice* slice = blob_alloc_slice();
+    Slice* slice = alloc_slice();
     copy(backingValue, &slice->backingValue);
     slice->data = data;
     slice->numBytes = numBytes;
@@ -181,6 +257,7 @@ CIRCA_EXPORT void circa_set_blob_from_backing_value(Value* blob, Value* backingV
     make_no_initialize(TYPES.blob, blob);
     blob->value_data.ptr = slice;
 }
+#endif
 
 void blob_setup_type(Type* type)
 {
@@ -190,15 +267,84 @@ void blob_setup_type(Type* type)
     type->hashFunc = blob_hash;
 }
 
+void set_blob(Value* value, u32 initialSize)
+{
+    make_no_initialize(TYPES.blob, value);
+    value->value_data.ptr = alloc_flat(initialSize);
+}
+
+void set_blob_slice(Value* value, Value* backingValue, const char* data, u32 size)
+{
+    Slice* slice = alloc_slice();
+    if (backingValue != NULL)
+        copy(backingValue, &slice->backingValue);
+    slice->data = (char*) data;
+    slice->header.size = size;
+
+    make_no_initialize(TYPES.blob, value);
+    value->value_data.ptr = slice;
+}
+
+void set_blob_flat(Value* value, const char* data, u32 size)
+{
+    Flat* flat = alloc_flat_and_fill(size, data, size);
+    make_no_initialize(TYPES.blob, value);
+    value->value_data.ptr = flat;
+}
+
+void set_blob_from_str(Value* value, const char* str)
+{
+    set_blob_flat(value, str, strlen(str));
+}
+
+char* blob_grow(Value* blob, u32 growSize)
+{
+    AbstractBlob* abstract = (AbstractBlob*) blob->value_data.ptr;
+    Flat* flat = blob_resize(abstract, abstract->size + growSize);
+    blob->value_data.ptr = flat;
+    return flat->data + flat->header.size - growSize;
+}
+
+void blob_slice(Value* blob, int start, int end, Value* sliceOut)
+{
+    if (end == -1)
+        end = blob_size(blob);
+
+    AbstractBlob* abstract = (AbstractBlob*) blob->value_data.ptr;
+
+    if (abstract->type != BLOB_FLAT)
+        internal_error("blob_slice: unimplemented");
+
+    const char* data = ((Flat*) abstract)->data;
+
+    set_blob_slice(sliceOut, blob, data + start, end - start);
+}
+
+void blob_to_str(Value* blob)
+{
+    AbstractBlob* abstract = (AbstractBlob*) blob->value_data.ptr;
+
+    Value out;
+    set_string(&out, blob_data_flat(blob), blob_size(blob));
+    move(&out, blob);
+}
+
 void make_blob(VM* vm)
 {
     u32 size = vm->input(0)->as_i();
-    set_blob_alloc_raw(vm->output(), NULL, size);
+    set_blob(vm->output(), size);
 }
 
 void Blob__size(VM* vm)
 {
     set_int(vm->output(), blob_size(vm->input(0)));
+}
+
+void Blob__resize(VM* vm)
+{
+    Value* blob = vm->input(0);
+    blob_resize(blob, vm->input(1)->as_i());
+    move(blob, vm->output());
 }
 
 void Blob__slice(VM* vm)
@@ -214,10 +360,10 @@ void Blob__slice(VM* vm)
     if ((offset + size) > existingNumBytes)
         return vm->throw_str("Offset+size is out of bounds");
 
-    circa_set_blob_from_backing_value(vm->output(), existingBlob, existingData+offset, size);
+    set_blob_slice(vm->output(), existingBlob, existingData+offset, size);
 }
 
-#define BLOB_SET(type) \
+#define blob_set_macro(type) \
     Value* blob = vm->input(0); \
     int offset = vm->input(1)->as_i(); \
     \
@@ -230,35 +376,49 @@ void Blob__slice(VM* vm)
 
 void Blob__set_u8(VM* vm)
 {
-    BLOB_SET(u8);
+    blob_set_macro(u8);
 }
 
 void Blob__set_u16(VM* vm)
 {
-    BLOB_SET(u16);
+    blob_set_macro(u16);
 }
 
 void Blob__set_u32(VM* vm)
 {
-    BLOB_SET(u32);
+    blob_set_macro(u32);
 }
 
 void Blob__set_i8(VM* vm)
 {
-    BLOB_SET(i8);
+    blob_set_macro(i8);
 }
 
 void Blob__set_i16(VM* vm)
 {
-    BLOB_SET(i16);
+    blob_set_macro(i16);
 }
 
 void Blob__set_i32(VM* vm)
 {
-    BLOB_SET(i32);
+    blob_set_macro(i32);
 }
 
-#define BLOB_GET(type) \
+#define blob_append_macro(type) \
+    Value* blob = vm->input(0); \
+    Value* val = vm->input(1); \
+    char* data = blob_grow(blob, sizeof(type)); \
+    *(type*)data = val->as_i(); \
+    move(blob, vm->output());
+
+void Blob__append_u8(VM* vm) { blob_append_macro(u8); }
+void Blob__append_u16(VM* vm) { blob_append_macro(u16); }
+void Blob__append_u32(VM* vm) { blob_append_macro(u32); }
+void Blob__append_i8(VM* vm) { blob_append_macro(i8); }
+void Blob__append_i16(VM* vm) { blob_append_macro(i16); }
+void Blob__append_i32(VM* vm) { blob_append_macro(i32); }
+
+#define blob_get_macro(type) \
     Value* blob = vm->input(0); \
     int offset = vm->input(1)->as_i(); \
     \
@@ -272,40 +432,18 @@ void Blob__set_i32(VM* vm)
     type result = *(type*) (data + offset); \
     set_int(vm->output(), result);
 
-void Blob__u8(VM* vm)
-{
-    BLOB_GET(u8);
-}
-
-void Blob__u16(VM* vm)
-{
-    BLOB_GET(u16);
-}
-
-void Blob__u32(VM* vm)
-{
-    BLOB_GET(u32);
-}
-
-void Blob__i8(VM* vm)
-{
-    BLOB_GET(i8);
-}
-
-void Blob__i16(VM* vm)
-{
-    BLOB_GET(i16);
-}
-
-void Blob__i32(VM* vm)
-{
-    BLOB_GET(i32);
-}
+void Blob__u8(VM* vm) { blob_get_macro(u8); }
+void Blob__u16(VM* vm) { blob_get_macro(u16); }
+void Blob__u32(VM* vm) { blob_get_macro(u32); }
+void Blob__i8(VM* vm) { blob_get_macro(i8); }
+void Blob__i16(VM* vm) { blob_get_macro(i16); }
+void Blob__i32(VM* vm) { blob_get_macro(i32); }
 
 void blob_install_functions(NativePatch* patch)
 {
     circa_patch_function(patch, "make_blob", make_blob);
     circa_patch_function(patch, "Blob.size", Blob__size);
+    circa_patch_function(patch, "Blob.resize", Blob__resize);
     circa_patch_function(patch, "Blob.slice", Blob__slice);
     circa_patch_function(patch, "Blob.set_u8", Blob__set_u8);
     circa_patch_function(patch, "Blob.set_u16", Blob__set_u16);
@@ -313,6 +451,12 @@ void blob_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Blob.set_i8", Blob__set_i8);
     circa_patch_function(patch, "Blob.set_i16", Blob__set_i16);
     circa_patch_function(patch, "Blob.set_i32", Blob__set_i32);
+    circa_patch_function(patch, "Blob.append_u8", Blob__append_u8);
+    circa_patch_function(patch, "Blob.append_u16", Blob__append_u16);
+    circa_patch_function(patch, "Blob.append_u32", Blob__append_u32);
+    circa_patch_function(patch, "Blob.append_i8", Blob__append_i8);
+    circa_patch_function(patch, "Blob.append_i16", Blob__append_i16);
+    circa_patch_function(patch, "Blob.append_i32", Blob__append_i32);
     circa_patch_function(patch, "Blob.i8", Blob__i8);
     circa_patch_function(patch, "Blob.i16", Blob__i16);
     circa_patch_function(patch, "Blob.i32", Blob__i32);

@@ -4,8 +4,17 @@ def unknown_function_prelude(any ins :multiple)
 def annotate(term, Symbol key, value :optional)
 def annotate_block(Symbol key, value :optional)
 def declare_field()
+
 def emit(Symbol name, any val)
   annotate_block(:effect)
+
+def emit_u8(Symbol name, int val)
+def emit_u16(Symbol name, int val)
+def emit_u32(Symbol name, int val)
+def emit_i8(Symbol name, int val)
+def emit_i16(Symbol name, int val)
+def emit_i32(Symbol name, int val)
+
 def equals(any a,any b) -> bool
 def not_equals(any a,any b) -> bool
 def discard(any outs :multiple :optional)
@@ -723,19 +732,42 @@ def sys_module_search_paths() -> List
 
 def make_blob(int size) -> Blob
 def Blob.size(self) -> int
+def Blob.resize(self, int len) -> Blob
 def Blob.slice(self, int offset, int len) -> Blob
-def Blob.set_u8(self, int offset, int value)
-def Blob.set_u16(self, int offset, int value)
-def Blob.set_u32(self, int offset, int value)
-def Blob.set_i8(self, int offset, int value)
-def Blob.set_i16(self, int offset, int value)
-def Blob.set_i32(self, int offset, int value)
+def Blob.set_u8(self, int offset, int value) -> Blob
+def Blob.set_u16(self, int offset, int value) -> Blob
+def Blob.set_u32(self, int offset, int value) -> Blob
+def Blob.set_i8(self, int offset, int value) -> Blob
+def Blob.set_i16(self, int offset, int value) -> Blob
+def Blob.set_i32(self, int offset, int value) -> Blob
+def Blob.append_u8(self, int value) -> Blob
+def Blob.append_u16(self, int value) -> Blob
+def Blob.append_u32(self, int value) -> Blob
+def Blob.append_i8(self, int value) -> Blob
+def Blob.append_i16(self, int value) -> Blob
+def Blob.append_i32(self, int value) -> Blob
 def Blob.u8(self, int offset) -> int
 def Blob.u16(self, int offset) -> int
 def Blob.u32(self, int offset) -> int
 def Blob.i8(self, int offset) -> int
 def Blob.i16(self, int offset) -> int
 def Blob.i32(self, int offset) -> int
+
+def Blob.from_string(self, String s) -> Blob
+  -- TODO: Propertly handle encoding
+  blob = make_blob(0)
+
+  for i in range(0, s.length)
+    @blob.append_u8(s.char_code_at(i))
+
+  blob
+
+def Blob.to_string(self) -> String
+  -- TODO: Propertly handle encoding
+  result = ""
+  for i in range(0, self.size)
+    @result.append(String.make.from_char_code(self.u8(i)))
+  result
 
 def Blob.to_hex_string(self, offset :optional, len :optional) -> String
   if offset == nil
@@ -1242,6 +1274,8 @@ def String.prepend(self, String left) -> String
     
 def String.char_at(self, int index) -> String
   -- Get character at a given index. UTF unsafe.
+
+def String.char_code_at(self, int index) -> int
 
 def String.index_of(self, String substr) -> any
   for i in 0..self.length

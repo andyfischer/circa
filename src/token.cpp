@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "blob.h"
 #include "debug.h"
 #include "names.h"
 #include "string_type.h"
@@ -808,14 +809,18 @@ void TokenStream::reset(Value* inputString)
 {
     _position = 0;
     tokens.clear();
-    set_value(&_sourceText, inputString);
-    tokenize(as_cstring(&_sourceText), string_length(&_sourceText), &tokens);
+    if (is_string(inputString))
+        set_blob_from_str(&_sourceText, as_cstring(inputString));
+    else
+        set_value(&_sourceText, inputString);
+
+    tokenize(blob_data_flat(&_sourceText), blob_size(&_sourceText), &tokens);
 }
 
 void TokenStream::reset(const char* inputString)
 {
     Value str;
-    set_string(&str, inputString);
+    set_blob_from_str(&str, inputString);
     reset(&str);
 }
 
@@ -837,7 +842,8 @@ void TokenStream::getNextStr(Value* value, int lookahead)
 {
     int startPos = next(lookahead).start;
     int length = next(lookahead).length();
-    string_substr(&_sourceText, startPos, length, value);
+    blob_slice(&_sourceText, startPos, startPos + length, value);
+    blob_to_str(value);
 }
 
 bool TokenStream::nextIsEof(int lookahead)

@@ -883,6 +883,24 @@ void String__char_at(VM* vm)
     set_string(circa_output(vm), output, 1);
 }
 
+void String__char_code_at(VM* vm)
+{
+    const char* str = circa_input(vm, 0)->as_str();
+    int index = circa_input(vm, 1)->as_i();
+
+    if (index < 0) {
+        circa_throw(vm, "negative index");
+        return;
+    }
+
+    if ((unsigned) index >= strlen(str)) {
+        circa_throw(vm, "index out of bounds");
+        return;
+    }
+
+    set_int(circa_output(vm), str[index]);
+}
+
 void String__length(VM* vm)
 {
     const char* str = circa_input(vm, 0)->as_str();
@@ -1426,6 +1444,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "Module._get", Module__get);
 
     circa_patch_function(patch, "String.char_at", String__char_at);
+    circa_patch_function(patch, "String.char_code_at", String__char_code_at);
     circa_patch_function(patch, "String.ends_with", String__ends_with);
     circa_patch_function(patch, "String.length", String__length);
     circa_patch_function(patch, "String.char_code", String__char_code);
@@ -1439,14 +1458,7 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "String.to_lower", String__to_lower);
     circa_patch_function(patch, "String.to_number", String__to_number);
     circa_patch_function(patch, "String.to_int", String__to_int);
-
-#if 0
-    circa_patch_function(patch, "file_version", file__version);
-    circa_patch_function(patch, "file_exists", file__exists);
-    circa_patch_function(patch, "file_read_text", file__read_text);
-#endif
     circa_patch_function(patch, "make_module", make_module);
-
     circa_patch_function(patch, "noise", noise);
     circa_patch_function(patch, "not_equals", not_equals);
     circa_patch_function(patch, "print", print);
@@ -1461,17 +1473,10 @@ void misc_builtins_setup_functions(NativePatch* patch)
     circa_patch_function(patch, "unique_id", unique_id);
     circa_patch_function(patch, "cache_get", cache_get);
     circa_patch_function(patch, "cache_set", cache_set);
-#if 0
-    circa_patch_function(patch, "source_id", source_id);
-#endif
     circa_patch_function(patch, "from_string", from_string);
     circa_patch_function(patch, "to_string_repr", to_string_repr);
     circa_patch_function(patch, "test_spy", test_spy);
     circa_patch_function(patch, "test_oracle", test_oracle);
-
-#if 0
-    circa_patch_function(patch, "global_script_version", global_script_version);
-#endif
 }
 
 } // namespace circa

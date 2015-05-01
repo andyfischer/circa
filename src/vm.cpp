@@ -918,11 +918,12 @@ void VM__get_raw_ops(VM* vm)
 {
     VM* self = (VM*) get_pointer(vm->input(0));
     if (self->bc == NULL) {
-        set_blob_alloc_raw(vm->output(), NULL, 0);
+        set_blob(vm->output(), 0);
         return;
     }
 
-    set_blob_alloc_raw(vm->output(), (char*) self->bc->ops, self->bc->opCount * sizeof(Op));
+    set_blob_slice(vm->output(), NULL, (char*) self->bc->ops, self->bc->opCount * sizeof(Op));
+    touch(vm->output());
 }
 
 void VM__get_func_raw_ops(VM* vm)
@@ -931,33 +932,35 @@ void VM__get_func_raw_ops(VM* vm)
     Value* func = vm->input(1);
 
     if (self->bc == NULL) {
-        set_blob_alloc_raw(vm->output(), NULL, 0);
+        set_blob(vm->output(), 0);
         return;
     }
 
     Value* record = self->bc->blockToAddr.val_key(func->index(0));
 
     if (record == NULL) {
-        set_blob_alloc_raw(vm->output(), NULL, 0);
+        set_blob(vm->output(), 0);
         return;
     }
 
     int start = record->index(0)->as_i();
     int fin = record->index(1)->as_i();
 
-    set_blob_alloc_raw(vm->output(), (char*) (self->bc->ops + start), (fin - start) * sizeof(Op));
+    set_blob_slice(vm->output(), NULL, (char*) (self->bc->ops + start), (fin - start) * sizeof(Op));
+    touch(vm->output());
 }
 
 void VM__get_raw_mops(VM* vm)
 {
     VM* self = (VM*) get_pointer(vm->input(0));
     if (self->bc == NULL) {
-        set_blob_alloc_raw(vm->output(), NULL, 0);
+        set_blob(vm->output(), 0);
         return;
     }
 
-    set_blob_alloc_raw(vm->output(), (char*) self->bc->metadata,
+    set_blob_slice(vm->output(), NULL, (char*) self->bc->metadata,
         self->bc->metadataSize * sizeof(BytecodeMetadata));
+    touch(vm->output());
 }
 
 void VM__get_bytecode_const(VM* vm)
@@ -1030,6 +1033,24 @@ void emit(VM* vm)
 
     move(val, list_append(list));
 }
+
+#define emit_blob_macro(type) \
+  Value* key = vm->input(0); \
+  Value* val = vm->input(1); \
+  Value* blob = hashtable_get(&vm->messageOutput, key); \
+  if (blob == NULL || is_null(blob)) \
+      return; \
+  if (!is_blob(blob)) \
+      set_blob(blob, 0); \
+  char* data = blob_grow(blob, sizeof(type)); \
+  *(type*)(data) = as_int(val);
+
+void emit_u8(VM* vm) { emit_blob_macro(u8); }
+void emit_u16(VM* vm) { emit_blob_macro(u16); }
+void emit_u32(VM* vm) { emit_blob_macro(u32); }
+void emit_i8(VM* vm) { emit_blob_macro(i8); }
+void emit_i16(VM* vm) { emit_blob_macro(i16); }
+void emit_i32(VM* vm) { emit_blob_macro(i32); }
 
 void VM__expect_messages(VM* vm)
 {
@@ -1516,6 +1537,12 @@ void vm_install_functions(NativePatch* patch)
     circa_patch_function(patch, "env", get_env);
     circa_patch_function(patch, "env_opt", get_env_opt);
     circa_patch_function(patch, "emit", emit);
+    circa_patch_function(patch, "emit_u8", emit_u8);
+    circa_patch_function(patch, "emit_u16", emit_u16);
+    circa_patch_function(patch, "emit_u32", emit_u32);
+    circa_patch_function(patch, "emit_i8", emit_i8);;
+    circa_patch_function(patch, "emit_i16", emit_i16);
+    circa_patch_function(patch, "emit_i32", emit_i32);
 }
 
 void vm_setup_type(Type* type)

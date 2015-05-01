@@ -41,6 +41,14 @@ World* g_world = NULL;
 BuiltinFuncs FUNCS;
 BuiltinTypes TYPES;
 
+void* ca_realloc(void* data, u32 newSize)
+{
+    void* newData = realloc(data, newSize);
+    if (newData == NULL && newSize != 0)
+        internal_error("realloc failure");
+    return newData;
+}
+
 Term* find_builtin_func(Block* builtins, const char* name);
 
 Type* output_placeholder_specializeType(Term* caller)

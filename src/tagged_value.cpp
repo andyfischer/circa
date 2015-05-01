@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "blob.h"
 #include "debug.h"
 #include "function.h"
 #include "hashtable.h"
@@ -1085,9 +1086,11 @@ bool circa_bool(Value* value) {
     ca_assert(circa_is_bool(value));
     return value->value_data.asbool;
 }
+#if 0
 char* circa_blob(Value* value) {
     return as_blob(value);
 }
+#endif
 caBlock* circa_block(Value* value) {
     ca_assert(circa_is_block(value));
     return (caBlock*) value->value_data.ptr;
@@ -1166,7 +1169,7 @@ caType* circa_type_of(Value* value)
     return value->value_type;
 }
 
-void circa_set_blob(Value* container, int size)
+void circa_set_blob(Value* container, u32 size)
 {
     set_blob(container, size);
 }
