@@ -385,7 +385,7 @@ void Surface__image_blob(caVM* vm)
     cairo_surface_t* surface = as_cairo_surface(surfaceVal);
     cairo_surface_flush(surface);
 
-    circa_set_blob_from_backing_value(
+    circa_set_blob_slice(
         circa_output(vm),
         surfaceVal,
         (char*) cairo_image_surface_get_data(surface),

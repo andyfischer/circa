@@ -1,0 +1,31 @@
+
+b = make_blob(0)
+
+@b.append_f32(0.123)
+@b.append_f32(4.56)
+
+print(b.to_hex_string)
+
+print('should be 0.123 = ' b.f32(0))
+print('should be 4.56 = ' b.f32(4))
+
+@b.set_f32(0, 78.9)
+@b.set_f32(4, 10.1)
+
+print('should be 78.9 = ' b.f32(0))
+print('should be 10.1 = ' b.f32(4))
+
+b = make_blob(0)
+@b.append_f64(0.123)
+@b.append_f64(4.56)
+
+print(b.to_hex_string)
+
+print('should be 0.123 = ' b.f64(0))
+print('should be 4.56 = ' b.f64(8))
+
+@b.set_f64(0, 78.9)
+@b.set_f64(8, 10.1)
+
+print('should be 78.9 = ' b.f64(0))
+print('should be 10.1 = ' b.f64(8))

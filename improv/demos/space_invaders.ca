@@ -1,7 +1,25 @@
 
-require draw
 require input
 require improv
+
+-- new draw
+
+struct Draw2d {
+  Color currentColor
+  Blob buffer
+}
+
+def Draw2d.color(@self, Color color)
+  self.currentColor = color
+
+def Draw2d.fill_rect(@self, shape)
+  @self.buffer.append_f32
+
+def Draw2d.fill(@self, shape)
+
+def Draw2d.clear(self, Color color)
+
+draw = NewDraw.make
 
 def grid_points(Vec2 size)
   set(FuncSeq.make

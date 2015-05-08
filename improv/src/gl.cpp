@@ -570,9 +570,8 @@ void Texture__set_data(caVM* vm)
     int width = int(widthF);
     int height = int(heightF);
 
-    char* data;
-    uint32_t blobSize;
-    circa_blob_data(blob, &data, &blobSize);
+    char* data = circa_blob(blob);
+    uint32_t blobSize = circa_blob_size(blob);
 
     if (blobSize < (width*height))
         return circa_output_error(vm, "Blob does not have enough bytes for dimensions");

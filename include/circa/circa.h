@@ -363,12 +363,11 @@ void        circa_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
 void        circa_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
 
 void* circa_get_boxed_native_ptr(caValue* val);
-void circa_blob_data(caValue* blob, char** dataOut, uint32_t* sizeOut);
 uint32_t circa_blob_size(caValue* blob);
 
 // Create a new blob based on a backing value. Caller must guarantee that 'data' is owned
 // or contained inside the backingValue.
-void circa_set_blob_from_backing_value(caValue* blob, caValue* backingValue, char* data, uint32_t numBytes);
+void circa_set_blob_slice(caValue* blob, caValue* backingValue, const char* data, uint32_t size);
 
 // Read the pointer value from a caValue. This call will do dereferencing: if the caValue
 // is actually a Handle then we'll dereference the handle.

@@ -113,9 +113,8 @@ void fill_audio(void* udata, Uint8* stream, int numBytes)
         return;
     }
 
-    char* effectBytes;
-    uint32_t effectNumBytes;
-    circa_blob_data(&audio->currentEffect, &effectBytes, &effectNumBytes);
+    char* effectBytes = circa_blob(&audio->currentEffect);
+    uint32_t effectNumBytes = circa_blob_size(&audio->currentEffect);
 
     int remainingEffectBytes = effectNumBytes - audio->effectPos;
 

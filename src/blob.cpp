@@ -151,6 +151,11 @@ char* blob_data_flat(Value* blob)
     return NULL;
 }
 
+CIRCA_EXPORT char* circa_blob(Value* blob)
+{
+    return blob_data_flat(blob);
+}
+
 void blob_data(Value* blobVal, char** dataOut, u32* sizeOut)
 {
     ca_assert(is_blob(blobVal));
@@ -246,6 +251,12 @@ u32 blob_size(Value* blob)
     return abstract->size;
 }
 
+CIRCA_EXPORT uint32_t circa_blob_size(Value* blob)
+{
+    return blob_size(blob);
+}
+
+
 #if 0
 void set_blob_from_backing_value(Value* blob, Value* backingValue, char* data, u32 numBytes)
 {
@@ -283,6 +294,11 @@ void set_blob_slice(Value* value, Value* backingValue, const char* data, u32 siz
 
     make_no_initialize(TYPES.blob, value);
     value->value_data.ptr = slice;
+}
+
+CIRCA_EXPORT void circa_set_blob_slice(Value* value, Value* backingValue, const char* data, uint32_t size)
+{
+    set_blob_slice(value, backingValue, data, size);
 }
 
 void set_blob_flat(Value* value, const char* data, u32 size)
@@ -363,7 +379,7 @@ void Blob__slice(VM* vm)
     set_blob_slice(vm->output(), existingBlob, existingData+offset, size);
 }
 
-#define blob_set_macro(type) \
+#define blob_set_macro(type, as) \
     Value* blob = vm->input(0); \
     int offset = vm->input(1)->as_i(); \
     \
@@ -371,54 +387,35 @@ void Blob__slice(VM* vm)
         return vm->throw_str("Offset is out of bounds"); \
     \
     char* data = blob_touch(blob); \
-    *(type*)(data + offset) = vm->input(2)->as_i(); \
+    *(type*)(data + offset) = as(vm->input(2)); \
     move(blob, vm->output());
 
-void Blob__set_u8(VM* vm)
-{
-    blob_set_macro(u8);
-}
+void Blob__set_u8(VM* vm) { blob_set_macro(u8, as_int); }
+void Blob__set_u16(VM* vm) { blob_set_macro(u16, as_int); }
+void Blob__set_u32(VM* vm) { blob_set_macro(u32, as_int); }
+void Blob__set_i8(VM* vm) { blob_set_macro(i8, as_int); }
+void Blob__set_i16(VM* vm) { blob_set_macro(i16, as_int); }
+void Blob__set_i32(VM* vm) { blob_set_macro(i32, as_int); }
+void Blob__set_f32(VM* vm) { blob_set_macro(f32, as_float); }
+void Blob__set_f64(VM* vm) { blob_set_macro(f64, as_float); }
 
-void Blob__set_u16(VM* vm)
-{
-    blob_set_macro(u16);
-}
-
-void Blob__set_u32(VM* vm)
-{
-    blob_set_macro(u32);
-}
-
-void Blob__set_i8(VM* vm)
-{
-    blob_set_macro(i8);
-}
-
-void Blob__set_i16(VM* vm)
-{
-    blob_set_macro(i16);
-}
-
-void Blob__set_i32(VM* vm)
-{
-    blob_set_macro(i32);
-}
-
-#define blob_append_macro(type) \
+#define blob_append_macro(type, as) \
     Value* blob = vm->input(0); \
     Value* val = vm->input(1); \
     char* data = blob_grow(blob, sizeof(type)); \
-    *(type*)data = val->as_i(); \
+    *(type*)data = as(val); \
     move(blob, vm->output());
 
-void Blob__append_u8(VM* vm) { blob_append_macro(u8); }
-void Blob__append_u16(VM* vm) { blob_append_macro(u16); }
-void Blob__append_u32(VM* vm) { blob_append_macro(u32); }
-void Blob__append_i8(VM* vm) { blob_append_macro(i8); }
-void Blob__append_i16(VM* vm) { blob_append_macro(i16); }
-void Blob__append_i32(VM* vm) { blob_append_macro(i32); }
+void Blob__append_u8(VM* vm) { blob_append_macro(u8, as_int); }
+void Blob__append_u16(VM* vm) { blob_append_macro(u16, as_int); }
+void Blob__append_u32(VM* vm) { blob_append_macro(u32, as_int); }
+void Blob__append_i8(VM* vm) { blob_append_macro(i8, as_int); }
+void Blob__append_i16(VM* vm) { blob_append_macro(i16, as_int); }
+void Blob__append_i32(VM* vm) { blob_append_macro(i32, as_int); }
+void Blob__append_f32(VM* vm) { blob_append_macro(f32, as_float); }
+void Blob__append_f64(VM* vm) { blob_append_macro(f64, as_float); }
 
-#define blob_get_macro(type) \
+#define blob_get_macro(type, set) \
     Value* blob = vm->input(0); \
     int offset = vm->input(1)->as_i(); \
     \
@@ -430,14 +427,16 @@ void Blob__append_i32(VM* vm) { blob_append_macro(i32); }
         return vm->throw_str("Offset is out of bounds"); \
     \
     type result = *(type*) (data + offset); \
-    set_int(vm->output(), result);
+    set(vm->output(), result);
 
-void Blob__u8(VM* vm) { blob_get_macro(u8); }
-void Blob__u16(VM* vm) { blob_get_macro(u16); }
-void Blob__u32(VM* vm) { blob_get_macro(u32); }
-void Blob__i8(VM* vm) { blob_get_macro(i8); }
-void Blob__i16(VM* vm) { blob_get_macro(i16); }
-void Blob__i32(VM* vm) { blob_get_macro(i32); }
+void Blob__u8(VM* vm) { blob_get_macro(u8, set_int); }
+void Blob__u16(VM* vm) { blob_get_macro(u16, set_int); }
+void Blob__u32(VM* vm) { blob_get_macro(u32, set_int); }
+void Blob__i8(VM* vm) { blob_get_macro(i8, set_int); }
+void Blob__i16(VM* vm) { blob_get_macro(i16, set_int); }
+void Blob__i32(VM* vm) { blob_get_macro(i32, set_int); }
+void Blob__f32(VM* vm) { blob_get_macro(f32, set_float); }
+void Blob__f64(VM* vm) { blob_get_macro(f64, set_float); }
 
 void blob_install_functions(NativePatch* patch)
 {
@@ -451,18 +450,24 @@ void blob_install_functions(NativePatch* patch)
     circa_patch_function(patch, "Blob.set_i8", Blob__set_i8);
     circa_patch_function(patch, "Blob.set_i16", Blob__set_i16);
     circa_patch_function(patch, "Blob.set_i32", Blob__set_i32);
+    circa_patch_function(patch, "Blob.set_f32", Blob__set_f32);
+    circa_patch_function(patch, "Blob.set_f64", Blob__set_f64);
     circa_patch_function(patch, "Blob.append_u8", Blob__append_u8);
     circa_patch_function(patch, "Blob.append_u16", Blob__append_u16);
     circa_patch_function(patch, "Blob.append_u32", Blob__append_u32);
     circa_patch_function(patch, "Blob.append_i8", Blob__append_i8);
     circa_patch_function(patch, "Blob.append_i16", Blob__append_i16);
     circa_patch_function(patch, "Blob.append_i32", Blob__append_i32);
-    circa_patch_function(patch, "Blob.i8", Blob__i8);
-    circa_patch_function(patch, "Blob.i16", Blob__i16);
-    circa_patch_function(patch, "Blob.i32", Blob__i32);
+    circa_patch_function(patch, "Blob.append_f32", Blob__append_f32);
+    circa_patch_function(patch, "Blob.append_f64", Blob__append_f64);
     circa_patch_function(patch, "Blob.u8", Blob__u8);
     circa_patch_function(patch, "Blob.u16", Blob__u16);
     circa_patch_function(patch, "Blob.u32", Blob__u32);
+    circa_patch_function(patch, "Blob.i8", Blob__i8);
+    circa_patch_function(patch, "Blob.i16", Blob__i16);
+    circa_patch_function(patch, "Blob.i32", Blob__i32);
+    circa_patch_function(patch, "Blob.f32", Blob__f32);
+    circa_patch_function(patch, "Blob.f64", Blob__f64);
 }
 
 } // namespace circa
