@@ -70,10 +70,10 @@ def Layout.solveDim(self, String dim) -> List
             prop = child.props.get(dim)
 
             if first_symbol(prop) == :percent
-                percent = prop[1] -> number.cast / 100.0
+                percent = prop[1] | number.cast / 100.0
                 desiredSize = (availableFin - availableStart) * percent
             else
-                desiredSize = prop -> number.cast
+                desiredSize = prop | number.cast
             
             min(@desiredSize, availableFin - nextLoc)
 

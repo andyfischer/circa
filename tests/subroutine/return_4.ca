@@ -7,5 +7,5 @@ def main() -> int
   return 8
 
 int = make_vm(main)
-int.call -> print
-int.get_state -> print
+int.call | print
+int.get_state | print

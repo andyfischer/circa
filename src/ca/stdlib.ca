@@ -1707,17 +1707,17 @@ def rect(number x1, number y1, number x2, number y2) -> Rect
 
 def bezier3(number t, List points) -> Vec2
   -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
-  p0 = points[0] -> Vec2.cast
-  p1 = points[1] -> Vec2.cast
-  p2 = points[2] -> Vec2.cast
+  p0 = points[0] | Vec2.cast
+  p1 = points[1] | Vec2.cast
+  p2 = points[2] | Vec2.cast
   (p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t))
 
 def bezier4(number t, List points) -> Vec2
   -- Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
-  p0 = points[0] -> Vec2.cast
-  p1 = points[1] -> Vec2.cast
-  p2 = points[2] -> Vec2.cast
-  p3 = points[3] -> Vec2.cast
+  p0 = points[0] | Vec2.cast
+  p1 = points[1] | Vec2.cast
+  p2 = points[2] | Vec2.cast
+  p3 = points[3] | Vec2.cast
   (p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t))
 
 def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
@@ -1745,9 +1745,9 @@ def random_color() -> Color
 def hsv_to_rgb(List hsv) -> Color
   -- Convert HSV components to an RGB Color
 
-  h = hsv[0] -> number.cast
-  s = hsv[1] -> number.cast
-  v = hsv[2] -> number.cast
+  h = hsv[0] | number.cast
+  s = hsv[1] | number.cast
+  v = hsv[2] | number.cast
 
   if s == 0
       -- grey

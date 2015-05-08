@@ -1,0 +1,3 @@
+
+print(1 | number.cast)
+2 | number.cast | print

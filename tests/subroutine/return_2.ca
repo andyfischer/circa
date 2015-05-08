@@ -5,5 +5,5 @@ def f(bool b) -> int
   else
     return 2
 
-f(true) -> print
-f(false) -> print
+f(true) | print
+f(false) | print

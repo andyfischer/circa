@@ -14,9 +14,9 @@ def UIElement.layoutInRect(@self, Rect rect)
     self.rect = rect
 
     if self.tag == :VerticalList
-        elements = self.args[0] -> List.cast
+        elements = self.args[0] | List.cast
         topY = self.rect.y1
-        elements = self.args[0] -> List.cast
+        elements = self.args[0] | List.cast
         for UIElement element in @elements
             elementSize = element.getSize()
 

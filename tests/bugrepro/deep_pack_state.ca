@@ -15,7 +15,7 @@ def click_resolver(any message)
             listener = message[2]
             @clickAreas.append(ClickArea.make(rect listener))
         elif message[0] == :resolve
-            mousePos = message[1] -> Vec2.cast
+            mousePos = message[1] | Vec2.cast
             event = message[2]
 
             listener = null

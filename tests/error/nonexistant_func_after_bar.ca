@@ -1,6 +1,6 @@
 
 def main()
-  1 -> NonexistantFunc
+  1 | NonexistantFunc
 
 vm = make_vm(main)
 vm.run

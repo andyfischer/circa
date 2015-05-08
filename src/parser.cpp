@@ -1909,8 +1909,6 @@ InfixOperatorInfo get_infix_operator_info(int tokenMatch)
     switch(tokenMatch) {
         case tok_TwoDots:
             return InfixOperatorInfo(FUNCS.range, 7, false);
-        case tok_RightArrow:
-            return InfixOperatorInfo(NULL, 7, false);
         case tok_Star:
             return InfixOperatorInfo(FUNCS.mult, 6, false);
         case tok_Slash:
@@ -2000,9 +1998,14 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
 
         ParseResult result;
 
-        if (operatorMatch == tok_RightArrow || operatorMatch == tok_VerticalBar) {
+        if (operatorMatch == tok_VerticalBar) {
 
             // Right-apply. Consume right side as a function name.
+            
+            if (tokens.nextIs(tok_Dot)) {
+                // 
+            }
+
             
             if (!tokens.nextIs(tok_Identifier))
                 return syntax_error(block, tokens, startPosition, "Expected identifier");
@@ -2058,10 +2061,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
                     set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
                 }
 
-                if (operatorMatch == tok_RightArrow)
-                    term->setStringProp(s_Syntax_DeclarationStyle, "arrow-concat");
-                else
-                    term->setStringProp(s_Syntax_DeclarationStyle, "bar-apply");
+                term->setStringProp(s_Syntax_DeclarationStyle, "bar-apply");
                 term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
 
             }
