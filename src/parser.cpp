@@ -1968,7 +1968,7 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
         //   <expr><whitespace><hyphen><non-whitespace>
         //
         // Then stop and don't parse it as an infix expression. The right side will be
-        // parsed as a subsequent expression that has an unary negation.
+        // parsed later as unary negation.
         if (tokens.nextIs(tok_Whitespace)
                 && tokens.nextIs(tok_Minus, 1)
                 && !tokens.nextIs(tok_Whitespace, 2))
@@ -2003,67 +2003,74 @@ ParseResult infix_expression(Block* block, TokenStream& tokens, ParserCxt* conte
             // Right-apply. Consume right side as a function name.
             
             if (tokens.nextIs(tok_Dot)) {
-                // 
-            }
+                // example: left | .method
 
-            
-            if (!tokens.nextIs(tok_Identifier))
-                return syntax_error(block, tokens, startPosition, "Expected identifier");
+                result = method_call(block, tokens, context, left);
 
-            ParseResult functionName = identifier_possibly_null(block, tokens, context);
-
-            if (tokens.nextIs(tok_Dot)) {
-                // Method call.
-                result = method_call(block, tokens, context, functionName);
-
-                Term* term = result.term;
-
-                set_input(term, 1, left.term);
-                term->setStringProp(s_Syntax_DeclarationStyle, "method-right-arrow");
-
-                term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string("");
-                term_insert_input_property(term, 1, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
-
-            } else if (tokens.nextIs(tok_LParen)) {
-                tokens.consume(tok_LParen);
-
-                ListSyntaxHints syntaxHints;
-
-                Value functionNameVal;
-                set_string(&functionNameVal, functionName.identifierName);
-
-                TermList inputs;
-                inputs.append(left.term);
-
-                function_call_inputs(block, tokens, context, inputs, syntaxHints);
-                tokens.consume(tok_RParen);
-
-                Term* function = find_name(block, &functionNameVal);
-                Term* term = apply(block, function, inputs);
-                set_source_location(term, startPosition, tokens);
-
-                if (left.identifierRebind) {
-                    set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
-                }
-
-                result = ParseResult(term);
-
+                // TODO: correct syntax hints
             } else {
+            
+                if (!tokens.nextIs(tok_Identifier))
+                    return syntax_error(block, tokens, startPosition, "Expected identifier");
 
-                Value functionNameVal;
-                set_string(&functionNameVal, functionName.identifierName);
-                result = right_apply_to_function(block, left.term, &functionNameVal);
+                ParseResult functionName = identifier_possibly_null(block, tokens, context);
 
+                if (tokens.nextIs(tok_Dot)) {
+                    // example: left | obj.method
+                   
+                    result = method_call(block, tokens, context, functionName);
 
-                Term* term = result.term;
+                    Term* term = result.term;
 
-                if (left.identifierRebind) {
-                    set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
+                    set_input(term, 1, left.term);
+                    term->setStringProp(s_Syntax_DeclarationStyle, "method-right-arrow");
+
+                    term_insert_input_property(term, 1, s_Syntax_PreWs)->set_string("");
+                    term_insert_input_property(term, 1, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
+
+                } else if (tokens.nextIs(tok_LParen)) {
+                    // example: left | func(args)
+                    
+                    tokens.consume(tok_LParen);
+
+                    ListSyntaxHints syntaxHints;
+
+                    Value functionNameVal;
+                    set_string(&functionNameVal, functionName.identifierName);
+
+                    TermList inputs;
+                    inputs.append(left.term);
+
+                    function_call_inputs(block, tokens, context, inputs, syntaxHints);
+                    tokens.consume(tok_RParen);
+
+                    Term* function = find_name(block, &functionNameVal);
+                    Term* term = apply(block, function, inputs);
+                    set_source_location(term, startPosition, tokens);
+
+                    if (left.identifierRebind) {
+                        set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
+                    }
+
+                    result = ParseResult(term);
+
+                } else {
+                    // example: left | func
+
+                    Value functionNameVal;
+                    set_string(&functionNameVal, functionName.identifierName);
+                    result = right_apply_to_function(block, left.term, &functionNameVal);
+
+                    Term* term = result.term;
+
+                    if (left.identifierRebind) {
+                        set_bool(term_insert_input_property(term, 0, s_Syntax_IdentifierRebind), true);
+                    }
+
+                    term->setStringProp(s_Syntax_DeclarationStyle, "bar-apply");
+                    term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
+
                 }
-
-                term->setStringProp(s_Syntax_DeclarationStyle, "bar-apply");
-                term_insert_input_property(term, 0, s_Syntax_PostWs)->set_string(preOperatorWhitespace.c_str());
-
             }
 
             result.term->setStringProp(s_Syntax_PostOperatorWs, postOperatorWhitespace);
@@ -2240,8 +2247,8 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
                 "Expected identifier or symbol after dot");
     }
 
-    Value functionName;
-    tokens.consumeStr(&functionName);
+    Value methodName;
+    tokens.consumeStr(&methodName);
 
     bool hasParens = false;
     int lparenPosition = 0;
@@ -2279,7 +2286,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
     if (rootType != NULL) {
         Value nameLocation;
         nameLocation.set_list(2);
-        nameLocation.index(0)->set(&functionName);
+        nameLocation.index(0)->set(&methodName);
         nameLocation.index(1)->set_block(block);
 
         Block* method = find_method_on_type(rootType, &nameLocation);
@@ -2294,7 +2301,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
         // Method could not be statically found. Create a dynamic_method call.
         function = FUNCS.dynamic_method;
         term = apply(block, function, inputs);
-        term->setStringProp(s_method_name, as_cstring(&functionName));
+        term->setStringProp(s_method_name, as_cstring(&methodName));
 
     } else {
         term = apply(block, function, inputs);
@@ -2302,7 +2309,7 @@ ParseResult method_call(Block* block, TokenStream& tokens, ParserCxt* context, P
 
     inputHints.apply(term);
     apply_hints_from_parsed_input(term, 0, lhs);
-    term->setProp(s_Syntax_FunctionName, &functionName);
+    term->setProp(s_Syntax_FunctionName, &methodName);
     term->setStringProp(s_Syntax_DeclarationStyle, "method-call");
     if (!hasParens)
         term->setBoolProp(s_Syntax_NoParens, true);
