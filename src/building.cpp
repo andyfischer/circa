@@ -823,6 +823,15 @@ void update_term_user_lists(Block* block)
     }
 }
 
+Term* find_existing_declared_state_close(Block* block, Term* result)
+{
+    for (BlockIteratorFlat it(block); it; ++it) {
+        if ((*it)->function == FUNCS.declared_state_close && (*it)->input(0) == result)
+            return *it;
+    }
+    return NULL;
+}
+
 void close_stateful_values(Block* block)
 {
     for (BlockIteratorFlat it(block); it; ++it) {
@@ -831,13 +840,15 @@ void close_stateful_values(Block* block)
             continue;
 
         Term* finalResult = find_name(block, term_name(term)); 
-        if (finalResult == term)
-            continue;
 
         term_set_bool_prop(finalResult, s_LocalStateResult, true);
 
-        Term* closer = apply(finalResult->owningBlock, FUNCS.declared_state_close, TermList(finalResult));
-        move_after(closer, finalResult);
+        Term* closer = find_existing_declared_state_close(block, finalResult);
+
+        #if 0
+        if (closer == NULL)
+            closer = apply(finalResult->owningBlock, FUNCS.declared_state_close, TermList(finalResult));
+        #endif
 
         BlockIterator2 exitPointSearch;
         exitPointSearch.startAt(term);
@@ -853,8 +864,10 @@ void close_stateful_values(Block* block)
 
             Term* localResult = find_name_at(&termVal, term_name(term)); 
 
+            #if 0
             Term* closer = apply(exitPoint->owningBlock, FUNCS.declared_state_close, TermList(localResult));
             move_before(closer, exitPoint);
+            #endif
 
             term_set_bool_prop(localResult, s_LocalStateResult, true);
         }

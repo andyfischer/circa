@@ -4,5 +4,4 @@ str = "Hello world!"
 blob = Blob.make.from_string(str)
 
 print('hex = ' blob.to_hex_string)
-
 print('str = ' blob.to_string)

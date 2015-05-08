@@ -1,3 +1,3 @@
 [tests/error/input_cast.ca:3] 
- [:649 inside increment()] 
+ [:659 inside increment()] 
   Error: Couldn't cast fish to type int

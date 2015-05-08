@@ -383,7 +383,7 @@ bool has_variable_args(Block* block)
     }
 }
 
-int count_minimum_num_inputs(Block* block)
+int required_input_count(Block* block)
 {
     int count = 0;
     for (int i=0;; i++) {

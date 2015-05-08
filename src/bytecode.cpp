@@ -916,10 +916,26 @@ void loop_condition_bool(Bytecode* bc, Term* term)
     append_unresolved_jump(bc, addr, s_done);
 }
 
+int minimum_input_count_for_call(Block* block)
+{
+    // Unlike required_input_count(), this function does include :optional values in the count.
+    // If an optional arg is not provided, we need to at least pass nil.
+    int count = 0;
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(block, i);
+        if (placeholder == NULL)
+            break;
+        if (placeholder->boolProp(s_multiple, false))
+            break;
+        count++;
+    }
+    return count;
+}
+
 void maybe_write_not_enough_inputs_error(Bytecode* bc, Block* func, int found)
 {
     ca_assert(func != NULL);
-    int expected = count_minimum_num_inputs(func);
+    int expected = required_input_count(func);
     int varargs = has_variable_args(func);
 
     if (found >= expected)
@@ -963,6 +979,20 @@ void maybe_write_too_many_inputs_error(Bytecode* bc, Block* func, int found)
     call(bc, top, 1, FUNCS.error->nestedContents);
 }
 
+int count_expected_num_inputs(Block* block)
+{
+    int count = 0;
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(block, i);
+        if (placeholder == NULL)
+            break;
+        if (placeholder->boolProp(s_multiple, false))
+            break;
+        count++;
+    }
+    return count;
+}
+
 void write_normal_call(Bytecode* bc, Term* term, Block* function)
 {
 #if DEBUG
@@ -985,6 +1015,12 @@ void write_normal_call(Bytecode* bc, Term* term, Block* function)
     maybe_write_not_enough_inputs_error(bc, function, inputCount);
     maybe_write_too_many_inputs_error(bc, function, inputCount);
 
+    int minimumInputCount = minimum_input_count_for_call(function);
+
+    if (inputCount < minimumInputCount)
+        // Pass at least the minimum. Will pass 'nil' for missing inputs.
+        inputCount = minimumInputCount;
+
     int top = reserve_new_frame_slots(bc, inputCount);
 
     append_op(bc, op_precall, top, inputCount);
@@ -993,6 +1029,8 @@ void write_normal_call(Bytecode* bc, Term* term, Block* function)
         int inputSlot = top + 1 + i;
         load_input_term(bc, term, term->input(i), inputSlot);
     }
+
+    // Pass nil for missing optional values
 
     if (count_closure_upvalues(function) != 0) {
         load_input_term(bc, term, term->function, top);
