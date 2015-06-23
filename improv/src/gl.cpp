@@ -354,19 +354,10 @@ void VertexBuffer__set_data(caVM* vm)
     VertexBuffer* buffer = VertexBuffer::get(circa_input(vm, 0));
     glBindBuffer(GL_ARRAY_BUFFER, buffer->id);
 
-    caValue* vertices = circa_input(vm, 1);
-    buffer->floatCount = circa_length(vertices);
-    size_t rawDataSize = sizeof(GLfloat) * buffer->floatCount;
-    GLfloat* rawData = (GLfloat*) malloc(rawDataSize);
-    for (int i=0; i < buffer->floatCount; i++) {
-        rawData[i] = circa_float(circa_index(vertices, i));
-    }
-
-    glBufferData(GL_ARRAY_BUFFER, rawDataSize, rawData, GL_DYNAMIC_DRAW);
-    free(rawData);
+    caValue* blob = circa_input(vm, 1);
+    buffer->floatCount = circa_blob_size(blob) / 4;
+    glBufferData(GL_ARRAY_BUFFER, circa_blob_size(blob), circa_blob(blob), GL_DYNAMIC_DRAW);
     gl_check_error();
-
-    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
 void VertexBuffer__draw(caVM* vm)
@@ -413,8 +404,6 @@ void VertexBuffer__draw(caVM* vm)
     gl_check_error();
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
 void VertexBuffer__set_draw_type(caVM* vm)
@@ -427,8 +416,6 @@ void VertexBuffer__set_draw_type(caVM* vm)
         buffer->drawType = GL_TRIANGLE_STRIP;
     else
         return circa_output_error(vm, "Unrecognized draw type");
-
-    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
 void VertexBuffer__set_attribs(caVM* vm)
@@ -449,8 +436,6 @@ void VertexBuffer__set_attribs(caVM* vm)
             return circa_output_error(vm, "Expected integer in element 1");
         buffer->floatsPerVertex += circa_int(circa_index(attrib, 1));
     }
-
-    circa_move(circa_input(vm, 0), circa_output(vm));
 }
 
 void clear(caVM* vm)

@@ -10,9 +10,12 @@ struct VertexBuffer {
 }
 
 def new_vertex_buffer() -> VertexBuffer
-def VertexBuffer.set_data(self, List vertices) -> VertexBuffer
-def VertexBuffer.set_draw_type(self, Symbol t) -> VertexBuffer
-def VertexBuffer.set_attribs(self, List attribs :multiple) -> VertexBuffer
+def VertexBuffer.set_draw_type(self, Symbol t)
+  annotate_block(:effect)
+def VertexBuffer.set_attribs(self, List attribs :multiple)
+  annotate_block(:effect)
+def VertexBuffer.set_data(self, Blob data)
+  annotate_block(:effect)
 def VertexBuffer.draw(self)
   annotate_block(:effect)
 

@@ -1,25 +1,97 @@
 
 require input
 require improv
+require gl
+require gl/shader_builder
+require gl/improv_util
 
 -- new draw
 
-struct Draw2d {
+struct Sprite2d {
   Color currentColor
-  Blob buffer
+  Blob data
 }
 
-def Draw2d.color(@self, Color color)
+def Sprite2d.color(@self, Color color)
   self.currentColor = color
 
-def Draw2d.fill_rect(@self, shape)
-  @self.buffer.append_f32
+def Sprite2d.append_color(@self, Color color)
+  @self.data | .append_f32(color.r)
+  @self.data | .append_f32(color.g)
+  @self.data | .append_f32(color.b)
+  @self.data | .append_f32(color.a)
 
-def Draw2d.fill(@self, shape)
+def Sprite2d.append_vec2(@self, Vec2 vec)
+  @self.data | .append_f32(vec.x)
+  @self.data | .append_f32(vec.y)
 
-def Draw2d.clear(self, Color color)
+def Sprite2d.send_rect(@self, Rect rect)
+  @self | .append_vec2(rect.top_left)
+  @self | .append_color(@currentColor)
+  @self | .append_vec2(rect.top_right)
+  @self | .append_color(@currentColor)
+  @self | .append_vec2(rect.bottom_left)
+  @self | .append_color(@currentColor)
+  @self | .append_vec2(rect.top_right)
+  @self | .append_color(@currentColor)
+  @self | .append_vec2(rect.bottom_right)
+  @self | .append_color(@currentColor)
+  @self | .append_vec2(rect.bottom_left)
+  @self | .append_color(@currentColor)
 
-draw = NewDraw.make
+def Sprite2d.to_vbo(self)
+  vbo = gl.new_vertex_buffer
+  vbo.set_draw_type(:triangles)
+  vbo.set_attribs([:pos 2] [:color 4])
+  vbo.set_data(self.data)
+  vbo
+
+def Sprite2d.fill(@self, shape)
+  if typeof(shape) == Rect
+    @self.fill_rect(shape)
+  else
+    error('unrecognized: ' shape)
+
+struct RenderPass {
+  any shader
+  any viewMat
+}
+
+def RenderPass.init(@self)
+  builder = shader_builder.new
+  @builder.attribute('vec2', 'pos')
+  @builder.attribute('vec4', 'color')
+  @builder.vertexUniform('mat3', 'view')
+  @builder.varying('vec4', 'var_color')
+
+  @builder.vertexBody(
+    <<<
+    void main()
+    {
+        gl_Position = vec4(view * vec3(pos, 1.0), 1.0);
+        var_color = color;
+    }
+    >>>
+  )
+
+  @builder.fragmentBody(
+    <<<
+    void main()
+    {
+        gl_FragColor = var_color;
+    }
+    >>>
+  )
+
+  self.shader = builder.to_shader
+  self.viewMat = improv_util.screenspace_mat3
+
+def RenderPass.start(self)
+  gl.uniform_mat3(:view self.viewMat)
+  gl.use_shader(self.shader)
+
+draw = Sprite2d.make
+render = RenderPass.make.init
 
 def grid_points(Vec2 size)
   set(FuncSeq.make
@@ -40,7 +112,7 @@ def grid_points(Vec2 size)
       seq
   )
 
-def within_rect(Vec2 @vec, Rect rect)
+def stay_inside_rect(Vec2 @vec, Rect rect)
   max(@vec.x rect.x1)
   min(@vec.x rect.x2)
   max(@vec.y rect.y1)
@@ -66,7 +138,7 @@ def PlayerShip.draw(self)
 
 def PlayerShip.update(self)
   @self.loc | add(input.arrows_vec * 3)
-  @self.loc | within_rect(improv.window_rect.grow([-20 -20]))
+  @self.loc | stay_inside_rect(improv.window_rect.grow([-20 -20]))
 
 @playerShip.update
 

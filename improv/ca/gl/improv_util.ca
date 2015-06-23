@@ -1,0 +1,8 @@
+
+require improv
+require matrix
+
+def screenspace_mat3()
+  window_rect = improv.window_rect
+  scale = Vec2.make(2 / window_rect.width, 2 / window_rect.height)
+  matrix.make_mat3.scale([1 -1]).translate([-1 -1]).scale(scale)
