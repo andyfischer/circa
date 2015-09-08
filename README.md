@@ -1,4 +1,21 @@
 
+Hiatus Notice - Nov 2015
+==============
+
+Hi all. This project has had extremely slow development for the past year, so I'm calling
+it, it's officially on hiatus. With two darling kids in my life, it's tough to
+find the time for such an ambitious project.
+
+I will probably take another stab at building a system like this, maybe a few years from now,
+and I think most of this codebase will be rewritten with lessons learned.
+
+In the meantime I'm hacking away on a [new project](https://github.com/andyfischer/ice) which
+is intended to be a foundation for any future language projects.
+
+Thanks for following and keep coding,
+
+-andyf
+
 Introduction
 ============
 
@@ -49,14 +66,23 @@ Directory layout
 ===========
 
  3rdparty/         - External dependencies.
+
  build/            - Created during build process, contains all build artifacts.
+
  docs/             - Documentation.
+
  include/          - Public include files. This is the directory to add to your include dirs.
+
  notes/            - Miscellaneous notes and plan files.
+
  src/              - Source code.
+
  src/ca/           - Builtin Circa scripts.
+
  src/unit_tests/   - C++ based unit tests.
+
  tests/            - Script-based tests.
+
  tools/            - Tools used for development of Circa itself.
 
 Documentation
