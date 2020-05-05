@@ -9,9 +9,6 @@ find the time for such an ambitious project.
 I will probably take another stab at building a system like this, maybe a few years from now,
 and I think most of this codebase will be rewritten with lessons learned.
 
-In the meantime I'm hacking away on a [new project](https://github.com/andyfischer/ice) which
-is intended to be a foundation for any future language projects.
-
 Thanks for following and keep coding,
 
 -andyf
